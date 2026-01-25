@@ -29,6 +29,8 @@ export const coverPageSchema = z.object({
 export const gallerySchema = z.object({
     galeriaPrincipalHabilitada: z.boolean().default(true),
     galeriaPrincipalFotos: z.array(z.string()).default([]),
+    galeriaSecundariaHabilitada: z.boolean().default(false),
+    galeriaSecundariaFotos: z.array(z.string()).default([]),
 });
 
 export const musicSchema = z.object({

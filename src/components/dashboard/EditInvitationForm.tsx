@@ -3,9 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
+
+import { MusicUploader } from "@/components/ui/MusicUploader";
+import { ImageUploader } from "@/components/ui/ImageUploader";
+import { Label } from "@/components/ui/label";
 
 interface Invitation {
     id: string;
@@ -24,6 +29,22 @@ interface Invitation {
     musicaUrl?: string | null;
     templateId: string;
     temaColores: string;
+
+    // Music
+    musicaHabilitada: boolean;
+
+    // Cover
+    portadaHabilitada: boolean;
+    portadaTitulo?: string | null;
+    portadaTextoBoton?: string | null;
+    portadaImagenFondo?: string | null;
+
+    // Gallery
+    galeriaPrincipalHabilitada: boolean;
+    galeriaPrincipalFotos: string | null; // Stored as JSON string in DB usually, need to check schema. 
+    // Wait, in schema it's String[]? No, prisma doesn't support string arrays easily in SQLite/MySQL without parsing, but in Postgres it does. 
+    // In logic I saw: `galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(...) : '[]'`
+    // So it's a string in DB.
 }
 
 interface EditInvitationFormProps {
@@ -50,9 +71,24 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         lugarNombre: invitation.lugarNombre || '',
         direccion: invitation.direccion || '',
         mapUrl: invitation.mapUrl || '',
-        colorPrincipal: temaColores?.colorPrincipal || '#e11d48',
+
+        // Theme
+        colorPrincipal: temaColores?.primaryColor || temaColores?.colorPrincipal || '#e11d48',
         tema: temaColores?.tema || 'moderno',
+
+        // Music
+        musicaHabilitada: invitation.musicaHabilitada,
         musicaUrl: invitation.musicaUrl || '',
+
+        // Cover
+        portadaHabilitada: invitation.portadaHabilitada,
+        portadaTitulo: invitation.portadaTitulo || '',
+        portadaTextoBoton: invitation.portadaTextoBoton || '',
+        portadaImagenFondo: invitation.portadaImagenFondo || '',
+
+        // Gallery
+        galeriaPrincipalHabilitada: invitation.galeriaPrincipalHabilitada,
+        galeriaPrincipalFotos: invitation.galeriaPrincipalFotos ? JSON.parse(invitation.galeriaPrincipalFotos) : [],
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -79,7 +115,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         }
     };
 
-    const handleInputChange = (field: string, value: string) => {
+    const handleInputChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
@@ -235,16 +271,112 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                             />
                         </div>
 
+                        {/* Portada */}
+                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="portadaHabilitada"
+                                    checked={formData.portadaHabilitada}
+                                    onCheckedChange={(checked) => handleInputChange('portadaHabilitada', checked)}
+                                />
+                                <Label htmlFor="portadaHabilitada" className="font-semibold cursor-pointer">Portada de Bienvenida</Label>
+                            </div>
+
+                            {formData.portadaHabilitada && (
+                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                    <div className="space-y-2">
+                                        <Label>Imagen de Fondo</Label>
+                                        <ImageUploader
+                                            currentImage={formData.portadaImagenFondo}
+                                            onImageUploaded={(url) => handleInputChange('portadaImagenFondo', url)}
+                                            aspectRatio={16 / 9}
+                                        />
+                                        <p className="text-xs text-muted-foreground">Se recomienda una imagen horizontal de alta calidad.</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Título</Label>
+                                        <input
+                                            type="text"
+                                            value={formData.portadaTitulo}
+                                            onChange={(e) => handleInputChange('portadaTitulo', e.target.value)}
+                                            className="w-full p-2 border rounded-md"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Texto del Botón</Label>
+                                        <input
+                                            type="text"
+                                            value={formData.portadaTextoBoton}
+                                            onChange={(e) => handleInputChange('portadaTextoBoton', e.target.value)}
+                                            className="w-full p-2 border rounded-md"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Música */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">URL de Música (opcional)</label>
-                            <input
-                                type="url"
-                                value={formData.musicaUrl}
-                                onChange={(e) => handleInputChange('musicaUrl', e.target.value)}
-                                className="w-full p-2 border rounded-md"
-                                placeholder="https://..."
-                            />
+                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                            {/* Note: I didn't add musicaHabilitada to state in previous step, checking... I missed it in formData init. I should add it. */}
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="musicaHabilitada"
+                                    checked={formData.musicaHabilitada}
+                                    onCheckedChange={(checked) => handleInputChange('musicaHabilitada', checked)}
+                                />
+                                <Label htmlFor="musicaHabilitada" className="font-semibold cursor-pointer">Música de Fondo</Label>
+                            </div>
+                            {formData.musicaHabilitada && (
+                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                    <MusicUploader
+                                        currentMusicUrl={formData.musicaUrl}
+                                        onMusicUploaded={(url) => handleInputChange('musicaUrl', url)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Galería Simple (Edición rápida) */}
+                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="galeriaPrincipalHabilitada"
+                                    checked={formData.galeriaPrincipalHabilitada}
+                                    onCheckedChange={(checked) => handleInputChange('galeriaPrincipalHabilitada', checked)}
+                                />
+                                <Label htmlFor="galeriaPrincipalHabilitada" className="font-semibold cursor-pointer">Galería de Fotos ({formData.galeriaPrincipalFotos.length})</Label>
+                            </div>
+                            {formData.galeriaPrincipalHabilitada && (
+                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                    <p className="text-xs text-muted-foreground">Para editar la galería completa, usa el Wizard completo (próximamente) o sube nuevas fotos aquí para reemplazar.</p>
+                                    <ImageUploader
+                                        currentImage=""
+                                        onImageUploaded={(url) => {
+                                            // Simple append 
+                                            const newPhotos = [...formData.galeriaPrincipalFotos, url];
+                                            setFormData(prev => ({ ...prev, galeriaPrincipalFotos: newPhotos }));
+                                        }}
+                                        aspectRatio={1 / 1}
+                                    />
+                                    <div className="grid grid-cols-4 gap-2 mt-2">
+                                        {formData.galeriaPrincipalFotos.map((foto: string, idx: number) => (
+                                            <div key={idx} className="relative aspect-square rounded overflow-hidden group">
+                                                <img src={foto} className="object-cover w-full h-full" alt="Gallery" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newPhotos = formData.galeriaPrincipalFotos.filter((_: string, i: number) => i !== idx);
+                                                        setFormData(prev => ({ ...prev, galeriaPrincipalFotos: newPhotos }));
+                                                    }}
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    X
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Botones */}

@@ -16,6 +16,7 @@ import { InvitationThemeProvider } from "./InvitationThemeProvider";
 import { ScrollReveal } from "./ScrollReveal";
 import { ThemeConfig } from "@/lib/theme-config";
 import Image from "next/image";
+import { MarqueeGallery } from "@/components/animations/MarqueeGallery";
 
 interface InvitationContentProps {
     invitation: any;
@@ -33,13 +34,30 @@ function safeJsonParse(value: string | null | undefined, defaultValue: any = nul
 }
 
 export function InvitationContent({ invitation }: InvitationContentProps) {
+    console.log('DEBUG: InvitationContent received:', JSON.stringify({
+        titulo: invitation.portadaTitulo,
+        fondo: invitation.portadaImagenFondo,
+        galeria: invitation.galeriaPrincipalFotos
+    }, null, 2));
     const [showSplash, setShowSplash] = useState(invitation.portadaHabilitada);
 
     // Parse theme configuration
     const temaColores = safeJsonParse(invitation.temaColores, { colorPrincipal: '#c7757f' });
     const themeConfig: Partial<ThemeConfig> = {
-        primaryColor: temaColores?.colorPrincipal || '#c7757f',
-        // Otros valores del tema si están guardados en la BD
+        colorTemplate: 'rosa-salmon', // Default fallback
+        primaryColor: temaColores?.primaryColor || temaColores?.colorPrincipal || '#c7757f',
+        backgroundColor: temaColores?.backgroundColor || '#ffffff',
+        textDark: temaColores?.textDark || '#1a1a1a',
+        textLight: temaColores?.textLight || '#ffffff',
+        textSecondary: temaColores?.textSecondary || '#666666',
+
+        layout: temaColores?.layout || 'classic',
+        fontFamily: temaColores?.fontFamily || 'poppins',
+        fontScale: temaColores?.fontScale || 1.0,
+        letterSpacing: temaColores?.letterSpacing || 'normal',
+        lineHeight: temaColores?.lineHeight || 'normal',
+        sectionSpacing: temaColores?.sectionSpacing || 100,
+        sectionPadding: temaColores?.sectionPadding || 50,
     };
 
     // Parse arrays directly
@@ -95,26 +113,24 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                             <p className="invitation-event-type">
                                 {invitation.tipo === 'CASAMIENTO' ? 'Nuestra Boda' :
                                     invitation.tipo === 'QUINCE_ANOS' ? 'Mis XV Años' :
-                                        invitation.nombreEvento}
+                                        'Celebración'}
                             </p>
 
                             {/* Nombres - Grande y script elegante */}
-                            {invitation.tipo === 'CASAMIENTO' && (
-                                <h1 className="invitation-names">
-                                    <span>{invitation.nombreNovia}</span>
-                                    <span className="mx-3 opacity-70">&</span>
-                                    <span>{invitation.nombreNovio}</span>
-                                </h1>
+                            {/* Nombres - Grande y script elegante */}
+                            <h1 className="invitation-names">
+                                {invitation.nombreEvento}
+                            </h1>
+
+                            {invitation.tipo === 'CASAMIENTO' && (invitation.nombreNovia || invitation.nombreNovio) && (
+                                <p className="text-2xl mt-4 font-light">
+                                    {invitation.nombreNovia} & {invitation.nombreNovio}
+                                </p>
                             )}
-                            {invitation.tipo === 'QUINCE_ANOS' && (
-                                <h1 className="invitation-names">
+                            {invitation.tipo === 'QUINCE_ANOS' && invitation.nombreQuinceanera && (
+                                <p className="text-2xl mt-4 font-light">
                                     {invitation.nombreQuinceanera}
-                                </h1>
-                            )}
-                            {invitation.tipo !== 'CASAMIENTO' && invitation.tipo !== 'QUINCE_ANOS' && (
-                                <h1 className="invitation-names">
-                                    {invitation.nombreEvento}
-                                </h1>
+                                </p>
                             )}
 
                             {/* Separador decorativo */}
@@ -182,8 +198,7 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                                     >
                                         Galería
                                     </h2>
-                                </div>
-                                <div className={`grid gap-4 ${galeriaPrincipal.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
+                                    {/* <div className={`grid gap-4 ${galeriaPrincipal.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
                                     galeriaPrincipal.length === 2 ? 'grid-cols-2 max-w-2xl mx-auto' :
                                         'grid-cols-2 md:grid-cols-4'
                                     }`}>
@@ -198,6 +213,8 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                                             />
                                         </div>
                                     ))}
+                                </div> */}
+                                    <MarqueeGallery images={galeriaPrincipal} />
                                 </div>
                             </div>
                         </ScrollReveal>

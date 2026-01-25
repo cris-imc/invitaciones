@@ -22,6 +22,9 @@ interface InvitationCardProps {
         fechaEvento: Date;
         lugarNombre: string | null;
         slug: string;
+        nombreNovia?: string | null;
+        nombreNovio?: string | null;
+        nombreQuinceanera?: string | null;
         _count: {
             rsvps: number;
         };
@@ -32,6 +35,16 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const router = useRouter();
+
+    const getDisplayTitle = () => {
+        if (invitation.tipo === 'CASAMIENTO' && invitation.nombreNovia && invitation.nombreNovio) {
+            return `${invitation.nombreNovia} & ${invitation.nombreNovio}`;
+        }
+        if (invitation.tipo === 'QUINCE_ANOS' && invitation.nombreQuinceanera) {
+            return invitation.nombreQuinceanera;
+        }
+        return invitation.nombreEvento;
+    };
 
     const handleDelete = async () => {
         setIsDeleting(true);
@@ -75,7 +88,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                             {invitation.tipo}
                                         </span>
                                     </div>
-                                    <CardTitle className="text-xl">{invitation.nombreEvento}</CardTitle>
+                                    <CardTitle className="text-xl">{getDisplayTitle()}</CardTitle>
                                 </div>
                             </div>
                             <CardDescription className="flex flex-col sm:flex-row gap-4 mt-2">

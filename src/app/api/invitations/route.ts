@@ -83,6 +83,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
+        console.log('DEBUG: POST /api/invitations body:', JSON.stringify(body, null, 2));
 
         // TODO: Obtener userId de la sesión
         const userId = "mock-user-id";
@@ -109,8 +110,39 @@ export async function POST(request: NextRequest) {
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
+                    layout: body.layout || 'classic',
+                    fontFamily: body.fontFamily,
+                    fontScale: body.fontScale,
+                    primaryColor: body.primaryColor,
+                    backgroundColor: body.backgroundColor,
+                    textDark: body.textDark,
+                    textLight: body.textLight,
+                    textSecondary: body.textSecondary,
+                    sectionSpacing: body.sectionSpacing,
+                    sectionPadding: body.sectionPadding,
+                    letterSpacing: body.letterSpacing,
+                    lineHeight: body.lineHeight,
                 }),
+                // 1. PORTADA
+                portadaHabilitada: body.portadaHabilitada !== undefined ? body.portadaHabilitada : true,
+                portadaTitulo: body.portadaTitulo,
+                portadaTextoBoton: body.portadaTextoBoton,
+                portadaImagenFondo: body.portadaImagenFondo,
+
+                // 8. GALERÍA PRINCIPAL
+                galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada !== undefined ? body.galeriaPrincipalHabilitada : true,
+                galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : '[]',
+
+                // 12. GALERÍA SECUNDARIA
+                galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada !== undefined ? body.galeriaSecundariaHabilitada : false,
+                galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : '[]',
+
+                // 2. MÚSICA
+                musicaHabilitada: body.musicaHabilitada !== undefined ? body.musicaHabilitada : false,
+                musicaAutoplay: body.musicaAutoplay !== undefined ? body.musicaAutoplay : false,
+                musicaLoop: body.musicaLoop !== undefined ? body.musicaLoop : true,
                 musicaUrl: body.musicaUrl,
+
                 // Crear álbum automáticamente
                 album: {
                     create: {
@@ -118,7 +150,7 @@ export async function POST(request: NextRequest) {
                         moderacion: false,
                     },
                 },
-            },
+            } as any, // Cast to any because Prisma Client might be stale due to file locks
             include: {
                 album: true,
             },
@@ -174,8 +206,39 @@ export async function PUT(request: NextRequest) {
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
+                    layout: body.layout || 'classic',
+                    fontFamily: body.fontFamily,
+                    fontScale: body.fontScale,
+                    primaryColor: body.primaryColor,
+                    backgroundColor: body.backgroundColor,
+                    textDark: body.textDark,
+                    textLight: body.textLight,
+                    textSecondary: body.textSecondary,
+                    sectionSpacing: body.sectionSpacing,
+                    sectionPadding: body.sectionPadding,
+                    letterSpacing: body.letterSpacing,
+                    lineHeight: body.lineHeight,
                 }),
-            },
+
+                // 1. PORTADA
+                portadaHabilitada: body.portadaHabilitada,
+                portadaTitulo: body.portadaTitulo,
+                portadaTextoBoton: body.portadaTextoBoton,
+                portadaImagenFondo: body.portadaImagenFondo,
+
+                // 8. GALERÍA PRINCIPAL
+                galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada,
+                galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : undefined,
+
+                // 12. GALERÍA SECUNDARIA
+                galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada,
+                galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : undefined,
+
+                // 2. MÚSICA
+                musicaHabilitada: body.musicaHabilitada,
+                musicaAutoplay: body.musicaAutoplay,
+                musicaLoop: body.musicaLoop,
+            } as any,
             include: {
                 album: true,
             },

@@ -24,6 +24,14 @@ export function StepPreview() {
             const payload = {
                 ...data,
                 ...themeConfig, // This overwrites design fields in data if they overlap, or adds new ones
+
+                // Explicitly ensure objects are passed (some frameworks strip undefineds/partials weirdly)
+                portadaHabilitada: data.portadaHabilitada,
+                galeriaPrincipalHabilitada: data.galeriaPrincipalHabilitada,
+                galeriaPrincipalFotos: data.galeriaPrincipalFotos,
+                galeriaSecundariaHabilitada: data.galeriaSecundariaHabilitada,
+                galeriaSecundariaFotos: data.galeriaSecundariaFotos,
+                musicaHabilitada: data.musicaHabilitada,
             };
 
             console.log('Datos enviados:', payload);

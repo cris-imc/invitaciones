@@ -6,24 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { ImageUploader } from "@/components/ui/ImageUploader";
+import { X } from "lucide-react";
 
 export function StepGallery() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
-    const [newPhotoUrl, setNewPhotoUrl] = useState("");
 
-    const galeriaPrincipal = data.galeriaPrincipalFotos 
-        ? (typeof data.galeriaPrincipalFotos === 'string' 
-            ? JSON.parse(data.galeriaPrincipalFotos) 
+    const galeriaPrincipal = data.galeriaPrincipalFotos
+        ? (typeof data.galeriaPrincipalFotos === 'string'
+            ? JSON.parse(data.galeriaPrincipalFotos)
             : data.galeriaPrincipalFotos)
         : [];
 
-    const addPhoto = () => {
-        if (newPhotoUrl.trim()) {
-            const updatedPhotos = [...galeriaPrincipal, newPhotoUrl.trim()];
-            setData({ galeriaPrincipalFotos: updatedPhotos as any });
-            setNewPhotoUrl("");
-        }
+    const handleImageUploaded = (userId: string) => {
+        const updatedPhotos = [...galeriaPrincipal, userId];
+        setData({ galeriaPrincipalFotos: updatedPhotos as any });
     };
 
     const removePhoto = (index: number) => {
@@ -36,7 +33,7 @@ export function StepGallery() {
             <div>
                 <h2 className="text-2xl font-bold mb-2">Galería de Fotos</h2>
                 <p className="text-muted-foreground">
-                    Agrega fotos para mostrar en tu invitación
+                    Sube las mejores fotos para tu invitación. Se recomienda formato cuadrado (1:1).
                 </p>
             </div>
 
@@ -56,38 +53,31 @@ export function StepGallery() {
 
                 {data.galeriaPrincipalHabilitada && (
                     <>
-                        <div className="space-y-2">
-                            <Label>Agregar foto (URL)</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    placeholder="https://ejemplo.com/foto.jpg"
-                                    value={newPhotoUrl}
-                                    onChange={(e) => setNewPhotoUrl(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && addPhoto()}
-                                />
-                                <Button type="button" onClick={addPhoto} size="icon">
-                                    <Plus className="w-4 h-4" />
-                                </Button>
-                            </div>
+                        <div className="space-y-4">
+                            <Label>Agregar nueva foto</Label>
+                            <ImageUploader
+                                onImageUploaded={handleImageUploaded}
+                                aspectRatio={1}
+                            />
                         </div>
 
                         {galeriaPrincipal.length > 0 && (
                             <div className="space-y-2">
                                 <Label>Fotos agregadas ({galeriaPrincipal.length})</Label>
-                                <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {galeriaPrincipal.map((url: string, index: number) => (
-                                        <div key={index} className="relative group">
+                                        <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border">
                                             <img
                                                 src={url}
                                                 alt={`Foto ${index + 1}`}
-                                                className="w-full h-24 object-cover rounded border"
+                                                className="w-full h-full object-cover"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => removePhoto(index)}
-                                                className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
                                             >
-                                                <X className="w-3 h-3" />
+                                                <X className="w-4 h-4" />
                                             </button>
                                         </div>
                                     ))}

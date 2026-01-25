@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ImageUploader } from "@/components/ui/ImageUploader";
 
 export function StepCoverPage() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
@@ -55,14 +56,13 @@ export function StepCoverPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="portadaImagenFondo">URL de imagen de fondo (opcional)</Label>
-                            <Input
-                                id="portadaImagenFondo"
-                                type="url"
-                                placeholder="https://ejemplo.com/imagen.jpg"
-                                value={data.portadaImagenFondo || ""}
-                                onChange={(e) => setData({ portadaImagenFondo: e.target.value })}
+                            <Label htmlFor="portadaImagenFondo">Imagen de Fondo</Label>
+                            <ImageUploader
+                                currentImage={data.portadaImagenFondo}
+                                onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
+                                aspectRatio={16 / 9} // Horizontal format
                             />
+                            <p className="text-xs text-muted-foreground">Se recomienda una imagen horizontal de alta calidad.</p>
                         </div>
                     </>
                 )}

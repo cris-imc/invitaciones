@@ -19,29 +19,43 @@ export function MusicPlayer({
     const [isPlaying, setIsPlaying] = useState(autoplay);
 
     useEffect(() => {
-        if (audioRef.current && autoplay) {
-            // Intentar reproducir automáticamente
-            audioRef.current.play().catch(() => {
-                setIsPlaying(false);
-            });
-        }
-    }, [autoplay]);
+        const audio = audioRef.current;
+        if (!audio) return;
 
-    const togglePlay = () => {
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-            } else {
-                audioRef.current.play();
+        const handlePlay = () => setIsPlaying(true);
+        const handlePause = () => setIsPlaying(false);
+
+        audio.addEventListener('play', handlePlay);
+        audio.addEventListener('pause', handlePause);
+
+        if (autoplay) {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    setIsPlaying(false);
+                });
             }
-            setIsPlaying(!isPlaying);
+        }
+
+        return () => {
+            audio.removeEventListener('play', handlePlay);
+            audio.removeEventListener('pause', handlePause);
+        };
+    }, [autoplay]);
+    const togglePlay = () => {
+        if (!audioRef.current) return;
+
+        if (audioRef.current.paused) {
+            audioRef.current.play().catch(e => console.error("Play error:", e));
+        } else {
+            audioRef.current.pause();
         }
     };
 
     return (
         <>
             <audio ref={audioRef} loop={loop} src={musicaUrl} />
-            
+
             <Button
                 onClick={togglePlay}
                 size="icon"
