@@ -172,18 +172,21 @@ export function StepDesign() {
             {/* Tipografía */}
             <div className="space-y-2">
                 <Label htmlFor="fontFamily">Fuente Principal</Label>
-                <select
-                    id="fontFamily"
-                    value={themeConfig.fontFamily}
-                    onChange={(e) => setThemeConfig({ fontFamily: e.target.value as FontFamilyId })}
-                    className="w-full p-2 rounded-md"
-                >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {Object.values(FONT_FAMILIES).map((font) => (
-                        <option key={font.id} value={font.id}>
-                            {font.name}
-                        </option>
+                        <button
+                            key={font.id}
+                            type="button"
+                            onClick={() => setThemeConfig({ fontFamily: font.id as FontFamilyId })}
+                            className={`p-3 border rounded-md text-left transition-all hover:border-primary ${themeConfig.fontFamily === font.id ? 'border-primary bg-primary/5 ring-1 ring-primary' : ''}`}
+                        >
+                            <span className="block text-sm font-medium mb-1">{font.name}</span>
+                            <span className="block text-xl" style={{ fontFamily: font.cssValue }}>
+                                ABCabc 123
+                            </span>
+                        </button>
                     ))}
-                </select>
+                </div>
             </div>
 
             {/* Opciones Avanzadas */}

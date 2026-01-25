@@ -11,10 +11,12 @@ interface DressCodeProps {
 
 export function DressCode({
     icono = "👔",
-    titulo,
+    titulo = "Dress Code",
     tipo,
     observaciones,
 }: DressCodeProps) {
+    // Determine effective title: use prop if provided, otherwise default
+    const displayTitle = titulo || "Dress Code";
     return (
         <section className="py-16 md:py-20" style={{ backgroundColor: 'var(--color-background)' }}>
             <div className="max-w-3xl mx-auto text-center px-6">
@@ -22,18 +24,18 @@ export function DressCode({
                     <div className="text-5xl">{icono}</div>
                     {/* Título y tipo en una línea */}
                     <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-                        <h2 
+                        <h2
                             className="text-2xl"
-                            style={{ 
-                                fontFamily: "'Parisienne', cursive", 
+                            style={{
+                                fontFamily: "'Parisienne', cursive",
                                 color: 'var(--color-primary)'
                             }}
                         >
-                            Dress Code:
+                            {displayTitle}:
                         </h2>
-                        <p 
+                        <p
                             className="text-base"
-                            style={{ 
+                            style={{
                                 fontFamily: "'Montserrat', sans-serif",
                                 fontWeight: '500',
                                 color: 'var(--color-text-dark)'
@@ -43,11 +45,11 @@ export function DressCode({
                         </p>
                     </div>
                 </div>
-                
+
                 {observaciones && (
-                    <p 
+                    <p
                         className="text-sm leading-relaxed max-w-xl mx-auto"
-                        style={{ 
+                        style={{
                             fontFamily: "'Montserrat', sans-serif",
                             color: 'var(--color-text-secondary)'
                         }}

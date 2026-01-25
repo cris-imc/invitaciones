@@ -65,10 +65,16 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
     const galeriaPrincipal = safeJsonParse(invitation.galeriaPrincipalFotos, []);
     const galeriaSecundaria = safeJsonParse(invitation.galeriaSecundariaFotos, []);
 
+    // Helper para obtener solo el primer nombre
+    const getFirstName = (fullName: string | null | undefined) => {
+        if (!fullName) return '';
+        return fullName.trim().split(' ')[0];
+    };
+
     // Calcular nombre(s) para despedida
     const nombreFestejado = invitation.tipo === 'CASAMIENTO'
-        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}`
-        : invitation.nombreQuinceanera || invitation.nombreEvento;
+        ? `${getFirstName(invitation.nombreNovia)} & ${getFirstName(invitation.nombreNovio)}`
+        : getFirstName(invitation.nombreQuinceanera) || invitation.nombreEvento;
 
     // Check if event has passed (one day after event date)
     const eventDate = new Date(invitation.fechaEvento);
@@ -113,7 +119,7 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                             titulo={invitation.portadaTitulo || ""}
                             nombre={nombreFestejado}
                             nombreInvitado=""
-                            textoBoton={invitation.portadaTextoBoton || "ABRIR INVITACIÓN"}
+                            textoBoton={invitation.portadaTextoBoton || "INGRESAR"}
                             imagenFondo={invitation.portadaImagenFondo}
                             onEnter={() => setShowSplash(false)}
                         />
@@ -155,17 +161,17 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                                     {/* Nombres - Grande y script elegante */}
                                     {/* Nombres - Grande y script elegante */}
                                     <h1 className="invitation-names">
-                                        {invitation.nombreEvento}
+                                        {nombreFestejado}
                                     </h1>
 
                                     {invitation.tipo === 'CASAMIENTO' && (invitation.nombreNovia || invitation.nombreNovio) && (
                                         <p className="text-2xl mt-4 font-light">
-                                            {invitation.nombreNovia} & {invitation.nombreNovio}
+                                            {getFirstName(invitation.nombreNovia)} & {getFirstName(invitation.nombreNovio)}
                                         </p>
                                     )}
                                     {invitation.tipo === 'QUINCE_ANOS' && invitation.nombreQuinceanera && (
                                         <p className="text-2xl mt-4 font-light">
-                                            {invitation.nombreQuinceanera}
+                                            {getFirstName(invitation.nombreQuinceanera)}
                                         </p>
                                     )}
 
@@ -209,8 +215,8 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                             <ScrollReveal>
                                 <DressCode
                                     icono={invitation.dresscodeIcono}
-                                    titulo={invitation.dresscodeTitulo || "DRESS CODE"}
-                                    tipo={invitation.dresscodeTipo || ""}
+                                    titulo={invitation.dresscodeTitulo || "Código de Vestimenta"}
+                                    tipo={invitation.dresscodeTipo || "Elegante Sport"}
                                     observaciones={invitation.dresscodeObservaciones}
                                 />
                             </ScrollReveal>

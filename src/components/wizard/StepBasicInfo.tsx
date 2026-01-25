@@ -145,6 +145,22 @@ export function StepBasicInfo() {
                         />
                     )}
 
+                    {tipo !== 'CASAMIENTO' && tipo !== 'QUINCE_ANOS' && (
+                        <FormField
+                            control={form.control}
+                            name="nombreQuinceanera"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nombre del Festejado/a (Opcional)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nombre de la persona o empresa" {...field} />
+                                    </FormControl>
+                                    <p className="text-xs text-muted-foreground">Si lo dejas vacío, se usará el nombre del evento.</p>
+                                </FormItem>
+                            )}
+                        />
+                    )}
+
                     <div className="flex justify-between pt-4">
                         <Button type="button" variant="outline" onClick={prevStep}>Atrás</Button>
                         <Button type="submit">Siguiente Paso</Button>

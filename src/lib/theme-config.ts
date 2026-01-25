@@ -147,6 +147,30 @@ export const FONT_FAMILIES = {
     cssValue: "'Roboto', sans-serif",
     googleFont: 'Roboto:300,400,500,700',
   },
+  greatvibes: {
+    id: 'greatvibes',
+    name: 'Great Vibes (Cursiva)',
+    cssValue: "'Great Vibes', cursive",
+    googleFont: 'Great+Vibes',
+  },
+  merriweather: {
+    id: 'merriweather',
+    name: 'Merriweather (Serif)',
+    cssValue: "'Merriweather', serif",
+    googleFont: 'Merriweather:300,400,700',
+  },
+  opensans: {
+    id: 'opensans',
+    name: 'Open Sans (Legible)',
+    cssValue: "'Open Sans', sans-serif",
+    googleFont: 'Open+Sans:300,400,600,700',
+  },
+  lora: {
+    id: 'lora',
+    name: 'Lora (Elegante)',
+    cssValue: "'Lora', serif",
+    googleFont: 'Lora:400,500,600',
+  },
 } as const;
 
 export type FontFamilyId = keyof typeof FONT_FAMILIES;

@@ -10,13 +10,8 @@ import { InvitationCard } from "@/components/dashboard/InvitationCard";
 
 async function getInvitations() {
     // TODO: Obtener userId de la sesión cuando tengamos auth
-    // Por ahora, buscar el usuario demo o mostrar todas las invitaciones
-    const demoUser = await prisma.user.findFirst({
-        where: { email: 'demo@invitadigital.com' }
-    });
-
+    // Por ahora, mostrar todas las invitaciones (desarrollo)
     const invitations = await prisma.invitation.findMany({
-        where: demoUser ? { userId: demoUser.id } : {},
         orderBy: { createdAt: 'desc' },
         include: {
             _count: {

@@ -48,7 +48,15 @@ export function StepTrivia() {
     };
 
     const handleNext = () => {
-        setData({ triviaPreguntas: JSON.stringify(preguntas) });
+        // If there is a pending question (has text), add it effectively
+        let finalPreguntas = [...preguntas];
+        if (currentQuestion.pregunta.trim() && currentQuestion.opciones.every(op => op.trim())) {
+            finalPreguntas.push(currentQuestion);
+            // Optional: alert user or just do it silently
+            // alert("Se agregó la última pregunta que estabas editando.");
+        }
+
+        setData({ triviaPreguntas: JSON.stringify(finalPreguntas) });
         nextStep();
     };
 

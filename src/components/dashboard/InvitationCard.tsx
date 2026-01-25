@@ -42,12 +42,17 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
             return fullName.trim().split(' ')[0];
         };
 
+        // Para casamientos: mostrar nombres de novios
         if (invitation.tipo === 'CASAMIENTO' && invitation.nombreNovia && invitation.nombreNovio) {
             return `${getFirstName(invitation.nombreNovia)} & ${getFirstName(invitation.nombreNovio)}`;
         }
-        if (invitation.tipo === 'QUINCE_ANOS' && invitation.nombreQuinceanera) {
+        
+        // Para otros eventos: mostrar nombre del festejado si existe
+        if (invitation.nombreQuinceanera) {
             return getFirstName(invitation.nombreQuinceanera);
         }
+        
+        // Si no hay nombres específicos, mostrar el título del evento
         return invitation.nombreEvento;
     };
 
@@ -83,8 +88,8 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${invitation.estado === 'ACTIVA'
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-yellow-100 text-yellow-700'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {invitation.estado}
                                         </span>
