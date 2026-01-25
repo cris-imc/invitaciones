@@ -124,7 +124,12 @@ model Invitation {
   triviaPreguntas String? // JSON array de preguntas
   triviaBotonTexto String?
   
-  // 15. CONFIRMACIÓN
+  // 15. CONFIRMACIÓN & RSVP
+  rsvpEnabled     Boolean   @default(true) // Replaces confirmacionHabilitada
+  rsvpType        String?   @default("INDIVIDUAL") // INDIVIDUAL, FAMILY
+  rsvpDeadline    DateTime? // Replaces confirmacionFechaLimite
+  
+  // Legacy confirmation fields (keep for now or migrate)
   confirmacionHabilitada Boolean @default(true)
   confirmacionIcono String?
   confirmacionTitulo String?
@@ -140,8 +145,29 @@ model Invitation {
   
   // Relaciones
   album           Album?
-  rsvps           RSVP[]
+  rsvps           RSVP[]    // Legacy open RSVPs
+  guests          Guest[]   // New Invite-only Guest list
   cuestionario    Cuestionario?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Guest {
+  id              String    @id @default(cuid())
+  invitationId    String
+  invitation      Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  
+  name            String    // "Familia Perez" or "Juan Perez"
+  type            String    @default("INDIVIDUAL") // INDIVIDUAL, FAMILY
+  expectedCount   Int       @default(1) // Max people allowed for this guest/family
+  
+  uniqueToken     String    @unique // Secure link token
+  
+  status          String    @default("PENDING") // PENDING, CONFIRMED, DECLINED
+  attendingCount  Int       @default(0) // Actual number attending
+  message         String?   // Optional message to host
+  responseDate    DateTime?
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -167,6 +193,7 @@ model Foto {
   createdAt       DateTime  @default(now())
 }
 
+// Legacy Open RSVP (Keeping for backward compatibility if needed, or migration)
 model RSVP {
   id                  String    @id @default(cuid())
   invitationId        String

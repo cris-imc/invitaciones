@@ -11,6 +11,7 @@ import { SharedAlbum } from "./SharedAlbum";
 import { GiftInfo } from "./GiftInfo";
 import { FinalMessage } from "./FinalMessage";
 import { RSVPForm } from "./RSVPForm";
+import { PersonalizedRsvpForm } from "./PersonalizedRsvpForm";
 import { Farewell } from "./Farewell";
 import { InvitationThemeProvider } from "./InvitationThemeProvider";
 import { ScrollReveal } from "./ScrollReveal";
@@ -21,6 +22,8 @@ import { QuizTrivia } from "./QuizTrivia";
 
 interface InvitationContentProps {
     invitation: any;
+    guest?: any;
+    isPersonalized?: boolean;
 }
 
 // Helper function para parsear JSON de forma segura
@@ -34,7 +37,7 @@ function safeJsonParse(value: string | null | undefined, defaultValue: any = nul
     }
 }
 
-export function InvitationContent({ invitation }: InvitationContentProps) {
+export function InvitationContent({ invitation, guest, isPersonalized = false }: InvitationContentProps) {
     console.log('DEBUG: InvitationContent received:', JSON.stringify({
         titulo: invitation.portadaTitulo,
         fondo: invitation.portadaImagenFondo,
@@ -371,7 +374,15 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                                                 </p>
                                             )}
                                         </div>
-                                        <RSVPForm invitationId={invitation.id} />
+
+                                        {isPersonalized && guest ? (
+                                            <PersonalizedRsvpForm
+                                                guest={guest}
+                                                onSuccess={() => alert("¡Gracias por confirmar!")}
+                                            />
+                                        ) : (
+                                            <RSVPForm invitationId={invitation.id} />
+                                        )}
                                     </div>
                                 </ScrollReveal>
                             </section>

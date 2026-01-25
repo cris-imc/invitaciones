@@ -10,7 +10,7 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card";
-import { MoreHorizontal, Calendar, MapPin, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Calendar, MapPin, Pencil, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface InvitationCardProps {
@@ -46,12 +46,12 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
         if (invitation.tipo === 'CASAMIENTO' && invitation.nombreNovia && invitation.nombreNovio) {
             return `${getFirstName(invitation.nombreNovia)} & ${getFirstName(invitation.nombreNovio)}`;
         }
-        
+
         // Para otros eventos: mostrar nombre del festejado si existe
         if (invitation.nombreQuinceanera) {
             return getFirstName(invitation.nombreQuinceanera);
         }
-        
+
         // Si no hay nombres específicos, mostrar el título del evento
         return invitation.nombreEvento;
     };
@@ -137,6 +137,16 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                         <Pencil className="w-3 h-3" />
                                         Editar
                                     </Button>
+                                    <Link href={`/dashboard/invitaciones/${invitation.id}/guests`}>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="h-9 gap-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                                        >
+                                            <Users className="w-3 h-3" />
+                                            Invitados
+                                        </Button>
+                                    </Link>
                                     <Button
                                         variant="destructive"
                                         size="sm"
