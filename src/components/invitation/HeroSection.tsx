@@ -1,6 +1,7 @@
 "use client";
 
-import { Heart } from "lucide-react";
+import { Heart, ChevronDown } from "lucide-react";
+import { Countdown } from "./Countdown";
 
 interface HeroSectionProps {
     nombreEvento: string;
@@ -10,6 +11,7 @@ interface HeroSectionProps {
     nombreQuinceanera?: string | null;
     fechaEvento: Date;
     colorPrincipal: string;
+    imagenPortada?: string | null;
 }
 
 export function HeroSection({
@@ -20,39 +22,86 @@ export function HeroSection({
     nombreQuinceanera,
     fechaEvento,
     colorPrincipal,
+    imagenPortada,
 }: HeroSectionProps) {
-    const scrollToCountdown = () => {
-        document.getElementById('countdown')?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToDetails = () => {
+        const nextSection = document.getElementById('detalles');
+        nextSection?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // Calculate dynamic font size based on total name length to prevent line breaks
+    const getNameFontSize = () => {
+        let displayName = '';
+
+        if (tipo === 'CASAMIENTO') {
+            displayName = `${nombreNovia || 'Novia'} & ${nombreNovio || 'Novio'}`;
+        } else {
+            displayName = nombreQuinceanera || nombreEvento;
+        }
+
+        const length = displayName.length;
+
+        // Adjust font sizes based on character count
+        if (length > 40) return 'text-2xl md:text-3xl lg:text-4xl';
+        if (length > 30) return 'text-3xl md:text-4xl lg:text-5xl';
+        if (length > 14) return 'text-5xl md:text-6xl lg:text-7xl';
+        return 'text-6xl md:text-8xl lg:text-9xl';
     };
 
     return (
         <div
-            className="relative h-screen flex items-center justify-center overflow-hidden"
+            className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden pb-16"
             style={{
-                background: `linear-gradient(135deg, ${colorPrincipal}15 0%, ${colorPrincipal}05 100%)`,
+                backgroundColor: '#f8f8f8',
             }}
         >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
+            {/* Background Image with reduced opacity */}
+            {imagenPortada && (
+                <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{
+                        backgroundImage: `url(${imagenPortada})`,
+                        opacity: 0.6,
+                    }}
+                />
+            )}
 
-            <div className="relative z-10 text-center px-4 space-y-8 animate-in fade-in duration-1000">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
-                    <Heart className="w-10 h-10 text-primary fill-primary" />
-                </div>
+            {/* Lighter gradient overlay for better visibility */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/20 to-white/40" />
 
-                <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight">
-                    {nombreEvento}
-                </h1>
+            {/* Main Content */}
+            <div className="relative z-10 text-center px-4 flex-1 flex flex-col justify-center items-center w-full max-w-4xl mx-auto mt-10">
 
-                <p className="text-2xl md:text-3xl text-muted-foreground font-light">
-                    {tipo === 'CASAMIENTO' && `${nombreNovia} & ${nombreNovio}`}
-                    {tipo === 'QUINCE_ANOS' && nombreQuinceanera}
-                </p>
-
-                <div className="pt-8">
-                    <p className="text-lg text-muted-foreground mb-2">
-                        {tipo === 'CASAMIENTO' ? 'Nos casamos el' : 'Celebramos el'}
+                {/* Overlapping Typography Layout */}
+                <div className="relative mb-8">
+                    {/* Event Type / Pre-title */}
+                    <p
+                        className="text-lg md:text-xl tracking-[0.3em] uppercase text-muted-foreground mb-4 font-sans"
+                        style={{ fontFamily: "'Montserrat', sans-serif" }}
+                    >
+                        {nombreEvento}
                     </p>
-                    <p className="text-2xl font-semibold">
+
+                    {/* Names with Overlap */}
+                    <div className="relative">
+                        <h1
+                            className={`leading-tight text-gray-900 ${getNameFontSize()}`}
+                            style={{ fontFamily: "'Parisienne', cursive", opacity: 0.9 }}
+                        >
+                            {tipo === 'CASAMIENTO' ? (
+                                <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-8">
+                                    <span className="leading-tight">{nombreNovia || "Novia"}</span>
+                                    <span className="text-primary italic text-4xl md:text-6xl my-2 md:my-0" style={{ fontFamily: "'Parisienne', cursive" }}>&</span>
+                                    <span className="leading-tight">{nombreNovio || "Novio"}</span>
+                                </div>
+                            ) : (
+                                <span>{nombreQuinceanera || nombreEvento}</span>
+                            )}
+                        </h1>
+                    </div>
+
+                    {/* Date */}
+                    <p className="mt-6 text-xl md:text-2xl text-gray-700 font-light border-t border-b border-gray-200 py-2 inline-block px-8">
                         {new Date(fechaEvento).toLocaleDateString('es-AR', {
                             day: 'numeric',
                             month: 'long',
@@ -61,14 +110,16 @@ export function HeroSection({
                     </p>
                 </div>
 
-                <div className="pt-4">
-                    <button
-                        onClick={scrollToCountdown}
-                        className="text-primary hover:underline animate-bounce"
-                    >
-                        ↓ Ver más ↓
-                    </button>
+                {/* Arrow Down */}
+                <div className="animate-bounce mb-8 text-primary/50">
+                    <ChevronDown className="w-8 h-8" />
                 </div>
+
+            </div>
+
+            {/* Integrated Countdown - Overlapping Bottom */}
+            <div className="relative z-20 w-full mb-[-4rem] md:mb-[-5rem]">
+                <Countdown targetDate={fechaEvento} />
             </div>
         </div>
     );

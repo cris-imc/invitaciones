@@ -52,8 +52,17 @@ export function StepBasicInfo() {
                             <FormItem>
                                 <FormLabel>Título de la Invitación</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Ej: Nuestra Boda, Mis 15, etc." {...field} />
+                                    <Input placeholder={
+                                        tipo === 'CASAMIENTO' ? "Ej: Nuestra Boda" :
+                                            tipo === 'QUINCE_ANOS' ? "Ej: Mis 15 Años" :
+                                                "Ej: Mi Cumpleaños, Mi Bautismo, etc."
+                                    } {...field} />
                                 </FormControl>
+                                <p className="text-xs text-muted-foreground">
+                                    {tipo === 'QUINCE_ANOS'
+                                        ? "Este es el título general de la invitación. Tu nombre lo ingresarás en el siguiente campo."
+                                        : "Este es el título general que aparecerá en la invitación."}
+                                </p>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -136,10 +145,13 @@ export function StepBasicInfo() {
                             name="nombreQuinceanera"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Nombre de la Quinceañera</FormLabel>
+                                    <FormLabel>Tu Nombre</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Nombre" {...field} />
+                                        <Input placeholder="Ej: María, Sofía, Valentina..." {...field} />
                                     </FormControl>
+                                    <p className="text-xs text-muted-foreground">
+                                        Este nombre aparecerá destacado en la invitación.
+                                    </p>
                                 </FormItem>
                             )}
                         />

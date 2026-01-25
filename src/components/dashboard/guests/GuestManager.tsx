@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Users, UserPlus, Link as LinkIcon, Trash2, CalendarIcon, CheckCircle, XCircle, Clock } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 
 interface Guest {
     id: string;
@@ -37,6 +38,7 @@ export function GuestManager({ invitationId, initialRsvpEnabled }: GuestManagerP
     const [isLoading, setIsLoading] = useState(true);
     const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
     const [activeTab, setActiveTab] = useState("list");
+    const { showToast } = useToast();
 
     // Form States
     const [newGuestName, setNewGuestName] = useState("");
@@ -82,12 +84,13 @@ export function GuestManager({ invitationId, initialRsvpEnabled }: GuestManagerP
                 setGuests([newGuest, ...guests]);
                 setNewGuestName("");
                 setNewGuestCount(1);
-                // toast.success("Invitado agregado");
+                showToast("Invitado agregado exitosamente", "success");
             } else {
-                alert("Error al agregar invitado");
+                showToast("Error al agregar invitado", "error");
             }
         } catch (error) {
             console.error(error);
+            showToast("Error de conexión", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -109,7 +112,7 @@ export function GuestManager({ invitationId, initialRsvpEnabled }: GuestManagerP
     const copyLink = (token: string) => {
         const url = `${window.location.origin}/invite/${invitationId}/${token}`;
         navigator.clipboard.writeText(url);
-        alert("¡Enlace copiado! Compártelo con el invitado.");
+        showToast("¡Enlace copiado! Compártelo con el invitado.", "success");
     };
 
     // Stats

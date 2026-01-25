@@ -11,20 +11,26 @@ import { InvitationCard } from "@/components/dashboard/InvitationCard";
 async function getInvitations() {
     // TODO: Obtener userId de la sesión cuando tengamos auth
     // Por ahora, mostrar todas las invitaciones (desarrollo)
-    const invitations = await prisma.invitation.findMany({
+    const invitationsData = await prisma.invitation.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
-            _count: {
+            guests: {
+                where: {
+                    status: 'CONFIRMED'
+                },
                 select: {
-                    rsvps: {
-                        where: {
-                            asistencia: 'CONFIRMA'
-                        }
-                    }
+                    attendingCount: true
                 }
             }
         }
     });
+
+    const invitations = invitationsData.map(inv => ({
+        ...inv,
+        _count: {
+            guests: inv.guests.reduce((sum, g) => sum + (g.attendingCount || 0), 0)
+        }
+    }));
 
     return invitations;
 }

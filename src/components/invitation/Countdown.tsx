@@ -45,47 +45,35 @@ export function Countdown({ targetDate }: CountdownProps) {
 
     return (
         <div className="py-16 md:py-20" style={{ backgroundColor: 'var(--color-background)' }}>
-            <div className="container px-6 mx-auto max-w-3xl">
-                <div className="text-center mb-8">
-                    <span 
-                        className="text-xs uppercase tracking-[0.25em] block mb-3"
+            <div className="container px-6 mx-auto max-w-4xl">
+                <div className="text-center mb-10">
+                    <span
+                        className="text-sm tracking-[0.3em] block mb-4 font-medium uppercase"
                         style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}
                     >
-                        Cuenta Regresiva
+                        FALTAN
                     </span>
-                    <h2 
-                        className="text-2xl md:text-3xl"
-                        style={{ color: 'var(--color-primary)', fontFamily: "'Parisienne', cursive" }}
-                    >
-                        Faltan
-                    </h2>
                 </div>
-                
-                <div className="flex justify-center gap-3 md:gap-6">
+
+                <div className="flex flex-wrap justify-center gap-4 md:gap-8">
                     {Object.entries(timeLeft).map(([unit, value]) => (
                         <div key={unit} className="text-center flex flex-col items-center">
-                            <div 
-                                className="w-18 h-18 md:w-24 md:h-24 flex items-center justify-center rounded-xl bg-white shadow-sm border border-gray-100"
-                                style={{ 
-                                    width: '72px',
-                                    height: '72px',
-                                    fontFamily: "'Montserrat', sans-serif",
-                                    fontSize: '28px',
-                                    fontWeight: '600',
+                            <div
+                                className="w-20 h-24 md:w-32 md:h-40 flex items-center justify-center rounded-sm bg-white shadow-lg border-b-4 border-primary/20"
+                                style={{
+                                    fontFamily: "var(--font-ornamental)",
                                     color: 'var(--color-primary)',
                                 }}
                             >
-                                {String(value).padStart(2, '0')}
+                                <span className="text-4xl md:text-6xl font-bold">
+                                    {String(value).padStart(2, '0')}
+                                </span>
                             </div>
-                            <span 
-                                className="mt-3 block"
+                            <span
+                                className="mt-4 block text-xs md:text-sm font-bold tracking-[0.2em] uppercase"
                                 style={{
                                     fontFamily: "'Montserrat', sans-serif",
-                                    fontSize: '11px',
-                                    fontWeight: '500',
                                     color: 'var(--color-text-secondary)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.15em',
                                 }}
                             >
                                 {labels[unit]}

@@ -55,19 +55,19 @@ export function PhotoGallery({ albumId, photos }: PhotoGalleryProps) {
         <div className="py-16 md:py-24" style={{ backgroundColor: 'var(--color-background)' }}>
             <div className="container px-6 mx-auto max-w-6xl">
                 <div className="text-center mb-12">
-                    <span 
-                        className="text-xs uppercase tracking-[0.25em] block mb-3"
+                    <span
+                        className="text-xs tracking-[0.25em] block mb-3"
                         style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}
                     >
                         Recuerdos
                     </span>
-                    <h2 
+                    <h2
                         className="text-3xl md:text-4xl mb-4"
-                        style={{ color: 'var(--color-primary)', fontFamily: "'Parisienne', cursive" }}
+                        style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}
                     >
-                        Galería de Fotos
+                        Galería
                     </h2>
-                    <p 
+                    <p
                         className="text-sm"
                         style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}
                     >
@@ -79,13 +79,13 @@ export function PhotoGallery({ albumId, photos }: PhotoGalleryProps) {
                     {/* Upload Button */}
                     <div className="flex justify-center">
                         <label htmlFor="photo-upload">
-                            <Button 
-                                variant="outline" 
-                                className="gap-2 cursor-pointer rounded-full px-8 py-5 border-2 hover:opacity-80 transition-opacity" 
-                                disabled={isUploading} 
+                            <Button
+                                variant="outline"
+                                className="gap-2 cursor-pointer rounded-full px-8 py-5 border-2 hover:opacity-80 transition-opacity"
+                                disabled={isUploading}
                                 asChild
-                                style={{ 
-                                    borderColor: 'var(--color-primary)', 
+                                style={{
+                                    borderColor: 'var(--color-primary)',
                                     color: 'var(--color-primary)',
                                     fontFamily: "'Montserrat', sans-serif",
                                     fontWeight: '500'
@@ -113,38 +113,36 @@ export function PhotoGallery({ albumId, photos }: PhotoGalleryProps) {
                         </label>
                     </div>
 
-                    {/* Photo Grid - Better layout for few photos */}
+                    {/* Photo Grid - Larger layout (max 2 cols) */}
                     {photos.length > 0 ? (
-                        <div className={`grid gap-4 ${
-                            photos.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
-                            photos.length === 2 ? 'grid-cols-2 max-w-2xl mx-auto' :
-                            'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                        }`}>
-                                {photos.map((photo) => (
-                                    <div
-                                        key={photo.id}
-                                        className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group hover:opacity-90 transition-opacity"
-                                        onClick={() => setSelectedPhoto(photo)}
-                                    >
-                                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                                            <Camera className="w-8 h-8 text-muted-foreground" />
-                                        </div>
-                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <p className="text-white text-sm">Ver foto</p>
-                                        </div>
+                        <div className={`grid gap-6 ${photos.length === 1 ? 'grid-cols-1 max-w-3xl mx-auto' :
+                            'grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto'
+                            }`}>
+                            {photos.map((photo) => (
+                                <div
+                                    key={photo.id}
+                                    className="relative aspect-square overflow-hidden cursor-pointer group hover:opacity-90 transition-opacity rounded-lg"
+                                    onClick={() => setSelectedPhoto(photo)}
+                                >
+                                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                                        <Camera className="w-12 h-12 text-muted-foreground" />
                                     </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-12">
-                                <Camera className="w-12 h-12 mx-auto mb-4 opacity-50" style={{ color: 'var(--color-text-secondary)' }} />
-                                <p style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}>
-                                    Aún no hay fotos. ¡Sé el primero en compartir!
-                                </p>
-                            </div>
-                        )}
-                    </div>
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <p className="text-white text-sm">Ver foto</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <Camera className="w-12 h-12 mx-auto mb-4 opacity-50" style={{ color: 'var(--color-text-secondary)' }} />
+                            <p style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}>
+                                Aún no hay fotos. ¡Sé el primero en compartir!
+                            </p>
+                        </div>
+                    )}
                 </div>
+            </div>
 
             {/* Lightbox Modal */}
             {selectedPhoto && (

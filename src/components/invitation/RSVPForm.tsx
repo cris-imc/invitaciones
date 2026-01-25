@@ -58,37 +58,25 @@ export function RSVPForm({ invitationId }: RSVPFormProps) {
     }
 
     return (
-        <div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-sm border">
-            <h3 className="text-lg font-semibold text-center mb-4">Confirmar Asistencia</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="name">Nombre Completo</Label>
+        <div className="max-w-md mx-auto bg-white p-8 rounded-[2rem] shadow-lg border border-gray-100">
+            <form onSubmit={handleSubmit} className="space-y-8">
+
+                <div className="space-y-4 text-center">
+                    <Label htmlFor="name" className="text-lg text-muted-foreground uppercase tracking-widest" style={{ fontFamily: "var(--font-sans)" }}>¿Quiénes asisten?</Label>
                     <Input
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Tu nombre y apellido"
+                        placeholder="Nombre y Apellido"
                         required
+                        className="text-center text-xl h-14 bg-slate-50 border-transparent focus:border-primary focus:ring-0 transition-all"
+                        style={{ fontFamily: "var(--font-sans)" }}
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <Label>¿Asistirás?</Label>
-                    <RadioGroup value={attending} onValueChange={setAttending} className="flex gap-4">
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id="gen-yes" />
-                            <Label htmlFor="gen-yes">Sí, asistiré</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id="gen-no" />
-                            <Label htmlFor="gen-no">No podré</Label>
-                        </div>
-                    </RadioGroup>
-                </div>
-
-                {attending === "yes" && (
-                    <div className="space-y-2">
-                        <Label htmlFor="count">Cantidad de personas</Label>
+                <div className="space-y-4 text-center">
+                    <Label htmlFor="count" className="text-lg text-muted-foreground uppercase tracking-widest" style={{ fontFamily: "var(--font-sans)" }}>¿Cuántos son?</Label>
+                    <div className="flex items-center justify-center">
                         <Input
                             id="count"
                             type="number"
@@ -96,22 +84,24 @@ export function RSVPForm({ invitationId }: RSVPFormProps) {
                             max="10"
                             value={count}
                             onChange={(e) => setCount(parseInt(e.target.value))}
+                            className="text-center text-5xl h-24 w-32 font-light border-2 border-slate-100 rounded-2xl focus:border-primary focus:ring-0 transition-all font-serif"
+                            style={{ fontFamily: "var(--font-serif)" }}
                         />
                     </div>
-                )}
-
-                <div className="space-y-2">
-                    <Label htmlFor="msg">Mensaje (Opcional)</Label>
-                    <Textarea
-                        id="msg"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Algún comentario..."
-                    />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Enviando..." : "Enviar Confirmación"}
+                <Button
+                    type="submit"
+                    className="w-full text-xl py-8 rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                    disabled={isSubmitting}
+                    style={{
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'var(--color-text-light)',
+                        fontFamily: "var(--font-sans)",
+                        letterSpacing: '0.1em'
+                    }}
+                >
+                    {isSubmitting ? "ENVIANDO..." : "CONFIRMAR ASISTENCIA"}
                 </Button>
             </form>
         </div>

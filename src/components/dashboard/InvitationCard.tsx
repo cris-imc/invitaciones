@@ -26,7 +26,7 @@ interface InvitationCardProps {
         nombreNovio?: string | null;
         nombreQuinceanera?: string | null;
         _count: {
-            rsvps: number;
+            guests: number;
         };
     };
 }
@@ -39,7 +39,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
     const getDisplayTitle = () => {
         const getFirstName = (fullName: string | null | undefined) => {
             if (!fullName) return '';
-            return fullName.trim().split(' ')[0];
+            return fullName.trim();
         };
 
         // Para casamientos: mostrar nombres de novios
@@ -118,7 +118,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                         <CardContent className="pb-6">
                             <div className="flex gap-4">
                                 <div className="flex flex-col">
-                                    <span className="text-2xl font-bold">{invitation._count.rsvps}</span>
+                                    <span className="text-2xl font-bold">{invitation._count?.guests || 0}</span>
                                     <span className="text-xs text-muted-foreground">Confirmados</span>
                                 </div>
                                 <div className="w-px h-10 bg-secondary" />

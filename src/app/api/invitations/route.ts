@@ -52,21 +52,29 @@ export async function GET(request: NextRequest) {
             // TODO: Obtener userId de la sesión cuando tengamos auth
             const userId = "mock-user-id";
 
-            const invitations = await prisma.invitation.findMany({
+            const invitationsData = await prisma.invitation.findMany({
                 where: { userId },
                 orderBy: { createdAt: 'desc' },
                 include: {
-                    _count: {
+                    guests: {
+                        where: {
+                            status: 'CONFIRMED'
+                        },
                         select: {
-                            rsvps: {
-                                where: {
-                                    asistencia: 'CONFIRMA'
-                                }
-                            }
+                            attendingCount: true
                         }
                     }
                 }
             });
+
+            // Calculate total confirmed guests count (sum of attendingCount)
+            const invitations = invitationsData.map(inv => ({
+                ...inv,
+                _count: {
+                    guests: inv.guests.reduce((sum, g) => sum + (g.attendingCount || 0), 0)
+                },
+                guests: undefined // Remove detailed list to keep response light
+            }));
 
             return NextResponse.json(invitations);
         } catch (error) {
@@ -136,6 +144,16 @@ export async function POST(request: NextRequest) {
                 // 12. GALERÍA SECUNDARIA
                 galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada !== undefined ? body.galeriaSecundariaHabilitada : false,
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : '[]',
+
+                // 11. REGALO
+                regaloHabilitado: body.regaloHabilitado !== undefined ? body.regaloHabilitado : false,
+                regaloTitulo: body.regaloTitulo,
+                regaloMensaje: body.regaloMensaje,
+                regaloMostrarDatos: body.regaloMostrarDatos,
+                regaloCbu: body.regaloCbu,
+                regaloAlias: body.regaloAlias,
+                regaloBanco: body.regaloBanco,
+                regaloTitular: body.regaloTitular,
 
                 // 2. MÚSICA
                 musicaHabilitada: body.musicaHabilitada !== undefined ? body.musicaHabilitada : false,
@@ -240,6 +258,16 @@ export async function PUT(request: NextRequest) {
                 // 12. GALERÍA SECUNDARIA
                 galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada,
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : undefined,
+
+                // 11. REGALO
+                regaloHabilitado: body.regaloHabilitado,
+                regaloTitulo: body.regaloTitulo,
+                regaloMensaje: body.regaloMensaje,
+                regaloMostrarDatos: body.regaloMostrarDatos,
+                regaloCbu: body.regaloCbu,
+                regaloAlias: body.regaloAlias,
+                regaloBanco: body.regaloBanco,
+                regaloTitular: body.regaloTitular,
 
 
                 // 2. MÚSICA

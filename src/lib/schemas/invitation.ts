@@ -62,6 +62,19 @@ export const invitationSchema = z.object({
     ...musicSchema.shape,
     ...designSchema.shape,
     ...triviaSchema.shape,
+    // Nuevas secciones
+    frasePersonalizadaHabilitada: z.boolean().default(false),
+    frasePersonalizadaTexto: z.string().optional(),
+    frasePersonalizadaEstilo: z.string().optional(),
+
+    regaloHabilitado: z.boolean().default(false),
+    regaloTitulo: z.string().optional(),
+    regaloMensaje: z.string().optional(),
+    regaloMostrarDatos: z.boolean().default(false),
+    regaloCbu: z.string().optional(),
+    regaloAlias: z.string().optional(),
+    regaloBanco: z.string().optional(),
+    regaloTitular: z.string().optional(),
 });
 
 export type InvitationFormData = z.infer<typeof invitationSchema>;

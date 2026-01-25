@@ -52,14 +52,14 @@ export function MarqueeGallery({ images, speed = 30 }: MarqueeGalleryProps) {
                             {images.map((src, i) => (
                                 <div
                                     key={`${setIndex}-${i}`}
-                                    className={`relative h-64 w-64 flex-shrink-0 rounded-lg overflow-hidden shadow-lg ${uniqueId}-image`}
+                                    className={`relative h-64 w-64 md:h-[420px] md:w-[420px] flex-shrink-0 overflow-hidden shadow-lg ${uniqueId}-image`}
                                 >
                                     <Image
                                         src={src}
                                         alt={`Gallery ${i + 1}`}
                                         fill
                                         className="object-cover"
-                                        sizes="256px"
+                                        sizes="(max-width: 768px) 256px, 420px"
                                     />
                                 </div>
                             ))}

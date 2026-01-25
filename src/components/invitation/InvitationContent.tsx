@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { SplashScreen } from "./SplashScreen";
 import { MusicPlayer } from "./MusicPlayer";
-import { Countdown } from "./Countdown";
 import { EventDetails } from "./EventDetails";
 import { DressCode } from "./DressCode";
 import { QuoteSection } from "./QuoteSection";
 import { SharedAlbum } from "./SharedAlbum";
-import { GiftInfo } from "./GiftInfo";
+import { BankDetails } from "./BankDetails";
 import { FinalMessage } from "./FinalMessage";
 import { RSVPForm } from "./RSVPForm";
 import { PersonalizedRsvpForm } from "./PersonalizedRsvpForm";
@@ -18,7 +17,8 @@ import { ScrollReveal } from "./ScrollReveal";
 import { ThemeConfig } from "@/lib/theme-config";
 import Image from "next/image";
 import { MarqueeGallery } from "@/components/animations/MarqueeGallery";
-import { QuizTrivia } from "./QuizTrivia";
+import { MotivationalSection } from "./MotivationalSection";
+import { HeroSection } from "./HeroSection";
 
 interface InvitationContentProps {
     invitation: any;
@@ -38,11 +38,6 @@ function safeJsonParse(value: string | null | undefined, defaultValue: any = nul
 }
 
 export function InvitationContent({ invitation, guest, isPersonalized = false }: InvitationContentProps) {
-    console.log('DEBUG: InvitationContent received:', JSON.stringify({
-        titulo: invitation.portadaTitulo,
-        fondo: invitation.portadaImagenFondo,
-        galeria: invitation.galeriaPrincipalFotos
-    }, null, 2));
     const [showSplash, setShowSplash] = useState(invitation.portadaHabilitada);
 
     // Parse theme configuration
@@ -55,23 +50,23 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         textLight: temaColores?.textLight || '#ffffff',
         textSecondary: temaColores?.textSecondary || '#666666',
 
-        layout: temaColores?.layout || 'classic',
-        fontFamily: temaColores?.fontFamily || 'poppins',
-        fontScale: temaColores?.fontScale || 1.0,
-        letterSpacing: temaColores?.letterSpacing || 'normal',
-        lineHeight: temaColores?.lineHeight || 'normal',
-        sectionSpacing: temaColores?.sectionSpacing || 100,
-        sectionPadding: temaColores?.sectionPadding || 50,
+        layout: 'modern', // Enforce Modern/Scroll layout
+        fontFamily: 'montserrat', // Enforce delicate font
+        fontScale: 1.0,
+        letterSpacing: 'normal',
+        lineHeight: 'normal',
+        sectionSpacing: 100,
+        sectionPadding: 50,
     };
 
     // Parse arrays directly
     const galeriaPrincipal = safeJsonParse(invitation.galeriaPrincipalFotos, []);
     const galeriaSecundaria = safeJsonParse(invitation.galeriaSecundariaFotos, []);
 
-    // Helper para obtener solo el primer nombre
+    // Helper para obtener el nombre completo (sin cortar)
     const getFirstName = (fullName: string | null | undefined) => {
         if (!fullName) return '';
-        return fullName.trim().split(' ')[0];
+        return fullName.trim();
     };
 
     // Calcular nombre(s) para despedida
@@ -88,6 +83,24 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
     // Determine the actual state
     const isInactive = invitation.estado === 'BORRADOR';
     const isFinalized = invitation.estado === 'FINALIZADA' || hasEventPassed;
+
+    // Parse trivia questions safely
+    const triviaData = invitation.triviaHabilitada ? (() => {
+        try {
+            const preguntas = JSON.parse(invitation.triviaPreguntas || "[]");
+            if (preguntas && preguntas.length > 0) {
+                return {
+                    icono: invitation.triviaIcono,
+                    titulo: invitation.triviaTitulo || "¿Cuánto nos conoces?",
+                    subtitulo: invitation.triviaSubtitulo,
+                    preguntas: preguntas
+                };
+            }
+        } catch (e) {
+            console.error("Error parsing trivia questions:", e);
+        }
+        return null;
+    })() : null;
 
     return (
         <InvitationThemeProvider themeConfig={themeConfig}>
@@ -128,90 +141,76 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                         />
                     )}
 
-                    <div className="min-h-screen bg-background">
+                    <div className="min-h-screen bg-background text-foreground">
                         {/* Reproductor de Música */}
                         {invitation.musicaHabilitada && invitation.musicaUrl && (
                             <MusicPlayer
                                 musicaUrl={invitation.musicaUrl}
-                                // Solo autoplay si está habilitado Y NO se muestra el splash screen (o ya pasó)
-                                // Si hay splash screen, el autoplay se activa al cerrarlo (interacción del usuario)
                                 autoplay={invitation.musicaAutoplay && !showSplash}
                                 loop={invitation.musicaLoop}
                             />
                         )}
 
-                        {/* Hero Section - Altura reducida y tipografía mejorada */}
-                        <section
-                            className="relative h-[75vh] min-h-[500px] max-h-[800px] flex items-center justify-center"
-                            style={{
-                                backgroundImage: (invitation.portadaImagenFondo || galeriaPrincipal[0])
-                                    ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5)), url(${invitation.portadaImagenFondo || galeriaPrincipal[0]})`
-                                    : 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-text-dark) 100%)',
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                                color: 'var(--color-text-light)',
-                            }}
-                        >
-                            <ScrollReveal className="w-full flex justify-center">
-                                <div className="text-center px-6 py-8 flex flex-col items-center justify-center gap-4" style={{ maxWidth: '700px' }}>
-                                    {/* Tipo de evento - Pequeño y elegante arriba */}
-                                    <p className="invitation-event-type">
-                                        {invitation.portadaTitulo || (invitation.tipo === 'CASAMIENTO' ? 'Nuestra Boda' :
-                                            invitation.tipo === 'QUINCE_ANOS' ? 'Mis XV Años' :
-                                                'Celebración')}
-                                    </p>
+                        {/* Hero Section (Includes Countdown internally) */}
+                        <HeroSection
+                            nombreEvento={invitation.nombreEvento || "Celebración"}
+                            tipo={invitation.tipo}
+                            nombreNovia={invitation.nombreNovia}
+                            nombreNovio={invitation.nombreNovio}
+                            nombreQuinceanera={invitation.nombreQuinceanera}
+                            fechaEvento={new Date(invitation.fechaEvento)}
+                            colorPrincipal={themeConfig.primaryColor!}
+                            imagenPortada={invitation.portadaImagenFondo || null}
+                        />
 
-                                    {/* Nombres - Grande y script elegante */}
-                                    {/* Nombres - Grande y script elegante */}
-                                    <h1 className="invitation-names">
-                                        {nombreFestejado}
-                                    </h1>
-
-                                    {invitation.tipo === 'CASAMIENTO' && (invitation.nombreNovia || invitation.nombreNovio) && (
-                                        <p className="text-2xl mt-4 font-light">
-                                            {getFirstName(invitation.nombreNovia)} & {getFirstName(invitation.nombreNovio)}
-                                        </p>
-                                    )}
-                                    {invitation.tipo === 'QUINCE_ANOS' && invitation.nombreQuinceanera && (
-                                        <p className="text-2xl mt-4 font-light">
-                                            {getFirstName(invitation.nombreQuinceanera)}
-                                        </p>
-                                    )}
-
-                                    {/* Separador decorativo */}
-                                    <div className="w-16 h-px bg-white/50 my-2"></div>
-
-                                    {/* Fecha */}
-                                    <p className="invitation-date-hero">
-                                        {new Date(invitation.fechaEvento).toLocaleDateString('es-AR', {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric'
-                                        })}
-                                    </p>
-                                </div>
-                            </ScrollReveal>
-                        </section>
-
-                        {/* Contador Regresivo */}
-                        {invitation.contadorHabilitado && (
+                        {/* Frase Personalizada */}
+                        {invitation.frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto && (
                             <ScrollReveal>
-                                <Countdown targetDate={new Date(invitation.fechaEvento)} />
+                                <QuoteSection
+                                    texto={invitation.frasePersonalizadaTexto}
+                                    estilo={invitation.frasePersonalizadaEstilo}
+                                />
                             </ScrollReveal>
                         )}
 
                         {/* Sección Cuándo y Dónde */}
-                        {invitation.seccionCuandoHabilitada && invitation.lugarNombre && (
-                            <ScrollReveal>
-                                <EventDetails
-                                    lugarNombre={invitation.lugarNombre}
-                                    direccion={invitation.direccion || ""}
-                                    fecha={new Date(invitation.fechaEvento)}
-                                    hora={invitation.hora || ""}
-                                    mapUrl={invitation.mapUrl || undefined}
-                                />
-                            </ScrollReveal>
+                        <div id="detalles">
+                            {invitation.seccionCuandoHabilitada && invitation.lugarNombre && (
+                                <ScrollReveal>
+                                    <EventDetails
+                                        lugarNombre={invitation.lugarNombre}
+                                        direccion={invitation.direccion || ""}
+                                        fecha={new Date(invitation.fechaEvento)}
+                                        hora={invitation.hora || ""}
+                                        mapUrl={invitation.mapUrl || undefined}
+                                    />
+                                </ScrollReveal>
+                            )}
+                        </div>
+
+                        {/* Galería Principal */}
+                        {invitation.galeriaPrincipalHabilitada && galeriaPrincipal.length > 0 && (
+                            <section className="py-20 px-6 bg-slate-50">
+                                <ScrollReveal>
+                                    <div className="max-w-6xl mx-auto mb-12 text-center">
+                                        <span className="text-xs tracking-[0.25em] block mb-3 text-muted-foreground uppercase">
+                                            Momentos
+                                        </span>
+                                        <h2 className="text-3xl md:text-4xl" style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}>
+                                            Galería de Fotos
+                                        </h2>
+                                    </div>
+                                    <MarqueeGallery images={galeriaPrincipal} />
+                                </ScrollReveal>
+                            </section>
                         )}
+
+
+                        {/* Motivational Phrase & Quiz */}
+                        <MotivationalSection
+                            triviaEnabled={invitation.triviaHabilitada}
+                            triviaData={triviaData}
+                        />
 
                         {/* Dress Code */}
                         {invitation.dresscodeHabilitado && (
@@ -225,53 +224,18 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                             </ScrollReveal>
                         )}
 
-                        {/* Galería Principal */}
-                        {invitation.galeriaPrincipalHabilitada && galeriaPrincipal.length > 0 && (
-                            <section className="py-16 md:py-20 px-6" style={{ backgroundColor: 'var(--color-background)' }}>
-                                <ScrollReveal>
-                                    <div className="max-w-6xl mx-auto">
-                                        <div className="text-center mb-12">
-                                            <span
-                                                className="text-xs uppercase tracking-[0.25em] block mb-3"
-                                                style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}
-                                            >
-                                                Recuerdos
-                                            </span>
-                                            <h2
-                                                className="text-3xl md:text-4xl"
-                                                style={{ color: 'var(--color-primary)', fontFamily: "'Parisienne', cursive" }}
-                                            >
-                                                Galería
-                                            </h2>
-                                            {/* <div className={`grid gap-4 ${galeriaPrincipal.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
-                                    galeriaPrincipal.length === 2 ? 'grid-cols-2 max-w-2xl mx-auto' :
-                                        'grid-cols-2 md:grid-cols-4'
-                                    }`}>
-                                    {galeriaPrincipal.map((foto: string, index: number) => (
-                                        <div key={index} className="aspect-square overflow-hidden rounded-lg relative group">
-                                            <Image
-                                                src={foto}
-                                                alt={`Foto ${index + 1}`}
-                                                fill
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                className="object-cover group-hover:scale-110 transition-transform duration-300"
-                                            />
-                                        </div>
-                                    ))}
-                                </div> */}
-                                            <MarqueeGallery images={galeriaPrincipal} />
-                                        </div>
-                                    </div>
-                                </ScrollReveal>
-                            </section>
-                        )}
 
-                        {/* Frase Personalizada */}
-                        {invitation.frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto && (
+                        {/* Área de Regalo / Datos Bancarios */}
+                        {invitation.regaloHabilitado && (
                             <ScrollReveal>
-                                <QuoteSection
-                                    texto={invitation.frasePersonalizadaTexto}
-                                    estilo={invitation.frasePersonalizadaEstilo}
+                                <BankDetails
+                                    titulo={invitation.regaloTitulo || "Regalo"}
+                                    mensaje={invitation.regaloMensaje}
+                                    mostrarDatos={invitation.regaloMostrarDatos}
+                                    banco={invitation.regaloBanco}
+                                    cbu={invitation.regaloCbu}
+                                    alias={invitation.regaloAlias}
+                                    titular={invitation.regaloTitular}
                                 />
                             </ScrollReveal>
                         )}
@@ -289,35 +253,20 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                             </ScrollReveal>
                         )}
 
-                        {/* Regalo/Datos Bancarios */}
-                        {invitation.regaloHabilitado && (
-                            <ScrollReveal>
-                                <GiftInfo
-                                    icono={invitation.regaloIcono}
-                                    titulo={invitation.regaloTitulo || "REGALO"}
-                                    mensaje={invitation.regaloMensaje || ""}
-                                    mostrarDatos={invitation.regaloMostrarDatos}
-                                    alias={invitation.regaloAlias}
-                                    cvu={invitation.regaloCvu}
-                                    cbu={invitation.regaloCbu}
-                                />
-                            </ScrollReveal>
-                        )}
-
                         {/* Galería Secundaria */}
                         {invitation.galeriaSecundariaHabilitada && galeriaSecundaria.length > 0 && (
-                            <section className="py-16 px-4 bg-gray-50">
+                            <section className="py-16 px-4 bg-white">
                                 <ScrollReveal>
                                     <div className="max-w-6xl mx-auto">
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             {galeriaSecundaria.map((foto: string, index: number) => (
-                                                <div key={index} className="aspect-square overflow-hidden rounded-lg relative group">
+                                                <div key={index} className="aspect-square overflow-hidden relative group">
                                                     <Image
                                                         src={foto}
                                                         alt={`Foto secundaria ${index + 1}`}
                                                         fill
-                                                        sizes="(max-width: 768px) 50vw, 25vw"
-                                                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                                                     />
                                                 </div>
                                             ))}
@@ -327,46 +276,15 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                             </section>
                         )}
 
-                        {/* Quiz/Trivia */}
-                        {invitation.triviaHabilitada && invitation.triviaPreguntas && (() => {
-                            try {
-                                const preguntas = JSON.parse(invitation.triviaPreguntas);
-                                if (preguntas && preguntas.length > 0) {
-                                    return (
-                                        <ScrollReveal>
-                                            <QuizTrivia
-                                                icono={invitation.triviaIcono}
-                                                titulo={invitation.triviaTitulo || "¿Cuánto nos conoces?"}
-                                                subtitulo={invitation.triviaSubtitulo}
-                                                preguntas={preguntas}
-                                            />
-                                        </ScrollReveal>
-                                    );
-                                }
-                            } catch (e) {
-                                console.error("Error parsing trivia questions:", e);
-                            }
-                            return null;
-                        })()}
-
-                        {/* Mensaje Final */}
-                        {invitation.mensajeFinalHabilitado && invitation.mensajeFinalTexto && (
-                            <ScrollReveal>
-                                <FinalMessage
-                                    texto={invitation.mensajeFinalTexto}
-                                />
-                            </ScrollReveal>
-                        )}
-
                         {/* Confirmación de Asistencia */}
                         {invitation.confirmacionHabilitada && (
-                            <section className="py-16 px-4 bg-white">
+                            <section className="py-20 px-4 bg-slate-50">
                                 <ScrollReveal>
                                     <div className="max-w-3xl mx-auto text-center space-y-8">
                                         <div className="space-y-4">
                                             <div className="text-6xl">{invitation.confirmacionIcono || "✉️"}</div>
-                                            <h2 className="invitation-title-section" style={{ color: 'var(--color-primary)' }}>
-                                                {invitation.confirmacionTitulo || "CONFIRMA TU ASISTENCIA"}
+                                            <h2 className="text-3xl md:text-4xl" style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}>
+                                                {invitation.confirmacionTitulo || "Confirmá tu asistencia"}
                                             </h2>
                                             {invitation.confirmacionFechaLimite && (
                                                 <p className="text-lg text-muted-foreground">
@@ -388,22 +306,36 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                             </section>
                         )}
 
-                        {/* Despedida */}
-                        {invitation.despedidaHabilitada && (
-                            <ScrollReveal>
-                                <Farewell
-                                    icono={invitation.despedidaIcono}
-                                    texto={invitation.despedidaTexto || "TE ESPERO"}
-                                    nombre={nombreFestejado}
-                                    foto={invitation.despedidaFoto}
-                                />
-                            </ScrollReveal>
-                        )}
+                        {/* Mensaje Final & Footer Dynamic */}
+                        <div className="py-20 bg-white text-center">
+                            {invitation.mensajeFinalHabilitado && invitation.mensajeFinalTexto && (
+                                <ScrollReveal>
+                                    <FinalMessage
+                                        texto={invitation.mensajeFinalTexto}
+                                    />
+                                </ScrollReveal>
+                            )}
 
-                        {/* Footer */}
-                        <footer className="py-8 text-center text-sm text-muted-foreground bg-gray-50">
-                            <p>Creado con ❤️ usando InvitaDigital</p>
-                        </footer>
+                            {invitation.despedidaHabilitada && (
+                                <ScrollReveal>
+                                    {/* Example 10: "Te espero" o "Los esperamos" logic could be handled here or inside Farewell */}
+                                    {/* Farewell component uses "TE ESPERO" by default or text prop.
+                                          We can check invitation type to send different default if needed.
+                                          But for now we use what is in `despedidaTexto` */}
+                                    <Farewell
+                                        icono={invitation.despedidaIcono}
+                                        texto={invitation.despedidaTexto || (invitation.tipo === 'CASAMIENTO' ? "LOS ESPERAMOS" : "TE ESPERO")}
+                                        nombre={nombreFestejado}
+                                        foto={invitation.despedidaFoto}
+                                    />
+                                </ScrollReveal>
+                            )}
+
+                            <footer className="mt-12 text-sm text-muted-foreground">
+                                <p>Creado con ❤️ usando InvitaDigital</p>
+                            </footer>
+                        </div>
+
                     </div>
                 </>
             )}

@@ -23,6 +23,10 @@ function InvitationStyleApplicator({ children }: { children: ReactNode }) {
     "--background": config.backgroundColor,
     "--font-family": fontConfig ? fontConfig.cssValue : "inherit",
     
+    // Fuentes específicas para títulos ornamentales vs texto legible
+    "--font-ornamental": fontConfig ? fontConfig.cssValue : "'Parisienne', cursive",
+    "--font-body": "'Montserrat', sans-serif",
+    
     // Mapping for Shadcn components to inherit look
     "--foreground": config.textDark,
     "--muted": "#f4f4f5", // Fallback or calculated
@@ -33,7 +37,7 @@ function InvitationStyleApplicator({ children }: { children: ReactNode }) {
     "--radius": "0.5rem",
     
     // Ensure font applies to sans variable often used by Shadcn
-    "--font-sans": fontConfig ? fontConfig.cssValue : "sans-serif",
+    "--font-sans": "'Montserrat', sans-serif",
   } as React.CSSProperties;
 
   return (

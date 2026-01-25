@@ -43,6 +43,9 @@ export function StepCoverPage() {
                                 value={data.portadaTitulo || ""}
                                 onChange={(e) => setData({ portadaTitulo: e.target.value })}
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Mensaje de bienvenida opcional. Tu nombre se mostrará automáticamente debajo.
+                            </p>
                         </div>
 
                         <div className="space-y-2">

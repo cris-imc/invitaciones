@@ -10,6 +10,8 @@ import { StepMusic } from "./StepMusic";
 import { StepTrivia } from "./StepTrivia";
 import { StepDesign } from "./StepDesign";
 import { StepPreview } from "./StepPreview";
+import { StepPhrase } from "./StepPhrase";
+import { StepBankDetails } from "./StepBankDetails";
 import { Progress } from "@/components/ui/progress";
 
 export function WizardSteps() {
@@ -21,8 +23,10 @@ export function WizardSteps() {
         { component: StepDetails, label: "Detalles del Evento" },
         { component: StepCoverPage, label: "Portada" },
         { component: StepGallery, label: "Galería" },
+        { component: StepPhrase, label: "Frase" },
         { component: StepMusic, label: "Música" },
         { component: StepTrivia, label: "Trivia" },
+        { component: StepBankDetails, label: "Regalo (CBU)" },
         { component: StepDesign, label: "Diseño" },
         { component: StepPreview, label: "Vista Previa" },
     ];

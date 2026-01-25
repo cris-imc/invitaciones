@@ -11,6 +11,9 @@ import Link from "next/link";
 import { MusicUploader } from "@/components/ui/MusicUploader";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 interface Invitation {
     id: string;
@@ -47,6 +50,16 @@ interface Invitation {
     // Trivia
     triviaHabilitada?: boolean;
     triviaPreguntas?: string | null;
+
+    // Regalo/Bank Details
+    regaloHabilitado?: boolean;
+    regaloTitulo?: string | null;
+    regaloMensaje?: string | null;
+    regaloMostrarDatos?: boolean;
+    regaloBanco?: string | null;
+    regaloCbu?: string | null;
+    regaloAlias?: string | null;
+    regaloTitular?: string | null;
 }
 
 interface EditInvitationFormProps {
@@ -96,6 +109,16 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         // Trivia
         triviaHabilitada: invitation.triviaHabilitada || false,
         triviaPreguntas: invitation.triviaPreguntas || '',
+
+        // Regalo
+        regaloHabilitado: invitation.regaloHabilitado || false,
+        regaloTitulo: invitation.regaloTitulo || '',
+        regaloMensaje: invitation.regaloMensaje || '',
+        regaloMostrarDatos: invitation.regaloMostrarDatos || false,
+        regaloBanco: invitation.regaloBanco || '',
+        regaloCbu: invitation.regaloCbu || '',
+        regaloAlias: invitation.regaloAlias || '',
+        regaloTitular: invitation.regaloTitular || '',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -187,14 +210,24 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
                         {/* Nombre del evento */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Nombre del Evento</label>
+                            <label className="text-sm font-medium">Título de la Invitación</label>
                             <input
                                 type="text"
                                 value={formData.nombreEvento}
                                 onChange={(e) => handleInputChange('nombreEvento', e.target.value)}
                                 className="w-full p-2 border rounded-md"
+                                placeholder={
+                                    formData.type === 'CASAMIENTO' ? "Ej: Nuestra Boda" :
+                                        formData.type === 'QUINCE_ANOS' ? "Ej: Mis 15 Años" :
+                                            "Ej: Mi Cumpleaños, Mi Bautismo, etc."
+                                }
                                 required
                             />
+                            {formData.type === 'QUINCE_ANOS' && (
+                                <p className="text-xs text-muted-foreground">
+                                    Este es el título general. Tu nombre lo ingresarás en el campo siguiente.
+                                </p>
+                            )}
                         </div>
 
                         {/* Fecha y hora */}
@@ -246,13 +279,17 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
                         {formData.type === 'QUINCE_ANOS' && (
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Nombre de la Quinceañera</label>
+                                <label className="text-sm font-medium">Tu Nombre</label>
                                 <input
                                     type="text"
                                     value={formData.nombreQuinceanera}
                                     onChange={(e) => handleInputChange('nombreQuinceanera', e.target.value)}
                                     className="w-full p-2 border rounded-md"
+                                    placeholder="Ej: María, Sofía, Valentina..."
                                 />
+                                <p className="text-xs text-muted-foreground">
+                                    Este nombre aparecerá destacado en la invitación.
+                                </p>
                             </div>
                         )}
 
@@ -441,6 +478,96 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                             return <p className="text-sm text-muted-foreground">No hay preguntas</p>;
                                         }
                                     })()}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Regalo/Datos Bancarios Section */}
+                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="regaloHabilitado"
+                                    checked={formData.regaloHabilitado}
+                                    onCheckedChange={(checked) => handleInputChange('regaloHabilitado', checked)}
+                                />
+                                <Label htmlFor="regaloHabilitado" className="font-semibold cursor-pointer">
+                                    Sección de Regalo / Datos Bancarios
+                                </Label>
+                            </div>
+                            {formData.regaloHabilitado && (
+                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="regaloTitulo">Título</Label>
+                                        <Input
+                                            id="regaloTitulo"
+                                            value={formData.regaloTitulo}
+                                            onChange={(e) => handleInputChange('regaloTitulo', e.target.value)}
+                                            placeholder="Ej: Regalo"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="regaloMensaje">Mensaje (Opcional)</Label>
+                                        <Textarea
+                                            id="regaloMensaje"
+                                            value={formData.regaloMensaje}
+                                            onChange={(e) => handleInputChange('regaloMensaje', e.target.value)}
+                                            placeholder="Tu presencia es nuestro mejor regalo..."
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center space-x-2 py-2">
+                                        <Switch
+                                            id="regaloMostrarDatos"
+                                            checked={formData.regaloMostrarDatos}
+                                            onCheckedChange={(checked) => handleInputChange('regaloMostrarDatos', checked)}
+                                        />
+                                        <Label htmlFor="regaloMostrarDatos">Mostrar Datos Bancarios</Label>
+                                    </div>
+
+                                    {formData.regaloMostrarDatos && (
+                                        <div className="space-y-4 pl-6 border-l-2 border-blue-200 ml-1 bg-blue-50/50 p-4 rounded">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="regaloBanco">Banco</Label>
+                                                <Input
+                                                    id="regaloBanco"
+                                                    value={formData.regaloBanco}
+                                                    onChange={(e) => handleInputChange('regaloBanco', e.target.value)}
+                                                    placeholder="Ej: Banco Galicia"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="regaloCbu">CBU / CVU</Label>
+                                                <Input
+                                                    id="regaloCbu"
+                                                    value={formData.regaloCbu}
+                                                    onChange={(e) => handleInputChange('regaloCbu', e.target.value)}
+                                                    placeholder="0000000000000000000000"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="regaloAlias">Alias</Label>
+                                                <Input
+                                                    id="regaloAlias"
+                                                    value={formData.regaloAlias}
+                                                    onChange={(e) => handleInputChange('regaloAlias', e.target.value)}
+                                                    placeholder="mi.alias.mp"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="regaloTitular">Titular de la Cuenta</Label>
+                                                <Input
+                                                    id="regaloTitular"
+                                                    value={formData.regaloTitular}
+                                                    onChange={(e) => handleInputChange('regaloTitular', e.target.value)}
+                                                    placeholder="Nombre Apellido"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

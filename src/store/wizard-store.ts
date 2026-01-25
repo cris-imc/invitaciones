@@ -18,6 +18,19 @@ export const useWizardStore = create<WizardState>((set) => ({
     currentStep: 0,
     data: {
         colorPrincipal: "#000000", // Default color (legacy)
+
+        // Initial values for new fields
+        frasePersonalizadaHabilitada: false,
+        frasePersonalizadaTexto: "",
+
+        regaloHabilitado: false,
+        regaloTitulo: "Regalo",
+        regaloMensaje: "",
+        regaloMostrarDatos: false,
+        regaloCbu: "",
+        regaloAlias: "",
+        regaloBanco: "",
+        regaloTitular: "",
     },
     themeConfig: DEFAULT_THEME_CONFIG,
     setData: (newData) => set((state) => ({
@@ -33,8 +46,8 @@ export const useWizardStore = create<WizardState>((set) => ({
         currentStep: Math.max(0, state.currentStep - 1)
     })),
     setStep: (step) => set({ currentStep: step }),
-    reset: () => set({ 
-        currentStep: 0, 
+    reset: () => set({
+        currentStep: 0,
         data: { colorPrincipal: "#000000" },
         themeConfig: DEFAULT_THEME_CONFIG
     }),

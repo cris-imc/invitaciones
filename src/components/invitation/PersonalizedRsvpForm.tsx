@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/Toast";
 
 interface Guest {
     id: string;
@@ -28,6 +29,7 @@ export function PersonalizedRsvpForm({ guest, onSuccess }: PersonalizedRsvpFormP
     const [count, setCount] = useState<string>(guest.attendingCount > 0 ? guest.attendingCount.toString() : guest.expectedCount.toString());
     const [message, setMessage] = useState(guest.message || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { showToast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,13 +51,14 @@ export function PersonalizedRsvpForm({ guest, onSuccess }: PersonalizedRsvpFormP
             });
 
             if (res.ok) {
+                showToast("¡Gracias por confirmar tu asistencia!", "success");
                 onSuccess();
             } else {
-                alert("Hubo un error al guardar tu respuesta.");
+                showToast("Hubo un error al guardar tu respuesta", "error");
             }
         } catch (error) {
             console.error(error);
-            alert("Error de conexión.");
+            showToast("Error de conexión", "error");
         } finally {
             setIsSubmitting(false);
         }

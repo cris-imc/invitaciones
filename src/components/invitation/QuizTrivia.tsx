@@ -73,8 +73,8 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas }: QuizTriviaPr
                 <div className="max-w-2xl mx-auto text-center space-y-6">
                     <div className="text-6xl">{icono || "🎯"}</div>
                     <h2
-                        className="text-3xl md:text-4xl font-bold"
-                        style={{ color: 'var(--color-primary)' }}
+                        className="text-3xl md:text-4xl"
+                        style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}
                     >
                         {titulo}
                     </h2>
