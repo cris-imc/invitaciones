@@ -33,6 +33,86 @@ export function StepDesign() {
                 </p>
             </div>
 
+            {/* Selección de Plantilla / Layout */}
+            <div className="space-y-4">
+                <Label className="text-lg font-semibold">Elige una estructura</Label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Classic */}
+                    <button
+                        type="button"
+                        onClick={() => setThemeConfig({ layout: 'classic' })}
+                        className={`p-4 border rounded-lg hover:border-primary transition-all text-left ${themeConfig.layout === 'classic' ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : ''}`}
+                    >
+                        <div className="bg-white p-2 border mb-2 h-24 flex items-center justify-center rounded">
+                            <div className="w-16 h-20 bg-slate-100 border flex items-center justify-center text-[10px] text-muted-foreground">Card</div>
+                        </div>
+                        <span className="font-semibold block">Clásico</span>
+                        <span className="text-xs text-muted-foreground">Tarjeta centrada tradicional</span>
+                    </button>
+
+                    {/* Modern */}
+                    <button
+                        type="button"
+                        onClick={() => setThemeConfig({ layout: 'modern' })}
+                        className={`p-4 border rounded-lg hover:border-primary transition-all text-left ${themeConfig.layout === 'modern' ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : ''}`}
+                    >
+                        <div className="bg-white p-2 border mb-2 h-24 flex items-center justify-center rounded overflow-hidden">
+                            <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col items-center justify-center text-[10px] text-muted-foreground">
+                                <span>Animado</span>
+                            </div>
+                        </div>
+                        <span className="font-semibold block">Moderno</span>
+                        <span className="text-xs text-muted-foreground">Animaciones y pantalla completa</span>
+                    </button>
+
+                    {/* Minimal */}
+                    <button
+                        type="button"
+                        onClick={() => setThemeConfig({ layout: 'minimal' })}
+                        className={`p-4 border rounded-lg hover:border-primary transition-all text-left ${themeConfig.layout === 'minimal' ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : ''}`}
+                    >
+                        <div className="bg-white p-2 border mb-2 h-24 flex items-center justify-center rounded">
+                            <div className="space-y-1 text-center">
+                                <div className="w-20 h-1 bg-slate-200 mx-auto"></div>
+                                <div className="w-12 h-1 bg-slate-200 mx-auto"></div>
+                            </div>
+                        </div>
+                        <span className="font-semibold block">Minimalista</span>
+                        <span className="text-xs text-muted-foreground">Enfoque en tipografía</span>
+                    </button>
+
+                    {/* Glass */}
+                    <button
+                        type="button"
+                        onClick={() => setThemeConfig({ layout: 'glass' })}
+                        className={`p-4 border rounded-lg hover:border-primary transition-all text-left ${themeConfig.layout === 'glass' ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : ''}`}
+                    >
+                        <div className="bg-slate-900 p-2 border mb-2 h-24 flex items-center justify-center rounded relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/50 to-blue-500/50"></div>
+                            <div className="absolute inset-2 bg-white/10 backdrop-blur-md rounded border border-white/20 flex items-center justify-center">
+                                <span className="text-[10px] text-white font-medium">Glass</span>
+                            </div>
+                        </div>
+                        <span className="font-semibold block">Glass</span>
+                        <span className="text-xs text-muted-foreground">Efecto cristal translúcido</span>
+                    </button>
+
+                    {/* Parallax */}
+                    <button
+                        type="button"
+                        onClick={() => setThemeConfig({ layout: 'parallax' })}
+                        className={`p-4 border rounded-lg hover:border-primary transition-all text-left ${themeConfig.layout === 'parallax' ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : ''}`}
+                    >
+                        <div className="bg-white p-2 border mb-2 h-24 flex items-center justify-center rounded overflow-hidden relative">
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=200&auto=format&fit=crop')] bg-cover bg-center opacity-50"></div>
+                            <div className="relative z-10 bg-white/80 px-2 py-1 rounded shadow-sm text-[8px]">SCROLL</div>
+                        </div>
+                        <span className="font-semibold block">Parallax</span>
+                        <span className="text-xs text-muted-foreground">Profundidad al hacer scroll</span>
+                    </button>
+                </div>
+            </div>
+
             {/* Paleta de Colores */}
             <div className="space-y-4">
                 <Label className="text-lg font-semibold">Selecciona una Paleta de Colores</Label>
@@ -44,13 +124,13 @@ export function StepDesign() {
                             onClick={() => handleTemplateSelect(template.id as ColorTemplateId)}
                             className={`
                                 flex flex-col items-center gap-2 p-4 rounded-lg transition-all
-                                ${themeConfig.colorTemplate === template.id 
-                                    ? 'bg-primary/5' 
+                                ${themeConfig.colorTemplate === template.id
+                                    ? 'bg-primary/5'
                                     : 'hover:bg-primary/5'
                                 }
                             `}
                         >
-                            <div 
+                            <div
                                 className="w-12 h-12 rounded-full shadow-md"
                                 style={{ backgroundColor: template.primaryColor }}
                             />
@@ -70,18 +150,18 @@ export function StepDesign() {
                         id="customColor"
                         type="color"
                         value={themeConfig.primaryColor}
-                        onChange={(e) => setThemeConfig({ 
+                        onChange={(e) => setThemeConfig({
                             colorTemplate: 'rosa-salmon',  // Reset template
-                            primaryColor: e.target.value 
+                            primaryColor: e.target.value
                         })}
                         className="w-20 h-12 cursor-pointer"
                     />
                     <Input
                         type="text"
                         value={themeConfig.primaryColor}
-                        onChange={(e) => setThemeConfig({ 
+                        onChange={(e) => setThemeConfig({
                             colorTemplate: 'rosa-salmon',
-                            primaryColor: e.target.value 
+                            primaryColor: e.target.value
                         })}
                         placeholder="#c7757f"
                         className="flex-1"

@@ -74,7 +74,40 @@ export const COLOR_TEMPLATES = {
   },
 } as const;
 
+
 export type ColorTemplateId = keyof typeof COLOR_TEMPLATES;
+
+// Plantillas de diseño (Layouts)
+export const LAYOUT_TEMPLATES = {
+  classic: {
+    id: 'classic',
+    name: 'Clásico (Tarjeta)',
+    description: 'Diseño tradicional en tarjeta centrada',
+  },
+  modern: {
+    id: 'modern',
+    name: 'Moderno (Scroll)',
+    description: 'Diseño fluido con animaciones de entrada',
+  },
+  minimal: {
+    id: 'minimal',
+    name: 'Minimalista (Texto)',
+    description: 'Enfoque en tipografía y espacios limpios',
+  },
+  glass: {
+    id: 'glass',
+    name: 'Glassmorphism',
+    description: 'Estilo cristal esmerilado con transparencias',
+  },
+  parallax: {
+    id: 'parallax',
+    name: 'Parallax (Cinemático)',
+    description: 'Efectos de profundidad y movimiento al hacer scroll',
+  },
+} as const;
+
+export type LayoutTemplateId = keyof typeof LAYOUT_TEMPLATES;
+
 
 // Configuración de tipografía
 export const FONT_FAMILIES = {
@@ -142,13 +175,16 @@ export interface ThemeConfig {
   textDark: string;
   textLight: string;
   textSecondary: string;
-  
+
+  // Estructura
+  layout: LayoutTemplateId;
+
   // Tipografía
   fontFamily: FontFamilyId;
   fontScale: number;
   letterSpacing: keyof typeof LETTER_SPACING_OPTIONS;
   lineHeight: keyof typeof LINE_HEIGHT_OPTIONS;
-  
+
   // Espaciado
   sectionSpacing: number;
   sectionPadding: number;
@@ -157,6 +193,7 @@ export interface ThemeConfig {
 // Configuración por defecto
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   colorTemplate: 'rosa-salmon',
+  layout: 'classic',
   primaryColor: '#c7757f',
   backgroundColor: '#ffffff',
   textDark: '#1a1a1a',
@@ -174,11 +211,11 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
 export function hexToRgb(hex: string): string {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!result) return '0, 0, 0';
-  
+
   const r = parseInt(result[1], 16);
   const g = parseInt(result[2], 16);
   const b = parseInt(result[3], 16);
-  
+
   return `${r}, ${g}, ${b}`;
 }
 
@@ -187,7 +224,7 @@ export function generateCSSVariables(config: ThemeConfig): Record<string, string
   const letterSpacingMultiplier = LETTER_SPACING_OPTIONS[config.letterSpacing].multiplier;
   const lineHeightMultiplier = LINE_HEIGHT_OPTIONS[config.lineHeight].multiplier;
   const fontFamily = FONT_FAMILIES[config.fontFamily].cssValue;
-  
+
   // Calculate derived colors (e.g., background-alt slightly darker than background)
   // Simple heuristic: if background is white, alt is f8f9fa. If dark, slightly lighter.
   const isDarkBg = config.backgroundColor.toLowerCase() === '#000000' || config.backgroundColor.toLowerCase() === '#1a1a1a';
@@ -198,11 +235,11 @@ export function generateCSSVariables(config: ThemeConfig): Record<string, string
     '--color-primary': config.primaryColor,
     '--color-primary-rgb': hexToRgb(config.primaryColor),
     '--color-background': config.backgroundColor,
-    '--color-background-alt': backgroundAlt, 
+    '--color-background-alt': backgroundAlt,
     '--color-text-dark': config.textDark,
     '--color-text-light': config.textLight,
     '--color-text-secondary': config.textSecondary,
-    
+
     // Tipografía
     '--font-primary': fontFamily,
     '--font-serif': fontFamily, // Map chosen font to serif/heading usage
@@ -212,7 +249,7 @@ export function generateCSSVariables(config: ThemeConfig): Record<string, string
     '--font-medium': '500',
     '--font-semibold': '600',
     '--font-bold': '700',
-    
+
     // Tamaños de texto
     '--text-xs': `${12 * config.fontScale}px`, // Slight bump for readability
     '--text-sm': `${14 * config.fontScale}px`,
@@ -222,20 +259,20 @@ export function generateCSSVariables(config: ThemeConfig): Record<string, string
     '--text-2xl': `${32 * config.fontScale}px`,
     '--text-3xl': `${40 * config.fontScale}px`, // Adjusted for better hierarchy
     '--text-4xl': `${56 * config.fontScale}px`,
-    
+
     // Letter spacing
     '--letter-spacing-tight': `${0.02 * letterSpacingMultiplier}em`,
     '--letter-spacing-normal': `${0.05 * letterSpacingMultiplier}em`,
     '--letter-spacing-wide': `${0.1 * letterSpacingMultiplier}em`,
     '--letter-spacing-wider': `${0.15 * letterSpacingMultiplier}em`,
-    
+
     // Line height
     '--line-height-tight': String(1.1 * lineHeightMultiplier),
     '--line-height-snug': String(1.3 * lineHeightMultiplier),
     '--line-height-normal': String(1.5 * lineHeightMultiplier),
     '--line-height-relaxed': String(1.7 * lineHeightMultiplier),
     '--line-height-loose': String(1.8 * lineHeightMultiplier),
-    
+
     // Espaciado
     '--section-spacing': `${config.sectionSpacing}px`,
     '--section-padding': `${config.sectionPadding}px`,

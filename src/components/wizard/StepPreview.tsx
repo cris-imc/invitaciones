@@ -7,19 +7,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, MapPin, Calendar, Clock, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { ClassicTemplate } from "../templates/ClassicTemplate";
+import { ModernTemplate } from "../templates/ModernTemplate";
+import { MinimalTemplate } from "../templates/MinimalTemplate";
+import { GlassTemplate } from "../templates/GlassTemplate";
+import { ParallaxTemplate } from "../templates/ParallaxTemplate";
 
 export function StepPreview() {
-    const { data, prevStep } = useWizardStore();
+    const { data, themeConfig, prevStep } = useWizardStore();
     const [isCreating, setIsCreating] = useState(false);
 
     const handleCreate = async () => {
         setIsCreating(true);
         try {
-            console.log('Datos enviados:', data);
+            // Include themeConfig in the data sent to the server
+            const payload = {
+                ...data,
+                ...themeConfig, // This overwrites design fields in data if they overlap, or adds new ones
+            };
+
+            console.log('Datos enviados:', payload);
             const response = await fetch('/api/invitations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
+                body: JSON.stringify(payload),
             });
 
             const responseData = await response.json();
@@ -40,6 +51,10 @@ export function StepPreview() {
         }
     };
 
+    // Cast data to InvitationFormData for the templates
+    // In a real app we might want to validate here
+    const formData = data as any;
+
     return (
         <div className="space-y-6">
             <div className="text-center mb-8">
@@ -47,42 +62,16 @@ export function StepPreview() {
                 <p className="text-muted-foreground">Revisá los datos antes de crear tu invitación.</p>
             </div>
 
-            <Card className="bg-slate-50 border-primary/20 overflow-hidden">
-                <div className="h-2 bg-gradient-to-r from-primary to-purple-600" style={{ backgroundColor: data.colorPrincipal }} />
-                <CardHeader className="text-center pb-2">
-                    <div className="mx-auto bg-white p-3 rounded-full shadow-sm mb-4 w-16 h-16 flex items-center justify-center">
-                        <CheckCircle2 className="w-8 h-8 text-primary" />
-                    </div>
-                    <CardTitle className="text-3xl font-serif text-primary">
-                        {data.nombreEvento}
-                    </CardTitle>
-                    <p className="text-lg text-muted-foreground font-medium">
-                        {data.type === 'CASAMIENTO' && `${data.nombreNovia} & ${data.nombreNovio}`}
-                        {data.type === 'QUINCE_ANOS' && data.nombreQuinceanera}
-                    </p>
-                </CardHeader>
-                <CardContent className="space-y-6 pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center md:text-left">
-                        <div className="flex flex-col items-center md:items-start p-4 bg-white rounded-lg shadow-sm">
-                            <Calendar className="w-6 h-6 text-primary mb-2" />
-                            <span className="font-semibold text-lg">Fecha</span>
-                            <span>{data.fecha ? format(data.fecha, "PPP", { locale: es }) : "No definida"}</span>
-                        </div>
-
-                        <div className="flex flex-col items-center md:items-start p-4 bg-white rounded-lg shadow-sm">
-                            <Clock className="w-6 h-6 text-primary mb-2" />
-                            <span className="font-semibold text-lg">Hora</span>
-                            <span>{data.hora || "No definida"}</span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-sm text-center">
-                        <MapPin className="w-6 h-6 text-primary mb-2" />
-                        <span className="font-semibold text-lg">{data.lugarNombre}</span>
-                        <span className="text-muted-foreground">{data.direccion}</span>
-                    </div>
-                </CardContent>
-            </Card>
+            <div className="border rounded-xl overflow-hidden shadow-sm bg-slate-100 min-h-[600px] flex items-center justify-center relative">
+                <div className="absolute inset-0 overflow-auto">
+                    {/* Render selected template */}
+                    {themeConfig.layout === 'classic' && <ClassicTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'modern' && <ModernTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'minimal' && <MinimalTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'glass' && <GlassTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'parallax' && <ParallaxTemplate data={formData} themeConfig={themeConfig} />}
+                </div>
+            </div>
 
             <div className="flex justify-between pt-4">
                 <Button variant="outline" onClick={prevStep} disabled={isCreating}>

@@ -15,6 +15,7 @@ import { Farewell } from "./Farewell";
 import { InvitationThemeProvider } from "./InvitationThemeProvider";
 import { ScrollReveal } from "./ScrollReveal";
 import { ThemeConfig } from "@/lib/theme-config";
+import Image from "next/image";
 
 interface InvitationContentProps {
     invitation: any;
@@ -40,13 +41,13 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
         primaryColor: temaColores?.colorPrincipal || '#c7757f',
         // Otros valores del tema si están guardados en la BD
     };
-    
+
     // Parse arrays directly
     const galeriaPrincipal = safeJsonParse(invitation.galeriaPrincipalFotos, []);
     const galeriaSecundaria = safeJsonParse(invitation.galeriaSecundariaFotos, []);
 
     // Calcular nombre(s) para despedida
-    const nombreFestejado = invitation.tipo === 'CASAMIENTO' 
+    const nombreFestejado = invitation.tipo === 'CASAMIENTO'
         ? `${invitation.nombreNovia} & ${invitation.nombreNovio}`
         : invitation.nombreQuinceanera || invitation.nombreEvento;
 
@@ -57,7 +58,7 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                 <SplashScreen
                     titulo={invitation.portadaTitulo || ""}
                     nombre={nombreFestejado}
-                    nombreInvitado="" 
+                    nombreInvitado=""
                     textoBoton={invitation.portadaTextoBoton || "ABRIR INVITACIÓN"}
                     imagenFondo={invitation.portadaImagenFondo}
                     onEnter={() => setShowSplash(false)}
@@ -69,16 +70,18 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                 {invitation.musicaHabilitada && invitation.musicaUrl && (
                     <MusicPlayer
                         musicaUrl={invitation.musicaUrl}
-                        autoplay={invitation.musicaAutoplay}
+                        // Solo autoplay si está habilitado Y NO se muestra el splash screen (o ya pasó)
+                        // Si hay splash screen, el autoplay se activa al cerrarlo (interacción del usuario)
+                        autoplay={invitation.musicaAutoplay && !showSplash}
                         loop={invitation.musicaLoop}
                     />
                 )}
 
                 {/* Hero Section - Altura reducida y tipografía mejorada */}
-                <section 
+                <section
                     className="relative h-[75vh] min-h-[500px] max-h-[800px] flex items-center justify-center"
                     style={{
-                        backgroundImage: galeriaPrincipal[0] 
+                        backgroundImage: galeriaPrincipal[0]
                             ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5)), url(${galeriaPrincipal[0]})`
                             : 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-text-dark) 100%)',
                         backgroundSize: 'cover',
@@ -87,45 +90,45 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                     }}
                 >
                     <ScrollReveal className="w-full flex justify-center">
-                    <div className="text-center px-6 py-8 flex flex-col items-center justify-center gap-4" style={{ maxWidth: '700px' }}>
-                        {/* Tipo de evento - Pequeño y elegante arriba */}
-                        <p className="invitation-event-type">
-                            {invitation.tipo === 'CASAMIENTO' ? 'Nuestra Boda' : 
-                             invitation.tipo === 'QUINCE_ANOS' ? 'Mis XV Años' : 
-                             invitation.nombreEvento}
-                        </p>
-                        
-                        {/* Nombres - Grande y script elegante */}
-                        {invitation.tipo === 'CASAMIENTO' && (
-                            <h1 className="invitation-names">
-                                <span>{invitation.nombreNovia}</span>
-                                <span className="mx-3 opacity-70">&</span>
-                                <span>{invitation.nombreNovio}</span>
-                            </h1>
-                        )}
-                        {invitation.tipo === 'QUINCE_ANOS' && (
-                            <h1 className="invitation-names">
-                                {invitation.nombreQuinceanera}
-                            </h1>
-                        )}
-                        {invitation.tipo !== 'CASAMIENTO' && invitation.tipo !== 'QUINCE_ANOS' && (
-                            <h1 className="invitation-names">
-                                {invitation.nombreEvento}
-                            </h1>
-                        )}
+                        <div className="text-center px-6 py-8 flex flex-col items-center justify-center gap-4" style={{ maxWidth: '700px' }}>
+                            {/* Tipo de evento - Pequeño y elegante arriba */}
+                            <p className="invitation-event-type">
+                                {invitation.tipo === 'CASAMIENTO' ? 'Nuestra Boda' :
+                                    invitation.tipo === 'QUINCE_ANOS' ? 'Mis XV Años' :
+                                        invitation.nombreEvento}
+                            </p>
 
-                        {/* Separador decorativo */}
-                        <div className="w-16 h-px bg-white/50 my-2"></div>
-                        
-                        {/* Fecha */}
-                        <p className="invitation-date-hero">
-                            {new Date(invitation.fechaEvento).toLocaleDateString('es-AR', {
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric'
-                            })}
-                        </p>
-                    </div>
+                            {/* Nombres - Grande y script elegante */}
+                            {invitation.tipo === 'CASAMIENTO' && (
+                                <h1 className="invitation-names">
+                                    <span>{invitation.nombreNovia}</span>
+                                    <span className="mx-3 opacity-70">&</span>
+                                    <span>{invitation.nombreNovio}</span>
+                                </h1>
+                            )}
+                            {invitation.tipo === 'QUINCE_ANOS' && (
+                                <h1 className="invitation-names">
+                                    {invitation.nombreQuinceanera}
+                                </h1>
+                            )}
+                            {invitation.tipo !== 'CASAMIENTO' && invitation.tipo !== 'QUINCE_ANOS' && (
+                                <h1 className="invitation-names">
+                                    {invitation.nombreEvento}
+                                </h1>
+                            )}
+
+                            {/* Separador decorativo */}
+                            <div className="w-16 h-px bg-white/50 my-2"></div>
+
+                            {/* Fecha */}
+                            <p className="invitation-date-hero">
+                                {new Date(invitation.fechaEvento).toLocaleDateString('es-AR', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric'
+                                })}
+                            </p>
+                        </div>
                     </ScrollReveal>
                 </section>
 
@@ -165,37 +168,38 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                 {invitation.galeriaPrincipalHabilitada && galeriaPrincipal.length > 0 && (
                     <section className="py-16 md:py-20 px-6" style={{ backgroundColor: 'var(--color-background)' }}>
                         <ScrollReveal>
-                        <div className="max-w-6xl mx-auto">
-                            <div className="text-center mb-12">
-                                <span 
-                                    className="text-xs uppercase tracking-[0.25em] block mb-3"
-                                    style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}
-                                >
-                                    Recuerdos
-                                </span>
-                                <h2 
-                                    className="text-3xl md:text-4xl"
-                                    style={{ color: 'var(--color-primary)', fontFamily: "'Parisienne', cursive" }}
-                                >
-                                    Galería
-                                </h2>
+                            <div className="max-w-6xl mx-auto">
+                                <div className="text-center mb-12">
+                                    <span
+                                        className="text-xs uppercase tracking-[0.25em] block mb-3"
+                                        style={{ color: 'var(--color-text-secondary)', fontFamily: "'Montserrat', sans-serif" }}
+                                    >
+                                        Recuerdos
+                                    </span>
+                                    <h2
+                                        className="text-3xl md:text-4xl"
+                                        style={{ color: 'var(--color-primary)', fontFamily: "'Parisienne', cursive" }}
+                                    >
+                                        Galería
+                                    </h2>
+                                </div>
+                                <div className={`grid gap-4 ${galeriaPrincipal.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
+                                    galeriaPrincipal.length === 2 ? 'grid-cols-2 max-w-2xl mx-auto' :
+                                        'grid-cols-2 md:grid-cols-4'
+                                    }`}>
+                                    {galeriaPrincipal.map((foto: string, index: number) => (
+                                        <div key={index} className="aspect-square overflow-hidden rounded-lg relative group">
+                                            <Image
+                                                src={foto}
+                                                alt={`Foto ${index + 1}`}
+                                                fill
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                className="object-cover group-hover:scale-110 transition-transform duration-300"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <div className={`grid gap-4 ${
-                                galeriaPrincipal.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
-                                galeriaPrincipal.length === 2 ? 'grid-cols-2 max-w-2xl mx-auto' :
-                                'grid-cols-2 md:grid-cols-4'
-                            }`}>
-                                {galeriaPrincipal.map((foto: string, index: number) => (
-                                    <div key={index} className="aspect-square overflow-hidden rounded-lg">
-                                        <img
-                                            src={foto}
-                                            alt={`Foto ${index + 1}`}
-                                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                         </ScrollReveal>
                     </section>
                 )}
@@ -242,19 +246,21 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                 {invitation.galeriaSecundariaHabilitada && galeriaSecundaria.length > 0 && (
                     <section className="py-16 px-4 bg-gray-50">
                         <ScrollReveal>
-                        <div className="max-w-6xl mx-auto">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {galeriaSecundaria.map((foto: string, index: number) => (
-                                    <div key={index} className="aspect-square overflow-hidden rounded-lg">
-                                        <img
-                                            src={foto}
-                                            alt={`Foto secundaria ${index + 1}`}
-                                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                        />
-                                    </div>
-                                ))}
+                            <div className="max-w-6xl mx-auto">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {galeriaSecundaria.map((foto: string, index: number) => (
+                                        <div key={index} className="aspect-square overflow-hidden rounded-lg relative group">
+                                            <Image
+                                                src={foto}
+                                                alt={`Foto secundaria ${index + 1}`}
+                                                fill
+                                                sizes="(max-width: 768px) 50vw, 25vw"
+                                                className="object-cover group-hover:scale-110 transition-transform duration-300"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
                         </ScrollReveal>
                     </section>
                 )}
@@ -272,20 +278,20 @@ export function InvitationContent({ invitation }: InvitationContentProps) {
                 {invitation.confirmacionHabilitada && (
                     <section className="py-16 px-4 bg-white">
                         <ScrollReveal>
-                        <div className="max-w-3xl mx-auto text-center space-y-8">
-                            <div className="space-y-4">
-                                <div className="text-6xl">{invitation.confirmacionIcono || "✉️"}</div>
-                                <h2 className="invitation-title-section" style={{ color: 'var(--color-primary)' }}>
-                                    {invitation.confirmacionTitulo || "CONFIRMA TU ASISTENCIA"}
-                                </h2>
-                                {invitation.confirmacionFechaLimite && (
-                                    <p className="text-lg text-muted-foreground">
-                                        Fecha límite: {new Date(invitation.confirmacionFechaLimite).toLocaleDateString('es-AR')}
-                                    </p>
-                                )}
+                            <div className="max-w-3xl mx-auto text-center space-y-8">
+                                <div className="space-y-4">
+                                    <div className="text-6xl">{invitation.confirmacionIcono || "✉️"}</div>
+                                    <h2 className="invitation-title-section" style={{ color: 'var(--color-primary)' }}>
+                                        {invitation.confirmacionTitulo || "CONFIRMA TU ASISTENCIA"}
+                                    </h2>
+                                    {invitation.confirmacionFechaLimite && (
+                                        <p className="text-lg text-muted-foreground">
+                                            Fecha límite: {new Date(invitation.confirmacionFechaLimite).toLocaleDateString('es-AR')}
+                                        </p>
+                                    )}
+                                </div>
+                                <RSVPForm invitationId={invitation.id} />
                             </div>
-                            <RSVPForm invitationId={invitation.id} />
-                        </div>
                         </ScrollReveal>
                     </section>
                 )}
