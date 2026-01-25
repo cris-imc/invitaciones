@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 interface Invitation {
     id: string;
     tipo: string;
+    estado: string; // BORRADOR, ACTIVA, FINALIZADA
     nombreEvento: string;
     fechaEvento: Date;
     nombreNovio?: string | null;
@@ -41,10 +42,11 @@ interface Invitation {
 
     // Gallery
     galeriaPrincipalHabilitada: boolean;
-    galeriaPrincipalFotos: string | null; // Stored as JSON string in DB usually, need to check schema. 
-    // Wait, in schema it's String[]? No, prisma doesn't support string arrays easily in SQLite/MySQL without parsing, but in Postgres it does. 
-    // In logic I saw: `galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(...) : '[]'`
-    // So it's a string in DB.
+    galeriaPrincipalFotos: string | null;
+
+    // Trivia
+    triviaHabilitada?: boolean;
+    triviaPreguntas?: string | null;
 }
 
 interface EditInvitationFormProps {
@@ -62,6 +64,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
     const [formData, setFormData] = useState({
         type: invitation.tipo,
+        estado: invitation.estado,
         nombreEvento: invitation.nombreEvento,
         fecha: invitation.fechaEvento.toISOString().split('T')[0],
         hora: invitation.hora || '',
@@ -89,6 +92,10 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         // Gallery
         galeriaPrincipalHabilitada: invitation.galeriaPrincipalHabilitada,
         galeriaPrincipalFotos: invitation.galeriaPrincipalFotos ? JSON.parse(invitation.galeriaPrincipalFotos) : [],
+
+        // Trivia
+        triviaHabilitada: invitation.triviaHabilitada || false,
+        triviaPreguntas: invitation.triviaPreguntas || '',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -136,6 +143,31 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Estado de la invitación */}
+                        <div className="border p-4 rounded-lg bg-blue-50">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <Label className="text-base font-semibold">Estado de la Invitación</Label>
+                                    <p className="text-sm text-muted-foreground">
+                                        {formData.estado === 'ACTIVA'
+                                            ? 'La invitación está visible y accesible para todos'
+                                            : formData.estado === 'BORRADOR'
+                                                ? 'La invitación está en modo borrador'
+                                                : 'El evento ha finalizado'}
+                                    </p>
+                                </div>
+                                <select
+                                    value={formData.estado}
+                                    onChange={(e) => handleInputChange('estado', e.target.value)}
+                                    className="p-2 border rounded-md font-medium"
+                                >
+                                    <option value="BORRADOR">📝 Borrador</option>
+                                    <option value="ACTIVA">✅ Activa</option>
+                                    <option value="FINALIZADA">🎉 Finalizada</option>
+                                </select>
+                            </div>
+                        </div>
+
                         {/* Tipo de evento */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Tipo de Evento</label>
@@ -379,22 +411,58 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                             )}
                         </div>
 
-                        {/* Botones */}
-                        <div className="flex gap-4 pt-4">
-                            <Button type="submit" disabled={isSaving} className="flex-1">
-                                {isSaving ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Guardando...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-4 h-4 mr-2" />
-                                        Guardar Cambios
-                                    </>
-                                )}
-                            </Button>
+                        {/* Quiz/Trivia Section */}
+                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="triviaHabilitada"
+                                    checked={formData.triviaHabilitada}
+                                    onCheckedChange={(checked) => handleInputChange('triviaHabilitada', checked)}
+                                />
+                                <Label htmlFor="triviaHabilitada" className="font-semibold cursor-pointer">
+                                    Quiz/Trivia
+                                </Label>
+                            </div>
+                            {formData.triviaHabilitada && (
+                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                    <p className="text-sm text-muted-foreground">
+                                        El quiz/trivia completo se puede editar desde el wizard de creación.
+                                        Aquí puedes ver cuántas preguntas hay configuradas.
+                                    </p>
+                                    {formData.triviaPreguntas && (() => {
+                                        try {
+                                            const preguntas = JSON.parse(formData.triviaPreguntas);
+                                            return (
+                                                <div className="text-sm bg-blue-50 p-3 rounded">
+                                                    <strong>{preguntas.length}</strong> preguntas configuradas
+                                                </div>
+                                            );
+                                        } catch {
+                                            return <p className="text-sm text-muted-foreground">No hay preguntas</p>;
+                                        }
+                                    })()}
+                                </div>
+                            )}
                         </div>
+
+                        {/* Submit Button */}
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isSaving}
+                        >
+                            {isSaving ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Guardando...
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="w-4 h-4 mr-2" />
+                                    Guardar Cambios
+                                </>
+                            )}
+                        </Button>
                     </form>
                 </CardContent>
             </Card>

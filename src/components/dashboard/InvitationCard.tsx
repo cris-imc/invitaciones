@@ -37,11 +37,16 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
     const router = useRouter();
 
     const getDisplayTitle = () => {
+        const getFirstName = (fullName: string | null | undefined) => {
+            if (!fullName) return '';
+            return fullName.trim().split(' ')[0];
+        };
+
         if (invitation.tipo === 'CASAMIENTO' && invitation.nombreNovia && invitation.nombreNovio) {
-            return `${invitation.nombreNovia} & ${invitation.nombreNovio}`;
+            return `${getFirstName(invitation.nombreNovia)} & ${getFirstName(invitation.nombreNovio)}`;
         }
         if (invitation.tipo === 'QUINCE_ANOS' && invitation.nombreQuinceanera) {
-            return invitation.nombreQuinceanera;
+            return getFirstName(invitation.nombreQuinceanera);
         }
         return invitation.nombreEvento;
     };
@@ -77,8 +82,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                            invitation.estado === 'ACTIVA'
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${invitation.estado === 'ACTIVA'
                                                 ? 'bg-green-100 text-green-700'
                                                 : 'bg-yellow-100 text-yellow-700'
                                             }`}>
@@ -119,18 +123,18 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                             Ver Invitación
                                         </Button>
                                     </Link>
-                                    <Button 
-                                        variant="default" 
-                                        size="sm" 
+                                    <Button
+                                        variant="default"
+                                        size="sm"
                                         className="h-9 gap-2"
                                         onClick={() => router.push(`/dashboard/invitaciones/editar/${invitation.id}`)}
                                     >
                                         <Pencil className="w-3 h-3" />
                                         Editar
                                     </Button>
-                                    <Button 
-                                        variant="destructive" 
-                                        size="sm" 
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
                                         className="h-9 gap-2"
                                         onClick={() => setShowDeleteDialog(true)}
                                     >
@@ -151,7 +155,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                         <div className="space-y-2">
                             <h2 className="text-xl font-semibold">¿Eliminar invitación?</h2>
                             <p className="text-muted-foreground">
-                                Esta acción no se puede deshacer. Se eliminará permanentemente la invitación 
+                                Esta acción no se puede deshacer. Se eliminará permanentemente la invitación
                                 <span className="font-semibold"> "{invitation.nombreEvento}"</span> y todos los datos asociados.
                             </p>
                         </div>

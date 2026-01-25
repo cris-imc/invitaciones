@@ -31,7 +31,10 @@ export function StepPreview() {
                 galeriaPrincipalFotos: data.galeriaPrincipalFotos,
                 galeriaSecundariaHabilitada: data.galeriaSecundariaHabilitada,
                 galeriaSecundariaFotos: data.galeriaSecundariaFotos,
+
                 musicaHabilitada: data.musicaHabilitada,
+                triviaHabilitada: data.triviaHabilitada,
+                triviaPreguntas: data.triviaPreguntas,
             };
 
             console.log('Datos enviados:', payload);

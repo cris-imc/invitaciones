@@ -221,9 +221,10 @@ export function hexToRgb(hex: string): string {
 
 // Generar variables CSS a partir de la configuración
 export function generateCSSVariables(config: ThemeConfig): Record<string, string> {
-  const letterSpacingMultiplier = LETTER_SPACING_OPTIONS[config.letterSpacing].multiplier;
-  const lineHeightMultiplier = LINE_HEIGHT_OPTIONS[config.lineHeight].multiplier;
-  const fontFamily = FONT_FAMILIES[config.fontFamily].cssValue;
+  const letterSpacingMultiplier = LETTER_SPACING_OPTIONS[config.letterSpacing]?.multiplier ?? 1.0;
+  const lineHeightMultiplier = LINE_HEIGHT_OPTIONS[config.lineHeight]?.multiplier ?? 1.5;
+  const fontConfig = FONT_FAMILIES[config.fontFamily] ?? FONT_FAMILIES['poppins'];
+  const fontFamily = fontConfig.cssValue;
 
   // Calculate derived colors (e.g., background-alt slightly darker than background)
   // Simple heuristic: if background is white, alt is f8f9fa. If dark, slightly lighter.

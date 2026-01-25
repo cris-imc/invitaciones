@@ -45,6 +45,14 @@ export const designSchema = z.object({
     tema: z.string().optional(),
 });
 
+export const triviaSchema = z.object({
+    triviaHabilitada: z.boolean().default(false),
+    triviaIcono: z.string().optional(),
+    triviaTitulo: z.string().optional(),
+    triviaSubtitulo: z.string().optional(),
+    triviaPreguntas: z.string().optional(), // JSON string
+});
+
 export const invitationSchema = z.object({
     ...eventTypeSchema.shape,
     ...basicInfoSchema.shape,
@@ -53,6 +61,7 @@ export const invitationSchema = z.object({
     ...gallerySchema.shape,
     ...musicSchema.shape,
     ...designSchema.shape,
+    ...triviaSchema.shape,
 });
 
 export type InvitationFormData = z.infer<typeof invitationSchema>;

@@ -7,6 +7,7 @@ import { StepDetails } from "./StepDetails";
 import { StepCoverPage } from "./StepCoverPage";
 import { StepGallery } from "./StepGallery";
 import { StepMusic } from "./StepMusic";
+import { StepTrivia } from "./StepTrivia";
 import { StepDesign } from "./StepDesign";
 import { StepPreview } from "./StepPreview";
 import { Progress } from "@/components/ui/progress";
@@ -21,6 +22,7 @@ export function WizardSteps() {
         { component: StepCoverPage, label: "Portada" },
         { component: StepGallery, label: "Galería" },
         { component: StepMusic, label: "Música" },
+        { component: StepTrivia, label: "Trivia" },
         { component: StepDesign, label: "Diseño" },
         { component: StepPreview, label: "Vista Previa" },
     ];

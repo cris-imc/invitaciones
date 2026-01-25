@@ -143,6 +143,13 @@ export async function POST(request: NextRequest) {
                 musicaLoop: body.musicaLoop !== undefined ? body.musicaLoop : true,
                 musicaUrl: body.musicaUrl,
 
+                // 3. TRIVIA
+                triviaHabilitada: body.triviaHabilitada !== undefined ? body.triviaHabilitada : false,
+                triviaIcono: body.triviaIcono,
+                triviaTitulo: body.triviaTitulo,
+                triviaSubtitulo: body.triviaSubtitulo,
+                triviaPreguntas: body.triviaPreguntas,
+
                 // Crear álbum automáticamente
                 album: {
                     create: {
@@ -234,10 +241,18 @@ export async function PUT(request: NextRequest) {
                 galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada,
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : undefined,
 
+
                 // 2. MÚSICA
                 musicaHabilitada: body.musicaHabilitada,
                 musicaAutoplay: body.musicaAutoplay,
                 musicaLoop: body.musicaLoop,
+
+                // 3. TRIVIA
+                triviaHabilitada: body.triviaHabilitada,
+                triviaIcono: body.triviaIcono,
+                triviaTitulo: body.triviaTitulo,
+                triviaSubtitulo: body.triviaSubtitulo,
+                triviaPreguntas: body.triviaPreguntas,
             } as any,
             include: {
                 album: true,
