@@ -1,56 +1,104 @@
 "use client";
 
+import { ScrollReveal } from "./ScrollReveal";
+
 interface FarewellProps {
-    icono?: string;
-    texto: string;
-    nombre: string;
-    foto?: string;
-    colorPrimario?: string;
+    nombreEvento: string;
+    tipo: string;
+    nombreNovia?: string | null;
+    nombreNovio?: string | null;
+    nombreQuinceanera?: string | null;
+    colorPrincipal: string;
+    despedidaFoto?: string | null;
 }
 
 export function Farewell({
-    icono = "💕",
-    texto,
-    nombre,
-    foto,
-    colorPrimario = "#000000",
+    nombreEvento,
+    tipo,
+    nombreNovia,
+    nombreNovio,
+    nombreQuinceanera,
+    colorPrincipal,
+    despedidaFoto,
 }: FarewellProps) {
+    // Determine host names and message
+    const getHostsAndMessage = () => {
+        if (tipo === 'CASAMIENTO') {
+            const hosts = [nombreNovia, nombreNovio].filter(Boolean);
+            return {
+                names: hosts.join(' & '),
+                message: hosts.length > 1 ? 'Te esperamos' : 'Te espero',
+            };
+        } else {
+            const hostName = nombreQuinceanera || nombreEvento;
+            return {
+                names: hostName,
+                message: 'Te espero',
+            };
+        }
+    };
+
+    const { names, message } = getHostsAndMessage();
+
     return (
-        <section className="py-20 md:py-24 px-6" style={{ backgroundColor: 'var(--color-background)' }}>
-            <div className="max-w-2xl mx-auto text-center">
-                {foto && (
-                    <div className="mb-8">
-                        <img
-                            src={foto}
-                            alt={nombre}
-                            className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover mx-auto shadow-lg border-4 border-white"
+        <section className="py-20 px-4 bg-gradient-to-b from-white to-slate-50">
+            <ScrollReveal>
+                <div className="max-w-3xl mx-auto text-center space-y-8">
+                    {/* Decorative Icon or Photo */}
+                    <div className="text-6xl">
+                        {despedidaFoto ? (
+                            <img
+                                src={despedidaFoto}
+                                alt="Despedida"
+                                className="w-32 h-32 mx-auto rounded-full object-cover shadow-lg"
+                            />
+                        ) : (
+                            <span style={{ color: colorPrincipal }}>✨</span>
+                        )}
+                    </div>
+
+                    {/* Message */}
+                    <div className="space-y-4">
+                        <h2
+                            className="text-4xl md:text-5xl lg:text-6xl"
+                            style={{
+                                fontFamily: "'Cormorant Garamond', serif",
+                                fontWeight: '300',
+                                color: colorPrincipal,
+                            }}
+                        >
+                            {message}
+                        </h2>
+
+                        <p
+                            className="text-2xl md:text-3xl"
+                            style={{
+                                fontFamily: "'Cormorant Garamond', serif",
+                                fontWeight: '400',
+                                color: '#1a1a1a',
+                            }}
+                        >
+                            {names}
+                        </p>
+                    </div>
+
+                    {/* Decorative Line */}
+                    <div className="flex items-center justify-center gap-4 pt-8">
+                        <div
+                            className="h-px w-24"
+                            style={{ backgroundColor: colorPrincipal, opacity: 0.3 }}
+                        />
+                        <div
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: colorPrincipal }}
+                        />
+                        <div
+                            className="h-px w-24"
+                            style={{ backgroundColor: colorPrincipal, opacity: 0.3 }}
                         />
                     </div>
-                )}
-                
-                <div className="space-y-6">
-                    <div className="text-5xl mb-4">{icono}</div>
-                    <p 
-                        className="text-base uppercase tracking-[0.25em]"
-                        style={{ 
-                            fontFamily: "'Montserrat', sans-serif",
-                            fontWeight: '400',
-                            color: 'var(--color-text-secondary)'
-                        }}
-                    >
-                        {texto}
-                    </p>
-                    <h2 
-                        className="text-3xl md:text-4xl"
-                        style={{ 
-                            fontFamily: "'Parisienne', cursive",
-                            color: 'var(--color-primary)'
-                        }}
-                    >
-                        {nombre}
-                    </h2>
                 </div>
-            </div>
+            </ScrollReveal>
         </section>
     );
 }

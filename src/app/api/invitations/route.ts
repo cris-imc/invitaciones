@@ -99,10 +99,21 @@ export async function POST(request: NextRequest) {
         // Generar slug único
         const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
 
-        // Ajustar la fecha para evitar problemas de zona horaria
-        // Asegurarse de que la fecha se guarde como medianoche en hora local
-        const eventDate = new Date(body.fecha);
-        eventDate.setHours(12, 0, 0, 0); // Establecer a mediodía para evitar problemas de zona horaria
+        // Combinar fecha y hora correctamente preservando la zona horaria local
+        let fechaEvento: Date;
+        if (body.hora) {
+            // Si hay hora, combinar fecha + hora
+            const [hours, minutes] = body.hora.split(':');
+            const dateStr = body.fecha; // "YYYY-MM-DD"
+            const [year, month, day] = dateStr.split('-').map(Number);
+            // Crear fecha en zona horaria local
+            fechaEvento = new Date(year, month - 1, day, parseInt(hours), parseInt(minutes), 0);
+        } else {
+            // Si no hay hora, usar solo la fecha a medianoche local
+            const dateStr = body.fecha;
+            const [year, month, day] = dateStr.split('-').map(Number);
+            fechaEvento = new Date(year, month - 1, day, 0, 0, 0);
+        }
 
         const invitation = await prisma.invitation.create({
             data: {
@@ -111,7 +122,7 @@ export async function POST(request: NextRequest) {
                 estado: 'ACTIVA',
                 slug,
                 nombreEvento: body.nombreEvento,
-                fechaEvento: eventDate,
+                fechaEvento,
                 nombreNovio: body.nombreNovio,
                 nombreNovia: body.nombreNovia,
                 nombreQuinceanera: body.nombreQuinceanera,
@@ -224,16 +235,28 @@ export async function PUT(request: NextRequest) {
         // Generar nuevo slug si cambió el nombre del evento
         const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
 
-        // Ajustar la fecha para evitar problemas de zona horaria
-        const eventDate = new Date(body.fecha);
-        eventDate.setHours(12, 0, 0, 0); // Establecer a mediodía para evitar problemas de zona horaria
+        // Combinar fecha y hora correctamente preservando la zona horaria local
+        let fechaEvento: Date;
+        if (body.hora) {
+            // Si hay hora, combinar fecha + hora
+            const [hours, minutes] = body.hora.split(':');
+            const dateStr = body.fecha; // "YYYY-MM-DD"
+            const [year, month, day] = dateStr.split('-').map(Number);
+            // Crear fecha en zona horaria local
+            fechaEvento = new Date(year, month - 1, day, parseInt(hours), parseInt(minutes), 0);
+        } else {
+            // Si no hay hora, usar solo la fecha a medianoche local
+            const dateStr = body.fecha;
+            const [year, month, day] = dateStr.split('-').map(Number);
+            fechaEvento = new Date(year, month - 1, day, 0, 0, 0);
+        }
 
         const invitation = await prisma.invitation.update({
             where: { id },
             data: {
                 tipo: body.type || 'CASAMIENTO',
                 nombreEvento: body.nombreEvento,
-                fechaEvento: eventDate,
+                fechaEvento,
                 nombreNovio: body.nombreNovio || null,
                 nombreNovia: body.nombreNovia || null,
                 nombreQuinceanera: body.nombreQuinceanera || null,

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 interface TriviaQuestion {
     pregunta: string;
@@ -15,30 +16,102 @@ interface QuizTriviaProps {
     titulo: string;
     subtitulo?: string;
     preguntas: TriviaQuestion[];
+    invitationId?: string;
+    guestName?: string;
+    guestToken?: string;
 }
 
-export function QuizTrivia({ icono, titulo, subtitulo, preguntas }: QuizTriviaProps) {
+export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, guestName, guestToken }: QuizTriviaProps) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [userAnswers, setUserAnswers] = useState<number[]>([]);
     const [showResults, setShowResults] = useState(false);
     const [hasStarted, setHasStarted] = useState(false);
+    const [hasAnswered, setHasAnswered] = useState(false);
+    const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+    const [globalStats, setGlobalStats] = useState<{ averagePercentage: number; totalResponses: number } | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     const currentQuestion = preguntas[currentQuestionIndex];
     const isLastQuestion = currentQuestionIndex === preguntas.length - 1;
+
+    // Check if user already answered on mount
+    useEffect(() => {
+        if (invitationId) {
+            checkQuizStatus();
+        } else {
+            setIsCheckingStatus(false);
+        }
+    }, [invitationId, guestToken]);
+
+    const checkQuizStatus = async () => {
+        try {
+            const params = new URLSearchParams({ invitationId: invitationId! });
+            if (guestToken) {
+                params.append("guestToken", guestToken);
+            }
+            
+            const response = await fetch(`/api/quiz?${params.toString()}`);
+            const data = await response.json();
+            
+            setHasAnswered(data.hasAnswered);
+            if (data.totalResponses > 0) {
+                setGlobalStats({
+                    averagePercentage: data.averagePercentage,
+                    totalResponses: data.totalResponses
+                });
+            }
+        } catch (error) {
+            console.error("Error checking quiz status:", error);
+        } finally {
+            setIsCheckingStatus(false);
+        }
+    };
+
+    const saveQuizResponse = async (answers: number[], score: number) => {
+        if (!invitationId) return;
+
+        setIsSaving(true);
+        try {
+            const response = await fetch('/api/quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    invitationId,
+                    guestName: guestName || 'Invitado Anónimo',
+                    guestToken: guestToken || null,
+                    answers,
+                    score,
+                    totalQuestions: preguntas.length
+                })
+            });
+
+            if (response.ok) {
+                // Refresh stats
+                await checkQuizStatus();
+            }
+        } catch (error) {
+            console.error("Error saving quiz response:", error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const handleAnswerSelect = (index: number) => {
         setSelectedAnswer(index);
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (selectedAnswer === null) return;
 
         const newAnswers = [...userAnswers, selectedAnswer];
         setUserAnswers(newAnswers);
 
         if (isLastQuestion) {
+            const score = calculateScoreFromAnswers(newAnswers);
             setShowResults(true);
+            // Save to database
+            await saveQuizResponse(newAnswers, score.correct);
         } else {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
             setSelectedAnswer(null);
@@ -46,16 +119,13 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas }: QuizTriviaPr
     };
 
     const handleRestart = () => {
-        setCurrentQuestionIndex(0);
-        setSelectedAnswer(null);
-        setUserAnswers([]);
-        setShowResults(false);
+        // Quiz can only be answered once
         setHasStarted(false);
     };
 
-    const calculateScore = () => {
+    const calculateScoreFromAnswers = (answers: number[]) => {
         let correct = 0;
-        userAnswers.forEach((answer, index) => {
+        answers.forEach((answer, index) => {
             if (answer === preguntas[index].respuestaCorrecta) {
                 correct++;
             }
@@ -66,6 +136,52 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas }: QuizTriviaPr
             percentage: Math.round((correct / preguntas.length) * 100),
         };
     };
+
+    const calculateScore = () => {
+        return calculateScoreFromAnswers(userAnswers);
+    };
+
+    if (isCheckingStatus) {
+        return (
+            <section className="py-16 px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+                <div className="max-w-2xl mx-auto text-center space-y-6">
+                    <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
+                </div>
+            </section>
+        );
+    }
+
+    if (hasAnswered && !hasStarted) {
+        return (
+            <section className="py-16 px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+                <div className="max-w-2xl mx-auto text-center space-y-6">
+                    <div className="text-6xl">✅</div>
+                    <h2
+                        className="text-3xl md:text-4xl"
+                        style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}
+                    >
+                        Ya completaste este quiz
+                    </h2>
+                    <p className="text-lg text-muted-foreground">
+                        ¡Gracias por participar! Solo se puede responder una vez.
+                    </p>
+                    {globalStats && (
+                        <Card className="mt-6">
+                            <CardContent className="pt-6">
+                                <p className="text-sm text-muted-foreground mb-2">Estadísticas globales</p>
+                                <div className="text-4xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                                    {globalStats.averagePercentage}%
+                                </div>
+                                <p className="text-muted-foreground mt-2">
+                                    Promedio de aciertos ({globalStats.totalResponses} {globalStats.totalResponses === 1 ? 'participante' : 'participantes'})
+                                </p>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
+            </section>
+        );
+    }
 
     if (!hasStarted) {
         return (
@@ -124,6 +240,12 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas }: QuizTriviaPr
                 <div className="max-w-2xl mx-auto">
                     <Card className="text-center">
                         <CardContent className="pt-8 pb-8 space-y-6">
+                            {isSaving && (
+                                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Guardando resultados...
+                                </div>
+                            )}
                             <div className="text-8xl">{emoji}</div>
                             <h3 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
                                 ¡Quiz Completado!
@@ -137,6 +259,19 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas }: QuizTriviaPr
                                 </p>
                                 <p className="text-lg font-medium mt-4">{mensaje}</p>
                             </div>
+
+                            {/* Global Stats */}
+                            {globalStats && globalStats.totalResponses > 0 && (
+                                <div className="mt-6 p-4 bg-slate-50 rounded-lg">
+                                    <p className="text-sm text-muted-foreground mb-2">📊 Estadísticas globales</p>
+                                    <div className="text-3xl font-bold text-slate-700">
+                                        {globalStats.averagePercentage}%
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                        Promedio de aciertos de {globalStats.totalResponses} {globalStats.totalResponses === 1 ? 'participante' : 'participantes'}
+                                    </p>
+                                </div>
+                            )}
 
                             {/* Detalle de respuestas */}
                             <div className="mt-8 space-y-3 text-left">
@@ -165,13 +300,11 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas }: QuizTriviaPr
                                 })}
                             </div>
 
-                            <Button
-                                onClick={handleRestart}
-                                variant="outline"
-                                className="mt-6"
-                            >
-                                Intentar de nuevo
-                            </Button>
+                            <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                                <p className="text-sm text-amber-800">
+                                    ℹ️ El quiz solo puede responderse una vez
+                                </p>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

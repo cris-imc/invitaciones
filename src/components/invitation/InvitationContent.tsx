@@ -218,6 +218,9 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                         <MotivationalSection
                             triviaEnabled={invitation.triviaHabilitada}
                             triviaData={triviaData}
+                            invitationId={invitation.id}
+                            guestName={guest?.name}
+                            guestToken={guest?.uniqueToken}
                         />
 
                         {/* Cronograma */}
@@ -259,11 +262,13 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                         {invitation.albumCompartidoHabilitado && (
                             <ScrollReveal>
                                 <SharedAlbum
-                                    icono={invitation.albumCompartidoIcono}
-                                    titulo={invitation.albumCompartidoTitulo || "COMPARTE TUS FOTOS"}
+                                    invitationSlug={invitation.slug}
+                                    titulo={invitation.albumCompartidoTitulo || "Álbum Colaborativo"}
                                     descripcion={invitation.albumCompartidoDescripcion}
-                                    botonTexto={invitation.albumCompartidoBotonTexto || "IR AL ÁLBUM"}
-                                    albumUrl={`/album/${invitation.id}`}
+                                    colorPrimario={themeConfig.primaryColor || '#c7757f'}
+                                    fechaEvento={invitation.fechaEvento}
+                                    horaEvento={invitation.hora || undefined}
+                                    guestName={guest?.name}
                                 />
                             </ScrollReveal>
                         )}
@@ -359,10 +364,13 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                                           We can check invitation type to send different default if needed.
                                           But for now we use what is in `despedidaTexto` */}
                                     <Farewell
-                                        icono={invitation.despedidaIcono}
-                                        texto={invitation.despedidaTexto || (invitation.tipo === 'CASAMIENTO' ? "LOS ESPERAMOS" : "TE ESPERO")}
-                                        nombre={nombreFestejado}
-                                        foto={invitation.despedidaFoto}
+                                        nombreEvento={invitation.nombreEvento}
+                                        tipo={invitation.tipo}
+                                        nombreNovia={invitation.nombreNovia}
+                                        nombreNovio={invitation.nombreNovio}
+                                        nombreQuinceanera={invitation.nombreQuinceanera}
+                                        colorPrincipal={themeConfig.primaryColor || '#c7757f'}
+                                        despedidaFoto={invitation.despedidaFoto}
                                     />
                                 </ScrollReveal>
                             )}

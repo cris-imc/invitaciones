@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CollaborativeAlbumUpload } from "./CollaborativeAlbumUpload";
-import { ScrollReveal } from "./ScrollReveal";
+import { motion } from "framer-motion";
+import { CollaborativeAlbumUpload } from "@/components/invitation/CollaborativeAlbumUpload";
 import { Loader2 } from "lucide-react";
 
 interface Photo {
@@ -12,33 +12,21 @@ interface Photo {
     createdAt: string;
 }
 
-interface SharedAlbumProps {
+interface CollaborativeAlbumModernProps {
     invitationSlug: string;
-    titulo?: string;
-    descripcion?: string;
-    colorPrimario?: string;
     fechaEvento?: Date;
     horaEvento?: string;
-    guestName?: string; // From personalized link
+    guestName?: string;
 }
 
-export function SharedAlbum({
-    invitationSlug,
-    titulo = "Álbum Colaborativo",
-    descripcion = "Subí tus fotos favoritas del evento y mirá las de los demás invitados",
-    colorPrimario = "#000000",
-    fechaEvento,
-    horaEvento,
-    guestName,
-}: SharedAlbumProps) {
+export function CollaborativeAlbumModern({ invitationSlug, fechaEvento, horaEvento, guestName }: CollaborativeAlbumModernProps) {
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Check if event has started (compare in UTC to avoid timezone issues)
+    // Check if event has started (compare timestamps to avoid timezone issues)
     const eventHasStarted = fechaEvento ? (() => {
         const now = new Date();
         const eventDate = new Date(fechaEvento);
-        // Compare timestamps directly
         return now.getTime() >= eventDate.getTime();
     })() : true;
 
@@ -61,32 +49,33 @@ export function SharedAlbum({
     }, [invitationSlug]);
 
     return (
-        <section className="py-20 px-4 bg-slate-50">
-            <ScrollReveal>
-                <div className="max-w-6xl mx-auto">
+        <section className="relative min-h-screen bg-black text-white py-32">
+            <div className="container mx-auto px-6 max-w-6xl">
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="space-y-16"
+                >
                     {/* Header */}
-                    <div className="text-center mb-12">
-                        <div className="text-6xl mb-6">📸</div>
-                        <h2
-                            className="text-3xl md:text-4xl font-bold mb-4"
-                            style={{ color: colorPrimario, fontFamily: "var(--font-ornamental)" }}
-                        >
-                            {titulo}
+                    <div className="text-center">
+                        <h2 className="text-5xl md:text-7xl font-thin mb-6" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                            Álbum Colaborativo
                         </h2>
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                            {descripcion}
+                        <p className="text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
+                            Compartí tus fotos favoritas del evento y mirá las de los demás invitados
                         </p>
                     </div>
 
                     {/* Upload Component or Event Not Started Message */}
-                    <div className="mb-16">
+                    <div className="max-w-md mx-auto">
                         {!eventHasStarted ? (
-                            <div className="max-w-md mx-auto p-6 bg-amber-50 border border-amber-200 rounded-lg text-center">
-                                <p className="text-amber-800 font-medium">
+                            <div className="p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-center">
+                                <p className="text-white font-light mb-2">
                                     📅 El álbum colaborativo estará disponible una vez que inicie el evento
                                 </p>
                                 {fechaEvento && (
-                                    <p className="text-sm text-amber-600 mt-2">
+                                    <p className="text-sm text-white/60 mt-2">
                                         {new Date(fechaEvento).toLocaleDateString('es-AR', {
                                             day: 'numeric',
                                             month: 'long',
@@ -109,14 +98,18 @@ export function SharedAlbum({
                     {/* Photos Grid */}
                     {isLoading ? (
                         <div className="flex justify-center items-center py-12">
-                            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                            <Loader2 className="w-8 h-8 animate-spin text-white/40" />
                         </div>
                     ) : photos.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {photos.map((photo, index) => (
-                                <div
+                                <motion.div
                                     key={photo.id}
-                                    className="relative group overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className="relative group overflow-hidden rounded-lg hover:-translate-y-1 transition-transform duration-300"
                                     style={{
                                         animation: `subtle-dance 3s ease-in-out infinite`,
                                         animationDelay: `${index * 0.1}s`
@@ -127,9 +120,9 @@ export function SharedAlbum({
                                         alt={`Foto de ${photo.uploadedBy}`}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                                         <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center justify-between">
-                                            <p className="text-white text-sm font-medium">
+                                            <p className="text-white text-sm font-light">
                                                 📷 {photo.uploadedBy}
                                             </p>
                                             <a
@@ -152,18 +145,18 @@ export function SharedAlbum({
                                             75% { transform: translateY(-2px) rotate(-0.5deg); }
                                         }
                                     `}</style>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <p className="text-gray-500">
+                            <p className="text-white/50 text-lg">
                                 Aún no hay fotos. ¡Sé el primero en subir una!
                             </p>
                         </div>
                     )}
-                </div>
-            </ScrollReveal>
+                </motion.div>
+            </div>
         </section>
     );
 }

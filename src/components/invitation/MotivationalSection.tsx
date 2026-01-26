@@ -47,9 +47,12 @@ interface MotivationalSectionProps {
     triviaEnabled: boolean;
     triviaData?: any;
     eventType?: 'CASAMIENTO' | 'QUINCE_ANOS' | 'CUMPLEANOS' | 'ANIVERSARIO' | string;
+    invitationId?: string;
+    guestName?: string;
+    guestToken?: string;
 }
 
-export function MotivationalSection({ triviaEnabled, triviaData, eventType = 'CUMPLEANOS' }: MotivationalSectionProps) {
+export function MotivationalSection({ triviaEnabled, triviaData, eventType = 'CUMPLEANOS', invitationId, guestName, guestToken }: MotivationalSectionProps) {
     const [phrase, setPhrase] = useState("");
 
     useEffect(() => {
@@ -95,6 +98,9 @@ export function MotivationalSection({ triviaEnabled, triviaData, eventType = 'CU
                         titulo={triviaData.titulo}
                         subtitulo={triviaData.subtitulo}
                         preguntas={triviaData.preguntas}
+                        invitationId={invitationId}
+                        guestName={guestName}
+                        guestToken={guestToken}
                     />
                 </div>
             )}

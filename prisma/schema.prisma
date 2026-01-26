@@ -226,3 +226,17 @@ model Cuestionario {
   titulo       String
   preguntas    String // JSON as string for SQLite
 }
+
+model QuizResponse {
+  id           String   @id @default(cuid())
+  invitationId String
+  guestName    String // Nombre del invitado que respondió
+  guestToken   String? // Token del guest si es personalizado
+  answers      String // JSON array de respuestas: [0, 2, 1, 3] (índices de respuestas seleccionadas)
+  score        Int // Cantidad de respuestas correctas
+  totalQuestions Int // Total de preguntas
+  createdAt    DateTime @default(now())
+
+  @@index([invitationId])
+  @@index([guestToken])
+}

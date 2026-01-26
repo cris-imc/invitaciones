@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { MarqueeGallery } from "@/components/animations/MarqueeGallery";
 import { useToast } from "@/components/ui/Toast";
 import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { CollaborativeAlbumModern } from "./CollaborativeAlbumModern";
 
 interface ModernInvitationProps {
     invitation: any;
@@ -76,8 +77,8 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
     ];
 
     // Get gallery photos
-    const galleryPhotos = invitation.galeriaPrincipalFotos 
-        ? JSON.parse(invitation.galeriaPrincipalFotos) 
+    const galleryPhotos = invitation.galeriaPrincipalFotos
+        ? JSON.parse(invitation.galeriaPrincipalFotos)
         : [];
 
     return (
@@ -114,7 +115,7 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                     <div
                         className="absolute inset-0 bg-cover bg-center"
                         style={{
-                            backgroundImage: invitation.portadaImagenFondo 
+                            backgroundImage: invitation.portadaImagenFondo
                                 ? `url(${invitation.portadaImagenFondo})`
                                 : 'url(https://images.unsplash.com/photo-1519741497674-611481863552?w=1200)',
                         }}
@@ -196,7 +197,7 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                                 Celebremos juntos
                             </h2>
                             <p className="text-lg text-gray-600 leading-relaxed">
-                                Con gran alegría te invitamos a ser parte de este día tan especial. 
+                                Con gran alegría te invitamos a ser parte de este día tan especial.
                                 Tu presencia hará que este momento sea aún más memorable.
                             </p>
                             <div className="pt-4">
@@ -207,7 +208,7 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                         <div className="hidden md:block" />
                     </div>
                 </div>
-                
+
                 {/* Absolute Image - Half Screen */}
                 <motion.div
                     style={{ opacity: imageOpacity, y: imageY }}
@@ -218,7 +219,7 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                         style={{
                             backgroundImage: invitation.imagenCelebremosJuntos
                                 ? `url(${invitation.imagenCelebremosJuntos})`
-                                : galleryPhotos.length > 0 
+                                : galleryPhotos.length > 0
                                     ? `url(${galleryPhotos[0]})`
                                     : 'url(https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600)',
                         }}
@@ -342,6 +343,16 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                 </div>
             </section>
 
+            {/* COLLABORATIVE ALBUM SECTION */}
+            {invitation.albumCompartidoHabilitado && (
+                <CollaborativeAlbumModern
+                    invitationSlug={invitation.slug}
+                    fechaEvento={invitation.fechaEvento}
+                    horaEvento={invitation.hora || undefined}
+                    guestName={guest?.name}
+                />
+            )}
+
             {/* BANK DETAILS SECTION */}
             {invitation.regaloHabilitado && invitation.regaloMostrarDatos && (
                 <BankDetailsModern
@@ -381,7 +392,7 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                                     {' '}({invitation.rsvpDaysBeforeEvent || 7} días antes del evento)
                                 </p>
                             </div>
-                            <PersonalizedRsvpForm guest={guest} invitation={invitation} onSuccess={() => {}} />
+                            <PersonalizedRsvpForm guest={guest} invitation={invitation} onSuccess={() => { }} />
                         </motion.div>
                     </div>
                 </section>
@@ -410,6 +421,34 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                     </div>
                 </section>
             )}
+
+            {/* FAREWELL SECTION */}
+            <section className="relative min-h-screen bg-gradient-to-b from-white to-gray-50 text-black flex items-center py-32">
+                <div className="container mx-auto px-6 max-w-3xl">
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-center space-y-8"
+                    >
+                        <div className="text-6xl mb-8">✨</div>
+                        <h2 className="text-5xl md:text-7xl font-thin mb-6" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                            {invitation.tipo === 'CASAMIENTO' ? 'Te esperamos' : 'Te espero'}
+                        </h2>
+                        <p className="text-3xl md:text-4xl font-light" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                            {invitation.tipo === 'CASAMIENTO'
+                                ? `${invitation.nombreNovia} & ${invitation.nombreNovio}`
+                                : invitation.nombreQuinceanera || invitation.nombreEvento
+                            }
+                        </p>
+                        <div className="flex items-center justify-center gap-4 pt-8">
+                            <div className="h-px w-24 bg-black/20" />
+                            <div className="w-2 h-2 rounded-full bg-black" />
+                            <div className="h-px w-24 bg-black/20" />
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
 
             {/* FOOTER */}
             <section className="relative bg-black text-white py-20">

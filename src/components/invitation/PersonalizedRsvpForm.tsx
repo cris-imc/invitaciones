@@ -30,6 +30,7 @@ export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: Personali
     const [count, setCount] = useState<string>(guest.attendingCount > 0 ? guest.attendingCount.toString() : guest.expectedCount.toString());
     const [message, setMessage] = useState(guest.message || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLocked, setIsLocked] = useState(guest.status !== "PENDING");
     const { showToast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -53,6 +54,7 @@ export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: Personali
 
             if (res.ok) {
                 showToast("¡Gracias por confirmar tu asistencia!", "success");
+                setIsLocked(true);
                 onSuccess();
             } else {
                 showToast("Hubo un error al guardar tu respuesta", "error");
@@ -68,7 +70,42 @@ export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: Personali
     return (
         <Card className="max-w-md mx-auto shadow-sm">
             <CardContent className="pt-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
+                {isLocked ? (
+                    <div className="space-y-6">
+                        {/* Status Display */}
+                        <div className={`p-6 rounded-lg border-2 ${attending === "yes" ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}>
+                            <div className="text-center space-y-3">
+                                <div className="text-5xl">
+                                    {attending === "yes" ? "✅" : "❌"}
+                                </div>
+                                <h3 className="text-2xl font-bold">
+                                    {attending === "yes" ? "¡Confirmaste tu asistencia!" : "No podrás asistir"}
+                                </h3>
+                                {attending === "yes" && guest.type === "FAMILY" && (
+                                    <p className="text-lg">
+                                        {count} {parseInt(count) === 1 ? "persona" : "personas"}
+                                    </p>
+                                )}
+                                {message && (
+                                    <div className="mt-4 p-3 bg-white/50 rounded-lg">
+                                        <p className="text-sm text-muted-foreground">Tu mensaje:</p>
+                                        <p className="text-sm italic">{message}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Edit Button */}
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setIsLocked(false)}
+                        >
+                            Modificar respuesta
+                        </Button>
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-3">
                         <Label>¿Podrás asistir?</Label>
                         <RadioGroup value={attending} onValueChange={setAttending} className="flex flex-col space-y-2">
@@ -118,6 +155,7 @@ export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: Personali
                         {isSubmitting ? "Enviando..." : "Confirmar Respuesta"}
                     </Button>
                 </form>
+                )}
             </CardContent>
         </Card>
     );
