@@ -1,5 +1,14 @@
 // Plantillas de colores predefinidas
 export const COLOR_TEMPLATES = {
+  'dorado': {
+    id: 'dorado',
+    name: 'Dorado Sofisticado',
+    primaryColor: '#d4af37',
+    backgroundColor: '#ffffff',
+    textDark: '#1a1a1a',
+    textLight: '#ffffff',
+    textSecondary: '#666666',
+  },
   'rosa-salmon': {
     id: 'rosa-salmon',
     name: 'Elegancia Rosa',
@@ -31,15 +40,6 @@ export const COLOR_TEMPLATES = {
     id: 'purpura',
     name: 'Púrpura Elegante',
     primaryColor: '#9b59b6',
-    backgroundColor: '#ffffff',
-    textDark: '#1a1a1a',
-    textLight: '#ffffff',
-    textSecondary: '#666666',
-  },
-  'dorado': {
-    id: 'dorado',
-    name: 'Dorado Sofisticado',
-    primaryColor: '#d4af37',
     backgroundColor: '#ffffff',
     textDark: '#1a1a1a',
     textLight: '#ffffff',
@@ -216,9 +216,9 @@ export interface ThemeConfig {
 
 // Configuración por defecto
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
-  colorTemplate: 'rosa-salmon',
+  colorTemplate: 'dorado',
   layout: 'classic',
-  primaryColor: '#c7757f',
+  primaryColor: '#d4af37',
   backgroundColor: '#ffffff',
   textDark: '#1a1a1a',
   textLight: '#ffffff',

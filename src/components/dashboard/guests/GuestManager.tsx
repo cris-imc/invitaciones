@@ -29,11 +29,11 @@ interface Guest {
 }
 
 interface GuestManagerProps {
-    invitationId: string;
+    slug: string;
     initialRsvpEnabled: boolean;
 }
 
-export function GuestManager({ invitationId, initialRsvpEnabled }: GuestManagerProps) {
+export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
     const [guests, setGuests] = useState<Guest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
@@ -48,11 +48,11 @@ export function GuestManager({ invitationId, initialRsvpEnabled }: GuestManagerP
 
     useEffect(() => {
         fetchGuests();
-    }, [invitationId]);
+    }, [slug]);
 
     const fetchGuests = async () => {
         try {
-            const res = await fetch(`/api/invitations/${invitationId}/guests`);
+            const res = await fetch(`/api/invitations/${slug}/guests`);
             if (res.ok) {
                 const data = await res.json();
                 setGuests(data);
@@ -69,7 +69,7 @@ export function GuestManager({ invitationId, initialRsvpEnabled }: GuestManagerP
         setIsSubmitting(true);
 
         try {
-            const res = await fetch(`/api/invitations/${invitationId}/guests`, {
+            const res = await fetch(`/api/invitations/${slug}/guests`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -110,7 +110,7 @@ export function GuestManager({ invitationId, initialRsvpEnabled }: GuestManagerP
     };
 
     const copyLink = (token: string) => {
-        const url = `${window.location.origin}/invite/${invitationId}/${token}`;
+        const url = `${window.location.origin}/invite/${slug}/${token}`;
         navigator.clipboard.writeText(url);
         showToast("¡Enlace copiado! Compártelo con el invitado.", "success");
     };

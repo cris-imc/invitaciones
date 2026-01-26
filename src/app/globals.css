@@ -28,8 +28,8 @@
   
   /* Variables de tema para invitaciones (valores por defecto) */
   /* Estas serán sobrescritas por el ThemeProvider */
-  --color-primary: #c7757f;
-  --color-primary-rgb: 199, 117, 127;
+  --color-primary: #d4af37;
+  --color-primary-rgb: 212, 175, 55;
   --color-bg: #ffffff;
   --color-text-dark: #1a1a1a;
   --color-text-light: #ffffff;

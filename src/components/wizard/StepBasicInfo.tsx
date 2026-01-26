@@ -26,6 +26,7 @@ export function StepBasicInfo() {
             nombreNovio: data.nombreNovio || "",
             nombreNovia: data.nombreNovia || "",
             nombreQuinceanera: data.nombreQuinceanera || "",
+            rsvpDaysBeforeEvent: data.rsvpDaysBeforeEvent || 7,
         },
     });
 

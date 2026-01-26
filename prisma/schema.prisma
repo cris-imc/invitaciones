@@ -44,15 +44,21 @@ model Invitation {
   mapUrl      String?
 
   // Configuración
-  templateId  String
-  temaColores String // JSON as string for SQLite
-  musicaUrl   String?
+  templateId            String
+  templateTipo          String  @default("ORIGINAL") // ORIGINAL, PARALLAX
+  temaColores           String // JSON as string for SQLite (mantener para backward compatibility)
+  imagenCelebremosJuntos String?
+  cronogramaEventos     String? // JSON array: [{time, title, icon}]
+  musicaUrl             String?
 
   // 1. PORTADA
-  portadaHabilitada  Boolean @default(true)
-  portadaTitulo      String?
-  portadaTextoBoton  String?
-  portadaImagenFondo String?
+  portadaHabilitada     Boolean @default(true)
+  portadaTitulo         String?
+  portadaTextoBoton     String?
+  portadaImagenFondo    String?
+  portadaImagenPosX     Int     @default(50)
+  portadaImagenPosY     Int     @default(50)
+  portadaImagenEscala   Int     @default(100)
 
   // 2. MÚSICA
   musicaHabilitada Boolean @default(true)
@@ -130,6 +136,7 @@ model Invitation {
   rsvpEnabled  Boolean   @default(true) // Replaces confirmacionHabilitada
   rsvpType     String?   @default("INDIVIDUAL") // INDIVIDUAL, FAMILY
   rsvpDeadline DateTime? // Replaces confirmacionFechaLimite
+  rsvpDaysBeforeEvent Int? @default(7) // Días sugeridos antes del evento para confirmar
 
   // Legacy confirmation fields (keep for now or migrate)
   confirmacionHabilitada  Boolean   @default(true)

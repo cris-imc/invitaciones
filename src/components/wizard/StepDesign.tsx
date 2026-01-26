@@ -3,109 +3,126 @@
 import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { COLOR_TEMPLATES, ColorTemplateId } from "@/lib/theme-config";
 import { ImageUploader } from "@/components/ui/ImageUploader";
+import { Sparkles, Image as ImageIcon } from "lucide-react";
+
+const TEMPLATES = [
+    {
+        id: "ORIGINAL",
+        name: "Original",
+        description: "Diseño clásico con acentos dorados y transiciones suaves",
+        color: "#d4af37",
+        features: ["Diseño vertical", "Colores cálidos", "Estilo tradicional"]
+    },
+    {
+        id: "PARALLAX",
+        name: "Parallax",
+        description: "Diseño moderno con efectos de profundidad y minimalismo",
+        color: "#000000",
+        features: ["Efectos parallax", "Minimalista", "Blanco y negro"]
+    }
+];
 
 export function StepDesign() {
-    const { data, setData, themeConfig, setThemeConfig, nextStep, prevStep } = useWizardStore();
+    const { data, setData, nextStep, prevStep } = useWizardStore();
+    const selectedTemplate = data.templateTipo || "ORIGINAL";
 
-    const handleTemplateSelect = (templateId: ColorTemplateId) => {
-        const template = COLOR_TEMPLATES[templateId];
-        setThemeConfig({
-            colorTemplate: templateId,
-            primaryColor: template.primaryColor,
-            backgroundColor: template.backgroundColor,
-            textDark: template.textDark,
-            textLight: template.textLight,
-            textSecondary: template.textSecondary,
-        });
+    const handleTemplateSelect = (templateId: string) => {
+        setData({ templateTipo: templateId });
     };
 
     return (
         <div className="space-y-8">
             <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Diseño y Estilo</h2>
+                <h2 className="text-2xl font-bold mb-2">Selecciona tu Plantilla</h2>
                 <p className="text-muted-foreground">
-                    Personaliza los colores y la imagen de fondo de tu invitación
+                    Elige el estilo que mejor represente tu evento
                 </p>
             </div>
 
-            {/* Layout Info (Fixed) */}
-            <div className="bg-slate-50 p-4 rounded-lg border text-center">
-                <p className="text-sm text-muted-foreground">
-                    Tu invitación utilizará el diseño <strong>Scroll Vertical</strong>, optimizado para una experiencia fluida y elegante.
-                </p>
+            {/* Template Selection */}
+            <div className="grid md:grid-cols-2 gap-6">
+                {TEMPLATES.map((template) => (
+                    <button
+                        key={template.id}
+                        type="button"
+                        onClick={() => handleTemplateSelect(template.id)}
+                        className={`
+                            relative p-6 rounded-xl border-2 transition-all text-left
+                            hover:shadow-lg
+                            ${selectedTemplate === template.id
+                                ? 'border-primary bg-primary/5 shadow-md'
+                                : 'border-gray-200 hover:border-primary/50'
+                            }
+                        `}
+                    >
+                        {selectedTemplate === template.id && (
+                            <div className="absolute top-4 right-4">
+                                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                                    <Sparkles className="w-4 h-4 text-white" />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-3 mb-4">
+                            <div
+                                className="w-12 h-12 rounded-lg flex items-center justify-center"
+                                style={{ backgroundColor: template.color }}
+                            >
+                                {template.id === "PARALLAX" ? (
+                                    <ImageIcon className="w-6 h-6 text-white" />
+                                ) : (
+                                    <Sparkles className="w-6 h-6 text-white" />
+                                )}
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold">{template.name}</h3>
+                                <p className="text-sm text-muted-foreground">{template.description}</p>
+                            </div>
+                        </div>
+
+                        <ul className="space-y-1">
+                            {template.features.map((feature, index) => (
+                                <li key={index} className="text-sm flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                    {feature}
+                                </li>
+                            ))}
+                        </ul>
+                    </button>
+                ))}
             </div>
 
             {/* Hero Background Image */}
             <div className="space-y-2">
-                <Label htmlFor="heroImagenFondo">Imagen de Fondo del Encabezado</Label>
+                <Label htmlFor="heroImagenFondo">Imagen de Portada Principal</Label>
                 <ImageUploader
                     currentImage={data.portadaImagenFondo}
                     onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
                     aspectRatio={16 / 9}
                 />
                 <p className="text-xs text-muted-foreground">
-                    Esta imagen se mostrará de fondo detrás de los nombres con opacidad baja para mejor legibilidad.
+                    Esta imagen aparecerá en la primera pantalla de tu invitación.
                 </p>
             </div>
 
-            {/* Paleta de Colores */}
-            <div className="space-y-4">
-                <Label className="text-lg font-semibold">Selecciona una Paleta de Colores</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {Object.values(COLOR_TEMPLATES).map((template) => (
-                        <button
-                            key={template.id}
-                            type="button"
-                            onClick={() => handleTemplateSelect(template.id as ColorTemplateId)}
-                            className={`
-                                flex flex-col items-center gap-2 p-4 rounded-lg transition-all
-                                ${themeConfig.colorTemplate === template.id
-                                    ? 'bg-primary/5 ring-2 ring-primary'
-                                    : 'hover:bg-primary/5 border hover:border-primary/50'
-                                }
-                            `}
-                        >
-                            <div
-                                className="w-12 h-12 rounded-full shadow-md"
-                                style={{ backgroundColor: template.primaryColor }}
-                            />
-                            <span className="text-sm font-medium text-center">
-                                {template.name}
-                            </span>
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Color Personalizado */}
-            <div className="space-y-2">
-                <Label htmlFor="customColor">O elige un color personalizado</Label>
-                <div className="flex gap-2 items-center">
-                    <Input
-                        id="customColor"
-                        type="color"
-                        value={themeConfig.primaryColor}
-                        onChange={(e) => setThemeConfig({
-                            colorTemplate: 'rosa-salmon',  // Reset template
-                            primaryColor: e.target.value
-                        })}
-                        className="w-20 h-12 cursor-pointer"
+            {/* Parallax-specific: Celebremos Juntos Image */}
+            {selectedTemplate === "PARALLAX" && (
+                <div className="space-y-2 border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-r-lg">
+                    <Label htmlFor="imagenCelebremosJuntos">
+                        Imagen "Celebremos Juntos" 
+                        <span className="text-xs text-muted-foreground ml-2">(Solo para Parallax)</span>
+                    </Label>
+                    <ImageUploader
+                        currentImage={data.imagenCelebremosJuntos}
+                        onImageUploaded={(url: string) => setData({ imagenCelebremosJuntos: url })}
+                        aspectRatio={3 / 4}
                     />
-                    <Input
-                        type="text"
-                        value={themeConfig.primaryColor}
-                        onChange={(e) => setThemeConfig({
-                            colorTemplate: 'rosa-salmon',
-                            primaryColor: e.target.value
-                        })}
-                        placeholder="#c7757f"
-                        className="flex-1"
-                    />
+                    <p className="text-xs text-muted-foreground">
+                        Esta imagen aparecerá en la mitad derecha de la pantalla con efecto parallax.
+                    </p>
                 </div>
-            </div>
+            )}
 
             <div className="flex justify-between pt-6">
                 <Button type="button" variant="outline" onClick={prevStep}>

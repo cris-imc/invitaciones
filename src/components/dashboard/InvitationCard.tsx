@@ -104,7 +104,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                 <div className="flex items-center gap-1.5">
                                     <Calendar className="w-4 h-4" />
                                     {new Date(invitation.fechaEvento).toLocaleDateString('es-AR', {
-                                        day: 'numeric', month: 'long', year: 'numeric'
+                                        day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC'
                                     })}
                                 </div>
                                 {invitation.lugarNombre && (
@@ -137,7 +137,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                         <Pencil className="w-3 h-3" />
                                         Editar
                                     </Button>
-                                    <Link href={`/dashboard/invitaciones/${invitation.id}/guests`}>
+                                    <Link href={`/dashboard/invitaciones/${invitation.slug}/guests`}>
                                         <Button
                                             variant="secondary"
                                             size="sm"

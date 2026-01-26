@@ -10,6 +10,7 @@ export const basicInfoSchema = z.object({
     nombreNovio: z.string().optional(),
     nombreNovia: z.string().optional(),
     nombreQuinceanera: z.string().optional(),
+    rsvpDaysBeforeEvent: z.number().min(1).max(90).default(7),
 });
 
 export const detailsSchema = z.object({

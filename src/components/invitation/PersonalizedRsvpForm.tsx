@@ -21,10 +21,11 @@ interface Guest {
 
 interface PersonalizedRsvpFormProps {
     guest: Guest;
+    invitation?: any;
     onSuccess: () => void;
 }
 
-export function PersonalizedRsvpForm({ guest, onSuccess }: PersonalizedRsvpFormProps) {
+export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: PersonalizedRsvpFormProps) {
     const [attending, setAttending] = useState<string>(guest.status === "CONFIRMED" ? "yes" : guest.status === "DECLINED" ? "no" : "");
     const [count, setCount] = useState<string>(guest.attendingCount > 0 ? guest.attendingCount.toString() : guest.expectedCount.toString());
     const [message, setMessage] = useState(guest.message || "");
@@ -66,14 +67,7 @@ export function PersonalizedRsvpForm({ guest, onSuccess }: PersonalizedRsvpFormP
 
     return (
         <Card className="max-w-md mx-auto shadow-sm">
-            <CardHeader className="text-center pb-2">
-                <CardTitle className="text-xl text-primary">Confirmar Asistencia</CardTitle>
-                <CardDescription>
-                    Hola <span className="font-semibold text-foreground">{guest.name}</span>, <br />
-                    por favor confirma tu presencia.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-3">
                         <Label>¿Podrás asistir?</Label>

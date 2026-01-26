@@ -9,6 +9,7 @@ import { StepGallery } from "./StepGallery";
 import { StepMusic } from "./StepMusic";
 import { StepTrivia } from "./StepTrivia";
 import { StepDesign } from "./StepDesign";
+import { StepCronograma } from "./StepCronograma";
 import { StepPreview } from "./StepPreview";
 import { StepPhrase } from "./StepPhrase";
 import { StepBankDetails } from "./StepBankDetails";
@@ -21,13 +22,14 @@ export function WizardSteps() {
         { component: StepEventType, label: "Tipo de Evento" },
         { component: StepBasicInfo, label: "Información Básica" },
         { component: StepDetails, label: "Detalles del Evento" },
+        { component: StepCronograma, label: "Cronograma" },
         { component: StepCoverPage, label: "Portada" },
         { component: StepGallery, label: "Galería" },
         { component: StepPhrase, label: "Frase" },
         { component: StepMusic, label: "Música" },
         { component: StepTrivia, label: "Trivia" },
         { component: StepBankDetails, label: "Regalo (CBU)" },
-        { component: StepDesign, label: "Diseño" },
+        { component: StepDesign, label: "Plantilla" },
         { component: StepPreview, label: "Vista Previa" },
     ];
 

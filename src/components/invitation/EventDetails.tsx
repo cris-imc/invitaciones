@@ -67,13 +67,13 @@ export function EventDetails({ lugarNombre, direccion, fecha, hora, mapUrl }: Ev
 
                             <div className="flex flex-col items-center gap-2">
                                 <p className="text-3xl md:text-4xl font-light text-gray-900 font-serif capitalize">
-                                    {fecha.toLocaleDateString('es-AR', { weekday: 'long' })}
+                                    {fecha.toLocaleDateString('es-AR', { weekday: 'long', timeZone: 'UTC' })}
                                 </p>
                                 <p className="text-5xl md:text-6xl font-medium text-primary font-serif">
-                                    {fecha.getDate()}
+                                    {fecha.getUTCDate()}
                                 </p>
                                 <p className="text-2xl md:text-3xl font-light text-gray-900 font-serif capitalize">
-                                    {fecha.toLocaleDateString('es-AR', { month: 'long' })}
+                                    {fecha.toLocaleDateString('es-AR', { month: 'long', timeZone: 'UTC' })}
                                 </p>
                             </div>
 

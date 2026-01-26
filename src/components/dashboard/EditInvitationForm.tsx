@@ -32,6 +32,7 @@ interface Invitation {
     tema?: string;
     musicaUrl?: string | null;
     templateId: string;
+    templateTipo?: string;
     temaColores: string;
 
     // Music
@@ -88,7 +89,8 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         direccion: invitation.direccion || '',
         mapUrl: invitation.mapUrl || '',
 
-        // Theme
+        // Theme & Template
+        templateTipo: invitation.templateTipo || 'ORIGINAL',
         colorPrincipal: temaColores?.primaryColor || temaColores?.colorPrincipal || '#e11d48',
         tema: temaColores?.tema || 'moderno',
 
@@ -119,6 +121,9 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         regaloCbu: invitation.regaloCbu || '',
         regaloAlias: invitation.regaloAlias || '',
         regaloTitular: invitation.regaloTitular || '',
+
+        // RSVP
+        rsvpDaysBeforeEvent: invitation.rsvpDaysBeforeEvent || 7,
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -293,6 +298,22 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                             </div>
                         )}
 
+                        {/* Días sugeridos para RSVP */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Días sugeridos para confirmar asistencia</label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="90"
+                                value={formData.rsvpDaysBeforeEvent}
+                                onChange={(e) => handleInputChange('rsvpDaysBeforeEvent', parseInt(e.target.value) || 7)}
+                                className="w-full p-2 border rounded-md"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Cuántos días antes del evento sugerirías que confirmen. Esto aparecerá como texto informativo, no como restricción.
+                            </p>
+                        </div>
+
                         {/* Lugar */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Lugar del Evento</label>
@@ -327,6 +348,47 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                 className="w-full p-2 border rounded-md"
                                 placeholder="https://maps.google.com/..."
                             />
+                        </div>
+
+                        {/* Selección de Plantilla */}
+                        <div className="space-y-3 border p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50">
+                            <label className="text-sm font-semibold block">Plantilla del Diseño</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => handleInputChange('templateTipo', 'ORIGINAL')}
+                                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                                        formData.templateTipo === 'ORIGINAL'
+                                            ? 'border-primary bg-white shadow-md'
+                                            : 'border-gray-200 hover:border-primary/50 bg-white/70'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-8 h-8 rounded-md bg-[#d4af37] flex items-center justify-center">
+                                            <span className="text-white text-xs font-bold">✨</span>
+                                        </div>
+                                        <span className="font-semibold text-sm">Original</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">Diseño clásico con acentos dorados</p>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleInputChange('templateTipo', 'PARALLAX')}
+                                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                                        formData.templateTipo === 'PARALLAX'
+                                            ? 'border-primary bg-white shadow-md'
+                                            : 'border-gray-200 hover:border-primary/50 bg-white/70'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center">
+                                            <span className="text-white text-xs font-bold">🖼️</span>
+                                        </div>
+                                        <span className="font-semibold text-sm">Parallax</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">Diseño moderno con efectos de profundidad</p>
+                                </button>
+                            </div>
                         </div>
 
                         {/* Color principal */}

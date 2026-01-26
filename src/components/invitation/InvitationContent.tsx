@@ -19,6 +19,8 @@ import Image from "next/image";
 import { MarqueeGallery } from "@/components/animations/MarqueeGallery";
 import { MotivationalSection } from "./MotivationalSection";
 import { HeroSection } from "./HeroSection";
+import { ModernInvitationTemplate } from "@/components/templates/ModernInvitationTemplate";
+import { CronogramaOriginal } from "./CronogramaOriginal";
 
 interface InvitationContentProps {
     invitation: any;
@@ -43,7 +45,7 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
     // Parse theme configuration
     const temaColores = safeJsonParse(invitation.temaColores, { colorPrincipal: '#c7757f' });
     const themeConfig: Partial<ThemeConfig> = {
-        colorTemplate: 'rosa-salmon', // Default fallback
+        colorTemplate: 'dorado', // Default fallback
         primaryColor: temaColores?.primaryColor || temaColores?.colorPrincipal || '#c7757f',
         backgroundColor: temaColores?.backgroundColor || '#ffffff',
         textDark: temaColores?.textDark || '#1a1a1a',
@@ -62,6 +64,7 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
     // Parse arrays directly
     const galeriaPrincipal = safeJsonParse(invitation.galeriaPrincipalFotos, []);
     const galeriaSecundaria = safeJsonParse(invitation.galeriaSecundariaFotos, []);
+    const cronogramaEvents = safeJsonParse(invitation.cronogramaEventos, []);
 
     // Helper para obtener el nombre completo (sin cortar)
     const getFirstName = (fullName: string | null | undefined) => {
@@ -101,6 +104,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         }
         return null;
     })() : null;
+
+    // Check if using Parallax template
+    if (invitation.templateTipo === "PARALLAX") {
+        return <ModernInvitationTemplate invitation={invitation} guest={guest} isPersonalized={isPersonalized} />;
+    }
 
     return (
         <InvitationThemeProvider themeConfig={themeConfig}>
@@ -212,6 +220,13 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                             triviaData={triviaData}
                         />
 
+                        {/* Cronograma */}
+                        {cronogramaEvents.length > 0 && (
+                            <ScrollReveal>
+                                <CronogramaOriginal events={cronogramaEvents} />
+                            </ScrollReveal>
+                        )}
+
                         {/* Dress Code */}
                         {invitation.dresscodeHabilitado && (
                             <ScrollReveal>
@@ -281,25 +296,46 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                             <section className="py-20 px-4 bg-slate-50">
                                 <ScrollReveal>
                                     <div className="max-w-3xl mx-auto text-center space-y-8">
-                                        <div className="space-y-4">
-                                            <div className="text-6xl">{invitation.confirmacionIcono || "✉️"}</div>
-                                            <h2 className="text-3xl md:text-4xl" style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}>
-                                                {invitation.confirmacionTitulo || "Confirmá tu asistencia"}
-                                            </h2>
-                                            {invitation.confirmacionFechaLimite && (
-                                                <p className="text-lg text-muted-foreground">
-                                                    Fecha límite: {new Date(invitation.confirmacionFechaLimite).toLocaleDateString('es-AR')}
-                                                </p>
-                                            )}
-                                        </div>
-
                                         {isPersonalized && guest ? (
-                                            <PersonalizedRsvpForm
-                                                guest={guest}
-                                                onSuccess={() => alert("¡Gracias por confirmar!")}
-                                            />
+                                            <>
+                                                <div className="space-y-4">
+                                                    <div className="text-6xl">{invitation.confirmacionIcono || "✉️"}</div>
+                                                    <h2 className="text-3xl md:text-4xl" style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}>
+                                                        Hola, {guest.name}
+                                                    </h2>
+                                                    <p className="text-lg text-muted-foreground">
+                                                        Confirmá tu asistencia antes del{' '}
+                                                        {(() => {
+                                                            const eventDate = new Date(invitation.fechaEvento);
+                                                            const daysBeforeEvent = invitation.rsvpDaysBeforeEvent || 7;
+                                                            const deadlineDate = new Date(eventDate);
+                                                            deadlineDate.setUTCDate(deadlineDate.getUTCDate() - daysBeforeEvent);
+                                                            return deadlineDate.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+                                                        })()}
+                                                        {' '}({invitation.rsvpDaysBeforeEvent || 7} días antes del evento)
+                                                    </p>
+                                                </div>
+                                                <PersonalizedRsvpForm
+                                                    guest={guest}
+                                                    invitation={invitation}
+                                                    onSuccess={() => alert("¡Gracias por confirmar!")}
+                                                />
+                                            </>
                                         ) : (
-                                            <RSVPForm invitationId={invitation.id} />
+                                            <>
+                                                <div className="space-y-4">
+                                                    <div className="text-6xl">{invitation.confirmacionIcono || "✉️"}</div>
+                                                    <h2 className="text-3xl md:text-4xl" style={{ color: 'var(--color-primary)', fontFamily: "var(--font-ornamental)" }}>
+                                                        {invitation.confirmacionTitulo || "Confirmá tu asistencia"}
+                                                    </h2>
+                                                    {invitation.confirmacionFechaLimite && (
+                                                        <p className="text-lg text-muted-foreground">
+                                                            Fecha límite: {new Date(invitation.confirmacionFechaLimite).toLocaleDateString('es-AR')}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <RSVPForm invitationId={invitation.id} />
+                                            </>
                                         )}
                                     </div>
                                 </ScrollReveal>

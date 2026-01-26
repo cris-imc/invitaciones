@@ -42,57 +42,69 @@ export function HeroSection({
         const length = displayName.length;
 
         // Adjust font sizes based on character count
-        if (length > 40) return 'text-2xl md:text-3xl lg:text-4xl';
-        if (length > 30) return 'text-3xl md:text-4xl lg:text-5xl';
-        if (length > 14) return 'text-5xl md:text-6xl lg:text-7xl';
+        if (length > 40) return 'text-3xl md:text-4xl lg:text-5xl';
+        if (length > 30) return 'text-4xl md:text-5xl lg:text-6xl';
+        if (length > 14) return 'text-5xl md:text-7xl lg:text-8xl';
         return 'text-6xl md:text-8xl lg:text-9xl';
     };
 
     return (
-        <div
-            className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden pb-16"
-            style={{
-                backgroundColor: '#f8f8f8',
-            }}
-        >
-            {/* Background Image with reduced opacity */}
-            {imagenPortada && (
-                <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                        backgroundImage: `url(${imagenPortada})`,
-                        opacity: 0.6,
-                    }}
-                />
-            )}
+        <div className="relative">
+            {/* Hero Section */}
+            <div
+                className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+                style={{
+                    backgroundColor: '#fafafa',
+                }}
+            >
+                {/* Background Image with subtle opacity */}
+                {imagenPortada && (
+                    <div
+                        className="absolute inset-0 bg-cover bg-center"
+                        style={{
+                            backgroundImage: `url(${imagenPortada})`,
+                            opacity: 0.12,
+                            transform: 'scale(1.05)',
+                        }}
+                    />
+                )}
 
-            {/* Lighter gradient overlay for better visibility */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/20 to-white/40" />
+                {/* Main Content */}
+                <div className="relative z-10 text-center px-4 py-20 max-w-5xl mx-auto">
+                    {/* Event Type Label */}
+                    <div className="mb-10">
+                        <span
+                            className="inline-block text-xs md:text-sm uppercase tracking-[0.5em] font-light"
+                            style={{
+                                color: colorPrincipal,
+                                fontFamily: "'Montserrat', sans-serif",
+                            }}
+                        >
+                            {nombreEvento}
+                        </span>
+                    </div>
 
-            {/* Main Content */}
-            <div className="relative z-10 text-center px-4 flex-1 flex flex-col justify-center items-center w-full max-w-4xl mx-auto mt-10">
-
-                {/* Overlapping Typography Layout */}
-                <div className="relative mb-8">
-                    {/* Event Type / Pre-title */}
-                    <p
-                        className="text-lg md:text-xl tracking-[0.3em] uppercase text-muted-foreground mb-4 font-sans"
-                        style={{ fontFamily: "'Montserrat', sans-serif" }}
-                    >
-                        {nombreEvento}
-                    </p>
-
-                    {/* Names with Overlap */}
-                    <div className="relative">
+                    {/* Names */}
+                    <div className="mb-12">
                         <h1
-                            className={`leading-tight text-gray-900 ${getNameFontSize()}`}
-                            style={{ fontFamily: "'Parisienne', cursive", opacity: 0.9 }}
+                            className={`leading-[1.1] ${getNameFontSize()}`}
+                            style={{
+                                fontFamily: "'Cormorant Garamond', serif",
+                                fontWeight: '300',
+                                color: '#1a1a1a',
+                                letterSpacing: '-0.01em',
+                            }}
                         >
                             {tipo === 'CASAMIENTO' ? (
-                                <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-8">
-                                    <span className="leading-tight">{nombreNovia || "Novia"}</span>
-                                    <span className="text-primary italic text-4xl md:text-6xl my-2 md:my-0" style={{ fontFamily: "'Parisienne', cursive" }}>&</span>
-                                    <span className="leading-tight">{nombreNovio || "Novio"}</span>
+                                <div className="flex flex-col items-center gap-6">
+                                    <span>{nombreNovia || "Novia"}</span>
+                                    <Heart
+                                        className="w-10 h-10 md:w-14 md:h-14"
+                                        style={{ color: colorPrincipal }}
+                                        fill={colorPrincipal}
+                                        strokeWidth={1}
+                                    />
+                                    <span>{nombreNovio || "Novio"}</span>
                                 </div>
                             ) : (
                                 <span>{nombreQuinceanera || nombreEvento}</span>
@@ -101,24 +113,37 @@ export function HeroSection({
                     </div>
 
                     {/* Date */}
-                    <p className="mt-6 text-xl md:text-2xl text-gray-700 font-light border-t border-b border-gray-200 py-2 inline-block px-8">
-                        {new Date(fechaEvento).toLocaleDateString('es-AR', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                        })}
-                    </p>
-                </div>
+                    <div className="mb-16">
+                        <p
+                            className="text-base md:text-lg font-light tracking-widest uppercase"
+                            style={{
+                                fontFamily: "'Montserrat', sans-serif",
+                                color: '#888',
+                                letterSpacing: '0.2em',
+                            }}
+                        >
+                            {new Date(fechaEvento).toLocaleDateString('es-AR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                timeZone: 'UTC'
+                            }).replace(/\//g, ' . ')}
+                        </p>
+                    </div>
 
-                {/* Arrow Down */}
-                <div className="animate-bounce mb-8 text-primary/50">
-                    <ChevronDown className="w-8 h-8" />
+                    {/* Scroll Indicator */}
+                    <button
+                        onClick={scrollToDetails}
+                        className="animate-bounce text-gray-300 hover:text-gray-500 transition-colors mt-8"
+                        aria-label="Scroll to details"
+                    >
+                        <ChevronDown className="w-6 h-6 md:w-8 md:h-8" strokeWidth={1} />
+                    </button>
                 </div>
-
             </div>
 
-            {/* Integrated Countdown - Overlapping Bottom */}
-            <div className="relative z-20 w-full mb-[-4rem] md:mb-[-5rem]">
+            {/* Countdown Section - Separate from Hero */}
+            <div className="relative bg-white border-t border-gray-100">
                 <Countdown targetDate={fechaEvento} />
             </div>
         </div>

@@ -99,6 +99,11 @@ export async function POST(request: NextRequest) {
         // Generar slug único
         const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
 
+        // Ajustar la fecha para evitar problemas de zona horaria
+        // Asegurarse de que la fecha se guarde como medianoche en hora local
+        const eventDate = new Date(body.fecha);
+        eventDate.setHours(12, 0, 0, 0); // Establecer a mediodía para evitar problemas de zona horaria
+
         const invitation = await prisma.invitation.create({
             data: {
                 userId,
@@ -106,7 +111,7 @@ export async function POST(request: NextRequest) {
                 estado: 'ACTIVA',
                 slug,
                 nombreEvento: body.nombreEvento,
-                fechaEvento: new Date(body.fecha),
+                fechaEvento: eventDate,
                 nombreNovio: body.nombreNovio,
                 nombreNovia: body.nombreNovia,
                 nombreQuinceanera: body.nombreQuinceanera,
@@ -115,6 +120,7 @@ export async function POST(request: NextRequest) {
                 hora: body.hora,
                 mapUrl: body.mapUrl,
                 templateId: 'default',
+                templateTipo: body.templateTipo || 'ORIGINAL',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -131,6 +137,8 @@ export async function POST(request: NextRequest) {
                     letterSpacing: body.letterSpacing,
                     lineHeight: body.lineHeight,
                 }),
+                cronogramaEventos: body.cronogramaEventos || '[]',
+                imagenCelebremosJuntos: body.imagenCelebremosJuntos,
                 // 1. PORTADA
                 portadaHabilitada: body.portadaHabilitada !== undefined ? body.portadaHabilitada : true,
                 portadaTitulo: body.portadaTitulo,
@@ -167,6 +175,9 @@ export async function POST(request: NextRequest) {
                 triviaTitulo: body.triviaTitulo,
                 triviaSubtitulo: body.triviaSubtitulo,
                 triviaPreguntas: body.triviaPreguntas,
+
+                // RSVP
+                rsvpDaysBeforeEvent: body.rsvpDaysBeforeEvent || 7,
 
                 // Crear álbum automáticamente
                 album: {
@@ -213,12 +224,16 @@ export async function PUT(request: NextRequest) {
         // Generar nuevo slug si cambió el nombre del evento
         const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
 
+        // Ajustar la fecha para evitar problemas de zona horaria
+        const eventDate = new Date(body.fecha);
+        eventDate.setHours(12, 0, 0, 0); // Establecer a mediodía para evitar problemas de zona horaria
+
         const invitation = await prisma.invitation.update({
             where: { id },
             data: {
                 tipo: body.type || 'CASAMIENTO',
                 nombreEvento: body.nombreEvento,
-                fechaEvento: new Date(body.fecha),
+                fechaEvento: eventDate,
                 nombreNovio: body.nombreNovio || null,
                 nombreNovia: body.nombreNovia || null,
                 nombreQuinceanera: body.nombreQuinceanera || null,
@@ -228,6 +243,7 @@ export async function PUT(request: NextRequest) {
                 mapUrl: body.mapUrl || null,
                 musicaUrl: body.musicaUrl || null,
                 slug, // Nuevo slug
+                templateTipo: body.templateTipo || 'ORIGINAL',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -244,6 +260,8 @@ export async function PUT(request: NextRequest) {
                     letterSpacing: body.letterSpacing,
                     lineHeight: body.lineHeight,
                 }),
+                cronogramaEventos: body.cronogramaEventos,
+                imagenCelebremosJuntos: body.imagenCelebremosJuntos,
 
                 // 1. PORTADA
                 portadaHabilitada: body.portadaHabilitada,
