@@ -5,30 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { Sparkles, Image as ImageIcon } from "lucide-react";
+import { AVAILABLE_TEMPLATES } from "@/lib/theme-config";
 
-const TEMPLATES = [
-    {
-        id: "ORIGINAL",
-        name: "Original",
-        description: "Diseño clásico con acentos dorados y transiciones suaves",
-        color: "#d4af37",
-        features: ["Diseño vertical", "Colores cálidos", "Estilo tradicional"]
-    },
-    {
-        id: "PARALLAX",
-        name: "Parallax",
-        description: "Diseño moderno con efectos de profundidad y minimalismo",
-        color: "#000000",
-        features: ["Efectos parallax", "Minimalista", "Blanco y negro"]
-    }
-];
+
 
 export function StepDesign() {
-    const { data, setData, nextStep, prevStep } = useWizardStore();
+    const { data, setData, setThemeConfig, nextStep, prevStep } = useWizardStore();
     const selectedTemplate = data.templateTipo || "ORIGINAL";
 
     const handleTemplateSelect = (templateId: string) => {
         setData({ templateTipo: templateId });
+
+        const template = AVAILABLE_TEMPLATES.find(t => t.id === templateId);
+        if (template?.layoutId) {
+            // @ts-ignore - Valid layout id check implied
+            setThemeConfig({ layout: template.layoutId as any });
+        }
     };
 
     return (
@@ -42,7 +34,7 @@ export function StepDesign() {
 
             {/* Template Selection */}
             <div className="grid md:grid-cols-2 gap-6">
-                {TEMPLATES.map((template) => (
+                {AVAILABLE_TEMPLATES.map((template) => (
                     <button
                         key={template.id}
                         type="button"
@@ -110,7 +102,7 @@ export function StepDesign() {
             {selectedTemplate === "PARALLAX" && (
                 <div className="space-y-2 border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-r-lg">
                     <Label htmlFor="imagenCelebremosJuntos">
-                        Imagen "Celebremos Juntos" 
+                        Imagen "Celebremos Juntos"
                         <span className="text-xs text-muted-foreground ml-2">(Solo para Parallax)</span>
                     </Label>
                     <ImageUploader

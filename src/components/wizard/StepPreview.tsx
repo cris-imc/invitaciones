@@ -12,6 +12,10 @@ import { ModernTemplate } from "../templates/ModernTemplate";
 import { MinimalTemplate } from "../templates/MinimalTemplate";
 import { GlassTemplate } from "../templates/GlassTemplate";
 import { ParallaxTemplate } from "../templates/ParallaxTemplate";
+import { LuxuryMinimalistTemplate } from "../templates/LuxuryMinimalistTemplate";
+import { BotanicalGardenTemplate } from "../templates/BotanicalGardenTemplate";
+import { GoldenLuxuryTemplate } from "../templates/GoldenLuxuryTemplate";
+import { NeonNightTemplate } from "../templates/NeonNightTemplate";
 
 export function StepPreview() {
     const { data, themeConfig, prevStep } = useWizardStore();
@@ -81,6 +85,10 @@ export function StepPreview() {
                     {themeConfig.layout === 'minimal' && <MinimalTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'glass' && <GlassTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'parallax' && <ParallaxTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'luxury' && <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'botanical' && <BotanicalGardenTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'golden' && <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'neon' && <NeonNightTemplate data={formData} themeConfig={themeConfig} />}
                 </div>
             </div>
 

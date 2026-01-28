@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { AVAILABLE_TEMPLATES } from "@/lib/theme-config";
 
 interface Invitation {
     id: string;
@@ -61,6 +62,9 @@ interface Invitation {
     regaloCbu?: string | null;
     regaloAlias?: string | null;
     regaloTitular?: string | null;
+
+    // RSVP
+    rsvpDaysBeforeEvent?: number | null;
 }
 
 interface EditInvitationFormProps {
@@ -352,42 +356,35 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
                         {/* Selección de Plantilla */}
                         <div className="space-y-3 border p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50">
-                            <label className="text-sm font-semibold block">Plantilla del Diseño</label>
+                            <label className="text-sm font-semibold block">Seleccionar Plantilla</label>
                             <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => handleInputChange('templateTipo', 'ORIGINAL')}
-                                    className={`p-4 rounded-lg border-2 transition-all text-left ${
-                                        formData.templateTipo === 'ORIGINAL'
+                                {AVAILABLE_TEMPLATES.map((template) => (
+                                    <button
+                                        key={template.id}
+                                        type="button"
+                                        onClick={() => handleInputChange('templateTipo', template.id)}
+                                        className={`p-4 rounded-lg border-2 transition-all text-left ${formData.templateTipo === template.id
                                             ? 'border-primary bg-white shadow-md'
                                             : 'border-gray-200 hover:border-primary/50 bg-white/70'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-8 h-8 rounded-md bg-[#d4af37] flex items-center justify-center">
-                                            <span className="text-white text-xs font-bold">✨</span>
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div
+                                                className="w-8 h-8 rounded-md flex items-center justify-center"
+                                                style={{ backgroundColor: template.color }}
+                                            >
+                                                <span className="text-white text-xs font-bold">
+                                                    {template.id === 'ORIGINAL' && '✨'}
+                                                    {template.id === 'PARALLAX' && '🖼️'}
+                                                    {template.id === 'LUXURY' && '✨'}
+                                                    {template.id === 'BOTANICAL' && '🌿'}
+                                                </span>
+                                            </div>
+                                            <span className="font-semibold text-sm">{template.name}</span>
                                         </div>
-                                        <span className="font-semibold text-sm">Original</span>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">Diseño clásico con acentos dorados</p>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => handleInputChange('templateTipo', 'PARALLAX')}
-                                    className={`p-4 rounded-lg border-2 transition-all text-left ${
-                                        formData.templateTipo === 'PARALLAX'
-                                            ? 'border-primary bg-white shadow-md'
-                                            : 'border-gray-200 hover:border-primary/50 bg-white/70'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center">
-                                            <span className="text-white text-xs font-bold">🖼️</span>
-                                        </div>
-                                        <span className="font-semibold text-sm">Parallax</span>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">Diseño moderno con efectos de profundidad</p>
-                                </button>
+                                        <p className="text-xs text-muted-foreground">{template.description}</p>
+                                    </button>
+                                ))}
                             </div>
                         </div>
 

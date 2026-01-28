@@ -104,6 +104,26 @@ export const LAYOUT_TEMPLATES = {
     name: 'Parallax (Cinemático)',
     description: 'Efectos de profundidad y movimiento al hacer scroll',
   },
+  luxury: {
+    id: 'luxury',
+    name: 'Luxury (Editorial)',
+    description: 'Diseño minimalista de lujo con tipografía serif',
+  },
+  botanical: {
+    id: 'botanical',
+    name: 'Jardín Botánico',
+    description: 'Estilo orgánico con animaciones flotantes',
+  },
+  golden: {
+    id: 'golden',
+    name: 'Golden Luxury',
+    description: 'Elegancia clásica con detalles en oro y estilo Gatsby',
+  },
+  neon: {
+    id: 'neon',
+    name: 'Neon Night',
+    description: 'Estilo cyberpunk con efectos de luz y modo oscuro',
+  },
 } as const;
 
 export type LayoutTemplateId = keyof typeof LAYOUT_TEMPLATES;
@@ -304,3 +324,54 @@ export function generateCSSVariables(config: ThemeConfig): Record<string, string
     '--element-spacing': `${config.sectionSpacing / 4}px`,
   };
 }
+
+export const AVAILABLE_TEMPLATES = [
+  {
+    id: "ORIGINAL",
+    layoutId: "classic",
+    name: "Original",
+    description: "Diseño clásico con acentos dorados y transiciones suaves",
+    color: "#d4af37",
+    features: ["Diseño vertical", "Colores cálidos", "Estilo tradicional"]
+  },
+  {
+    id: "PARALLAX",
+    layoutId: "parallax",
+    name: "Parallax",
+    description: "Diseño moderno con efectos de profundidad y minimalismo",
+    color: "#000000",
+    features: ["Efectos parallax", "Minimalista", "Blanco y negro"]
+  },
+  {
+    id: "LUXURY",
+    layoutId: "luxury",
+    name: "Luxury",
+    description: "Minimalismo editorial de alto nivel con tipografía serif",
+    color: "#1a1a1a",
+    features: ["Tipografía editorial", "Estilo revista", "Animaciones suaves"]
+  },
+  {
+    id: "BOTANICAL",
+    layoutId: "botanical",
+    name: "Jardín Botánico",
+    description: "Estilo orgánico inspirado en la naturaleza",
+    color: "#3A5A40",
+    features: ["Formas orgánicas", "Animaciones flotantes", "Paleta natural"]
+  },
+  {
+    id: "GOLDEN",
+    layoutId: "golden",
+    name: "Golden Luxury",
+    description: "Elegancia clásica con detalles en oro y efecto Great Gatsby",
+    color: "#D4AF37",
+    features: ["Partículas doradas", "Estilo Gatsby", "Animaciones premium"]
+  },
+  {
+    id: "NEON",
+    layoutId: "neon",
+    name: "Neon Night",
+    description: "Estilo cyberpunk con efectos glitch y modo oscuro",
+    color: "#00F3FF",
+    features: ["Efectos Glitch", "Modo Oscuro", "Bordes de Neón"]
+  }
+] as const;

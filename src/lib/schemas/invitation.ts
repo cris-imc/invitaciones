@@ -44,6 +44,8 @@ export const musicSchema = z.object({
 export const designSchema = z.object({
     colorPrincipal: z.string(),
     tema: z.string().optional(),
+    templateTipo: z.string().optional().default("ORIGINAL"),
+    imagenCelebremosJuntos: z.string().optional(),
 });
 
 export const triviaSchema = z.object({

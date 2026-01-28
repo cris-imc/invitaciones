@@ -21,6 +21,10 @@ import { MotivationalSection } from "./MotivationalSection";
 import { HeroSection } from "./HeroSection";
 import { ModernInvitationTemplate } from "@/components/templates/ModernInvitationTemplate";
 import { CronogramaOriginal } from "./CronogramaOriginal";
+import { LuxuryMinimalistTemplate } from "@/components/templates/LuxuryMinimalistTemplate";
+import { BotanicalGardenTemplate } from "@/components/templates/BotanicalGardenTemplate";
+import { GoldenLuxuryTemplate } from "@/components/templates/GoldenLuxuryTemplate";
+import { NeonNightTemplate } from "@/components/templates/NeonNightTemplate";
 
 interface InvitationContentProps {
     invitation: any;
@@ -105,9 +109,57 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         return null;
     })() : null;
 
-    // Check if using Parallax template
     if (invitation.templateTipo === "PARALLAX") {
         return <ModernInvitationTemplate invitation={invitation} guest={guest} isPersonalized={isPersonalized} />;
+    }
+
+    if (invitation.templateTipo === "LUXURY") {
+        // Map invitation/Prisma data to InvitationFormData shape
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "BOTANICAL") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <BotanicalGardenTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "GOLDEN") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "NEON") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <NeonNightTemplate data={formData} themeConfig={themeConfig as any} />;
     }
 
     return (
