@@ -19,9 +19,11 @@ interface QuizTriviaProps {
     invitationId?: string;
     guestName?: string;
     guestToken?: string;
+    className?: string; // Root section override
+    cardClassName?: string; // Card component override
 }
 
-export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, guestName, guestToken }: QuizTriviaProps) {
+export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, guestName, guestToken, className, cardClassName }: QuizTriviaProps) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [userAnswers, setUserAnswers] = useState<number[]>([]);
@@ -50,10 +52,10 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
             if (guestToken) {
                 params.append("guestToken", guestToken);
             }
-            
+
             const response = await fetch(`/api/quiz?${params.toString()}`);
             const data = await response.json();
-            
+
             setHasAnswered(data.hasAnswered);
             if (data.totalResponses > 0) {
                 setGlobalStats({
@@ -143,7 +145,7 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
 
     if (isCheckingStatus) {
         return (
-            <section className="py-16 px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+            <section className={`py-16 px-4 ${className || ''}`} style={className ? undefined : { backgroundColor: 'var(--color-background)' }}>
                 <div className="max-w-2xl mx-auto text-center space-y-6">
                     <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
                 </div>
@@ -153,7 +155,7 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
 
     if (hasAnswered && !hasStarted) {
         return (
-            <section className="py-16 px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+            <section className={`py-16 px-4 ${className || ''}`} style={className ? undefined : { backgroundColor: 'var(--color-background)' }}>
                 <div className="max-w-2xl mx-auto text-center space-y-6">
                     <div className="text-6xl">✅</div>
                     <h2
@@ -185,7 +187,7 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
 
     if (!hasStarted) {
         return (
-            <section className="py-16 px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+            <section className={`py-16 px-4 ${className || ''}`} style={className ? undefined : { backgroundColor: 'var(--color-background)' }}>
                 <div className="max-w-2xl mx-auto text-center space-y-6">
                     <div className="text-6xl">{icono || "🎯"}</div>
                     <h2
@@ -236,9 +238,9 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
         }
 
         return (
-            <section className="py-16 px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+            <section className={`py-16 px-4 ${className || ''}`} style={className ? undefined : { backgroundColor: 'var(--color-background)' }}>
                 <div className="max-w-2xl mx-auto">
-                    <Card className="text-center">
+                    <Card className={`text-center ${cardClassName || ''}`}>
                         <CardContent className="pt-8 pb-8 space-y-6">
                             {isSaving && (
                                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
@@ -313,7 +315,7 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
     }
 
     return (
-        <section className="py-16 px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+        <section className={`py-16 px-4 ${className || ''}`} style={className ? undefined : { backgroundColor: 'var(--color-background)' }}>
             <div className="max-w-2xl mx-auto">
                 <div className="mb-6 flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
@@ -324,17 +326,17 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
                             <div
                                 key={index}
                                 className={`h-2 w-8 rounded-full ${index < currentQuestionIndex
-                                        ? 'bg-green-500'
-                                        : index === currentQuestionIndex
-                                            ? 'bg-primary'
-                                            : 'bg-gray-200'
+                                    ? 'bg-green-500'
+                                    : index === currentQuestionIndex
+                                        ? 'bg-primary'
+                                        : 'bg-gray-200'
                                     }`}
                             />
                         ))}
                     </div>
                 </div>
 
-                <Card>
+                <Card className={cardClassName || ''}>
                     <CardContent className="pt-8 pb-8 space-y-6">
                         <h3 className="text-2xl font-bold text-center">
                             {currentQuestion.pregunta}
@@ -346,15 +348,15 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
                                     key={index}
                                     onClick={() => handleAnswerSelect(index)}
                                     className={`w-full p-4 text-left rounded-lg border-2 transition-all ${selectedAnswer === index
-                                            ? 'border-primary bg-primary/10'
-                                            : 'border-gray-200 hover:border-primary/50'
+                                        ? 'border-primary bg-primary/10'
+                                        : 'border-gray-200 hover:border-primary/50'
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <div
                                             className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-medium ${selectedAnswer === index
-                                                    ? 'border-primary bg-primary text-white'
-                                                    : 'border-gray-300'
+                                                ? 'border-primary bg-primary text-white'
+                                                : 'border-gray-300'
                                                 }`}
                                         >
                                             {String.fromCharCode(65 + index)}

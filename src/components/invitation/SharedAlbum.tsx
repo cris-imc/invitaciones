@@ -20,6 +20,7 @@ interface SharedAlbumProps {
     fechaEvento?: Date;
     horaEvento?: string;
     guestName?: string; // From personalized link
+    className?: string;
 }
 
 export function SharedAlbum({
@@ -30,6 +31,7 @@ export function SharedAlbum({
     fechaEvento,
     horaEvento,
     guestName,
+    className,
 }: SharedAlbumProps) {
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +63,7 @@ export function SharedAlbum({
     }, [invitationSlug]);
 
     return (
-        <section className="py-20 px-4 bg-slate-50">
+        <section className={`py-20 px-4 ${className || 'bg-slate-50'}`}>
             <ScrollReveal>
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}

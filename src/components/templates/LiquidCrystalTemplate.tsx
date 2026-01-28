@@ -105,6 +105,19 @@ export function LiquidCrystalTemplate({ data, themeConfig }: InvitationTemplateP
                     66% { transform: translate(-20px, 20px) scale(0.9); }
                     100% { transform: translate(0, 0) scale(1); }
                 }
+                @keyframes float {
+                    0% { transform: translate(0, 0) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0, 0) scale(1); }
+                }
+
+                /* Theme Variables for Reusable Components */
+                :root {
+                    --color-primary: #4f46e5;
+                    --color-text-light: #ffffff;
+                    --font-ornamental: 'Cormorant Garamond', serif;
+                }
             `}</style>
 
             {/* Background Animated Blobs */}
@@ -291,6 +304,8 @@ export function LiquidCrystalTemplate({ data, themeConfig }: InvitationTemplateP
                             subtitulo="¿Cuánto sabes sobre nosotros?"
                             preguntas={typeof data.triviaPreguntas === 'string' ? JSON.parse(data.triviaPreguntas) : data.triviaPreguntas}
                             invitationId={data.id}
+                            className="bg-transparent"
+                            cardClassName="bg-white/40 backdrop-blur-md border-white/50 shadow-none text-slate-800"
                         />
                     </div>
                 </section>
@@ -306,6 +321,7 @@ export function LiquidCrystalTemplate({ data, themeConfig }: InvitationTemplateP
                         colorPrimario="#6366f1" // indigo-500
                         fechaEvento={data.fecha ? new Date(data.fecha) : undefined}
                         guestName="Invitado"
+                        className="bg-transparent"
                     />
                 </section>
             )}
