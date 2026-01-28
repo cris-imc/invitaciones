@@ -80,6 +80,17 @@ export const invitationSchema = z.object({
     regaloTitular: z.string().optional(),
 
     cronogramaEventos: z.string().optional(), // JSON string
+
+    // Propiedades opcionales de plantillas
+    tituloPortada: z.string().optional(),
+    subtituloPortada: z.string().optional(),
+    albumCompartidoHabilitado: z.boolean().default(false),
+    mensajeFinalHabilitado: z.boolean().default(false),
+    mensajeFinalTexto: z.string().optional(),
+
+    // IDs y metadata
+    id: z.string().optional(),
+    slug: z.string().optional(),
 });
 
 export type InvitationFormData = z.infer<typeof invitationSchema>;

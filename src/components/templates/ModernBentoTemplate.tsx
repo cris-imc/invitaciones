@@ -262,7 +262,7 @@ export function ModernBentoTemplate({ data, themeConfig, guest, isPersonalized =
                                             variant="secondary"
                                             size="sm"
                                             className="bg-neutral-800 text-white hover:bg-neutral-700 border border-neutral-700"
-                                            onClick={() => copyToClipboard(data.regaloCbu)}
+                                            onClick={() => copyToClipboard(data.regaloCbu!)}
                                         >
                                             <Copy size={14} className="mr-2" /> CBU
                                         </Button>
@@ -272,7 +272,7 @@ export function ModernBentoTemplate({ data, themeConfig, guest, isPersonalized =
                                             variant="secondary"
                                             size="sm"
                                             className="bg-neutral-800 text-white hover:bg-neutral-700 border border-neutral-700"
-                                            onClick={() => copyToClipboard(data.regaloAlias)}
+                                            onClick={() => copyToClipboard(data.regaloAlias!)}
                                         >
                                             <Copy size={14} className="mr-2" /> Alias
                                         </Button>

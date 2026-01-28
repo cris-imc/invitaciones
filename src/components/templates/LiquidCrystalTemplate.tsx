@@ -407,7 +407,7 @@ export function LiquidCrystalTemplate({ data, themeConfig, guest, isPersonalized
                                             { label: "CBU/CVU", value: data.regaloCbu },
                                             { label: "Alias", value: data.regaloAlias },
                                         ].map((field, i) => field.value && (
-                                            <div key={i} onClick={() => copyToClipboard(field.value)} className="flex justify-between items-center p-3 bg-white/40 rounded-xl cursor-pointer hover:bg-white/60 transition-colors">
+                                            <div key={i} onClick={() => copyToClipboard(field.value!)} className="flex justify-between items-center p-3 bg-white/40 rounded-xl cursor-pointer hover:bg-white/60 transition-colors">
                                                 <span className="font-semibold text-slate-700">{field.label}</span>
                                                 <div className="flex items-center gap-2 text-indigo-600">
                                                     <span className="truncate max-w-[120px]">{field.value}</span>
