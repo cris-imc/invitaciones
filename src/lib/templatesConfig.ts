@@ -18,22 +18,6 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
         colors: ['#D4AF37', '#FDFCF8', '#1a1a1a']
     },
     {
-        id: 'ROYAL',
-        label: 'Royal Velvet',
-        description: 'Elegancia real con texturas de terciopelo y oro.',
-        category: 'ELEGANT',
-        icon: '⚜️',
-        colors: ['#300000', '#D4AF37', '#000000']
-    },
-    {
-        id: 'CHAMPAGNE',
-        label: 'Champagne Gala',
-        description: 'Burbujas doradas animadas, festivo y sofisticado.',
-        category: 'ELEGANT',
-        icon: '🥂',
-        colors: ['#F7E7CE', '#D4AF37', '#FFFFFF']
-    },
-    {
         id: 'ORIGINAL',
         label: 'Classic Original',
         description: 'El diseño clásico original con detalles suaves.',
@@ -49,16 +33,16 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
         icon: '🎭',
         colors: ['#B48E60', '#FBF8F3', '#8B6F47']
     },
+    {
+        id: 'LUXURY',
+        label: 'Luxury Minimalist',
+        description: 'Minimalismo editorial de alto nivel con tipografía serif.',
+        category: 'ELEGANT',
+        icon: '💎',
+        colors: ['#1a1a1a', '#ffffff', '#f5f5f5']
+    },
 
     // --- MODERN (Fiestas, XV, Eventos) ---
-    {
-        id: 'CINEMATIC',
-        label: 'Cinematic Love',
-        description: 'Estilo película con video de fondo y tipografía minimal.',
-        category: 'MODERN',
-        icon: '🎬',
-        colors: ['#000000', '#FFFFFF', '#333333']
-    },
     {
         id: 'NEON',
         label: 'Neon Night',
@@ -66,14 +50,6 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
         category: 'MODERN',
         icon: '⚡',
         colors: ['#000000', '#00F3FF', '#FF00FF']
-    },
-    {
-        id: 'CYBERPUNK',
-        label: 'Cyberpunk Party',
-        description: 'Glitch art, tecnología agresiva y colores vibrantes.',
-        category: 'MODERN',
-        icon: '🤖',
-        colors: ['#000000', '#FCEE09', '#00F3FF']
     },
     {
         id: 'PARALLAX',
@@ -84,20 +60,20 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
         colors: ['#ffffff', '#000000', '#666666']
     },
     {
-        id: 'GALLERY',
-        label: 'Minimal Gallery',
-        description: 'Limpio, estilo museo, foco en fotografía.',
-        category: 'MODERN',
-        icon: '🎨',
-        colors: ['#ffffff', '#000000', '#f5f5f5']
-    },
-    {
-        id: 'GLASS',
-        label: 'Ethereal Glass',
-        description: 'Glassmorphism, transparencias y 3D flotante.',
+        id: 'LIQUID',
+        label: 'Liquid Crystal',
+        description: 'Estilo etéreo de cristal líquido con gradientes suaves.',
         category: 'MODERN',
         icon: '🧊',
-        colors: ['#e0f2fe', '#ffffff', '#bae6fd']
+        colors: ['#818cf8', '#c4b5fd', '#e0e7ff']
+    },
+    {
+        id: 'BENTO',
+        label: 'Modern Bento',
+        description: 'Diseño estructurado ultra-moderno estilo Grid.',
+        category: 'MODERN',
+        icon: '🎨',
+        colors: ['#a3e635', '#84cc16', '#65a30d']
     },
     {
         id: 'AURORA_DREAMY',
@@ -110,14 +86,6 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
 
     // --- RUSTIC (Bodas aire libre) ---
     {
-        id: 'BOHO',
-        label: 'Boho Chic',
-        description: 'Rústico, tonos tierra, texturas naturales.',
-        category: 'RUSTIC',
-        icon: '🌾',
-        colors: ['#F7F5F0', '#C17C74', '#D4C5B0']
-    },
-    {
         id: 'BOTANICAL',
         label: 'Botanical Garden',
         description: 'Acuarelas botánicas y mucha naturaleza.',
@@ -125,89 +93,33 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
         icon: '🌿',
         colors: ['#F0FFF0', '#2E8B57', '#8FBC8F']
     },
-    {
-        id: 'SUNSET',
-        label: 'Beach Sunset',
-        description: 'Gradientes cálidos de atardecer en la playa.',
-        category: 'RUSTIC',
-        icon: '🌅',
-        colors: ['#FF7F50', '#8A2BE2', '#FFD700']
-    },
 
     // --- THEMATIC (Romántico, Retro, Temas) ---
     {
-        id: 'FLORAL',
-        label: 'Floral Dream',
-        description: 'Romántico y femenino con flores pastel y pétalos.',
+        id: 'DISCO_NIGHT',
+        label: 'Disco Night',
+        description: 'Fiesta de discoteca con neón vibrante y luces estroboscópicas.',
         category: 'THEMATIC',
-        icon: '🌸',
-        colors: ['#FFF0F5', '#FF69B4', '#FFB6C1']
-    },
-    {
-        id: 'VINTAGE',
-        label: 'Vintage Story',
-        description: 'Nostalgia, papel envejecido y estilo typewriter.',
-        category: 'THEMATIC',
-        icon: '📜',
-        colors: ['#F4E4BC', '#8B4513', '#2F1B12']
-    },
-    {
-        id: 'RETRO',
-        label: 'Retro 80s',
-        description: 'Vaporwave, palmeras y gradientes ochenteros.',
-        category: 'THEMATIC',
-        icon: '📼',
-        colors: ['#FF00FF', '#00FFFF', '#FFFF00']
-    },
-    {
-        id: 'VIBRANT',
-        label: 'Vibrant Fiesta',
-        description: 'Explosión de color, confetti y pura alegría.',
-        category: 'THEMATIC',
-        icon: '🎉',
-        colors: ['#FF0000', '#FFFF00', '#0000FF']
+        icon: '🕺',
+        colors: ['#FF006E', '#8338EC', '#3A86FF']
     },
 
     // --- KIDS (Infantil, Baby Shower) ---
     {
-        id: 'KIDS_PLAYFUL',
-        label: 'Playful Kids',
-        description: 'Alegre, formas suaves y colores primarios.',
+        id: 'KIDS_PARTY',
+        label: 'Kids Party',
+        description: 'Fiesta infantil colorida con animaciones bounce y confetti.',
         category: 'KIDS',
         icon: '🎈',
         colors: ['#FF6B6B', '#4ECDC4', '#FFE66D']
     },
     {
-        id: 'KIDS_JUNGLE',
-        label: 'Jungle Safari',
-        description: 'Animales de la selva, hojas y aventuras.',
+        id: 'BABY_BAPTISM',
+        label: 'Baby Baptism',
+        description: 'Diseño tierno para bebés con paleta pastel y elementos suaves.',
         category: 'KIDS',
-        icon: '🦁',
-        colors: ['#8DA399', '#D4C5B0', '#4A5D23']
-    },
-    {
-        id: 'KIDS_SPACE',
-        label: 'Space Explorer',
-        description: 'Cohetes, estrellas y planetas animados.',
-        category: 'KIDS',
-        icon: '🚀',
-        colors: ['#0B1026', '#4B0082', '#FFD700']
-    },
-    {
-        id: 'KIDS_DINO',
-        label: 'Dino Party',
-        description: 'Dinosaurios divertidos y texturas prehistóricas.',
-        category: 'KIDS',
-        icon: '🦕',
-        colors: ['#6B8E23', '#D2691E', '#F5DEB3']
-    },
-    {
-        id: 'KIDS_CLOUDS',
-        label: 'Pastel Clouds',
-        description: 'Nubes esponjosas, ideal Baby Shower.',
-        category: 'KIDS',
-        icon: '☁️',
-        colors: ['#E0FFFF', '#E6E6FA', '#FFFFFF']
+        icon: '👶',
+        colors: ['#FADADD', '#E8E9F3', '#F0E5CF']
     }
 ];
 

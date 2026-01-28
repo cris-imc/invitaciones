@@ -16,6 +16,9 @@ import { LiquidCrystalTemplate } from "../templates/LiquidCrystalTemplate";
 import { ModernInvitationTemplate } from "../templates/ModernInvitationTemplate";
 import { VintageEleganceTemplate } from "../templates/VintageEleganceTemplate";
 import { AuroraDreamyTemplate } from "../templates/AuroraDreamyTemplate";
+import { DiscoNightTemplate } from "../templates/DiscoNightTemplate";
+import { KidsPartyTemplate } from "../templates/KidsPartyTemplate";
+import { BabyBaptismTemplate } from "../templates/BabyBaptismTemplate";
 
 export function StepPreview() {
     const { data, themeConfig, prevStep } = useWizardStore();
@@ -121,6 +124,9 @@ export function StepPreview() {
                     {themeConfig.layout === 'liquid' && <LiquidCrystalTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'vintage' && <VintageEleganceTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'aurora' && <AuroraDreamyTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'disco' && <DiscoNightTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'kidsparty' && <KidsPartyTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'baby' && <BabyBaptismTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'parallax' && (
                         <div className="min-h-screen p-8" style={{ background: `linear-gradient(135deg, ${themeConfig.primaryColor}20, ${themeConfig.backgroundColor})` }}>
                             <div className="max-w-4xl mx-auto text-center">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check, Search, Filter, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -18,14 +18,14 @@ interface TemplateSelectorProps {
 export function TemplateSelector({ value, onChange }: TemplateSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
     const selectedTemplate = TEMPLATES_CONFIG.find(t => t.id === value) || TEMPLATES_CONFIG[0];
 
     const filteredTemplates = TEMPLATES_CONFIG.filter(template => {
         const matchesSearch = template.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
             template.description.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCategory = selectedCategory ? template.category === selectedCategory : true;
+        const matchesCategory = selectedCategory === "ALL" ? true : template.category === selectedCategory;
         return matchesSearch && matchesCategory;
     });
 
@@ -34,6 +34,10 @@ export function TemplateSelector({ value, onChange }: TemplateSelectorProps) {
     const handleSelect = (id: string) => {
         onChange(id);
         setIsOpen(false);
+    };
+
+    const getCategoryCount = (cat: string) => {
+        return TEMPLATES_CONFIG.filter(t => t.category === cat).length;
     };
 
     return (
@@ -46,101 +50,126 @@ export function TemplateSelector({ value, onChange }: TemplateSelectorProps) {
                             Explorar Galería ({TEMPLATES_CONFIG.length})
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-4xl h-[80vh] flex flex-col p-0 gap-0">
-                        <div className="p-6 border-b space-y-4">
+                    <DialogContent className="max-w-6xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+                        <div className="p-6 border-b space-y-4 shrink-0">
                             <DialogHeader>
-                                <DialogTitle className="text-2xl">Galería de Diseños</DialogTitle>
+                                <DialogTitle className="text-2xl font-bold">Galería de Diseños</DialogTitle>
                             </DialogHeader>
 
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="relative flex-1">
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Buscar por nombre o estilo..."
-                                        className="pl-9"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-                                    <Button
-                                        variant={selectedCategory === null ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() => setSelectedCategory(null)}
-                                        className="whitespace-nowrap"
-                                    >
-                                        Todos
-                                    </Button>
-                                    {categories.map(cat => (
-                                        <Button
-                                            key={cat}
-                                            variant={selectedCategory === cat ? "default" : "outline"}
-                                            size="sm"
-                                            onClick={() => setSelectedCategory(cat)}
-                                            className="whitespace-nowrap"
-                                        >
-                                            {CATEGORY_LABELS[cat]}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 p-6 bg-slate-50 overflow-y-auto">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {filteredTemplates.map((template) => (
+                            <div className="relative">
+                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Buscar por nombre o estilo..."
+                                    className="pl-9"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                {searchQuery && (
                                     <button
-                                        key={template.id}
-                                        onClick={() => handleSelect(template.id)}
-                                        className={cn(
-                                            "group relative flex flex-col text-left rounded-xl border-2 transition-all overflow-hidden bg-white hover:border-primary/50 hover:shadow-lg",
-                                            value === template.id ? "border-primary shadow-md ring-2 ring-primary/20" : "border-transparent shadow-sm"
-                                        )}
+                                        onClick={() => setSearchQuery("")}
+                                        className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                                     >
-                                        {/* Color Pattern Preview */}
-                                        <div className="h-32 w-full relative">
-                                            <div className="absolute inset-0 flex">
-                                                {template.colors.map((color, i) => (
-                                                    <div key={i} style={{ backgroundColor: color }} className="flex-1 h-full" />
-                                                ))}
-                                            </div>
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-transparent transition-colors">
-                                                <div className="bg-white/90 backdrop-blur-sm rounded-full w-12 h-12 flex items-center justify-center shadow-lg text-2xl">
-                                                    {template.icon}
-                                                </div>
-                                            </div>
-                                            {value === template.id && (
-                                                <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1 shadow-lg">
-                                                    <Check className="w-4 h-4" />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="p-4 space-y-2">
-                                            <div className="flex items-start justify-between">
-                                                <span className="font-bold text-lg">{template.label}</span>
-                                                <Badge variant="secondary" className="text-[10px]">
-                                                    {CATEGORY_LABELS[template.category].split('&')[0].trim()}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground line-clamp-2">
-                                                {template.description}
-                                            </p>
-                                        </div>
+                                        <X className="h-4 w-4" />
                                     </button>
-                                ))}
+                                )}
+                            </div>
+                        </div>
+
+                        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="flex-1 flex flex-col min-h-0">
+                            <div className="px-6 pt-4 border-b shrink-0">
+                                <TabsList className="w-full justify-start h-auto bg-transparent p-0 gap-2 flex-wrap">
+                                    <TabsTrigger 
+                                        value="ALL" 
+                                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full px-4 py-2 text-sm font-medium"
+                                    >
+                                        Todos ({TEMPLATES_CONFIG.length})
+                                    </TabsTrigger>
+                                    {categories.map(cat => (
+                                        <TabsTrigger 
+                                            key={cat} 
+                                            value={cat}
+                                            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-full px-4 py-2 text-sm font-medium"
+                                        >
+                                            {CATEGORY_LABELS[cat]} ({getCategoryCount(cat)})
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
                             </div>
 
-                            {filteredTemplates.length === 0 && (
-                                <div className="h-40 flex flex-col items-center justify-center text-muted-foreground">
-                                    <Search className="w-8 h-8 mb-2 opacity-20" />
-                                    <p>No se encontraron diseños con esos filtros.</p>
-                                    <Button variant="link" onClick={() => { setSearchQuery(""); setSelectedCategory(null); }}>
-                                        Limpiar filtros
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
+                            <TabsContent value={selectedCategory} className="flex-1 overflow-y-auto p-6 mt-0 bg-gradient-to-b from-slate-50 to-white data-[state=inactive]:hidden">{filteredTemplates.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">{filteredTemplates.map((template) => (
+                                            <button
+                                                key={template.id}
+                                                onClick={() => handleSelect(template.id)}
+                                                className={cn(
+                                                    "group relative flex flex-col text-left rounded-xl border-2 transition-all overflow-hidden bg-white hover:border-primary/50 hover:shadow-xl hover:-translate-y-1",
+                                                    value === template.id ? "border-primary shadow-lg ring-4 ring-primary/20 scale-[1.02]" : "border-slate-200 shadow-sm"
+                                                )}
+                                            >
+                                                {/* Color Pattern Preview */}
+                                                <div className="h-32 w-full relative overflow-hidden">
+                                                    <div className="absolute inset-0 flex">
+                                                        {template.colors.map((color, i) => (
+                                                            <div 
+                                                                key={i} 
+                                                                style={{ backgroundColor: color }} 
+                                                                className="flex-1 h-full transition-transform group-hover:scale-110" 
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-black/20 to-transparent group-hover:from-black/10 transition-colors">
+                                                        <div className="bg-white/95 backdrop-blur-sm rounded-full w-14 h-14 flex items-center justify-center shadow-xl text-3xl group-hover:scale-110 transition-transform">
+                                                            {template.icon}
+                                                        </div>
+                                                    </div>
+                                                    {value === template.id && (
+                                                        <div className="absolute top-3 right-3 bg-primary text-white rounded-full p-1.5 shadow-lg animate-in zoom-in">
+                                                            <Check className="w-4 h-4" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="p-4 space-y-2 flex-1 flex flex-col">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <span className="font-bold text-base leading-tight">{template.label}</span>
+                                                        <Badge variant="secondary" className="text-[10px] shrink-0">
+                                                            {CATEGORY_LABELS[template.category].split('&')[0].trim()}
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground line-clamp-2 flex-1">
+                                                        {template.description}
+                                                    </p>
+                                                    <div className="flex gap-1 pt-2">
+                                                        {template.colors.map((c, i) => (
+                                                            <div 
+                                                                key={i} 
+                                                                className="w-4 h-4 rounded-full border-2 border-white shadow-sm" 
+                                                                style={{ backgroundColor: c }} 
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="h-64 flex flex-col items-center justify-center text-muted-foreground">
+                                        <Search className="w-12 h-12 mb-3 opacity-20" />
+                                        <p className="text-lg font-medium">No se encontraron diseños</p>
+                                        <p className="text-sm mb-4">Intenta con otros filtros o categorías</p>
+                                        <Button 
+                                            variant="outline" 
+                                            onClick={() => { 
+                                                setSearchQuery(""); 
+                                                setSelectedCategory("ALL"); 
+                                            }}
+                                        >
+                                            Limpiar filtros
+                                        </Button>
+                                    </div>
+                                )}
+                            </TabsContent>
+                        </Tabs>
                     </DialogContent>
                 </Dialog>
             </div>

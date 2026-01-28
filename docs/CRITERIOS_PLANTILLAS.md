@@ -4,7 +4,9 @@
 
 Este documento detalla los **criterios y estándares** que se siguen para crear plantillas de invitaciones digitales en el sistema. Estos criterios aseguran consistencia, calidad visual premium y funcionalidad completa.
 
----
+## Dónde sacar ideas?
+
+Revisar plantillas web de ENVATO y Pinterest.
 
 ## 🎯 Principios Fundamentales
 
@@ -511,13 +513,17 @@ Accent: #D4AF37     // Dorado brillante
 ```
 
 #### Secciones Implementadas
-- ✅ Hero con nombres en tipografía script grande
-- ✅ Countdown con cajas decorativas y esquinas ornamentales
-- ✅ Detalles del evento con iconografía vintage
-- ✅ Galería con efecto grayscale → color
-- ✅ Información de regalo con diseño clásico
+- ✅ Hero con nombres en tipografía script grande y marcos ornamentales SVG
+- ✅ Countdown con cajas decorativas (border-2 border-[#B48E60]) y 4 esquinas ornamentales por box
+- ✅ Detalles del evento con marco Art Deco (esquinas de 16x16px con bordes de 4px)
+- ✅ Galería con efecto sepia → color en hover y marcos de 4px
+- ✅ Trivia con contenedor decorado y esquinas ornamentales de 12x12px
+- ✅ Álbum compartido con bordes superiores/inferiores de 2px
+- ✅ Información de regalo con diseño clásico y copy-to-clipboard
+- ✅ RSVP form con inputs estilo vintage y esquinas ornamentales de 8x8px
 - ✅ Control de música con estilo vintage
-- ✅ Footer con divisores decorativos
+- ✅ Footer con diseño completo y variables CSS para QuizTrivia
+- ✅ Mensaje final con tipografía script y divisor decorativo
 
 #### Casos de Uso Ideales
 - Bodas clásicas y elegantes
@@ -604,13 +610,19 @@ const rotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
 ```
 
 #### Secciones Implementadas
-- ✅ Hero con gradiente holográfico y partículas flotantes
-- ✅ Countdown con glass cards y glow effects
-- ✅ Detalles con glassmorphism y bordes luminosos
-- ✅ Galería con efectos de hover holográfico
-- ✅ RSVP form con diseño futurista
-- ✅ Música con controles estilo aurora
-- ✅ Footer con gradiente de cierre
+- ✅ Hero con gradiente holográfico animado, estrella giratoria (360° en 20s) y 20 partículas flotantes
+- ✅ Countdown con glass-aurora cards, hover scale-105 y overlay holográfico al hover
+- ✅ Detalles con glassmorphism (.glass-aurora) y overlay holográfico interactivo
+- ✅ Imagen de pareja con overlay holográfico al hover (opacity-0 → opacity-20)
+- ✅ Galería con glass-aurora frames y efecto scale-110 en hover
+- ✅ Trivia con contenedor glass-aurora y variables CSS personalizadas
+- ✅ Álbum compartido con bordes purple-400/30
+- ✅ Información de regalo con glassmorphism y copy-to-clipboard
+- ✅ RSVP form con inputs futuristas (bg-white/5, border-purple-400)
+- ✅ Control de música con glass-aurora y z-50
+- ✅ Footer con glass-aurora y variables CSS para QuizTrivia
+- ✅ Mensaje final con texto holográfico y divisor degradado
+- ✅ Partículas animadas generadas dinámicamente con posiciones y delays aleatorios
 
 #### Casos de Uso Ideales
 - Quinceañeros modernos
@@ -641,8 +653,14 @@ const rotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
 ### Archivos Creados
 ```
 src/components/templates/
-  ├── VintageEleganceTemplate.tsx  (466 líneas)
-  └── AuroraDreamyTemplate.tsx     (420 líneas)
+  ├── VintageEleganceTemplate.tsx  (531 líneas - completo)
+  └── AuroraDreamyTemplate.tsx     (502 líneas - completo)
+
+src/lib/
+  └── theme-config.ts              (actualizado con vintage y aurora)
+
+src/components/wizard/
+  └── StepPreview.tsx              (actualizado con imports y rendering)
 ```
 
 ### Configuración en theme-config.ts
@@ -662,9 +680,301 @@ aurora: {
 ### Uso en Wizard
 Las plantillas están disponibles en el selector de diseño del wizard de creación y pueden combinarse con cualquier paleta de colores del sistema.
 
+### Integración con Componentes Reutilizables
+Ambas plantillas integran correctamente:
+- **QuizTrivia**: Con variables CSS personalizadas (--color-background, --color-primary, --color-text-light)
+- **SharedAlbum**: Con props de color primario adaptado al tema
+- **Hooks personalizados**: useCountdown para cuenta regresiva
+- **Framer Motion**: Animaciones de scroll y viewport con `initial`, `whileInView`, `variants`
+- **Lucide Icons**: Heart, Sparkles, Gift, Star, Copy, Volume2, VolumeX, ChevronDown
+
+### Detalles de Renderizado
+```tsx
+// En StepPreview.tsx
+{themeConfig.layout === 'vintage' && (
+  <VintageEleganceTemplate data={formData} themeConfig={themeConfig} />
+)}
+{themeConfig.layout === 'aurora' && (
+  <AuroraDreamyTemplate data={formData} themeConfig={themeConfig} />
+)}
+```
+
+---
+
+## 🕺 Plantilla: Disco Night
+
+### Descripción General
+Plantilla enérgica y vibrante para fiestas nocturnas, eventos de discoteca o celebraciones con ambiente de club. Inspirada en el neón de los años 80 y el futurismo cyberpunk.
+
+### Paleta de Colores
+```css
+--neon-pink: #FF006E;      /* Rosa neón vibrante */
+--electric-purple: #8338EC; /* Púrpura eléctrico */
+--cyber-blue: #3A86FF;     /* Azul cibernético */
+--blazing-orange: #FB5607; /* Naranja ardiente */
+--dark-base: #0a0a0a;      /* Fondo oscuro profundo */
+--neon-gradient: linear-gradient(135deg, #FF006E, #8338EC, #3A86FF);
+```
+
+### Tipografías
+- **Display:** Audiowide (futurista, tech)
+- **Títulos:** Righteous (bold, impactante)
+- **Texto:** Orbitron (legible, sci-fi)
+
+### Decoraciones Distintivas
+- **Confetti animado:** 30 partículas con colores neón cayendo continuamente
+- **Spotlights rotativos:** 3 focos de luz que giran en el fondo
+- **Efectos de luces estroboscópicas:** Parpadeo sutil en elementos clave
+- **Glassmorphism disco:** Cards con efecto vidrio y brillo neón
+
+### Animaciones CSS Personalizadas
+```css
+@keyframes neon-pulse {
+  0%, 100% { 
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+  50% { 
+    text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor;
+  }
+}
+
+@keyframes strobe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes disco-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-100vh) rotate(0deg); }
+  100% { transform: translateY(100vh) rotate(720deg); }
+}
+
+@keyframes spotlight-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+```
+
+### Características Especiales
+- **Fondo dinámico:** Gradiente animado con efecto disco
+- **Neon pulse:** Texto con efecto de neón pulsante
+- **Glass-disco cards:** Cards con glassmorphism y bordes neón
+- **Iconos temáticos:** Zap, Sparkles, Music para secciones clave
+
+### Secciones Implementadas
+1. **Hero:** Gradiente neón animado con título pulsante
+2. **Countdown:** Contador con glow effects en cada unidad
+3. **Event Details:** Cards glass-disco con información del evento
+4. **Photo Gallery:** Grid con hover effects neón
+5. **Quiz/Trivia:** Preguntas interactivas con tema cyberpunk
+6. **Shared Album:** Álbum colaborativo con borde neón
+7. **Gift Info/Bank Details:** Información bancaria con iconos tech
+8. **RSVP Form:** Formulario con inputs neón y validación visual
+9. **Footer:** Despedida con efecto strobe sutil
+
+### Casos de Uso Ideales
+- 🎉 Fiestas de cumpleaños 18-30 años
+- 💃 Eventos de discoteca/club
+- 🎊 Celebraciones nocturnas temáticas
+- 🌃 Fiestas de año nuevo o eventos nocturnos
+
+### Especificaciones Técnicas
+- **Archivo:** `src/components/templates/DiscoNightTemplate.tsx`
+- **Layout ID:** `disco`
+- **Template ID:** `DISCO_NIGHT`
+- **Categoría:** THEMATIC
+- **Líneas de código:** ~700
+- **Dependencias:** SharedAlbum, QuizTrivia, useCountdown, Framer Motion
+
+---
+
+## 🎈 Plantilla: Kids Party
+
+### Descripción General
+Plantilla alegre y colorida diseñada para fiestas infantiles. Con animaciones bounce, globos flotantes y paleta de colores arcoíris que cautiva a los niños.
+
+### Paleta de Colores
+```css
+--happy-red: #FF6B6B;      /* Rojo alegre */
+--playful-teal: #4ECDC4;   /* Turquesa juguetón */
+--sunny-yellow: #FFE66D;   /* Amarillo soleado */
+--mint-fresh: #95E1D3;     /* Menta fresca */
+--lavender-soft: #C7CEEA;  /* Lavanda suave */
+--rainbow-gradient: linear-gradient(90deg, #FF6B6B, #4ECDC4, #FFE66D, #95E1D3, #C7CEEA);
+--cream-base: #FFF4E6;     /* Base crema suave */
+```
+
+### Tipografías
+- **Display:** Bubblegum Sans (infantil, redondeada)
+- **Títulos:** Chewy (divertida, orgánica)
+- **Texto:** Fredoka (legible, amigable)
+
+### Decoraciones Distintivas
+- **Globos flotantes SVG:** 15 globos con cuerdas que flotan suavemente
+- **Confetti colorido:** 25 piezas de confetti con colores del arcoíris
+- **Bounce animations:** Elementos que rebotan de forma juguetona
+- **Cards redondeadas:** Border-radius de 30px para look amigable
+
+### Animaciones CSS Personalizadas
+```css
+@keyframes bounce-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes rainbow-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes confetti-pop {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-200px) rotate(720deg); opacity: 0; }
+}
+```
+
+### Características Especiales
+- **Globos SVG personalizados:** Diseñados con ellipse y líneas como cuerdas
+- **Gradiente arcoíris:** Fondo dinámico con colores infantiles
+- **Iconos emoji:** Uso de emojis en countdown (📅⏰⏱️⚡)
+- **Tarjetas redondeadas:** Cards con border-radius pronunciado
+
+### Secciones Implementadas
+1. **Hero:** Fondo arcoíris con título bounce y globos flotantes
+2. **Countdown:** Contador con emojis y animaciones de rebote
+3. **Event Details:** Información con iconos Star y MapPin coloridos
+4. **Photo Gallery:** Galería con frames redondeados
+5. **Quiz/Trivia:** Trivia interactiva con tema infantil
+6. **Shared Album:** Álbum colaborativo con decoración de globos
+7. **Gift Info:** Información de regalos con icono Gift
+8. **RSVP Form:** Formulario colorido con inputs redondeados
+9. **Footer:** Despedida alegre con confetti
+
+### Casos de Uso Ideales
+- 🎂 Cumpleaños infantiles (1-12 años)
+- 🎪 Fiestas temáticas de niños
+- 🎨 Eventos escolares y recreativos
+- 🧸 Baby showers con tema alegre
+
+### Especificaciones Técnicas
+- **Archivo:** `src/components/templates/KidsPartyTemplate.tsx`
+- **Layout ID:** `kidsparty`
+- **Template ID:** `KIDS_PARTY`
+- **Categoría:** KIDS
+- **Líneas de código:** ~750
+- **Dependencias:** SharedAlbum, QuizTrivia, useCountdown, Framer Motion, SVG balloons
+
+---
+
+## 👶 Plantilla: Baby Baptism
+
+### Descripción General
+Plantilla tierna y delicada para celebraciones de bebés como bautismos, baby showers o primer cumpleaños. Con paleta pastel, nubes flotantes y efectos acuarela.
+
+### Paleta de Colores
+```css
+--cream-soft: #FFF4E6;     /* Crema suave */
+--lavender-mist: #E8E9F3;  /* Lavanda niebla */
+--beige-warm: #F0E5CF;     /* Beige cálido */
+--pink-blush: #FADADD;     /* Rosa rubor */
+--pastel-gradient: linear-gradient(135deg, #FFF4E6, #F0E5CF, #E8E9F3);
+```
+
+### Tipografías
+- **Display:** Comfortaa (redondeada, suave)
+- **Script:** Pacifico (manuscrita, delicada)
+- **Texto:** Quicksand (legible, moderna)
+
+### Decoraciones Distintivas
+- **Nubes flotantes SVG:** 8 nubes con movimiento suave
+- **Estrellas titilantes:** 20 estrellas con efecto twinkle
+- **Watercolor blobs:** 3 manchas de acuarela con blur
+- **Cards ultra-redondeadas:** Border-radius de 40px
+
+### Animaciones CSS Personalizadas
+```css
+@keyframes cloud-float {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(20px) translateY(-10px); }
+}
+
+@keyframes gentle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes watercolor-spread {
+  0%, 100% { filter: blur(40px); opacity: 0.3; }
+  50% { filter: blur(60px); opacity: 0.5; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+```
+
+### Características Especiales
+- **Nubes SVG personalizadas:** Diseñadas con paths curvos
+- **Efecto acuarela:** Blobs con filtro blur animado
+- **Iconos temáticos:** Moon, Cloud, Sparkles
+- **Paleta ultra-suave:** Colores pasteles que transmiten ternura
+
+### Secciones Implementadas
+1. **Hero:** Gradiente pastel con título manuscrito y luna
+2. **Countdown:** Contador suave con animación gentle-bounce
+3. **Event Details:** Información con iconos Cloud y MapPin
+4. **Photo Gallery:** Galería con frames redondeados y pastel
+5. **Quiz/Trivia:** Trivia interactiva tema bebé
+6. **Shared Album:** Álbum con decoración de nubes y estrellas
+7. **Gift Info:** Información de regalos con icono Gift
+8. **RSVP Form:** Formulario delicado con inputs redondeados
+9. **Footer:** Despedida tierna con estrellas
+
+### Casos de Uso Ideales
+- 🍼 Bautismos y presentaciones
+- 👶 Baby showers
+- 🎂 Primer cumpleaños
+- 🌟 Celebraciones de bebés (0-2 años)
+
+### Especificaciones Técnicas
+- **Archivo:** `src/components/templates/BabyBaptismTemplate.tsx`
+- **Layout ID:** `baby`
+- **Template ID:** `BABY_BAPTISM`
+- **Categoría:** KIDS
+- **Líneas de código:** ~700
+- **Dependencias:** SharedAlbum, QuizTrivia, useCountdown, Framer Motion, Cloud SVG
+
 ---
 
 ## 🎯 Próximas Mejoras Sugeridas
+
+### Para Disco Night
+- [ ] Agregar más efectos de luz estroboscópica
+- [ ] Implementar música de fondo automática (opcional)
+- [ ] Añadir efectos de partículas 3D
+- [ ] Incluir modo de bajo consumo
+
+### Para Kids Party
+- [ ] Agregar más variantes de globos (formas, colores)
+- [ ] Implementar sonidos de celebración
+- [ ] Añadir animaciones de personajes
+- [ ] Incluir stickers interactivos
+
+### Para Baby Baptism
+- [ ] Optimizar nubes para mejor performance
+- [ ] Agregar más variantes de acuarela
+- [ ] Implementar modo nocturno (luna y estrellas)
+- [ ] Añadir efectos de música de cuna
 
 ### Para Vintage Elegance
 - [ ] Agregar más ornamentos SVG personalizados
@@ -680,6 +990,56 @@ Las plantillas están disponibles en el selector de diseño del wizard de creaci
 
 ---
 
-**Última actualización:** 2026-01-28
-**Versión:** 1.1
-**Nuevas plantillas:** 2 (Vintage Elegance, Aurora Dreamy)
+## ✅ Estado de Implementación
+
+### Build Status
+- **Última compilación:** Pendiente de verificar
+- **TypeScript:** Pendiente de compilar
+- **Nuevas plantillas:** 3 (Disco Night, Kids Party, Baby Baptism)
+- **Templates totales:** 14 plantillas
+
+### Templates Implementados
+- ✅ DiscoNightTemplate: Código completo (700 líneas)
+- ✅ KidsPartyTemplate: Código completo (750 líneas)
+- ✅ BabyBaptismTemplate: Código completo (700 líneas)
+- ✅ VintageEleganceTemplate: Compilado y funcional
+- ✅ AuroraDreamyTemplate: Compilado y funcional
+- ✅ Integración con theme-config.ts: Completa (3 nuevos layouts)
+- ✅ Integración con templatesConfig.ts: Completa (3 nuevas entradas)
+- ✅ Integración con StepPreview.tsx: Completa (imports y rendering)
+- ✅ Integración con InvitationContent.tsx: Completa (3 nuevos condicionales)
+- ✅ TemplateSelector UX mejorado: Tabs por categorías implementadas
+
+### Archivos Modificados en esta Implementación
+```
+Modificados:
+- src/lib/theme-config.ts (agregados layouts: disco, kidsparty, baby)
+- src/lib/templatesConfig.ts (agregados: DISCO_NIGHT, KIDS_PARTY, BABY_BAPTISM)
+- src/components/wizard/StepPreview.tsx (3 imports y rendering)
+- src/components/invitation/InvitationContent.tsx (3 imports y condicionales)
+- src/components/dashboard/TemplateSelector.tsx (UX mejorado con Tabs)
+
+Creados:
+- src/components/templates/DiscoNightTemplate.tsx (100% nuevo, 700 líneas)
+- src/components/templates/KidsPartyTemplate.tsx (100% nuevo, 750 líneas)
+- src/components/templates/BabyBaptismTemplate.tsx (100% nuevo, 700 líneas)
+
+Actualizados:
+- docs/CRITERIOS_PLANTILLAS.md (documentación completa de 3 nuevas plantillas)
+```
+
+### Template Selector Improvements
+- ✅ Tabs component para navegación por categorías
+- ✅ Contador de templates por categoría
+- ✅ Búsqueda mejorada con botón de limpieza
+- ✅ Hover effects mejorados en cards
+- ✅ Dialog más grande (max-w-6xl, h-85vh)
+- ✅ Grid adaptativo (4 columnas en xl)
+- ✅ Animaciones de transición mejoradas
+
+---
+
+**Última actualización:** 2026-01-29 01:15
+**Versión:** 1.3
+**Nuevas plantillas:** 5 totales (Vintage Elegance, Aurora Dreamy, Disco Night, Kids Party, Baby Baptism)
+**Estado:** ✅ Implementación Completa - Pendiente de Build Verification

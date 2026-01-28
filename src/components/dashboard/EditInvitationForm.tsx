@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { AVAILABLE_TEMPLATES } from "@/lib/theme-config";
+import { TemplateSelector } from "@/components/dashboard/TemplateSelector";
 
 interface Invitation {
     id: string;
@@ -355,38 +355,10 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         </div>
 
                         {/* Selección de Plantilla */}
-                        <div className="space-y-3 border p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50">
-                            <label className="text-sm font-semibold block">Seleccionar Plantilla</label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {AVAILABLE_TEMPLATES.map((template) => (
-                                    <button
-                                        key={template.id}
-                                        type="button"
-                                        onClick={() => handleInputChange('templateTipo', template.id)}
-                                        className={`p-4 rounded-lg border-2 transition-all text-left ${formData.templateTipo === template.id
-                                            ? 'border-primary bg-white shadow-md'
-                                            : 'border-gray-200 hover:border-primary/50 bg-white/70'
-                                            }`}
-                                    >
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <div
-                                                className="w-8 h-8 rounded-md flex items-center justify-center"
-                                                style={{ backgroundColor: template.color }}
-                                            >
-                                                <span className="text-white text-xs font-bold">
-                                                    {template.id === 'ORIGINAL' && '✨'}
-                                                    {template.id === 'PARALLAX' && '🖼️'}
-                                                    {template.id === 'LUXURY' && '✨'}
-                                                    {template.id === 'BOTANICAL' && '🌿'}
-                                                </span>
-                                            </div>
-                                            <span className="font-semibold text-sm">{template.name}</span>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground">{template.description}</p>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        <TemplateSelector 
+                            value={formData.templateTipo}
+                            onChange={(value) => handleInputChange('templateTipo', value)}
+                        />
 
                         {/* Color principal */}
                         <div className="space-y-2">

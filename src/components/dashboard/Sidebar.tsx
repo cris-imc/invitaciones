@@ -47,16 +47,16 @@ export function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <div className="flex flex-col h-full bg-card text-card-foreground w-64">
-            <div className="p-6 border-b">
+        <div className="flex flex-col h-screen bg-card text-card-foreground w-64 border-r fixed left-0 top-0">
+            <div className="p-6 border-b shrink-0">
                 <Link href="/" className="flex items-center gap-2 font-bold text-xl">
                     <Calendar className="w-6 h-6 text-primary" />
                     <span>InvitaDigital</span>
                 </Link>
             </div>
 
-            <div className="flex-1 overflow-y-auto py-4">
-                <nav className="grid gap-1 px-2">
+            <div className="flex-1 py-4 overflow-hidden">
+                <nav className="flex flex-col gap-1 px-2">
                     {sidebarItems.map((item, index) => (
                         <Link
                             key={index}
@@ -75,7 +75,7 @@ export function Sidebar() {
                 </nav>
             </div>
 
-            <div className="p-4 border-t">
+            <div className="p-4 border-t shrink-0">
                 <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive">
                     <LogOut className="w-4 h-4" />
                     Cerrar Sesión

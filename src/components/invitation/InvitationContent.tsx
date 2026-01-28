@@ -29,6 +29,9 @@ import { LiquidCrystalTemplate } from "@/components/templates/LiquidCrystalTempl
 import { ModernBentoTemplate } from "@/components/templates/ModernBentoTemplate";
 import { VintageEleganceTemplate } from "@/components/templates/VintageEleganceTemplate";
 import { AuroraDreamyTemplate } from "@/components/templates/AuroraDreamyTemplate";
+import { DiscoNightTemplate } from "@/components/templates/DiscoNightTemplate";
+import { KidsPartyTemplate } from "@/components/templates/KidsPartyTemplate";
+import { BabyBaptismTemplate } from "@/components/templates/BabyBaptismTemplate";
 
 interface InvitationContentProps {
     invitation: any;
@@ -212,6 +215,42 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return <AuroraDreamyTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "DISCO_NIGHT") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <DiscoNightTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "KIDS_PARTY") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <KidsPartyTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "BABY_BAPTISM") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <BabyBaptismTemplate data={formData} themeConfig={themeConfig as any} />;
     }
 
     return (

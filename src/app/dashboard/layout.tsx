@@ -7,7 +7,7 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="flex h-screen bg-background">
-            <div className="hidden md:flex flex-shrink-0">
+            <div className="hidden md:block w-64 flex-shrink-0">
                 <Sidebar />
             </div>
 

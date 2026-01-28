@@ -134,6 +134,21 @@ export const LAYOUT_TEMPLATES = {
     name: 'Aurora Dreamy',
     description: 'Gradientes holográficos con efectos iridiscentes y glassmorphism',
   },
+  disco: {
+    id: 'disco',
+    name: 'Disco Night',
+    description: 'Fiesta de discoteca con gradientes neón vibrantes y luces estroboscópicas',
+  },
+  kidsparty: {
+    id: 'kidsparty',
+    name: 'Kids Party',
+    description: 'Plantilla infantil colorida con animaciones bounce y confetti',
+  },
+  baby: {
+    id: 'baby',
+    name: 'Baby Baptism',
+    description: 'Diseño tierno para bebés con paleta pastel y elementos suaves',
+  },
 } as const;
 
 export type LayoutTemplateId = keyof typeof LAYOUT_TEMPLATES;
@@ -415,5 +430,29 @@ export const AVAILABLE_TEMPLATES = [
     description: "Gradientes holográficos con efectos iridiscentes modernos",
     color: "#667eea",
     features: ["Gradientes Holográficos", "Glassmorphism", "Efectos Glow"]
+  },
+  {
+    id: "DISCO_NIGHT",
+    layoutId: "disco",
+    name: "Disco Night",
+    description: "Fiesta de discoteca con gradientes neón vibrantes y luces estroboscópicas",
+    color: "#FF006E",
+    features: ["Efectos Neón", "Luces Estroboscópicas", "Confetti Animado"]
+  },
+  {
+    id: "KIDS_PARTY",
+    layoutId: "kidsparty",
+    name: "Kids Party",
+    description: "Fiesta infantil colorida con animaciones bounce y confetti",
+    color: "#FF6B6B",
+    features: ["Globos Flotantes", "Arcoíris", "Super Divertido"]
+  },
+  {
+    id: "BABY_BAPTISM",
+    layoutId: "baby",
+    name: "Baby Baptism",
+    description: "Diseño tierno para bebés con paleta pastel y elementos suaves",
+    color: "#FADADD",
+    features: ["Nubes Flotantes", "Estrellas Brillantes", "Acuarela Pastel"]
   }
 ] as const;

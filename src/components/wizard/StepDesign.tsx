@@ -4,8 +4,8 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
-import { Sparkles, Image as ImageIcon } from "lucide-react";
 import { AVAILABLE_TEMPLATES } from "@/lib/theme-config";
+import { TemplateSelector } from "@/components/dashboard/TemplateSelector";
 
 
 
@@ -32,58 +32,11 @@ export function StepDesign() {
                 </p>
             </div>
 
-            {/* Template Selection */}
-            <div className="grid md:grid-cols-2 gap-6">
-                {AVAILABLE_TEMPLATES.map((template) => (
-                    <button
-                        key={template.id}
-                        type="button"
-                        onClick={() => handleTemplateSelect(template.id)}
-                        className={`
-                            relative p-6 rounded-xl border-2 transition-all text-left
-                            hover:shadow-lg
-                            ${selectedTemplate === template.id
-                                ? 'border-primary bg-primary/5 shadow-md'
-                                : 'border-gray-200 hover:border-primary/50'
-                            }
-                        `}
-                    >
-                        {selectedTemplate === template.id && (
-                            <div className="absolute top-4 right-4">
-                                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                                    <Sparkles className="w-4 h-4 text-white" />
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="flex items-center gap-3 mb-4">
-                            <div
-                                className="w-12 h-12 rounded-lg flex items-center justify-center"
-                                style={{ backgroundColor: template.color }}
-                            >
-                                {template.id === "PARALLAX" ? (
-                                    <ImageIcon className="w-6 h-6 text-white" />
-                                ) : (
-                                    <Sparkles className="w-6 h-6 text-white" />
-                                )}
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold">{template.name}</h3>
-                                <p className="text-sm text-muted-foreground">{template.description}</p>
-                            </div>
-                        </div>
-
-                        <ul className="space-y-1">
-                            {template.features.map((feature, index) => (
-                                <li key={index} className="text-sm flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                                    {feature}
-                                </li>
-                            ))}
-                        </ul>
-                    </button>
-                ))}
-            </div>
+            {/* Template Selection with New Selector */}
+            <TemplateSelector 
+                value={selectedTemplate} 
+                onChange={handleTemplateSelect}
+            />
 
             {/* Hero Background Image */}
             <div className="space-y-2">
