@@ -25,6 +25,8 @@ import { LuxuryMinimalistTemplate } from "@/components/templates/LuxuryMinimalis
 import { BotanicalGardenTemplate } from "@/components/templates/BotanicalGardenTemplate";
 import { GoldenLuxuryTemplate } from "@/components/templates/GoldenLuxuryTemplate";
 import { NeonNightTemplate } from "@/components/templates/NeonNightTemplate";
+import { LiquidCrystalTemplate } from "@/components/templates/LiquidCrystalTemplate";
+import { ModernBentoTemplate } from "@/components/templates/ModernBentoTemplate";
 
 interface InvitationContentProps {
     invitation: any;
@@ -160,6 +162,30 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return <NeonNightTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "LIQUID") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <LiquidCrystalTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "BENTO") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <ModernBentoTemplate data={formData} themeConfig={themeConfig as any} />;
     }
 
     return (

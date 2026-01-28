@@ -124,6 +124,16 @@ export const LAYOUT_TEMPLATES = {
     name: 'Neon Night',
     description: 'Estilo cyberpunk con efectos de luz y modo oscuro',
   },
+  liquid: {
+    id: 'liquid',
+    name: 'Liquid Crystal',
+    description: 'Estilo etéreo con glassmorphism líquido',
+  },
+  bento: {
+    id: 'bento',
+    name: 'Modern Bento',
+    description: 'Interfaz moderna basada en grid estructurado',
+  },
 } as const;
 
 export type LayoutTemplateId = keyof typeof LAYOUT_TEMPLATES;
@@ -373,5 +383,21 @@ export const AVAILABLE_TEMPLATES = [
     description: "Estilo cyberpunk con efectos glitch y modo oscuro",
     color: "#00F3FF",
     features: ["Efectos Glitch", "Modo Oscuro", "Bordes de Neón"]
+  },
+  {
+    id: "LIQUID",
+    layoutId: "liquid",
+    name: "Liquid Crystal",
+    description: "Estilo etéreo de cristal líquido con gradientes suaves",
+    color: "#818cf8",
+    features: ["Glassmorphism", "Gradientes Animados", "Tipografía Líquida"]
+  },
+  {
+    id: "BENTO",
+    layoutId: "bento",
+    name: "Modern Bento",
+    description: "Diseño estructurado ultra-moderno estilo Grid",
+    color: "#a3e635",
+    features: ["Grid Layout", "Interfaz OS", "Bloques Interactivos"]
   }
 ] as const;
