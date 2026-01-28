@@ -4,17 +4,14 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "fra
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useRef, useState, useEffect } from "react";
-// import { InvitationTemplateProps } from "./types";
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
+import { InvitationTemplateProps } from "./types";
 import { MapPin, Calendar, Clock, Gift, Music, Heart, Copy, Check, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
 import { useToast } from "@/components/ui/Toast";
 
 // Hook for countdown
@@ -51,7 +48,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function LuxuryMinimalistTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { primaryColor, textDark, backgroundColor, fontFamily } = themeConfig;
     const { showToast } = useToast();
 
@@ -424,44 +421,62 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                         viewport={{ once: true }}
                         className="max-w-xl mx-auto text-center"
                     >
-                        <h2 className="font-luxury-serif text-5xl mb-8 text-white">R . S . V . P</h2>
-                        <p className="font-luxury-sans text-stone-400 mb-12 font-light">
-                            Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
-                            <br />
-                            {data.rsvpDaysBeforeEvent ? `(Confirmar ${data.rsvpDaysBeforeEvent} días antes)` : ''}
-                        </p>
-
-                        <form className="space-y-8 text-left">
-                            <div className="space-y-2">
-                                <Label className="text-xs uppercase tracking-widest text-stone-500 ml-1">Full Name</Label>
-                                <Input
-                                    className="bg-transparent border-0 border-b border-stone-700 rounded-none focus-visible:ring-0 focus-visible:border-white px-1 text-xl font-luxury-serif placeholder:text-stone-700 h-12 transition-colors"
-                                    placeholder="Ingresa tu nombre"
+                        {isPersonalized && guest ? (
+                            <>
+                                <h2 className="font-luxury-serif text-5xl mb-4 text-white">Hola, {guest.name}</h2>
+                                <p className="font-luxury-sans text-stone-400 mb-12 font-light">
+                                    Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    <br />
+                                    {data.rsvpDaysBeforeEvent ? `(Confirmar ${data.rsvpDaysBeforeEvent} días antes)` : ''}
+                                </p>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
                                 />
-                            </div>
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="font-luxury-serif text-5xl mb-8 text-white">R . S . V . P</h2>
+                                <p className="font-luxury-sans text-stone-400 mb-12 font-light">
+                                    Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    <br />
+                                    {data.rsvpDaysBeforeEvent ? `(Confirmar ${data.rsvpDaysBeforeEvent} días antes)` : ''}
+                                </p>
 
-                            <div className="space-y-2">
-                                <Label className="text-xs uppercase tracking-widest text-stone-500 ml-1">Attending?</Label>
-                                <div className="flex gap-8 pt-2">
-                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                        <div className="w-4 h-4 rounded-full border border-stone-500 group-hover:border-white flex items-center justify-center">
-                                            <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </div>
-                                        <span className="font-luxury-sans text-sm text-stone-300">Yes, gladly</span>
-                                    </label>
-                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                        <div className="w-4 h-4 rounded-full border border-stone-500 group-hover:border-white flex items-center justify-center">
-                                            <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </div>
-                                        <span className="font-luxury-sans text-sm text-stone-300">Regretfully no</span>
-                                    </label>
-                                </div>
-                            </div>
+                                <form className="space-y-8 text-left">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs uppercase tracking-widest text-stone-500 ml-1">Nombre Completo</Label>
+                                        <Input
+                                            className="bg-transparent border-0 border-b border-stone-700 rounded-none focus-visible:ring-0 focus-visible:border-white px-1 text-xl font-luxury-serif placeholder:text-stone-700 h-12 transition-colors"
+                                            placeholder="Ingresa tu nombre"
+                                        />
+                                    </div>
 
-                            <Button className="w-full bg-white text-black hover:bg-stone-200 rounded-none h-14 font-luxury-sans uppercase tracking-[0.2em] text-xs mt-8 transition-all">
-                                Send Response
-                            </Button>
-                        </form>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs uppercase tracking-widest text-stone-500 ml-1">¿Asistirás?</Label>
+                                        <div className="flex gap-8 pt-2">
+                                            <label className="flex items-center gap-3 cursor-pointer group">
+                                                <div className="w-4 h-4 rounded-full border border-stone-500 group-hover:border-white flex items-center justify-center">
+                                                    <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </div>
+                                                <span className="font-luxury-sans text-sm text-stone-300">Sí, con gusto</span>
+                                            </label>
+                                            <label className="flex items-center gap-3 cursor-pointer group">
+                                                <div className="w-4 h-4 rounded-full border border-stone-500 group-hover:border-white flex items-center justify-center">
+                                                    <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </div>
+                                                <span className="font-luxury-sans text-sm text-stone-300">Lamentablemente no</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <Button className="w-full bg-white text-black hover:bg-stone-200 rounded-none h-14 font-luxury-sans uppercase tracking-[0.2em] text-xs mt-8 transition-all">
+                                        Enviar Respuesta
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </motion.div>
                 </section>
 

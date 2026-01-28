@@ -8,15 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
 import { useToast } from "@/components/ui/Toast";
 import { GlitchText, ScanlineOverlay, NeonBorder } from "@/components/modern/CyberpunkEffects";
+import { InvitationTemplateProps } from "./types";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
 
 // Hook for countdown
 function useCountdown(targetDate: Date | string | undefined) {
@@ -52,7 +49,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function NeonNightTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -370,30 +367,49 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                 {/* RSVP */}
                 <section className="py-20 relative">
                     <div className="max-w-xl mx-auto space-y-8 bg-black/80 border border-[#FF00FF] p-8 md:p-12 rounded-2xl backdrop-blur-xl">
-                        <div className="text-center">
-                            <h2 className="font-neon-display text-2xl md:text-3xl text-[#FF00FF] mb-2 uppercase tracking-wider">CONFIRMACIÓN</h2>
-                            <p className="font-neon-body text-neutral-400">Confirmar presencia antes del {data.fecha ? format(new Date(data.fecha), "yyyy.MM.dd") : "xxxx.xx.xx"}</p>
-                        </div>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div className="text-center space-y-4">
+                                    <div className="text-6xl">👋</div>
+                                    <h2 className="font-neon-display text-2xl md:text-3xl text-[#FF00FF] uppercase tracking-wider">
+                                        Hola, {guest.name}
+                                    </h2>
+                                    <p className="font-neon-body text-neutral-400">Confirmar presencia antes del {data.fecha ? format(new Date(data.fecha), "yyyy.MM.dd") : "xxxx.xx.xx"}</p>
+                                </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div className="text-center">
+                                    <h2 className="font-neon-display text-2xl md:text-3xl text-[#FF00FF] mb-2 uppercase tracking-wider">CONFIRMACIÓN</h2>
+                                    <p className="font-neon-body text-neutral-400">Confirmar presencia antes del {data.fecha ? format(new Date(data.fecha), "yyyy.MM.dd") : "xxxx.xx.xx"}</p>
+                                </div>
 
-                        <form className="space-y-6">
-                            <div className="space-y-2">
-                                <Label className="font-neon-display text-[#FF00FF]">NOMBRE DEL JUGADOR</Label>
-                                <Input className="bg-[#111] border-[#333] text-white focus:border-[#FF00FF] h-12 font-neon-body text-lg" placeholder="Ingresa tu nombre..." />
-                            </div>
+                                <form className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label className="font-neon-display text-[#FF00FF]">NOMBRE DEL JUGADOR</Label>
+                                        <Input className="bg-[#111] border-[#333] text-white focus:border-[#FF00FF] h-12 font-neon-body text-lg" placeholder="Ingresa tu nombre..." />
+                                    </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <button type="button" className="p-4 border-2 border-[#333] hover:border-[#00F3FF] hover:text-[#00F3FF] hover:bg-[#00F3FF]/10 rounded-xl transition-all font-neon-display text-sm font-bold">
-                                    CONFIRMAR
-                                </button>
-                                <button type="button" className="p-4 border-2 border-[#333] hover:border-[#FF0099] hover:text-[#FF0099] hover:bg-[#FF0099]/10 rounded-xl transition-all font-neon-display text-sm font-bold">
-                                    DECLINAR
-                                </button>
-                            </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button type="button" className="p-4 border-2 border-[#333] hover:border-[#00F3FF] hover:text-[#00F3FF] hover:bg-[#00F3FF]/10 rounded-xl transition-all font-neon-display text-sm font-bold">
+                                            CONFIRMAR
+                                        </button>
+                                        <button type="button" className="p-4 border-2 border-[#333] hover:border-[#FF0099] hover:text-[#FF0099] hover:bg-[#FF0099]/10 rounded-xl transition-all font-neon-display text-sm font-bold">
+                                            DECLINAR
+                                        </button>
+                                    </div>
 
-                            <Button className="w-full bg-[#FF00FF] hover:bg-[#cc00cc] text-white font-bold font-neon-display h-14 rounded-xl shadow-[0_0_20px_rgba(255,0,255,0.4)]">
-                                ENVIAR RESPUESTA
-                            </Button>
-                        </form>
+                                    <Button className="w-full bg-[#FF00FF] hover:bg-[#cc00cc] text-white font-bold font-neon-display h-14 rounded-xl shadow-[0_0_20px_rgba(255,0,255,0.4)]">
+                                        ENVIAR RESPUESTA
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </div>
                 </section>
 

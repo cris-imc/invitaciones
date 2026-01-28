@@ -27,16 +27,23 @@ export async function PUT(
         const { guestId } = await params;
         const body = await request.json();
 
+        const updateData: any = {
+            // Permitir actualizar nombre, cantidad esperada, o estado
+            name: body.name,
+            expectedCount: body.expectedCount,
+            status: body.status,
+            attendingCount: body.attendingCount,
+            message: body.message
+        };
+
+        // Si se está confirmando (status cambia), registrar fecha de respuesta
+        if (body.status && (body.status === "CONFIRMED" || body.status === "DECLINED")) {
+            updateData.responseDate = new Date();
+        }
+
         const updatedGuest = await prisma.guest.update({
             where: { id: guestId },
-            data: {
-                // Permitir actualizar nombre, cantidad esperada, o estado
-                name: body.name,
-                expectedCount: body.expectedCount,
-                status: body.status,
-                attendingCount: body.attendingCount,
-                message: body.message
-            }
+            data: updateData
         });
 
         return NextResponse.json(updatedGuest);

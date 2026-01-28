@@ -11,11 +11,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { InvitationTemplateProps } from "./types";
 
 function useCountdown(targetDate: Date | string | undefined) {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -45,7 +42,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function LiquidCrystalTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function LiquidCrystalTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -333,28 +330,45 @@ export function LiquidCrystalTemplate({ data, themeConfig }: InvitationTemplateP
                     <div className="lg:col-span-7 glass-card rounded-[2.5rem] p-10 md:p-16 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-pink-300 rounded-full filter blur-[80px] opacity-20 -mr-20 -mt-20"></div>
 
-                        <h2 className="font-liquid-serif text-5xl text-slate-800 mb-2">R.S.V.P</h2>
-                        <p className="text-slate-500 mb-8 font-liquid-display">Por favor confirmar antes del {data.fecha ? format(new Date(data.fecha), "dd MMM", { locale: es }) : "..."}</p>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div className="mb-8">
+                                    <div className="text-5xl mb-4">💌</div>
+                                    <h2 className="font-liquid-serif text-4xl text-slate-800 mb-2">Hola, {guest.name}</h2>
+                                    <p className="text-slate-500 font-liquid-display">Por favor confirmar antes del {data.fecha ? format(new Date(data.fecha), "dd MMM", { locale: es }) : "..."}</p>
+                                </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="font-liquid-serif text-5xl text-slate-800 mb-2">R.S.V.P</h2>
+                                <p className="text-slate-500 mb-8 font-liquid-display">Por favor confirmar antes del {data.fecha ? format(new Date(data.fecha), "dd MMM", { locale: es }) : "..."}</p>
 
-                        <form className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="name" className="text-indigo-900 font-semibold">Nombre Completo</Label>
-                                <Input id="name" className="bg-white/50 border-indigo-100 h-12 rounded-xl focus:ring-indigo-300 text-lg" placeholder="Tu nombre" />
-                            </div>
+                                <form className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name" className="text-indigo-900 font-semibold">Nombre Completo</Label>
+                                        <Input id="name" className="bg-white/50 border-indigo-100 h-12 rounded-xl focus:ring-indigo-300 text-lg" placeholder="Tu nombre" />
+                                    </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <Button type="button" variant="outline" className="h-14 rounded-xl border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 text-lg font-liquid-display">
-                                    ¡Sí, asistiré!
-                                </Button>
-                                <Button type="button" variant="outline" className="h-14 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-600 text-lg font-liquid-display">
-                                    No podré ir
-                                </Button>
-                            </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Button type="button" variant="outline" className="h-14 rounded-xl border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 text-lg font-liquid-display">
+                                            ¡Sí, asistiré!
+                                        </Button>
+                                        <Button type="button" variant="outline" className="h-14 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-600 text-lg font-liquid-display">
+                                            No podré ir
+                                        </Button>
+                                    </div>
 
-                            <Button className="w-full h-14 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-lg font-bold shadow-lg shadow-indigo-200 mt-4">
-                                Enviar Confirmación
-                            </Button>
-                        </form>
+                                    <Button className="w-full h-14 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-lg font-bold shadow-lg shadow-indigo-200 mt-4">
+                                        Enviar Confirmación
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </div>
 
                     {/* Gifts Box */}

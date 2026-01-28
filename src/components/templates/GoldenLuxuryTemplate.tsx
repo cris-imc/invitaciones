@@ -8,14 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { InvitationTemplateProps } from "./types";
 import { useToast } from "@/components/ui/Toast";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
 
 // Hook for countdown
 function useCountdown(targetDate: Date | string | undefined) {
@@ -51,7 +48,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function GoldenLuxuryTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { primaryColor } = themeConfig;
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
@@ -402,39 +399,58 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                         initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                         className="max-w-xl mx-auto space-y-12"
                     >
-                        <div>
-                            <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
-                            <h2 className="font-gold-serif text-5xl md:text-6xl text-[#F4E4BC]">Responde Gentilmente</h2>
-                            <p className="font-gold-sans text-[#FDFCF8]/60 mt-6 font-light">
-                                Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
-                            </p>
-                        </div>
-
-                        <form className="space-y-8 text-left bg-[#0f0f0f] p-8 md:p-12 border border-[#D4AF37]/20">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Nombre Completo</Label>
-                                <Input
-                                    className="bg-transparent border-0 border-b border-[#D4AF37]/40 rounded-none focus-visible:ring-0 focus-visible:border-[#D4AF37] px-0 text-xl font-gold-serif placeholder:text-[#333] h-12 text-[#F4E4BC]"
-                                    placeholder="Ingresa tu nombre"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Asistencia</Label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button type="button" className="p-4 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors font-gold-sans text-sm text-[#F4E4BC]">
-                                        Acepta con Placer
-                                    </button>
-                                    <button type="button" className="p-4 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors font-gold-sans text-sm text-[#F4E4BC]">
-                                        Declina con Pesar
-                                    </button>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div>
+                                    <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <h2 className="font-gold-serif text-5xl md:text-6xl text-[#F4E4BC]">Hola, {guest.name}</h2>
+                                    <p className="font-gold-sans text-[#FDFCF8]/60 mt-6 font-light">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
                                 </div>
-                            </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div>
+                                    <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <h2 className="font-gold-serif text-5xl md:text-6xl text-[#F4E4BC]">Responde Gentilmente</h2>
+                                    <p className="font-gold-sans text-[#FDFCF8]/60 mt-6 font-light">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
+                                </div>
 
-                            <Button className="w-full bg-[#D4AF37] text-[#0a0a0a] hover:bg-[#c5a028] font-gold-display uppercase tracking-widest py-6 rounded-none">
-                                Enviar Confirmación
-                            </Button>
-                        </form>
+                                <form className="space-y-8 text-left bg-[#0f0f0f] p-8 md:p-12 border border-[#D4AF37]/20">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Nombre Completo</Label>
+                                        <Input
+                                            className="bg-transparent border-0 border-b border-[#D4AF37]/40 rounded-none focus-visible:ring-0 focus-visible:border-[#D4AF37] px-0 text-xl font-gold-serif placeholder:text-[#333] h-12 text-[#F4E4BC]"
+                                            placeholder="Ingresa tu nombre"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Asistencia</Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button type="button" className="p-4 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors font-gold-sans text-sm text-[#F4E4BC]">
+                                                Acepta con Placer
+                                            </button>
+                                            <button type="button" className="p-4 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors font-gold-sans text-sm text-[#F4E4BC]">
+                                                Declina con Pesar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <Button className="w-full bg-[#D4AF37] text-[#0a0a0a] hover:bg-[#c5a028] font-gold-display uppercase tracking-widest py-6 rounded-none">
+                                        Enviar Confirmación
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </motion.div>
                 </section>
 

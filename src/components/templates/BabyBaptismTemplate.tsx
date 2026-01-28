@@ -11,11 +11,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { InvitationTemplateProps } from "./types";
 
 function useCountdown(targetDate: Date | string | undefined) {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -45,7 +42,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function BabyBaptismTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function BabyBaptismTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -482,40 +479,61 @@ export function BabyBaptismTemplate({ data, themeConfig }: InvitationTemplatePro
                         initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                         className="max-w-xl mx-auto space-y-12"
                     >
-                        <div>
-                            <span className="font-baby-text text-[#E8E9F3] text-sm tracking-widest uppercase font-semibold block mb-4">R.S.V.P</span>
-                            <h2 className="font-baby-display text-5xl md:text-6xl text-[#FADADD] font-semibold">Confirmá tu Asistencia</h2>
-                            <div className="w-32 h-1 bg-gradient-to-r from-transparent via-[#FADADD] to-transparent rounded-full mx-auto mt-6" />
-                            <p className="font-baby-text text-gray-600 mt-6 text-lg">
-                                Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
-                            </p>
-                        </div>
-
-                        <form className="space-y-8 text-left card-baby p-8 md:p-12">
-                            <div className="space-y-2">
-                                <Label className="text-sm uppercase tracking-wider text-[#FADADD] font-baby-text font-semibold">Nombre Completo</Label>
-                                <Input
-                                    className="bg-white border-2 border-[#FADADD]/40 rounded-3xl focus-visible:ring-0 focus-visible:border-[#FADADD] px-6 text-xl font-baby-text placeholder:text-gray-400 h-14 text-gray-700"
-                                    placeholder="Ingresa tu nombre"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <Label className="text-sm uppercase tracking-wider text-[#E8E9F3] font-baby-text font-semibold">Asistencia</Label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button type="button" className="p-6 bg-white border-3 border-[#E8E9F3] hover:bg-[#E8E9F3]/10 transition-colors font-baby-text text-lg text-gray-700 rounded-3xl font-semibold">
-                                        Confirmo Asistencia
-                                    </button>
-                                    <button type="button" className="p-6 bg-white border-3 border-[#FADADD] hover:bg-[#FADADD]/10 transition-colors font-baby-text text-lg text-gray-700 rounded-3xl font-semibold">
-                                        No Podré Asistir
-                                    </button>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div>
+                                    <span className="font-baby-text text-[#E8E9F3] text-sm tracking-widest uppercase font-semibold block mb-4">R.S.V.P</span>
+                                    <div className="text-6xl mb-4">👶</div>
+                                    <h2 className="font-baby-display text-4xl md:text-5xl text-[#FADADD] font-semibold">Hola, {guest.name}</h2>
+                                    <div className="w-32 h-1 bg-gradient-to-r from-transparent via-[#FADADD] to-transparent rounded-full mx-auto mt-6" />
+                                    <p className="font-baby-text text-gray-600 mt-6 text-lg">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
                                 </div>
-                            </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div>
+                                    <span className="font-baby-text text-[#E8E9F3] text-sm tracking-widest uppercase font-semibold block mb-4">R.S.V.P</span>
+                                    <h2 className="font-baby-display text-5xl md:text-6xl text-[#FADADD] font-semibold">Confirmá tu Asistencia</h2>
+                                    <div className="w-32 h-1 bg-gradient-to-r from-transparent via-[#FADADD] to-transparent rounded-full mx-auto mt-6" />
+                                    <p className="font-baby-text text-gray-600 mt-6 text-lg">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
+                                </div>
 
-                            <Button className="w-full pastel-gradient text-white hover:opacity-90 font-baby-text text-xl uppercase tracking-wider py-7 border-0 rounded-full shadow-xl">
-                                Enviar Confirmación
-                            </Button>
-                        </form>
+                                <form className="space-y-8 text-left card-baby p-8 md:p-12">
+                                    <div className="space-y-2">
+                                        <Label className="text-sm uppercase tracking-wider text-[#FADADD] font-baby-text font-semibold">Nombre Completo</Label>
+                                        <Input
+                                            className="bg-white border-2 border-[#FADADD]/40 rounded-3xl focus-visible:ring-0 focus-visible:border-[#FADADD] px-6 text-xl font-baby-text placeholder:text-gray-400 h-14 text-gray-700"
+                                            placeholder="Ingresa tu nombre"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <Label className="text-sm uppercase tracking-wider text-[#E8E9F3] font-baby-text font-semibold">Asistencia</Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button type="button" className="p-6 bg-white border-3 border-[#E8E9F3] hover:bg-[#E8E9F3]/10 transition-colors font-baby-text text-lg text-gray-700 rounded-3xl font-semibold">
+                                                Confirmo Asistencia
+                                            </button>
+                                            <button type="button" className="p-6 bg-white border-3 border-[#FADADD] hover:bg-[#FADADD]/10 transition-colors font-baby-text text-lg text-gray-700 rounded-3xl font-semibold">
+                                                No Podré Asistir
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <Button className="w-full pastel-gradient text-white hover:opacity-90 font-baby-text text-xl uppercase tracking-wider py-7 border-0 rounded-full shadow-xl">
+                                        Enviar Confirmación
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </motion.div>
                 </section>
 

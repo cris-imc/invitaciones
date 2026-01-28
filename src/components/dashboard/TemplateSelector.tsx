@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Check, Search, Filter, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,21 +21,29 @@ export function TemplateSelector({ value, onChange, eventType }: TemplateSelecto
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
-    const selectedTemplate = TEMPLATES_CONFIG.find(t => t.id === value) || TEMPLATES_CONFIG[0];
+    const selectedTemplate = useMemo(() => 
+        TEMPLATES_CONFIG.find(t => t.id === value) || TEMPLATES_CONFIG[0],
+        [value]
+    );
 
-    const filteredTemplates = TEMPLATES_CONFIG.filter(template => {
-        const matchesSearch = template.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            template.description.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCategory = selectedCategory === "ALL" ? true : template.category === selectedCategory;
-        
-        // Filtrar plantillas infantiles solo para cumpleaños y bautismo
-        const isKidsTemplate = template.id === 'KIDS_PARTY' || template.id === 'BABY_BAPTISM';
-        const matchesEventType = !isKidsTemplate || eventType === 'CUMPLEANOS' || eventType === 'BAUTISMO';
-        
-        return matchesSearch && matchesCategory && matchesEventType;
-    });
+    const filteredTemplates = useMemo(() => {
+        return TEMPLATES_CONFIG.filter(template => {
+            const matchesSearch = template.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                template.description.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesCategory = selectedCategory === "ALL" ? true : template.category === selectedCategory;
+            
+            // Filtrar plantillas infantiles solo para cumpleaños y bautismo
+            const isKidsTemplate = template.id === 'KIDS_PARTY' || template.id === 'BABY_BAPTISM';
+            const matchesEventType = !isKidsTemplate || eventType === 'CUMPLEANOS' || eventType === 'BAUTISMO';
+            
+            return matchesSearch && matchesCategory && matchesEventType;
+        });
+    }, [searchQuery, selectedCategory, eventType]);
 
-    const categories = Array.from(new Set(TEMPLATES_CONFIG.map(t => t.category)));
+    const categories = useMemo(() => 
+        Array.from(new Set(TEMPLATES_CONFIG.map(t => t.category))),
+        []
+    );
 
     const handleSelect = (id: string) => {
         onChange(id);
@@ -102,8 +110,11 @@ export function TemplateSelector({ value, onChange, eventType }: TemplateSelecto
                                 </TabsList>
                             </div>
 
-                            <TabsContent value={selectedCategory} className="flex-1 overflow-y-auto p-6 mt-0 bg-gradient-to-b from-slate-50 to-white data-[state=inactive]:hidden">{filteredTemplates.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">{filteredTemplates.map((template) => (
+                            {/* Render only active tab content */}
+                            <div className="flex-1 overflow-y-auto p-6 mt-0 bg-gradient-to-b from-slate-50 to-white">
+                                {filteredTemplates.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
+                                        {filteredTemplates.map((template) => (
                                             <button
                                                 key={template.id}
                                                 onClick={() => handleSelect(template.id)}
@@ -174,7 +185,7 @@ export function TemplateSelector({ value, onChange, eventType }: TemplateSelecto
                                         </Button>
                                     </div>
                                 )}
-                            </TabsContent>
+                            </div>
                         </Tabs>
                     </DialogContent>
                 </Dialog>

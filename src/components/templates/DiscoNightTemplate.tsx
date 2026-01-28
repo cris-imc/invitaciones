@@ -11,11 +11,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { InvitationTemplateProps } from "./types";
 
 function useCountdown(targetDate: Date | string | undefined) {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -45,7 +42,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function DiscoNightTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function DiscoNightTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -478,40 +475,61 @@ export function DiscoNightTemplate({ data, themeConfig }: InvitationTemplateProp
                         initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                         className="max-w-xl mx-auto space-y-12"
                     >
-                        <div>
-                            <span className="font-disco-text text-[#FB5607] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
-                            <h2 className="font-disco-title text-6xl md:text-7xl neon-text uppercase">Confirmá</h2>
-                            <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-[#FF006E] to-transparent mx-auto mt-6" />
-                            <p className="font-disco-text text-white mt-6">
-                                Responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
-                            </p>
-                        </div>
-
-                        <form className="space-y-8 text-left glass-disco p-8 md:p-12">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#FF006E] font-disco-text">Nombre Completo</Label>
-                                <Input
-                                    className="bg-white/5 border-0 border-b-2 border-[#FF006E]/40 rounded-none focus-visible:ring-0 focus-visible:border-[#FF006E] px-0 text-xl font-disco-text placeholder:text-white/30 h-12 text-white"
-                                    placeholder="Tu nombre"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#8338EC] font-disco-text">Asistencia</Label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button type="button" className="p-4 glass-disco hover:bg-[#FF006E]/20 transition-colors font-disco-text text-sm text-white border border-[#FF006E]/30">
-                                        ¡Voy a la Fiesta!
-                                    </button>
-                                    <button type="button" className="p-4 glass-disco hover:bg-[#8338EC]/20 transition-colors font-disco-text text-sm text-white border border-[#8338EC]/30">
-                                        No Podré Asistir
-                                    </button>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div>
+                                    <span className="font-disco-text text-[#FB5607] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <div className="text-6xl mb-4">🎉</div>
+                                    <h2 className="font-disco-title text-5xl md:text-6xl neon-text uppercase">Hola, {guest.name}</h2>
+                                    <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-[#FF006E] to-transparent mx-auto mt-6" />
+                                    <p className="font-disco-text text-white mt-6">
+                                        Responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
                                 </div>
-                            </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div>
+                                    <span className="font-disco-text text-[#FB5607] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <h2 className="font-disco-title text-6xl md:text-7xl neon-text uppercase">Confirmá</h2>
+                                    <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-[#FF006E] to-transparent mx-auto mt-6" />
+                                    <p className="font-disco-text text-white mt-6">
+                                        Responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
+                                </div>
 
-                            <Button className="w-full disco-gradient text-white hover:opacity-90 font-disco-text uppercase tracking-widest py-6 border-0">
-                                Enviar Confirmación
-                            </Button>
-                        </form>
+                                <form className="space-y-8 text-left glass-disco p-8 md:p-12">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase tracking-widest text-[#FF006E] font-disco-text">Nombre Completo</Label>
+                                        <Input
+                                            className="bg-white/5 border-0 border-b-2 border-[#FF006E]/40 rounded-none focus-visible:ring-0 focus-visible:border-[#FF006E] px-0 text-xl font-disco-text placeholder:text-white/30 h-12 text-white"
+                                            placeholder="Tu nombre"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] uppercase tracking-widest text-[#8338EC] font-disco-text">Asistencia</Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button type="button" className="p-4 glass-disco hover:bg-[#FF006E]/20 transition-colors font-disco-text text-sm text-white border border-[#FF006E]/30">
+                                                ¡Voy a la Fiesta!
+                                            </button>
+                                            <button type="button" className="p-4 glass-disco hover:bg-[#8338EC]/20 transition-colors font-disco-text text-sm text-white border border-[#8338EC]/30">
+                                                No Podré Asistir
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <Button className="w-full disco-gradient text-white hover:opacity-90 font-disco-text uppercase tracking-widest py-6 border-0">
+                                        Enviar Confirmación
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </motion.div>
                 </section>
 

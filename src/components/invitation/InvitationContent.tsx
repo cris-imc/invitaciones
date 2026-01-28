@@ -1,37 +1,42 @@
 "use client";
 
-import { useState } from "react";
-import { SplashScreen } from "./SplashScreen";
-import { MusicPlayer } from "./MusicPlayer";
-import { EventDetails } from "./EventDetails";
-import { DressCode } from "./DressCode";
-import { QuoteSection } from "./QuoteSection";
-import { SharedAlbum } from "./SharedAlbum";
-import { BankDetails } from "./BankDetails";
-import { FinalMessage } from "./FinalMessage";
-import { RSVPForm } from "./RSVPForm";
-import { PersonalizedRsvpForm } from "./PersonalizedRsvpForm";
-import { Farewell } from "./Farewell";
-import { InvitationThemeProvider } from "./InvitationThemeProvider";
-import { ScrollReveal } from "./ScrollReveal";
-import { ThemeConfig } from "@/lib/theme-config";
+import { useState, lazy, Suspense } from "react";
 import Image from "next/image";
-import { MarqueeGallery } from "@/components/animations/MarqueeGallery";
-import { MotivationalSection } from "./MotivationalSection";
-import { HeroSection } from "./HeroSection";
-import { ModernInvitationTemplate } from "@/components/templates/ModernInvitationTemplate";
-import { CronogramaOriginal } from "./CronogramaOriginal";
-import { LuxuryMinimalistTemplate } from "@/components/templates/LuxuryMinimalistTemplate";
-import { BotanicalGardenTemplate } from "@/components/templates/BotanicalGardenTemplate";
-import { GoldenLuxuryTemplate } from "@/components/templates/GoldenLuxuryTemplate";
-import { NeonNightTemplate } from "@/components/templates/NeonNightTemplate";
-import { LiquidCrystalTemplate } from "@/components/templates/LiquidCrystalTemplate";
-import { ModernBentoTemplate } from "@/components/templates/ModernBentoTemplate";
-import { VintageEleganceTemplate } from "@/components/templates/VintageEleganceTemplate";
-import { AuroraDreamyTemplate } from "@/components/templates/AuroraDreamyTemplate";
-import { DiscoNightTemplate } from "@/components/templates/DiscoNightTemplate";
-import { KidsPartyTemplate } from "@/components/templates/KidsPartyTemplate";
-import { BabyBaptismTemplate } from "@/components/templates/BabyBaptismTemplate";
+import { InvitationThemeProvider } from "./InvitationThemeProvider";
+import { ThemeConfig } from "@/lib/theme-config";
+import { TemplateLoadingFallback } from "@/components/wizard/TemplateLoadingFallback";
+
+// Lazy load componentes pesados
+const SplashScreen = lazy(() => import("./SplashScreen").then(m => ({ default: m.SplashScreen })));
+const MusicPlayer = lazy(() => import("./MusicPlayer").then(m => ({ default: m.MusicPlayer })));
+const EventDetails = lazy(() => import("./EventDetails").then(m => ({ default: m.EventDetails })));
+const DressCode = lazy(() => import("./DressCode").then(m => ({ default: m.DressCode })));
+const QuoteSection = lazy(() => import("./QuoteSection").then(m => ({ default: m.QuoteSection })));
+const SharedAlbum = lazy(() => import("./SharedAlbum").then(m => ({ default: m.SharedAlbum })));
+const BankDetails = lazy(() => import("./BankDetails").then(m => ({ default: m.BankDetails })));
+const FinalMessage = lazy(() => import("./FinalMessage").then(m => ({ default: m.FinalMessage })));
+const RSVPForm = lazy(() => import("./RSVPForm").then(m => ({ default: m.RSVPForm })));
+const PersonalizedRsvpForm = lazy(() => import("./PersonalizedRsvpForm").then(m => ({ default: m.PersonalizedRsvpForm })));
+const Farewell = lazy(() => import("./Farewell").then(m => ({ default: m.Farewell })));
+const ScrollReveal = lazy(() => import("./ScrollReveal").then(m => ({ default: m.ScrollReveal })));
+const MarqueeGallery = lazy(() => import("@/components/animations/MarqueeGallery").then(m => ({ default: m.MarqueeGallery })));
+const MotivationalSection = lazy(() => import("./MotivationalSection").then(m => ({ default: m.MotivationalSection })));
+const HeroSection = lazy(() => import("./HeroSection").then(m => ({ default: m.HeroSection })));
+const CronogramaOriginal = lazy(() => import("./CronogramaOriginal").then(m => ({ default: m.CronogramaOriginal })));
+
+// Dynamic imports para optimizar carga de plantillas
+const ModernInvitationTemplate = lazy(() => import("@/components/templates/ModernInvitationTemplate").then(m => ({ default: m.ModernInvitationTemplate })));
+const LuxuryMinimalistTemplate = lazy(() => import("@/components/templates/LuxuryMinimalistTemplate").then(m => ({ default: m.LuxuryMinimalistTemplate })));
+const BotanicalGardenTemplate = lazy(() => import("@/components/templates/BotanicalGardenTemplate").then(m => ({ default: m.BotanicalGardenTemplate })));
+const GoldenLuxuryTemplate = lazy(() => import("@/components/templates/GoldenLuxuryTemplate").then(m => ({ default: m.GoldenLuxuryTemplate })));
+const NeonNightTemplate = lazy(() => import("@/components/templates/NeonNightTemplate").then(m => ({ default: m.NeonNightTemplate })));
+const LiquidCrystalTemplate = lazy(() => import("@/components/templates/LiquidCrystalTemplate").then(m => ({ default: m.LiquidCrystalTemplate })));
+const ModernBentoTemplate = lazy(() => import("@/components/templates/ModernBentoTemplate").then(m => ({ default: m.ModernBentoTemplate })));
+const VintageEleganceTemplate = lazy(() => import("@/components/templates/VintageEleganceTemplate").then(m => ({ default: m.VintageEleganceTemplate })));
+const AuroraDreamyTemplate = lazy(() => import("@/components/templates/AuroraDreamyTemplate").then(m => ({ default: m.AuroraDreamyTemplate })));
+const DiscoNightTemplate = lazy(() => import("@/components/templates/DiscoNightTemplate").then(m => ({ default: m.DiscoNightTemplate })));
+const KidsPartyTemplate = lazy(() => import("@/components/templates/KidsPartyTemplate").then(m => ({ default: m.KidsPartyTemplate })));
+const BabyBaptismTemplate = lazy(() => import("@/components/templates/BabyBaptismTemplate").then(m => ({ default: m.BabyBaptismTemplate })));
 
 interface InvitationContentProps {
     invitation: any;
@@ -117,7 +122,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
     })() : null;
 
     if (invitation.templateTipo === "PARALLAX") {
-        return <ModernInvitationTemplate invitation={invitation} guest={guest} isPersonalized={isPersonalized} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <ModernInvitationTemplate invitation={invitation} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "LUXURY") {
@@ -130,7 +139,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "BOTANICAL") {
@@ -142,7 +155,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <BotanicalGardenTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <BotanicalGardenTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "GOLDEN") {
@@ -154,7 +171,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "NEON") {
@@ -166,7 +187,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <NeonNightTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <NeonNightTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "LIQUID") {
@@ -178,7 +203,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <LiquidCrystalTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <LiquidCrystalTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "BENTO") {
@@ -190,7 +219,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <ModernBentoTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <ModernBentoTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "VINTAGE_ELEGANCE") {
@@ -202,7 +235,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <VintageEleganceTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <VintageEleganceTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "AURORA_DREAMY") {
@@ -214,7 +251,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <AuroraDreamyTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <AuroraDreamyTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "DISCO_NIGHT") {
@@ -226,7 +267,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <DiscoNightTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <DiscoNightTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "KIDS_PARTY") {
@@ -238,7 +283,11 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <KidsPartyTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <KidsPartyTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     if (invitation.templateTipo === "BABY_BAPTISM") {
@@ -250,47 +299,52 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
             galeriaSecundariaFotos: galeriaSecundaria,
         } as any;
 
-        return <BabyBaptismTemplate data={formData} themeConfig={themeConfig as any} />;
+        return (
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                <BabyBaptismTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+            </Suspense>
+        );
     }
 
     return (
         <InvitationThemeProvider themeConfig={themeConfig}>
-            {/* Status Banners */}
-            {isInactive && (
-                <div className="bg-yellow-500 text-white py-3 px-4 text-center font-medium">
-                    ⚠️ Esta invitación está INACTIVA y solo es visible en modo de vista previa
-                </div>
-            )}
-
-            {isFinalized && (
-                <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12 px-4 text-center">
-                    <div className="max-w-2xl mx-auto space-y-4">
-                        <div className="text-6xl">🎉</div>
-                        <h2 className="text-3xl font-bold">¡Gracias por ser parte!</h2>
-                        <p className="text-xl">
-                            Esperamos que hayas disfrutado de este día tan especial tanto como nosotros.
-                        </p>
-                        <p className="text-lg opacity-90">
-                            Tu presencia hizo que este momento fuera aún más memorable.
-                        </p>
+            <Suspense fallback={<TemplateLoadingFallback />}>
+                {/* Status Banners */}
+                {isInactive && (
+                    <div className="bg-yellow-500 text-white py-3 px-4 text-center font-medium">
+                        ⚠️ Esta invitación está INACTIVA y solo es visible en modo de vista previa
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Only show full invitation content if not finalized */}
-            {!isFinalized && (
-                <>
-                    {/* Portada/Splash Screen */}
-                    {showSplash && invitation.portadaHabilitada && (
-                        <SplashScreen
-                            titulo={invitation.portadaTitulo || ""}
-                            nombre={nombreFestejado}
-                            nombreInvitado=""
-                            textoBoton={invitation.portadaTextoBoton || "INGRESAR"}
-                            imagenFondo={invitation.portadaImagenFondo}
-                            onEnter={() => setShowSplash(false)}
-                        />
-                    )}
+                {isFinalized && (
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12 px-4 text-center">
+                        <div className="max-w-2xl mx-auto space-y-4">
+                            <div className="text-6xl">🎉</div>
+                            <h2 className="text-3xl font-bold">¡Gracias por ser parte!</h2>
+                            <p className="text-xl">
+                                Esperamos que hayas disfrutado de este día tan especial tanto como nosotros.
+                            </p>
+                            <p className="text-lg opacity-90">
+                                Tu presencia hizo que este momento fuera aún más memorable.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Only show full invitation content if not finalized */}
+                {!isFinalized && (
+                    <>
+                        {/* Portada/Splash Screen */}
+                        {showSplash && invitation.portadaHabilitada && (
+                            <SplashScreen
+                                titulo={invitation.portadaTitulo || ""}
+                                nombre={nombreFestejado}
+                                nombreInvitado=""
+                                textoBoton={invitation.portadaTextoBoton || "INGRESAR"}
+                                imagenFondo={invitation.portadaImagenFondo}
+                                onEnter={() => setShowSplash(false)}
+                            />
+                        )}
 
                     <div className="min-h-screen bg-background text-foreground">
                         {/* Reproductor de Música */}
@@ -526,6 +580,7 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                     </div>
                 </>
             )}
+            </Suspense>
         </InvitationThemeProvider>
     );
 }

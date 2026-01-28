@@ -1,24 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, MapPin, Calendar, Clock, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { LuxuryMinimalistTemplate } from "../templates/LuxuryMinimalistTemplate";
-import { BotanicalGardenTemplate } from "../templates/BotanicalGardenTemplate";
-import { GoldenLuxuryTemplate } from "../templates/GoldenLuxuryTemplate";
-import { NeonNightTemplate } from "../templates/NeonNightTemplate";
-import { ModernBentoTemplate } from "../templates/ModernBentoTemplate";
-import { LiquidCrystalTemplate } from "../templates/LiquidCrystalTemplate";
-import { ModernInvitationTemplate } from "../templates/ModernInvitationTemplate";
-import { VintageEleganceTemplate } from "../templates/VintageEleganceTemplate";
-import { AuroraDreamyTemplate } from "../templates/AuroraDreamyTemplate";
-import { DiscoNightTemplate } from "../templates/DiscoNightTemplate";
-import { KidsPartyTemplate } from "../templates/KidsPartyTemplate";
-import { BabyBaptismTemplate } from "../templates/BabyBaptismTemplate";
+import { TemplateLoadingFallback } from "./TemplateLoadingFallback";
+
+// Dynamic imports para optimizar carga
+const LuxuryMinimalistTemplate = lazy(() => import("../templates/LuxuryMinimalistTemplate").then(m => ({ default: m.LuxuryMinimalistTemplate })));
+const BotanicalGardenTemplate = lazy(() => import("../templates/BotanicalGardenTemplate").then(m => ({ default: m.BotanicalGardenTemplate })));
+const GoldenLuxuryTemplate = lazy(() => import("../templates/GoldenLuxuryTemplate").then(m => ({ default: m.GoldenLuxuryTemplate })));
+const NeonNightTemplate = lazy(() => import("../templates/NeonNightTemplate").then(m => ({ default: m.NeonNightTemplate })));
+const ModernBentoTemplate = lazy(() => import("../templates/ModernBentoTemplate").then(m => ({ default: m.ModernBentoTemplate })));
+const LiquidCrystalTemplate = lazy(() => import("../templates/LiquidCrystalTemplate").then(m => ({ default: m.LiquidCrystalTemplate })));
+const ModernInvitationTemplate = lazy(() => import("../templates/ModernInvitationTemplate").then(m => ({ default: m.ModernInvitationTemplate })));
+const VintageEleganceTemplate = lazy(() => import("../templates/VintageEleganceTemplate").then(m => ({ default: m.VintageEleganceTemplate })));
+const AuroraDreamyTemplate = lazy(() => import("../templates/AuroraDreamyTemplate").then(m => ({ default: m.AuroraDreamyTemplate })));
+const DiscoNightTemplate = lazy(() => import("../templates/DiscoNightTemplate").then(m => ({ default: m.DiscoNightTemplate })));
+const KidsPartyTemplate = lazy(() => import("../templates/KidsPartyTemplate").then(m => ({ default: m.KidsPartyTemplate })));
+const BabyBaptismTemplate = lazy(() => import("../templates/BabyBaptismTemplate").then(m => ({ default: m.BabyBaptismTemplate })));
 
 export function StepPreview() {
     const { data, themeConfig, prevStep } = useWizardStore();
@@ -82,60 +85,62 @@ export function StepPreview() {
 
             <div className="border rounded-xl overflow-hidden shadow-sm bg-slate-100 min-h-[600px] flex items-center justify-center relative">
                 <div className="absolute inset-0 overflow-auto">
-                    {/* Render preview based on layout */}
-                    {(themeConfig.layout === 'classic' || themeConfig.layout === 'modern') && (
-                        <div 
-                            className="min-h-screen flex items-center justify-center p-8"
-                            style={{
-                                backgroundColor: themeConfig.backgroundColor || '#ffffff',
-                                fontFamily: themeConfig.fontFamily || 'Poppins, sans-serif',
-                            }}
-                        >
-                            <div className="max-w-2xl w-full text-center space-y-6">
-                                <h1 
-                                    className="text-5xl font-bold"
-                                    style={{ color: themeConfig.primaryColor || '#d4af37' }}
-                                >
-                                    {formData.nombreEvento}
-                                </h1>
-                                {formData.eventDate && (
-                                    <p className="text-xl" style={{ color: themeConfig.textSecondary || '#666' }}>
-                                        {new Date(formData.eventDate).toLocaleDateString('es-ES', {
-                                            weekday: 'long',
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                    </p>
-                                )}
-                                {formData.location && (
-                                    <p className="text-lg" style={{ color: themeConfig.textDark || '#1a1a1a' }}>
-                                        📍 {formData.location}
-                                    </p>
-                                )}
+                    <Suspense fallback={<TemplateLoadingFallback />}>
+                        {/* Render preview based on layout */}
+                        {(themeConfig.layout === 'classic' || themeConfig.layout === 'modern') && (
+                            <div 
+                                className="min-h-screen flex items-center justify-center p-8"
+                                style={{
+                                    backgroundColor: themeConfig.backgroundColor || '#ffffff',
+                                    fontFamily: themeConfig.fontFamily || 'Poppins, sans-serif',
+                                }}
+                            >
+                                <div className="max-w-2xl w-full text-center space-y-6">
+                                    <h1 
+                                        className="text-5xl font-bold"
+                                        style={{ color: themeConfig.primaryColor || '#d4af37' }}
+                                    >
+                                        {formData.nombreEvento}
+                                    </h1>
+                                    {formData.eventDate && (
+                                        <p className="text-xl" style={{ color: themeConfig.textSecondary || '#666' }}>
+                                            {new Date(formData.eventDate).toLocaleDateString('es-ES', {
+                                                weekday: 'long',
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </p>
+                                    )}
+                                    {formData.location && (
+                                        <p className="text-lg" style={{ color: themeConfig.textDark || '#1a1a1a' }}>
+                                            📍 {formData.location}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    {themeConfig.layout === 'luxury' && <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'botanical' && <BotanicalGardenTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'golden' && <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'neon' && <NeonNightTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'bento' && <ModernBentoTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'liquid' && <LiquidCrystalTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'vintage' && <VintageEleganceTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'aurora' && <AuroraDreamyTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'disco' && <DiscoNightTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'kidsparty' && <KidsPartyTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'baby' && <BabyBaptismTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'parallax' && (
-                        <div className="min-h-screen p-8" style={{ background: `linear-gradient(135deg, ${themeConfig.primaryColor}20, ${themeConfig.backgroundColor})` }}>
-                            <div className="max-w-4xl mx-auto text-center">
-                                <h1 className="text-6xl font-bold mb-4" style={{ color: themeConfig.primaryColor }}>
-                                    {formData.nombreEvento}
-                                </h1>
+                        )}
+                        {themeConfig.layout === 'luxury' && <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'botanical' && <BotanicalGardenTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'golden' && <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'neon' && <NeonNightTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'bento' && <ModernBentoTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'liquid' && <LiquidCrystalTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'vintage' && <VintageEleganceTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'aurora' && <AuroraDreamyTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'disco' && <DiscoNightTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'kidsparty' && <KidsPartyTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'baby' && <BabyBaptismTemplate data={formData} themeConfig={themeConfig} />}
+                        {themeConfig.layout === 'parallax' && (
+                            <div className="min-h-screen p-8" style={{ background: `linear-gradient(135deg, ${themeConfig.primaryColor}20, ${themeConfig.backgroundColor})` }}>
+                                <div className="max-w-4xl mx-auto text-center">
+                                    <h1 className="text-6xl font-bold mb-4" style={{ color: themeConfig.primaryColor }}>
+                                        {formData.nombreEvento}
+                                    </h1>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </Suspense>
                 </div>
             </div>
 

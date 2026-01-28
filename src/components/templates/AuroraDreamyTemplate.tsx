@@ -11,11 +11,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { InvitationTemplateProps } from "./types";
 
 function useCountdown(targetDate: Date | string | undefined) {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -45,7 +42,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function AuroraDreamyTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function AuroraDreamyTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -440,40 +437,61 @@ export function AuroraDreamyTemplate({ data, themeConfig }: InvitationTemplatePr
                         initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                         className="max-w-xl mx-auto space-y-12"
                     >
-                        <div>
-                            <span className="font-aurora-sans text-purple-300 text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
-                            <h2 className="font-aurora-display text-5xl md:text-6xl holographic-text">Confirma tu Asistencia</h2>
-                            <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto mt-6" />
-                            <p className="font-aurora-sans text-cyan-200 mt-6">
-                                Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
-                            </p>
-                        </div>
-
-                        <form className="space-y-8 text-left glass-aurora p-8 md:p-12">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] uppercase tracking-widest text-purple-300 font-aurora-sans">Nombre Completo</Label>
-                                <Input
-                                    className="bg-white/5 border-0 border-b-2 border-purple-400/40 rounded-none focus-visible:ring-0 focus-visible:border-purple-400 px-0 text-xl font-aurora-sans placeholder:text-white/30 h-12 text-white"
-                                    placeholder="Ingresa tu nombre"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <Label className="text-[10px] uppercase tracking-widest text-purple-300 font-aurora-sans">Asistencia</Label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button type="button" className="p-4 glass-aurora hover:bg-purple-400/20 transition-colors font-aurora-sans text-sm text-white">
-                                        Confirmo Asistencia
-                                    </button>
-                                    <button type="button" className="p-4 glass-aurora hover:bg-purple-400/20 transition-colors font-aurora-sans text-sm text-white">
-                                        No Podré Asistir
-                                    </button>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div>
+                                    <span className="font-aurora-sans text-purple-300 text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <div className="text-6xl mb-4">✨</div>
+                                    <h2 className="font-aurora-display text-4xl md:text-5xl holographic-text">Hola, {guest.name}</h2>
+                                    <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto mt-6" />
+                                    <p className="font-aurora-sans text-cyan-200 mt-6">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
                                 </div>
-                            </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div>
+                                    <span className="font-aurora-sans text-purple-300 text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <h2 className="font-aurora-display text-5xl md:text-6xl holographic-text">Confirma tu Asistencia</h2>
+                                    <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto mt-6" />
+                                    <p className="font-aurora-sans text-cyan-200 mt-6">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
+                                </div>
 
-                            <Button className="w-full holographic-bg text-white hover:opacity-90 font-aurora-display uppercase tracking-widest py-6">
-                                Enviar Confirmación
-                            </Button>
-                        </form>
+                                <form className="space-y-8 text-left glass-aurora p-8 md:p-12">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase tracking-widest text-purple-300 font-aurora-sans">Nombre Completo</Label>
+                                        <Input
+                                            className="bg-white/5 border-0 border-b-2 border-purple-400/40 rounded-none focus-visible:ring-0 focus-visible:border-purple-400 px-0 text-xl font-aurora-sans placeholder:text-white/30 h-12 text-white"
+                                            placeholder="Ingresa tu nombre"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] uppercase tracking-widest text-purple-300 font-aurora-sans">Asistencia</Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button type="button" className="p-4 glass-aurora hover:bg-purple-400/20 transition-colors font-aurora-sans text-sm text-white">
+                                                Confirmo Asistencia
+                                            </button>
+                                            <button type="button" className="p-4 glass-aurora hover:bg-purple-400/20 transition-colors font-aurora-sans text-sm text-white">
+                                                No Podré Asistir
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <Button className="w-full holographic-bg text-white hover:opacity-90 font-aurora-display uppercase tracking-widest py-6">
+                                        Enviar Confirmación
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </motion.div>
                 </section>
 
@@ -483,16 +501,9 @@ export function AuroraDreamyTemplate({ data, themeConfig }: InvitationTemplatePr
                         <p className="font-aurora-script text-4xl holographic-text">
                             "{data.mensajeFinalTexto || 'Esperamos celebrar junto a ustedes.'}"
                         </p>
-                        <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto mt-6" />
                     </div>
                 )}
             </main>
-
-            <footer className="py-8 text-center border-t border-purple-400/30 glass-aurora">
-                <p className="font-aurora-sans text-[10px] tracking-[0.2em] text-purple-300 uppercase">
-                    Diseñado con Magia Digital
-                </p>
-            </footer>
             
             <style jsx global>{`
                 .quiz-container {

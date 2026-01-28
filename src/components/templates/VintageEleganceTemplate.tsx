@@ -8,14 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { InvitationTemplateProps } from "./types";
 import { useToast } from "@/components/ui/Toast";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
 
 // Hook for countdown
 function useCountdown(targetDate: Date | string | undefined) {
@@ -51,7 +48,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function VintageEleganceTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function VintageEleganceTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { primaryColor } = themeConfig;
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
@@ -460,45 +457,66 @@ export function VintageEleganceTemplate({ data, themeConfig }: InvitationTemplat
                         initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                         className="max-w-xl mx-auto space-y-12"
                     >
-                        <div>
-                            <span className="font-vintage-sans text-[#B48E60] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
-                            <h2 className="font-vintage-serif text-5xl md:text-6xl text-[#4A3F35]">Confirma tu Asistencia</h2>
-                            <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-[#B48E60] to-transparent mx-auto mt-6" />
-                            <p className="font-vintage-sans text-[#8B6F47] mt-6">
-                                Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
-                            </p>
-                        </div>
-
-                        <form className="space-y-8 text-left bg-[#F5EFE7] p-8 md:p-12 border-2 border-[#B48E60] relative">
-                            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#8B6F47]"></div>
-                            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#8B6F47]"></div>
-                            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#8B6F47]"></div>
-                            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#8B6F47]"></div>
-                            
-                            <div className="space-y-2">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#B48E60] font-vintage-sans">Nombre Completo</Label>
-                                <Input
-                                    className="bg-transparent border-0 border-b-2 border-[#B48E60]/40 rounded-none focus-visible:ring-0 focus-visible:border-[#B48E60] px-0 text-xl font-vintage-serif placeholder:text-[#8B6F47]/40 h-12 text-[#4A3F35]"
-                                    placeholder="Ingresa tu nombre"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#B48E60] font-vintage-sans">Asistencia</Label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button type="button" className="p-4 border-2 border-[#B48E60] hover:bg-[#B48E60] hover:text-[#FBF8F3] transition-colors font-vintage-sans text-sm text-[#4A3F35]">
-                                        Confirmo Asistencia
-                                    </button>
-                                    <button type="button" className="p-4 border-2 border-[#B48E60] hover:bg-[#B48E60] hover:text-[#FBF8F3] transition-colors font-vintage-sans text-sm text-[#4A3F35]">
-                                        No Podré Asistir
-                                    </button>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div>
+                                    <span className="font-vintage-sans text-[#B48E60] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <div className="text-6xl mb-4">✨</div>
+                                    <h2 className="font-vintage-serif text-4xl md:text-5xl text-[#4A3F35]">Hola, {guest.name}</h2>
+                                    <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-[#B48E60] to-transparent mx-auto mt-6" />
+                                    <p className="font-vintage-sans text-[#8B6F47] mt-6">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
                                 </div>
-                            </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div>
+                                    <span className="font-vintage-sans text-[#B48E60] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
+                                    <h2 className="font-vintage-serif text-5xl md:text-6xl text-[#4A3F35]">Confirma tu Asistencia</h2>
+                                    <div className="w-32 h-[2px] bg-gradient-to-r from-transparent via-[#B48E60] to-transparent mx-auto mt-6" />
+                                    <p className="font-vintage-sans text-[#8B6F47] mt-6">
+                                        Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
+                                </div>
 
-                            <Button className="w-full bg-[#B48E60] text-[#FBF8F3] hover:bg-[#8B6F47] font-vintage-display uppercase tracking-widest py-6">
-                                Enviar Confirmación
-                            </Button>
-                        </form>
+                                <form className="space-y-8 text-left bg-[#F5EFE7] p-8 md:p-12 border-2 border-[#B48E60] relative">
+                                    <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#8B6F47]"></div>
+                                    <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#8B6F47]"></div>
+                                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#8B6F47]"></div>
+                                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#8B6F47]"></div>
+                                    
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase tracking-widest text-[#B48E60] font-vintage-sans">Nombre Completo</Label>
+                                        <Input
+                                            className="bg-transparent border-0 border-b-2 border-[#B48E60]/40 rounded-none focus-visible:ring-0 focus-visible:border-[#B48E60] px-0 text-xl font-vintage-serif placeholder:text-[#8B6F47]/40 h-12 text-[#4A3F35]"
+                                            placeholder="Ingresa tu nombre"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] uppercase tracking-widest text-[#B48E60] font-vintage-sans">Asistencia</Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button type="button" className="p-4 border-2 border-[#B48E60] hover:bg-[#B48E60] hover:text-[#FBF8F3] transition-colors font-vintage-sans text-sm text-[#4A3F35]">
+                                                Confirmo Asistencia
+                                            </button>
+                                            <button type="button" className="p-4 border-2 border-[#B48E60] hover:bg-[#B48E60] hover:text-[#FBF8F3] transition-colors font-vintage-sans text-sm text-[#4A3F35]">
+                                                No Podré Asistir
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <Button className="w-full bg-[#B48E60] text-[#FBF8F3] hover:bg-[#8B6F47] font-vintage-display uppercase tracking-widest py-6">
+                                        Enviar Confirmación
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </motion.div>
                 </section>
 

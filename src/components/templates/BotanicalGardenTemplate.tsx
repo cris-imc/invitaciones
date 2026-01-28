@@ -4,17 +4,14 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "fra
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useRef, useState, useEffect } from "react";
-// import { InvitationTemplateProps } from "./types"; (removed strict type)
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
+import { InvitationTemplateProps } from "./types";
 import { MapPin, Calendar, Clock, Gift, Music, Heart, Leaf, Copy, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
 import { useToast } from "@/components/ui/Toast";
 
 // Hook for countdown
@@ -51,7 +48,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function BotanicalGardenTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function BotanicalGardenTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { primaryColor, backgroundColor } = themeConfig;
     const { showToast } = useToast();
 
@@ -452,43 +449,64 @@ export function BotanicalGardenTemplate({ data, themeConfig }: InvitationTemplat
                         <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#F7E7DC] rounded-tl-[100%] opacity-50 -z-0" />
 
                         <div className="relative z-10 text-center">
-                            <h2 className="font-botanic-serif text-3xl text-[#3A5A40] mb-2">Confirmación</h2>
-                            <p className="font-botanic-sans text-gray-500 mb-8">
-                                Esperamos contar contigo.
-                                <br />
-                                {data.rsvpDaysBeforeEvent ? `(Confirmar hasta ${data.rsvpDaysBeforeEvent} días antes)` : ''}
-                            </p>
-
-                            <form className="space-y-6">
-                                <div>
-                                    <Label className="sr-only">Nombre</Label>
-                                    <Input
-                                        placeholder="Nombre completo"
-                                        className="h-14 rounded-2xl bg-[#FAFAFA] border-[#E8F3E8] focus:border-[#D4A574] focus:ring-0 text-center font-botanic-sans"
+                            {isPersonalized && guest ? (
+                                <>
+                                    <div className="space-y-4 mb-8">
+                                        <div className="text-6xl">🌿</div>
+                                        <h2 className="font-botanic-serif text-3xl text-[#3A5A40]">Hola, {guest.name}</h2>
+                                        <p className="font-botanic-sans text-gray-500">
+                                            Esperamos contar contigo.
+                                            <br />
+                                            {data.rsvpDaysBeforeEvent ? `(Confirmar hasta ${data.rsvpDaysBeforeEvent} días antes)` : ''}
+                                        </p>
+                                    </div>
+                                    <PersonalizedRsvpForm
+                                        guest={guest}
+                                        invitation={data}
+                                        onSuccess={() => {}}
                                     />
-                                </div>
+                                </>
+                            ) : (
+                                <>
+                                    <h2 className="font-botanic-serif text-3xl text-[#3A5A40] mb-2">Confirmación</h2>
+                                    <p className="font-botanic-sans text-gray-500 mb-8">
+                                        Esperamos contar contigo.
+                                        <br />
+                                        {data.rsvpDaysBeforeEvent ? `(Confirmar hasta ${data.rsvpDaysBeforeEvent} días antes)` : ''}
+                                    </p>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="h-14 rounded-2xl border-[#E8F3E8] hover:bg-[#E8F3E8] hover:text-[#3A5A40] text-gray-600 font-botanic-sans"
-                                    >
-                                        Asistiré
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="h-14 rounded-2xl border-[#E8F3E8] hover:bg-[#FEE2E2] hover:text-red-500 text-gray-600 font-botanic-sans"
-                                    >
-                                        No podré
-                                    </Button>
-                                </div>
+                                    <form className="space-y-6">
+                                        <div>
+                                            <Label className="sr-only">Nombre</Label>
+                                            <Input
+                                                placeholder="Nombre completo"
+                                                className="h-14 rounded-2xl bg-[#FAFAFA] border-[#E8F3E8] focus:border-[#D4A574] focus:ring-0 text-center font-botanic-sans"
+                                            />
+                                        </div>
 
-                                <Button className="w-full h-14 rounded-2xl bg-[#3A5A40] hover:bg-[#2D4531] text-white font-botanic-sans text-lg shadow-lg shadow-[#3A5A40]/20 mt-4">
-                                    Enviar Respuesta
-                                </Button>
-                            </form>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="h-14 rounded-2xl border-[#E8F3E8] hover:bg-[#E8F3E8] hover:text-[#3A5A40] text-gray-600 font-botanic-sans"
+                                            >
+                                                Asistiré
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="h-14 rounded-2xl border-[#E8F3E8] hover:bg-[#FEE2E2] hover:text-red-500 text-gray-600 font-botanic-sans"
+                                            >
+                                                No podré
+                                            </Button>
+                                        </div>
+
+                                        <Button className="w-full h-14 rounded-2xl bg-[#3A5A40] hover:bg-[#2D4531] text-white font-botanic-sans text-lg shadow-lg shadow-[#3A5A40]/20 mt-4">
+                                            Enviar Respuesta
+                                        </Button>
+                                    </form>
+                                </>
+                            )}
                         </div>
                     </motion.div>
                 </section>

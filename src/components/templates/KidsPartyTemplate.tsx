@@ -11,11 +11,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { SharedAlbum } from "@/components/invitation/SharedAlbum";
 import { QuizTrivia } from "@/components/invitation/QuizTrivia";
-
-interface InvitationTemplateProps {
-    data: any;
-    themeConfig: any;
-}
+import { PersonalizedRsvpForm } from "@/components/invitation/PersonalizedRsvpForm";
+import { InvitationTemplateProps } from "./types";
 
 function useCountdown(targetDate: Date | string | undefined) {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -45,7 +42,7 @@ function useCountdown(targetDate: Date | string | undefined) {
     return timeLeft;
 }
 
-export function KidsPartyTemplate({ data, themeConfig }: InvitationTemplateProps) {
+export function KidsPartyTemplate({ data, themeConfig, guest, isPersonalized = false }: InvitationTemplateProps) {
     const { showToast } = useToast();
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -489,40 +486,61 @@ export function KidsPartyTemplate({ data, themeConfig }: InvitationTemplateProps
                         initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                         className="max-w-xl mx-auto space-y-12"
                     >
-                        <div>
-                            <span className="font-kids-text text-[#4ECDC4] text-sm tracking-widest uppercase font-semibold block mb-4">✉️ R.S.V.P</span>
-                            <h2 className="font-kids-title text-6xl md:text-7xl text-[#FF6B6B]">¡Confirmá!</h2>
-                            <div className="w-32 h-2 rainbow-gradient rounded-full mx-auto mt-6" />
-                            <p className="font-kids-text text-gray-700 mt-6 text-lg">
-                                Responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
-                            </p>
-                        </div>
-
-                        <form className="space-y-8 text-left card-kids p-8 md:p-12">
-                            <div className="space-y-2">
-                                <Label className="text-sm uppercase tracking-wider text-[#FF6B6B] font-kids-text font-semibold">Nombre Completo</Label>
-                                <Input
-                                    className="bg-white border-4 border-[#FFE66D]/40 rounded-2xl focus-visible:ring-0 focus-visible:border-[#FFE66D] px-6 text-xl font-kids-text placeholder:text-gray-400 h-14 text-gray-700"
-                                    placeholder="Tu nombre aquí..."
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <Label className="text-sm uppercase tracking-wider text-[#4ECDC4] font-kids-text font-semibold">¿Vas a Venir?</Label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button type="button" className="p-6 bg-white border-4 border-[#4ECDC4] hover:bg-[#4ECDC4]/10 transition-colors font-kids-text text-lg text-gray-700 rounded-2xl font-semibold">
-                                        ¡Sí, voy! 🎉
-                                    </button>
-                                    <button type="button" className="p-6 bg-white border-4 border-[#FF6B6B] hover:bg-[#FF6B6B]/10 transition-colors font-kids-text text-lg text-gray-700 rounded-2xl font-semibold">
-                                        No podré 😢
-                                    </button>
+                        {isPersonalized && guest ? (
+                            <>
+                                <div>
+                                    <span className="font-kids-text text-[#4ECDC4] text-sm tracking-widest uppercase font-semibold block mb-4">✉️ R.S.V.P</span>
+                                    <div className="text-6xl mb-4">🎉</div>
+                                    <h2 className="font-kids-title text-5xl md:text-6xl text-[#FF6B6B]">Hola, {guest.name}</h2>
+                                    <div className="w-32 h-2 rainbow-gradient rounded-full mx-auto mt-6" />
+                                    <p className="font-kids-text text-gray-700 mt-6 text-lg">
+                                        Responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
                                 </div>
-                            </div>
+                                <PersonalizedRsvpForm
+                                    guest={guest}
+                                    invitation={data}
+                                    onSuccess={() => {}}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div>
+                                    <span className="font-kids-text text-[#4ECDC4] text-sm tracking-widest uppercase font-semibold block mb-4">✉️ R.S.V.P</span>
+                                    <h2 className="font-kids-title text-6xl md:text-7xl text-[#FF6B6B]">¡Confirmá!</h2>
+                                    <div className="w-32 h-2 rainbow-gradient rounded-full mx-auto mt-6" />
+                                    <p className="font-kids-text text-gray-700 mt-6 text-lg">
+                                        Responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
+                                    </p>
+                                </div>
 
-                            <Button className="w-full rainbow-gradient text-white hover:opacity-90 font-kids-text text-xl uppercase tracking-wider py-7 border-0 rounded-full shadow-xl">
-                                Enviar Confirmación ✨
-                            </Button>
-                        </form>
+                                <form className="space-y-8 text-left card-kids p-8 md:p-12">
+                                    <div className="space-y-2">
+                                        <Label className="text-sm uppercase tracking-wider text-[#FF6B6B] font-kids-text font-semibold">Nombre Completo</Label>
+                                        <Input
+                                            className="bg-white border-4 border-[#FFE66D]/40 rounded-2xl focus-visible:ring-0 focus-visible:border-[#FFE66D] px-6 text-xl font-kids-text placeholder:text-gray-400 h-14 text-gray-700"
+                                            placeholder="Tu nombre aquí..."
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <Label className="text-sm uppercase tracking-wider text-[#4ECDC4] font-kids-text font-semibold">¿Vas a Venir?</Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button type="button" className="p-6 bg-white border-4 border-[#4ECDC4] hover:bg-[#4ECDC4]/10 transition-colors font-kids-text text-lg text-gray-700 rounded-2xl font-semibold">
+                                                ¡Sí, voy! 🎉
+                                            </button>
+                                            <button type="button" className="p-6 bg-white border-4 border-[#FF6B6B] hover:bg-[#FF6B6B]/10 transition-colors font-kids-text text-lg text-gray-700 rounded-2xl font-semibold">
+                                                No podré 😢
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <Button className="w-full rainbow-gradient text-white hover:opacity-90 font-kids-text text-xl uppercase tracking-wider py-7 border-0 rounded-full shadow-xl">
+                                        Enviar Confirmación ✨
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </motion.div>
                 </section>
 
