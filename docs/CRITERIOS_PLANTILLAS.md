@@ -458,5 +458,228 @@ Para crear una nueva plantilla:
 
 ---
 
-**Última actualización:** 2026-01-27
-**Versión:** 1.0
+## 🎨 Plantillas Implementadas - Nuevas Adiciones
+
+### **1. Vintage Elegance Template** 
+*Inspirada en diseños Art Deco y estética vintage de los años 20-30*
+
+#### Concepto Visual
+Plantilla premium que evoca la elegancia atemporal del Art Deco, con marcos ornamentales, tipografía serif clásica y detalles en tonos dorados/sepia. Perfecta para bodas clásicas y eventos de alta gama.
+
+#### Paleta de Colores
+```typescript
+Primary: #B48E60    // Dorado vintage/bronce
+Secondary: #8B6F47  // Marrón cálido
+Background: #FBF8F3 // Crema suave
+Text Dark: #4A3F35  // Marrón oscuro
+Text Light: #8B6F47 // Marrón medio
+Accent: #D4AF37     // Dorado brillante
+```
+
+#### Tipografías
+```tsx
+// Google Fonts importadas
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap');
+
+.font-vintage-serif    // Cormorant Garamond - Títulos principales
+.font-vintage-sans     // Montserrat - Cuerpo de texto
+.font-vintage-script   // Great Vibes - Nombres y elementos decorativos
+```
+
+#### Elementos Decorativos Únicos
+- **Marcos de esquina**: Bordes en L en las 4 esquinas del hero
+- **Círculos concéntricos**: Ornamentos SVG con opacidad baja
+- **Patrón Art Deco**: Background con líneas diagonales cruzadas
+- **Efecto shimmer**: Animación de brillo sutil en degradado
+- **Bordes ornamentales**: Marcos con esquinas decorativas en secciones
+- **Imágenes en escala de grises**: Con efecto hover a color
+
+#### Características Técnicas
+```tsx
+// Animaciones personalizadas
+@keyframes shimmer-vintage {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+// Patrón de fondo
+.art-deco-pattern {
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(180, 142, 96, 0.05) 10px, rgba(180, 142, 96, 0.05) 20px),
+        repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(180, 142, 96, 0.05) 10px, rgba(180, 142, 96, 0.05) 20px);
+}
+```
+
+#### Secciones Implementadas
+- ✅ Hero con nombres en tipografía script grande
+- ✅ Countdown con cajas decorativas y esquinas ornamentales
+- ✅ Detalles del evento con iconografía vintage
+- ✅ Galería con efecto grayscale → color
+- ✅ Información de regalo con diseño clásico
+- ✅ Control de música con estilo vintage
+- ✅ Footer con divisores decorativos
+
+#### Casos de Uso Ideales
+- Bodas clásicas y elegantes
+- Aniversarios de oro/plata
+- Eventos formales
+- Celebraciones de época/temáticas
+- Quinceañeros estilo Gatsby
+
+---
+
+### **2. Aurora Dreamy Template**
+*Inspirada en gradientes holográficos, efectos iridiscentes y estética dreamy moderna*
+
+#### Concepto Visual
+Plantilla ultra-moderna con gradientes holográficos vibrantes, efectos de glassmorphism evolucionado y animaciones fluidas. Colores iridiscentes que cambian con el scroll y la interacción. Perfecta para eventos juveniles y contemporáneos.
+
+#### Paleta de Colores (Gradiente Holográfico)
+```typescript
+// Gradiente principal multicolor
+gradient: linear-gradient(135deg, 
+    #667eea 0%,    // Púrpura brillante
+    #764ba2 25%,   // Violeta
+    #f093fb 50%,   // Rosa
+    #4facfe 75%,   // Azul cielo
+    #00f2fe 100%   // Cyan
+)
+
+Background: #0a0a1f       // Azul oscuro casi negro
+Glass: rgba(255, 255, 255, 0.1)  // Glassmorphism
+Glow: #a78bfa             // Violeta luminoso
+Text: #ffffff             // Blanco puro
+```
+
+#### Tipografías
+```tsx
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+.font-aurora-display  // Orbitron - Títulos futuristas
+.font-aurora-body     // Space Grotesk - Cuerpo moderno
+```
+
+#### Elementos Decorativos Únicos
+- **Partículas flotantes**: Burbujas de colores iridiscentes animadas
+- **Blur orbs**: Esferas difuminadas con gradiente holográfico
+- **Glass cards**: Tarjetas con backdrop-filter y bordes luminosos
+- **Glow effects**: Sombras de color que cambian con hover
+- **Animated mesh**: Gradiente animado en bucle
+- **Glassmorphism layers**: Múltiples capas semitransparentes
+
+#### Características Técnicas
+```tsx
+// Gradiente animado
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.aurora-gradient {
+    background: linear-gradient(270deg, #667eea, #764ba2, #f093fb, #4facfe);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+}
+
+// Glassmorphism avanzado
+.glass-morphism {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+```
+
+#### Efectos de Scroll
+```tsx
+// Parallax de partículas
+const particleY = useTransform(scrollYProgress, [0, 1], [0, -300]);
+
+// Cambio de opacidad en orbs
+const orbOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [1, 0.5, 0.8, 0.3]);
+
+// Rotación de elementos
+const rotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
+```
+
+#### Secciones Implementadas
+- ✅ Hero con gradiente holográfico y partículas flotantes
+- ✅ Countdown con glass cards y glow effects
+- ✅ Detalles con glassmorphism y bordes luminosos
+- ✅ Galería con efectos de hover holográfico
+- ✅ RSVP form con diseño futurista
+- ✅ Música con controles estilo aurora
+- ✅ Footer con gradiente de cierre
+
+#### Casos de Uso Ideales
+- Quinceañeros modernos
+- Fiestas juveniles
+- Eventos tech/gaming
+- Bodas contemporáneas
+- Celebraciones trendy
+- Eventos nocturnos/clubes
+
+---
+
+## 📊 Comparativa de Plantillas
+
+| Característica | Vintage Elegance | Aurora Dreamy |
+|---|---|---|
+| **Estilo** | Clásico Art Deco | Moderno Holográfico |
+| **Paleta** | Tonos cálidos sepia/dorado | Gradientes vibrantes multicolor |
+| **Tipografía** | Serif clásica + Script | Sans futurista |
+| **Efectos** | Shimmer + Ornamentos | Glassmorphism + Glow |
+| **Mood** | Elegante y atemporal | Energético y juvenil |
+| **Complejidad** | Media | Alta |
+| **Performance** | Óptimo | Bueno (por animaciones) |
+
+---
+
+## 🛠️ Implementación Técnica
+
+### Archivos Creados
+```
+src/components/templates/
+  ├── VintageEleganceTemplate.tsx  (466 líneas)
+  └── AuroraDreamyTemplate.tsx     (420 líneas)
+```
+
+### Configuración en theme-config.ts
+```typescript
+vintage: {
+    id: 'vintage',
+    name: 'Vintage Elegance',
+    description: 'Diseño Art Deco con marcos ornamentales y tipografía clásica',
+},
+aurora: {
+    id: 'aurora',
+    name: 'Aurora Dreamy',
+    description: 'Gradientes holográficos con efectos iridiscentes y glassmorphism',
+}
+```
+
+### Uso en Wizard
+Las plantillas están disponibles en el selector de diseño del wizard de creación y pueden combinarse con cualquier paleta de colores del sistema.
+
+---
+
+## 🎯 Próximas Mejoras Sugeridas
+
+### Para Vintage Elegance
+- [ ] Agregar más ornamentos SVG personalizados
+- [ ] Implementar variantes de marcos (rectangular, circular, oval)
+- [ ] Añadir efectos de tinta vintage
+- [ ] Incluir texturas de papel antiguo
+
+### Para Aurora Dreamy
+- [ ] Optimizar animaciones para mejor performance
+- [ ] Agregar más variantes de partículas
+- [ ] Implementar modo de bajo consumo (menos efectos)
+- [ ] Añadir efectos de sonido sutiles
+
+---
+
+**Última actualización:** 2026-01-28
+**Versión:** 1.1
+**Nuevas plantillas:** 2 (Vintage Elegance, Aurora Dreamy)

@@ -41,6 +41,14 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
         icon: '✨',
         colors: ['#c7757f', '#ffffff', '#000000']
     },
+    {
+        id: 'VINTAGE_ELEGANCE',
+        label: 'Vintage Elegance',
+        description: 'Art Deco con marcos ornamentales y tipografía clásica.',
+        category: 'ELEGANT',
+        icon: '🎭',
+        colors: ['#B48E60', '#FBF8F3', '#8B6F47']
+    },
 
     // --- MODERN (Fiestas, XV, Eventos) ---
     {
@@ -90,6 +98,14 @@ export const TEMPLATES_CONFIG: TemplateConfig[] = [
         category: 'MODERN',
         icon: '🧊',
         colors: ['#e0f2fe', '#ffffff', '#bae6fd']
+    },
+    {
+        id: 'AURORA_DREAMY',
+        label: 'Aurora Dreamy',
+        description: 'Gradientes holográficos con efectos iridiscentes modernos.',
+        category: 'MODERN',
+        icon: '🌈',
+        colors: ['#667eea', '#f093fb', '#4facfe']
     },
 
     // --- RUSTIC (Bodas aire libre) ---

@@ -27,6 +27,8 @@ import { GoldenLuxuryTemplate } from "@/components/templates/GoldenLuxuryTemplat
 import { NeonNightTemplate } from "@/components/templates/NeonNightTemplate";
 import { LiquidCrystalTemplate } from "@/components/templates/LiquidCrystalTemplate";
 import { ModernBentoTemplate } from "@/components/templates/ModernBentoTemplate";
+import { VintageEleganceTemplate } from "@/components/templates/VintageEleganceTemplate";
+import { AuroraDreamyTemplate } from "@/components/templates/AuroraDreamyTemplate";
 
 interface InvitationContentProps {
     invitation: any;
@@ -186,6 +188,30 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return <ModernBentoTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "VINTAGE_ELEGANCE") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <VintageEleganceTemplate data={formData} themeConfig={themeConfig as any} />;
+    }
+
+    if (invitation.templateTipo === "AURORA_DREAMY") {
+        const formData = {
+            ...invitation,
+            type: invitation.tipo,
+            fecha: new Date(invitation.fechaEvento),
+            galeriaPrincipalFotos: galeriaPrincipal,
+            galeriaSecundariaFotos: galeriaSecundaria,
+        } as any;
+
+        return <AuroraDreamyTemplate data={formData} themeConfig={themeConfig as any} />;
     }
 
     return (

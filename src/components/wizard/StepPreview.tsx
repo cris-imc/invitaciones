@@ -14,6 +14,8 @@ import { NeonNightTemplate } from "../templates/NeonNightTemplate";
 import { ModernBentoTemplate } from "../templates/ModernBentoTemplate";
 import { LiquidCrystalTemplate } from "../templates/LiquidCrystalTemplate";
 import { ModernInvitationTemplate } from "../templates/ModernInvitationTemplate";
+import { VintageEleganceTemplate } from "../templates/VintageEleganceTemplate";
+import { AuroraDreamyTemplate } from "../templates/AuroraDreamyTemplate";
 
 export function StepPreview() {
     const { data, themeConfig, prevStep } = useWizardStore();
@@ -117,6 +119,8 @@ export function StepPreview() {
                     {themeConfig.layout === 'neon' && <NeonNightTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'bento' && <ModernBentoTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'liquid' && <LiquidCrystalTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'vintage' && <VintageEleganceTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'aurora' && <AuroraDreamyTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'parallax' && (
                         <div className="min-h-screen p-8" style={{ background: `linear-gradient(135deg, ${themeConfig.primaryColor}20, ${themeConfig.backgroundColor})` }}>
                             <div className="max-w-4xl mx-auto text-center">

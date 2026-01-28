@@ -124,6 +124,16 @@ export const LAYOUT_TEMPLATES = {
     name: 'Modern Bento',
     description: 'Interfaz moderna basada en grid estructurado',
   },
+  vintage: {
+    id: 'vintage',
+    name: 'Vintage Elegance',
+    description: 'Diseño Art Deco con marcos ornamentales y tipografía clásica',
+  },
+  aurora: {
+    id: 'aurora',
+    name: 'Aurora Dreamy',
+    description: 'Gradientes holográficos con efectos iridiscentes y glassmorphism',
+  },
 } as const;
 
 export type LayoutTemplateId = keyof typeof LAYOUT_TEMPLATES;
@@ -389,5 +399,21 @@ export const AVAILABLE_TEMPLATES = [
     description: "Diseño estructurado ultra-moderno estilo Grid",
     color: "#a3e635",
     features: ["Grid Layout", "Interfaz OS", "Bloques Interactivos"]
+  },
+  {
+    id: "VINTAGE_ELEGANCE",
+    layoutId: "vintage",
+    name: "Vintage Elegance",
+    description: "Art Deco con marcos ornamentales y tipografía clásica",
+    color: "#B48E60",
+    features: ["Estilo Art Deco", "Marcos Ornamentales", "Efecto Shimmer"]
+  },
+  {
+    id: "AURORA_DREAMY",
+    layoutId: "aurora",
+    name: "Aurora Dreamy",
+    description: "Gradientes holográficos con efectos iridiscentes modernos",
+    color: "#667eea",
+    features: ["Gradientes Holográficos", "Glassmorphism", "Efectos Glow"]
   }
 ] as const;
