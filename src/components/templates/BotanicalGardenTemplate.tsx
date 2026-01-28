@@ -395,7 +395,7 @@ export function BotanicalGardenTemplate({ data, themeConfig }: InvitationTemplat
                                             className="border-[#3A5A40] text-[#3A5A40] hover:bg-[#3A5A40] hover:text-white rounded-full px-8 py-2 font-botanic-sans"
                                             onClick={() => setShowBankDetails(!showBankDetails)}
                                         >
-                                            {showBankDetails ? "Ocultar Datos" : "Ver Datos Bancarios"}
+                                            {showBankDetails ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                                         </Button>
 
                                         <AnimatePresence>

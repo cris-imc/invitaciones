@@ -155,7 +155,7 @@ export function LiquidCrystalTemplate({ data, themeConfig }: InvitationTemplateP
                         className="glass-card p-12 md:p-20 rounded-[3rem] inline-block"
                     >
                         <span className="font-liquid-display text-indigo-900/60 uppercase tracking-[0.4em] text-sm md:text-base font-semibold block mb-8">
-                            {data.type === 'CASAMIENTO' ? 'Join us to celebrate' : 'You are invited'}
+                            {data.nombreEvento || (data.type === 'CASAMIENTO' ? 'Celebremos Juntos' : 'Estás Invitado')}
                         </span>
 
                         <h1 className="font-liquid-serif text-6xl md:text-8xl lg:text-9xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 mb-6 leading-[0.9]">

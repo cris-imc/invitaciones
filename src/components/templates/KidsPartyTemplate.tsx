@@ -240,10 +240,10 @@ export function KidsPartyTemplate({ data, themeConfig }: InvitationTemplateProps
                             <Smile className="w-12 h-12 text-white inline-block" />
                         </div>
                         <h1 className="font-kids-display text-7xl md:text-9xl font-bold text-[#FF6B6B] drop-shadow-lg">
-                            {data.tituloPortada || "¡Fiesta Infantil!"}
+                            {data.nombreQuinceanera || data.tituloPortada || "¡Fiesta Infantil!"}
                         </h1>
                         <p className="font-kids-title text-4xl md:text-6xl text-[#4ECDC4]">
-                            {data.subtituloPortada || data.nombreFestejado || "Celebremos Juntos"}
+                            {data.subtituloPortada || data.nombreEvento || "Celebremos Juntos"}
                         </p>
                     </motion.div>
 
@@ -453,7 +453,7 @@ export function KidsPartyTemplate({ data, themeConfig }: InvitationTemplateProps
                                     className="border-4 border-[#4ECDC4] text-[#4ECDC4] hover:bg-[#4ECDC4]/20 font-kids-text uppercase tracking-widest text-sm rounded-full px-8 py-6"
                                     onClick={() => setShowBankDetails(!showBankDetails)}
                                 >
-                                    {showBankDetails ? "Ocultar Datos 👆" : "Ver Datos Bancarios 👇"}
+                                    {showBankDetails ? "Ocultar Detalles 👆" : "Ver Datos Bancarios 👇"}
                                 </Button>
 
                                 <AnimatePresence>

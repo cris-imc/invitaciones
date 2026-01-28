@@ -442,7 +442,7 @@ export function DiscoNightTemplate({ data, themeConfig }: InvitationTemplateProp
                                     className="border-2 border-[#8338EC] text-[#8338EC] hover:bg-[#8338EC]/20 font-disco-text uppercase tracking-widest text-xs"
                                     onClick={() => setShowBankDetails(!showBankDetails)}
                                 >
-                                    {showBankDetails ? "Ocultar Datos" : "Ver Datos Bancarios"}
+                                    {showBankDetails ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                                 </Button>
 
                                 <AnimatePresence>
@@ -528,7 +528,7 @@ export function DiscoNightTemplate({ data, themeConfig }: InvitationTemplateProp
 
             <footer className="py-8 text-center border-t border-[#FF006E]/30 glass-disco">
                 <p className="font-disco-text text-[10px] tracking-[0.2em] text-[#8338EC] uppercase">
-                    Let's Party All Night
+                    Fiesta Toda la Noche
                 </p>
             </footer>
             

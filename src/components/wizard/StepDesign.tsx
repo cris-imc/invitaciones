@@ -36,6 +36,7 @@ export function StepDesign() {
             <TemplateSelector 
                 value={selectedTemplate} 
                 onChange={handleTemplateSelect}
+                eventType={data.type}
             />
 
             {/* Hero Background Image */}

@@ -172,7 +172,7 @@ export function ModernInvitationTemplate({ invitation, guest, isPersonalized = f
                     transition={{ delay: 2 }}
                     className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center"
                 >
-                    <span className="text-xs tracking-widest mb-4 text-white/50">SCROLL</span>
+                    <span className="text-xs tracking-widest mb-4 text-white/50">DESLIZAR</span>
                     <motion.div
                         animate={{ y: [0, 10, 0] }}
                         transition={{ repeat: Infinity, duration: 1.5 }}
@@ -500,12 +500,20 @@ function CountdownTimer({ targetDate }: { targetDate: Date }) {
 
     return (
         <div className="flex gap-6">
-            {Object.entries(timeLeft).map(([unit, value]) => (
-                <div key={unit} className="text-center">
-                    <div className="text-4xl font-thin tabular-nums">{String(value).padStart(2, '0')}</div>
-                    <div className="text-xs tracking-wider text-gray-400 uppercase mt-1">{unit}</div>
-                </div>
-            ))}
+            {Object.entries(timeLeft).map(([unit, value]) => {
+                const labels: Record<string, string> = {
+                    days: 'Días',
+                    hours: 'Horas',
+                    minutes: 'Minutos',
+                    seconds: 'Segundos'
+                };
+                return (
+                    <div key={unit} className="text-center">
+                        <div className="text-4xl font-thin tabular-nums">{String(value).padStart(2, '0')}</div>
+                        <div className="text-xs tracking-wider text-gray-400 uppercase mt-1">{labels[unit] || unit}</div>
+                    </div>
+                );
+            })}
         </div>
     );
 }
@@ -566,7 +574,7 @@ function BankDetailsModern({
                                 size="lg"
                                 className="px-8 py-6 text-base rounded-full bg-white text-black hover:bg-gray-200 transition-all hover:scale-105"
                             >
-                                {isRevealed ? "Ocultar datos" : "Ver datos bancarios"}
+                                {isRevealed ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                             </Button>
 
                             {isRevealed && (

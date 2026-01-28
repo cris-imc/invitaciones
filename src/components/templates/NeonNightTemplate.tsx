@@ -76,7 +76,7 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        showToast("Data copied to clipboard", "success");
+        showToast("Datos copiados al portapapeles", "success");
     };
 
     return (
@@ -134,7 +134,7 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                         transition={{ duration: 0.8 }}
                     >
                         <GlitchText className="text-sm md:text-lg font-neon-display tracking-[0.5em] text-[#00F3FF] mb-4">
-                            {data.type === 'CASAMIENTO' ? 'THE WEDDING PROTOCOL' : 'SYSTEM UPDATE: PARTY MODE'}
+                            {data.nombreEvento || (data.type === 'CASAMIENTO' ? 'PROTOCOLO DE BODA' : 'MODO FIESTA ACTIVADO')}
                         </GlitchText>
 
                         <h1 className="font-neon-display text-5xl md:text-7xl lg:text-9xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#00F3FF] via-white to-[#FF00FF] drop-shadow-[0_0_10px_rgba(0,243,255,0.5)] italic transform -skew-x-12">
@@ -182,14 +182,14 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
             {/* COUNTDOWN */}
             <section className="py-20 bg-[#050505] relative border-y border-[#00F3FF]/20">
                 <div className="text-center mb-12">
-                    <h2 className="font-neon-display text-[#00F3FF] text-xl tracking-[0.3em] animate-pulse">INITIATING...</h2>
+                    <h2 className="font-neon-display text-[#00F3FF] text-xl tracking-[0.3em] animate-pulse">INICIANDO...</h2>
                 </div>
                 <div className="container mx-auto flex flex-wrap justify-center gap-6 md:gap-12">
                     {[
-                        { label: 'DAYS', value: countdown.days },
-                        { label: 'HOURS', value: countdown.hours },
+                        { label: 'DÍAS', value: countdown.days },
+                        { label: 'HORAS', value: countdown.hours },
                         { label: 'MINS', value: countdown.minutes },
-                        { label: 'SECS', value: countdown.seconds }
+                        { label: 'SEGS', value: countdown.seconds }
                     ].map((item, i) => (
                         <div key={i} className="bg-black border border-[#222] p-6 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] min-w-[120px] text-center relative overflow-hidden group">
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00F3FF] to-[#FF00FF]" />
@@ -227,7 +227,7 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                     <div className="space-y-8">
                         <NeonBorder className="p-8 bg-black/60 backdrop-blur-md rounded-2xl border border-white/10" color="#FF00FF">
                             <h3 className="text-[#FF00FF] font-neon-display text-2xl mb-4 flex items-center gap-3">
-                                <MapPin /> COORDINATES
+                                <MapPin /> COORDENADAS
                             </h3>
                             <p className="font-neon-body text-2xl">{data.lugarNombre}</p>
                             <p className="font-neon-body text-lg text-neutral-400 mt-2">{data.direccion}</p>
@@ -237,14 +237,14 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                                     className="mt-6 w-full bg-transparent border border-[#FF00FF] text-[#FF00FF] hover:bg-[#FF00FF] hover:text-black font-neon-display font-bold uppercase transition-all shadow-[0_0_10px_rgba(255,0,255,0.3)]"
                                     onClick={() => window.open(data.mapUrl, '_blank')}
                                 >
-                                    Access Map
+                                    Acceder al Mapa
                                 </Button>
                             )}
                         </NeonBorder>
 
                         <NeonBorder className="p-8 bg-black/60 backdrop-blur-md rounded-2xl border border-white/10" color="#00F3FF">
                             <h3 className="text-[#00F3FF] font-neon-display text-2xl mb-4 flex items-center gap-3">
-                                <Clock /> TIMELINE
+                                <Clock /> CRONOGRAMA
                             </h3>
                             <p className="font-neon-body text-2xl">
                                 {new Date(data.fecha).toLocaleDateString('es-AR', { dateStyle: 'full' })}
@@ -292,8 +292,8 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
 
                         <div className="quiz-override relative z-10">
                             <QuizTrivia
-                                titulo="SYSTEM CHECK: COMPATIBILITY"
-                                subtitulo="Test your knowledge about the hosts"
+                                titulo="VERIFICACIÓN DEL SISTEMA: COMPATIBILIDAD"
+                                subtitulo="Pon a prueba tu conocimiento sobre los anfitriones"
                                 preguntas={typeof data.triviaPreguntas === 'string' ? JSON.parse(data.triviaPreguntas) : data.triviaPreguntas}
                                 invitationId={data.id}
                             />
@@ -303,14 +303,14 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
 
                 {/* SHARED ALBUM */}
                 {data.albumCompartidoHabilitado && (
-                    <div className="border border-[#333] rounded-3xl overflow-hidden bg-black/50">
+                    <div className="border border-[#333] rounded-3xl overflow-hidden bg-black/50 album-neon-override">
                         <SharedAlbum
                             invitationSlug={data.slug || ''}
-                            titulo="CROWDSOURCED MEMORIES"
-                            descripcion="Upload your POV. All data is synchronized."
+                            titulo="RECUERDOS COLABORATIVOS"
+                            descripcion="Sube tu perspectiva. Todos los datos se sincronizan."
                             colorPrimario="#FF00FF" // Neon Pink for album accents
                             fechaEvento={data.fecha ? new Date(data.fecha) : undefined}
-                            guestName="User"
+                            guestName="Usuario"
                         />
                     </div>
                 )}
@@ -322,7 +322,7 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                         className="bg-black border border-[#00F3FF] p-10 md:p-16 rounded-[2rem] text-center relative overflow-hidden shadow-[0_0_40px_rgba(0,243,255,0.1)]"
                     >
                         <Gift className="w-16 h-16 mx-auto text-[#00F3FF] mb-6 animate-pulse" />
-                        <h3 className="font-neon-display text-3xl md:text-4xl text-white mb-6 uppercase">{data.regaloTitulo || "Gifts Protocol"}</h3>
+                        <h3 className="font-neon-display text-3xl md:text-4xl text-white mb-6 uppercase">{data.regaloTitulo || "Protocolo de Regalos"}</h3>
                         <p className="font-neon-body text-xl text-neutral-400 max-w-2xl mx-auto mb-10">
                             {data.regaloMensaje}
                         </p>
@@ -333,7 +333,7 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                                     className="bg-[#00F3FF] text-black hover:bg-white font-neon-display font-bold uppercase px-8 py-6 rounded-lg shadow-[0_0_20px_rgba(0,243,255,0.4)]"
                                     onClick={() => setShowBankDetails(!showBankDetails)}
                                 >
-                                    {showBankDetails ? "TERMINATE CONNECTION" : "ESTABLISH TRANSFER LINK"}
+                                    {showBankDetails ? "TERMINAR CONEXIÓN" : "ESTABLECER ENLACE DE TRANSFERENCIA"}
                                 </Button>
 
                                 <AnimatePresence>
@@ -345,7 +345,7 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                                             className="mt-8 bg-[#0a0a0a] border border-[#333] rounded-xl p-6 text-left font-mono text-[#00F3FF] text-sm overflow-hidden"
                                         >
                                             <div className="space-y-4">
-                                                <p className="text-white border-b border-[#333] pb-2 mb-4">// BANK_DETAILS_DECRYPTED</p>
+                                                <p className="text-white border-b border-[#333] pb-2 mb-4">// DETALLES_BANCARIOS_DESCIFRADOS</p>
                                                 {[
                                                     { label: "BANK_ID", value: data.regaloBanco },
                                                     { label: "CBU_KEY", value: data.regaloCbu },
@@ -357,7 +357,7 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                                                         <span className="flex items-center gap-2 text-white">{field.value} <Copy className="w-3 h-3 group-hover:text-[#00F3FF]" /></span>
                                                     </div>
                                                 ))}
-                                                <p className="text-[#00F3FF] animate-pulse mt-4">&gt;_ Ready for input...</p>
+                                                <p className="text-[#00F3FF] animate-pulse mt-4">&gt;_ Listo para entrada...</p>
                                             </div>
                                         </motion.div>
                                     )}
@@ -371,27 +371,27 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                 <section className="py-20 relative">
                     <div className="max-w-xl mx-auto space-y-8 bg-black/80 border border-[#FF00FF] p-8 md:p-12 rounded-2xl backdrop-blur-xl">
                         <div className="text-center">
-                            <h2 className="font-neon-display text-4xl text-[#FF00FF] mb-2 uppercase">RSVP</h2>
-                            <p className="font-neon-body text-neutral-400">Confirm presence before {data.fecha ? format(new Date(data.fecha), "yyyy.MM.dd") : "xxxx.xx.xx"}</p>
+                            <h2 className="font-neon-display text-2xl md:text-3xl text-[#FF00FF] mb-2 uppercase tracking-wider">CONFIRMACIÓN</h2>
+                            <p className="font-neon-body text-neutral-400">Confirmar presencia antes del {data.fecha ? format(new Date(data.fecha), "yyyy.MM.dd") : "xxxx.xx.xx"}</p>
                         </div>
 
                         <form className="space-y-6">
                             <div className="space-y-2">
-                                <Label className="font-neon-display text-[#FF00FF]">PLAYER ONE NAME</Label>
-                                <Input className="bg-[#111] border-[#333] text-white focus:border-[#FF00FF] h-12 font-neon-body text-lg" placeholder="Enter Name..." />
+                                <Label className="font-neon-display text-[#FF00FF]">NOMBRE DEL JUGADOR</Label>
+                                <Input className="bg-[#111] border-[#333] text-white focus:border-[#FF00FF] h-12 font-neon-body text-lg" placeholder="Ingresa tu nombre..." />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <button type="button" className="p-4 border-2 border-[#333] hover:border-[#00F3FF] hover:text-[#00F3FF] hover:bg-[#00F3FF]/10 rounded-xl transition-all font-neon-display text-sm font-bold">
-                                    CONFIRM
+                                    CONFIRMAR
                                 </button>
                                 <button type="button" className="p-4 border-2 border-[#333] hover:border-[#FF0099] hover:text-[#FF0099] hover:bg-[#FF0099]/10 rounded-xl transition-all font-neon-display text-sm font-bold">
-                                    DECLINE
+                                    DECLINAR
                                 </button>
                             </div>
 
                             <Button className="w-full bg-[#FF00FF] hover:bg-[#cc00cc] text-white font-bold font-neon-display h-14 rounded-xl shadow-[0_0_20px_rgba(255,0,255,0.4)]">
-                                SUBMIT RESPONSE
+                                ENVIAR RESPUESTA
                             </Button>
                         </form>
                     </div>
@@ -413,7 +413,20 @@ export function NeonNightTemplate({ data, themeConfig }: InvitationTemplateProps
                 .quiz-override {
                     --color-background: #111111;
                     --color-primary: #00F3FF;
-                    --color-text-light: #000000; 
+                    --color-text-light: #000000;
+                }
+                .quiz-override h2,
+                .quiz-override h3 {
+                    font-family: 'Orbitron', sans-serif !important;
+                    text-transform: uppercase;
+                    letter-spacing: 0.2em;
+                }
+                .album-neon-override h2,
+                .album-neon-override h3,
+                .album-neon-override h4 {
+                    font-family: 'Orbitron', sans-serif !important;
+                    text-transform: uppercase;
+                    letter-spacing: 0.2em;
                 }
             `}</style>
         </div>

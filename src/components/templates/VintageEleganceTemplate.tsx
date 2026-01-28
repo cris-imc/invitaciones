@@ -342,8 +342,8 @@ export function VintageEleganceTemplate({ data, themeConfig }: InvitationTemplat
                 {(data.galeriaPrincipalHabilitada && data.galeriaPrincipalFotos.length > 0) && (
                     <section className="space-y-12">
                         <div className="text-center space-y-4">
-                            <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase">Memories</span>
-                            <h2 className="font-gold-serif text-4xl md:text-5xl">Captured Moments</h2>
+                            <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase">Recuerdos</span>
+                            <h2 className="font-gold-serif text-4xl md:text-5xl">Momentos Capturados</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -424,7 +424,7 @@ export function VintageEleganceTemplate({ data, themeConfig }: InvitationTemplat
                                     className="border-2 border-[#B48E60] text-[#B48E60] hover:bg-[#B48E60] hover:text-[#FBF8F3] font-vintage-display uppercase tracking-widest text-xs"
                                     onClick={() => setShowBankDetails(!showBankDetails)}
                                 >
-                                    {showBankDetails ? "Ocultar Datos" : "Ver Datos Bancarios"}
+                                    {showBankDetails ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                                 </Button>
 
                                 <AnimatePresence>

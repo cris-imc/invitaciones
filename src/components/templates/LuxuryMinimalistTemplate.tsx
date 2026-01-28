@@ -138,7 +138,7 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                     style={{ opacity: heroOpacity }}
                 >
                     <motion.p variants={fadeInUp} className="font-luxury-sans text-sm tracking-[0.3em] uppercase mb-8 text-stone-500">
-                        {data.type === 'CASAMIENTO' ? 'The Wedding of' : 'You Are Invited'}
+                        {data.nombreEvento || (data.type === 'CASAMIENTO' ? 'Nuestra Boda' : 'Estás Invitado')}
                     </motion.p>
 
                     <motion.h1 variants={fadeInUp} className="font-luxury-serif text-6xl md:text-8xl lg:text-9xl font-light mb-6 leading-none text-stone-900">
@@ -155,7 +155,7 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                     <motion.div variants={fadeInUp} className="w-px h-24 bg-stone-900 mx-auto my-8" />
 
                     <motion.div variants={fadeInUp} className="font-luxury-sans text-lg tracking-widest uppercase">
-                        {data.fecha ? format(new Date(data.fecha), "MMMM dd, yyyy", { locale: es }) : "Date TBD"}
+                        {data.fecha ? format(new Date(data.fecha), "dd 'de' MMMM, yyyy", { locale: es }) : "Fecha por confirmar"}
                     </motion.div>
                 </motion.div>
 
@@ -203,15 +203,15 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                         {/* Text Details */}
                         <div className="space-y-12 text-center md:text-right order-2 md:order-1">
                             <motion.div variants={fadeInUp}>
-                                <h3 className="font-luxury-sans text-xs tracking-[0.2em] mb-4 text-stone-400 uppercase">Ceremony</h3>
+                                <h3 className="font-luxury-sans text-xs tracking-[0.2em] mb-4 text-stone-400 uppercase">Ceremonia</h3>
                                 <div className="font-luxury-serif text-4xl md:text-5xl mb-4">{data.lugarNombre}</div>
                                 <div className="font-luxury-sans text-stone-500 font-light">{data.direccion}</div>
                                 <div className="font-luxury-sans text-stone-500 font-light mt-2">{data.hora}</div>
                             </motion.div>
 
                             <motion.div variants={fadeInUp} className="pt-8">
-                                <h3 className="font-luxury-sans text-xs tracking-[0.2em] mb-4 text-stone-400 uppercase">Reception</h3>
-                                <div className="font-luxury-serif text-3xl text-stone-800">Dinner and Dancing to follow</div>
+                                <h3 className="font-luxury-sans text-xs tracking-[0.2em] mb-4 text-stone-400 uppercase">Recepción</h3>
+                                <div className="font-luxury-serif text-3xl text-stone-800">Cena y Baile a continuación</div>
                             </motion.div>
 
                             {data.mapUrl && (
@@ -221,7 +221,7 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                                         className="rounded-none border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white transition-colors duration-500 uppercase tracking-widest text-xs py-6 px-8"
                                         onClick={() => window.open(data.mapUrl, '_blank')}
                                     >
-                                        View Map
+                                        Ver Mapa
                                     </Button>
                                 </motion.div>
                             )}
@@ -271,8 +271,8 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                 {(data.galeriaPrincipalHabilitada && data.galeriaPrincipalFotos.length > 0) && (
                     <section className="py-32 bg-stone-50 overflow-hidden">
                         <div className="px-6 mb-16 max-w-6xl mx-auto flex items-end justify-between">
-                            <h2 className="font-luxury-serif text-5xl md:text-6xl text-stone-900">Moments</h2>
-                            <span className="font-luxury-sans text-stone-400 text-sm tracking-widest hidden md:inline-block">CAPTURED MEMORIES</span>
+                            <h2 className="font-luxury-serif text-5xl md:text-6xl text-stone-900">Momentos</h2>
+                            <span className="font-luxury-sans text-stone-400 text-sm tracking-widest hidden md:inline-block">RECUERDOS CAPTURADOS</span>
                         </div>
 
                         {/* Marquee Container */}
@@ -305,8 +305,8 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                 {data.triviaHabilitada && data.triviaPreguntas && (
                     <div className="bg-white">
                         <QuizTrivia
-                            titulo="How well do you know us?"
-                            subtitulo="Take the quiz and find out"
+                            titulo="¿Qué tan bien nos conoces?"
+                            subtitulo="Responde el quiz y descúbrelo"
                             preguntas={typeof data.triviaPreguntas === 'string' ? JSON.parse(data.triviaPreguntas) : data.triviaPreguntas}
                             invitationId={data.id}
                         />
@@ -318,11 +318,11 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                     <div className="bg-stone-50">
                         <SharedAlbum
                             invitationSlug={data.slug || ''} // Fallback if slug missing in preview
-                            titulo="Shared Moments"
-                            descripcion="Upload your photos and help us capture every angle of our special day."
+                            titulo="Momentos Compartidos"
+                            descripcion="Sube tus fotos y ayúdanos a capturar cada ángulo de nuestro día especial."
                             colorPrimario={primaryColor}
                             fechaEvento={data.fecha ? new Date(data.fecha) : undefined}
-                            guestName="Guest"
+                            guestName="Invitado"
                         />
                     </div>
                 )}
@@ -371,7 +371,7 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                                             className="text-stone-900 underline-offset-4 font-luxury-sans text-xs uppercase tracking-widest"
                                             onClick={() => setShowBankDetails(!showBankDetails)}
                                         >
-                                            {showBankDetails ? "Hide Details" : "View Bank Details"}
+                                            {showBankDetails ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                                         </Button>
 
                                         <AnimatePresence>
@@ -426,9 +426,9 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                     >
                         <h2 className="font-luxury-serif text-5xl mb-8 text-white">R . S . V . P</h2>
                         <p className="font-luxury-sans text-stone-400 mb-12 font-light">
-                            Please respond by {data.fecha ? format(new Date(data.fecha), "MMMM d", { locale: es }) : "..."}
+                            Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
                             <br />
-                            {data.rsvpDaysBeforeEvent ? `(Please confirm ${data.rsvpDaysBeforeEvent} days before)` : ''}
+                            {data.rsvpDaysBeforeEvent ? `(Confirmar ${data.rsvpDaysBeforeEvent} días antes)` : ''}
                         </p>
 
                         <form className="space-y-8 text-left">
@@ -436,7 +436,7 @@ export function LuxuryMinimalistTemplate({ data, themeConfig }: InvitationTempla
                                 <Label className="text-xs uppercase tracking-widest text-stone-500 ml-1">Full Name</Label>
                                 <Input
                                     className="bg-transparent border-0 border-b border-stone-700 rounded-none focus-visible:ring-0 focus-visible:border-white px-1 text-xl font-luxury-serif placeholder:text-stone-700 h-12 transition-colors"
-                                    placeholder="Enter your name"
+                                    placeholder="Ingresa tu nombre"
                                 />
                             </div>
 

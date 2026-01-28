@@ -404,7 +404,7 @@ export function AuroraDreamyTemplate({ data, themeConfig }: InvitationTemplatePr
                                     className="border-2 border-purple-400 text-purple-300 hover:bg-purple-400/20 font-aurora-display uppercase tracking-widest text-xs"
                                     onClick={() => setShowBankDetails(!showBankDetails)}
                                 >
-                                    {showBankDetails ? "Ocultar Datos" : "Ver Datos Bancarios"}
+                                    {showBankDetails ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                                 </Button>
 
                                 <AnimatePresence>

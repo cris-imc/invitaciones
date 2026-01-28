@@ -302,6 +302,22 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                             </div>
                         )}
 
+                        {(formData.type === 'CUMPLEANOS' || formData.type === 'BAUTISMO') && (
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Nombre del Festejado/a</label>
+                                <input
+                                    type="text"
+                                    value={formData.nombreQuinceanera}
+                                    onChange={(e) => handleInputChange('nombreQuinceanera', e.target.value)}
+                                    className="w-full p-2 border rounded-md"
+                                    placeholder="Ej: Juancito, Sofía, etc."
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Este nombre aparecerá en el encabezado de la invitación.
+                                </p>
+                            </div>
+                        )}
+
                         {/* Días sugeridos para RSVP */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Días sugeridos para confirmar asistencia</label>
@@ -358,6 +374,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         <TemplateSelector 
                             value={formData.templateTipo}
                             onChange={(value) => handleInputChange('templateTipo', value)}
+                            eventType={formData.type}
                         />
 
                         {/* Color principal */}
@@ -493,20 +510,26 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                             </div>
                             {formData.triviaHabilitada && (
                                 <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
-                                    <p className="text-sm text-muted-foreground">
-                                        El quiz/trivia completo se puede editar desde el wizard de creación.
-                                        Aquí puedes ver cuántas preguntas hay configuradas.
+                                    <p className="text-sm text-muted-foreground mb-3">
+                                        Edita las preguntas del quiz (formato JSON)
                                     </p>
+                                    <Textarea
+                                        value={formData.triviaPreguntas}
+                                        onChange={(e) => handleInputChange('triviaPreguntas', e.target.value)}
+                                        rows={8}
+                                        className="font-mono text-xs"
+                                        placeholder='[["¿Pregunta?","Opción 1","Opción 2","Opción 3","Opción 4",0]]'
+                                    />
                                     {formData.triviaPreguntas && (() => {
                                         try {
                                             const preguntas = JSON.parse(formData.triviaPreguntas);
                                             return (
                                                 <div className="text-sm bg-blue-50 p-3 rounded">
-                                                    <strong>{preguntas.length}</strong> preguntas configuradas
+                                                    ✓ <strong>{preguntas.length}</strong> preguntas válidas
                                                 </div>
                                             );
                                         } catch {
-                                            return <p className="text-sm text-muted-foreground">No hay preguntas</p>;
+                                            return <p className="text-sm text-red-500">⚠ Formato JSON inválido</p>;
                                         }
                                     })()}
                                 </div>

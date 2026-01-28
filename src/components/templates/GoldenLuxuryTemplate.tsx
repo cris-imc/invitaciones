@@ -150,7 +150,7 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                     >
                         <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#D4AF37]" />
                         <span className="font-gold-display text-[#D4AF37] tracking-[0.3em] text-sm uppercase">
-                            {data.type === 'CASAMIENTO' ? 'The Wedding Of' : 'You Are Invited'}
+                            {data.nombreEvento || (data.type === 'CASAMIENTO' ? 'Nuestra Boda' : 'Estás Invitado')}
                         </span>
                         <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#D4AF37]" />
                     </motion.div>
@@ -170,7 +170,7 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                     <div className="flex flex-col items-center gap-4 font-gold-sans tracking-widest text-[#FDFCF8]/80 text-sm md:text-base uppercase mt-12">
                         <div className="flex items-center gap-3">
                             <Calendar className="w-4 h-4 text-[#D4AF37]" />
-                            <span>{data.fecha ? format(new Date(data.fecha), "MMMM dd, yyyy", { locale: es }) : "Date TBD"}</span>
+                            <span>{data.fecha ? format(new Date(data.fecha), "dd 'de' MMMM, yyyy", { locale: es }) : "Fecha por confirmar"}</span>
                         </div>
                         <div className="w-1 h-1 rounded-full bg-[#D4AF37]" />
                         <div className="flex items-center gap-3">
@@ -187,7 +187,7 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                     transition={{ delay: 2, duration: 2, repeat: Infinity }}
                     className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
                 >
-                    <span className="font-gold-sans text-[10px] tracking-[0.3em] uppercase text-[#D4AF37]/60">Scroll</span>
+                    <span className="font-gold-sans text-[10px] tracking-[0.3em] uppercase text-[#D4AF37]/60">Deslizar</span>
                     <ChevronDown className="w-4 h-4 text-[#D4AF37]/60" />
                 </motion.div>
             </header>
@@ -196,14 +196,14 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
             <section className="py-24 relative overflow-hidden border-y border-[#D4AF37]/20 bg-gradient-to-b from-[#0a0a0a] to-[#12100b]">
                 <div className="absolute inset-0 animate-shimmer pointer-events-none" />
                 <div className="container mx-auto px-6 relative z-10 text-center">
-                    <h2 className="font-gold-display text-[#D4AF37] text-lg tracking-[0.4em] uppercase mb-12">Countdown</h2>
+                    <h2 className="font-gold-display text-[#D4AF37] text-lg tracking-[0.4em] uppercase mb-12">Cuenta Regresiva</h2>
 
                     <div className="flex flex-wrap justify-center gap-8 md:gap-16">
                         {[
-                            { label: 'Days', value: countdown.days },
-                            { label: 'Hours', value: countdown.hours },
-                            { label: 'Minutes', value: countdown.minutes },
-                            { label: 'Seconds', value: countdown.seconds }
+                            { label: 'Días', value: countdown.days },
+                            { label: 'Horas', value: countdown.hours },
+                            { label: 'Minutos', value: countdown.minutes },
+                            { label: 'Segundos', value: countdown.seconds }
                         ].map((item, i) => (
                             <div key={i} className="flex flex-col items-center">
                                 <div className="w-24 h-24 md:w-32 md:h-32 border border-[#D4AF37]/30 flex items-center justify-center bg-[#0a0a0a]/50 rotate-45 mb-8">
@@ -246,7 +246,7 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                             <div className="absolute top-0 right-0 p-4 opacity-10"><Sparkles size={64} /></div>
 
                             <div>
-                                <h3 className="font-gold-display text-[#D4AF37] text-xl mb-4 tracking-widest uppercase">Ceremony</h3>
+                                <h3 className="font-gold-display text-[#D4AF37] text-xl mb-4 tracking-widest uppercase">Ceremonia</h3>
                                 <div className="space-y-2 font-gold-sans font-light text-[#FDFCF8]/90">
                                     <p className="text-lg">{data.lugarNombre}</p>
                                     <p className="text-sm opacity-70">{data.direccion}</p>
@@ -257,8 +257,8 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                             <div className="w-full h-[1px] bg-[#D4AF37]/20" />
 
                             <div>
-                                <h3 className="font-gold-display text-[#D4AF37] text-xl mb-4 tracking-widest uppercase">Reception</h3>
-                                <p className="font-gold-serif italic text-lg opacity-80">Dinner, drinks and dancing to follow.</p>
+                                <h3 className="font-gold-display text-[#D4AF37] text-xl mb-4 tracking-widest uppercase">Recepción</h3>
+                                <p className="font-gold-serif italic text-lg opacity-80">Cena, bebidas y baile a continuación.</p>
                             </div>
 
                             {data.mapUrl && (
@@ -266,7 +266,7 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                                     className="mt-4 bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0a0a0a] rounded-none px-8 py-6 font-gold-display tracking-widest uppercase transition-all duration-500"
                                     onClick={() => window.open(data.mapUrl, '_blank')}
                                 >
-                                    View Map
+                                    Ver Mapa
                                 </Button>
                             )}
                         </div>
@@ -292,8 +292,8 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                 {(data.galeriaPrincipalHabilitada && data.galeriaPrincipalFotos.length > 0) && (
                     <section className="space-y-12">
                         <div className="text-center space-y-4">
-                            <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase">Memories</span>
-                            <h2 className="font-gold-serif text-4xl md:text-5xl">Captured Moments</h2>
+                            <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase">Recuerdos</span>
+                            <h2 className="font-gold-serif text-4xl md:text-5xl">Momentos Capturados</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -322,8 +322,8 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                 {data.triviaHabilitada && data.triviaPreguntas && (
                     <div className="quiz-container border border-[#D4AF37]/20 p-8 md:p-12 bg-[#0f0f0f]">
                         <QuizTrivia
-                            titulo="How well do you know us?"
-                            subtitulo="Test your knowledge"
+                            titulo="¿Qué tan bien nos conoces?"
+                            subtitulo="Pon a prueba tu conocimiento"
                             preguntas={typeof data.triviaPreguntas === 'string' ? JSON.parse(data.triviaPreguntas) : data.triviaPreguntas}
                             invitationId={data.id}
                         />
@@ -336,11 +336,11 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                     <section className="py-12 border-t border-[#D4AF37]/20 border-b border-[#D4AF37]/20">
                         <SharedAlbum
                             invitationSlug={data.slug || ''}
-                            titulo="Shared Gallery"
-                            descripcion="Help us capture the magic from your perspective."
+                            titulo="Galería Compartida"
+                            descripcion="Ayúdanos a capturar la magia desde tu perspectiva."
                             colorPrimario="#D4AF37"
                             fechaEvento={data.fecha ? new Date(data.fecha) : undefined}
-                            guestName="Guest"
+                            guestName="Invitado"
                         />
                     </section>
                 )}
@@ -366,7 +366,7 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                                     className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black font-gold-display uppercase tracking-widest text-xs"
                                     onClick={() => setShowBankDetails(!showBankDetails)}
                                 >
-                                    {showBankDetails ? "Hide Details" : "View Bank Details"}
+                                    {showBankDetails ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                                 </Button>
 
                                 <AnimatePresence>
@@ -404,35 +404,35 @@ export function GoldenLuxuryTemplate({ data, themeConfig }: InvitationTemplatePr
                     >
                         <div>
                             <span className="font-gold-sans text-[#D4AF37] text-xs tracking-[0.3em] uppercase block mb-4">R.S.V.P</span>
-                            <h2 className="font-gold-serif text-5xl md:text-6xl text-[#F4E4BC]">Kindly Reply</h2>
+                            <h2 className="font-gold-serif text-5xl md:text-6xl text-[#F4E4BC]">Responde Gentilmente</h2>
                             <p className="font-gold-sans text-[#FDFCF8]/60 mt-6 font-light">
-                                Please respond by {data.fecha ? format(new Date(data.fecha), "MMMM d", { locale: es }) : "..."}
+                                Por favor responder antes del {data.fecha ? format(new Date(data.fecha), "d 'de' MMMM", { locale: es }) : "..."}
                             </p>
                         </div>
 
                         <form className="space-y-8 text-left bg-[#0f0f0f] p-8 md:p-12 border border-[#D4AF37]/20">
                             <div className="space-y-2">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Full Name</Label>
+                                <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Nombre Completo</Label>
                                 <Input
                                     className="bg-transparent border-0 border-b border-[#D4AF37]/40 rounded-none focus-visible:ring-0 focus-visible:border-[#D4AF37] px-0 text-xl font-gold-serif placeholder:text-[#333] h-12 text-[#F4E4BC]"
-                                    placeholder="Enter your name"
+                                    placeholder="Ingresa tu nombre"
                                 />
                             </div>
 
                             <div className="space-y-4">
-                                <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Attendance</Label>
+                                <Label className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Asistencia</Label>
                                 <div className="grid grid-cols-2 gap-4">
                                     <button type="button" className="p-4 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors font-gold-sans text-sm text-[#F4E4BC]">
-                                        Accepts with Pleasure
+                                        Acepta con Placer
                                     </button>
                                     <button type="button" className="p-4 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 transition-colors font-gold-sans text-sm text-[#F4E4BC]">
-                                        Declines with Regret
+                                        Declina con Pesar
                                     </button>
                                 </div>
                             </div>
 
                             <Button className="w-full bg-[#D4AF37] text-[#0a0a0a] hover:bg-[#c5a028] font-gold-display uppercase tracking-widest py-6 rounded-none">
-                                Send Confirmation
+                                Enviar Confirmación
                             </Button>
                         </form>
                     </motion.div>

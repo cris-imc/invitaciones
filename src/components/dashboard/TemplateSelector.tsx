@@ -13,9 +13,10 @@ import { TEMPLATES_CONFIG, CATEGORY_LABELS } from "@/lib/templatesConfig";
 interface TemplateSelectorProps {
     value: string;
     onChange: (value: string) => void;
+    eventType?: string;
 }
 
-export function TemplateSelector({ value, onChange }: TemplateSelectorProps) {
+export function TemplateSelector({ value, onChange, eventType }: TemplateSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -26,7 +27,12 @@ export function TemplateSelector({ value, onChange }: TemplateSelectorProps) {
         const matchesSearch = template.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
             template.description.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesCategory = selectedCategory === "ALL" ? true : template.category === selectedCategory;
-        return matchesSearch && matchesCategory;
+        
+        // Filtrar plantillas infantiles solo para cumpleaños y bautismo
+        const isKidsTemplate = template.id === 'KIDS_PARTY' || template.id === 'BABY_BAPTISM';
+        const matchesEventType = !isKidsTemplate || eventType === 'CUMPLEANOS' || eventType === 'BAUTISMO';
+        
+        return matchesSearch && matchesCategory && matchesEventType;
     });
 
     const categories = Array.from(new Set(TEMPLATES_CONFIG.map(t => t.category)));

@@ -241,10 +241,10 @@ export function BabyBaptismTemplate({ data, themeConfig }: InvitationTemplatePro
                             <Heart className="w-10 h-10 text-[#FADADD] fill-[#FADADD]" />
                         </div>
                         <h1 className="font-baby-script text-6xl md:text-8xl text-[#FADADD] drop-shadow-lg">
-                            {data.tituloPortada || "Bienvenido al Mundo"}
+                            {data.nombreQuinceanera || data.tituloPortada || "Bienvenido al Mundo"}
                         </h1>
                         <p className="font-baby-display text-4xl md:text-5xl text-[#E8E9F3] font-semibold">
-                            {data.subtituloPortada || data.nombreFestejado || "Un Nuevo Angelito"}
+                            {data.subtituloPortada || data.nombreEvento || "Un Nuevo Angelito"}
                         </p>
                     </motion.div>
 
@@ -446,7 +446,7 @@ export function BabyBaptismTemplate({ data, themeConfig }: InvitationTemplatePro
                                     className="border-3 border-[#E8E9F3] text-[#E8E9F3] hover:bg-[#E8E9F3]/20 font-baby-text uppercase tracking-widest text-sm rounded-full px-10 py-6"
                                     onClick={() => setShowBankDetails(!showBankDetails)}
                                 >
-                                    {showBankDetails ? "Ocultar Datos" : "Ver Datos Bancarios"}
+                                    {showBankDetails ? "Ocultar Detalles" : "Ver Datos Bancarios"}
                                 </Button>
 
                                 <AnimatePresence>
