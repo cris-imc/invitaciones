@@ -1,162 +1,164 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { CollaborativeAlbumUpload } from "@/components/invitation/CollaborativeAlbumUpload";
-import { Loader2 } from "lucide-react";
-
-interface Photo {
-    id: string;
-    url: string;
-    uploadedBy: string;
-    createdAt: string;
-}
+import { Upload, Image as ImageIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/Toast";
 
 interface CollaborativeAlbumModernProps {
-    invitationSlug: string;
-    fechaEvento?: Date;
-    horaEvento?: string;
-    guestName?: string;
+  invitationSlug: string;
+  fechaEvento?: Date | string;
+  horaEvento?: string;
+  guestName?: string;
+  photos?: Array<{
+    url: string;
+    uploaderName?: string;
+    uploadedAt?: string;
+  }>;
 }
 
-export function CollaborativeAlbumModern({ invitationSlug, fechaEvento, horaEvento, guestName }: CollaborativeAlbumModernProps) {
-    const [photos, setPhotos] = useState<Photo[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+export function CollaborativeAlbumModern({ 
+  invitationSlug, 
+  fechaEvento,
+  horaEvento,
+  guestName,
+  photos = [] 
+}: CollaborativeAlbumModernProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploaderName, setUploaderName] = useState(guestName || "");
+  const [isUploading, setIsUploading] = useState(false);
+  const { showToast } = useToast();
 
-    // Check if event has started (compare timestamps to avoid timezone issues)
-    const eventHasStarted = fechaEvento ? (() => {
-        const now = new Date();
-        const eventDate = new Date(fechaEvento);
-        return now.getTime() >= eventDate.getTime();
-    })() : true;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
 
-    const fetchPhotos = async () => {
-        try {
-            const response = await fetch(`/api/invitations/${invitationSlug}/album`);
-            if (response.ok) {
-                const data = await response.json();
-                setPhotos(data.photos || []);
-            }
-        } catch (error) {
-            console.error("Error fetching photos:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  const handleUpload = async () => {
+    if (!selectedFile || !uploaderName.trim()) {
+      showToast("Por favor completa todos los campos", "error");
+      return;
+    }
 
-    useEffect(() => {
-        fetchPhotos();
-    }, [invitationSlug]);
+    setIsUploading(true);
 
-    return (
-        <section className="relative min-h-screen bg-black text-white py-32">
-            <div className="container mx-auto px-6 max-w-6xl">
-                <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="space-y-16"
-                >
-                    {/* Header */}
-                    <div className="text-center">
-                        <h2 className="text-5xl md:text-7xl font-thin mb-6" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                            Álbum Colaborativo
-                        </h2>
-                        <p className="text-xl text-white/70 leading-relaxed max-w-2xl mx-auto">
-                            Compartí tus fotos favoritas del evento y mirá las de los demás invitados
-                        </p>
-                    </div>
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("uploaderName", uploaderName);
+      formData.append("invitationSlug", invitationSlug);
 
-                    {/* Upload Component or Event Not Started Message */}
-                    <div className="max-w-md mx-auto">
-                        {!eventHasStarted ? (
-                            <div className="p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-center">
-                                <p className="text-white font-light mb-2">
-                                    📅 El álbum colaborativo estará disponible una vez que inicie el evento
-                                </p>
-                                {fechaEvento && (
-                                    <p className="text-sm text-white/60 mt-2">
-                                        {new Date(fechaEvento).toLocaleDateString('es-AR', {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric',
-                                            timeZone: 'UTC'
-                                        })}
-                                        {horaEvento && ` a las ${horaEvento}`}
-                                    </p>
-                                )}
-                            </div>
-                        ) : (
-                            <CollaborativeAlbumUpload
-                                invitationSlug={invitationSlug}
-                                guestName={guestName}
-                                onUploadSuccess={fetchPhotos}
-                            />
-                        )}
-                    </div>
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-                    {/* Photos Grid */}
-                    {isLoading ? (
-                        <div className="flex justify-center items-center py-12">
-                            <Loader2 className="w-8 h-8 animate-spin text-white/40" />
-                        </div>
-                    ) : photos.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {photos.map((photo, index) => (
-                                <motion.div
-                                    key={photo.id}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: index * 0.05 }}
-                                    className="relative group overflow-hidden rounded-lg hover:-translate-y-1 transition-transform duration-300"
-                                    style={{
-                                        animation: `subtle-dance 3s ease-in-out infinite`,
-                                        animationDelay: `${index * 0.1}s`
-                                    }}
-                                >
-                                    <img
-                                        src={photo.url}
-                                        alt={`Foto de ${photo.uploadedBy}`}
-                                        className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <div className="absolute bottom-0 left-0 right-0 p-4 flex items-center justify-between">
-                                            <p className="text-white text-sm font-light">
-                                                📷 {photo.uploadedBy}
-                                            </p>
-                                            <a
-                                                href={photo.url}
-                                                download
-                                                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm p-2 rounded-full transition-colors"
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <style jsx>{`
-                                        @keyframes subtle-dance {
-                                            0%, 100% { transform: translateY(0px) rotate(0deg); }
-                                            25% { transform: translateY(-3px) rotate(0.5deg); }
-                                            50% { transform: translateY(0px) rotate(0deg); }
-                                            75% { transform: translateY(-2px) rotate(-0.5deg); }
-                                        }
-                                    `}</style>
-                                </motion.div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-12">
-                            <p className="text-white/50 text-lg">
-                                Aún no hay fotos. ¡Sé el primero en subir una!
-                            </p>
-                        </div>
-                    )}
-                </motion.div>
-            </div>
-        </section>
-    );
+      if (!response.ok) {
+        throw new Error("Error al subir la foto");
+      }
+
+      showToast("Tu foto se ha subido correctamente", "success");
+
+      setSelectedFile(null);
+      setUploaderName("");
+    } catch (error) {
+      showToast("No se pudo subir la foto. Inténtalo nuevamente", "error");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Upload Section */}
+      <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-2xl p-8">
+        <h3 className="text-2xl font-bold mb-4 text-center">
+          Compartí tus fotos
+        </h3>
+        <p className="text-center text-muted-foreground mb-6">
+          Ayudanos a crear un álbum colaborativo del evento
+        </p>
+
+        <div className="space-y-4 max-w-md mx-auto">
+          <div>
+            <Input
+              type="text"
+              placeholder="Tu nombre"
+              value={uploaderName}
+              onChange={(e) => setUploaderName(e.target.value)}
+              className="w-full"
+            />
+          </div>
+
+          <div className="relative">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              id="photo-upload"
+            />
+            <label
+              htmlFor="photo-upload"
+              className="flex items-center justify-center gap-2 w-full p-4 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+            >
+              <Upload className="w-5 h-5" />
+              <span>
+                {selectedFile ? selectedFile.name : "Seleccionar foto"}
+              </span>
+            </label>
+          </div>
+
+          <Button
+            onClick={handleUpload}
+            disabled={!selectedFile || !uploaderName.trim() || isUploading}
+            className="w-full"
+          >
+            {isUploading ? "Subiendo..." : "Subir foto"}
+          </Button>
+        </div>
+      </div>
+
+      {/* Gallery */}
+      {photos.length > 0 && (
+        <div>
+          <h4 className="text-xl font-semibold mb-4 text-center">
+            Fotos compartidas ({photos.length})
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {photos.map((photo, index) => (
+              <motion.div
+                key={index}
+                className="relative aspect-square rounded-lg overflow-hidden group"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <img
+                  src={photo.url}
+                  alt={`Foto de ${photo.uploaderName || "invitado"}`}
+                  className="w-full h-full object-cover"
+                />
+                {photo.uploaderName && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-sm p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {photo.uploaderName}
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {photos.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p>Sé el primero en compartir una foto</p>
+        </div>
+      )}
+    </div>
+  );
 }

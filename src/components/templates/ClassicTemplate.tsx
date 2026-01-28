@@ -1,58 +1,85 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, MapPin, Calendar, Clock } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { InvitationTemplateProps } from "./types";
+interface ClassicTemplateProps {
+  data: any;
+  themeConfig: any;
+}
 
-export function ClassicTemplate({ data, themeConfig }: InvitationTemplateProps) {
-    // Generate CSS variables for this specific instance if needed, 
-    // or rely on parent container variables. 
-    // For now, we rely on parent setting variables or inline styles where critical.
-
-    const { primaryColor } = themeConfig;
-
-    return (
-        <Card className="bg-slate-50 border-primary/20 overflow-hidden max-w-md mx-auto shadow-lg">
-            <div
-                className="h-2 bg-gradient-to-r from-primary to-purple-600"
-                style={{ backgroundColor: primaryColor }}
-            />
-            <CardHeader className="text-center pb-2">
-                <div className="mx-auto bg-white p-3 rounded-full shadow-sm mb-4 w-16 h-16 flex items-center justify-center">
-                    <CheckCircle2 className="w-8 h-8 text-primary" style={{ color: primaryColor }} />
-                </div>
-                <CardTitle className="text-3xl font-serif text-primary" style={{ color: primaryColor }}>
-                    {data.nombreEvento}
-                </CardTitle>
-                <p className="text-lg text-muted-foreground font-medium">
-                    {data.type === 'CASAMIENTO' && `${data.nombreNovia} & ${data.nombreNovio}`}
-                    {data.type === 'QUINCE_ANOS' && data.nombreQuinceanera}
-                    {data.type !== 'CASAMIENTO' && data.type !== 'QUINCE_ANOS' && "¡Te invitamos!"}
-                </p>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-4">
-                <div className="grid grid-cols-1 gap-4 text-center md:text-left">
-                    <div className="flex flex-col items-center md:items-start p-4 bg-white rounded-lg shadow-sm">
-                        <Calendar className="w-6 h-6 text-primary mb-2" style={{ color: primaryColor }} />
-                        <span className="font-semibold text-lg">Fecha</span>
-                        <span>{data.fecha ? format(new Date(data.fecha), "PPP", { locale: es }) : "No definida"}</span>
-                    </div>
-
-                    <div className="flex flex-col items-center md:items-start p-4 bg-white rounded-lg shadow-sm">
-                        <Clock className="w-6 h-6 text-primary mb-2" style={{ color: primaryColor }} />
-                        <span className="font-semibold text-lg">Hora</span>
-                        <span>{data.hora || "No definida"}</span>
-                    </div>
-                </div>
-
-                <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-sm text-center">
-                    <MapPin className="w-6 h-6 text-primary mb-2" style={{ color: primaryColor }} />
-                    <span className="font-semibold text-lg">{data.lugarNombre}</span>
-                    <span className="text-muted-foreground">{data.direccion}</span>
-                </div>
-            </CardContent>
-        </Card>
-    );
+export function ClassicTemplate({ data, themeConfig }: ClassicTemplateProps) {
+  return (
+    <div 
+      className="min-h-screen flex items-center justify-center p-8"
+      style={{
+        backgroundColor: themeConfig.backgroundColor || '#ffffff',
+        fontFamily: themeConfig.fontFamily || 'Poppins, sans-serif',
+      }}
+    >
+      <div 
+        className="max-w-2xl w-full rounded-xl shadow-2xl p-12 text-center"
+        style={{
+          borderColor: themeConfig.primaryColor || '#d4af37',
+          borderWidth: '2px',
+          borderStyle: 'solid',
+        }}
+      >
+        <h1 
+          className="text-5xl font-bold mb-6"
+          style={{ color: themeConfig.primaryColor || '#d4af37' }}
+        >
+          {data.eventTitle}
+        </h1>
+        
+        {data.subtitle && (
+          <p 
+            className="text-xl mb-8"
+            style={{ color: themeConfig.textSecondary || '#666' }}
+          >
+            {data.subtitle}
+          </p>
+        )}
+        
+        <div 
+          className="text-lg mb-8"
+          style={{ color: themeConfig.textDark || '#1a1a1a' }}
+        >
+          {data.description}
+        </div>
+        
+        {data.eventDate && (
+          <div className="mb-6">
+            <p 
+              className="text-2xl font-semibold"
+              style={{ color: themeConfig.primaryColor || '#d4af37' }}
+            >
+              {new Date(data.eventDate).toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+            {data.eventTime && (
+              <p 
+                className="text-xl mt-2"
+                style={{ color: themeConfig.textSecondary || '#666' }}
+              >
+                {data.eventTime}
+              </p>
+            )}
+          </div>
+        )}
+        
+        {data.location && (
+          <div className="mb-6">
+            <p 
+              className="text-lg"
+              style={{ color: themeConfig.textDark || '#1a1a1a' }}
+            >
+              📍 {data.location}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

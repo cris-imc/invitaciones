@@ -7,15 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, MapPin, Calendar, Clock, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ClassicTemplate } from "../templates/ClassicTemplate";
-import { ModernTemplate } from "../templates/ModernTemplate";
-import { MinimalTemplate } from "../templates/MinimalTemplate";
-import { GlassTemplate } from "../templates/GlassTemplate";
-import { ParallaxTemplate } from "../templates/ParallaxTemplate";
 import { LuxuryMinimalistTemplate } from "../templates/LuxuryMinimalistTemplate";
 import { BotanicalGardenTemplate } from "../templates/BotanicalGardenTemplate";
 import { GoldenLuxuryTemplate } from "../templates/GoldenLuxuryTemplate";
 import { NeonNightTemplate } from "../templates/NeonNightTemplate";
+import { ModernBentoTemplate } from "../templates/ModernBentoTemplate";
+import { LiquidCrystalTemplate } from "../templates/LiquidCrystalTemplate";
+import { ModernInvitationTemplate } from "../templates/ModernInvitationTemplate";
 
 export function StepPreview() {
     const { data, themeConfig, prevStep } = useWizardStore();
@@ -79,16 +77,55 @@ export function StepPreview() {
 
             <div className="border rounded-xl overflow-hidden shadow-sm bg-slate-100 min-h-[600px] flex items-center justify-center relative">
                 <div className="absolute inset-0 overflow-auto">
-                    {/* Render selected template */}
-                    {themeConfig.layout === 'classic' && <ClassicTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'modern' && <ModernTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'minimal' && <MinimalTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'glass' && <GlassTemplate data={formData} themeConfig={themeConfig} />}
-                    {themeConfig.layout === 'parallax' && <ParallaxTemplate data={formData} themeConfig={themeConfig} />}
+                    {/* Render preview based on layout */}
+                    {(themeConfig.layout === 'classic' || themeConfig.layout === 'modern') && (
+                        <div 
+                            className="min-h-screen flex items-center justify-center p-8"
+                            style={{
+                                backgroundColor: themeConfig.backgroundColor || '#ffffff',
+                                fontFamily: themeConfig.fontFamily || 'Poppins, sans-serif',
+                            }}
+                        >
+                            <div className="max-w-2xl w-full text-center space-y-6">
+                                <h1 
+                                    className="text-5xl font-bold"
+                                    style={{ color: themeConfig.primaryColor || '#d4af37' }}
+                                >
+                                    {formData.nombreEvento}
+                                </h1>
+                                {formData.eventDate && (
+                                    <p className="text-xl" style={{ color: themeConfig.textSecondary || '#666' }}>
+                                        {new Date(formData.eventDate).toLocaleDateString('es-ES', {
+                                            weekday: 'long',
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
+                                    </p>
+                                )}
+                                {formData.location && (
+                                    <p className="text-lg" style={{ color: themeConfig.textDark || '#1a1a1a' }}>
+                                        📍 {formData.location}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
                     {themeConfig.layout === 'luxury' && <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'botanical' && <BotanicalGardenTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'golden' && <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig} />}
                     {themeConfig.layout === 'neon' && <NeonNightTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'bento' && <ModernBentoTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'liquid' && <LiquidCrystalTemplate data={formData} themeConfig={themeConfig} />}
+                    {themeConfig.layout === 'parallax' && (
+                        <div className="min-h-screen p-8" style={{ background: `linear-gradient(135deg, ${themeConfig.primaryColor}20, ${themeConfig.backgroundColor})` }}>
+                            <div className="max-w-4xl mx-auto text-center">
+                                <h1 className="text-6xl font-bold mb-4" style={{ color: themeConfig.primaryColor }}>
+                                    {formData.nombreEvento}
+                                </h1>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

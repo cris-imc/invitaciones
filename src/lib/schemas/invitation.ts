@@ -10,7 +10,7 @@ export const basicInfoSchema = z.object({
     nombreNovio: z.string().optional(),
     nombreNovia: z.string().optional(),
     nombreQuinceanera: z.string().optional(),
-    rsvpDaysBeforeEvent: z.number().min(1).max(90).default(7),
+    rsvpDaysBeforeEvent: z.number().min(1).max(90).optional(),
 });
 
 export const detailsSchema = z.object({
@@ -78,6 +78,8 @@ export const invitationSchema = z.object({
     regaloAlias: z.string().optional(),
     regaloBanco: z.string().optional(),
     regaloTitular: z.string().optional(),
+
+    cronogramaEventos: z.string().optional(), // JSON string
 });
 
 export type InvitationFormData = z.infer<typeof invitationSchema>;

@@ -1,98 +1,112 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { MapPin, Calendar, Clock } from "lucide-react";
-import { InvitationTemplateProps } from "./types";
+interface GlassTemplateProps {
+  data: any;
+  themeConfig: any;
+}
 
-export function GlassTemplate({ data, themeConfig }: InvitationTemplateProps) {
-    const { primaryColor, textDark, textLight } = themeConfig;
-
-    return (
-        <div
-            className="min-h-screen w-full relative flex flex-col items-center justify-center p-4 overflow-hidden"
-            style={{
-                background: `linear-gradient(135deg, #f6d365 0%, #fda085 100%)` // Fallback/Default gradient
-            }}
+export function GlassTemplate({ data, themeConfig }: GlassTemplateProps) {
+  return (
+    <div 
+      className="min-h-screen flex items-center justify-center p-8 relative overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, ${themeConfig.primaryColor || '#d4af37'}40, ${themeConfig.primaryColor || '#d4af37'}20)`,
+        fontFamily: themeConfig.fontFamily || 'Poppins, sans-serif',
+      }}
+    >
+      {/* Background blur elements */}
+      <div 
+        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-30"
+        style={{ backgroundColor: themeConfig.primaryColor || '#d4af37' }}
+      />
+      <div 
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-30"
+        style={{ backgroundColor: themeConfig.primaryColor || '#d4af37' }}
+      />
+      
+      {/* Glass card */}
+      <div 
+        className="max-w-2xl w-full rounded-2xl p-12 text-center relative z-10"
+        style={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <h1 
+          className="text-5xl md:text-6xl font-bold mb-6"
+          style={{ 
+            color: themeConfig.textDark || '#1a1a1a',
+            textShadow: '0 2px 10px rgba(255, 255, 255, 0.3)',
+          }}
         >
-            {/* Background elements for depth */}
-            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-400/30 blur-[100px]" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/30 blur-[100px]" />
-
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="w-full max-w-lg relative z-10"
+          {data.eventTitle}
+        </h1>
+        
+        {data.subtitle && (
+          <p 
+            className="text-xl mb-8"
+            style={{ color: themeConfig.textSecondary || '#666' }}
+          >
+            {data.subtitle}
+          </p>
+        )}
+        
+        <div 
+          className="h-px w-32 mx-auto mb-8"
+          style={{ backgroundColor: themeConfig.primaryColor || '#d4af37' }}
+        />
+        
+        {data.description && (
+          <p 
+            className="text-lg mb-8"
+            style={{ color: themeConfig.textDark || '#1a1a1a' }}
+          >
+            {data.description}
+          </p>
+        )}
+        
+        {data.eventDate && (
+          <div 
+            className="inline-block px-6 py-4 rounded-xl mb-6"
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+            }}
+          >
+            <p 
+              className="text-xl font-semibold"
+              style={{ color: themeConfig.primaryColor || '#d4af37' }}
             >
-                {/* Glass Card */}
-                <div
-                    className="backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl rounded-3xl p-8 md:p-12 text-center"
-                    style={{
-                        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
-                    }}
-                >
-                    <div className="space-y-8">
-                        <div className="inline-block px-4 py-1.5 rounded-full border border-white/40 bg-white/10 backdrop-blur-md text-white font-medium text-sm tracking-widest uppercase">
-                            {data.type === 'CASAMIENTO' ? 'Nuestra Boda' :
-                                data.type === 'QUINCE_ANOS' ? 'Mis 15 Años' : 'Invitación'}
-                        </div>
-
-                        <h1
-                            className="text-5xl md:text-6xl font-serif font-bold text-white drop-shadow-md"
-                            style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.1)' }}
-                        >
-                            {data.nombreEvento}
-                        </h1>
-
-                        <p className="text-xl text-white/90 font-light">
-                            {data.type === 'CASAMIENTO' && `${data.nombreNovia} & ${data.nombreNovio}`}
-                            {data.type === 'QUINCE_ANOS' && data.nombreQuinceanera}
-                        </p>
-
-                        <div className="w-16 h-px bg-white/40 mx-auto my-6" />
-
-                        <div className="grid gap-6 text-white text-left">
-                            <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/10 hover:bg-white/20 transition-colors">
-                                <Calendar className="w-6 h-6 shrink-0" />
-                                <div>
-                                    <p className="text-xs uppercase opacity-70 tracking-wider">Fecha</p>
-                                    <p className="font-semibold text-lg">
-                                        {data.fecha ? format(new Date(data.fecha), "PPP", { locale: es }) : "Por definir"}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/10 hover:bg-white/20 transition-colors">
-                                <Clock className="w-6 h-6 shrink-0" />
-                                <div>
-                                    <p className="text-xs uppercase opacity-70 tracking-wider">Hora</p>
-                                    <p className="font-semibold text-lg">{data.hora || "--:--"}</p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/10 hover:bg-white/20 transition-colors">
-                                <MapPin className="w-6 h-6 shrink-0" />
-                                <div>
-                                    <p className="text-xs uppercase opacity-70 tracking-wider">Lugar</p>
-                                    <p className="font-semibold text-lg leading-tight">{data.lugarNombre}</p>
-                                    <p className="text-sm opacity-80 mt-1">{data.direccion}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full py-4 rounded-xl bg-white text-gray-900 font-bold shadow-lg mt-4 hover:shadow-xl transition-all"
-                            style={{ color: primaryColor }}
-                        >
-                            Confirmar Asistencia
-                        </motion.button>
-                    </div>
-                </div>
-            </motion.div>
-        </div>
-    );
+              {new Date(data.eventDate).toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+            {data.eventTime && (
+              <p 
+                className="text-lg mt-2"
+                style={{ color: themeConfig.textDark || '#1a1a1a' }}
+              >
+                {data.eventTime}
+              </p>
+            )}
+          </div>
+        )}
+        
+        {data.location && (
+          <p 
+            className="text-lg"
+            style={{ color: themeConfig.textDark || '#1a1a1a' }}
+          >
+            📍 {data.location}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }

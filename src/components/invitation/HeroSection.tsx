@@ -12,6 +12,10 @@ interface HeroSectionProps {
     fechaEvento: Date;
     colorPrincipal: string;
     imagenPortada?: string | null;
+    imagenPosX?: number;
+    imagenPosY?: number;
+    imagenEscala?: number;
+    invitationId?: string;
 }
 
 export function HeroSection({
@@ -23,6 +27,10 @@ export function HeroSection({
     fechaEvento,
     colorPrincipal,
     imagenPortada,
+    imagenPosX = 50,
+    imagenPosY = 50,
+    imagenEscala = 100,
+    invitationId,
 }: HeroSectionProps) {
     const scrollToDetails = () => {
         const nextSection = document.getElementById('detalles');

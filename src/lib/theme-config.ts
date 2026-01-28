@@ -89,16 +89,6 @@ export const LAYOUT_TEMPLATES = {
     name: 'Moderno (Scroll)',
     description: 'Diseño fluido con animaciones de entrada',
   },
-  minimal: {
-    id: 'minimal',
-    name: 'Minimalista (Texto)',
-    description: 'Enfoque en tipografía y espacios limpios',
-  },
-  glass: {
-    id: 'glass',
-    name: 'Glassmorphism',
-    description: 'Estilo cristal esmerilado con transparencias',
-  },
   parallax: {
     id: 'parallax',
     name: 'Parallax (Cinemático)',

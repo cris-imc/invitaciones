@@ -1,107 +1,104 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { MapPin, Calendar, Clock, Music } from "lucide-react";
-import { InvitationTemplateProps } from "./types";
+interface ModernTemplateProps {
+  data: any;
+  themeConfig: any;
+}
 
-export function ModernTemplate({ data, themeConfig }: InvitationTemplateProps) {
-    const { primaryColor, backgroundColor, textDark } = themeConfig;
-
-    return (
-        <div
-            className="min-h-screen w-full overflow-hidden relative flex flex-col items-center justify-center p-6"
-            style={{ backgroundColor: backgroundColor }}
-        >
-            {/* Background Decor */}
-            <div
-                className="absolute top-0 left-0 w-full h-64 opacity-10 rounded-b-[50%]"
-                style={{ backgroundColor: primaryColor }}
-            />
-
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="z-10 text-center space-y-8 w-full max-w-lg"
+export function ModernTemplate({ data, themeConfig }: ModernTemplateProps) {
+  return (
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundColor: themeConfig.backgroundColor || '#ffffff',
+        fontFamily: themeConfig.fontFamily || 'Poppins, sans-serif',
+      }}
+    >
+      {/* Hero Section */}
+      <div 
+        className="min-h-screen flex items-center justify-center p-8"
+        style={{
+          background: `linear-gradient(135deg, ${themeConfig.primaryColor || '#d4af37'}20, ${themeConfig.backgroundColor || '#ffffff'})`,
+        }}
+      >
+        <div className="max-w-4xl w-full text-center">
+          <h1 
+            className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in"
+            style={{ 
+              color: themeConfig.primaryColor || '#d4af37',
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            }}
+          >
+            {data.eventTitle}
+          </h1>
+          
+          {data.subtitle && (
+            <p 
+              className="text-2xl md:text-3xl mb-12"
+              style={{ color: themeConfig.textSecondary || '#666' }}
             >
-                <header className="space-y-4">
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="inline-block px-4 py-1 rounded-full text-sm font-medium uppercase tracking-wider"
-                        style={{ backgroundColor: `${primaryColor}20`, color: primaryColor }}
-                    >
-                        {data.type === 'CASAMIENTO' ? 'Nuestra Boda' :
-                            data.type === 'QUINCE_ANOS' ? 'Mis 15 Años' : 'Estás Invitado'}
-                    </motion.div>
-
-                    <h1
-                        className="text-5xl md:text-6xl font-serif font-bold leading-tight"
-                        style={{ color: textDark }}
-                    >
-                        {data.nombreEvento}
-                    </h1>
-
-                    <p className="text-xl md:text-2xl font-light text-muted-foreground">
-                        {data.type === 'CASAMIENTO' && `${data.nombreNovia} & ${data.nombreNovio}`}
-                        {data.type === 'QUINCE_ANOS' && data.nombreQuinceanera}
-                    </p>
-                </header>
-
-                <div
-                    className="grid gap-6 p-8 rounded-2xl shadow-xl backdrop-blur-sm bg-white/50 border border-white/20"
-                >
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-white shadow-sm">
-                            <Calendar className="w-6 h-6" style={{ color: primaryColor }} />
-                        </div>
-                        <div className="text-left">
-                            <p className="text-sm text-muted-foreground uppercase tracking-wide">Cuándo</p>
-                            <p className="font-semibold text-lg" style={{ color: textDark }}>
-                                {data.fecha ? format(new Date(data.fecha), "PPPP", { locale: es }) : "Fecha por definir"}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-white shadow-sm">
-                            <Clock className="w-6 h-6" style={{ color: primaryColor }} />
-                        </div>
-                        <div className="text-left">
-                            <p className="text-sm text-muted-foreground uppercase tracking-wide">Hora</p>
-                            <p className="font-semibold text-lg" style={{ color: textDark }}>
-                                {data.hora || "Hora por definir"}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-white shadow-sm">
-                            <MapPin className="w-6 h-6" style={{ color: primaryColor }} />
-                        </div>
-                        <div className="text-left">
-                            <p className="text-sm text-muted-foreground uppercase tracking-wide">Dónde</p>
-                            <p className="font-semibold text-lg" style={{ color: textDark }}>
-                                {data.lugarNombre}
-                            </p>
-                            <p className="text-sm text-muted-foreground">{data.direccion}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {data.musicaHabilitada && (
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-md cursor-pointer"
-                    >
-                        <Music className="w-4 h-4" style={{ color: primaryColor }} />
-                        <span className="text-sm font-medium">Reproducir música</span>
-                    </motion.div>
-                )}
-            </motion.div>
+              {data.subtitle}
+            </p>
+          )}
+          
+          {data.eventDate && (
+            <div 
+              className="inline-block px-8 py-4 rounded-full mb-8"
+              style={{
+                backgroundColor: themeConfig.primaryColor || '#d4af37',
+                color: themeConfig.textLight || '#ffffff',
+              }}
+            >
+              <p className="text-xl font-semibold">
+                {new Date(data.eventDate).toLocaleDateString('es-ES', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+              {data.eventTime && (
+                <p className="text-lg mt-1">{data.eventTime}</p>
+              )}
+            </div>
+          )}
         </div>
-    );
+      </div>
+      
+      {/* Content Section */}
+      <div className="max-w-4xl mx-auto px-8 py-16">
+        {data.description && (
+          <div 
+            className="text-lg md:text-xl mb-12 text-center"
+            style={{ color: themeConfig.textDark || '#1a1a1a' }}
+          >
+            {data.description}
+          </div>
+        )}
+        
+        {data.location && (
+          <div 
+            className="text-center p-6 rounded-lg"
+            style={{
+              backgroundColor: `${themeConfig.primaryColor || '#d4af37'}10`,
+              borderLeft: `4px solid ${themeConfig.primaryColor || '#d4af37'}`,
+            }}
+          >
+            <p 
+              className="text-xl font-semibold mb-2"
+              style={{ color: themeConfig.primaryColor || '#d4af37' }}
+            >
+              Ubicación
+            </p>
+            <p 
+              className="text-lg"
+              style={{ color: themeConfig.textDark || '#1a1a1a' }}
+            >
+              📍 {data.location}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

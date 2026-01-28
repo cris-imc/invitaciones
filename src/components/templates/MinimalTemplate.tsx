@@ -1,68 +1,111 @@
 "use client";
 
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { InvitationTemplateProps } from "./types";
+interface MinimalTemplateProps {
+  data: any;
+  themeConfig: any;
+}
 
-export function MinimalTemplate({ data, themeConfig }: InvitationTemplateProps) {
-    const { primaryColor, textDark } = themeConfig;
-
-    return (
-        <div className="max-w-xl mx-auto py-12 px-6 text-center space-y-12 bg-white min-h-screen flex flex-col justify-center">
-            <div className="space-y-2">
-                <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-                    {data.type === 'CASAMIENTO' ? 'Save The Date' : 'Invitación'}
-                </p>
-                <div
-                    className="w-12 h-0.5 mx-auto"
-                    style={{ backgroundColor: primaryColor }}
-                />
-            </div>
-
-            <div className="space-y-6">
-                <h1 className="text-6xl md:text-7xl font-light tracking-tight" style={{ color: textDark }}>
-                    {data.nombreEvento}
-                </h1>
-
-                <p className="text-2xl font-light italic text-muted-foreground">
-                    {data.type === 'CASAMIENTO' && `${data.nombreNovia} & ${data.nombreNovio}`}
-                    {data.type === 'QUINCE_ANOS' && data.nombreQuinceanera}
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-12 border-y border-gray-100">
-                <div className="space-y-2">
-                    <span className="block text-sm uppercase tracking-widest text-muted-foreground">Día</span>
-                    <span className="block text-xl font-medium" style={{ color: primaryColor }}>
-                        {data.fecha ? format(new Date(data.fecha), "d", { locale: es }) : "--"}
-                    </span>
-                </div>
-                <div className="space-y-2">
-                    <span className="block text-sm uppercase tracking-widest text-muted-foreground">Mes</span>
-                    <span className="block text-xl font-medium" style={{ color: primaryColor }}>
-                        {data.fecha ? format(new Date(data.fecha), "MMMM", { locale: es }) : "--"}
-                    </span>
-                </div>
-                <div className="space-y-2">
-                    <span className="block text-sm uppercase tracking-widest text-muted-foreground">Año</span>
-                    <span className="block text-xl font-medium" style={{ color: primaryColor }}>
-                        {data.fecha ? format(new Date(data.fecha), "yyyy", { locale: es }) : "--"}
-                    </span>
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <p className="text-lg font-medium" style={{ color: textDark }}>{data.lugarNombre}</p>
-                <p className="text-muted-foreground">{data.direccion}</p>
-                <p className="text-muted-foreground">{data.hora} hs</p>
-            </div>
-
-            <button
-                className="px-8 py-3 bg-black text-white text-sm uppercase tracking-widest hover:bg-gray-800 transition-colors"
-                style={{ backgroundColor: textDark }}
+export function MinimalTemplate({ data, themeConfig }: MinimalTemplateProps) {
+  return (
+    <div 
+      className="min-h-screen flex items-center justify-center p-8"
+      style={{
+        backgroundColor: themeConfig.backgroundColor || '#ffffff',
+        fontFamily: themeConfig.fontFamily || 'Raleway, sans-serif',
+      }}
+    >
+      <div className="max-w-3xl w-full">
+        <div className="text-center space-y-12">
+          {/* Title */}
+          <h1 
+            className="text-4xl md:text-5xl font-light tracking-wider uppercase"
+            style={{ 
+              color: themeConfig.textDark || '#1a1a1a',
+              letterSpacing: '0.3em',
+            }}
+          >
+            {data.eventTitle}
+          </h1>
+          
+          {/* Divider */}
+          <div className="flex items-center justify-center gap-4">
+            <div 
+              className="h-px w-24"
+              style={{ backgroundColor: themeConfig.primaryColor || '#d4af37' }}
+            />
+            <div 
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: themeConfig.primaryColor || '#d4af37' }}
+            />
+            <div 
+              className="h-px w-24"
+              style={{ backgroundColor: themeConfig.primaryColor || '#d4af37' }}
+            />
+          </div>
+          
+          {/* Subtitle */}
+          {data.subtitle && (
+            <p 
+              className="text-xl font-light italic"
+              style={{ color: themeConfig.textSecondary || '#666' }}
             >
-                Confirmar Asistencia
-            </button>
+              {data.subtitle}
+            </p>
+          )}
+          
+          {/* Date & Time */}
+          {data.eventDate && (
+            <div className="space-y-2">
+              <p 
+                className="text-2xl font-light tracking-wide"
+                style={{ color: themeConfig.primaryColor || '#d4af37' }}
+              >
+                {new Date(data.eventDate).toLocaleDateString('es-ES', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+              {data.eventTime && (
+                <p 
+                  className="text-lg font-light"
+                  style={{ color: themeConfig.textSecondary || '#666' }}
+                >
+                  {data.eventTime}
+                </p>
+              )}
+            </div>
+          )}
+          
+          {/* Description */}
+          {data.description && (
+            <p 
+              className="text-base font-light max-w-2xl mx-auto leading-relaxed"
+              style={{ color: themeConfig.textDark || '#1a1a1a' }}
+            >
+              {data.description}
+            </p>
+          )}
+          
+          {/* Location */}
+          {data.location && (
+            <div className="pt-8">
+              <p 
+                className="text-sm uppercase tracking-widest mb-2"
+                style={{ color: themeConfig.primaryColor || '#d4af37' }}
+              >
+                Ubicación
+              </p>
+              <p 
+                className="text-lg font-light"
+                style={{ color: themeConfig.textDark || '#1a1a1a' }}
+              >
+                {data.location}
+              </p>
+            </div>
+          )}
         </div>
-    );
+      </div>
+    </div>
+  );
 }
