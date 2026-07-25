@@ -27,20 +27,20 @@ export async function toggleInvitationStatus(invitationId: string, currentStatus
     }
 }
 
-export async function updateUserPlan(userId: string, planTier: string) {
+export async function updateInvitationPlan(invitationId: string, planTier: string) {
     try {
         const session = await auth();
         if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized");
 
-        await prisma.user.update({
-            where: { id: userId },
+        await prisma.invitation.update({
+            where: { id: invitationId },
             data: { planTier }
         });
 
         revalidatePath("/dashboard");
         return { success: true };
     } catch (error) {
-        console.error("Error updating user plan:", error);
+        console.error("Error updating invitation plan:", error);
         return { success: false, error: "Failed to update plan" };
     }
 }

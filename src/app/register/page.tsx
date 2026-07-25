@@ -17,6 +17,7 @@ export default function RegisterPage() {
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("FREE");
+  const [premiumQuantity, setPremiumQuantity] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -48,6 +49,7 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           planTier: selectedPlan,
+          premiumCredits: selectedPlan === "PREMIUM" ? premiumQuantity : 0,
         }),
       });
 
@@ -158,12 +160,11 @@ export default function RegisterPage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-2xl font-display">
-                    {PLAN_LIMITS.PREMIUM.name}
+                    Invitaciones Premium
                   </h3>
                   <p className="text-3xl font-display text-[var(--paper)] mt-2">
-                    {formatPrice(PLAN_LIMITS.PREMIUM.price)}
+                    {formatPrice(PLAN_LIMITS.PREMIUM.price)} <span className="text-sm opacity-60 font-body">c/u</span>
                   </p>
-                  <p className="text-sm opacity-60">pago único por evento</p>
                 </div>
                 {selectedPlan === "PREMIUM" && (
                   <div className="w-8 h-8 bg-[var(--paper)] rounded-full flex items-center justify-center">
@@ -171,6 +172,24 @@ export default function RegisterPage() {
                   </div>
                 )}
               </div>
+              
+              {selectedPlan === "PREMIUM" && (
+                <div className="mb-6 bg-[var(--ink)] p-4 rounded-2xl border border-[var(--ink-2)]" onClick={(e) => e.stopPropagation()}>
+                  <label className="block text-sm font-semibold opacity-70 mb-2">Cantidad de invitaciones a comprar:</label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center bg-[var(--ink-2)] rounded-full p-1">
+                        <button type="button" onClick={() => setPremiumQuantity(Math.max(1, premiumQuantity - 1))} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">-</button>
+                        <span className="w-12 text-center font-bold text-lg">{premiumQuantity}</span>
+                        <button type="button" onClick={() => setPremiumQuantity(premiumQuantity + 1)} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">+</button>
+                    </div>
+                    <div className="ml-auto text-right">
+                        <span className="text-xs opacity-60 block">Total a pagar</span>
+                        <span className="font-display text-xl text-[var(--accent)]">{formatPrice(PLAN_LIMITS.PREMIUM.price * premiumQuantity)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <ul className="space-y-2 opacity-80">
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
@@ -291,14 +310,18 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <Button
-                type="submit"
+              <Button 
+                type="submit" 
+                className="w-full l-cta h-14 text-lg bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--paper)]/90 border-none mt-8"
                 disabled={isLoading}
-                className="w-full h-12 rounded-xl bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--paper)]/90 font-semibold mt-4 transition-all"
               >
-                {isLoading
-                  ? "Creando cuenta..."
-                  : `Crear cuenta ${selectedPlan === "PREMIUM" ? "Premium" : "Gratis"}`}
+                {isLoading ? (
+                  "Creando cuenta..."
+                ) : selectedPlan === "PREMIUM" ? (
+                  `Pagar ${formatPrice(PLAN_LIMITS.PREMIUM.price * premiumQuantity)} y Registrarme`
+                ) : (
+                  "Crear Cuenta Gratis"
+                )}
               </Button>
 
               <div className="text-center pt-4">

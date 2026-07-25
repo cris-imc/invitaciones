@@ -22,6 +22,8 @@ model User {
   subscriptionStartDate DateTime?
   subscriptionEndDate   DateTime?
   
+  premiumCredits        Int                 @default(0) // Contador de invitaciones premium compradas disponibles
+
   // Payment integration (future)
   mercadoPagoCustomerId String?             @unique
   

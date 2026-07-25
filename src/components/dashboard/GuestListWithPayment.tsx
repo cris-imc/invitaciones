@@ -128,7 +128,7 @@ export function GuestListWithPayment({
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
-          borderBottom: "1px solid #eee",
+          borderBottom: "1px solid var(--line)",
           marginBottom: "20px",
         }}
       >
@@ -137,10 +137,10 @@ export function GuestListWithPayment({
           { label: "Personas", value: totalPeople },
           { label: "Pagaron", value: paidCount },
           { label: "Pendientes", value: pendingPayCount },
-        ].map(({ label, value }) => (
-          <div key={label} style={{ padding: "16px 12px", textAlign: "center", borderRight: "1px solid #eee" }}>
-            <b style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: "22px", color: "#1a1a1a" }}>{value}</b>
-            <span style={{ fontSize: "10.5px", textTransform: "uppercase", letterSpacing: ".05em", color: "#888" }}>
+        ].map(({ label, value }, index) => (
+          <div key={label} style={{ padding: "16px 12px", textAlign: "center", borderRight: index === 3 ? "none" : "1px solid var(--line)" }}>
+            <b style={{ display: "block", fontFamily: "var(--font-display)", fontSize: "28px", color: "var(--accent)" }}>{value}</b>
+            <span style={{ fontSize: "10.5px", textTransform: "uppercase", letterSpacing: ".05em", opacity: 0.7 }}>
               {label}
             </span>
           </div>
@@ -156,16 +156,18 @@ export function GuestListWithPayment({
             flexWrap: "wrap",
             marginBottom: "20px",
             padding: "12px 16px",
-            background: "#f9f7f2",
+            background: "var(--ink)",
+            border: "1px solid var(--ink-2)",
+            color: "var(--on-ink)",
             borderRadius: "12px",
             fontSize: "13px",
           }}
         >
-          <span>💰 Recaudado: <b>{formatARS(collectedTotal)}</b></span>
+          <span>💰 Recaudado: <b style={{ color: "var(--accent)" }}>{formatARS(collectedTotal)}</b></span>
           <span style={{ opacity: .5 }}>·</span>
           <span>⏳ Estimado total: <b>{formatARS(estimatedTotal)}</b></span>
           <span style={{ opacity: .5 }}>·</span>
-          <span style={{ color: "#8b8b8b" }}>⊘ Exentos: {exemptCount}</span>
+          <span style={{ opacity: .6 }}>⊘ Exentos: {exemptCount}</span>
         </div>
       )}
 

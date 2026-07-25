@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         try {
             const session = await auth();
             
-            if (!session?.user) {
+            if (!session?.user || !session.user.id) {
                 return NextResponse.json(
                     { error: 'No autenticado' },
                     { status: 401 }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     try {
         const session = await auth();
         
-        if (!session?.user) {
+        if (!session?.user || !session.user.id) {
             return NextResponse.json(
                 { error: 'No autenticado' },
                 { status: 401 }
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
         const invitation = await prisma.invitation.create({
             data: {
                 userId,
-                planTier, // Snapshot of user's plan at creation time
+                planTier: 'FREE', // Todas las invitaciones nacen en plan Gratis
                 tipo: body.type || 'CASAMIENTO',
                 estado: 'ACTIVA',
                 slug,

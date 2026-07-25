@@ -5,6 +5,8 @@ import { useState, useTransition } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { Input } from "@/components/ui/input";
 
+import { AdminPlanSelect } from "./AdminPlanSelect";
+
 export function AdminInvitationRow({ invitation }: { invitation: any }) {
     const [isPending, startTransition] = useTransition();
     const [status, setStatus] = useState(invitation.estado);
@@ -36,13 +38,15 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
     };
 
     return (
-        <div className="flex items-center justify-between bg-black/5 rounded-xl p-3 flex-wrap gap-4">
+        <div className="flex items-center justify-between bg-black/20 border border-[var(--ink-2)] rounded-xl p-3 flex-wrap gap-4">
             <div>
                 <strong className="block">{invitation.nombreEvento}</strong>
                 <span className="text-xs opacity-60">/{invitation.slug}</span>
             </div>
             
             <div className="flex items-center gap-4 flex-wrap">
+                <AdminPlanSelect invitationId={invitation.id} currentPlan={invitation.planTier} />
+                
                 <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold opacity-70">Invitados Max:</span>
                     <Input 
@@ -50,12 +54,12 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                         value={maxGuests}
                         onChange={(e) => setMaxGuests(e.target.value)}
                         placeholder="Ilimitado"
-                        className="w-24 h-8 text-sm"
+                        className="w-24 h-8 text-sm bg-[var(--ink)] border-none text-[var(--on-ink)] placeholder:text-white/30"
                     />
                     <button 
                         disabled={isPending || maxGuests === (invitation.maxGuestsOverride || "")}
                         onClick={handleUpdateMaxGuests}
-                        className="text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50 disabled:no-underline"
+                        className="text-xs font-semibold text-[var(--accent)] hover:text-white transition-colors disabled:opacity-30 disabled:hover:text-[var(--accent)]"
                     >
                         Guardar
                     </button>

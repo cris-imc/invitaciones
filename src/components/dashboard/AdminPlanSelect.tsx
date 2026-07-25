@@ -1,10 +1,10 @@
 "use client";
 
-import { updateUserPlan } from "@/app/actions/admin";
+import { updateInvitationPlan } from "@/app/actions/admin";
 import { useState, useTransition } from "react";
 import { useToast } from "@/components/ui/Toast";
 
-export function AdminPlanSelect({ userId, currentPlan }: { userId: string, currentPlan: string }) {
+export function AdminPlanSelect({ invitationId, currentPlan }: { invitationId: string, currentPlan: string }) {
     const [isPending, startTransition] = useTransition();
     const [plan, setPlan] = useState(currentPlan);
     const { showToast } = useToast();
@@ -13,7 +13,7 @@ export function AdminPlanSelect({ userId, currentPlan }: { userId: string, curre
         const newPlan = e.target.value;
         setPlan(newPlan);
         startTransition(async () => {
-            const res = await updateUserPlan(userId, newPlan);
+            const res = await updateInvitationPlan(invitationId, newPlan);
             if (res.success) {
                 showToast("Plan actualizado correctamente", "success");
             } else {
@@ -23,13 +23,13 @@ export function AdminPlanSelect({ userId, currentPlan }: { userId: string, curre
     };
 
     return (
-        <div className="flex items-center gap-2 mb-4">
-            <span className="text-sm font-semibold opacity-70">Tipo de Cuenta:</span>
+        <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold opacity-70">Plan:</span>
             <select
                 disabled={isPending}
                 value={plan}
                 onChange={handleUpdate}
-                className="text-sm border rounded-lg px-2 py-1 bg-black/5"
+                className="text-sm border rounded-lg px-2 py-1 bg-[var(--ink-2)] text-[var(--on-ink)] border-[var(--ink-2)] focus:ring-1 focus:ring-[var(--paper)]"
             >
                 <option value="FREE">Gratis (20 inv)</option>
                 <option value="PREMIUM">Premium (Ilimitado)</option>

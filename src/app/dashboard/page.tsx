@@ -5,10 +5,11 @@ import { CalendarCheck, Eye, Plus, Users, Music, TrendingUp } from "lucide-react
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { AdminInvitationRow } from "@/components/dashboard/AdminInvitationRow";
-import { AdminPlanSelect } from "@/components/dashboard/AdminPlanSelect";
+import { AdminDashboardClient } from "@/components/dashboard/AdminDashboardClient";
+import { PLAN_LIMITS } from "@/lib/plan-limits";
 
 async function getDashboardStats(userId: string) {
+  if (!userId) throw new Error("No user ID provided");
   const invitations = await prisma.invitation.findMany({
     where: { userId },
     include: {
@@ -51,17 +52,24 @@ async function getDashboardStats(userId: string) {
     totalPaid,
     totalPending,
     totalSongsPending,
-    recentInvitations: invitations.slice(0, 3),
+    recentInvitations: invitations.filter((i) => i.estado === "ACTIVA").slice(0, 3),
   };
 }
 
 export default async function DashboardPage() {
   const session = await auth().catch(() => null);
-  if (!session?.user) redirect("/login");
+  if (!session?.user || !session.user.id) redirect("/login");
 
   const userId  = session.user.id as string;
   const role = session.user.role as string;
   const userName = (session.user.name ?? "").split(" ")[0] || "anfitrión";
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { planTier: true }
+  });
+  const currentPlan = dbUser?.planTier || "FREE";
+  const planName = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS]?.name || "Gratis";
 
   if (role === "ADMIN") {
     const clients = await prisma.user.findMany({
@@ -84,25 +92,8 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 mt-6">
-          {clients.map(client => (
-            <div key={client.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-               <h3 className="font-bold text-xl mb-1 text-gray-900">
-                 {client.name} <span className="text-sm text-gray-500 font-normal">({client.email})</span>
-               </h3>
-               <AdminPlanSelect userId={client.id} currentPlan={client.planTier} />
-               
-               {client.invitations.length === 0 ? (
-                 <p className="text-sm text-gray-400 mt-2">No tiene invitaciones creadas.</p>
-               ) : (
-                 <div className="flex flex-col gap-2 mt-4">
-                   {client.invitations.map(inv => (
-                      <AdminInvitationRow key={inv.id} invitation={inv} />
-                   ))}
-                 </div>
-               )}
-            </div>
-          ))}
+        <div className="mt-6">
+          <AdminDashboardClient clients={clients} />
         </div>
       </>
     );
@@ -141,9 +132,11 @@ export default async function DashboardPage() {
   return (
     <>
       {/* Topbar */}
-      <div className="p-topbar">
+      <div className="p-topbar flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2>Hola, {userName} 👋</h2>
+          <div className="flex items-center gap-3 mb-1">
+            <h2 className="m-0">Hola, {userName} 👋</h2>
+          </div>
           <p>Acá tenés el resumen de tus eventos en tiempo real.</p>
         </div>
         <Link href="/dashboard/invitaciones/crear">
@@ -169,12 +162,16 @@ export default async function DashboardPage() {
         <h3>Tus invitaciones recientes</h3>
       </div>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-4">
         {stats.recentInvitations.length > 0 ? (
           stats.recentInvitations.map((inv) => {
             const confirmed = inv.guests.filter((g) => g.status === "CONFIRMED");
             const people = confirmed.reduce((s, g) => s + g.attendingCount, 0);
             const mono = inv.nombreEvento.substring(0, 1).toUpperCase();
+            
+            const planLimit = PLAN_LIMITS[inv.planTier as keyof typeof PLAN_LIMITS]?.maxGuests;
+            const maxGuests = inv.maxGuestsOverride !== null ? inv.maxGuestsOverride : planLimit;
+            const maxGuestsStr = maxGuests === null ? "∞" : maxGuests.toString();
             
             return (
               <div className="inv-row" key={inv.id}>
@@ -199,12 +196,27 @@ export default async function DashboardPage() {
 
                 <div className="rsvp-mini flex items-center gap-2">
                   <div className="dot" style={{ background: 'var(--accent)', width: 8, height: 8, borderRadius: '50%' }}></div>
-                  {people} confirmadas
+                  {people} <span className="opacity-60 text-xs">/ {maxGuestsStr} confirmadas</span>
                 </div>
 
-                <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go">
-                  Administrar →
-                </Link>
+                <div className="flex items-center gap-4">
+                  {inv.planTier === "FREE" ? (
+                    <button
+                      type="button"
+                      className="hidden sm:inline-flex items-center justify-center h-8 px-4 text-xs font-semibold rounded-full bg-accent/10 text-accent border border-accent hover:bg-accent/20 transition-colors"
+                      title="Por ahora sin funcionar"
+                    >
+                      Mejorar a Premium
+                    </button>
+                  ) : (
+                    <div className="hidden sm:inline-flex items-center justify-center h-6 px-3 text-[10px] uppercase tracking-widest font-bold rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">
+                      Premium
+                    </div>
+                  )}
+                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go">
+                    Administrar →
+                  </Link>
+                </div>
               </div>
             );
           })
