@@ -5,6 +5,7 @@ import Image from "next/image";
 import { InvitationThemeProvider } from "./InvitationThemeProvider";
 import { ThemeConfig } from "@/lib/theme-config";
 import { TemplateLoadingFallback } from "@/components/wizard/TemplateLoadingFallback";
+import { WatermarkBadge } from "./WatermarkBadge";
 
 // Lazy load componentes pesados
 const SplashScreen = lazy(() => import("./SplashScreen").then(m => ({ default: m.SplashScreen })));
@@ -123,9 +124,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
 
     if (invitation.templateTipo === "PARALLAX") {
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <ModernInvitationTemplate invitation={invitation} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <ModernInvitationTemplate invitation={invitation} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -140,9 +144,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <LuxuryMinimalistTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -156,9 +163,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <BotanicalGardenTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <BotanicalGardenTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -172,9 +182,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <GoldenLuxuryTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -188,9 +201,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <NeonNightTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <NeonNightTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -204,9 +220,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <LiquidCrystalTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <LiquidCrystalTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -220,9 +239,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <ModernBentoTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <ModernBentoTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -236,9 +258,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <VintageEleganceTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <VintageEleganceTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -252,9 +277,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <AuroraDreamyTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <AuroraDreamyTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -268,9 +296,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <DiscoNightTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <DiscoNightTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -284,9 +315,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <KidsPartyTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <KidsPartyTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -300,9 +334,12 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
         } as any;
 
         return (
-            <Suspense fallback={<TemplateLoadingFallback />}>
-                <BabyBaptismTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
-            </Suspense>
+            <>
+                <Suspense fallback={<TemplateLoadingFallback />}>
+                    <BabyBaptismTemplate data={formData} themeConfig={themeConfig as any} guest={guest} isPersonalized={isPersonalized} />
+                </Suspense>
+                <WatermarkBadge planTier={invitation.planTier || "FREE"} />
+            </>
         );
     }
 
@@ -580,6 +617,9 @@ export function InvitationContent({ invitation, guest, isPersonalized = false }:
                     </div>
                 </>
             )}
+
+            {/* Watermark for FREE tier */}
+            <WatermarkBadge planTier={invitation.planTier || "FREE"} />
             </Suspense>
         </InvitationThemeProvider>
     );

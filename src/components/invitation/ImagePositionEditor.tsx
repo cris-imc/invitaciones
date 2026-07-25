@@ -77,7 +77,7 @@ export function ImagePositionEditor({
                             <Label>Posición Horizontal: {position.x}%</Label>
                             <Slider
                                 value={[position.x]}
-                                onValueChange={(value) => setPosition({ ...position, x: value[0] })}
+                                onValueChange={(value: number[]) => setPosition({ ...position, x: value[0] })}
                                 min={0}
                                 max={100}
                                 step={1}
@@ -88,7 +88,7 @@ export function ImagePositionEditor({
                             <Label>Posición Vertical: {position.y}%</Label>
                             <Slider
                                 value={[position.y]}
-                                onValueChange={(value) => setPosition({ ...position, y: value[0] })}
+                                onValueChange={(value: number[]) => setPosition({ ...position, y: value[0] })}
                                 min={0}
                                 max={100}
                                 step={1}
@@ -99,7 +99,7 @@ export function ImagePositionEditor({
                             <Label>Zoom: {scale}%</Label>
                             <Slider
                                 value={[scale]}
-                                onValueChange={(value) => setScale(value[0])}
+                                onValueChange={(value: number[]) => setScale(value[0])}
                                 min={50}
                                 max={200}
                                 step={5}

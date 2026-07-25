@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { auth } from '@/auth';
+import { checkPlanLimits } from '@/lib/plan-limits';
+import type { PlanTier } from '@/lib/plan-limits';
 
 // GET - Obtener invitaciones del usuario o invitación pública por slug
 export async function GET(request: NextRequest) {
@@ -49,8 +52,16 @@ export async function GET(request: NextRequest) {
     } else {
         // Obtener invitaciones del usuario
         try {
-            // TODO: Obtener userId de la sesión cuando tengamos auth
-            const userId = "mock-user-id";
+            const session = await auth();
+            
+            if (!session?.user) {
+                return NextResponse.json(
+                    { error: 'No autenticado' },
+                    { status: 401 }
+                );
+            }
+
+            const userId = session.user.id;
 
             const invitationsData = await prisma.invitation.findMany({
                 where: { userId },
@@ -90,34 +101,62 @@ export async function GET(request: NextRequest) {
 // POST - Crear nueva invitación
 export async function POST(request: NextRequest) {
     try {
+        const session = await auth();
+        
+        if (!session?.user) {
+            return NextResponse.json(
+                { error: 'No autenticado' },
+                { status: 401 }
+            );
+        }
+
+        const userId = session.user.id;
+        const planTier = session.user.planTier;
+
+        // Check if user can create more invitations
+        const currentInvitationsCount = await prisma.invitation.count({
+            where: { userId, estado: 'ACTIVA' }
+        });
+
+        const limitError = await checkPlanLimits(
+            userId,
+            planTier,
+            'create-invitation',
+            currentInvitationsCount
+        );
+
+        if (limitError) {
+            return NextResponse.json(
+                { error: limitError.message },
+                { status: 403 }
+            );
+        }
+
         const body = await request.json();
         console.log('DEBUG: POST /api/invitations body:', JSON.stringify(body, null, 2));
-
-        // TODO: Obtener userId de la sesión
-        const userId = "mock-user-id";
 
         // Generar slug único
         const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
 
         // Combinar fecha y hora correctamente preservando la zona horaria local
         let fechaEvento: Date;
+        const datePart = body.fecha ? body.fecha.split('T')[0] : '';
         if (body.hora) {
             // Si hay hora, combinar fecha + hora
             const [hours, minutes] = body.hora.split(':');
-            const dateStr = body.fecha; // "YYYY-MM-DD"
-            const [year, month, day] = dateStr.split('-').map(Number);
+            const [year, month, day] = datePart.split('-').map(Number);
             // Crear fecha en zona horaria local
             fechaEvento = new Date(year, month - 1, day, parseInt(hours), parseInt(minutes), 0);
         } else {
             // Si no hay hora, usar solo la fecha a medianoche local
-            const dateStr = body.fecha;
-            const [year, month, day] = dateStr.split('-').map(Number);
+            const [year, month, day] = datePart.split('-').map(Number);
             fechaEvento = new Date(year, month - 1, day, 0, 0, 0);
         }
 
         const invitation = await prisma.invitation.create({
             data: {
                 userId,
+                planTier, // Snapshot of user's plan at creation time
                 tipo: body.type || 'CASAMIENTO',
                 estado: 'ACTIVA',
                 slug,
@@ -237,17 +276,16 @@ export async function PUT(request: NextRequest) {
 
         // Combinar fecha y hora correctamente preservando la zona horaria local
         let fechaEvento: Date;
+        const datePart = body.fecha ? body.fecha.split('T')[0] : '';
         if (body.hora) {
             // Si hay hora, combinar fecha + hora
             const [hours, minutes] = body.hora.split(':');
-            const dateStr = body.fecha; // "YYYY-MM-DD"
-            const [year, month, day] = dateStr.split('-').map(Number);
+            const [year, month, day] = datePart.split('-').map(Number);
             // Crear fecha en zona horaria local
             fechaEvento = new Date(year, month - 1, day, parseInt(hours), parseInt(minutes), 0);
         } else {
             // Si no hay hora, usar solo la fecha a medianoche local
-            const dateStr = body.fecha;
-            const [year, month, day] = dateStr.split('-').map(Number);
+            const [year, month, day] = datePart.split('-').map(Number);
             fechaEvento = new Date(year, month - 1, day, 0, 0, 0);
         }
 

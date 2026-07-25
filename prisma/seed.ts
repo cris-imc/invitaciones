@@ -1,9 +1,29 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  // Crear usuario de prueba
+  // Crear usuario ADMIN
+  const adminPassword = await bcrypt.hash('97Chucky-', 10)
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@invitaciones.com' },
+    update: {},
+    create: {
+      id: 'admin-user-id',
+      email: 'admin@invitaciones.com',
+      name: 'User Admin',
+      password: adminPassword,
+      role: 'ADMIN',
+      planTier: 'ADMIN',
+      subscriptionStatus: 'ACTIVE',
+    },
+  })
+
+  console.log('✅ Usuario Admin creado:', adminUser.email)
+
+  // Crear usuario de prueba FREE
+  const testPassword = await bcrypt.hash('test123', 10)
   const user = await prisma.user.upsert({
     where: { email: 'test@example.com' },
     update: {},
@@ -11,18 +31,22 @@ async function main() {
       id: 'mock-user-id',
       email: 'test@example.com',
       name: 'Usuario de Prueba',
+      password: testPassword,
       role: 'CLIENT',
+      planTier: 'FREE',
+      subscriptionStatus: 'TRIAL',
     },
   })
 
-  console.log('✅ Usuario creado:', user)
+  console.log('✅ Usuario de prueba creado:', user.email)
 
-  // Invitación 1: 15 Años Completa (similar a Paulina)
+  // Invitación 1: 15 Años Completa (similar a Paulina) - ADMIN USER
   const invitation15 = await prisma.invitation.upsert({
     where: { slug: 'mis-15-paulina' },
     update: {},
     create: {
-      userId: user.id,
+      userId: adminUser.id,
+      planTier: 'ADMIN',
       tipo: 'QUINCE_ANOS',
       estado: 'ACTIVA',
       slug: 'mis-15-paulina',

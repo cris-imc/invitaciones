@@ -2,7 +2,7 @@
 
 ## Resumen Ejecutivo
 
-Este documento detalla los **criterios y estándares** que se siguen para crear plantillas de invitaciones digitales en el sistema. Estos criterios aseguran consistencia, calidad visual premium y funcionalidad completa.
+Este documento detalla los **criterios y estándares** que se siguen para crear plantillas de invitaciones digitales en el sistema. Estos criterios aseguran consistencia, calidad visual premium y funcionalidad completa. Todas deben crearse en español.
 
 ## Dónde sacar ideas?
 
