@@ -1,105 +1,99 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { Countdown } from "@/components/invitation/Countdown";
-import { EventDetails } from "@/components/invitation/EventDetails";
-import { RSVPForm } from "@/components/invitation/RSVPForm";
-import { PhotoGallery } from "@/components/invitation/PhotoGallery";
-import { HeroSection } from "@/components/invitation/HeroSection";
-import { EditModeProvider } from "@/contexts/EditModeContext";
-import { EditModeToggle } from "@/components/invitation/EditModeToggle";
+import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 
+// ── Helpers ──────────────────────────────────────────────────────
 async function getInvitation(slug: string) {
-    const invitation = await prisma.invitation.findUnique({
-        where: { slug },
+  return prisma.invitation.findUnique({
+    where: { slug },
+    include: {
+      album: {
         include: {
-            album: {
-                include: {
-                    fotos: {
-                        where: { aprobada: true },
-                        orderBy: { createdAt: 'desc' },
-                    },
-                },
-            },
+          fotos: {
+            where: { aprobada: true },
+            orderBy: { createdAt: "desc" },
+          },
         },
-    });
-
-    return invitation;
+      },
+    },
+  });
 }
 
-export default async function InvitationPage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
-    const invitation = await getInvitation(slug);
+function getEventTitle(invitation: Awaited<ReturnType<typeof getInvitation>>) {
+  if (!invitation) return "Invitación";
+  if (invitation.tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio) {
+    return `Boda de ${invitation.nombreNovia} & ${invitation.nombreNovio}`;
+  }
+  if (invitation.tipo === "QUINCE_ANOS" && invitation.nombreQuinceanera) {
+    return `XV años de ${invitation.nombreQuinceanera}`;
+  }
+  return invitation.nombreEvento;
+}
 
-    if (!invitation) {
-        notFound();
-    }
+// ── OG Metadata dinámica por invitación ─────────────────────────
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const invitation = await getInvitation(slug);
 
-    const temaColores = typeof invitation.temaColores === 'string'
-        ? JSON.parse(invitation.temaColores)
-        : invitation.temaColores;
-    const colorPrincipal = temaColores?.colorPrincipal || '#2563eb';
+  if (!invitation) {
+    return { title: "Invitación no encontrada · Convite" };
+  }
 
-    return (
-        <EditModeProvider>
-            <div className="min-h-screen bg-background">
-                {/* Hero Section */}
-                <HeroSection
-                    nombreEvento={invitation.nombreEvento}
-                    tipo={invitation.tipo}
-                    nombreNovia={invitation.nombreNovia}
-                    nombreNovio={invitation.nombreNovio}
-                    nombreQuinceanera={invitation.nombreQuinceanera}
-                    fechaEvento={invitation.fechaEvento}
-                    colorPrincipal={colorPrincipal}
-                    imagenPortada={invitation.portadaImagenFondo}
-                    imagenPosX={invitation.portadaImagenPosX || 50}
-                    imagenPosY={invitation.portadaImagenPosY || 50}
-                    imagenEscala={invitation.portadaImagenEscala || 100}
-                    invitationId={invitation.id}
-                />
+  const eventTitle = getEventTitle(invitation);
+  const fecha = new Date(invitation.fechaEvento).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const description = `${eventTitle} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ""}. Confirmá tu asistencia.`;
 
-            {/* Música de fondo (si existe) */}
-            {invitation.musicaUrl && (
-                <audio autoPlay loop>
-                    <source src={invitation.musicaUrl} type="audio/mpeg" />
-                </audio>
-            )}
+  const ogImage = invitation.portadaImagenFondo
+    ? [{ url: invitation.portadaImagenFondo, width: 1200, height: 630, alt: eventTitle }]
+    : undefined;
 
-            {/* Countdown */}
-            <div id="countdown">
-                <Countdown targetDate={new Date(invitation.fechaEvento)} />
-            </div>
+  return {
+    title: `${eventTitle} · Convite`,
+    description,
+    openGraph: {
+      title: eventTitle,
+      description,
+      type: "website",
+      locale: "es_AR",
+      siteName: "Convite",
+      images: ogImage,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: eventTitle,
+      description,
+      images: ogImage?.map((i) => i.url),
+    },
+  };
+}
 
-            {/* Event Details */}
-            {invitation.lugarNombre && invitation.direccion && (
-                <EventDetails
-                    lugarNombre={invitation.lugarNombre}
-                    direccion={invitation.direccion}
-                    fecha={new Date(invitation.fechaEvento)}
-                    hora={invitation.hora || "Por confirmar"}
-                    mapUrl={invitation.mapUrl || undefined}
-                />
-            )}
+// ── Página principal ─────────────────────────────────────────────
+export default async function InvitationPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const invitation = await getInvitation(slug);
 
-            {/* Photo Gallery */}
-            {invitation.album && (
-                <PhotoGallery
-                    albumId={invitation.album.id}
-                    photos={invitation.album.fotos}
-                />
-            )}
+  if (!invitation) notFound();
 
-            {/* RSVP Form */}
-            <RSVPForm invitationId={invitation.id} />
-
-            {/* Footer */}
-            <footer className="py-8 text-center text-sm text-muted-foreground border-t">
-                <p>Creado con ❤️ usando InvitaDigital</p>
-            </footer>
-
-            {/* Edit Mode Toggle Button */}
-            <EditModeToggle />
-        </div>
-        </EditModeProvider>
-    );
+  // Usar el nuevo ConviteTemplate para todas las invitaciones
+  // Las invitaciones existentes con templates viejos se migran automáticamente
+  return (
+    <ConviteTemplate
+      invitation={invitation as Record<string, unknown>}
+      guest={null}
+      isPersonalized={false}
+    />
+  );
 }

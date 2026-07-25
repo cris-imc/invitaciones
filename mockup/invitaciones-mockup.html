@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convite — Maquetado de invitación digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-display:'Fraunces', serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'Space Mono', monospace;
+  --radius-s:10px;
+  --radius-m:18px;
+  --radius-l:28px;
+}
+
+/* ---------- Theme: Boda ---------- */
+[data-theme="boda"]{
+  --ink:#122019;
+  --ink-2:#1c2f26;
+  --paper:#F7F1E4;
+  --paper-2:#EFE6D2;
+  --accent:#B98B3E;      /* dorado envejecido */
+  --accent-2:#5C2333;    /* vino profundo */
+  --muted:#7C8C74;       /* salvia */
+  --on-ink:#F7F1E4;
+  --on-paper:#1B2A24;
+  --hair:rgba(185,139,62,.35);
+}
+
+/* ---------- Theme: XV años ---------- */
+[data-theme="xv"]{
+  --ink:#241221;
+  --ink-2:#33162d;
+  --paper:#FBF0E9;
+  --paper-2:#F5E3D6;
+  --accent:#C98A4B;      /* ambar */
+  --accent-2:#9B3B52;    /* frambuesa */
+  --muted:#C98A4B;
+  --on-ink:#FBF0E9;
+  --on-paper:#2B141F;
+  --hair:rgba(155,59,82,.35);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:#0d0d0d;
+  font-family:var(--font-body);
+  color:#eee;
+  min-height:100vh;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+}
+
+/* ============ App chrome (not part of the deliverable design, just the demo shell) ============ */
+.app-shell{
+  max-width:1280px;
+  margin:0 auto;
+  padding:20px 16px 64px;
+}
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+  padding:12px 14px;
+  background:#161616;
+  border:1px solid #2a2a2a;
+  border-radius:16px;
+}
+.control-group{display:flex; gap:8px; flex-wrap:wrap;}
+.chip{
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:600;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid #333;
+  background:#000;
+  color:#aaa;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.chip.active{
+  background:#fff;
+  color:#000;
+  border-color:#fff;
+}
+.label-mini{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#777;
+  margin-right:4px;
+  align-self:center;
+}
+.stage{
+  display:flex;
+  gap:28px;
+  align-items:flex-start;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* ============ Phone frame ============ */
+.phone{
+  width:390px;
+  max-width:100%;
+  background:#000;
+  border-radius:44px;
+  padding:14px;
+  box-shadow:0 30px 60px rgba(0,0,0,.5);
+  flex-shrink:0;
+}
+.phone-notch{
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.phone-notch::before{
+  content:'';
+  width:110px;height:16px;
+  background:#000;
+  border-radius:12px;
+}
+.phone-screen{
+  height:780px;
+  overflow-y:auto;
+  border-radius:30px;
+  background:var(--paper);
+  scrollbar-width:none;
+  position:relative;
+}
+.phone-screen::-webkit-scrollbar{display:none;}
+
+/* ============ INVITATION TEMPLATE ============ */
+.tpl{color:var(--on-paper);}
+
+.hero{
+  position:relative;
+  min-height:560px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:28px 26px 34px;
+  background:
+    linear-gradient(180deg, rgba(18,32,25,.15) 0%, rgba(18,32,25,.75) 100%),
+    radial-gradient(120% 90% at 30% 15%, var(--ink-2), var(--ink) 70%);
+  color:var(--on-ink);
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.05) 0, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,.04) 0, transparent 45%);
+}
+.seal{
+  width:64px; height:64px;
+  border-radius:50%;
+  border:1.5px solid var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:22px;
+  position:relative;
+  animation:sealIn 900ms cubic-bezier(.2,.8,.2,1) both;
+}
+.seal span{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:20px;
+  color:var(--accent);
+}
+@keyframes sealIn{
+  0%{transform:scale(.4) rotate(-14deg); opacity:0;}
+  100%{transform:scale(1) rotate(0deg); opacity:1;}
+}
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 10px;
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:44px;
+  line-height:1.04;
+  margin:0 0 14px;
+}
+.hero h1 em{
+  font-style:italic;
+  font-weight:500;
+  color:var(--accent);
+}
+.hero p.date{
+  font-family:var(--font-mono);
+  font-size:13px;
+  color:var(--on-ink);
+  opacity:.8;
+  margin:0;
+}
+.scroll-cue{
+  position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+  width:1px; height:26px; background:var(--accent);
+  opacity:.6;
+}
+
+.section{
+  padding:40px 26px;
+  border-bottom:1px solid var(--hair);
+}
+.section.dark{background:var(--ink); color:var(--on-ink);}
+.kicker{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent-2);
+  margin:0 0 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.kicker::before{content:''; width:18px; height:1px; background:var(--accent-2);}
+.section.dark .kicker{color:var(--accent);}
+.section.dark .kicker::before{background:var(--accent);}
+h2{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:26px;
+  margin:0 0 12px;
+}
+
+/* countdown */
+.countdown{
+  display:flex; gap:10px; margin-top:18px;
+}
+.cd-box{
+  flex:1;
+  background:var(--paper-2);
+  border-radius:var(--radius-s);
+  text-align:center;
+  padding:12px 4px;
+}
+.section.dark .cd-box{background:rgba(255,255,255,.06);}
+.cd-num{
+  font-family:var(--font-mono); font-weight:700; font-size:22px; display:block;
+}
+.cd-label{font-size:9px; text-transform:uppercase; letter-spacing:.08em; opacity:.6;}
+
+.quote{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:19px;
+  line-height:1.5;
+  margin:0;
+}
+
+/* detail cards */
+.detail-card{
+  background:var(--paper-2);
+  border-radius:var(--radius-m);
+  padding:18px;
+  margin-bottom:12px;
+}
+.detail-card h3{
+  font-family:var(--font-display);
+  font-size:18px;
+  margin:0 0 4px;
+}
+.detail-card p{margin:0 0 12px; font-size:13.5px; line-height:1.5; opacity:.85;}
+.btn{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-body); font-weight:600; font-size:12.5px;
+  padding:9px 16px; border-radius:999px;
+  border:1px solid var(--on-paper); color:var(--on-paper);
+  background:transparent; cursor:pointer; text-decoration:none;
+}
+.btn.solid{background:var(--accent-2); color:var(--on-ink); border-color:var(--accent-2);}
+
+/* form */
+.field{margin-bottom:12px;}
+.field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.6; margin-bottom:6px;}
+.field input, .field select{
+  width:100%; padding:12px 14px; border-radius:var(--radius-s);
+  border:1px solid rgba(0,0,0,.15); background:var(--paper);
+  font-family:var(--font-body); font-size:14px; color:var(--on-paper);
+}
+.stepper{display:flex; align-items:center; gap:14px;}
+.stepper button{
+  width:34px; height:34px; border-radius:50%; border:1px solid var(--on-paper);
+  background:transparent; font-size:16px; cursor:pointer;
+}
+.stepper .n{font-family:var(--font-mono); font-weight:700; font-size:16px; min-width:20px; text-align:center;}
+
+/* payment badge */
+.pay-info{
+  border-radius:var(--radius-m);
+  padding:16px 18px;
+  margin-top:16px;
+  display:flex; gap:12px; align-items:flex-start;
+}
+.pay-info.pending{background:rgba(185,139,62,.15); border:1px dashed var(--accent);}
+.pay-info.paid{background:rgba(124,140,116,.18); border:1px solid var(--muted);}
+.pay-info .dot{width:8px; height:8px; border-radius:50%; margin-top:5px; flex-shrink:0;}
+.pending .dot{background:var(--accent);}
+.paid .dot{background:var(--muted);}
+.pay-info p{margin:0; font-size:13px; line-height:1.5;}
+.pay-info strong{display:block; font-size:13.5px; margin-bottom:2px;}
+
+/* songs */
+.song-input-row{display:flex; gap:8px; margin-top:14px;}
+.song-input-row input{flex:1;}
+.song-list{margin-top:16px; display:flex; flex-direction:column; gap:8px;}
+.song-item{
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--paper-2); border-radius:var(--radius-s); padding:11px 14px;
+}
+.section.dark .song-item{background:rgba(255,255,255,.06);}
+.song-item .meta{font-size:13px;}
+.song-item .meta b{display:block; font-size:13.5px;}
+.song-item .meta span{opacity:.6; font-size:11.5px;}
+.vote{
+  display:flex; align-items:center; gap:5px;
+  font-family:var(--font-mono); font-size:12px;
+  background:none; border:1px solid var(--accent-2); color:var(--accent-2);
+  border-radius:999px; padding:5px 10px; cursor:pointer;
+}
+.section.dark .vote{border-color:var(--accent); color:var(--accent);}
+
+footer.tpl-footer{
+  padding:30px 26px 40px;
+  text-align:center;
+  background:var(--ink); color:var(--on-ink);
+}
+footer.tpl-footer .monogram{
+  font-family:var(--font-display); font-style:italic; font-size:22px; color:var(--accent);
+  margin-bottom:6px;
+}
+footer.tpl-footer small{font-size:11px; opacity:.55;}
+
+/* bottom nav pill */
+.bottom-nav{
+  position:sticky; bottom:10px; margin:0 16px;
+  display:flex; justify-content:space-around;
+  background:rgba(18,32,25,.92);
+  backdrop-filter:blur(6px);
+  border-radius:999px;
+  padding:10px 6px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.bottom-nav a{
+  color:var(--on-ink); opacity:.65; text-decoration:none;
+  font-size:9.5px; text-transform:uppercase; letter-spacing:.04em;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.bottom-nav a b{font-size:15px; opacity:1;}
+
+/* ============ ADMIN PANEL ============ */
+.admin-wrap{
+  width:640px;
+  max-width:100%;
+  background:#fff;
+  border-radius:var(--radius-l);
+  overflow:hidden;
+  color:#1c1c1c;
+  box-shadow:0 30px 60px rgba(0,0,0,.5);
+}
+.admin-head{
+  background:var(--ink); color:var(--on-ink);
+  padding:24px 26px;
+}
+.admin-head .eyebrow{color:var(--accent); margin-bottom:6px;}
+.admin-head h2{color:var(--on-ink); font-size:22px; margin:0 0 4px;}
+.admin-head p{margin:0; font-size:13px; opacity:.7;}
+
+.stat-row{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid #eee;
+}
+.stat{
+  padding:16px 12px; text-align:center; border-right:1px solid #eee;
+}
+.stat:last-child{border-right:none;}
+.stat b{display:block; font-family:var(--font-mono); font-size:20px;}
+.stat span{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:#888;}
+
+.admin-body{padding:20px 22px 26px;}
+.admin-section-title{
+  font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:#999;
+  margin:18px 0 10px;
+}
+.guest-row{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid #f0f0f0;
+}
+.guest-name{font-weight:600; font-size:14px;}
+.guest-sub{font-size:11.5px; color:#888;}
+.status-toggle{
+  display:flex; border-radius:999px; overflow:hidden; border:1px solid #ddd; flex-shrink:0;
+}
+.status-toggle button{
+  border:none; background:#fafafa; padding:6px 10px; font-size:11px; font-weight:600;
+  cursor:pointer; color:#999; font-family:var(--font-body);
+}
+.status-toggle button.on-pending.active{background:var(--accent); color:#fff;}
+.status-toggle button.on-exempt.active{background:#8b8b8b; color:#fff;}
+.status-toggle button.on-paid.active{background:var(--muted); color:#fff;}
+
+.mod-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 0; border-bottom:1px solid #f0f0f0; gap:10px;
+}
+.mod-meta b{font-size:13.5px; display:block;}
+.mod-meta span{font-size:11px; color:#888;}
+.mod-actions{display:flex; gap:6px;}
+.mod-actions button{
+  border:1px solid #ddd; background:#fff; border-radius:8px; padding:6px 9px; font-size:12px; cursor:pointer;
+}
+.mod-actions button.approve{color:var(--muted); border-color:var(--muted);}
+.mod-actions button.reject{color:var(--accent-2); border-color:var(--accent-2);}
+
+.hint{
+  font-size:11.5px; color:#999; margin-top:10px; line-height:1.5;
+}
+@media (max-width:820px){
+  .stage{flex-direction:column; align-items:center;}
+}
+</style>
+</head>
+<body data-theme="boda">
+
+<div class="app-shell">
+  <div class="controls">
+    <div class="control-group">
+      <span class="label-mini">Evento</span>
+      <button class="chip active" data-theme-btn="boda">Boda</button>
+      <button class="chip" data-theme-btn="xv">XV años</button>
+    </div>
+    <div class="control-group">
+      <span class="label-mini">Vista</span>
+      <button class="chip active" data-view-btn="guest">Invitación (invitado)</button>
+      <button class="chip" data-view-btn="admin">Panel del anfitrión</button>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- ======= GUEST VIEW ======= -->
+    <div id="view-guest">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="tpl">
+
+            <section class="hero">
+              <div class="seal"><span id="monogram">M&G</span></div>
+              <p class="eyebrow" id="eyebrow-text">Nos casamos</p>
+              <h1 id="hero-title">Martina <em>&</em> Gonzalo</h1>
+              <p class="date" id="hero-date">14 · 03 · 2027 — Córdoba, Argentina</p>
+              <div class="scroll-cue"></div>
+            </section>
+
+            <section class="section">
+              <p class="kicker">Cuenta regresiva</p>
+              <h2 id="cd-title">Faltan poquitas semanas</h2>
+              <div class="countdown">
+                <div class="cd-box"><span class="cd-num">62</span><span class="cd-label">días</span></div>
+                <div class="cd-box"><span class="cd-num">14</span><span class="cd-label">hs</span></div>
+                <div class="cd-box"><span class="cd-num">32</span><span class="cd-label">min</span></div>
+              </div>
+            </section>
+
+            <section class="section dark">
+              <p class="kicker">Nuestra historia</p>
+              <p class="quote" id="quote-text">"Once nos cruzamos por accidente. El resto fue elección, todos los días, uno del otro."</p>
+            </section>
+
+            <section class="section">
+              <p class="kicker">Cuándo y dónde</p>
+              <h2>Los esperamos</h2>
+              <div class="detail-card">
+                <h3 id="d1-title">Ceremonia</h3>
+                <p id="d1-sub">18:30 hs · Capilla Santa Catalina</p>
+                <a class="btn" href="#">Ver mapa ↗</a>
+              </div>
+              <div class="detail-card">
+                <h3 id="d2-title">Fiesta</h3>
+                <p id="d2-sub">20:30 hs · Estancia Los Alamos</p>
+                <a class="btn" href="#">Ver mapa ↗</a>
+              </div>
+            </section>
+
+            <section class="section dark">
+              <p class="kicker">Confirmá tu asistencia</p>
+              <h2>¿Vas a venir?</h2>
+              <div class="field">
+                <label>Nombre y apellido</label>
+                <input type="text" placeholder="Familia Garabal" value="Familia Garabal">
+              </div>
+              <div class="field">
+                <label>¿Cuántos asisten?</label>
+                <div class="stepper">
+                  <button aria-label="Restar">–</button>
+                  <span class="n">3</span>
+                  <button aria-label="Sumar">+</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Restricción alimentaria (opcional)</label>
+                <input type="text" placeholder="Ej: vegetariano, celíaco...">
+              </div>
+              <button class="btn solid" style="width:100%; justify-content:center; padding:13px;">Confirmar asistencia</button>
+
+              <div class="pay-info pending">
+                <div class="dot"></div>
+                <p><strong>Valor de tarjeta: $18.000 por persona</strong>
+                Podés abonar por transferencia (alias: martiygon.boda) o efectivo el día del evento. Apenas lo recibamos, vas a ver acá la confirmación. 💛</p>
+              </div>
+            </section>
+
+            <section class="section">
+              <p class="kicker">Sugerí una canción</p>
+              <h2>Que no falte en la pista</h2>
+              <p style="font-size:13.5px; opacity:.75; margin:0 0 6px;">Dejanos el tema que no puede faltar esa noche.</p>
+              <div class="song-input-row">
+                <input type="text" placeholder="Canción — artista">
+                <button class="btn solid">Enviar</button>
+              </div>
+              <div class="song-list">
+                <div class="song-item">
+                  <div class="meta"><b>La Bilirrubina</b><span>Juan Luis Guerra · sugerida por Fam. Ríos</span></div>
+                  <button class="vote">♥ 12</button>
+                </div>
+                <div class="song-item">
+                  <div class="meta"><b>September</b><span>Earth, Wind & Fire · sugerida por Caro</span></div>
+                  <button class="vote">♥ 9</button>
+                </div>
+                <div class="song-item">
+                  <div class="meta"><b>Amigos son los Amigos</b><span>Ricardo Montaner · sugerida por Tíos</span></div>
+                  <button class="vote">♥ 6</button>
+                </div>
+              </div>
+            </section>
+
+            <footer class="tpl-footer">
+              <div class="monogram">M & G</div>
+              <small>Con cariño, gracias por ser parte de este día</small>
+            </footer>
+
+            <div class="bottom-nav">
+              <a href="#"><b>◈</b>Detalles</a>
+              <a href="#"><b>✓</b>Confirmar</a>
+              <a href="#"><b>♪</b>Música</a>
+              <a href="#"><b>◎</b>Ubicación</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= ADMIN VIEW ======= -->
+    <div id="view-admin" style="display:none;">
+      <div class="admin-wrap">
+        <div class="admin-head">
+          <p class="eyebrow">Panel del anfitrión</p>
+          <h2>Martina & Gonzalo</h2>
+          <p>62 invitaciones enviadas · actualizado en tiempo real</p>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><b>48</b><span>Confirmados</span></div>
+          <div class="stat"><b>31</b><span>Pagaron</span></div>
+          <div class="stat"><b>9</b><span>Pendientes</span></div>
+          <div class="stat"><b>8</b><span>Exentos</span></div>
+        </div>
+        <div class="admin-body">
+          <p class="admin-section-title">Invitados · estado de tarjeta</p>
+
+          <div class="guest-row">
+            <div><div class="guest-name">Familia Garabal</div><div class="guest-sub">3 personas confirmadas</div></div>
+            <div class="status-toggle" data-guest="garabal">
+              <button class="on-pending" data-set="pending">Pendiente</button>
+              <button class="on-exempt" data-set="exempt">Exento</button>
+              <button class="on-paid active" data-set="paid">Pagado</button>
+            </div>
+          </div>
+
+          <div class="guest-row">
+            <div><div class="guest-name">Caro Fernández</div><div class="guest-sub">1 persona confirmada</div></div>
+            <div class="status-toggle" data-guest="caro">
+              <button class="on-pending active" data-set="pending">Pendiente</button>
+              <button class="on-exempt" data-set="exempt">Exento</button>
+              <button class="on-paid" data-set="paid">Pagado</button>
+            </div>
+          </div>
+
+          <div class="guest-row">
+            <div><div class="guest-name">Tíos (padrinos)</div><div class="guest-sub">2 personas confirmadas</div></div>
+            <div class="status-toggle" data-guest="tios">
+              <button class="on-pending" data-set="pending">Pendiente</button>
+              <button class="on-exempt active" data-set="exempt">Exento</button>
+              <button class="on-paid" data-set="paid">Pagado</button>
+            </div>
+          </div>
+
+          <p class="hint">Tocá un estado para cambiarlo. El invitado ve reflejado el cambio automáticamente en su invitación — nunca puede modificarlo él mismo.</p>
+
+          <p class="admin-section-title">Canciones sugeridas · moderación</p>
+
+          <div class="mod-row">
+            <div class="mod-meta"><b>La Bilirrubina — Juan Luis Guerra</b><span>Fam. Ríos · 12 votos</span></div>
+            <div class="mod-actions"><button class="approve">✓ Aprobar</button><button class="reject">✕ Ocultar</button></div>
+          </div>
+          <div class="mod-row">
+            <div class="mod-meta"><b>September — Earth, Wind & Fire</b><span>Caro · 9 votos</span></div>
+            <div class="mod-actions"><button class="approve">✓ Aprobar</button><button class="reject">✕ Ocultar</button></div>
+          </div>
+          <div class="mod-row">
+            <div class="mod-meta"><b>Tema repetido (duplicado)</b><span>Anónimo · 1 voto</span></div>
+            <div class="mod-actions"><button class="approve">✓ Aprobar</button><button class="reject">✕ Ocultar</button></div>
+          </div>
+
+          <p class="hint">Exportar lista final para el DJ (.pdf / .xlsx) — botón disponible arriba a la derecha del panel completo.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const themeBtns = document.querySelectorAll('[data-theme-btn]');
+const viewBtns = document.querySelectorAll('[data-view-btn]');
+const body = document.body;
+
+const themeContent = {
+  boda:{
+    monogram:'M&G', eyebrow:'Nos casamos', title:'Martina <em>&</em> Gonzalo',
+    date:'14 · 03 · 2027 — Córdoba, Argentina', cdTitle:'Faltan poquitas semanas',
+    quote:'"Once nos cruzamos por accidente. El resto fue elección, todos los días, uno del otro."',
+    d1t:'Ceremonia', d1s:'18:30 hs · Capilla Santa Catalina',
+    d2t:'Fiesta', d2s:'20:30 hs · Estancia Los Alamos'
+  },
+  xv:{
+    monogram:'V', eyebrow:'Mis quince años', title:'Valentina',
+    date:'22 · 08 · 2026 — Córdoba, Argentina', cdTitle:'La cuenta regresiva ya empezó',
+    quote:'"Gracias por acompañarme a cerrar esta etapa y celebrar la que empieza."',
+    d1t:'Ceremonia', d1s:'19:00 hs · Parroquia San José',
+    d2t:'Fiesta', d2s:'21:00 hs · Salón Jardín del Sol'
+  }
+};
+
+function applyTheme(t){
+  body.setAttribute('data-theme', t);
+  const c = themeContent[t];
+  document.getElementById('monogram').textContent = c.monogram;
+  document.getElementById('eyebrow-text').textContent = c.eyebrow;
+  document.getElementById('hero-title').innerHTML = c.title;
+  document.getElementById('hero-date').textContent = c.date;
+  document.getElementById('cd-title').textContent = c.cdTitle;
+  document.getElementById('quote-text').textContent = c.quote;
+  document.getElementById('d1-title').textContent = c.d1t;
+  document.getElementById('d1-sub').textContent = c.d1s;
+  document.getElementById('d2-title').textContent = c.d2t;
+  document.getElementById('d2-sub').textContent = c.d2s;
+}
+
+themeBtns.forEach(b=>b.addEventListener('click', ()=>{
+  themeBtns.forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  applyTheme(b.dataset.themeBtn);
+}));
+
+viewBtns.forEach(b=>b.addEventListener('click', ()=>{
+  viewBtns.forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  const v = b.dataset.viewBtn;
+  document.getElementById('view-guest').style.display = v==='guest' ? 'block':'none';
+  document.getElementById('view-admin').style.display = v==='admin' ? 'block':'none';
+}));
+
+// status toggle interactivity
+document.querySelectorAll('.status-toggle').forEach(group=>{
+  group.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      group.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+});
+
+// vote buttons
+document.querySelectorAll('.vote').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const n = parseInt(btn.textContent.replace('♥',''));
+    btn.textContent = '♥ ' + (n+1);
+  });
+});
+</script>
+
+</body>
+</html>

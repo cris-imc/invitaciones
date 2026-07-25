@@ -1,229 +1,707 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ================================================
+   CONVITE — DESIGN TOKENS
+   Sistema centralizado. Todo el UI bebe de aquí.
+   ================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* --------------------------------------------------
+   1. TOKENS GLOBALES (UI del producto: dashboard, landing)
+   -------------------------------------------------- */
 :root {
-  /* Variables del dashboard/sistema (para la app, no la invitación) */
-  --background: #fdfbf7;
-  --foreground: #2a2a2a;
-  --card: #ffffff;
-  --card-foreground: #2a2a2a;
-  --popover: #ffffff;
-  --popover-foreground: #2a2a2a;
-  --primary: #d4af37;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f1ea;
-  --secondary-foreground: #2a2a2a;
-  --muted: #f4f1ea;
-  --muted-foreground: #888888;
-  --accent: #f9f7f2;
-  --accent-foreground: #2a2a2a;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #f2f2f2;
-  --input: #f2f2f2;
-  --ring: #d4af37;
-  --radius: 0.5rem;
-  --font-serif: var(--font-playfair);
-  --font-sans: var(--font-lato);
-  
-  /* Variables de tema para invitaciones (valores por defecto) */
-  /* Estas serán sobrescritas por el ThemeProvider */
-  --color-primary: #d4af37;
-  --color-primary-rgb: 212, 175, 55;
-  --color-bg: #ffffff;
-  --color-text-dark: #1a1a1a;
-  --color-text-light: #ffffff;
-  --color-text-secondary: #666666;
-  
-  --font-primary: 'Poppins', sans-serif;
-  --font-light: 300;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  
-  --text-xs: 11px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 20px;
-  --text-xl: 24px;
-  --text-2xl: 32px;
-  --text-3xl: 48px;
-  --text-4xl: 64px;
-  
+  /* Tipografía del sistema */
+  --font-display: 'Fraunces', serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+
+  /* Las fuentes legacy del dashboard */
+  --font-serif: var(--font-display);
+  --font-sans:  var(--font-body);
+
+  /* ── Escala tipográfica fluid (mobile → desktop) ── */
+  --text-eyebrow: clamp(10px, 2.5vw, 11px);
+  --text-caption:  clamp(11px, 2.8vw, 12px);
+  --text-sm:       clamp(12px, 3vw, 13.5px);
+  --text-body:     clamp(13.5px, 3.5vw, 15px);
+  --text-body-lg:  clamp(15px, 4vw, 17px);
+  --text-h3:       clamp(17px, 4.5vw, 20px);
+  --text-h2:       clamp(22px, 6vw, 28px);
+  --text-h1:       clamp(32px, 9vw, 52px);
+  --text-display:  clamp(40px, 11vw, 64px);
+
+  /* Compatibilidad con sistema viejo */
+  --text-xs: 10px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 36px;
+  --text-4xl: 42px;
+
+  /* ── Spacing ── */
+  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px; --sp-20: 80px;
+  --sp-section: clamp(40px, 10vw, 80px);
+
+  /* Compatibilidad con sistema viejo */
   --letter-spacing-tight: 0.02em;
   --letter-spacing-normal: 0.05em;
   --letter-spacing-wide: 0.1em;
   --letter-spacing-wider: 0.15em;
-  
   --line-height-tight: 1.1;
   --line-height-snug: 1.3;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.7;
-  --line-height-loose: 1.8;
-  
-  --section-spacing: 100px;
-  --section-padding: 50px;
-  --element-spacing: 25px;
-}
+  --section-spacing: 80px;
+  --section-padding: 24px;
+  --element-spacing: 20px;
 
-.dark {
-  --background: #1a1a1a;
-  --foreground: #fdfbf7;
-  --card: #2a2a2a;
-  --card-foreground: #fdfbf7;
-  --popover: #2a2a2a;
-  --popover-foreground: #fdfbf7;
-  --primary: #d4af37;
+  /* ── Border radius ── */
+  --radius-xs: 6px;
+  --radius-s:  10px;
+  --radius-m:  18px;
+  --radius-l:  28px;
+  --radius-pill: 999px;
+  --radius: 0.5rem; /* compat shadcn */
+
+  /* ── Easing & duración ── */
+  --ease-out:    cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:   120ms;
+  --dur-normal: 280ms;
+  --dur-slow:   500ms;
+  --dur-xslow:  900ms;
+
+  /* ── Sombras ── */
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.06);
+  --shadow-card:  0 2px 12px rgba(0,0,0,.07);
+  --shadow-float: 0 10px 30px rgba(0,0,0,.14);
+  --shadow-nav:   0 10px 30px rgba(0,0,0,.35);
+
+  /* ── Colores del dashboard (Tailwind/ShadCN compat) ── */
+  --background:         #fdfbf7;
+  --foreground:         #2a2a2a;
+  --card:               #ffffff;
+  --card-foreground:    #2a2a2a;
+  --popover:            #ffffff;
+  --popover-foreground: #2a2a2a;
+  --primary:            #B98B3E;
   --primary-foreground: #ffffff;
-  --secondary: #333333;
+  --secondary:          #f4f1ea;
+  --secondary-foreground: #2a2a2a;
+  --muted:              #f4f1ea;
+  --muted-foreground:   #888888;
+  --accent:             #f9f7f2;
+  --accent-foreground:  #2a2a2a;
+  --destructive:        #ef4444;
+  --destructive-foreground: #ffffff;
+  --border:             #ece9e2;
+  --input:              #ece9e2;
+  --ring:               #B98B3E;
+
+  /* ── Tokens de invitación (overrideados por [data-theme]) ── */
+  --ink:       #122019;
+  --ink-2:     #1c2f26;
+  --paper:     #F7F1E4;
+  --paper-2:   #EFE6D2;
+  --c-accent:  #B98B3E;
+  --c-accent-2:#5C2333;
+  --c-muted:   #7C8C74;
+  --on-ink:    #F7F1E4;
+  --on-paper:  #1B2A24;
+  --hair:      rgba(185,139,62,.25);
+
+  /* compat con sistema viejo de invitaciones */
+  --color-primary:        #B98B3E;
+  --color-primary-rgb:    185, 139, 62;
+  --color-bg:             #F7F1E4;
+  --color-text-dark:      #1B2A24;
+  --color-text-light:     #F7F1E4;
+  --color-text-secondary: #7C8C74;
+  --font-primary: 'Inter', sans-serif;
+}
+
+/* --------------------------------------------------
+   2. TEMAS DE INVITACIÓN
+   -------------------------------------------------- */
+
+/* ── BODA: Dorado envejecido × Vino profundo ── */
+[data-theme="boda"] {
+  --ink:       #122019;
+  --ink-2:     #1c2f26;
+  --paper:     #F7F1E4;
+  --paper-2:   #EFE6D2;
+  --c-accent:  #B98B3E;   /* dorado envejecido */
+  --c-accent-2:#5C2333;   /* vino profundo */
+  --c-muted:   #7C8C74;   /* salvia */
+  --on-ink:    #F7F1E4;
+  --on-paper:  #1B2A24;
+  --hair:      rgba(185,139,62,.22);
+  /* compat */
+  --color-primary: #B98B3E;
+  --color-primary-rgb: 185, 139, 62;
+  --color-bg: #F7F1E4;
+  --color-text-dark: #1B2A24;
+  --color-text-secondary: #7C8C74;
+}
+
+/* ── XV AÑOS: Ámbar × Frambuesa ── */
+[data-theme="xv"] {
+  --ink:       #241221;
+  --ink-2:     #33162d;
+  --paper:     #FBF0E9;
+  --paper-2:   #F5E3D6;
+  --c-accent:  #C98A4B;   /* ámbar */
+  --c-accent-2:#9B3B52;   /* frambuesa */
+  --c-muted:   #B87A6A;   /* terracota suave */
+  --on-ink:    #FBF0E9;
+  --on-paper:  #2B141F;
+  --hair:      rgba(155,59,82,.22);
+  /* compat */
+  --color-primary: #C98A4B;
+  --color-primary-rgb: 201, 138, 75;
+  --color-bg: #FBF0E9;
+  --color-text-dark: #2B141F;
+  --color-text-secondary: #B87A6A;
+}
+
+/* ── GENERAL / CUMPLEAÑOS: Terracota × Ciruela ── */
+[data-theme="general"] {
+  --ink:       #1a1a2e;
+  --ink-2:     #16213e;
+  --paper:     #F8F5EE;
+  --paper-2:   #EDE9DF;
+  --c-accent:  #C47D52;   /* terracota cálida */
+  --c-accent-2:#7D4E8F;   /* ciruela */
+  --c-muted:   #8A9B8E;   /* salvia gris */
+  --on-ink:    #F8F5EE;
+  --on-paper:  #1a1a2e;
+  --hair:      rgba(196,125,82,.22);
+  /* compat */
+  --color-primary: #C47D52;
+  --color-primary-rgb: 196, 125, 82;
+  --color-bg: #F8F5EE;
+  --color-text-dark: #1a1a2e;
+  --color-text-secondary: #8A9B8E;
+}
+
+/* --------------------------------------------------
+   3. MODO OSCURO — Dashboard
+   -------------------------------------------------- */
+.dark {
+  --background:         #1a1a1a;
+  --foreground:         #fdfbf7;
+  --card:               #242424;
+  --card-foreground:    #fdfbf7;
+  --popover:            #242424;
+  --popover-foreground: #fdfbf7;
+  --primary:            #B98B3E;
+  --primary-foreground: #ffffff;
+  --secondary:          #333333;
   --secondary-foreground: #fdfbf7;
-  --muted: #333333;
-  --muted-foreground: #a1a1aa;
-  --accent: #333333;
-  --accent-foreground: #fdfbf7;
-  --destructive: #7f1d1d;
+  --muted:              #2e2e2e;
+  --muted-foreground:   #a1a1aa;
+  --accent:             #2e2e2e;
+  --accent-foreground:  #fdfbf7;
+  --destructive:        #7f1d1d;
   --destructive-foreground: #fdfbf7;
-  --border: #333333;
-  --input: #333333;
-  --ring: #d4af37;
+  --border:             #333333;
+  --input:              #333333;
+  --ring:               #B98B3E;
 }
 
+/* --------------------------------------------------
+   4. TAILWIND @theme bridge
+   -------------------------------------------------- */
 @theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
+  --color-primary:            var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
+  --color-secondary:          var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-destructive:        var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+  --radius-lg:  var(--radius);
+  --radius-md:  calc(var(--radius) - 2px);
+  --radius-sm:  calc(var(--radius) - 4px);
   --font-serif: var(--font-serif);
-  --font-sans: var(--font-sans);
+  --font-sans:  var(--font-sans);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* --------------------------------------------------
+   5. BASE STYLES
+   -------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-.animate-fade-in {
-  animation: fadeIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
+  line-height: 1.1;
 }
 
-/* Estilos para invitaciones con sistema de tema dinámico */
-.invitation-theme-wrapper {
-  font-family: var(--font-primary);
-  background-color: var(--color-bg);
-  color: var(--color-text-dark);
+/* --------------------------------------------------
+   6. KEYFRAMES GLOBALES
+   -------------------------------------------------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Fuente elegante para nombres */
-.font-script-elegant {
-  font-family: 'Parisienne', cursive;
-  font-weight: 400;
+@keyframes sealIn {
+  0%   { transform: scale(.4) rotate(-14deg); opacity: 0; }
+  100% { transform: scale(1)  rotate(0deg);  opacity: 1; }
 }
 
-.font-script {
-  font-family: 'Great Vibes', cursive;
-  font-weight: 400;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Utilidades de tipografía para invitaciones */
+@keyframes pulseRing {
+  0%   { transform: scale(1);    opacity: .6; }
+  50%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1);    opacity: .6; }
+}
 
-/* Tipo de evento: "Nuestra Boda", "Mis XV Años" - Sans serif limpio */
-.invitation-event-type {
-  font-family: 'Montserrat', sans-serif;
-  font-size: var(--text-sm);
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
+}
+
+.animate-fade-in  { animation: fadeIn  var(--dur-slow) var(--ease-out) both; }
+.animate-slide-up { animation: slideUp var(--dur-slow) var(--ease-out) both; }
+.animate-seal-in  { animation: sealIn  var(--dur-xslow) var(--ease-out) both; }
+
+/* --------------------------------------------------
+   7. INVITATION WRAPPER — tema dinámico
+   -------------------------------------------------- */
+.invitation-wrapper {
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--on-paper);
+  min-height: 100dvh;
+}
+
+/* ── Eyebrow ── */
+.inv-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.inv-eyebrow::before {
+  content: '';
+  width: 18px; height: 1px;
+  background: var(--c-accent);
+  flex-shrink: 0;
+}
+
+/* ── Heading display (nombres, h1 hero) ── */
+.inv-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-display);
+  line-height: 1.04;
+}
+.inv-display em {
+  font-style: italic;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: inherit;
-  opacity: 0.9;
+  color: var(--c-accent);
 }
 
-/* Nombres de festejados - Script elegante y grande */
-.invitation-names {
-  font-family: 'Parisienne', cursive;
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  font-weight: 400;
-  line-height: 1.2;
-  color: inherit;
+/* ── Section heading ── */
+.inv-h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-h2);
+  margin: 0 0 var(--sp-3);
 }
 
-/* Fecha en hero */
-.invitation-date-hero {
-  font-family: 'Montserrat', sans-serif;
+/* ── Body text ── */
+.inv-body {
+  font-size: var(--text-body);
+  line-height: 1.6;
+  opacity: .85;
+}
+
+/* ── Date / mono label ── */
+.inv-mono {
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
-  font-weight: 400;
+  letter-spacing: .06em;
+}
+
+/* ── Sección base ── */
+.inv-section {
+  padding: var(--sp-section) var(--sp-6);
+  border-bottom: 1px solid var(--hair);
+}
+.inv-section.dark {
+  background: var(--ink);
+  color: var(--on-ink);
+  border-bottom-color: rgba(255,255,255,.08);
+}
+
+/* ── Card ── */
+.inv-card {
+  background: var(--paper-2);
+  border-radius: var(--radius-m);
+  padding: var(--sp-5);
+  margin-bottom: var(--sp-3);
+}
+.inv-section.dark .inv-card {
+  background: rgba(255,255,255,.06);
+}
+
+/* ── Botón primario ── */
+.inv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  padding: 13px var(--sp-6);
+  border-radius: var(--radius-pill);
+  background: var(--c-accent-2);
+  color: var(--on-ink);
+  border: none;
+  cursor: pointer;
+  transition: all var(--dur-normal) var(--ease-out);
+  min-height: 44px;
+  letter-spacing: .02em;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.inv-btn:hover   { filter: brightness(1.08); transform: translateY(-1px); }
+.inv-btn:active  { transform: translateY(0); }
+.inv-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ── Botón ghost ── */
+.inv-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  padding: 9px var(--sp-4);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--on-paper);
+  border: 1px solid currentColor;
+  cursor: pointer;
+  transition: all var(--dur-normal) var(--ease-out);
+  min-height: 44px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.inv-section.dark .inv-btn-ghost { color: var(--on-ink); }
+.inv-btn-ghost:hover { background: rgba(0,0,0,.05); }
+.inv-btn-ghost:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ── Countdown boxes ── */
+.inv-cd {
+  display: flex;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+.inv-cd-box {
+  flex: 1;
+  background: var(--paper-2);
+  border-radius: var(--radius-s);
+  text-align: center;
+  padding: var(--sp-3) var(--sp-1);
+}
+.inv-section.dark .inv-cd-box { background: rgba(255,255,255,.07); }
+.inv-cd-num {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(20px, 6vw, 26px);
+  display: block;
+  line-height: 1;
+  color: var(--c-accent);
+}
+.inv-cd-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: inherit;
-  opacity: 0.85;
+  letter-spacing: .08em;
+  opacity: .55;
+  margin-top: 4px;
+  display: block;
 }
 
-.invitation-title-main {
-  font-size: var(--text-4xl);
-  font-weight: var(--font-bold);
-  color: var(--color-primary);
-  letter-spacing: var(--letter-spacing-wide);
-  line-height: var(--line-height-tight);
-  text-align: center;
-  margin-bottom: 1rem;
+/* ── Seal / monograma ── */
+.inv-seal {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-accent);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--sp-6);
+  animation: sealIn var(--dur-xslow) var(--ease-out) both;
+}
+.inv-seal span {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--c-accent);
 }
 
-.invitation-title-section {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-light);
-  letter-spacing: var(--letter-spacing-wider);
-  line-height: var(--line-height-snug);
+/* ── Payment badge ── */
+.inv-pay {
+  border-radius: var(--radius-m);
+  padding: var(--sp-4) var(--sp-5);
+  margin-top: var(--sp-4);
+  display: flex; gap: var(--sp-3); align-items: flex-start;
+}
+.inv-pay.pending {
+  background: rgba(var(--color-primary-rgb), .12);
+  border: 1px dashed var(--c-accent);
+}
+.inv-pay.paid {
+  background: rgba(124, 140, 116, .15);
+  border: 1px solid var(--c-muted);
+}
+.inv-pay.exempt {
+  background: rgba(124, 140, 116, .10);
+  border: 1px solid var(--c-muted);
+}
+.inv-pay-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 5px; flex-shrink: 0;
+}
+.pending .inv-pay-dot { background: var(--c-accent); }
+.paid    .inv-pay-dot { background: var(--c-muted); }
+.exempt  .inv-pay-dot { background: var(--c-muted); }
+
+/* ── Song row ── */
+.inv-song-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--paper-2);
+  border-radius: var(--radius-s);
+  padding: 11px var(--sp-4);
+  gap: var(--sp-3);
+}
+.inv-section.dark .inv-song-item { background: rgba(255,255,255,.06); }
+.inv-vote-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono); font-size: 12px;
+  background: none;
+  border: 1px solid var(--c-accent-2);
+  color: var(--c-accent-2);
+  border-radius: var(--radius-pill);
+  padding: 5px 10px;
+  cursor: pointer;
+  min-height: 44px; min-width: 44px;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.inv-section.dark .inv-vote-btn {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+.inv-vote-btn:hover { background: rgba(var(--color-primary-rgb), .1); }
+.inv-vote-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+/* ── Bottom Nav Pill ── */
+.inv-bottom-nav {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 380px;
+  display: flex;
+  justify-content: space-around;
+  background: rgba(18, 32, 25, .92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-pill);
+  padding: 10px 6px;
+  box-shadow: var(--shadow-nav);
+  z-index: 100;
+}
+.inv-nav-item {
+  color: var(--on-ink);
+  opacity: .6;
+  text-decoration: none;
+  font-size: 9.5px;
   text-transform: uppercase;
+  letter-spacing: .04em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  border-radius: var(--radius-s);
+  transition: opacity var(--dur-fast);
+  min-width: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+.inv-nav-item svg { width: 18px; height: 18px; }
+.inv-nav-item.active, .inv-nav-item:hover { opacity: 1; }
+.inv-nav-item:focus-visible { outline: 2px solid var(--c-accent); opacity: 1; }
+
+/* ── Form fields ── */
+.inv-field { margin-bottom: var(--sp-3); }
+.inv-label {
+  display: block;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  opacity: .6;
+  margin-bottom: var(--sp-2);
+  font-family: var(--font-body);
+}
+.inv-input {
+  width: 100%;
+  padding: 12px var(--sp-4);
+  border-radius: var(--radius-s);
+  border: 1px solid rgba(0,0,0,.14);
+  background: var(--paper);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--on-paper);
+  transition: border-color var(--dur-fast);
+  min-height: 44px;
+}
+.inv-section.dark .inv-input {
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.15);
+  color: var(--on-ink);
+}
+.inv-input:focus {
+  outline: none;
+  border-color: var(--c-accent);
+}
+.inv-input::placeholder { opacity: .45; }
+
+/* ── Stepper ── */
+.inv-stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.inv-stepper button {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--on-paper);
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--dur-fast);
+}
+.inv-section.dark .inv-stepper button { border-color: var(--on-ink); color: var(--on-ink); }
+.inv-stepper button:hover { background: rgba(0,0,0,.06); }
+.inv-stepper button:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.inv-stepper-n {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 24px;
+  min-width: 32px;
   text-align: center;
 }
 
-.invitation-subtitle {
-  font-size: var(--text-lg);
-  font-weight: var(--font-medium);
-  color: var(--color-primary);
-  letter-spacing: var(--letter-spacing-wide);
-  line-height: var(--line-height-snug);
-  text-align: center;
+/* ── Status toggle (admin) ── */
+.inv-status-toggle {
+  display: flex;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  border: 1px solid #ddd;
+  flex-shrink: 0;
+}
+.inv-status-btn {
+  border: none;
+  background: #fafafa;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #999;
+  font-family: var(--font-body);
+  transition: all var(--dur-fast);
+  min-height: 44px;
+}
+.inv-status-btn.active-pending  { background: var(--c-accent);   color: #fff; }
+.inv-status-btn.active-exempt   { background: #8b8b8b;            color: #fff; }
+.inv-status-btn.active-paid     { background: #5a8a6e;            color: #fff; }
+
+/* ── Scroll reveal utility ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
 }
 
-.invitation-text {
-  font-size: var(--text-base);
-  font-weight: var(--font-normal);
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-relaxed);
-  text-align: center;
-}
-
+/* --------------------------------------------------
+   8. LEGACY COMPAT — clases del sistema viejo
+   -------------------------------------------------- */
+.invitation-theme-wrapper  { font-family: var(--font-body); }
+.font-script-elegant       { font-family: var(--font-display); font-style: italic; }
+.font-script               { font-family: var(--font-display); font-style: italic; }
+.invitation-event-type     { font-family: var(--font-body); font-size: var(--text-eyebrow); text-transform: uppercase; letter-spacing: .3em; }
+.invitation-names          { font-family: var(--font-display); font-size: clamp(2.5rem, 8vw, 5rem); line-height: 1.2; }
+.invitation-date-hero      { font-family: var(--font-mono); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: .2em; }
+.invitation-title-main     { font-size: var(--text-h1); font-weight: 600; color: var(--color-primary); }
+.invitation-title-section  { font-size: var(--text-h3); font-weight: 600; text-transform: uppercase; }
+.invitation-subtitle       { font-size: var(--text-h3); color: var(--color-primary); }
+.invitation-text           { font-size: var(--text-body); line-height: 1.6; }
 .invitation-button {
   background: transparent;
   border: 2px solid var(--color-primary);
@@ -231,39 +709,19 @@ h1, h2, h3, h4, h5, h6 {
   padding: 14px 32px;
   border-radius: 30px;
   font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
+  font-weight: 600;
   letter-spacing: var(--letter-spacing-wide);
   text-transform: uppercase;
-  transition: all 0.3s ease;
+  transition: all var(--dur-normal) ease;
   cursor: pointer;
   text-align: center;
   display: inline-block;
   text-decoration: none;
+  min-height: 44px;
 }
-
 .invitation-button:hover {
   background: var(--color-primary);
   color: var(--color-text-light);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.3);
 }
-
-.invitation-section {
-  padding: var(--section-spacing) var(--section-padding);
-}
-
-@media (max-width: 767px) {
-  :root {
-    --text-xs: 10px;
-    --text-sm: 12px;
-    --text-base: 14px;
-    --text-lg: 16px;
-    --text-xl: 20px;
-    --text-2xl: 24px;
-    --text-3xl: 36px;
-    --text-4xl: 42px;
-    --section-spacing: 60px;
-    --section-padding: 24px;
-    --element-spacing: 16px;
-  }
-}
+.invitation-section { padding: var(--section-spacing) var(--section-padding); }

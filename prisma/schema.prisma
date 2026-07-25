@@ -229,10 +229,11 @@ model Invitation {
   despedidaFoto       String?
 
   // Relaciones
-  album        Album?
-  rsvps        RSVP[] // Legacy open RSVPs
-  guests       Guest[] // New Invite-only Guest list
-  cuestionario Cuestionario?
+  album           Album?
+  rsvps           RSVP[] // Legacy open RSVPs
+  guests          Guest[] // New Invite-only Guest list
+  cuestionario    Cuestionario?
+  songSuggestions SongSuggestion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -253,9 +254,20 @@ model Guest {
   attendingCount Int       @default(0) // Actual number attending
   message        String? // Optional message to host
   responseDate   DateTime?
+  dietaryRestrictions String? // Restricciones alimentarias
+
+  // Estado de pago de tarjeta (controlado SOLO por el anfitrión)
+  paymentStatus          String    @default("PENDING") // PENDING, EXEMPT, PAID
+  paymentStatusUpdatedAt DateTime?
+  paymentStatusUpdatedBy String?   // userId del anfitrión que hizo el cambio
+
+  songSuggestions SongSuggestion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([invitationId])
+  @@index([uniqueToken])
 }
 
 model Album {
@@ -315,4 +327,26 @@ model QuizResponse {
 
   @@index([invitationId])
   @@index([guestToken])
+}
+
+// Sugerencias de canciones por invitados
+model SongSuggestion {
+  id           String     @id @default(cuid())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  guestId      String?    // null si es RSVP abierto (no personalizado)
+  guest        Guest?     @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  guestToken   String?    // Token del invitado personalizado
+  guestName    String     // Nombre libre del invitado
+
+  title        String     // Nombre de la canción
+  artist       String     // Artista
+  votes        Int        @default(0)
+  status       String     @default("PENDING") // PENDING, APPROVED, HIDDEN
+
+  createdAt    DateTime   @default(now())
+
+  @@index([invitationId])
+  @@index([invitationId, status])
 }
