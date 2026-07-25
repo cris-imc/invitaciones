@@ -84,7 +84,7 @@ export function StepTrivia() {
                 {data.triviaHabilitada && (
                     <>
                         {/* Configuración básica */}
-                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                        <div className="space-y-4 border border-[var(--ink-2)] p-4 rounded-lg bg-[var(--ink-2)]">
                             <div className="space-y-2">
                                 <Label htmlFor="triviaIcono">Icono (emoji)</Label>
                                 <Input
@@ -125,7 +125,7 @@ export function StepTrivia() {
                                     {preguntas.map((q, index) => (
                                         <div
                                             key={index}
-                                            className="flex items-start justify-between p-3 bg-white border rounded-lg"
+                                            className="flex items-start justify-between p-3 bg-[var(--ink)] border border-[var(--ink-2)] rounded-lg"
                                         >
                                             <div className="flex-1">
                                                 <p className="font-medium">{index + 1}. {q.pregunta}</p>
@@ -155,8 +155,8 @@ export function StepTrivia() {
                         )}
 
                         {/* Formulario para nueva pregunta */}
-                        <div className="border p-4 rounded-lg space-y-4 bg-blue-50">
-                            <h3 className="font-semibold">Agregar nueva pregunta</h3>
+                        <div className="border border-[var(--ink-2)] p-4 rounded-lg space-y-4 bg-yellow-500/10">
+                            <h3 className="font-semibold text-yellow-500">Agregar nueva pregunta</h3>
 
                             <div className="space-y-2">
                                 <Label htmlFor="pregunta">Pregunta</Label>

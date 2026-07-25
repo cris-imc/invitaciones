@@ -12,7 +12,7 @@ import { TemplateLoadingFallback } from "./TemplateLoadingFallback";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 
 export function StepPreview() {
-    const { data, themeConfig, prevStep } = useWizardStore();
+    const { data, themeConfig, prevStep, usePremiumCredit } = useWizardStore();
     const [isCreating, setIsCreating] = useState(false);
 
     const handleCreate = async () => {
@@ -33,6 +33,7 @@ export function StepPreview() {
                 musicaHabilitada: data.musicaHabilitada,
                 triviaHabilitada: data.triviaHabilitada,
                 triviaPreguntas: data.triviaPreguntas,
+                usePremiumCredit: usePremiumCredit,
             };
 
             console.log('Datos enviados:', payload);
@@ -46,7 +47,7 @@ export function StepPreview() {
             console.log('Respuesta de servidor:', responseData);
 
             if (!response.ok) {
-                throw new Error(responseData.details || 'Error al crear invitación');
+                throw new Error(responseData.error || responseData.details || 'Error al crear invitación');
             }
 
             const invitation = responseData;

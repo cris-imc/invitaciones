@@ -6,8 +6,10 @@ interface WizardState {
     currentStep: number;
     data: Partial<InvitationFormData>;
     themeConfig: ThemeConfig;
+    usePremiumCredit: boolean;
     setData: (data: Partial<InvitationFormData>) => void;
     setThemeConfig: (config: Partial<ThemeConfig>) => void;
+    setUsePremiumCredit: (usePremiumCredit: boolean) => void;
     nextStep: () => void;
     prevStep: () => void;
     setStep: (step: number) => void;
@@ -48,12 +50,14 @@ export const useWizardStore = create<WizardState>((set) => ({
         rsvpDaysBeforeEvent: 7, // Default 7 days before event
     },
     themeConfig: DEFAULT_THEME_CONFIG,
+    usePremiumCredit: false,
     setData: (newData) => set((state) => ({
         data: { ...state.data, ...newData }
     })),
     setThemeConfig: (config) => set((state) => ({
         themeConfig: { ...state.themeConfig, ...config }
     })),
+    setUsePremiumCredit: (usePremiumCredit) => set({ usePremiumCredit }),
     nextStep: () => set((state) => ({
         currentStep: state.currentStep + 1
     })),
@@ -72,9 +76,16 @@ export const useWizardStore = create<WizardState>((set) => ({
                 { time: "21:00", title: "Cena", icon: "Utensils" },
                 { time: "23:00", title: "Fiesta", icon: "Music" }
             ]),
-            rsvpDaysBeforeEvent: 7
+            rsvpDaysBeforeEvent: 7,
+            
+            // Booleans Defaults
+            frasePersonalizadaHabilitada: false,
+            regaloHabilitado: false,
+            triviaHabilitada: false,
+            albumCompartidoHabilitado: true,
         },
-        themeConfig: DEFAULT_THEME_CONFIG
+        themeConfig: DEFAULT_THEME_CONFIG,
+        usePremiumCredit: false
     }),
 }));
 

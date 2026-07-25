@@ -74,19 +74,34 @@ export default function ImageCropper({
 
             <div className="bg-black/80 p-6 space-y-6 backdrop-blur-md">
                 <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-gray-400">
+                    <div className="flex justify-between items-center text-xs text-gray-400 mb-2">
                         <span>Zoom</span>
                         <span>{zoom.toFixed(1)}x</span>
                     </div>
-                    <input
-                        type="range"
-                        min={1}
-                        max={3}
-                        step={0.1}
-                        value={zoom}
-                        onChange={(e) => setZoom(parseFloat(e.target.value))}
-                        className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"
-                    />
+                    <div className="flex items-center gap-4">
+                        <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="w-10 h-10 rounded-full border-white/20 text-white hover:bg-white/10 flex-shrink-0"
+                            onClick={() => setZoom(Math.max(1, zoom - 0.2))}
+                        >
+                            -
+                        </Button>
+                        <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden relative">
+                            <div 
+                                className="absolute top-0 left-0 h-full bg-white transition-all" 
+                                style={{ width: `${((zoom - 1) / 2) * 100}%` }}
+                            />
+                        </div>
+                        <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="w-10 h-10 rounded-full border-white/20 text-white hover:bg-white/10 flex-shrink-0"
+                            onClick={() => setZoom(Math.min(3, zoom + 0.2))}
+                        >
+                            +
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="flex gap-3">

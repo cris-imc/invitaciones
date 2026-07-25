@@ -44,15 +44,15 @@ export function StepEventType() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
-                                        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                                        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
                                     >
                                         <FormItem>
                                             <FormControl>
                                                 <RadioGroupItem value="CASAMIENTO" className="peer sr-only" />
                                             </FormControl>
-                                            <FormLabel className="flex flex-col items-center justify-between rounded-md bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer shadow-sm peer-data-[state=checked]:bg-primary/10 transition-all">
-                                                <CalendarHeart className="mb-3 h-8 w-8 text-primary" />
-                                                <span className="text-lg font-semibold">Casamiento</span>
+                                            <FormLabel className="flex flex-col items-center justify-center text-center h-full min-h-[120px] rounded-xl bg-[var(--ink-2)] border border-[var(--ink-2)] p-4 hover:border-[var(--paper)]/50 cursor-pointer shadow-sm peer-data-[state=checked]:border-[var(--paper)] transition-all">
+                                                <CalendarHeart className="mb-3 h-8 w-8 text-[var(--accent)]" />
+                                                <span className="text-sm font-semibold">Casamiento</span>
                                             </FormLabel>
                                         </FormItem>
 
@@ -60,9 +60,9 @@ export function StepEventType() {
                                             <FormControl>
                                                 <RadioGroupItem value="QUINCE_ANOS" className="peer sr-only" />
                                             </FormControl>
-                                            <FormLabel className="flex flex-col items-center justify-between rounded-md bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer shadow-sm peer-data-[state=checked]:bg-primary/10 transition-all">
+                                            <FormLabel className="flex flex-col items-center justify-center text-center h-full min-h-[120px] rounded-xl bg-[var(--ink-2)] border border-[var(--ink-2)] p-4 hover:border-[var(--paper)]/50 cursor-pointer shadow-sm peer-data-[state=checked]:border-[var(--paper)] transition-all">
                                                 <Crown className="mb-3 h-8 w-8 text-pink-500" />
-                                                <span className="text-lg font-semibold">15 Años</span>
+                                                <span className="text-sm font-semibold">15 Años</span>
                                             </FormLabel>
                                         </FormItem>
 
@@ -70,9 +70,9 @@ export function StepEventType() {
                                             <FormControl>
                                                 <RadioGroupItem value="CUMPLEANOS" className="peer sr-only" />
                                             </FormControl>
-                                            <FormLabel className="flex flex-col items-center justify-between rounded-md bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer shadow-sm peer-data-[state=checked]:bg-primary/10 transition-all">
+                                            <FormLabel className="flex flex-col items-center justify-center text-center h-full min-h-[120px] rounded-xl bg-[var(--ink-2)] border border-[var(--ink-2)] p-4 hover:border-[var(--paper)]/50 cursor-pointer shadow-sm peer-data-[state=checked]:border-[var(--paper)] transition-all">
                                                 <PartyPopper className="mb-3 h-8 w-8 text-yellow-500" />
-                                                <span className="text-lg font-semibold">Cumpleaños</span>
+                                                <span className="text-sm font-semibold">Evento</span>
                                             </FormLabel>
                                         </FormItem>
                                     </RadioGroup>

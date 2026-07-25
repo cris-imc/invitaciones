@@ -7,6 +7,8 @@ import {
 import { Plus, Calendar } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { InvitationCard } from "@/components/dashboard/InvitationCard";
+import { DeleteInvitationButton } from "@/components/dashboard/DeleteInvitationButton";
+import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
 
 import { auth } from "@/auth";
@@ -16,6 +18,11 @@ async function getInvitations() {
     const session = await auth().catch(() => null);
     if (!session?.user || !session.user.id) redirect("/login");
     const userId = session.user.id;
+    
+    const dbUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { premiumCredits: true }
+    });
     
     const invitationsData = await prisma.invitation.findMany({
         where: { userId },
@@ -38,24 +45,29 @@ async function getInvitations() {
             guests: inv.guests.reduce((sum, g) => sum + (g.attendingCount || 0), 0)
         }
     }));
+    const totalPremiumUsadas = invitations.filter((i) => i.planTier === "PREMIUM").length;
 
-    return invitations;
+    return { invitations, dbUser, totalPremiumUsadas };
 }
 
 export default async function InvitacionesPage() {
-    const invitations = await getInvitations();
+    const { invitations, dbUser, totalPremiumUsadas } = await getInvitations();
+    const totalPremiumCompradas = totalPremiumUsadas + (dbUser?.premiumCredits || 0);
     return (
         <>
             <div className="p-topbar">
                 <div>
                     <h2>Mis Invitaciones</h2>
-                    <p>Gestiona tus eventos y monitorea las confirmaciones.</p>
+                    <p>
+                        Gestiona tus eventos y monitorea las confirmaciones.
+                        {dbUser && (
+                            <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
+                                Invitaciones Premium: {totalPremiumUsadas} en uso | {dbUser.premiumCredits || 0} disponibles.
+                            </span>
+                        )}
+                    </p>
                 </div>
-                <Link href="/dashboard/invitaciones/crear">
-                    <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
-                        + Nueva Invitación
-                    </Button>
-                </Link>
+                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} />
             </div>
 
             <div className="flex flex-col">
@@ -106,6 +118,7 @@ export default async function InvitacionesPage() {
                                       Premium
                                     </div>
                                   )}
+                                  <DeleteInvitationButton invitationId={inv.id} />
                                   <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go !ml-0">
                                       Administrar →
                                   </Link>
@@ -116,11 +129,7 @@ export default async function InvitacionesPage() {
                 ) : (
                     <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
                         <p className="text-muted-foreground mb-4 font-ui">No tienes invitaciones. Comienza creando tu primera invitación para un evento.</p>
-                        <Link href="/dashboard/invitaciones/crear">
-                            <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
-                                Crear Primera Invitación
-                            </Button>
-                        </Link>
+                        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} />
                     </div>
                 )}
             </div>

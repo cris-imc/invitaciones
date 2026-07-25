@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AdminDashboardClient } from "@/components/dashboard/AdminDashboardClient";
+import { DeleteInvitationButton } from "@/components/dashboard/DeleteInvitationButton";
+import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
 
 async function getDashboardStats(userId: string) {
@@ -45,6 +47,8 @@ async function getDashboardStats(userId: string) {
     totalSongsPending += inv.songSuggestions.length;
   }
 
+  const totalPremiumUsadas = invitations.filter((i) => i.planTier === "PREMIUM").length;
+
   return {
     totalInvitations,
     activeInvitations,
@@ -52,6 +56,7 @@ async function getDashboardStats(userId: string) {
     totalPaid,
     totalPending,
     totalSongsPending,
+    totalPremiumUsadas,
     recentInvitations: invitations.filter((i) => i.estado === "ACTIVA").slice(0, 3),
   };
 }
@@ -66,7 +71,7 @@ export default async function DashboardPage() {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: userId },
-    select: { planTier: true }
+    select: { planTier: true, premiumCredits: true }
   });
   const currentPlan = dbUser?.planTier || "FREE";
   const planName = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS]?.name || "Gratis";
@@ -137,13 +142,16 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-3 mb-1">
             <h2 className="m-0">Hola, {userName} 👋</h2>
           </div>
-          <p>Acá tenés el resumen de tus eventos en tiempo real.</p>
+          <p>
+            Acá tenés el resumen de tus eventos en tiempo real.
+            {dbUser && (
+              <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
+                Invitaciones Premium: {stats.totalPremiumUsadas} en uso | {dbUser.premiumCredits || 0} disponibles.
+              </span>
+            )}
+          </p>
         </div>
-        <Link href="/dashboard/invitaciones/crear">
-          <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
-            + Nueva invitación
-          </Button>
-        </Link>
+        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} />
       </div>
 
       {/* KPIs */}
@@ -213,6 +221,7 @@ export default async function DashboardPage() {
                       Premium
                     </div>
                   )}
+                  <DeleteInvitationButton invitationId={inv.id} />
                   <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go">
                     Administrar →
                   </Link>
@@ -223,11 +232,7 @@ export default async function DashboardPage() {
         ) : (
           <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
             <p className="text-muted-foreground mb-4 font-ui">Todavía no tenés invitaciones.</p>
-            <Link href="/dashboard/invitaciones/crear">
-              <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
-                Crear tu primera invitación
-              </Button>
-            </Link>
+            <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} />
           </div>
         )}
       </div>

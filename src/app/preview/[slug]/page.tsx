@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { ModernInvitationTemplate } from "@/components/templates/ModernInvitationTemplate";
+import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 
 export default async function PreviewPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -12,5 +12,5 @@ export default async function PreviewPage({ params }: { params: Promise<{ slug: 
         notFound();
     }
 
-    return <ModernInvitationTemplate invitation={invitation} />;
+    return <ConviteTemplate invitation={invitation as Record<string, unknown>} />;
 }

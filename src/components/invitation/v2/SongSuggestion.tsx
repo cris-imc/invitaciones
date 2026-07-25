@@ -111,8 +111,8 @@ export function SongSuggestion({
 
   return (
     <section className={sectionClass} id="songs">
-      <p className="kicker">{kicker}</p>
-      <h2 className="section-title">{title}</h2>
+      <p className="t-kicker">{kicker}</p>
+      <h2>{title}</h2>
       <p style={{ marginBottom: "var(--sp-5)" }}>
         Dejanos el tema que no puede faltar esa noche.
       </p>
@@ -149,9 +149,9 @@ export function SongSuggestion({
             )}
             <button
               type="submit"
-              className="btn solid"
+              className="t-btn"
               disabled={isSubmitting}
-              style={{ width: "100%", padding: "12px", marginTop: "4px" }}
+              style={{ background: "var(--t-onpaper)", color: "var(--t-paper)", border: "none", width: "100%", padding: "12px", marginTop: "4px" }}
             >
               {isSubmitting ? "Enviando…" : "Enviar sugerencia"}
             </button>
@@ -198,7 +198,7 @@ export function SongSuggestion({
                     </span>
                   </div>
                   <button
-                    className="badge"
+                    className="t-badge"
                     onClick={() => handleVote(song.id)}
                     disabled={alreadyVoted}
                     aria-label={`${alreadyVoted ? "Ya votaste" : "Votar"} "${song.title}" — ${song.votes} votos`}

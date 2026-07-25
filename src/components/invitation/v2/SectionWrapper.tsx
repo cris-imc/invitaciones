@@ -53,7 +53,7 @@ export function SectionWrapper({
   }, [delay]);
 
   const classes = [
-    "section",
+    "d-sec",
     dark ? "dark" : "",
     noBorder ? "border-b-0" : "",
     className,

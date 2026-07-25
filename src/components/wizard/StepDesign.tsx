@@ -39,19 +39,6 @@ export function StepDesign() {
                 eventType={data.type}
             />
 
-            {/* Hero Background Image */}
-            <div className="space-y-2">
-                <Label htmlFor="heroImagenFondo">Imagen de Portada Principal</Label>
-                <ImageUploader
-                    currentImage={data.portadaImagenFondo}
-                    onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
-                    aspectRatio={16 / 9}
-                />
-                <p className="text-xs text-muted-foreground">
-                    Esta imagen aparecerá en la primera pantalla de tu invitación.
-                </p>
-            </div>
-
             {/* Parallax-specific: Celebremos Juntos Image */}
             {selectedTemplate === "PARALLAX" && (
                 <div className="space-y-2 border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-r-lg">

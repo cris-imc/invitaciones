@@ -87,10 +87,11 @@ export function ImageUploader({ onImageUploaded, aspectRatio = 1, className, cur
             <div
                 {...getRootProps()}
                 className={cn(
-                    "relative border-2 border-dashed rounded-xl transition-all cursor-pointer overflow-hidden min-h-[200px] flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-slate-100",
+                    "relative border-2 border-dashed rounded-xl transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-slate-100",
                     isDragActive ? "border-primary bg-primary/5" : "border-slate-300",
-                    (currentImage && !isUploading) ? "border-solid border-slate-200 p-0" : "p-8"
+                    (currentImage && !isUploading) ? "border-solid border-slate-200 p-0" : "p-8 min-h-[200px]"
                 )}
+                style={(currentImage && !isUploading) ? { aspectRatio: aspectRatio } : undefined}
             >
                 <input {...getInputProps()} />
 
@@ -100,7 +101,7 @@ export function ImageUploader({ onImageUploaded, aspectRatio = 1, className, cur
                         <p className="text-sm text-muted-foreground">Procesando imagen...</p>
                     </div>
                 ) : currentImage ? (
-                    <div className="relative w-full h-full min-h-[200px] group">
+                    <div className="relative w-full h-full group">
                         <Image
                             src={currentImage}
                             alt="Preview"

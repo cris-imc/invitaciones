@@ -10,16 +10,31 @@ import { Switch } from "@/components/ui/switch";
 export function StepPhrase() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
 
+    const tipo = data.type || "OTRO";
+    const phraseHelp =
+        tipo === "CASAMIENTO"
+            ? "Una frase que refleje la historia de ustedes dos."
+            : tipo === "QUINCE_ANOS"
+            ? "Una frase que la quinceañera quiera compartir."
+            : "Una frase institucional o de bienvenida para el evento.";
+
+    const phrasePlaceholder =
+        tipo === "CASAMIENTO"
+            ? "Ej: 'Lo mejor de la vida es compartirla con quien amás...'"
+            : tipo === "QUINCE_ANOS"
+            ? "Ej: 'Este es el comienzo del resto de mi vida...'"
+            : "Ej: 'Bienvenidos a nuestra celebración. Gracias por estar aquí.'";
+
     return (
         <div className="space-y-6">
             <div className="text-center">
                 <h2 className="text-2xl font-bold mb-2">Frase Personalizada</h2>
                 <p className="text-muted-foreground">
-                    Agrega una frase especial que identifique el evento.
+                    {phraseHelp}
                 </p>
             </div>
 
-            <div className="space-y-4 bg-slate-50 p-4 rounded-lg border">
+            <div className="space-y-4 bg-[var(--ink-2)] border-[var(--ink-2)] p-4 rounded-lg border">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="enablePhrase" className="text-lg font-medium">
                         Habilitar Frase
@@ -37,13 +52,14 @@ export function StepPhrase() {
                             <Label htmlFor="phraseText">Tu Frase</Label>
                             <Textarea
                                 id="phraseText"
-                                placeholder="Ej: 'Lo mejor de la vida es compartirla con quienes amamos...'"
+                                placeholder={phrasePlaceholder}
                                 value={data.frasePersonalizadaTexto || ""}
                                 onChange={(e) => setData({ frasePersonalizadaTexto: e.target.value })}
                                 className="min-h-[100px] resize-none text-lg"
+                                maxLength={300}
                             />
                             <p className="text-xs text-muted-foreground text-right">
-                                {(data.frasePersonalizadaTexto || "").length}/200
+                                {(data.frasePersonalizadaTexto || "").length}/300
                             </p>
                         </div>
                     </div>

@@ -42,6 +42,14 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 portadaTitulo: true,
                 portadaTextoBoton: true,
                 portadaImagenFondo: true,
+                portadaImagenFondoDesktop: true,
+                portadaImagenPosX: true,
+                portadaImagenPosY: true,
+                portadaImagenEscala: true,
+                portadaImagenDesktopPosX: true,
+                portadaImagenDesktopPosY: true,
+                contadorHabilitado: true,
+                rsvpEnabled: true,
                 musicaHabilitada: true,
                 musicaUrl: true,
                 musicaAutoplay: true,
@@ -66,6 +74,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 regaloCbu: true,
                 regaloAlias: true,
                 regaloTitular: true,
+                regaloMonto: true,
                 triviaHabilitada: true,
                 triviaIcono: true,
                 triviaTitulo: true,
@@ -100,7 +109,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                         },
                     },
                 },
-            },
+            } as any,
         }),
         prisma.guest.findUnique({
             where: { uniqueToken: token },
@@ -115,6 +124,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 attendingCount: true,
                 message: true,
                 responseDate: true,
+                paymentStatus: true,
             },
         }),
     ]);
@@ -122,7 +132,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
     if (!invitation) return notFound();
 
     // Security check: Ensure token matches the invitation
-    if (!guest || guest.invitationId !== invitation.id) {
+    if (!guest || guest.invitationId !== String(invitation.id)) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
                 <h1 className="text-2xl font-bold mb-2">Enlace no válido</h1>

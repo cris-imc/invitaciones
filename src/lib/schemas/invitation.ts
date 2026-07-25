@@ -25,6 +25,7 @@ export const coverPageSchema = z.object({
     portadaTitulo: z.string().optional(),
     portadaTextoBoton: z.string().optional(),
     portadaImagenFondo: z.string().optional(),
+    portadaImagenFondoDesktop: z.string().optional(),
 });
 
 export const gallerySchema = z.object({
@@ -78,6 +79,7 @@ export const invitationSchema = z.object({
     regaloAlias: z.string().optional(),
     regaloBanco: z.string().optional(),
     regaloTitular: z.string().optional(),
+    regaloMonto: z.number().optional(),
 
     cronogramaEventos: z.string().optional(), // JSON string
 

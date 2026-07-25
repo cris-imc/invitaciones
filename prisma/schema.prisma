@@ -135,6 +135,7 @@ model Invitation {
   portadaTitulo         String?
   portadaTextoBoton     String?
   portadaImagenFondo    String?
+  portadaImagenFondoDesktop String?
   portadaImagenPosX          Int     @default(50)
   portadaImagenPosY          Int     @default(50)
   portadaImagenEscala        Int     @default(100)
@@ -197,6 +198,7 @@ model Invitation {
   regaloCbu          String?
   regaloBanco        String?
   regaloTitular      String?
+  regaloMonto        Float?  // Monto por persona (tarjeta)
 
   // 12. GALERÍA SECUNDARIA
   galeriaSecundariaHabilitada Boolean @default(false)

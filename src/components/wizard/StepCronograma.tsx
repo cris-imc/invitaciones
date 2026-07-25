@@ -69,7 +69,7 @@ export function StepCronograma() {
 
             <div className="space-y-4">
                 {events.map((event, index) => (
-                    <div key={index} className="p-4 border rounded-lg space-y-3 bg-white shadow-sm">
+                    <div key={index} className="p-4 border rounded-lg space-y-3 bg-[var(--ink-2)] shadow-sm">
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-muted-foreground">
                                 Evento #{index + 1}
@@ -87,7 +87,7 @@ export function StepCronograma() {
                             )}
                         </div>
 
-                        <div className="grid md:grid-cols-3 gap-3">
+                        <div className="grid md:grid-cols-[1fr_2fr_1.5fr] gap-3">
                             <div className="space-y-1">
                                 <Label>Hora</Label>
                                 <Input
@@ -111,21 +111,21 @@ export function StepCronograma() {
 
                             <div className="space-y-1">
                                 <Label>Icono</Label>
-                                <div className="grid grid-cols-4 gap-1 p-1 border rounded-md">
+                                <div className="grid grid-cols-4 gap-1 p-1 border border-white/10 rounded-xl bg-[var(--ink)]">
                                     {ICON_OPTIONS.map(({ value, Icon }) => (
                                         <button
                                             key={value}
                                             type="button"
                                             onClick={() => updateEvent(index, "icon", value)}
                                             className={`
-                                                p-2 rounded transition-all
+                                                p-2 rounded-lg transition-all flex items-center justify-center
                                                 ${event.icon === value
-                                                    ? 'bg-primary text-white'
-                                                    : 'hover:bg-gray-100'
+                                                    ? 'bg-accent text-accent-foreground'
+                                                    : 'hover:bg-white/5 text-muted-foreground'
                                                 }
                                             `}
                                         >
-                                            <Icon className="w-4 h-4 mx-auto" />
+                                            <Icon className="w-4 h-4" />
                                         </button>
                                     ))}
                                 </div>
@@ -145,8 +145,8 @@ export function StepCronograma() {
                 </Button>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+                <p className="text-sm text-yellow-500">
                     💡 <strong>Tip:</strong> El cronograma ayuda a tus invitados a planificar su llegada y saber qué esperar durante el evento.
                 </p>
             </div>

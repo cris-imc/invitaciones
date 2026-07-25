@@ -55,11 +55,11 @@ export function StepDetails() {
                         control={form.control}
                         name="direccion"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="flex flex-col justify-end">
                                 <FormLabel>Dirección Completa</FormLabel>
                                 <FormControl>
                                     <div className="relative">
-                                        <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                         <Input className="pl-9" placeholder="Calle 123, Ciudad" {...field} />
                                     </div>
                                 </FormControl>
@@ -73,11 +73,11 @@ export function StepDetails() {
                             control={form.control}
                             name="hora"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="flex flex-col justify-end">
                                     <FormLabel>Horario</FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                             <Input className="pl-9" type="time" {...field} />
                                         </div>
                                     </FormControl>
@@ -90,7 +90,7 @@ export function StepDetails() {
                             control={form.control}
                             name="mapUrl"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="flex flex-col justify-end">
                                     <FormLabel>Link de Google Maps (Opcional)</FormLabel>
                                     <FormControl>
                                         <Input placeholder="https://goo.gl/maps/..." {...field} />

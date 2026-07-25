@@ -19,7 +19,7 @@ export function StepBankDetails() {
                 </p>
             </div>
 
-            <div className="space-y-4 bg-slate-50 p-4 rounded-lg border">
+            <div className="space-y-4 bg-[var(--ink-2)] border-[var(--ink-2)] p-4 rounded-lg border">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="enableGift" className="text-lg font-medium">
                         Habilitar Sección de Regalo
@@ -64,7 +64,7 @@ export function StepBankDetails() {
                         </div>
 
                         {data.regaloMostrarDatos && (
-                            <div className="grid gap-4 p-4 border rounded-md bg-white">
+                            <div className="grid gap-4 p-4 border border-[var(--ink-2)] rounded-md bg-[var(--ink)]">
                                 <div className="space-y-2">
                                     <Label htmlFor="bankName">Banco</Label>
                                     <Input
@@ -100,6 +100,21 @@ export function StepBankDetails() {
                                         value={data.regaloTitular || ""}
                                         onChange={(e) => setData({ regaloTitular: e.target.value })}
                                     />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="regaloMonto">Monto de la tarjeta por persona (opcional)</Label>
+                                    <Input
+                                        id="regaloMonto"
+                                        type="number"
+                                        min={0}
+                                        step={100}
+                                        placeholder="Ej: 15000"
+                                        value={(data as any).regaloMonto || ""}
+                                        onChange={(e) => setData({ regaloMonto: e.target.value ? Number(e.target.value) : undefined } as any)}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Si cargás un monto, se mostrará en la invitación de cada invitado (salvo los que estén exentos de pago).
+                                    </p>
                                 </div>
                             </div>
                         )}

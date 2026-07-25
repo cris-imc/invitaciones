@@ -82,6 +82,60 @@ footer.tpl-footer small{font-size:11px; opacity:.55;}
 .bottom-nav a{color:var(--on-ink); opacity:.68; text-decoration:none; font-size:9.5px; text-transform:uppercase; letter-spacing:.03em; display:flex; flex-direction:column; align-items:center; gap:4px;}
 .bottom-nav a b{font-size:15px; opacity:1;}
 
+/* ---- carrusel de álbum ---- */
+.album-wrap{position:relative;}
+.album-track{display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:6px; -webkit-overflow-scrolling:touch; scrollbar-width:none;}
+.album-track::-webkit-scrollbar{display:none;}
+.album-item{flex:0 0 auto; width:200px; height:270px; border-radius:var(--radius-m); background-size:cover; background-position:center; scroll-snap-align:start; flex-shrink:0;}
+.album-nav{display:flex; gap:8px; margin-top:10px; justify-content:flex-end;}
+.album-btn{width:36px; height:36px; border-radius:50%; border:1px solid var(--hair); background:transparent; color:var(--on-paper); font-size:16px; cursor:pointer; line-height:1; transition:background 150ms;}
+.album-btn:hover{background:rgba(0,0,0,.08);}
+.section.dark .album-btn{border-color:rgba(255,255,255,.25); color:var(--on-ink);}
+.section.dark .album-btn:hover{background:rgba(255,255,255,.1);}
+
+/* ---- datos bancarios ---- */
+.bank-card{background:var(--paper-2); border-radius:var(--radius-m); padding:4px 20px;}
+.section.dark .bank-card{background:rgba(255,255,255,.06);}
+.bank-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid var(--hair);}
+.bank-row:last-child{border-bottom:none;}
+.bank-row label{display:block; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; opacity:.6; margin-bottom:4px; color:inherit;}
+.bank-row span{font-family:var(--font-mono); font-size:13.5px; font-weight:700; color:inherit; word-break:break-all;}
+.copy-btn{flex-shrink:0; font-family:var(--font-ui, 'Inter', sans-serif); font-size:12px; font-weight:600; padding:8px 14px; border-radius:999px; border:1px solid currentColor; background:transparent; color:inherit; cursor:pointer; transition:background 150ms, opacity 150ms;}
+.copy-btn:hover{opacity:.75;}
+.copy-btn.copied{opacity:.55;}
+
+/* ---- quiz progresivo ---- */
+.quiz-box{max-width:560px;}
+.quiz-q{margin-bottom:16px; animation:quizIn .35s ease both;}
+@keyframes quizIn{from{opacity:0; transform:translateY(6px);}to{opacity:1; transform:translateY(0);}}
+.quiz-q-text{font-family:var(--font-display); font-weight:700; font-size:15.5px; margin:0 0 10px; color:inherit;}
+.quiz-opts{display:flex; flex-wrap:wrap; gap:8px;}
+.quiz-opt{font-family:var(--font-body, 'Inter', sans-serif); padding:9px 14px; border-radius:999px; border:1px solid var(--hair); background:var(--paper-2); font-size:13px; cursor:pointer; color:var(--on-paper); transition:background 120ms;}
+.quiz-opt:hover:not(:disabled){background:rgba(0,0,0,.07);}
+.section.dark .quiz-opt{background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); color:var(--on-ink);}
+.section.dark .quiz-opt:hover:not(:disabled){background:rgba(255,255,255,.14);}
+.quiz-opt.picked{background:var(--accent-2); border-color:var(--accent-2); color:var(--on-ink);}
+.quiz-opt:disabled{cursor:default; opacity:.55;}
+.quiz-opt.picked:disabled{opacity:1;}
+.quiz-done{font-family:var(--font-display); font-weight:700; font-size:16px; padding:8px 0; color:inherit;}
+
+/* ---- cronograma ---- */
+.cronograma-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-top:16px;}
+.crono-card{background:var(--paper-2); border-radius:var(--radius-m); padding:17px 18px;}
+.section.dark .crono-card{background:rgba(255,255,255,.07);}
+.crono-icon{font-size:20px; margin-bottom:8px;}
+.crono-time{font-family:var(--font-mono); font-size:11px; opacity:.6; margin:0 0 4px;}
+.crono-title{font-family:var(--font-display); font-weight:700; font-size:16px; margin:0; color:inherit;}
+
+/* ---- countdown pasado ---- */
+.cd-past{text-align:center; padding:20px 0;}
+.cd-past-emoji{font-size:40px; display:block; margin-bottom:8px;}
+.cd-past-text{font-family:var(--font-display); font-weight:700; font-size:22px; color:var(--accent); margin:0;}
+
+/* ---- desktop 2 cols grid ---- */
+.d-cols-2{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;}
+.d-cols-2 .detail-card{margin-bottom:0;}
+
 /* ================= THEMES ================= */
 [data-theme="boda"]{
   --font-display:var(--font-fraunces), serif; --font-body:var(--font-inter), sans-serif;

@@ -135,6 +135,30 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         console.log('DEBUG: POST /api/invitations body:', JSON.stringify(body, null, 2));
 
+        let invitationPlanTier = 'FREE';
+
+        if (body.usePremiumCredit) {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { premiumCredits: true }
+            });
+
+            if (!user || user.premiumCredits <= 0) {
+                return NextResponse.json(
+                    { error: 'No tienes créditos premium disponibles' },
+                    { status: 403 }
+                );
+            }
+
+            // Descontar 1 crédito
+            await prisma.user.update({
+                where: { id: userId },
+                data: { premiumCredits: { decrement: 1 } }
+            });
+
+            invitationPlanTier = 'PREMIUM';
+        }
+
         // Generar slug único
         const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
 
@@ -156,7 +180,7 @@ export async function POST(request: NextRequest) {
         const invitation = await prisma.invitation.create({
             data: {
                 userId,
-                planTier: 'FREE', // Todas las invitaciones nacen en plan Gratis
+                planTier: invitationPlanTier, // Asignar el plan correspondiente
                 tipo: body.type || 'CASAMIENTO',
                 estado: 'ACTIVA',
                 slug,
@@ -194,6 +218,13 @@ export async function POST(request: NextRequest) {
                 portadaTitulo: body.portadaTitulo,
                 portadaTextoBoton: body.portadaTextoBoton,
                 portadaImagenFondo: body.portadaImagenFondo,
+                portadaImagenFondoDesktop: body.portadaImagenFondoDesktop,
+                portadaImagenPosX: body.portadaImagenPosX,
+                portadaImagenPosY: body.portadaImagenPosY,
+                portadaImagenEscala: body.portadaImagenEscala,
+                portadaImagenDesktopPosX: body.portadaImagenDesktopPosX,
+                portadaImagenDesktopPosY: body.portadaImagenDesktopPosY,
+                portadaImagenDesktopEscala: body.portadaImagenDesktopEscala,
 
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada !== undefined ? body.galeriaPrincipalHabilitada : true,
@@ -212,6 +243,7 @@ export async function POST(request: NextRequest) {
                 regaloAlias: body.regaloAlias,
                 regaloBanco: body.regaloBanco,
                 regaloTitular: body.regaloTitular,
+                regaloMonto: body.regaloMonto ?? null,
 
                 // 2. MÚSICA
                 musicaHabilitada: body.musicaHabilitada !== undefined ? body.musicaHabilitada : false,
@@ -329,6 +361,13 @@ export async function PUT(request: NextRequest) {
                 portadaTitulo: body.portadaTitulo,
                 portadaTextoBoton: body.portadaTextoBoton,
                 portadaImagenFondo: body.portadaImagenFondo,
+                portadaImagenFondoDesktop: body.portadaImagenFondoDesktop,
+                portadaImagenPosX: body.portadaImagenPosX,
+                portadaImagenPosY: body.portadaImagenPosY,
+                portadaImagenEscala: body.portadaImagenEscala,
+                portadaImagenDesktopPosX: body.portadaImagenDesktopPosX,
+                portadaImagenDesktopPosY: body.portadaImagenDesktopPosY,
+                portadaImagenDesktopEscala: body.portadaImagenDesktopEscala,
 
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada,
@@ -347,6 +386,7 @@ export async function PUT(request: NextRequest) {
                 regaloAlias: body.regaloAlias,
                 regaloBanco: body.regaloBanco,
                 regaloTitular: body.regaloTitular,
+                regaloMonto: body.regaloMonto ?? null,
 
 
                 // 2. MÚSICA

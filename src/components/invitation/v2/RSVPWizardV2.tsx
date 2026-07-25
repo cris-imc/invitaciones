@@ -57,220 +57,208 @@ export function RSVPWizardV2({
   const [paymentStatus] = useState<PaymentStatus>(initialPaymentStatus);
 
   const sectionClass = `section${dark ? " dark" : ""}`;
-
   const totalPayment = (paymentAmount ?? 0) * count;
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
 
-  if (step === "decision") {
-    return (
-      <section className={sectionClass} id="rsvp">
-        <p className="kicker">Confirmá tu asistencia</p>
-        <h2 className="section-title">¿Vas a venir?</h2>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-3)", marginTop: "var(--sp-6)" }}>
+  const renderContent = () => {
+    if (step === "decision") {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-3)" }}>
           <button
-            className="btn solid"
+            className="t-btn"
             onClick={() => setStep("details")}
-            style={{ width: "100%", fontSize: "15px", padding: "16px" }}
+            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px" }}
             aria-label="Confirmar asistencia"
           >
             ✓ Sí, voy a estar
           </button>
           <button
-            className="btn"
+            className="t-btn"
             onClick={() => handleDecline()}
-            style={{ width: "100%" }}
+            style={{ width: "100%", justifyContent: "center", background: "transparent" }}
             aria-label="Declinar invitación"
           >
             No puedo ir esta vez
           </button>
         </div>
-      </section>
-    );
-  }
+      );
+    }
 
-  // ── PASO 2: Detalles ──────────────────────────────────────────
-  if (step === "details") {
-    return (
-      <section className={sectionClass} id="rsvp">
-        <p className="kicker">Paso 2 de 3</p>
-        <h2 className="section-title">¿Cuántos van?</h2>
+    if (step === "details") {
+      return (
+        <div>
+          <p className="t-kicker" style={{ margin: "0 0 12px 0" }}>Paso 2 de 3</p>
+          {!guestToken && (
+            <div className="t-field" style={{ marginBottom: "14px" }}>
+              <label htmlFor="rsvp-name">Tu nombre y apellido</label>
+              <input
+                id="rsvp-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nombre y apellido"
+                required
+                autoComplete="name"
+              />
+            </div>
+          )}
 
-        {/* Nombre solo si no es invitación personalizada */}
-        {!guestToken && (
-          <div className="field" style={{ marginTop: "var(--sp-5)" }}>
-            <label htmlFor="rsvp-name">Tu nombre</label>
-            <input
-              id="rsvp-name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nombre y apellido"
-              required
-              autoComplete="name"
-            />
-          </div>
-        )}
-
-        {/* Stepper de cantidad */}
-        <div className="field" style={{ marginTop: "var(--sp-5)" }}>
-          <label id="count-label">
-            Personas que asisten {maxGuests > 1 ? `(máx. ${maxGuests})` : ""}
-          </label>
-          <div className="stepper" aria-labelledby="count-label">
-            <button
-              type="button"
-              onClick={() => setCount(Math.max(1, count - 1))}
-              aria-label="Restar una persona"
-              disabled={count <= 1}
-            >
-              −
-            </button>
-            <span className="n" aria-live="polite" aria-atomic="true">
-              {count}
-            </span>
-            <button
-              type="button"
-              onClick={() => setCount(Math.min(maxGuests, count + 1))}
-              aria-label="Sumar una persona"
-              disabled={count >= maxGuests}
-            >
-              +
-            </button>
-          </div>
-        </div>
-
-        {/* Restricción alimentaria */}
-        <div className="field" style={{ marginTop: "var(--sp-4)" }}>
-          <label htmlFor="rsvp-dietary">
-            Restricción alimentaria <span style={{ opacity: .5 }}>(opcional)</span>
-          </label>
-          <input
-            id="rsvp-dietary"
-            type="text"
-            value={dietary}
-            onChange={(e) => setDietary(e.target.value)}
-            placeholder="Ej: vegetariano, celíaco, alérgico a mariscos…"
-          />
-        </div>
-
-        <button
-          className="btn solid"
-          onClick={() => setStep("finish")}
-          style={{ width: "100%", marginTop: "var(--sp-5)" }}
-          disabled={!guestToken && !name.trim()}
-          aria-label="Continuar al último paso"
-        >
-          Continuar →
-        </button>
-      </section>
-    );
-  }
-
-  // ── PASO 3: Pago + Canción ────────────────────────────────────
-  if (step === "finish") {
-    return (
-      <section className={sectionClass} id="rsvp">
-        <p className="kicker">Último paso</p>
-        <h2 className="section-title">Casi listo</h2>
-
-        {/* Info de pago si corresponde */}
-        {hasPayment && paymentAmount && paymentStatus === "PENDING" && (
-          <div className="info-card tone-a">
-            <div className="dot" aria-hidden="true" />
-            <div>
-              <strong>
-                Tarjeta: {formatARS(paymentAmount)} por persona
-                {count > 1 && ` · Total ${formatARS(totalPayment)}`}
-              </strong>
-              {paymentAlias && (
-                <p>
-                  Transferencia: <span style={{ fontFamily: "var(--font-mono)", color: "var(--c-accent)" }}>{paymentAlias}</span>
-                </p>
-              )}
-              {paymentBanco && (
-                <p style={{ opacity: .7 }}>
-                  {paymentBanco}{paymentTitular ? ` · ${paymentTitular}` : ""}
-                </p>
-              )}
-              <p style={{ opacity: .65 }}>
-                Una vez que lo recibamos, lo verás confirmado acá 💛
-              </p>
+          <div className="t-field" style={{ marginBottom: "14px" }}>
+            <label id="count-label">
+              ¿Cuántos asisten? {maxGuests > 1 ? `(máx. ${maxGuests})` : ""}
+            </label>
+            <div className="stepper" style={{ display: "flex", alignItems: "center", gap: "14px" }} aria-labelledby="count-label">
+              <button
+                type="button"
+                style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1px solid var(--t-onpaper)", background: "transparent", fontSize: "15px", cursor: "pointer", color: "var(--t-onpaper)" }}
+                onClick={() => setCount(Math.max(1, count - 1))}
+                aria-label="Restar una persona"
+                disabled={count <= 1}
+              >
+                −
+              </button>
+              <span className="n" style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "15px", minWidth: "18px", textAlign: "center", color: "var(--t-onpaper)" }} aria-live="polite" aria-atomic="true">
+                {count}
+              </span>
+              <button
+                type="button"
+                style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1px solid var(--t-onpaper)", background: "transparent", fontSize: "15px", cursor: "pointer", color: "var(--t-onpaper)" }}
+                onClick={() => setCount(Math.min(maxGuests, count + 1))}
+                aria-label="Sumar una persona"
+                disabled={count >= maxGuests}
+              >
+                +
+              </button>
             </div>
           </div>
-        )}
 
-        {error && (
-          <p role="alert" style={{ color: "var(--c-accent)", fontSize: "13px", marginBottom: "var(--sp-3)" }}>
-            {error}
+          <div className="t-field" style={{ marginBottom: "14px" }}>
+            <label htmlFor="rsvp-dietary">
+              Restricción alimentaria <span style={{ opacity: .5 }}>(opcional)</span>
+            </label>
+            <input
+              id="rsvp-dietary"
+              type="text"
+              value={dietary}
+              onChange={(e) => setDietary(e.target.value)}
+              placeholder="Ej: vegetariano, celíaco…"
+            />
+          </div>
+
+          <button
+            className="t-btn"
+            onClick={() => setStep("finish")}
+            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", marginTop: "14px" }}
+            disabled={!guestToken && !name.trim()}
+          >
+            Continuar →
+          </button>
+        </div>
+      );
+    }
+
+    if (step === "finish") {
+      return (
+        <div>
+          <p className="t-kicker" style={{ margin: "0 0 12px 0" }}>Último paso</p>
+          {error && (
+            <p role="alert" style={{ color: "var(--c-accent)", fontSize: "13px", marginBottom: "var(--sp-3)" }}>
+              {error}
+            </p>
+          )}
+
+          <button
+            className="t-btn"
+            onClick={handleConfirm}
+            disabled={isSubmitting}
+            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px" }}
+          >
+            {isSubmitting ? "Guardando…" : "✓ Confirmar asistencia"}
+          </button>
+          <button
+            className="t-btn"
+            onClick={() => setStep("details")}
+            style={{ width: "100%", justifyContent: "center", marginTop: "14px", background: "transparent" }}
+          >
+            ← Volver
+          </button>
+        </div>
+      );
+    }
+
+    if (step === "done") {
+      return (
+        <div role="status" aria-live="polite">
+          <h3 style={{ marginBottom: "12px", fontFamily: "var(--t-font-d)", color: "var(--t-onpaper)" }}>Te esperamos 🎉</h3>
+          <p style={{ marginBottom: "12px", fontSize: "14px", opacity: 0.9 }}>
+            Confirmaste {count} {count === 1 ? "persona" : "personas"}.
+            {hasPayment && paymentStatus === "PENDING" && paymentAmount
+              ? ` Recordá abonar la tarjeta (${formatARS(totalPayment)}).`
+              : ""}
+            {paymentStatus === "PAID" ? " Tu tarjeta fue confirmada. ✓" : ""}
           </p>
-        )}
+          {hasPayment && paymentStatus === "PENDING" && paymentAlias && (
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", opacity: .75 }}>
+              Alias: {paymentAlias}
+            </p>
+          )}
+        </div>
+      );
+    }
 
-        <button
-          className="btn solid"
-          onClick={handleConfirm}
-          disabled={isSubmitting}
-          style={{ width: "100%", fontSize: "15px", padding: "16px" }}
-          aria-label="Confirmar asistencia definitivamente"
-        >
-          {isSubmitting ? "Guardando…" : "✓ Confirmar asistencia"}
-        </button>
-        <button
-          className="btn"
-          onClick={() => setStep("details")}
-          style={{ width: "100%", justifyContent: "center", marginTop: "var(--sp-3)" }}
-          aria-label="Volver al paso anterior"
-        >
-          ← Volver
-        </button>
-      </section>
-    );
-  }
-
-  // ── DONE ──────────────────────────────────────────────────────
-  if (step === "done") {
-    return (
-      <section className={sectionClass} id="rsvp" role="status" aria-live="polite">
-        <p className="kicker">¡Listo!</p>
-        <h2 className="section-title">Te esperamos 🎉</h2>
-        <p style={{ margin: "var(--sp-3) 0 var(--sp-5)" }}>
-          Confirmaste {count} {count === 1 ? "persona" : "personas"}.
-          {hasPayment && paymentStatus === "PENDING" && paymentAmount
-            ? ` Recordá abonar la tarjeta (${formatARS(totalPayment)}).`
-            : ""}
-          {paymentStatus === "PAID" ? " Tu tarjeta fue confirmada. ✓" : ""}
-        </p>
-        {hasPayment && paymentStatus === "PENDING" && paymentAlias && (
-          <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", opacity: .75 }}>
-            Alias: {paymentAlias}
+    if (step === "declined") {
+      return (
+        <div role="status">
+          <h3 style={{ marginBottom: "12px", fontFamily: "var(--t-font-d)", color: "var(--t-onpaper)" }}>Qué pena 💙</h3>
+          <p style={{ fontSize: "14px", opacity: 0.9 }}>
+            Gracias por avisarnos. Si cambiás de idea, el link sigue activo.
           </p>
+          <button
+            className="t-btn"
+            onClick={() => setStep("decision")}
+            style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent" }}
+          >
+            Cambié de idea, ¡voy!
+          </button>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <section className={sectionClass} id="rsvp">
+      {step !== "done" && step !== "declined" && (
+        <>
+          <p className="t-kicker">Confirmá tu asistencia</p>
+          <h2>¿Vas a venir?</h2>
+        </>
+      )}
+
+      <div className="d-rsvp-grid" style={{ marginTop: "24px" }}>
+        <div>
+          {renderContent()}
+        </div>
+
+        {hasPayment && paymentAmount != null && (
+          <div className="t-detail" style={{ background: "rgba(255,255,255,.07)", border: "1px dashed var(--t-acc)", margin: 0, height: "fit-content", borderRadius: "12px", padding: "16px" }}>
+            <h4 style={{ marginBottom: "8px", fontFamily: "var(--t-font-d)", fontSize: "15px", color: "var(--t-acc)", marginTop: 0 }}>
+              {!guestToken ? "Valor de la tarjeta (vista previa)" : (paymentStatus === "PAID" ? "Tarjeta abonada ✓" : "Valor de la tarjeta")}
+            </h4>
+            <p style={{ opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
+              {!guestToken ? (
+                `El valor de tu tarjeta es de ${formatARS(paymentAmount)} por persona. Así es como tus invitados verán esta información.`
+              ) : (
+                paymentStatus === "PAID"
+                ? "Ya recibimos el pago de tu tarjeta. ¡Gracias!"
+                : `El valor es de ${formatARS(paymentAmount)} por persona.`
+              )}
+            </p>
+          </div>
         )}
-      </section>
-    );
-  }
-
-  // ── DECLINED ─────────────────────────────────────────────────
-  if (step === "declined") {
-    return (
-      <section className={sectionClass} id="rsvp" role="status">
-        <p className="kicker">Respuesta registrada</p>
-        <h2 className="section-title">Qué pena 💙</h2>
-        <p style={{ marginTop: "var(--sp-3)" }}>
-          Gracias por avisarnos. Si cambiás de idea, el link sigue activo.
-        </p>
-        <button
-          className="btn"
-          onClick={() => setStep("decision")}
-          style={{ marginTop: "var(--sp-5)", justifyContent: "center", width: "100%" }}
-        >
-          Cambié de idea, ¡voy!
-        </button>
-      </section>
-    );
-  }
-
-  return null;
+      </div>
+    </section>
+  );
 
   // ── Handlers ─────────────────────────────────────────────────
   async function handleConfirm() {
@@ -326,7 +314,7 @@ export function RSVPWizardV2({
         }),
       });
     } catch {
-      // Silenciar — el invitado igual ve la pantalla de "no puedo ir"
+      // Silenciar
     }
     setStep("declined");
   }
