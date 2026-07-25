@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-// POST /api/guests/[token]/confirm
+// POST /api/guests/[id]/confirm
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ token: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { token } = await params;
+    const { id } = await params;
     const body = await request.json();
 
     const guest = await prisma.guest.findFirst({
-      where: { uniqueToken: token },
+      where: { uniqueToken: id },
     });
 
     if (!guest) {

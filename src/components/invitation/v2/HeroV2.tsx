@@ -59,18 +59,13 @@ export function HeroV2({
 
   return (
     <section
-      className="hero-v2"
+      className="hero"
       style={{
-        position: "relative",
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        padding: "28px 26px 100px", // 100px para dejar espacio al bottom nav
-        color: "var(--on-ink)",
-        overflow: "hidden",
-        ...bgStyle,
-        backgroundRepeat: "no-repeat",
+        ...(backgroundImage ? {
+          backgroundImage: `linear-gradient(180deg, rgba(18,32,25,.2) 0%, rgba(18,32,25,.78) 100%), url(${backgroundImage})`,
+          backgroundSize: `${scale}%`,
+          backgroundPosition: `${posX}% ${posY}%`,
+        } : {}),
       }}
       aria-label={`Portada: ${eyebrow} — ${title}`}
     >
@@ -86,50 +81,20 @@ export function HeroV2({
         }}
       />
 
-      {/* Sello / monograma */}
-      <div
-        className="inv-seal animate-seal-in"
-        aria-hidden="true"
-      >
+      <div className="seal" aria-hidden="true">
         <span>{monogram}</span>
       </div>
 
-      {/* Eyebrow */}
-      <p className="inv-eyebrow" style={{ marginBottom: "10px" }}>
-        {eyebrow}
-      </p>
+      <p className="eyebrow">{eyebrow}</p>
 
-      {/* Título display */}
-      <h1
-        className="inv-display"
-        style={{ margin: "0 0 14px", color: "var(--on-ink)" }}
-      >
-        {renderTitle()}
-      </h1>
+      <h1>{renderTitle()}</h1>
 
-      {/* Fecha + lugar */}
-      <p
-        className="inv-mono"
-        style={{ margin: 0, opacity: 0.75 }}
-      >
+      <p className="date">
         {date}
-        {location ? ` — ${location}` : ""}
+        {location && ` — ${location}`}
       </p>
 
-      {/* Scroll cue */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: "76px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "1px",
-          height: "24px",
-          background: "var(--c-accent)",
-          opacity: 0.55,
-        }}
-      />
+      <div className="scroll-cue" aria-hidden="true" />
     </section>
   );
 }

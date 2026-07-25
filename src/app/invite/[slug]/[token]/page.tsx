@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { InvitationContent } from "@/components/invitation/InvitationContent";
+import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 import { Metadata } from 'next';
 
 // Generate metadata for social sharing
@@ -135,9 +135,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
     }
 
     return (
-        <InvitationContent
-            invitation={invitation}
-            guest={guest}
+        <ConviteTemplate
+            invitation={invitation as Record<string, unknown>}
+            guest={guest as any}
             isPersonalized={true}
         />
     );

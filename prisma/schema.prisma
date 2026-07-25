@@ -132,9 +132,12 @@ model Invitation {
   portadaTitulo         String?
   portadaTextoBoton     String?
   portadaImagenFondo    String?
-  portadaImagenPosX     Int     @default(50)
-  portadaImagenPosY     Int     @default(50)
-  portadaImagenEscala   Int     @default(100)
+  portadaImagenPosX          Int     @default(50)
+  portadaImagenPosY          Int     @default(50)
+  portadaImagenEscala        Int     @default(100)
+  portadaImagenDesktopPosX   Int     @default(50)
+  portadaImagenDesktopPosY   Int     @default(50)
+  portadaImagenDesktopEscala Int     @default(100)
 
   // 2. MÚSICA
   musicaHabilitada Boolean @default(true)

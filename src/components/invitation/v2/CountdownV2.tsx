@@ -56,7 +56,7 @@ export function CountdownV2({
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [targetDate]);
 
-  const sectionClass = `inv-section${dark ? " dark" : ""}`;
+  const sectionClass = `section${dark ? " dark" : ""}`;
 
   const boxes: { label: string; value: string }[] = [
     { label: "Días", value: String(time.dias) },
@@ -67,24 +67,24 @@ export function CountdownV2({
   if (hasEnded) {
     return (
       <section className={sectionClass} id="countdown">
-        <p className="inv-eyebrow">{kicker}</p>
-        <h2 className="inv-h2">¡Hoy es el gran día! 🎉</h2>
+        <p className="kicker">{kicker}</p>
+        <h2 className="section-title">¡Hoy es el gran día! 🎉</h2>
       </section>
     );
   }
 
   return (
     <section className={sectionClass} id="countdown">
-      <p className="inv-eyebrow">{kicker}</p>
-      {title && <h2 className="inv-h2">{title}</h2>}
+      <p className="kicker">{kicker}</p>
+      {title && <h2 className="section-title">{title}</h2>}
 
-      <div className="inv-cd" role="timer" aria-live="off" aria-label="Cuenta regresiva">
+      <div className="countdown" role="timer" aria-live="off" aria-label="Cuenta regresiva">
         {boxes.map(({ label, value }) => (
-          <div key={label} className="inv-cd-box">
-            <span className="inv-cd-num" aria-label={`${value} ${label}`}>
+          <div key={label} className="cd-box">
+            <span className="cd-num" aria-label={`${value} ${label}`}>
               {value}
             </span>
-            <span className="inv-cd-label" aria-hidden="true">{label}</span>
+            <span className="cd-label" aria-hidden="true">{label}</span>
           </div>
         ))}
       </div>

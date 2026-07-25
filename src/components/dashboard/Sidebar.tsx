@@ -47,40 +47,56 @@ export function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <div className="flex flex-col h-screen bg-card text-card-foreground w-64 border-r fixed left-0 top-0">
-            <div className="p-6 border-b shrink-0">
-                <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-                    <Calendar className="w-6 h-6 text-primary" />
-                    <span>InvitaDigital</span>
-                </Link>
-            </div>
+        <>
+            {/* DESKTOP SIDEBAR */}
+            <aside className="p-side">
+                <div className="p-brand">
+                    <div className="seal" style={{ borderColor: 'var(--line)', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)' }}>
+                        <span className="font-display" style={{ color: 'var(--paper)', fontSize: 15, fontWeight: 700 }}>C</span>
+                    </div>
+                    Convite
+                </div>
 
-            <div className="flex-1 py-4 overflow-hidden">
-                <nav className="flex flex-col gap-1 px-2">
+                <nav className="p-nav flex-1">
                     {sidebarItems.map((item, index) => (
                         <Link
                             key={index}
                             href={item.href}
-                            className={cn(
-                                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                                pathname === item.href
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                            )}
+                            className={pathname === item.href ? "active" : ""}
                         >
-                            <item.icon className="w-4 h-4" />
+                            <b><item.icon className="w-4 h-4" /></b>
                             {item.title}
                         </Link>
                     ))}
                 </nav>
-            </div>
 
-            <div className="p-4 border-t shrink-0">
-                <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive">
-                    <LogOut className="w-4 h-4" />
-                    Cerrar Sesión
-                </Button>
-            </div>
-        </div>
+                <div className="p-side-foot">
+                    <div className="seal">
+                        <span className="font-display">U</span>
+                    </div>
+                    <div className="who flex-1">
+                        <b>Mi Cuenta</b>
+                        <span>Ver Perfil</span>
+                    </div>
+                    <button className="text-danger hover:text-danger/80">
+                        <LogOut className="w-4 h-4" />
+                    </button>
+                </div>
+            </aside>
+
+            {/* MOBILE NAV (Tira horizontal de tabs) */}
+            <nav className="p-nav-mobile md:hidden">
+                {sidebarItems.map((item, index) => (
+                    <Link
+                        key={index}
+                        href={item.href}
+                        className={pathname === item.href ? "active" : ""}
+                    >
+                        <b><item.icon className="w-4 h-4" /></b>
+                        {item.title}
+                    </Link>
+                ))}
+            </nav>
+        </>
     );
 }

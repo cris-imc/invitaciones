@@ -53,9 +53,9 @@ export function SectionWrapper({
   }, [delay]);
 
   const classes = [
-    "inv-section",
+    "section",
     dark ? "dark" : "",
-    noBorder ? "no-border" : "",
+    noBorder ? "border-b-0" : "",
     className,
   ]
     .filter(Boolean)

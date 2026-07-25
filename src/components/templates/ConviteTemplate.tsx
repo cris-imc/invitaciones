@@ -15,12 +15,17 @@ const IconMusic = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 const IconMap   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
 
 // ── Tipos de tema ────────────────────────────────────────────────
-type Theme = "boda" | "xv" | "general";
+type Theme = "boda" | "xv" | "cumple" | "ejecutivo" | "bautismo" | "nacimiento" | "infantil";
 
 function getThemeFromTipo(tipo: string): Theme {
   if (tipo === "CASAMIENTO") return "boda";
   if (tipo === "QUINCE_ANOS") return "xv";
-  return "general";
+  if (tipo === "CUMPLEANOS") return "cumple";
+  if (tipo === "CORPORATIVO") return "ejecutivo";
+  if (tipo === "BAUTISMO") return "bautismo";
+  if (tipo === "BABY_SHOWER") return "nacimiento";
+  if (tipo === "INFANTIL") return "infantil";
+  return "cumple"; // default fallback
 }
 
 function safeJson(val: string | null | undefined, fallback: unknown = null) {
@@ -117,21 +122,57 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   ];
 
   return (
-    <div className="invitation-wrapper" data-theme={theme}>
+    <div className="desktop-stage" data-theme={theme}>
+      {/* ── DESKTOP LEFT SIDEBAR ── */}
+      <div className="d-left hidden md:flex" style={
+        invitation.portadaImagenFondo ? {
+          background: `linear-gradient(165deg, rgba(18,32,25,0.85), var(--t-ink) 95%), url(${invitation.portadaImagenFondo})`,
+          backgroundSize: `${Number(invitation.portadaImagenDesktopEscala ?? 100)}%`,
+          backgroundPosition: `${Number(invitation.portadaImagenDesktopPosX ?? 50)}% ${Number(invitation.portadaImagenDesktopPosY ?? 50)}%`
+        } : undefined
+      }>
+        <div className="d-left-top">
+          <div className="seal" style={{ borderColor: 'var(--t-acc)' }}>
+            <span style={{ color: 'var(--t-acc)' }}>{monogram}</span>
+          </div>
+          <p className="pdate">{fechaStr} {lugarNombre ? `· ${lugarNombre}` : ''}</p>
+          <h1>
+            {em ? (
+              <>
+                {title.slice(0, title.indexOf(em))}
+                <em>{em}</em>
+                {title.slice(title.indexOf(em) + em.length)}
+              </>
+            ) : title}
+          </h1>
+        </div>
+        
+        <div className="d-nav">
+          {navSections.map((sec, i) => (
+            <a key={sec.id} href={`#${sec.id}`}>
+              <b>0{i + 1}</b> {sec.label}
+            </a>
+          ))}
+        </div>
+      </div>
 
-      {/* ── HERO ── */}
-      <HeroV2
-        monogram={monogram}
-        eyebrow={eyebrow}
-        title={title}
-        titleEm={em}
-        date={fechaStr}
-        location={lugarNombre || undefined}
-        backgroundImage={String(invitation.portadaImagenFondo ?? "") || undefined}
-        posX={Number(invitation.portadaImagenPosX ?? 50)}
-        posY={Number(invitation.portadaImagenPosY ?? 30)}
-        scale={Number(invitation.portadaImagenEscala ?? 110)}
-      />
+      {/* ── RIGHT SCROLLABLE CONTENT ── */}
+      <div className="d-right tpl">
+        {/* MOBILE HERO */}
+        <div className="md:hidden">
+          <HeroV2
+            monogram={monogram}
+            eyebrow={eyebrow}
+            title={title}
+            titleEm={em}
+            date={fechaStr}
+            location={lugarNombre || undefined}
+            backgroundImage={String(invitation.portadaImagenFondo ?? "") || undefined}
+            posX={Number(invitation.portadaImagenPosX ?? 50)}
+            posY={Number(invitation.portadaImagenPosY ?? 30)}
+            scale={Number(invitation.portadaImagenEscala ?? 110)}
+          />
+        </div>
 
       {/* ── COUNTDOWN ── */}
       {invitation.contadorHabilitado ? (
@@ -145,10 +186,10 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
       {/* ── QUOTE / FRASE ── */}
       {invitation.frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto ? (
         <SectionWrapper dark id="quote" delay={100}>
-          <p className="inv-eyebrow">Nuestra historia</p>
+          <p className="kicker">Nuestra historia</p>
           <blockquote
-            className="inv-display"
-            style={{ fontSize: "var(--text-h2)", fontStyle: "italic", fontWeight: 500, margin: 0 }}
+            className="quote"
+            style={{ margin: 0 }}
           >
             {String(invitation.frasePersonalizadaTexto)}
           </blockquote>
@@ -157,29 +198,29 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
       {/* ── DETALLES DEL EVENTO ── */}
       <SectionWrapper id="details" delay={150}>
-        <p className="inv-eyebrow">Cuándo y dónde</p>
-        <h2 className="inv-h2">Los esperamos</h2>
+        <p className="kicker">Cuándo y dónde</p>
+        <h2 className="section-title">Los esperamos</h2>
 
         {/* Lugar + hora */}
         {lugarNombre && (
-          <div className="inv-card" style={{ marginTop: "var(--sp-5)" }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h3)", margin: "0 0 4px" }}>
+          <div className="detail-card">
+            <h3>
               {lugarNombre}
             </h3>
             {hora && (
-              <p className="inv-mono" style={{ margin: "0 0 4px", fontSize: "var(--text-sm)" }}>
+              <p>
                 {hora} hs
               </p>
             )}
             {direccion && (
-              <p className="inv-body" style={{ margin: "0 0 var(--sp-3)" }}>{direccion}</p>
+              <p>{direccion}</p>
             )}
             {mapUrl && (
               <a
                 href={mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inv-btn-ghost"
+                className="btn"
                 aria-label={`Ver mapa de ${lugarNombre} en Google Maps`}
               >
                 Ver mapa ↗
@@ -190,12 +231,10 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
         {/* Invitado personalizado: nombre y mesa */}
         {isPersonalized && guest && (
-          <div className="inv-card" style={{ marginTop: "var(--sp-3)", borderLeft: "3px solid var(--c-accent)" }}>
-            <p className="inv-eyebrow" style={{ marginBottom: "var(--sp-2)" }}>Tu invitación</p>
-            <p style={{ margin: 0, fontSize: "var(--text-h3)", fontFamily: "var(--font-display)", fontWeight: 600 }}>
-              {guest.name}
-            </p>
-            <p className="inv-mono" style={{ margin: "4px 0 0", opacity: .65 }}>
+          <div className="info-card tone-a">
+            <div className="dot"></div>
+            <p>
+              <strong>Tu invitación: {guest.name}</strong>
               {guest.expectedCount} {guest.expectedCount === 1 ? "lugar reservado" : "lugares reservados"}
             </p>
           </div>
@@ -205,11 +244,11 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
       {/* ── DRESS CODE ── */}
       {dresscode && Boolean(invitation.dresscodeTipo) && (
         <SectionWrapper dark id="dresscode" delay={200}>
-          <p className="inv-eyebrow">Dress code</p>
-          <h2 className="inv-h2">{String(invitation.dresscodeTitulo ?? "Vestimenta")}</h2>
-          <p className="inv-body">{String(invitation.dresscodeTipo ?? "")}</p>
+          <p className="kicker">Dress code</p>
+          <h2 className="section-title">{String(invitation.dresscodeTitulo ?? "Vestimenta")}</h2>
+          <p>{String(invitation.dresscodeTipo ?? "")}</p>
           {invitation.dresscodeObservaciones != null && (
-            <p className="inv-body" style={{ opacity: .7, marginTop: "var(--sp-2)" }}>
+            <p style={{ opacity: .7, marginTop: "var(--sp-2)" }}>
               {String(invitation.dresscodeObservaciones)}
             </p>
           )}
@@ -219,7 +258,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
       {/* ── GALERÍA ── */}
       {Boolean(invitation.galeriaPrincipalHabilitada) && galeria.length > 0 && (
         <SectionWrapper id="gallery" delay={250} noBorder>
-          <p className="inv-eyebrow">Galería</p>
+          <p className="kicker">Galería</p>
           <div
             style={{
               display: "grid",
@@ -289,7 +328,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
       {/* ── BADGE DE PAGO (fuera del wizard, visible siempre si ya confirmó) ── */}
       {isPersonalized && guest?.status === "CONFIRMED" && paymentEnabled && paymentAmount && (
         <SectionWrapper id="payment" delay={0} dark={false}>
-          <p className="inv-eyebrow">Estado de tu tarjeta</p>
+          <p className="kicker">Estado de tu tarjeta</p>
           <PaymentBadge
             paymentStatus={guestPayStatus}
             amount={paymentAmount}
@@ -314,30 +353,15 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
       )}
 
       {/* ── FOOTER ── */}
-      <footer
-        style={{
-          padding: "var(--sp-10) var(--sp-6) 90px",
-          textAlign: "center",
-          background: "var(--ink)",
-          color: "var(--on-ink)",
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "var(--font-display)",
-            fontStyle: "italic",
-            fontSize: "22px",
-            color: "var(--c-accent)",
-            marginBottom: "var(--sp-2)",
-          }}
-        >
+      <footer className="tpl-footer">
+        <div className="monogram">
           {monogram}
         </div>
-        <small style={{ fontSize: "11px", opacity: 0.5 }}>
+        <small>
           Con cariño, gracias por ser parte de este día ✦{" "}
           <a
             href="https://convite.ar"
-            style={{ color: "inherit", opacity: 0.6, textDecoration: "none" }}
+            style={{ color: "inherit", textDecoration: "none" }}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -348,6 +372,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
       {/* ── BOTTOM NAV PILL ── */}
       <BottomNavPill sections={navSections} />
+      </div>
     </div>
   );
 }

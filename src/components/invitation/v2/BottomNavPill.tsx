@@ -45,22 +45,25 @@ export function BottomNavPill({ sections }: BottomNavPillProps) {
 
   return (
     <nav
-      className="inv-bottom-nav"
+      className="bottom-nav"
       aria-label="Navegación de la invitación"
       role="navigation"
     >
       {sections.map(({ id, label, icon }) => (
-        <button
+        <a
           key={id}
-          className={`inv-nav-item ${activeId === id ? "active" : ""}`}
-          onClick={() => handleNav(id)}
+          href={`#${id}`}
+          onClick={(e) => {
+            e.preventDefault();
+            handleNav(id);
+          }}
           aria-label={`Ir a ${label}`}
           aria-current={activeId === id ? "true" : undefined}
-          type="button"
+          style={activeId === id ? { opacity: 1 } : undefined}
         >
-          {icon}
-          <span>{label}</span>
-        </button>
+          <b>{icon}</b>
+          {label}
+        </a>
       ))}
     </nav>
   );

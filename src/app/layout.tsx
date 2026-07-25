@@ -2,6 +2,17 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2 } from 'next/font/google';
+
+const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
+const spaceMono = Space_Mono({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-space-mono', display: 'swap' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+
+const cormorant = Cormorant_Garamond({ weight: ['500'], subsets: ['latin'], variable: '--font-cormorant', display: 'swap' });
+const bricolage = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-bricolage', display: 'swap' });
+const fredoka = Fredoka({ subsets: ['latin'], variable: '--font-fredoka', display: 'swap' });
+const baloo = Baloo_2({ subsets: ['latin'], variable: '--font-baloo', display: 'swap' });
 
 export const metadata: Metadata = {
   title: "Convite — Invitaciones digitales para tus eventos",
@@ -22,20 +33,8 @@ export default function RootLayout({
   return (
     <html lang="es-AR">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Sistema tipográfico principal: Fraunces (display) + Inter (body) + Space Mono (números) */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-        {/* Fuentes de soporte para templates legacy */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&family=Parisienne&family=Great+Vibes&display=swap"
-          rel="stylesheet"
-        />
       </head>
-      <body className="antialiased">
+      <body className={`antialiased ${fraunces.variable} ${spaceGrotesk.variable} ${spaceMono.variable} ${inter.variable} ${cormorant.variable} ${bricolage.variable} ${fredoka.variable} ${baloo.variable}`}>
         <AuthProvider>
           <ToastProvider>
             {children}

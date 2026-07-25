@@ -8,17 +8,13 @@ export default function DashboardLayout({
 }) {
     return (
         <AuthProvider>
-            <div className="flex h-screen bg-background">
-                <div className="hidden md:block w-64 flex-shrink-0">
+            <div className="flex min-h-screen justify-center md:py-6 md:px-6 bg-black">
+                <div className="panel w-full max-w-[1180px]">
                     <Sidebar />
-                </div>
-
-                <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900/20">
-                    {/* Mobile Header would go here */}
-                    <div className="min-h-full">
+                    <main className="p-main relative">
                         {children}
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
         </AuthProvider>
     );

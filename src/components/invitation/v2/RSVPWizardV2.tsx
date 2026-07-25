@@ -56,22 +56,21 @@ export function RSVPWizardV2({
   const [error, setError] = useState("");
   const [paymentStatus] = useState<PaymentStatus>(initialPaymentStatus);
 
-  const sectionClass = `inv-section${dark ? " dark" : ""}`;
+  const sectionClass = `section${dark ? " dark" : ""}`;
 
   const totalPayment = (paymentAmount ?? 0) * count;
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
 
-  // ── PASO 1: Decisión ──────────────────────────────────────────
   if (step === "decision") {
     return (
       <section className={sectionClass} id="rsvp">
-        <p className="inv-eyebrow">Confirmá tu asistencia</p>
-        <h2 className="inv-h2">¿Vas a venir?</h2>
+        <p className="kicker">Confirmá tu asistencia</p>
+        <h2 className="section-title">¿Vas a venir?</h2>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-3)", marginTop: "var(--sp-6)" }}>
           <button
-            className="inv-btn"
+            className="btn solid"
             onClick={() => setStep("details")}
             style={{ width: "100%", fontSize: "15px", padding: "16px" }}
             aria-label="Confirmar asistencia"
@@ -79,9 +78,9 @@ export function RSVPWizardV2({
             ✓ Sí, voy a estar
           </button>
           <button
-            className="inv-btn-ghost"
+            className="btn"
             onClick={() => handleDecline()}
-            style={{ width: "100%", justifyContent: "center" }}
+            style={{ width: "100%" }}
             aria-label="Declinar invitación"
           >
             No puedo ir esta vez
@@ -95,16 +94,15 @@ export function RSVPWizardV2({
   if (step === "details") {
     return (
       <section className={sectionClass} id="rsvp">
-        <p className="inv-eyebrow">Paso 2 de 3</p>
-        <h2 className="inv-h2">¿Cuántos van?</h2>
+        <p className="kicker">Paso 2 de 3</p>
+        <h2 className="section-title">¿Cuántos van?</h2>
 
         {/* Nombre solo si no es invitación personalizada */}
         {!guestToken && (
-          <div className="inv-field" style={{ marginTop: "var(--sp-5)" }}>
-            <label className="inv-label" htmlFor="rsvp-name">Tu nombre</label>
+          <div className="field" style={{ marginTop: "var(--sp-5)" }}>
+            <label htmlFor="rsvp-name">Tu nombre</label>
             <input
               id="rsvp-name"
-              className="inv-input"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -116,11 +114,11 @@ export function RSVPWizardV2({
         )}
 
         {/* Stepper de cantidad */}
-        <div className="inv-field" style={{ marginTop: "var(--sp-5)" }}>
-          <p className="inv-label" id="count-label">
+        <div className="field" style={{ marginTop: "var(--sp-5)" }}>
+          <label id="count-label">
             Personas que asisten {maxGuests > 1 ? `(máx. ${maxGuests})` : ""}
-          </p>
-          <div className="inv-stepper" aria-labelledby="count-label">
+          </label>
+          <div className="stepper" aria-labelledby="count-label">
             <button
               type="button"
               onClick={() => setCount(Math.max(1, count - 1))}
@@ -129,7 +127,7 @@ export function RSVPWizardV2({
             >
               −
             </button>
-            <span className="inv-stepper-n" aria-live="polite" aria-atomic="true">
+            <span className="n" aria-live="polite" aria-atomic="true">
               {count}
             </span>
             <button
@@ -144,13 +142,12 @@ export function RSVPWizardV2({
         </div>
 
         {/* Restricción alimentaria */}
-        <div className="inv-field" style={{ marginTop: "var(--sp-4)" }}>
-          <label className="inv-label" htmlFor="rsvp-dietary">
+        <div className="field" style={{ marginTop: "var(--sp-4)" }}>
+          <label htmlFor="rsvp-dietary">
             Restricción alimentaria <span style={{ opacity: .5 }}>(opcional)</span>
           </label>
           <input
             id="rsvp-dietary"
-            className="inv-input"
             type="text"
             value={dietary}
             onChange={(e) => setDietary(e.target.value)}
@@ -159,7 +156,7 @@ export function RSVPWizardV2({
         </div>
 
         <button
-          className="inv-btn"
+          className="btn solid"
           onClick={() => setStep("finish")}
           style={{ width: "100%", marginTop: "var(--sp-5)" }}
           disabled={!guestToken && !name.trim()}
@@ -175,29 +172,29 @@ export function RSVPWizardV2({
   if (step === "finish") {
     return (
       <section className={sectionClass} id="rsvp">
-        <p className="inv-eyebrow">Último paso</p>
-        <h2 className="inv-h2">Casi listo</h2>
+        <p className="kicker">Último paso</p>
+        <h2 className="section-title">Casi listo</h2>
 
         {/* Info de pago si corresponde */}
         {hasPayment && paymentAmount && paymentStatus === "PENDING" && (
-          <div className="inv-pay pending" style={{ marginBottom: "var(--sp-5)", marginTop: "var(--sp-4)" }}>
-            <div className="inv-pay-dot" aria-hidden="true" />
+          <div className="info-card tone-a">
+            <div className="dot" aria-hidden="true" />
             <div>
-              <strong style={{ display: "block", fontSize: "13.5px", marginBottom: 4 }}>
+              <strong>
                 Tarjeta: {formatARS(paymentAmount)} por persona
                 {count > 1 && ` · Total ${formatARS(totalPayment)}`}
               </strong>
               {paymentAlias && (
-                <p style={{ margin: "0 0 4px", fontSize: "13px", lineHeight: 1.5 }}>
+                <p>
                   Transferencia: <span style={{ fontFamily: "var(--font-mono)", color: "var(--c-accent)" }}>{paymentAlias}</span>
                 </p>
               )}
               {paymentBanco && (
-                <p style={{ margin: 0, fontSize: "12px", opacity: .7 }}>
+                <p style={{ opacity: .7 }}>
                   {paymentBanco}{paymentTitular ? ` · ${paymentTitular}` : ""}
                 </p>
               )}
-              <p style={{ margin: "6px 0 0", fontSize: "12px", opacity: .65 }}>
+              <p style={{ opacity: .65 }}>
                 Una vez que lo recibamos, lo verás confirmado acá 💛
               </p>
             </div>
@@ -211,7 +208,7 @@ export function RSVPWizardV2({
         )}
 
         <button
-          className="inv-btn"
+          className="btn solid"
           onClick={handleConfirm}
           disabled={isSubmitting}
           style={{ width: "100%", fontSize: "15px", padding: "16px" }}
@@ -220,7 +217,7 @@ export function RSVPWizardV2({
           {isSubmitting ? "Guardando…" : "✓ Confirmar asistencia"}
         </button>
         <button
-          className="inv-btn-ghost"
+          className="btn"
           onClick={() => setStep("details")}
           style={{ width: "100%", justifyContent: "center", marginTop: "var(--sp-3)" }}
           aria-label="Volver al paso anterior"
@@ -235,9 +232,9 @@ export function RSVPWizardV2({
   if (step === "done") {
     return (
       <section className={sectionClass} id="rsvp" role="status" aria-live="polite">
-        <p className="inv-eyebrow">¡Listo!</p>
-        <h2 className="inv-h2">Te esperamos 🎉</h2>
-        <p className="inv-body" style={{ margin: "var(--sp-3) 0 var(--sp-5)" }}>
+        <p className="kicker">¡Listo!</p>
+        <h2 className="section-title">Te esperamos 🎉</h2>
+        <p style={{ margin: "var(--sp-3) 0 var(--sp-5)" }}>
           Confirmaste {count} {count === 1 ? "persona" : "personas"}.
           {hasPayment && paymentStatus === "PENDING" && paymentAmount
             ? ` Recordá abonar la tarjeta (${formatARS(totalPayment)}).`
@@ -245,7 +242,7 @@ export function RSVPWizardV2({
           {paymentStatus === "PAID" ? " Tu tarjeta fue confirmada. ✓" : ""}
         </p>
         {hasPayment && paymentStatus === "PENDING" && paymentAlias && (
-          <p className="inv-mono" style={{ fontSize: "13px", opacity: .75 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", opacity: .75 }}>
             Alias: {paymentAlias}
           </p>
         )}
@@ -257,13 +254,13 @@ export function RSVPWizardV2({
   if (step === "declined") {
     return (
       <section className={sectionClass} id="rsvp" role="status">
-        <p className="inv-eyebrow">Respuesta registrada</p>
-        <h2 className="inv-h2">Qué pena 💙</h2>
-        <p className="inv-body" style={{ marginTop: "var(--sp-3)" }}>
+        <p className="kicker">Respuesta registrada</p>
+        <h2 className="section-title">Qué pena 💙</h2>
+        <p style={{ marginTop: "var(--sp-3)" }}>
           Gracias por avisarnos. Si cambiás de idea, el link sigue activo.
         </p>
         <button
-          className="inv-btn-ghost"
+          className="btn"
           onClick={() => setStep("decision")}
           style={{ marginTop: "var(--sp-5)", justifyContent: "center", width: "100%" }}
         >

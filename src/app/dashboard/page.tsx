@@ -89,110 +89,94 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="p-6 md:p-8 space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <>
+      {/* Topbar */}
+      <div className="p-topbar">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Hola, {userName} 👋
-          </h1>
-          <p className="text-muted-foreground">
-            Acá tenés el resumen de tus eventos en tiempo real.
-          </p>
+          <h2>Hola, {userName} 👋</h2>
+          <p>Acá tenés el resumen de tus eventos en tiempo real.</p>
         </div>
         <Link href="/dashboard/invitaciones/crear">
-          <Button className="gap-2">
-            <Plus className="w-4 h-4" /> Nueva invitación
+          <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
+            + Nueva invitación
           </Button>
         </Link>
       </div>
 
       {/* KPIs */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {kpis.map(({ label, value, sub, icon: Icon }) => (
-          <Card key={label}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{label}</CardTitle>
-              <Icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{value}</div>
-              <p className="text-xs text-muted-foreground">{sub}</p>
-            </CardContent>
-          </Card>
+      <div className="p-stats">
+        {kpis.map(({ label, value, sub }) => (
+          <div className="stat" key={label}>
+            <p className="kicker">{label}</p>
+            <b>{value}</b>
+            <small>{sub}</small>
+          </div>
         ))}
       </div>
 
       {/* Invitaciones recientes */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Tus invitaciones</h2>
-        <div className="grid gap-4">
-          {stats.recentInvitations.length > 0 ? (
-            stats.recentInvitations.map((inv) => {
-              const confirmed = inv.guests.filter((g) => g.status === "CONFIRMED");
-              const people = confirmed.reduce((s, g) => s + g.attendingCount, 0);
-              const paid   = confirmed.filter((g) => g.paymentStatus === "PAID").length;
-              return (
-                <Card key={inv.id}>
-                  <CardContent className="p-5">
-                    <div className="flex items-center justify-between gap-4 flex-wrap">
-                      <div>
-                        <p className="font-semibold">{inv.nombreEvento}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                          {" · "}
-                          <span className={
-                            inv.estado === "ACTIVA" ? "text-green-600" :
-                            inv.estado === "BORRADOR" ? "text-amber-600" : "text-muted-foreground"
-                          }>
-                            {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
-                          </span>
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {people} confirmadas · {paid} pagaron
-                        </p>
-                      </div>
-                      <div className="flex gap-2 flex-shrink-0">
-                        <Link href={`/dashboard/invitaciones/${inv.slug}/guests`}>
-                          <Button variant="outline" size="sm" className="gap-1">
-                            <Users className="w-3 h-3" /> Invitados
-                          </Button>
-                        </Link>
-                        <Link href={`/i/${inv.slug}`} target="_blank">
-                          <Button variant="ghost" size="sm" className="gap-1">
-                            <Eye className="w-3 h-3" /> Ver
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                <p className="mb-4">Todavía no tenés invitaciones.</p>
-                <Link href="/dashboard/invitaciones/crear">
-                  <Button>Crear tu primera invitación</Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+      <div className="p-list-head">
+        <h3>Tus invitaciones recientes</h3>
+      </div>
 
-        {stats.totalInvitations > 3 && (
-          <div className="mt-4 text-center">
-            <Link href="/dashboard/invitaciones">
-              <Button variant="ghost" size="sm">Ver todas las invitaciones →</Button>
+      <div className="flex flex-col">
+        {stats.recentInvitations.length > 0 ? (
+          stats.recentInvitations.map((inv) => {
+            const confirmed = inv.guests.filter((g) => g.status === "CONFIRMED");
+            const people = confirmed.reduce((s, g) => s + g.attendingCount, 0);
+            const mono = inv.nombreEvento.substring(0, 1).toUpperCase();
+            
+            return (
+              <div className="inv-row" key={inv.id}>
+                <div className="seal" style={{ borderColor: 'var(--line)', width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="font-display text-accent font-bold">{mono}</span>
+                </div>
+                
+                <div className="meta">
+                  <b>{inv.nombreEvento}</b>
+                  <span>
+                    {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+
+                <div className={`tag ${inv.estado === "ACTIVA" ? "on" : "draft"}`}>
+                  {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
+                </div>
+
+                <div className="rsvp-mini flex items-center gap-2">
+                  <div className="dot" style={{ background: 'var(--accent)', width: 8, height: 8, borderRadius: '50%' }}></div>
+                  {people} confirmadas
+                </div>
+
+                <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go">
+                  Administrar →
+                </Link>
+              </div>
+            );
+          })
+        ) : (
+          <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
+            <p className="text-muted-foreground mb-4 font-ui">Todavía no tenés invitaciones.</p>
+            <Link href="/dashboard/invitaciones/crear">
+              <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
+                Crear tu primera invitación
+              </Button>
             </Link>
           </div>
         )}
       </div>
-    </div>
+
+      {stats.totalInvitations > 3 && (
+        <div className="mt-4 text-center">
+          <Link href="/dashboard/invitaciones" className="text-accent font-ui font-semibold text-sm hover:underline">
+            Ver todas las invitaciones →
+          </Link>
+        </div>
+      )}
+    </>
   );
 }

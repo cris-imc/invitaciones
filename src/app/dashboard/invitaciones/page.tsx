@@ -38,41 +38,66 @@ async function getInvitations() {
 export default async function InvitacionesPage() {
     const invitations = await getInvitations();
     return (
-        <div className="p-6 md:p-8 space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <>
+            <div className="p-topbar">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Mis Invitaciones</h1>
-                    <p className="text-muted-foreground">Gestiona tus eventos y monitorea las confirmaciones.</p>
+                    <h2>Mis Invitaciones</h2>
+                    <p>Gestiona tus eventos y monitorea las confirmaciones.</p>
                 </div>
                 <Link href="/dashboard/invitaciones/crear">
-                    <Button className="gap-2">
-                        <Plus className="w-4 h-4" /> Nueva Invitación
+                    <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
+                        + Nueva Invitación
                     </Button>
                 </Link>
             </div>
 
-            <div className="grid gap-6">
+            <div className="flex flex-col">
                 {invitations.length > 0 ? (
-                    invitations.map((invitation) => (
-                        <InvitationCard key={invitation.id} invitation={invitation} />
-                    ))
+                    invitations.map((inv) => {
+                        const mono = inv.nombreEvento.substring(0, 1).toUpperCase();
+                        return (
+                            <div className="inv-row" key={inv.id}>
+                                <div className="seal" style={{ borderColor: 'var(--line)', width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <span className="font-display text-accent font-bold">{mono}</span>
+                                </div>
+                                
+                                <div className="meta">
+                                    <b>{inv.nombreEvento}</b>
+                                    <span>
+                                        {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                        })}
+                                    </span>
+                                </div>
+
+                                <div className={`tag ${inv.estado === "ACTIVA" ? "on" : "draft"}`}>
+                                    {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
+                                </div>
+
+                                <div className="rsvp-mini flex items-center gap-2">
+                                    <div className="dot" style={{ background: 'var(--accent)', width: 8, height: 8, borderRadius: '50%' }}></div>
+                                    {inv._count.guests} confirmadas
+                                </div>
+
+                                <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go">
+                                    Administrar →
+                                </Link>
+                            </div>
+                        );
+                    })
                 ) : (
-                    <Card>
-                        <CardContent className="flex flex-col items-center justify-center py-10 space-y-4">
-                            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
-                                <Calendar className="w-6 h-6 text-muted-foreground" />
-                            </div>
-                            <div className="text-center">
-                                <h3 className="text-lg font-semibold">No tienes invitaciones</h3>
-                                <p className="text-muted-foreground">Comienza creando tu primera invitación para un evento.</p>
-                            </div>
-                            <Link href="/dashboard/invitaciones/crear">
-                                <Button>Crear Primera Invitación</Button>
-                            </Link>
-                        </CardContent>
-                    </Card>
+                    <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
+                        <p className="text-muted-foreground mb-4 font-ui">No tienes invitaciones. Comienza creando tu primera invitación para un evento.</p>
+                        <Link href="/dashboard/invitaciones/crear">
+                            <Button className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
+                                Crear Primera Invitación
+                            </Button>
+                        </Link>
+                    </div>
                 )}
             </div>
-        </div>
+        </>
     );
 }

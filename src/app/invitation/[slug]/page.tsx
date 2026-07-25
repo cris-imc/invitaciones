@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { InvitationContent } from "@/components/invitation/InvitationContent";
+import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 
 async function getInvitation(slug: string) {
     const invitation = await prisma.invitation.findUnique({
@@ -96,5 +96,5 @@ export default async function InvitationPage({ params }: { params: Promise<{ slu
         notFound();
     }
 
-    return <InvitationContent invitation={invitation} />;
+    return <ConviteTemplate invitation={invitation as Record<string, unknown>} />;
 }

@@ -39,7 +39,7 @@ export function SongSuggestion({
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const sectionClass = `inv-section${dark ? " dark" : ""}`;
+  const sectionClass = `section${dark ? " dark" : ""}`;
 
   // Cargar canciones aprobadas
   useEffect(() => {
@@ -111,9 +111,9 @@ export function SongSuggestion({
 
   return (
     <section className={sectionClass} id="songs">
-      <p className="inv-eyebrow">{kicker}</p>
-      <h2 className="inv-h2">{title}</h2>
-      <p className="inv-body" style={{ marginBottom: "var(--sp-5)" }}>
+      <p className="kicker">{kicker}</p>
+      <h2 className="section-title">{title}</h2>
+      <p style={{ marginBottom: "var(--sp-5)" }}>
         Dejanos el tema que no puede faltar esa noche.
       </p>
 
@@ -121,27 +121,25 @@ export function SongSuggestion({
       {!submitted ? (
         <form onSubmit={handleSubmit} noValidate>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-2)", marginBottom: "var(--sp-3)" }}>
-            <div style={{ display: "flex", gap: "var(--sp-2)" }}>
+            <div className="mod-input-row">
               <input
                 ref={inputRef}
-                className="inv-input"
                 type="text"
                 placeholder="Nombre de la canción"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 maxLength={100}
                 aria-label="Nombre de la canción"
-                style={{ flex: 2 }}
+                style={{ flex: 2, padding: "12px 14px", borderRadius: "var(--radius-s)", border: "1px solid rgba(255,255,255,.2)", background: "rgba(255,255,255,.1)", color: "var(--on-ink)" }}
               />
               <input
-                className="inv-input"
                 type="text"
                 placeholder="Artista"
                 value={artistValue}
                 onChange={(e) => setArtistValue(e.target.value)}
                 maxLength={80}
                 aria-label="Artista"
-                style={{ flex: 1 }}
+                style={{ flex: 1, padding: "12px 14px", borderRadius: "var(--radius-s)", border: "1px solid rgba(255,255,255,.2)", background: "rgba(255,255,255,.1)", color: "var(--on-ink)" }}
               />
             </div>
             {error && (
@@ -151,9 +149,9 @@ export function SongSuggestion({
             )}
             <button
               type="submit"
-              className="inv-btn"
+              className="btn solid"
               disabled={isSubmitting}
-              style={{ width: "100%" }}
+              style={{ width: "100%", padding: "12px", marginTop: "4px" }}
             >
               {isSubmitting ? "Enviando…" : "Enviar sugerencia"}
             </button>
@@ -182,25 +180,25 @@ export function SongSuggestion({
 
       {/* Lista pública */}
       {showPublicList && songs.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-2)", marginTop: "var(--sp-4)" }}>
+        <div className="mod-list">
           {songs
             .sort((a, b) => b.votes - a.votes)
             .slice(0, 10)
             .map((song) => {
               const alreadyVoted = votedIds.has(song.id);
               return (
-                <div key={song.id} className="inv-song-item">
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <b style={{ display: "block", fontSize: "13.5px", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <div key={song.id} className="mod-item">
+                  <div className="meta" style={{ flex: 1, minWidth: 0, paddingRight: 8 }}>
+                    <b style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {song.title}
                     </b>
-                    <span style={{ opacity: 0.6, fontSize: "11.5px" }}>
+                    <span>
                       {song.artist}
                       {song.guestName ? ` · sugerida por ${song.guestName}` : ""}
                     </span>
                   </div>
                   <button
-                    className="inv-vote-btn"
+                    className="badge"
                     onClick={() => handleVote(song.id)}
                     disabled={alreadyVoted}
                     aria-label={`${alreadyVoted ? "Ya votaste" : "Votar"} "${song.title}" — ${song.votes} votos`}
