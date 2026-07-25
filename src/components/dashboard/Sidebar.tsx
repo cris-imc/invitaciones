@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import {
     BarChart,
     Calendar,
@@ -14,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-const sidebarItems = [
+const allSidebarItems = [
     {
         title: "Inicio",
         href: "/dashboard",
@@ -26,25 +27,26 @@ const sidebarItems = [
         icon: Heart,
     },
     {
-        title: "Clientes (Admin)",
-        href: "/dashboard/clientes",
-        icon: Users,
-        adminOnly: true,
-    },
-    {
         title: "Analytics",
         href: "/dashboard/analytics",
         icon: BarChart,
-    },
-    {
-        title: "Configuración",
-        href: "/dashboard/configuracion",
-        icon: Settings,
-    },
+    }
 ];
 
 export function Sidebar() {
     const pathname = usePathname();
+    const { data: session } = useSession();
+    const role = session?.user?.role || "CLIENT";
+
+    // Filter items based on role
+    const sidebarItems = allSidebarItems.filter(item => {
+        if (role === "ADMIN") {
+            // Admin solo ve Inicio y Analytics
+            return item.title === "Inicio" || item.title === "Analytics";
+        }
+        // Client ve todo lo definido arriba
+        return true;
+    });
 
     return (
         <>
@@ -72,13 +74,13 @@ export function Sidebar() {
 
                 <div className="p-side-foot">
                     <div className="seal">
-                        <span className="font-display">U</span>
+                        <span className="font-display">{session?.user?.name?.charAt(0).toUpperCase() || 'U'}</span>
                     </div>
                     <div className="who flex-1">
-                        <b>Mi Cuenta</b>
-                        <span>Ver Perfil</span>
+                        <b>{session?.user?.name || 'Mi Cuenta'}</b>
+                        <span className="text-xs opacity-70 truncate">{session?.user?.email || 'Ver Perfil'}</span>
                     </div>
-                    <button className="text-danger hover:text-danger/80">
+                    <button onClick={() => signOut({ callbackUrl: '/login' })} className="text-danger hover:text-danger/80">
                         <LogOut className="w-4 h-4" />
                     </button>
                 </div>

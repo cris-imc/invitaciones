@@ -45,26 +45,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--ink)]">
+      <div className="w-full max-w-md relative z-10">
+        <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-8 shadow-2xl text-[var(--on-ink)]">
           {/* Logo/Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-4">
-              <Sparkles className="w-8 h-8 text-white" />
+            <div className="mx-auto seal mb-4" style={{ borderColor: 'var(--line)', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)' }}>
+              <span className="font-display" style={{ color: 'var(--paper)', fontSize: 32, fontWeight: 700 }}>C</span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="font-display text-3xl mb-2">
               Iniciar Sesión
             </h1>
-            <p className="text-gray-600">
+            <p className="opacity-70 font-body">
               Accede a tu cuenta de invitaciones digitales
             </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 font-body">
             <div>
-              <Label htmlFor="email" className="flex items-center gap-2 mb-2">
+              <Label htmlFor="email" className="flex items-center gap-2 mb-2 opacity-80">
                 <Mail className="w-4 h-4" />
                 Email
               </Label>
@@ -77,12 +77,12 @@ export default function LoginPage() {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
-                className="w-full"
+                className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
               />
             </div>
 
             <div>
-              <Label htmlFor="password" className="flex items-center gap-2 mb-2">
+              <Label htmlFor="password" className="flex items-center gap-2 mb-2 opacity-80">
                 <Lock className="w-4 h-4" />
                 Contraseña
               </Label>
@@ -95,45 +95,38 @@ export default function LoginPage() {
                   setFormData({ ...formData, password: e.target.value })
                 }
                 required
-                className="w-full"
+                className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
               />
             </div>
 
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-6 text-lg font-semibold"
+              className="w-full h-12 rounded-xl bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--paper)]/90 font-semibold mt-4 transition-all"
             >
               {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
           </form>
 
           {/* Divider */}
-          <div className="my-6 flex items-center">
-            <div className="flex-1 border-t border-gray-300"></div>
-            <span className="px-4 text-sm text-gray-500">o</span>
-            <div className="flex-1 border-t border-gray-300"></div>
+          <div className="my-6 flex items-center opacity-30">
+            <div className="flex-1 border-t border-current"></div>
+            <span className="px-4 text-sm font-mono uppercase tracking-widest">o</span>
+            <div className="flex-1 border-t border-current"></div>
           </div>
 
           {/* Register Link */}
-          <div className="text-center">
-            <p className="text-gray-600">
+          <div className="text-center font-body">
+            <p className="opacity-70">
               ¿No tienes cuenta?{" "}
               <Link
                 href="/register"
-                className="text-purple-600 hover:text-purple-700 font-semibold"
+                className="text-[var(--paper)] hover:underline font-semibold opacity-100"
               >
                 Regístrate gratis
               </Link>
             </p>
           </div>
-        </div>
-
-        {/* Admin Demo Credentials */}
-        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-          <p className="font-semibold text-blue-900 mb-1">Demo Admin:</p>
-          <p className="text-blue-700">Email: admin@invitaciones.com</p>
-          <p className="text-blue-700">Pass: 97Chucky-</p>
         </div>
       </div>
     </div>

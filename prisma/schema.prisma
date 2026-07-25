@@ -96,6 +96,7 @@ model Invitation {
 
   // Plan tier snapshot (to preserve features if user downgrades)
   planTier String @default("FREE") // FREE, PREMIUM, ENTERPRISE, ADMIN
+  maxGuestsOverride Int? // Admin-defined guest limit for this specific invitation
 
   // Datos básicos
   tipo   String // CASAMIENTO, QUINCE_ANOS, CUMPLEANOS, BAUTISMO, COMUNION, OTRO

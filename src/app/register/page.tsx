@@ -68,25 +68,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen py-12 px-4 flex items-center justify-center bg-[var(--ink)]">
+      <div className="max-w-6xl mx-auto w-full relative z-10 text-[var(--on-ink)]">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-4">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className="mx-auto seal mb-4" style={{ borderColor: 'var(--line)', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)' }}>
+            <span className="font-display" style={{ color: 'var(--paper)', fontSize: 32, fontWeight: 700 }}>C</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-display mb-2">
             Crea tu cuenta
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="opacity-70 text-lg font-body">
             Comienza a crear invitaciones digitales increíbles
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-8 font-body">
           {/* Plan Selection */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl font-display mb-6">
               Elige tu plan
             </h2>
 
@@ -94,49 +94,49 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setSelectedPlan("FREE")}
-              className={`w-full text-left p-6 rounded-xl border-2 transition-all ${
+              className={`w-full text-left p-6 rounded-3xl border transition-all ${
                 selectedPlan === "FREE"
-                  ? "border-purple-500 bg-purple-50 shadow-lg"
-                  : "border-gray-200 hover:border-purple-300"
+                  ? "border-[var(--paper)] bg-[var(--ink-2)] shadow-[0_0_20px_rgba(246,243,236,0.1)]"
+                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md"
               }`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-display">
                     {PLAN_LIMITS.FREE.name}
                   </h3>
-                  <p className="text-3xl font-bold text-purple-600 mt-2">
+                  <p className="text-3xl font-display text-[var(--paper)] mt-2">
                     {formatPrice(PLAN_LIMITS.FREE.price)}
                   </p>
                 </div>
                 {selectedPlan === "FREE" && (
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <Check className="w-5 h-5 text-white" />
+                  <div className="w-8 h-8 bg-[var(--paper)] rounded-full flex items-center justify-center">
+                    <Check className="w-5 h-5 text-[var(--ink)]" />
                   </div>
                 )}
               </div>
-              <ul className="space-y-2 text-gray-700">
+              <ul className="space-y-2 opacity-80">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   Hasta {PLAN_LIMITS.FREE.maxGuests} invitados
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   {PLAN_LIMITS.FREE.maxInvitations} evento
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   4 plantillas premium
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   RSVP básico
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   Cuenta regresiva
                 </li>
-                <li className="text-sm text-gray-500 italic">
+                <li className="text-sm opacity-60 italic">
                   * Incluye marca de agua
                 </li>
               </ul>
@@ -146,76 +146,76 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setSelectedPlan("PREMIUM")}
-              className={`w-full text-left p-6 rounded-xl border-2 transition-all relative ${
+              className={`w-full text-left p-6 rounded-3xl border transition-all relative ${
                 selectedPlan === "PREMIUM"
-                  ? "border-purple-500 bg-purple-50 shadow-lg"
-                  : "border-gray-200 hover:border-purple-300"
+                  ? "border-[var(--paper)] bg-[var(--ink-2)] shadow-[0_0_20px_rgba(246,243,236,0.1)]"
+                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md"
               }`}
             >
-              <div className="absolute -top-3 right-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+              <div className="absolute -top-3 right-6 bg-[var(--paper)] text-[var(--ink)] px-4 py-1 rounded-full text-sm font-semibold font-mono tracking-wide uppercase">
                 Más Popular
               </div>
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-2xl font-display">
                     {PLAN_LIMITS.PREMIUM.name}
                   </h3>
-                  <p className="text-3xl font-bold text-purple-600 mt-2">
+                  <p className="text-3xl font-display text-[var(--paper)] mt-2">
                     {formatPrice(PLAN_LIMITS.PREMIUM.price)}
                   </p>
-                  <p className="text-sm text-gray-500">pago único por evento</p>
+                  <p className="text-sm opacity-60">pago único por evento</p>
                 </div>
                 {selectedPlan === "PREMIUM" && (
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <Check className="w-5 h-5 text-white" />
+                  <div className="w-8 h-8 bg-[var(--paper)] rounded-full flex items-center justify-center">
+                    <Check className="w-5 h-5 text-[var(--ink)]" />
                   </div>
                 )}
               </div>
-              <ul className="space-y-2 text-gray-700">
+              <ul className="space-y-2 opacity-80">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   <strong>Invitados ilimitados</strong>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   Todas las plantillas
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   Álbum de fotos colaborativo
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   Cuestionarios interactivos
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   Música personalizada
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   <strong>Sin marca de agua</strong>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-green-400" />
                   Soporte prioritario
                 </li>
               </ul>
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+              <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-500">
                 ⚠️ El pago se habilitará próximamente con Mercado Pago
               </div>
             </button>
           </div>
 
           {/* Registration Form */}
-          <div className="bg-white rounded-2xl shadow-2xl p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-8 shadow-2xl">
+            <h2 className="text-2xl font-display mb-6">
               Datos de tu cuenta
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label htmlFor="name" className="flex items-center gap-2 mb-2">
+                <Label htmlFor="name" className="flex items-center gap-2 mb-2 opacity-80">
                   <User className="w-4 h-4" />
                   Nombre completo
                 </Label>
@@ -228,12 +228,12 @@ export default function RegisterPage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   required
-                  className="w-full"
+                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                 />
               </div>
 
               <div>
-                <Label htmlFor="email" className="flex items-center gap-2 mb-2">
+                <Label htmlFor="email" className="flex items-center gap-2 mb-2 opacity-80">
                   <Mail className="w-4 h-4" />
                   Email
                 </Label>
@@ -246,12 +246,12 @@ export default function RegisterPage() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
-                  className="w-full"
+                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                 />
               </div>
 
               <div>
-                <Label htmlFor="password" className="flex items-center gap-2 mb-2">
+                <Label htmlFor="password" className="flex items-center gap-2 mb-2 opacity-80">
                   <Lock className="w-4 h-4" />
                   Contraseña
                 </Label>
@@ -265,14 +265,14 @@ export default function RegisterPage() {
                   }
                   required
                   minLength={6}
-                  className="w-full"
+                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                 />
               </div>
 
               <div>
                 <Label
                   htmlFor="confirmPassword"
-                  className="flex items-center gap-2 mb-2"
+                  className="flex items-center gap-2 mb-2 opacity-80"
                 >
                   <Lock className="w-4 h-4" />
                   Confirmar contraseña
@@ -287,14 +287,14 @@ export default function RegisterPage() {
                   }
                   required
                   minLength={6}
-                  className="w-full"
+                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-6 text-lg font-semibold"
+                className="w-full h-12 rounded-xl bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--paper)]/90 font-semibold mt-4 transition-all"
               >
                 {isLoading
                   ? "Creando cuenta..."
@@ -302,11 +302,11 @@ export default function RegisterPage() {
               </Button>
 
               <div className="text-center pt-4">
-                <p className="text-gray-600">
+                <p className="opacity-70">
                   ¿Ya tienes cuenta?{" "}
                   <Link
                     href="/login"
-                    className="text-purple-600 hover:text-purple-700 font-semibold"
+                    className="text-[var(--paper)] hover:underline font-semibold opacity-100"
                   >
                     Inicia sesión
                   </Link>

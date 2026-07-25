@@ -28,7 +28,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     name: "Gratis",
     price: 0,
     maxInvitations: 1,
-    maxGuests: 40,
+    maxGuests: 20,
     maxPhotos: 10,
     allowedTemplates: [
       "modern-invitation",
@@ -51,7 +51,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   },
   PREMIUM: {
     name: "Premium",
-    price: 25000,
+    price: 50000,
     maxInvitations: 10,
     maxGuests: null, // unlimited
     maxPhotos: 200,

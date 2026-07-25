@@ -5,6 +5,8 @@ import { CalendarCheck, Eye, Plus, Users, Music, TrendingUp } from "lucide-react
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { AdminInvitationRow } from "@/components/dashboard/AdminInvitationRow";
+import { AdminPlanSelect } from "@/components/dashboard/AdminPlanSelect";
 
 async function getDashboardStats(userId: string) {
   const invitations = await prisma.invitation.findMany({
@@ -58,8 +60,56 @@ export default async function DashboardPage() {
   if (!session?.user) redirect("/login");
 
   const userId  = session.user.id as string;
-  const stats   = await getDashboardStats(userId);
+  const role = session.user.role as string;
   const userName = (session.user.name ?? "").split(" ")[0] || "anfitrión";
+
+  if (role === "ADMIN") {
+    const clients = await prisma.user.findMany({
+      where: { role: "CLIENT" },
+      include: {
+        invitations: {
+          orderBy: { createdAt: "desc" }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return (
+      <>
+        {/* Topbar */}
+        <div className="p-topbar">
+          <div>
+            <h2>Panel de Administrador 👋</h2>
+            <p>Gestiona los clientes activos y sus invitaciones.</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4 mt-6">
+          {clients.map(client => (
+            <div key={client.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+               <h3 className="font-bold text-xl mb-1 text-gray-900">
+                 {client.name} <span className="text-sm text-gray-500 font-normal">({client.email})</span>
+               </h3>
+               <AdminPlanSelect userId={client.id} currentPlan={client.planTier} />
+               
+               {client.invitations.length === 0 ? (
+                 <p className="text-sm text-gray-400 mt-2">No tiene invitaciones creadas.</p>
+               ) : (
+                 <div className="flex flex-col gap-2 mt-4">
+                   {client.invitations.map(inv => (
+                      <AdminInvitationRow key={inv.id} invitation={inv} />
+                   ))}
+                 </div>
+               )}
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  // Lógica original para CLIENT
+  const stats   = await getDashboardStats(userId);
 
   const kpis = [
     {

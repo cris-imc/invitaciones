@@ -47,10 +47,10 @@ export async function POST(
         const { slug } = await params;
         const body = await request.json();
 
-        // Primero obtener la invitación para conseguir su ID
+        // Primero obtener la invitación para conseguir su ID y plan
         const invitation = await prisma.invitation.findUnique({
             where: { slug },
-            select: { id: true }
+            select: { id: true, planTier: true, maxGuestsOverride: true }
         });
 
         if (!invitation) {
@@ -58,6 +58,29 @@ export async function POST(
                 { error: "Invitación no encontrada" },
                 { status: 404 }
             );
+        }
+
+        // Obtener límite de invitados (override o el del plan)
+        const { PLAN_LIMITS } = await import("@/lib/plan-limits");
+        const planLimit = PLAN_LIMITS[invitation.planTier as keyof typeof PLAN_LIMITS]?.maxGuests;
+        const maxGuests = invitation.maxGuestsOverride !== null ? invitation.maxGuestsOverride : planLimit;
+        
+        // Calcular total actual de invitados esperados
+        if (maxGuests !== null) {
+            const currentGuests = await prisma.guest.aggregate({
+                where: { invitationId: invitation.id },
+                _sum: { expectedCount: true }
+            });
+            
+            const totalCurrent = currentGuests._sum.expectedCount || 0;
+            const toAdd = body.expectedCount || 1;
+            
+            if (totalCurrent + toAdd > maxGuests) {
+                return NextResponse.json(
+                    { error: `Límite de invitados superado (Máximo: ${maxGuests})` },
+                    { status: 400 }
+                );
+            }
         }
 
         // Generar token único para el invitado
