@@ -23,6 +23,12 @@ export const useWizardStore = create<WizardState>((set) => ({
         templateTipo: "ORIGINAL", // Default template
 
         // Initial values for new fields
+        portadaHabilitada: true,
+        portadaKicker: "Con mucho cariño, para",
+        portadaTitulo: "",
+        portadaDressCode: "",
+        portadaMensaje: "",
+        portadaTextoBoton: "Abrir invitación",
         frasePersonalizadaHabilitada: false,
         frasePersonalizadaTexto: "",
 
@@ -65,7 +71,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         currentStep: Math.max(0, state.currentStep - 1)
     })),
     setStep: (step) => set({ currentStep: step }),
-    reset: () => set({
+    reset: () => set((state) => ({
         currentStep: 0,
         data: {
             colorPrincipal: "#000000",
@@ -79,13 +85,19 @@ export const useWizardStore = create<WizardState>((set) => ({
             rsvpDaysBeforeEvent: 7,
             
             // Booleans Defaults
+            portadaHabilitada: true,
+            portadaKicker: "Con mucho cariño, para",
+            portadaTitulo: "",
+            portadaDressCode: "",
+            portadaMensaje: "",
+            portadaTextoBoton: "Abrir invitación",
             frasePersonalizadaHabilitada: false,
             regaloHabilitado: false,
             triviaHabilitada: false,
             albumCompartidoHabilitado: true,
         },
         themeConfig: DEFAULT_THEME_CONFIG,
-        usePremiumCredit: false
-    }),
+        usePremiumCredit: state.usePremiumCredit
+    })),
 }));
 

@@ -77,8 +77,13 @@ export function StepDetails() {
                                     <FormLabel>Horario</FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input className="pl-9" type="time" {...field} />
+                                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
+                                            <Input 
+                                                className="pl-9 [&::-webkit-calendar-picker-indicator]:hidden cursor-pointer" 
+                                                type="time" 
+                                                onClick={(e) => "showPicker" in e.currentTarget && typeof e.currentTarget.showPicker === 'function' && e.currentTarget.showPicker()}
+                                                {...field} 
+                                            />
                                         </div>
                                     </FormControl>
                                     <FormMessage />

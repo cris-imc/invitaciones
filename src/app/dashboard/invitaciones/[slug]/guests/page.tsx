@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GuestManager } from "@/components/dashboard/guests/GuestManager";
 import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPayment";
 import { SongModerationPanel } from "@/components/dashboard/SongModerationPanel";
+import { QuickEditPrice } from "@/components/dashboard/QuickEditPrice";
 import { EventShareCard } from "@/components/dashboard/EventShareCard";
 
 export default async function GuestManagementPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -73,13 +74,22 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         </div>
       </div>
 
-      <EventShareCard slug={slug} eventName={invitation.nombreEvento} />
+      <EventShareCard slug={slug} eventName={invitation.nombreEvento} invitationId={invitation.id} />
 
       <Tabs defaultValue="invitados" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="invitados">Invitados & Pagos</TabsTrigger>
-          <TabsTrigger value="canciones">Música</TabsTrigger>
-          <TabsTrigger value="agregar">Agregar Invitado</TabsTrigger>
+        <TabsList className="mb-4 w-full flex flex-wrap justify-start gap-2 h-auto p-1 bg-muted/50">
+          <TabsTrigger value="invitados" className="h-9">Invitados & Pagos</TabsTrigger>
+          <TabsTrigger value="canciones" className="h-9">Música</TabsTrigger>
+          {invitation.regaloHabilitado && (
+            <TabsTrigger value="precio" className="h-9">Precio Tarjeta</TabsTrigger>
+          )}
+          <div className="flex-1 min-w-[20px]" />
+          <TabsTrigger 
+            value="agregar" 
+            className="h-10 px-6 font-bold bg-indigo-600 text-white hover:bg-indigo-700 data-[state=active]:bg-indigo-800 data-[state=active]:text-white shadow-md transition-all rounded-lg border border-indigo-500"
+          >
+            Gestionar Invitados 📲
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="invitados">
@@ -97,6 +107,22 @@ export default async function GuestManagementPage({ params }: { params: Promise<
             <SongModerationPanel invitationId={invitation.id} />
           </div>
         </TabsContent>
+
+        {invitation.regaloHabilitado && (
+          <TabsContent value="precio">
+            <div className="bg-card border rounded-lg p-6 max-w-lg">
+              <h2 className="text-xl font-semibold mb-6">Actualizar Precio de Tarjeta</h2>
+              <p className="text-muted-foreground text-sm mb-6">
+                Modifica rápidamente el valor por persona. Al cambiarlo aquí, aparecerá un indicador animado de &quot;¡Valor Actualizado!&quot; en la invitación de forma automática por 72 horas.
+              </p>
+              <QuickEditPrice 
+                invitationId={invitation.id}
+                slug={invitation.slug}
+                currentAmount={invitation.regaloMonto ?? null}
+              />
+            </div>
+          </TabsContent>
+        )}
 
         <TabsContent value="agregar">
           {/* Reutilizamos el GuestManager viejo solo para el form de agregar y sus stats, 

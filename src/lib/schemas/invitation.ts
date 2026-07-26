@@ -7,6 +7,7 @@ export const eventTypeSchema = z.object({
 export const basicInfoSchema = z.object({
     nombreEvento: z.string().min(3, "El nombre del evento debe tener al menos 3 caracteres"),
     fecha: z.date(),
+    ciudad: z.string().optional(),
     nombreNovio: z.string().optional(),
     nombreNovia: z.string().optional(),
     nombreQuinceanera: z.string().optional(),
@@ -22,7 +23,10 @@ export const detailsSchema = z.object({
 
 export const coverPageSchema = z.object({
     portadaHabilitada: z.boolean().default(true),
+    portadaKicker: z.string().optional(),
     portadaTitulo: z.string().optional(),
+    portadaDressCode: z.string().optional(),
+    portadaMensaje: z.string().optional(),
     portadaTextoBoton: z.string().optional(),
     portadaImagenFondo: z.string().optional(),
     portadaImagenFondoDesktop: z.string().optional(),
@@ -57,10 +61,20 @@ export const triviaSchema = z.object({
     triviaPreguntas: z.string().optional(), // JSON string
 });
 
+export const ceremoniaSchema = z.object({
+    ceremoniaHabilitada: z.boolean().default(false),
+    ceremoniaTitulo: z.string().optional(),
+    ceremoniaNombre: z.string().optional(),
+    ceremoniaDireccion: z.string().optional(),
+    ceremoniaHora: z.string().optional(),
+    ceremoniaMapUrl: z.string().optional(),
+});
+
 export const invitationSchema = z.object({
     ...eventTypeSchema.shape,
     ...basicInfoSchema.shape,
     ...detailsSchema.shape,
+    ...ceremoniaSchema.shape,
     ...coverPageSchema.shape,
     ...gallerySchema.shape,
     ...musicSchema.shape,

@@ -8,36 +8,27 @@ datasource db {
 }
 
 model User {
-  id                    String              @id @default(cuid())
-  email                 String              @unique
+  id                    String       @id @default(cuid())
+  email                 String       @unique
   emailVerified         DateTime?
-  password              String?             // hashed with bcrypt
+  password              String?
   name                  String
   image                 String?
-  role                  String              @default("CLIENT") // ADMIN, CLIENT, GUEST
-  
-  // Membership fields (using String for SQLite compatibility)
-  planTier              String              @default("FREE") // FREE, PREMIUM, ENTERPRISE, ADMIN
-  subscriptionStatus    String              @default("TRIAL") // ACTIVE, CANCELLED, EXPIRED, TRIAL
+  role                  String       @default("CLIENT")
+  planTier              String       @default("FREE")
+  subscriptionStatus    String       @default("TRIAL")
   subscriptionStartDate DateTime?
   subscriptionEndDate   DateTime?
-  
-  premiumCredits        Int                 @default(0) // Contador de invitaciones premium compradas disponibles
-
-  // Payment integration (future)
-  mercadoPagoCustomerId String?             @unique
-  
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt
-  
-  // Relations
-  invitations           Invitation[]
+  premiumCredits        Int          @default(0)
+  mercadoPagoCustomerId String?      @unique
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
   accounts              Account[]
-  sessions              Session[]
+  invitations           Invitation[]
   payments              Payment[]
+  sessions              Session[]
 }
 
-// NextAuth.js Models
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -51,8 +42,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -74,205 +64,157 @@ model VerificationToken {
 }
 
 model Payment {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  amount          Float
-  currency        String   @default("ARS")
-  status          String   // pending, completed, failed
-  paymentMethod   String?  // mercadopago, stripe, etc
-  planTier        String   // FREE, PREMIUM, ENTERPRISE, ADMIN
-  
-  mercadoPagoId   String?  @unique
-  
-  createdAt       DateTime @default(now())
-  
+  id            String   @id @default(cuid())
+  userId        String
+  amount        Float
+  currency      String   @default("ARS")
+  status        String
+  paymentMethod String?
+  planTier      String
+  mercadoPagoId String?  @unique
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
 model Invitation {
-  id     String   @id @default(cuid())
-  userId String
-  user   User     @relation(fields: [userId], references: [id])
-
-  // Plan tier snapshot (to preserve features if user downgrades)
-  planTier String @default("FREE") // FREE, PREMIUM, ENTERPRISE, ADMIN
-  maxGuestsOverride Int? // Admin-defined guest limit for this specific invitation
-
-  // Datos básicos
-  tipo   String // CASAMIENTO, QUINCE_ANOS, CUMPLEANOS, BAUTISMO, COMUNION, OTRO
-  estado String @default("BORRADOR") // BORRADOR, ACTIVA, FINALIZADA
-  slug   String @unique
-
-  // Datos del evento
-  nombreEvento String
-  fechaEvento  DateTime
-
-  // Casamiento específico
-  nombreNovio String?
-  nombreNovia String?
-
-  // 15 años específico
-  nombreQuinceanera String?
-
-  // Detalles del evento
-  lugarNombre String?
-  direccion   String?
-  hora        String?
-  mapUrl      String?
-
-  // Configuración
-  templateId            String
-  templateTipo          String  @default("ORIGINAL") // ORIGINAL, PARALLAX
-  temaColores           String // JSON as string for SQLite (mantener para backward compatibility)
-  imagenCelebremosJuntos String?
-  cronogramaEventos     String? // JSON array: [{time, title, icon}]
-  musicaUrl             String?
-
-  // 1. PORTADA
-  portadaHabilitada     Boolean @default(true)
-  portadaTitulo         String?
-  portadaTextoBoton     String?
-  portadaImagenFondo    String?
-  portadaImagenFondoDesktop String?
-  portadaImagenPosX          Int     @default(50)
-  portadaImagenPosY          Int     @default(50)
-  portadaImagenEscala        Int     @default(100)
-  portadaImagenDesktopPosX   Int     @default(50)
-  portadaImagenDesktopPosY   Int     @default(50)
-  portadaImagenDesktopEscala Int     @default(100)
-
-  // 2. MÚSICA
-  musicaHabilitada Boolean @default(true)
-  musicaAutoplay   Boolean @default(true)
-  musicaLoop       Boolean @default(true)
-
-  // 4. CONTADOR
-  contadorHabilitado Boolean @default(true)
-
-  // 5. SECCIÓN CUÁNDO
-  seccionCuandoHabilitada Boolean @default(true)
-  seccionCuandoIcono      String?
-  seccionCuandoTitulo     String?
-
-  // 6. SECCIÓN DÓNDE
-  seccionDondeHabilitada Boolean @default(true)
-  seccionDondeIcono      String?
-  seccionDondeTitulo     String?
-  lugarBotonTexto        String?
-
-  // 7. DRESS CODE
-  dresscodeHabilitado    Boolean @default(false)
-  dresscodeIcono         String?
-  dresscodeTitulo        String?
-  dresscodeTipo          String?
-  dresscodeObservaciones String?
-
-  // 8. GALERÍA PRINCIPAL
-  galeriaPrincipalHabilitada Boolean @default(true)
-  galeriaPrincipalFotos      String? // JSON array de URLs
-  galeriaPrincipalEstilo     String? // carrusel, grid, masonry
-  galeriaPrincipalAutoplay   Boolean @default(false)
-
-  // 9. FRASE PERSONALIZADA
-  frasePersonalizadaHabilitada Boolean @default(false)
+  id                           String           @id @default(cuid())
+  userId                       String
+  planTier                     String           @default("FREE")
+  maxGuestsOverride            Int?
+  tipo                         String
+  estado                       String           @default("BORRADOR")
+  slug                         String           @unique
+  nombreEvento                 String
+  fechaEvento                  DateTime
+  nombreNovio                  String?
+  nombreNovia                  String?
+  nombreQuinceanera            String?
+  lugarNombre                  String?
+  direccion                    String?
+  hora                         String?
+  mapUrl                       String?
+  templateId                   String
+  templateTipo                 String           @default("ORIGINAL")
+  temaColores                  String
+  imagenCelebremosJuntos       String?
+  cronogramaEventos            String?
+  musicaUrl                    String?
+  portadaHabilitada            Boolean          @default(true)
+  portadaTitulo                String?
+  portadaDressCode             String?
+  portadaTextoBoton            String?
+  portadaImagenFondo           String?
+  portadaImagenFondoDesktop    String?
+  portadaImagenPosX            Int              @default(50)
+  portadaImagenPosY            Int              @default(50)
+  portadaImagenEscala          Int              @default(100)
+  portadaImagenDesktopPosX     Int              @default(50)
+  portadaImagenDesktopPosY     Int              @default(50)
+  portadaImagenDesktopEscala   Int              @default(100)
+  musicaHabilitada             Boolean          @default(true)
+  musicaAutoplay               Boolean          @default(true)
+  musicaLoop                   Boolean          @default(true)
+  contadorHabilitado           Boolean          @default(true)
+  seccionCuandoHabilitada      Boolean          @default(true)
+  seccionCuandoIcono           String?
+  seccionCuandoTitulo          String?
+  seccionDondeHabilitada       Boolean          @default(true)
+  seccionDondeIcono            String?
+  seccionDondeTitulo           String?
+  lugarBotonTexto              String?
+  ceremoniaHabilitada          Boolean          @default(false)
+  ceremoniaTitulo              String?
+  ceremoniaNombre              String?
+  ceremoniaDireccion           String?
+  ceremoniaHora                String?
+  ceremoniaMapUrl              String?
+  dresscodeHabilitado          Boolean          @default(false)
+  dresscodeIcono               String?
+  dresscodeTitulo              String?
+  dresscodeTipo                String?
+  dresscodeObservaciones       String?
+  galeriaPrincipalHabilitada   Boolean          @default(true)
+  galeriaPrincipalFotos        String?
+  galeriaPrincipalEstilo       String?
+  galeriaPrincipalAutoplay     Boolean          @default(false)
+  frasePersonalizadaHabilitada Boolean          @default(false)
   frasePersonalizadaTexto      String?
   frasePersonalizadaEstilo     String?
-
-  // 10. ÁLBUM COMPARTIDO
-  albumCompartidoHabilitado  Boolean @default(true)
-  albumCompartidoIcono       String?
-  albumCompartidoTitulo      String?
-  albumCompartidoDescripcion String?
-  albumCompartidoBotonTexto  String?
-
-  // 11. REGALO/DATOS BANCARIOS
-  regaloHabilitado   Boolean @default(false)
-  regaloIcono        String?
-  regaloTitulo       String?
-  regaloMensaje      String?
-  regaloMostrarDatos Boolean @default(false)
-  regaloAlias        String?
-  regaloCvu          String?
-  regaloCbu          String?
-  regaloBanco        String?
-  regaloTitular      String?
-  regaloMonto        Float?  // Monto por persona (tarjeta)
-
-  // 12. GALERÍA SECUNDARIA
-  galeriaSecundariaHabilitada Boolean @default(false)
-  galeriaSecundariaFotos      String? // JSON array de URLs
-
-  // 13. MENSAJE MOTIVACIONAL
-  mensajeFinalHabilitado Boolean @default(false)
-  mensajeFinalTexto      String?
-
-  // 14. TRIVIA
-  triviaHabilitada Boolean @default(false)
-  triviaIcono      String?
-  triviaTitulo     String?
-  triviaSubtitulo  String?
-  triviaPreguntas  String? // JSON array de preguntas
-  triviaBotonTexto String?
-
-  // 15. CONFIRMACIÓN & RSVP
-  rsvpEnabled  Boolean   @default(true) // Replaces confirmacionHabilitada
-  rsvpType     String?   @default("INDIVIDUAL") // INDIVIDUAL, FAMILY
-  rsvpDeadline DateTime? // Replaces confirmacionFechaLimite
-  rsvpDaysBeforeEvent Int? @default(7) // Días sugeridos antes del evento para confirmar
-
-  // Legacy confirmation fields (keep for now or migrate)
-  confirmacionHabilitada  Boolean   @default(true)
-  confirmacionIcono       String?
-  confirmacionTitulo      String?
-  confirmacionFechaLimite DateTime?
-  confirmacionWhatsapp    String?
-  confirmacionEmail       String?
-
-  // 16. DESPEDIDA
-  despedidaHabilitada Boolean @default(false)
-  despedidaIcono      String?
-  despedidaTexto      String?
-  despedidaFoto       String?
-
-  // Relaciones
-  album           Album?
-  rsvps           RSVP[] // Legacy open RSVPs
-  guests          Guest[] // New Invite-only Guest list
-  cuestionario    Cuestionario?
-  songSuggestions SongSuggestion[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  albumCompartidoHabilitado    Boolean          @default(true)
+  albumCompartidoIcono         String?
+  albumCompartidoTitulo        String?
+  albumCompartidoDescripcion   String?
+  albumCompartidoBotonTexto    String?
+  regaloHabilitado             Boolean          @default(false)
+  regaloIcono                  String?
+  regaloTitulo                 String?
+  regaloMensaje                String?
+  regaloMostrarDatos           Boolean          @default(false)
+  regaloAlias                  String?
+  regaloCvu                    String?
+  regaloCbu                    String?
+  regaloBanco                  String?
+  regaloTitular                String?
+  regaloMonto                  Float?
+  regaloMontoUpdatedAt         DateTime?
+  galeriaSecundariaHabilitada  Boolean          @default(false)
+  galeriaSecundariaFotos       String?
+  mensajeFinalHabilitado       Boolean          @default(false)
+  mensajeFinalTexto            String?
+  triviaHabilitada             Boolean          @default(false)
+  triviaIcono                  String?
+  triviaTitulo                 String?
+  triviaSubtitulo              String?
+  triviaPreguntas              String?
+  triviaBotonTexto             String?
+  rsvpEnabled                  Boolean          @default(true)
+  rsvpType                     String?          @default("INDIVIDUAL")
+  rsvpDeadline                 DateTime?
+  rsvpDaysBeforeEvent          Int?             @default(7)
+  confirmacionHabilitada       Boolean          @default(true)
+  confirmacionIcono            String?
+  confirmacionTitulo           String?
+  confirmacionFechaLimite      DateTime?
+  confirmacionWhatsapp         String?
+  confirmacionEmail            String?
+  despedidaHabilitada          Boolean          @default(false)
+  despedidaIcono               String?
+  despedidaTexto               String?
+  despedidaFoto                String?
+  createdAt                    DateTime         @default(now())
+  updatedAt                    DateTime         @updatedAt
+  ciudad                       String?
+  portadaKicker                String?
+  portadaMensaje               String?
+  album                        Album?
+  cuestionario                 Cuestionario?
+  guests                       Guest[]
+  user                         User             @relation(fields: [userId], references: [id])
+  rsvps                        RSVP[]
+  songSuggestions              SongSuggestion[]
 }
 
 model Guest {
-  id           String     @id @default(cuid())
-  invitationId String
-  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
-
-  name          String // "Familia Perez" or "Juan Perez"
-  type          String @default("INDIVIDUAL") // INDIVIDUAL, FAMILY
-  expectedCount Int    @default(1) // Max people allowed for this guest/family
-
-  uniqueToken String @unique // Secure link token
-
-  status         String    @default("PENDING") // PENDING, CONFIRMED, DECLINED
-  attendingCount Int       @default(0) // Actual number attending
-  message        String? // Optional message to host
-  responseDate   DateTime?
-  dietaryRestrictions String? // Restricciones alimentarias
-
-  // Estado de pago de tarjeta (controlado SOLO por el anfitrión)
-  paymentStatus          String    @default("PENDING") // PENDING, EXEMPT, PAID
+  id                     String           @id @default(cuid())
+  invitationId           String
+  name                   String
+  type                   String           @default("INDIVIDUAL")
+  expectedCount          Int              @default(1)
+  uniqueToken            String           @unique
+  status                 String           @default("PENDING")
+  attendingCount         Int              @default(0)
+  message                String?
+  responseDate           DateTime?
+  dietaryRestrictions    String?
+  paymentStatus          String           @default("PENDING")
   paymentStatusUpdatedAt DateTime?
-  paymentStatusUpdatedBy String?   // userId del anfitrión que hizo el cambio
-
-  songSuggestions SongSuggestion[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  paymentStatusUpdatedBy String?
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  invitation             Invitation       @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  songSuggestions        SongSuggestion[]
 
   @@index([invitationId])
   @@index([uniqueToken])
@@ -281,79 +223,72 @@ model Guest {
 model Album {
   id             String     @id @default(cuid())
   invitationId   String     @unique
-  invitation     Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
-  fotos          Foto[]
   permitirSubida Boolean    @default(true)
   moderacion     Boolean    @default(false)
+  invitation     Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  fotos          Foto[]
 }
 
 model Foto {
   id          String   @id @default(cuid())
   albumId     String
-  album       Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
   url         String
   descripcion String?
   uploadedBy  String
   aprobada    Boolean  @default(true)
   createdAt   DateTime @default(now())
+  album       Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
 }
 
-// Legacy Open RSVP (Keeping for backward compatibility if needed, or migration)
 model RSVP {
-  id           String     @id @default(cuid())
-  invitationId String
-  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
-
+  id                 String     @id @default(cuid())
+  invitationId       String
   nombre             String
   email              String?
   telefono           String?
-  asistencia         String // CONFIRMA, NO_ASISTE, PENDIENTE
-  numeroAcompanantes Int     @default(0)
+  asistencia         String
+  numeroAcompanantes Int        @default(0)
   restricciones      String?
   mensaje            String?
-
-  createdAt DateTime @default(now())
+  createdAt          DateTime   @default(now())
+  invitation         Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 }
 
 model Cuestionario {
   id           String     @id @default(cuid())
   invitationId String     @unique
-  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
   titulo       String
-  preguntas    String // JSON as string for SQLite
+  preguntas    String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 }
 
 model QuizResponse {
-  id           String   @id @default(cuid())
-  invitationId String
-  guestName    String // Nombre del invitado que respondió
-  guestToken   String? // Token del guest si es personalizado
-  answers      String // JSON array de respuestas: [0, 2, 1, 3] (índices de respuestas seleccionadas)
-  score        Int // Cantidad de respuestas correctas
-  totalQuestions Int // Total de preguntas
-  createdAt    DateTime @default(now())
+  id             String   @id @default(cuid())
+  invitationId   String
+  guestName      String
+  guestToken     String?
+  answers        String
+  score          Int
+  totalQuestions Int
+  createdAt      DateTime @default(now())
 
   @@index([invitationId])
   @@index([guestToken])
 }
 
-// Sugerencias de canciones por invitados
 model SongSuggestion {
   id           String     @id @default(cuid())
   invitationId String
-  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
-
-  guestId      String?    // null si es RSVP abierto (no personalizado)
-  guest        Guest?     @relation(fields: [guestId], references: [id], onDelete: SetNull)
-  guestToken   String?    // Token del invitado personalizado
-  guestName    String     // Nombre libre del invitado
-
-  title        String     // Nombre de la canción
-  artist       String     // Artista
+  guestId      String?
+  guestToken   String?
+  guestName    String
+  title        String
+  artist       String
   votes        Int        @default(0)
-  status       String     @default("PENDING") // PENDING, APPROVED, HIDDEN
-
+  status       String     @default("PENDING")
   createdAt    DateTime   @default(now())
+  guest        Guest?     @relation(fields: [guestId], references: [id])
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 
   @@index([invitationId])
   @@index([invitationId, status])

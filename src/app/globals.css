@@ -813,7 +813,7 @@ footer.tpl-footer .monogram { font-family:var(--font-display); font-weight:700; 
 footer.tpl-footer small { font-size:11px; opacity:.55; }
 
 .bottom-nav {
-  position:sticky; bottom:10px; margin:0 16px;
+  position:fixed; left:50%; bottom:14px; transform:translateX(-50%); width:calc(100% - 28px); max-width:390px; margin:0;
   display:flex; justify-content:space-around;
   background:rgba(0,0,0,.55);
   backdrop-filter:blur(6px);

@@ -4,8 +4,6 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ImageUploader } from "@/components/ui/ImageUploader";
 
 export function StepCoverPage() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
@@ -20,73 +18,63 @@ export function StepCoverPage() {
             </div>
 
             <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="portadaHabilitada"
-                        checked={data.portadaHabilitada}
-                        onCheckedChange={(checked) =>
-                            setData({ portadaHabilitada: Boolean(checked) })
-                        }
-                    />
-                    <Label htmlFor="portadaHabilitada">
-                        Mostrar portada de bienvenida
-                    </Label>
-                </div>
-
-                {data.portadaHabilitada && (
-                    <>
-                        <div className="space-y-2">
-                            <Label htmlFor="portadaTitulo">Título de la portada</Label>
-                            <Input
-                                id="portadaTitulo"
-                                placeholder="¡Estás invitado!"
-                                value={data.portadaTitulo || ""}
-                                onChange={(e) => setData({ portadaTitulo: e.target.value })}
+                <div className="space-y-2">
+                    <Label htmlFor="portadaKicker">Encabezado / Copete de portada</Label>
+                    <Input
+                                id="portadaKicker"
+                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
+                                placeholder="Ej: Con mucho cariño, para / ¡Te invitamos!"
+                                value={data.portadaKicker || ""}
+                                onChange={(e) => setData({ portadaKicker: e.target.value })}
                             />
                             <p className="text-xs text-muted-foreground">
-                                Mensaje de bienvenida opcional. Tu nombre se mostrará automáticamente debajo.
+                                Aparece arriba del nombre del invitado en la tarjeta de bienvenida.
                             </p>
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="portadaTextoBoton">Texto del botón</Label>
+                            <Label htmlFor="portadaTitulo">Título / Mensaje Principal (Opcional)</Label>
+                            <Input
+                                id="portadaTitulo"
+                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
+                                placeholder="Ej: ¡Estás invitado! / Nuestra Boda"
+                                value={data.portadaTitulo || ""}
+                                onChange={(e) => setData({ portadaTitulo: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="portadaMensaje">Frase / Mensaje de Bienvenida</Label>
+                            <Input
+                                id="portadaMensaje"
+                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
+                                placeholder="Ej: Queremos compartir este momento único con vos."
+                                value={data.portadaMensaje || ""}
+                                onChange={(e) => setData({ portadaMensaje: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="portadaDressCode">Dress Code en Portada (Opcional)</Label>
+                            <Input
+                                id="portadaDressCode"
+                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
+                                placeholder="Ej: Elegante Sport / Black Tie"
+                                value={data.portadaDressCode || ""}
+                                onChange={(e) => setData({ portadaDressCode: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="portadaTextoBoton">Texto del Botón de Entrada</Label>
                             <Input
                                 id="portadaTextoBoton"
-                                placeholder="ABRIR INVITACIÓN"
+                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
+                                placeholder="Ej: Abrir invitación / Ver detalles"
                                 value={data.portadaTextoBoton || ""}
                                 onChange={(e) => setData({ portadaTextoBoton: e.target.value })}
                             />
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-white/10 pt-6">
-                            {/* Hero Background Image Mobile */}
-                            <div className="space-y-2">
-                                <Label htmlFor="heroImagenFondo">Portada (Mobile - Horizontal)</Label>
-                                <ImageUploader
-                                    currentImage={data.portadaImagenFondo}
-                                    onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
-                                    aspectRatio={16 / 9}
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    Esta imagen se verá en dispositivos móviles (celulares).
-                                </p>
-                            </div>
-
-                            {/* Hero Background Image Desktop */}
-                            <div className="space-y-2">
-                                <Label htmlFor="heroImagenFondoDesktop">Portada (Desktop - Vertical)</Label>
-                                <ImageUploader
-                                    currentImage={data.portadaImagenFondoDesktop}
-                                    onImageUploaded={(url: string) => setData({ portadaImagenFondoDesktop: url })}
-                                    aspectRatio={9 / 16}
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    Esta imagen se verá en computadoras o pantallas anchas.
-                                </p>
-                            </div>
-                        </div>
-                    </>
-                )}
             </div>
 
             <div className="flex justify-between pt-6">

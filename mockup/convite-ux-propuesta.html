@@ -162,7 +162,7 @@ a{color:inherit;}
 /* ---------- MOBILE preview (teléfono) ---------- */
 .mobile-stage{display:flex; justify-content:center; padding:36px 16px; background:#000;}
 .phone{width:360px; background:#000; border-radius:38px; padding:12px;}
-.phone-screen{height:680px; overflow-y:auto; border-radius:26px; background:var(--t-paper); scrollbar-width:none; font-family:'Inter',sans-serif;}
+.phone-screen{position:relative; height:680px; overflow-y:auto; border-radius:26px; background:var(--t-paper); scrollbar-width:none; font-family:'Inter',sans-serif;}
 .phone-screen::-webkit-scrollbar{display:none;}
 .p-hero{min-height:300px; display:flex; flex-direction:column; justify-content:flex-end; padding:24px 22px 28px; background:linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.55) 100%), radial-gradient(120% 90% at 30% 15%, var(--t-ink2), var(--t-ink) 70%); color:var(--t-onink);}
 .p-seal{width:50px; height:50px; border-radius:50%; border:1.5px solid var(--t-acc); display:flex; align-items:center; justify-content:center; margin-bottom:16px;}
@@ -193,7 +193,7 @@ a{color:inherit;}
 .d-nav a{font-family:'Space Grotesk',sans-serif; font-size:13.5px; font-weight:600; padding:9px 0; color:rgba(255,255,255,.55); text-decoration:none; border-top:1px solid rgba(255,255,255,.1); display:flex; align-items:center; gap:10px;}
 .d-nav a:first-child{border-top:none;}
 .d-nav a b{font-family:'Space Mono',monospace; color:var(--t-acc); font-size:12px; width:14px;}
-.d-right{max-height:640px; overflow-y:auto;}
+.d-right{position:relative; max-height:640px; overflow-y:auto;}
 .d-right::-webkit-scrollbar{width:8px;}
 .d-right::-webkit-scrollbar-thumb{background:var(--t-hair); border-radius:8px;}
 .d-sec{padding:40px 48px; border-bottom:1px solid var(--t-hair); color:var(--t-onpaper);}
@@ -256,6 +256,23 @@ a{color:inherit;}
 .dark .bank-row span{color:var(--t-onink);}
 .copy-btn{flex-shrink:0; font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:600; padding:8px 14px; border-radius:999px; border:1px solid var(--t-onpaper); background:transparent; color:var(--t-onpaper); cursor:pointer;}
 .dark .copy-btn{border-color:var(--t-onink); color:var(--t-onink);}
+
+/* ---- carátula / antesala tipo sobre, antes de abrir la invitación ---- */
+.invite-cover{position:absolute; top:0; left:0; right:0; height:560px; z-index:20; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:48px 30px; background:linear-gradient(165deg, var(--t-ink2), var(--t-ink) 85%); color:var(--t-onink); transition:opacity .6s ease; opacity:1;}
+.invite-cover::before{content:''; position:absolute; inset:16px; border:1px solid rgba(255,255,255,.18); border-radius:16px; pointer-events:none;}
+.invite-cover.cover-lg{height:640px; padding:0 56px;}
+.invite-cover.is-open{opacity:0; pointer-events:none;}
+.cover-seal{width:56px; height:56px; border-radius:50%; border:1.5px solid var(--t-acc); display:flex; align-items:center; justify-content:center; margin-bottom:22px; position:relative; z-index:1;}
+.cover-seal span{font-family:var(--t-font-d); font-size:16px; color:var(--t-acc); font-weight:600;}
+.cover-kicker{font-family:'Space Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; opacity:.6; margin:0 0 10px; position:relative; z-index:1;}
+.cover-guest{font-family:var(--t-font-d); font-weight:700; font-size:26px; margin:0 0 14px; line-height:1.15; position:relative; z-index:1;}
+.cover-lg .cover-guest{font-size:36px;}
+.cover-sub{font-size:14px; line-height:1.55; opacity:.85; max-width:280px; margin:0 auto 8px; position:relative; z-index:1;}
+.cover-lg .cover-sub{font-size:16px; max-width:400px;}
+.cover-date{font-family:'Space Mono',monospace; font-size:11px; opacity:.6; margin:0 0 30px; position:relative; z-index:1;}
+.cover-open{position:relative; z-index:1; display:inline-flex; align-items:center; gap:9px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px; padding:13px 26px; border-radius:999px; border:1px solid var(--t-acc); background:var(--t-acc); color:var(--t-ink); cursor:pointer;}
+.cover-open-icon{font-size:14px;}
+.cover-hint{margin-top:14px; font-size:10.5px; opacity:.45; position:relative; z-index:1;}
 
 @media (max-width:900px){ .desktop-stage{grid-template-columns:1fr;} .d-left{position:static; height:auto;} .d-right{max-height:none;} }
 
@@ -414,6 +431,18 @@ body[data-bp="mobile"] .inv-bottom-nav{position:fixed; left:50%; bottom:14px; tr
         </aside>
 
         <div class="d-right">
+          <div class="invite-cover cover-lg">
+            <div class="cover-seal"><span data-f="monogram"></span></div>
+            <p class="cover-kicker">Con mucho cariño, para</p>
+            <h2 class="cover-guest" data-f="guestName"></h2>
+            <p class="cover-sub" data-f="coverLine"></p>
+            <p class="cover-date" data-f="coverDate"></p>
+            <button class="cover-open" type="button" data-cover-open>
+              <span class="cover-open-icon">✦</span> Abrir invitación
+            </button>
+            <p class="cover-hint">Hacé click para entrar</p>
+          </div>
+
           <section class="d-sec">
             <p class="t-kicker" data-f="cdKicker"></p>
             <h2 data-f="cdTitle"></h2>
@@ -498,6 +527,18 @@ body[data-bp="mobile"] .inv-bottom-nav{position:fixed; left:50%; bottom:14px; tr
       <div class="mobile-stage" data-bp-view="mobile" style="display:none;">
         <div class="phone">
           <div class="phone-screen">
+            <div class="invite-cover">
+              <div class="cover-seal"><span data-f="monogram2"></span></div>
+              <p class="cover-kicker">Con mucho cariño, para</p>
+              <h2 class="cover-guest" data-f="guestName2"></h2>
+              <p class="cover-sub" data-f="coverLine2"></p>
+              <p class="cover-date" data-f="coverDate2"></p>
+              <button class="cover-open" type="button" data-cover-open>
+                <span class="cover-open-icon">✦</span> Abrir invitación
+              </button>
+              <p class="cover-hint">Tocá para entrar</p>
+            </div>
+
             <div class="p-hero">
               <div class="hero-photo"></div>
               <div class="p-seal"><span data-f="monogram2"></span></div>
@@ -687,6 +728,7 @@ const INV_THEMES = {
     footerMono:'M & G', footerText:'Con cariño, gracias por ser parte de este día', nav:[{i:'◈',l:'Detalles'},{i:'✓',l:'Confirmar'},{i:'♪',l:'Música'},{i:'◎',l:'Ubicación'}],
     cover:'convite-boda-cover', album:['convite-boda-a1','convite-boda-a2','convite-boda-a3','convite-boda-a4','convite-boda-a5','convite-boda-a6'],
     bank:{banco:'Banco Galicia', cbu:'0070999530004001234567', alias:'MARTI.GON.BODA', titular:'Martina Garabal'},
+    coverLine:'nos casamos y queremos que estés ahí para celebrarlo con nosotros',
     quiz:[{q:'¿En qué año se conocieron los novios?', options:['2018','2020','2022']},{q:'¿Dónde fue la primera cita?', options:['Un café en Nueva Córdoba','Un asado con amigos','Un recital']},{q:'¿Quién dijo "te amo" primero?', options:['Martina','Gonzalo','Al mismo tiempo']}]},
   xv:{monogram:'V', eyebrow:'Mis quince años', title:'Valentina', date:'22 · 08 · 2026 — Córdoba, Argentina',
     cdKicker:'Cuenta regresiva', cdTitle:'La cuenta ya empezó', cd:[{n:'40',l:'días'},{n:'09',l:'hs'},{n:'15',l:'min'}],
@@ -699,6 +741,7 @@ const INV_THEMES = {
     footerMono:'Vale · XV', footerText:'Gracias por ser parte de mi noche', nav:[{i:'◈',l:'Detalles'},{i:'✓',l:'Confirmar'},{i:'♪',l:'Música'},{i:'◎',l:'Ubicación'}],
     cover:'convite-xv-cover', album:['convite-xv-a1','convite-xv-a2','convite-xv-a3','convite-xv-a4','convite-xv-a5','convite-xv-a6'],
     bank:{banco:'Banco Macro', cbu:'2850999530004009876543', alias:'VALE.XV.15', titular:'Familia Ríos'},
+    coverLine:'celebro mis 15 años y quiero que seas parte de esta noche',
     quiz:[{q:'¿Cuál es el color favorito de Valentina?', options:['Rosa','Celeste','Dorado']},{q:'¿Qué le gusta más?', options:['Bailar','Cantar','Sacarse fotos']},{q:'¿Con quién va a bailar el vals?', options:['Su papá','Su hermano','Su padrino']}]},
   cumple:{monogram:'J·40', eyebrow:'Cumpleaños número 40', title:'Julián <em>festeja</em>', date:'05 · 11 · 2026 — Córdoba, Argentina',
     cdKicker:'Cuenta regresiva', cdTitle:'Se viene la fiesta', cd:[{n:'21',l:'días'},{n:'06',l:'hs'},{n:'40',l:'min'}],
@@ -711,6 +754,7 @@ const INV_THEMES = {
     footerMono:'Julián · 40', footerText:'Gracias por venir a celebrar conmigo', nav:[{i:'◈',l:'Detalles'},{i:'✓',l:'Confirmar'},{i:'♪',l:'Música'},{i:'◎',l:'Ubicación'}],
     cover:'convite-cumple-cover', album:['convite-cumple-a1','convite-cumple-a2','convite-cumple-a3','convite-cumple-a4','convite-cumple-a5','convite-cumple-a6'],
     bank:{banco:'Banco Santander', cbu:'0720999530004001112223', alias:'JULI.40.FIESTA', titular:'Julián Ferreyra'},
+    coverLine:'festejamos su cumpleaños y no puede faltar tu presencia',
     quiz:[{q:'¿Hace cuánto conocés a Julián?', options:['Menos de 5 años','Entre 5 y 15','Más de 15 años']},{q:'¿Cuál es su hobby favorito?', options:['La parrilla','El fútbol','La música']},{q:'¿Qué no puede faltar en su cumple?', options:['Buena música','Buen asado','Buenos amigos']}]},
   ejecutivo:{monogram:'NX', eyebrow:'Evento anual', title:'Convención <em>Nortex</em> 2026', date:'18 · 09 · 2026 — Hotel Sheraton, Córdoba',
     cdKicker:'Comienza en', cdTitle:'Faltan', cd:[{n:'12',l:'días'},{n:'03',l:'hs'},{n:'22',l:'min'}],
@@ -723,6 +767,7 @@ const INV_THEMES = {
     footerMono:'Nortex', footerText:'Área de Eventos Corporativos', nav:[{i:'◈',l:'Agenda'},{i:'✓',l:'Confirmar'},{i:'ⓘ',l:'Info'},{i:'◎',l:'Ubicación'}],
     cover:'convite-ejecutivo-cover', album:['convite-ejecutivo-a1','convite-ejecutivo-a2','convite-ejecutivo-a3','convite-ejecutivo-a4','convite-ejecutivo-a5','convite-ejecutivo-a6'],
     bank:{banco:'Banco Nación', cbu:'0110999530004005556667', alias:'NORTEX.EVENTOS', titular:'Nortex S.A.'},
+    coverLine:'te esperamos en nuestro evento anual de la compañía',
     quiz:[{q:'¿Cuántos años cumple la convención?', options:['3°','5°','8°']},{q:'¿Cuál es el eje temático de esta edición?', options:['Innovación','Sustentabilidad','Expansión regional']},{q:'¿Dónde será la próxima edición?', options:['Córdoba','Buenos Aires','Mendoza']}]},
   bautismo:{monogram:'S', eyebrow:'Bautismo de', title:'Simón', date:'13 · 09 · 2026 — Córdoba, Argentina',
     cdKicker:'Cuenta regresiva', cdTitle:'Ya casi es el día', cd:[{n:'28',l:'días'},{n:'11',l:'hs'},{n:'05',l:'min'}],
@@ -735,6 +780,7 @@ const INV_THEMES = {
     footerMono:'Simón', footerText:'Gracias por ser parte de este día', nav:[{i:'◈',l:'Detalles'},{i:'✓',l:'Confirmar'},{i:'✦',l:'Padrinos'},{i:'◎',l:'Ubicación'}],
     cover:'convite-bautismo-cover', album:['convite-bautismo-a1','convite-bautismo-a2','convite-bautismo-a3','convite-bautismo-a4','convite-bautismo-a5','convite-bautismo-a6'],
     bank:{banco:'Banco BBVA', cbu:'0170999530004008889990', alias:'SIMON.BAUTISMO', titular:'Familia Torres'},
+    coverLine:'celebramos el bautismo de Simón y queremos que lo acompañes',
     quiz:[{q:'¿Quiénes son los padrinos de Simón?', options:['María y Tomás','Sole y Nico','Ana y Pedro']},{q:'¿En qué parroquia es la ceremonia?', options:['Ntra. Sra. del Carmen','San José','Santa Catalina']},{q:'¿Qué significa el nombre Simón?', options:['"El que escucha"','"El fuerte"','"El elegido"']}]},
   nacimiento:{monogram:'V', eyebrow:'Llegó al mundo', title:'Vera', date:'02 · 07 · 2026 — Córdoba, Argentina',
     cdKicker:'Sus datos', cdTitle:'Así llegó', cd:[{n:'3.2',l:'kg'},{n:'49',l:'cm'},{n:'02/07',l:'fecha'}],
@@ -747,6 +793,7 @@ const INV_THEMES = {
     footerMono:'Vera', footerText:'Con todo nuestro amor', nav:[{i:'◈',l:'Detalles'},{i:'✓',l:'Confirmar'},{i:'♥',l:'Mensajes'},{i:'◎',l:'Ubicación'}],
     cover:'convite-nacimiento-cover', album:['convite-nacimiento-a1','convite-nacimiento-a2','convite-nacimiento-a3','convite-nacimiento-a4','convite-nacimiento-a5','convite-nacimiento-a6'],
     bank:{banco:'Banco Provincia', cbu:'0140999530004003334445', alias:'VERA.BEBE', titular:'Familia Sosa'},
+    coverLine:'te presentamos a Vera, la nueva integrante de la familia',
     quiz:[{q:'¿Cuánto pesó Vera al nacer?', options:['2.8 kg','3.2 kg','3.6 kg']},{q:'¿A quién se parece más?', options:['A la mamá','Al papá','Todavía no se sabe']},{q:'¿Qué día nació?', options:['1 de julio','2 de julio','3 de julio']}]},
   infantil:{monogram:'F·7', eyebrow:'Cumple 7 años', title:'Fran <em>cumple</em>', date:'19 · 10 · 2026 — Córdoba, Argentina',
     cdKicker:'Cuenta regresiva', cdTitle:'Ya casi es la fiesta', cd:[{n:'15',l:'días'},{n:'08',l:'hs'},{n:'50',l:'min'}],
@@ -759,6 +806,7 @@ const INV_THEMES = {
     footerMono:'Fran · 7', footerText:'Gracias por venir a jugar con nosotros', nav:[{i:'◈',l:'Detalles'},{i:'✓',l:'Confirmar'},{i:'★',l:'Sorpresas'},{i:'◎',l:'Ubicación'}],
     cover:'convite-infantil-cover', album:['convite-infantil-a1','convite-infantil-a2','convite-infantil-a3','convite-infantil-a4','convite-infantil-a5','convite-infantil-a6'],
     bank:{banco:'Banco Credicoop', cbu:'0191999530004006667778', alias:'FRAN.CUMPLE7', titular:'Familia Gómez'},
+    coverLine:'Fran cumple 7 años y quiere que vengas a jugar con él',
     quiz:[{q:'¿Cuál es el superhéroe favorito de Fran?', options:['Spiderman','Batman','Los Increíbles']},{q:'¿Qué le gusta jugar?', options:['Fútbol','Videojuegos','Andar en bici']},{q:'¿Qué sabor de torta pidió?', options:['Chocolate','Vainilla','Frutilla']}]}
 };
 
@@ -837,6 +885,12 @@ function renderInv(key){
   setText('bankAlias', t.bank.alias); setText('bankAlias2', t.bank.alias);
   setText('bankTitular', t.bank.titular); setText('bankTitular2', t.bank.titular);
 
+  // carátula / antesala — usa el nombre de invitado de ejemplo ya definido en el tema
+  document.querySelectorAll('.invite-cover').forEach(el=> el.classList.remove('is-open'));
+  setText('guestName', t.rsvpName); setText('guestName2', t.rsvpName);
+  setText('coverLine', t.coverLine); setText('coverLine2', t.coverLine);
+  setText('coverDate', t.date); setText('coverDate2', t.date);
+
   // quiz — se reconstruye desde cero cada vez que cambia el tema
   document.querySelectorAll('[data-quiz]').forEach(el=> buildQuiz(el, t.quiz));
 }
@@ -878,6 +932,14 @@ function buildQuiz(container, questions){
   renderQ(0);
 }
 
+// abrir la carátula: fundido (fade out), no scroll — revela el contenido en el mismo lugar
+document.addEventListener('click', e=>{
+  const openBtn = e.target.closest('[data-cover-open]');
+  if(!openBtn) return;
+  const cover = openBtn.closest('.invite-cover');
+  if(cover) cover.classList.add('is-open');
+});
+
 // carrusel del álbum: flechas prev/next (delegado, sirve para mobile y desktop)
 document.addEventListener('click', e=>{
   const prevBtn = e.target.closest('[data-album-prev]');
@@ -909,6 +971,7 @@ document.querySelectorAll('[data-theme-btn]').forEach(b=>{
 function setBreakpoint(mode){
   document.querySelectorAll('[data-bp]').forEach(x=>x.classList.toggle('active', x.dataset.bp===mode));
   document.body.setAttribute('data-bp', mode);
+  document.querySelectorAll('.invite-cover').forEach(el=> el.classList.remove('is-open'));
   document.querySelector('[data-bp-view="desktop"]').style.display = mode==='desktop' ? 'grid' : 'none';
   document.querySelector('[data-bp-view="mobile"]').style.display = mode==='mobile' ? 'flex' : 'none';
 }

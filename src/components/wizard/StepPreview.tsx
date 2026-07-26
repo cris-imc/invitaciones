@@ -36,9 +36,13 @@ export function StepPreview() {
                 usePremiumCredit: usePremiumCredit,
             };
 
+            const isEditing = Boolean(data.id);
+            const url = isEditing ? `/api/invitations?id=${data.id}` : '/api/invitations';
+            const method = isEditing ? 'PUT' : 'POST';
+
             console.log('Datos enviados:', payload);
-            const response = await fetch('/api/invitations', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
@@ -47,7 +51,9 @@ export function StepPreview() {
             console.log('Respuesta de servidor:', responseData);
 
             if (!response.ok) {
-                throw new Error(responseData.error || responseData.details || 'Error al crear invitación');
+                const errMsg = responseData.error || responseData.details || 'Error al crear la invitación';
+                console.error('Error retornado por /api/invitations:', responseData);
+                throw new Error(errMsg);
             }
 
             const invitation = responseData;

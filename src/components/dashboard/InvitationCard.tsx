@@ -25,6 +25,8 @@ interface InvitationCardProps {
         nombreNovia?: string | null;
         nombreNovio?: string | null;
         nombreQuinceanera?: string | null;
+        regaloMonto?: number | null;
+        regaloHabilitado?: boolean;
         _count: {
             guests: number;
         };

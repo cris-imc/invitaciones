@@ -86,12 +86,20 @@ export default async function InvitacionesPage() {
                                 
                                 <div className="meta">
                                     <b>{inv.nombreEvento}</b>
-                                    <span>
-                                        {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
-                                            day: "2-digit",
-                                            month: "long",
-                                            year: "numeric",
-                                        })}
+                                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs opacity-80 mt-0.5">
+                                        <span>
+                                            📅 {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
+                                                day: "2-digit",
+                                                month: "long",
+                                                year: "numeric",
+                                            })}
+                                        </span>
+                                        {inv.lugarNombre && (
+                                            <span>🏰 {inv.lugarNombre}</span>
+                                        )}
+                                        {inv.direccion && (
+                                            <span>📍 {inv.direccion}</span>
+                                        )}
                                     </span>
                                 </div>
 
@@ -104,11 +112,11 @@ export default async function InvitacionesPage() {
                                     {inv._count.guests} <span className="opacity-60 text-xs">/ {maxGuestsStr} confirmadas</span>
                                 </div>
 
-                                <div className="flex items-center gap-4 ml-auto">
+                                <div className="flex items-center gap-2 flex-wrap ml-auto">
                                   {inv.planTier === "FREE" ? (
                                     <button
                                       type="button"
-                                      className="hidden sm:inline-flex items-center justify-center h-8 px-4 text-xs font-semibold rounded-full bg-accent/10 text-accent border border-accent hover:bg-accent/20 transition-colors"
+                                      className="hidden sm:inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-full bg-accent/10 text-accent border border-accent hover:bg-accent/20 transition-colors"
                                       title="Por ahora sin funcionar"
                                     >
                                       Mejorar a Premium
@@ -118,8 +126,21 @@ export default async function InvitacionesPage() {
                                       Premium
                                     </div>
                                   )}
+                                  <Link
+                                      href={`/i/${inv.slug}`}
+                                      target="_blank"
+                                      className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors"
+                                  >
+                                      Ver 👁️
+                                  </Link>
+                                  <Link
+                                      href={`/dashboard/invitaciones/editar/${inv.id}`}
+                                      className="inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 transition-colors"
+                                  >
+                                      Editar ✏️
+                                  </Link>
                                   <DeleteInvitationButton invitationId={inv.id} />
-                                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go !ml-0">
+                                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go !ml-0 text-xs">
                                       Administrar →
                                   </Link>
                                 </div>

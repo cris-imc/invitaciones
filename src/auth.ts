@@ -35,26 +35,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("[AUTH DEBUG] Attempting login with:", credentials?.email, "Password length:", (credentials?.password as string)?.length);
         if (!credentials?.email || !credentials?.password) {
+          console.log("[AUTH DEBUG] Missing email or password");
           return null;
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
+          where: { email: (credentials.email as string).trim().toLowerCase() },
         });
+
+        console.log("[AUTH DEBUG] User found in DB:", user ? user.email : "NO USER FOUND");
 
         if (!user || !user.password) {
           return null;
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
+          (credentials.password as string).trim(),
           user.password
         );
+
+        console.log("[AUTH DEBUG] Password valid?:", isPasswordValid);
 
         if (!isPasswordValid) {
           return null;
         }
+
 
         return {
           id: user.id,
@@ -95,5 +102,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signOut: "/login",
     error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "secret-invitaciones-dev-key-2026",
 });
+

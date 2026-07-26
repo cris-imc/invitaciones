@@ -113,25 +113,6 @@ export async function POST(request: NextRequest) {
         const userId = session.user.id;
         const planTier = session.user.planTier;
 
-        // Check if user can create more invitations
-        const currentInvitationsCount = await prisma.invitation.count({
-            where: { userId, estado: 'ACTIVA' }
-        });
-
-        const limitError = await checkPlanLimits(
-            userId,
-            planTier,
-            'create-invitation',
-            currentInvitationsCount
-        );
-
-        if (limitError) {
-            return NextResponse.json(
-                { error: limitError.message },
-                { status: 403 }
-            );
-        }
-
         const body = await request.json();
         console.log('DEBUG: POST /api/invitations body:', JSON.stringify(body, null, 2));
 
@@ -157,6 +138,25 @@ export async function POST(request: NextRequest) {
             });
 
             invitationPlanTier = 'PREMIUM';
+        } else {
+            // Check if user can create more invitations on their base plan
+            const currentInvitationsCount = await prisma.invitation.count({
+                where: { userId, estado: 'ACTIVA' }
+            });
+
+            const limitError = await checkPlanLimits(
+                userId,
+                planTier,
+                'create-invitation',
+                currentInvitationsCount
+            );
+
+            if (limitError) {
+                return NextResponse.json(
+                    { error: limitError.message },
+                    { status: 403 }
+                );
+            }
         }
 
         // Generar slug único
@@ -164,17 +164,25 @@ export async function POST(request: NextRequest) {
 
         // Combinar fecha y hora correctamente preservando la zona horaria local
         let fechaEvento: Date;
-        const datePart = body.fecha ? body.fecha.split('T')[0] : '';
-        if (body.hora) {
-            // Si hay hora, combinar fecha + hora
-            const [hours, minutes] = body.hora.split(':');
-            const [year, month, day] = datePart.split('-').map(Number);
-            // Crear fecha en zona horaria local
-            fechaEvento = new Date(year, month - 1, day, parseInt(hours), parseInt(minutes), 0);
-        } else {
-            // Si no hay hora, usar solo la fecha a medianoche local
-            const [year, month, day] = datePart.split('-').map(Number);
-            fechaEvento = new Date(year, month - 1, day, 0, 0, 0);
+        try {
+            if (body.fecha) {
+                const dateStr = String(body.fecha);
+                if (dateStr.includes('-') && body.hora && typeof body.hora === 'string' && body.hora.includes(':')) {
+                    const datePart = dateStr.split('T')[0];
+                    const [hours, minutes] = body.hora.split(':');
+                    const [year, month, day] = datePart.split('-').map(Number);
+                    fechaEvento = new Date(year, month - 1, day, parseInt(hours || '0'), parseInt(minutes || '0'), 0);
+                } else {
+                    fechaEvento = new Date(body.fecha);
+                }
+            } else {
+                fechaEvento = new Date();
+            }
+            if (isNaN(fechaEvento.getTime())) {
+                fechaEvento = new Date();
+            }
+        } catch {
+            fechaEvento = new Date();
         }
 
         const invitation = await prisma.invitation.create({
@@ -184,15 +192,24 @@ export async function POST(request: NextRequest) {
                 tipo: body.type || 'CASAMIENTO',
                 estado: 'ACTIVA',
                 slug,
-                nombreEvento: body.nombreEvento,
+                nombreEvento: body.nombreEvento || 'Nuestra Invitación',
                 fechaEvento,
-                nombreNovio: body.nombreNovio,
-                nombreNovia: body.nombreNovia,
-                nombreQuinceanera: body.nombreQuinceanera,
-                lugarNombre: body.lugarNombre,
-                direccion: body.direccion,
-                hora: body.hora,
-                mapUrl: body.mapUrl,
+                nombreNovio: body.nombreNovio || null,
+                nombreNovia: body.nombreNovia || null,
+                nombreQuinceanera: body.nombreQuinceanera || null,
+                lugarNombre: body.lugarNombre || null,
+                direccion: body.direccion || null,
+                hora: body.hora || null,
+                mapUrl: body.mapUrl || null,
+
+                // CEREMONIA / CIVIL
+                ceremoniaHabilitada: body.ceremoniaHabilitada !== undefined ? Boolean(body.ceremoniaHabilitada) : false,
+                ceremoniaTitulo: body.ceremoniaTitulo || null,
+                ceremoniaNombre: body.ceremoniaNombre || null,
+                ceremoniaDireccion: body.ceremoniaDireccion || null,
+                ceremoniaHora: body.ceremoniaHora || null,
+                ceremoniaMapUrl: body.ceremoniaMapUrl || null,
+
                 templateId: 'default',
                 templateTipo: body.templateTipo || 'ORIGINAL',
                 temaColores: JSON.stringify({
@@ -214,8 +231,12 @@ export async function POST(request: NextRequest) {
                 cronogramaEventos: body.cronogramaEventos || '[]',
                 imagenCelebremosJuntos: body.imagenCelebremosJuntos,
                 // 1. PORTADA
+                ciudad: body.ciudad,
                 portadaHabilitada: body.portadaHabilitada !== undefined ? body.portadaHabilitada : true,
+                portadaKicker: body.portadaKicker,
                 portadaTitulo: body.portadaTitulo,
+                portadaDressCode: body.portadaDressCode,
+                portadaMensaje: body.portadaMensaje,
                 portadaTextoBoton: body.portadaTextoBoton,
                 portadaImagenFondo: body.portadaImagenFondo,
                 portadaImagenFondoDesktop: body.portadaImagenFondoDesktop,
@@ -230,6 +251,10 @@ export async function POST(request: NextRequest) {
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada !== undefined ? body.galeriaPrincipalHabilitada : true,
                 galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : '[]',
 
+                // 9. FRASE PERSONALIZADA
+                frasePersonalizadaHabilitada: body.frasePersonalizadaHabilitada !== undefined ? Boolean(body.frasePersonalizadaHabilitada) : false,
+                frasePersonalizadaTexto: body.frasePersonalizadaTexto || null,
+
                 // 12. GALERÍA SECUNDARIA
                 galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada !== undefined ? body.galeriaSecundariaHabilitada : false,
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : '[]',
@@ -243,7 +268,8 @@ export async function POST(request: NextRequest) {
                 regaloAlias: body.regaloAlias,
                 regaloBanco: body.regaloBanco,
                 regaloTitular: body.regaloTitular,
-                regaloMonto: body.regaloMonto ?? null,
+                regaloMonto: body.regaloMonto ? parseFloat(body.regaloMonto) : null,
+                regaloMontoUpdatedAt: body.regaloMonto ? new Date() : null,
 
                 // 2. MÚSICA
                 musicaHabilitada: body.musicaHabilitada !== undefined ? body.musicaHabilitada : false,
@@ -321,6 +347,21 @@ export async function PUT(request: NextRequest) {
             fechaEvento = new Date(year, month - 1, day, 0, 0, 0);
         }
 
+        const existingInvitation = await prisma.invitation.findUnique({
+            where: { id },
+            select: { regaloMonto: true }
+        });
+
+        // Parse new regalo monto
+        const newRegaloMonto = body.regaloMonto !== undefined && body.regaloMonto !== null 
+            ? parseFloat(body.regaloMonto) 
+            : null;
+        
+        let regaloMontoUpdatedAt = undefined;
+        if (existingInvitation && existingInvitation.regaloMonto !== newRegaloMonto && newRegaloMonto !== null) {
+            regaloMontoUpdatedAt = new Date();
+        }
+
         const invitation = await prisma.invitation.update({
             where: { id },
             data: {
@@ -357,8 +398,12 @@ export async function PUT(request: NextRequest) {
                 imagenCelebremosJuntos: body.imagenCelebremosJuntos,
 
                 // 1. PORTADA
+                ciudad: body.ciudad,
                 portadaHabilitada: body.portadaHabilitada,
+                portadaKicker: body.portadaKicker,
                 portadaTitulo: body.portadaTitulo,
+                portadaDressCode: body.portadaDressCode,
+                portadaMensaje: body.portadaMensaje,
                 portadaTextoBoton: body.portadaTextoBoton,
                 portadaImagenFondo: body.portadaImagenFondo,
                 portadaImagenFondoDesktop: body.portadaImagenFondoDesktop,
@@ -373,6 +418,10 @@ export async function PUT(request: NextRequest) {
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada,
                 galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : undefined,
 
+                // 9. FRASE PERSONALIZADA
+                frasePersonalizadaHabilitada: body.frasePersonalizadaHabilitada,
+                frasePersonalizadaTexto: body.frasePersonalizadaTexto,
+
                 // 12. GALERÍA SECUNDARIA
                 galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada,
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : undefined,
@@ -386,7 +435,8 @@ export async function PUT(request: NextRequest) {
                 regaloAlias: body.regaloAlias,
                 regaloBanco: body.regaloBanco,
                 regaloTitular: body.regaloTitular,
-                regaloMonto: body.regaloMonto ?? null,
+                regaloMonto: newRegaloMonto,
+                ...(regaloMontoUpdatedAt && { regaloMontoUpdatedAt }),
 
 
                 // 2. MÚSICA

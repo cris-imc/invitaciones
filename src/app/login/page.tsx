@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { authenticate } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,25 +24,27 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        showToast("Email o contraseña incorrectos", "error");
+      const res = await authenticate(formData.email, formData.password);
+      if (res?.error) {
+        showToast(res.error, "error");
       } else {
         showToast("¡Bienvenido!", "success");
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+        // Next.js redirection succeeded
+        showToast("¡Bienvenido!", "success");
+        return;
+      }
+      console.error("[LOGIN ERROR]", error);
       showToast("Error al iniciar sesión", "error");
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--ink)]">

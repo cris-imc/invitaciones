@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { EditInvitationForm } from "@/components/dashboard/EditInvitationForm";
+import { EditWizardContainer } from "@/components/dashboard/EditWizardContainer";
 
 async function getInvitation(id: string) {
     const invitation = await prisma.invitation.findUnique({
@@ -30,11 +30,11 @@ export default async function EditInvitationPage({
             <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tight">Editar Invitación</h1>
                 <p className="text-muted-foreground">
-                    Modifica los detalles de tu invitación "{invitation.nombreEvento}".
+                    Modificá cualquier paso de tu invitación "{invitation.nombreEvento}".
                 </p>
             </div>
 
-            <EditInvitationForm invitation={invitation} />
+            <EditWizardContainer invitation={invitation} />
         </div>
     );
 }

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { AdminInvitationRow } from "@/components/dashboard/AdminInvitationRow";
+import { DeleteUserButton } from "@/components/dashboard/DeleteUserButton";
+import { EditCreditsButton } from "@/components/dashboard/EditCreditsButton";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
@@ -30,9 +32,15 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
             <div className="flex flex-col gap-4">
                 {filteredClients.map(client => (
                     <div key={client.id} className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-[var(--ink-2)] text-[var(--on-ink)]">
-                        <h3 className="font-bold text-xl mb-1">
-                            {client.name} <span className="text-sm opacity-50 font-normal">({client.email})</span>
-                        </h3>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="font-bold text-xl mb-1">
+                                {client.name} <span className="text-sm opacity-50 font-normal">({client.email})</span>
+                            </h3>
+                            <div className="flex gap-2 items-center">
+                                <EditCreditsButton userId={client.id} currentCredits={client.premiumCredits || 0} />
+                                <DeleteUserButton userId={client.id} userName={client.name} />
+                            </div>
+                        </div>
                         
                         {client.invitations.length === 0 ? (
                             <p className="text-sm opacity-40 mt-2">No tiene invitaciones creadas.</p>

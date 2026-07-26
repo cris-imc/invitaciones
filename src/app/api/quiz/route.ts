@@ -70,11 +70,19 @@ export async function GET(request: NextRequest) {
 
         // Check if guest already answered
         let hasAnswered = false;
+        let guestScore = null;
         if (guestToken) {
             const existingResponse = await prisma.quizResponse.findFirst({
                 where: { invitationId, guestToken }
             });
-            hasAnswered = !!existingResponse;
+            if (existingResponse) {
+                hasAnswered = true;
+                guestScore = {
+                    score: existingResponse.score,
+                    totalQuestions: existingResponse.totalQuestions,
+                    answers: JSON.parse(existingResponse.answers as string)
+                };
+            }
         }
 
         // Get all responses for this invitation
@@ -89,6 +97,7 @@ export async function GET(request: NextRequest) {
         if (responses.length === 0) {
             return NextResponse.json({
                 hasAnswered,
+                guestScore,
                 totalResponses: 0,
                 averagePercentage: 0,
             });
@@ -104,6 +113,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
             hasAnswered,
+            guestScore,
             totalResponses: responses.length,
             averagePercentage,
         });

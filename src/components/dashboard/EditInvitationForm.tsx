@@ -41,8 +41,12 @@ interface Invitation {
 
     // Cover
     portadaHabilitada: boolean;
+    portadaKicker?: string | null;
     portadaTitulo?: string | null;
+    portadaMensaje?: string | null;
     portadaTextoBoton?: string | null;
+    portadaDressCode?: string | null;
+    ciudad?: string | null;
     portadaImagenFondo?: string | null;
 
     // Gallery
@@ -86,6 +90,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         nombreEvento: invitation.nombreEvento,
         fecha: invitation.fechaEvento.toISOString().split('T')[0],
         hora: invitation.hora || '',
+        ciudad: invitation.ciudad || '',
         nombreNovio: invitation.nombreNovio || '',
         nombreNovia: invitation.nombreNovia || '',
         nombreQuinceanera: invitation.nombreQuinceanera || '',
@@ -104,7 +109,9 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
         // Cover
         portadaHabilitada: invitation.portadaHabilitada,
+        portadaKicker: invitation.portadaKicker || '',
         portadaTitulo: invitation.portadaTitulo || '',
+        portadaMensaje: invitation.portadaMensaje || '',
         portadaTextoBoton: invitation.portadaTextoBoton || '',
         portadaImagenFondo: invitation.portadaImagenFondo || '',
 
@@ -262,6 +269,18 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                             </div>
                         </div>
 
+                        {/* Ciudad */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Ciudad / Localidad</label>
+                            <input
+                                type="text"
+                                placeholder="Ej: Buenos Aires, Rosario..."
+                                value={formData.ciudad}
+                                onChange={(e) => handleInputChange('ciudad', e.target.value)}
+                                className="w-full p-2 border rounded-md"
+                            />
+                        </div>
+
                         {/* Nombres según tipo */}
                         {formData.type === 'CASAMIENTO' && (
                             <div className="grid grid-cols-2 gap-4">
@@ -390,18 +409,9 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
                         {/* Portada */}
                         <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="portadaHabilitada"
-                                    checked={formData.portadaHabilitada}
-                                    onCheckedChange={(checked) => handleInputChange('portadaHabilitada', checked)}
-                                />
-                                <Label htmlFor="portadaHabilitada" className="font-semibold cursor-pointer">Portada de Bienvenida</Label>
-                            </div>
-
-                            {formData.portadaHabilitada && (
-                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
-                                    <div className="space-y-2">
+                            <h3 className="font-semibold text-lg border-b pb-2">Portada de Bienvenida</h3>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
                                         <Label>Imagen de Fondo</Label>
                                         <ImageUploader
                                             currentImage={formData.portadaImagenFondo}
@@ -411,12 +421,42 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                         <p className="text-xs text-muted-foreground">Se recomienda una imagen horizontal de alta calidad.</p>
                                     </div>
                                     <div className="space-y-2">
+                                        <Label>Encabezado / Copete de portada</Label>
+                                        <input
+                                            type="text"
+                                            value={formData.portadaKicker ?? ''}
+                                            onChange={(e) => handleInputChange('portadaKicker', e.target.value)}
+                                            className="w-full p-2 border rounded-md"
+                                            placeholder="Ej: Con mucho cariño, para / ¡Te invitamos!"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label>Título</Label>
                                         <input
                                             type="text"
-                                            value={formData.portadaTitulo}
+                                            value={formData.portadaTitulo ?? ''}
                                             onChange={(e) => handleInputChange('portadaTitulo', e.target.value)}
                                             className="w-full p-2 border rounded-md"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Frase / Mensaje de Bienvenida</Label>
+                                        <input
+                                            type="text"
+                                            value={formData.portadaMensaje ?? ''}
+                                            onChange={(e) => handleInputChange('portadaMensaje', e.target.value)}
+                                            className="w-full p-2 border rounded-md"
+                                            placeholder="Ej: Queremos compartir este momento único con vos."
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Dress Code en Portada (Opcional)</Label>
+                                        <input
+                                            type="text"
+                                            value={formData.portadaDressCode ?? ''}
+                                            onChange={(e) => handleInputChange('portadaDressCode', e.target.value)}
+                                            className="w-full p-2 border rounded-md"
+                                            placeholder="Ej: Elegante Sport / Black Tie"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -429,7 +469,6 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                         />
                                     </div>
                                 </div>
-                            )}
                         </div>
 
                         {/* Música */}

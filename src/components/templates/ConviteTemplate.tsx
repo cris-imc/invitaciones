@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { CountdownV2 } from "@/components/invitation/v2/CountdownV2";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
@@ -9,11 +9,15 @@ import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
 import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
 import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
+import { MusicPlayer } from "@/components/invitation/MusicPlayer";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users } from "lucide-react";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
 const IconMusic = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
 const IconMap   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
+const IconGift  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>;
+const IconQuiz  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
 
 const CRONO_ICONS: Record<string, string> = {
   Heart: "💛", Music: "🎵", Utensils: "🍽️", Calendar: "📅",
@@ -77,15 +81,41 @@ function CopyField({ label, value }: { label: string; value: string }) {
 interface QuizQuestion {
   pregunta: string;
   opciones: string[];
-  correcta?: number;
+  respuestaCorrecta?: number;
 }
 
-function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string }) {
+function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string; tipo?: string }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [stats, setStats] = useState<{ avg: number; count: number } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!invitationId) {
+      setHasLoaded(true);
+      return;
+    }
+    
+    // Fetch latest stats and guest past response from database
+    const params = new URLSearchParams({ invitationId });
+    if (guestToken) params.append("guestToken", guestToken);
+    
+    fetch(`/api/quiz?${params.toString()}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data.averagePercentage === 'number') {
+          setStats({ avg: data.averagePercentage, count: data.totalResponses });
+        }
+        if (data && data.hasAnswered && data.guestScore) {
+          setPicks(data.guestScore.answers || {});
+          setFinished(true);
+        }
+      })
+      .catch(e => console.error("Error fetching quiz data", e))
+      .finally(() => setHasLoaded(true));
+  }, [invitationId, guestToken]);
 
   const pick = async (oi: number) => {
     if (picks[currentIdx] !== undefined) return;
@@ -104,7 +134,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName }: { p
             // Compute score
             let score = 0;
             preguntas.forEach((q, i) => {
-              if (newPicks[i] === q.correcta) score++;
+              if (newPicks[i] === q.respuestaCorrecta) score++;
             });
             const res = await fetch('/api/quiz', {
               method: 'POST',
@@ -137,14 +167,18 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName }: { p
     }, 400);
   };
 
+  if (!hasLoaded) return null;
+
   if (finished) {
     let score = 0;
-    preguntas.forEach((q, i) => { if (picks[i] === q.correcta) score++; });
+    preguntas.forEach((q, i) => { if (picks[i] === q.respuestaCorrecta) score++; });
     const percent = Math.round((score / preguntas.length) * 100);
     
     return (
       <div className="quiz-box text-center">
-        <div style={{ fontSize: "64px", marginBottom: "16px" }}>{percent === 100 ? "🏆" : percent >= 70 ? "⭐" : "👍"}</div>
+        <div className="flex justify-center mb-4 text-amber-500">
+          {percent === 100 ? <Trophy className="w-16 h-16" strokeWidth={1.5} /> : percent >= 70 ? <Star className="w-16 h-16" strokeWidth={1.5} /> : <ThumbsUp className="w-16 h-16" strokeWidth={1.5} />}
+        </div>
         <h3 style={{ fontFamily: "var(--t-font-d)", fontSize: "28px", color: "var(--t-onpaper)" }}>¡Quiz Completado!</h3>
         <p style={{ marginTop: "12px", opacity: 0.9 }}>
           Respondiste {score} de {preguntas.length} correctamente ({percent}%).
@@ -154,12 +188,13 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName }: { p
           <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7 }}>Guardando tus resultados...</p>
         ) : (
           stats && stats.count > 0 && (
-            <div style={{ marginTop: "24px", padding: "16px", background: "var(--t-paper2)", borderRadius: "12px", border: "1px dashed var(--t-acc)" }}>
-              <p style={{ fontFamily: "var(--t-font-d)", fontSize: "16px", marginBottom: "8px" }}>Estadísticas de invitados</p>
-              <div style={{ fontSize: "24px", fontWeight: "bold", color: "var(--t-acc2)" }}>{stats.avg}%</div>
-              <p style={{ fontSize: "12px", opacity: 0.8, marginTop: "4px" }}>
-                Promedio de aciertos entre {stats.count} {stats.count === 1 ? "invitado" : "invitados"}.
-              </p>
+            <div style={{ marginTop: "28px" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "var(--t-paper2)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(0,0,0,0.06)", textAlign: "left", maxWidth: "90%" }}>
+                <Users className="w-5 h-5 opacity-60 shrink-0" />
+                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4 }}>
+                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong>{stats.avg}%</strong>.
+                </p>
+              </div>
             </div>
           )
         )}
@@ -205,8 +240,16 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName }: { p
 }
 
 export function ConviteTemplate({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
+  const [isCoverOpen, setIsCoverOpen] = useState(false);
   const tipo   = String(invitation.tipo ?? "OTRO");
   const theme  = getThemeFromTipo(tipo);
+
+  // Cover / Welcome Overlay data
+  const portadaHabilitada = Boolean(invitation.portadaHabilitada ?? true);
+  const ciudad = String(invitation.ciudad ?? "");
+  const portadaKicker = String(invitation.portadaKicker || "Con mucho cariño, para");
+  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || "Te invitamos a compartir este día tan especial con nosotros");
+  const portadaBoton = String(invitation.portadaTextoBoton || "Abrir invitación");
 
   const getHeroTitle = () => {
     if (tipo === "CASAMIENTO") {
@@ -246,10 +289,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   const hora        = String(invitation.hora ?? "");
   const mapUrl      = String(invitation.mapUrl ?? "");
 
-  const quoteKicker =
-    tipo === "CASAMIENTO"   ? "Nuestra historia"
-    : tipo === "QUINCE_ANOS" ? "Sus palabras"
-    : "Mensaje de bienvenida";
+  const quoteKicker = "Unas palabras";
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
   const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
@@ -272,18 +312,92 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
   const songsEnabled = Boolean(invitation.albumCompartidoHabilitado ?? true);
 
+  const portadaDressCode = String(invitation.portadaDressCode ?? "");
+  const regaloMontoUpdatedAt = invitation.regaloMontoUpdatedAt ? new Date(String(invitation.regaloMontoUpdatedAt)) : null;
+  const isPriceRecentlyUpdated = regaloMontoUpdatedAt ? (new Date().getTime() - regaloMontoUpdatedAt.getTime()) < 72 * 60 * 60 * 1000 : false;
+
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
+    ...(mapUrl        ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
     ...(rsvpEnabled   ? [{ id: "rsvp",     label: "Confirmar", icon: <IconCheck /> }] : []),
+    ...(showBankData  ? [{ id: "banco",    label: "Regalo",    icon: <IconGift /> }]  : []),
+    ...(triviaHabilitada && triviaPreguntas.length > 0 ? [{ id: "quiz", label: "Juego", icon: <IconQuiz /> }] : []),
     ...(songsEnabled  ? [{ id: "songs",    label: "Música",    icon: <IconMusic /> }] : []),
-    ...(lugarNombre   ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
   ];
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
 
+  const guestNameDisplay = guest?.name
+    ? guest.name
+    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio 
+        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}` 
+        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+
   return (
-    <div className="desktop-stage" data-theme={theme}>
+    <>
+      {/* PORTADA / WELCOME OVERLAY (Antesala tipo sobre) */}
+      {portadaHabilitada && !isCoverOpen && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-[#182420] via-[#0F1613] to-[#050807] text-[#F7F1E4] transition-all duration-700 animate-in fade-in"
+          style={{
+            backgroundImage: heroBgDesktop 
+              ? `linear-gradient(rgba(15,22,19,0.88), rgba(15,22,19,0.94)), url(${heroBgDesktop})`
+              : undefined,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div className="relative w-full max-w-lg p-8 sm:p-12 border border-white/20 rounded-3xl bg-[#0F1613]/90 backdrop-blur-xl text-center shadow-2xl flex flex-col items-center justify-center">
+            {/* Monogram Seal */}
+            <div className="w-16 h-16 rounded-full border-2 border-[var(--t-acc,#C79A4B)] flex items-center justify-center mb-6 shadow-inner bg-black/20">
+              <span className="font-serif text-xl font-bold text-[var(--t-acc,#C79A4B)]">{monogram}</span>
+            </div>
+
+            {/* Kicker */}
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--t-acc,#C79A4B)] mb-3 opacity-90">
+              {portadaKicker}
+            </p>
+
+            {/* Guest Name or Event Title */}
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4 text-[#F7F1E4] leading-tight">
+              {guestNameDisplay}
+            </h2>
+
+            {/* Message / Phrase */}
+            <p className="text-sm sm:text-base opacity-85 leading-relaxed max-w-sm mb-6 font-light">
+              {portadaMensaje}
+            </p>
+
+            {portadaDressCode && portadaDressCode !== "undefined" && (
+              <div className="mb-8 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 backdrop-blur-md border border-[var(--t-acc,#C79A4B)]/40 text-[var(--t-acc,#C79A4B)] shadow-[0_0_20px_rgba(0,0,0,0.3)] transform transition-transform hover:scale-105">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 9.5l-4-4-3 3-2-2-2 2-3-3-4 4M21 9.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9" />
+                </svg>
+                <p className="text-sm font-bold tracking-widest uppercase font-sans">Dress Code: {portadaDressCode}</p>
+              </div>
+            )}
+
+            {/* City & Date */}
+            <p className="font-mono text-xs opacity-75 mb-8 tracking-wider">
+              {ciudad ? `${ciudad} · ` : ""}{fechaStr}
+            </p>
+
+            {/* Open Button */}
+            <button
+              type="button"
+              onClick={() => setIsCoverOpen(true)}
+              className="inline-flex items-center gap-3 font-sans font-bold text-sm px-8 py-4 rounded-full bg-[var(--t-acc,#C79A4B)] text-[#0F1613] hover:scale-105 transition-all shadow-lg active:scale-95 cursor-pointer"
+            >
+              <span className="text-base">✦</span> {portadaBoton}
+            </button>
+
+            <p className="mt-4 text-[11px] opacity-45 font-mono">Tocá para entrar</p>
+          </div>
+        </div>
+      )}
+
+      <div className="desktop-stage" data-theme={theme}>
       <aside className="d-left hide-mobile">
         <div
           className="hero-photo"
@@ -308,7 +422,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               </>
             ) : title}
           </h1>
-          <p className="pdate">{fechaStr}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
+          <p className="pdate">{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
         </div>
 
         <nav className="d-nav">
@@ -357,13 +471,14 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           />
         ) : null}
 
-        {((invitation.frasePersonalizadaHabilitada ?? false) && Boolean(invitation.frasePersonalizadaTexto)) ? (
+        {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper dark id="quote" delay={100}>
             <div className="d-quote-wrap">
-              <p className="t-kicker">{quoteKicker}</p>
-              <p className="t-quote" style={{ margin: 0 }}>
+              <h2 style={{ margin: 0, fontStyle: "italic", fontWeight: 500, textAlign: "center", position: "relative", padding: "0 10px" }}>
+                <span style={{ color: "var(--t-acc)", fontSize: "1.6em", lineHeight: 0, verticalAlign: "-0.2em", marginRight: "4px" }}>&ldquo;</span>
                 {String(invitation.frasePersonalizadaTexto)}
-              </p>
+                <span style={{ color: "var(--t-acc)", fontSize: "1.6em", lineHeight: 0, verticalAlign: "-0.2em", marginLeft: "4px" }}>&rdquo;</span>
+              </h2>
             </div>
           </SectionWrapper>
         ) : null}
@@ -372,31 +487,69 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           <p className="t-kicker">Cuándo y dónde</p>
           <h2>Los esperamos</h2>
 
-          {cronograma.length > 0 ? (
-            <div className="d-cols-2">
-              {cronograma.map((item, i) => (
-                <div key={i} className="t-detail">
-                  <h4>{item.title}</h4>
-                  <p>
-                    {item.time ? `${item.time} hs · ` : ""}
-                    {lugarNombre || ""}
-                  </p>
-                </div>
-              ))}
+          {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
+          {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+            <div className="t-detail" style={{ margin: "0 0 20px 0", borderLeft: "4px solid var(--t-acc)", paddingLeft: "18px" }}>
+              <span className="t-kicker" style={{ display: "block", marginBottom: "6px" }}>
+                {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
+              </span>
+              {invitation.ceremoniaNombre && (
+                <h4 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: "4px" }}>
+                  {String(invitation.ceremoniaNombre)}
+                </h4>
+              )}
+              {Boolean(invitation.ceremoniaHora) && (
+                <p style={{ fontWeight: 600, margin: "4px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Clock className="w-4 h-4 text-amber-600/70 dark:text-amber-400/70" /> {String(invitation.ceremoniaHora)} hs
+                </p>
+              )}
+              {Boolean(invitation.ceremoniaDireccion) && (
+                <p style={{ margin: "4px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <MapPin className="w-4 h-4 text-amber-600/70 dark:text-amber-400/70" /> {String(invitation.ceremoniaDireccion)}
+                </p>
+              )}
+              {Boolean(invitation.ceremoniaMapUrl) && (
+                <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="t-btn" style={{ marginTop: "10px" }}>
+                  Ver mapa ceremonia ↗
+                </a>
+              )}
             </div>
-          ) : (
-            lugarNombre && (
-              <div className="t-detail" style={{ margin: 0 }}>
-                <h4>{lugarNombre}</h4>
-                {hora && <p>{hora} hs</p>}
-                {direccion && <p>{direccion}</p>}
-                {mapUrl && (
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="t-btn">
-                    Ver mapa ↗
-                  </a>
-                )}
+          )}
+
+          {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
+          {(lugarNombre || direccion) && (
+            <div className="t-detail" style={{ margin: "0 0 20px 0" }}>
+              <span className="t-kicker" style={{ display: "block", marginBottom: "6px" }}>Fiesta / Salón</span>
+              {lugarNombre && <h4 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: "4px" }}>{lugarNombre}</h4>}
+              {hora && <p style={{ fontWeight: 600, margin: "4px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Clock className="w-4 h-4 text-amber-600/70 dark:text-amber-400/70" /> {hora} hs
+              </p>}
+              {direccion && <p style={{ margin: "4px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                <MapPin className="w-4 h-4 text-amber-600/70 dark:text-amber-400/70" /> {direccion}
+              </p>}
+              {mapUrl && (
+                <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="t-btn" style={{ marginTop: "10px" }}>
+                  Ver mapa fiesta ↗
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
+          {cronograma.length > 0 && (
+            <div className="mt-6">
+              <span className="t-kicker" style={{ display: "block", marginBottom: "12px" }}>Cronograma del Evento</span>
+              <div className="d-cols-2">
+                {cronograma.map((item, i) => (
+                  <div key={i} className="t-detail">
+                    <h4>{item.title}</h4>
+                    <p style={{ margin: "4px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                      {item.time ? <><Clock className="w-4 h-4 text-amber-600/70 dark:text-amber-400/70" /> {item.time} hs</> : ""}
+                    </p>
+                  </div>
+                ))}
               </div>
-            )
+            </div>
           )}
 
           {isPersonalized && guest && (
@@ -413,7 +566,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           <AlbumCarousel photos={allPhotos} dark />
         )}
 
-        {mapUrl && cronograma.length > 0 && (
+        {mapUrl && (
           <section id="location" style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={mapUrl.replace("maps.google.com", "maps.google.com/maps?output=embed&")}
@@ -484,7 +637,14 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 <CopyField label="Titular" value={String(invitation.regaloTitular)} />
               )}
               {paymentAmount && (
-                <CopyField label="Monto por persona" value={`$${paymentAmount.toLocaleString("es-AR")}`} />
+                <div className="relative">
+                  <CopyField label="Monto por persona" value={`$${paymentAmount.toLocaleString("es-AR")}`} />
+                  {isPriceRecentlyUpdated && (
+                    <span className="absolute -top-3 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-lg z-10">
+                      ¡Valor Actualizado!
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           </SectionWrapper>
@@ -499,6 +659,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               invitationId={String(invitation.id ?? "")}
               guestToken={guest?.uniqueToken}
               guestName={guest?.name}
+              tipo={tipo}
             />
           </SectionWrapper>
         )}
@@ -513,16 +674,25 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           />
         )}
 
+        {Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl) && (
+          <MusicPlayer 
+            musicaUrl={String(invitation.musicaUrl)} 
+            autoplay={Boolean(invitation.musicaAutoplay ?? true)}
+            loop={Boolean(invitation.musicaLoop ?? true)}
+          />
+        )}
+
         <footer className="d-foot">
           <div className="mono">{monogram}</div>
           <small>
             Con cariño, gracias por ser parte de este día ✦{" "}
-            <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Convite</a>
+            <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
           </small>
         </footer>
 
         <BottomNavPill sections={navSections} />
       </div>
     </div>
+    </>
   );
 }

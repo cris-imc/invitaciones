@@ -5,6 +5,7 @@ import { StepEventType } from "./StepEventType";
 import { StepBasicInfo } from "./StepBasicInfo";
 import { StepDetails } from "./StepDetails";
 import { StepCoverPage } from "./StepCoverPage";
+import { StepHeroImages } from "./StepHeroImages";
 import { StepGallery } from "./StepGallery";
 import { StepMusic } from "./StepMusic";
 import { StepTrivia } from "./StepTrivia";
@@ -13,17 +14,22 @@ import { StepCronograma } from "./StepCronograma";
 import { StepPreview } from "./StepPreview";
 import { StepPhrase } from "./StepPhrase";
 import { StepBankDetails } from "./StepBankDetails";
+import { StepCeremonia } from "./StepCeremonia";
 import { Progress } from "@/components/ui/progress";
 
 export function WizardSteps() {
-    const { currentStep } = useWizardStore();
+    const { currentStep, data } = useWizardStore();
+
+    const isCasamiento = data.type === 'CASAMIENTO';
 
     const steps = [
         { component: StepEventType, label: "Tipo de Evento" },
         { component: StepBasicInfo, label: "Información Básica" },
-        { component: StepDetails, label: "Detalles del Evento" },
+        { component: StepDetails, label: "Detalles del Salón" },
+        ...(isCasamiento ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
         { component: StepCronograma, label: "Cronograma" },
-        { component: StepCoverPage, label: "Portada" },
+        { component: StepCoverPage, label: "Bienvenida" },
+        { component: StepHeroImages, label: "Portada" },
         { component: StepGallery, label: "Galería" },
         { component: StepPhrase, label: "Frase" },
         { component: StepMusic, label: "Música" },

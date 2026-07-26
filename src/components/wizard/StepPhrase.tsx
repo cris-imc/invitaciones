@@ -25,6 +25,24 @@ export function StepPhrase() {
             ? "Ej: 'Este es el comienzo del resto de mi vida...'"
             : "Ej: 'Bienvenidos a nuestra celebración. Gracias por estar aquí.'";
 
+    const WEDDING_PHRASES = [
+        "El amor no consiste en mirarse el uno al otro, sino en mirar juntos en la misma dirección.",
+        "Unimos nuestras vidas para siempre, porque juntos todo es mejor.",
+        "Donde hay amor, hay vida. ¡Y queremos celebrar la nuestra con vos!",
+        "Lo mejor de la vida es compartirla con quien amás... y con quienes te aman.",
+        "Hoy comienza la mejor de nuestras aventuras."
+    ];
+
+    const QUINCE_PHRASES = [
+        "Este es el comienzo del resto de mi vida. ¡Gracias por acompañarme!",
+        "Hay momentos inolvidables que se atesoran en el corazón para siempre.",
+        "Dejo atrás mi niñez para comenzar a vivir mis sueños.",
+        "Celebro la magia de crecer, rodeada del amor de mi familia y amigos.",
+        "Una noche mágica, un recuerdo eterno. ¡Acompáñame a festejar mis 15!"
+    ];
+
+    const suggestedPhrases = tipo === "CASAMIENTO" ? WEDDING_PHRASES : tipo === "QUINCE_ANOS" ? QUINCE_PHRASES : [];
+
     return (
         <div className="space-y-6">
             <div className="text-center">
@@ -62,6 +80,23 @@ export function StepPhrase() {
                                 {(data.frasePersonalizadaTexto || "").length}/300
                             </p>
                         </div>
+                        
+                        {suggestedPhrases.length > 0 && (
+                            <div className="space-y-2 mt-4 pt-4 border-t border-border">
+                                <Label className="text-sm font-semibold text-muted-foreground">Sugerencias (haz clic para usar):</Label>
+                                <div className="grid gap-2">
+                                    {suggestedPhrases.map((phrase, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setData({ frasePersonalizadaTexto: phrase })}
+                                            className="text-left text-sm p-3 rounded-md bg-background/50 hover:bg-muted border border-border text-foreground transition-colors"
+                                        >
+                                            &quot;{phrase}&quot;
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

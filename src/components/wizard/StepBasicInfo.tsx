@@ -23,6 +23,7 @@ export function StepBasicInfo() {
         defaultValues: {
             nombreEvento: data.nombreEvento || "",
             fecha: data.fecha,
+            ciudad: data.ciudad || "",
             nombreNovio: data.nombreNovio || "",
             nombreNovia: data.nombreNovia || "",
             nombreQuinceanera: data.nombreQuinceanera || "",
@@ -54,7 +55,7 @@ export function StepBasicInfo() {
                                 <FormLabel>Título de la Invitación</FormLabel>
                                 <FormControl>
                                      <Input 
-                                        className="bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                                        className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                                         placeholder={
                                             tipo === 'CASAMIENTO' ? "Ej: Nuestra Boda" :
                                                 tipo === 'QUINCE_ANOS' ? "Ej: Mis 15 Años" :
@@ -83,7 +84,7 @@ export function StepBasicInfo() {
                                              <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "w-full pl-3 text-left font-normal bg-[var(--ink-2)] border-none text-[var(--on-ink)] h-12 rounded-xl hover:bg-[var(--ink-2)]/80 hover:text-[var(--on-ink)]",
+                                                    "w-full pl-3 text-left font-normal bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl hover:bg-[var(--ink-2)]/80 hover:text-[var(--on-ink)]",
                                                     !field.value && "text-white/30"
                                                 )}
                                             >
@@ -113,6 +114,27 @@ export function StepBasicInfo() {
                         )}
                     />
 
+                    <FormField
+                        control={form.control}
+                        name="ciudad"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Ciudad / Localidad del Evento</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                                        placeholder="Ej: Buenos Aires, Rosario, Mendoza..."
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <p className="text-xs text-muted-foreground">
+                                    Aparecerá junto a la fecha en la tarjeta de bienvenida de tus invitados.
+                                </p>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                     {tipo === 'CASAMIENTO' && (
                         <div className="grid grid-cols-2 gap-4">
                             <FormField
@@ -122,7 +144,7 @@ export function StepBasicInfo() {
                                     <FormItem>
                                         <FormLabel>Nombre Novia</FormLabel>
                                         <FormControl>
-                                             <Input className="bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
+                                             <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
                                         </FormControl>
                                     </FormItem>
                                 )}
@@ -134,7 +156,7 @@ export function StepBasicInfo() {
                                     <FormItem>
                                         <FormLabel>Nombre Novio</FormLabel>
                                         <FormControl>
-                                             <Input className="bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
+                                             <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
                                         </FormControl>
                                     </FormItem>
                                 )}
@@ -150,7 +172,7 @@ export function StepBasicInfo() {
                                 <FormItem>
                                     <FormLabel>Tu Nombre</FormLabel>
                                     <FormControl>
-                                         <Input className="bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Ej: María, Sofía, Valentina..." {...field} />
+                                         <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Ej: María, Sofía, Valentina..." {...field} />
                                     </FormControl>
                                     <p className="text-xs text-muted-foreground">
                                         Este nombre aparecerá destacado en la invitación.
@@ -168,7 +190,7 @@ export function StepBasicInfo() {
                                 <FormItem>
                                     <FormLabel>Nombre del Festejado/a (Opcional)</FormLabel>
                                     <FormControl>
-                                         <Input className="bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre de la persona o empresa" {...field} />
+                                         <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre de la persona o empresa" {...field} />
                                     </FormControl>
                                     <p className="text-xs text-muted-foreground">Si lo dejas vacío, se usará el nombre del evento.</p>
                                 </FormItem>

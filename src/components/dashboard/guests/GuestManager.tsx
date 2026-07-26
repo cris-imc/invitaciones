@@ -12,9 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Users, UserPlus, Link as LinkIcon, Trash2, CalendarIcon, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Users, UserPlus, Link as LinkIcon, Trash2, CalendarIcon, CheckCircle, XCircle, Clock, MessageCircle } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
 interface Guest {
@@ -38,6 +39,10 @@ export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
     const [activeTab, setActiveTab] = useState("list");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [guestToDelete, setGuestToDelete] = useState<Guest | null>(null);
+    const itemsPerPage = 3;
     const { showToast } = useToast();
 
     // Form States
@@ -96,16 +101,20 @@ export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
         }
     };
 
-    const handleDeleteGuest = async (guestId: string) => {
-        if (!confirm("¿Eliminar este invitado?")) return;
+    const handleDeleteGuest = async () => {
+        if (!guestToDelete) return;
 
         try {
-            const res = await fetch(`/api/guests/${guestId}`, { method: "DELETE" });
+            const res = await fetch(`/api/guests/${guestToDelete.id}`, { method: "DELETE" });
             if (res.ok) {
-                setGuests(guests.filter(g => g.id !== guestId));
+                setGuests(guests.filter(g => g.id !== guestToDelete.id));
+                showToast("Invitado eliminado", "success");
             }
         } catch (error) {
             console.error(error);
+            showToast("Error al eliminar", "error");
+        } finally {
+            setGuestToDelete(null);
         }
     };
 
@@ -114,6 +123,11 @@ export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
         navigator.clipboard.writeText(url);
         showToast("¡Enlace copiado! Compártelo con el invitado.", "success");
     };
+
+    // Filter and Pagination
+    const filteredGuests = guests.filter(g => g.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const totalPages = Math.max(1, Math.ceil(filteredGuests.length / itemsPerPage));
+    const paginatedGuests = filteredGuests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     // Stats
     const totalGuests = guests.length;
@@ -225,58 +239,142 @@ export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
 
                 {/* Guest List */}
                 <Card className="md:col-span-2">
-                    <CardHeader className="flex flex-row items-center justify-between">
+                    <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div>
                             <CardTitle>Lista de Invitados</CardTitle>
                             <CardDescription>Gestiona tus invitados y comparte sus enlaces.</CardDescription>
+                        </div>
+                        <div className="w-full sm:w-64">
+                            <Input 
+                                type="search"
+                                placeholder="Buscar invitado..."
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
                         </div>
                     </CardHeader>
                     <CardContent>
                         {isLoading ? (
                             <div className="text-center py-8">Cargando invitados...</div>
-                        ) : guests.length === 0 ? (
+                        ) : filteredGuests.length === 0 ? (
                             <div className="text-center py-10 border-2 border-dashed rounded-lg text-muted-foreground">
                                 <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                                <p>Aún no has agregado invitados.</p>
+                                <p>{searchQuery ? "No se encontraron invitados que coincidan con tu búsqueda." : "Aún no has agregado invitados."}</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {guests.map((guest) => (
-                                    <div key={guest.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-semibold">{guest.name}</span>
-                                                <Badge variant="secondary" className="text-[10px]">
-                                                    {guest.type === "FAMILY" ? "FAMILIA" : "INDIVIDUAL"}
-                                                </Badge>
+                                {paginatedGuests.map((guest) => {
+                                    const guestUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/i/${slug}?t=${guest.uniqueToken}`;
+                                    const waMsg = encodeURIComponent(
+                                        `¡Hola ${guest.name}! Te invitamos a nuestra celebración. Hacé clic en tu link personalizado para ver la invitación y confirmar tu asistencia: ${guestUrl}`
+                                    );
+                                    const waHref = `https://wa.me/?text=${waMsg}`;
+
+                                    return (
+                                        <div key={guest.id} className="flex items-center justify-between p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors flex-wrap gap-3">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-semibold text-base">{guest.name}</span>
+                                                    <Badge variant="secondary" className="text-[10px]">
+                                                        {guest.type === "FAMILY" ? "FAMILIA" : "INDIVIDUAL"}
+                                                    </Badge>
+                                                </div>
+                                                <div className="text-xs text-muted-foreground flex gap-3">
+                                                    <span>Esperados: {guest.expectedCount}</span>
+                                                    {guest.status === "CONFIRMED" && (
+                                                        <span className="text-green-600 font-medium">Asistirán: {guest.attendingCount}</span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="text-sm text-muted-foreground flex gap-3">
-                                                <span>Esperados: {guest.expectedCount}</span>
-                                                {guest.status === "CONFIRMED" && (
-                                                    <span className="text-green-600 font-medium">Asistirán: {guest.attendingCount}</span>
-                                                )}
+
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <StatusBadge status={guest.status} />
+
+                                                <a 
+                                                    href={waHref} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#128C7E] text-white text-xs font-semibold shadow-sm transition-colors"
+                                                >
+                                                    <MessageCircle className="w-3.5 h-3.5" />
+                                                    Enviar WhatsApp
+                                                </a>
+
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm" 
+                                                    className="h-8 px-2.5 text-xs gap-1" 
+                                                    title="Copiar enlace personalizado" 
+                                                    onClick={() => copyLink(guest.uniqueToken)}
+                                                >
+                                                    <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
+                                                    Copiar Link
+                                                </Button>
+
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50" 
+                                                    title="Eliminar" 
+                                                    onClick={() => setGuestToDelete(guest)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
                                             </div>
                                         </div>
+                                    );
+                                })}
 
-                                        <div className="flex items-center gap-3">
-                                            <StatusBadge status={guest.status} />
-
-                                            <div className="flex items-center border-l pl-3 gap-1">
-                                                <Button variant="ghost" size="icon" title="Copiar enlace" onClick={() => copyLink(guest.uniqueToken)}>
-                                                    <LinkIcon className="w-4 h-4 text-blue-600" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" title="Eliminar" onClick={() => handleDeleteGuest(guest.id)}>
-                                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                                </Button>
-                                            </div>
-                                        </div>
+                                {totalPages > 1 && (
+                                    <div className="flex items-center justify-center gap-2 pt-4 border-t">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                        >
+                                            Anterior
+                                        </Button>
+                                        <span className="text-sm text-muted-foreground px-2">
+                                            Página {currentPage} de {totalPages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            Siguiente
+                                        </Button>
                                     </div>
-                                ))}
+                                )}
                             </div>
                         )}
                     </CardContent>
                 </Card>
             </div>
+
+            <Dialog open={!!guestToDelete} onOpenChange={(open) => !open && setGuestToDelete(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>¿Eliminar invitado?</DialogTitle>
+                        <DialogDescription>
+                            Estás a punto de eliminar a <strong>{guestToDelete?.name}</strong> de la lista de invitados. Esta acción no se puede deshacer y el enlace de la invitación dejará de funcionar para ellos.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => setGuestToDelete(null)}>
+                            Cancelar
+                        </Button>
+                        <Button variant="destructive" onClick={handleDeleteGuest}>
+                            Eliminar Invitado
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

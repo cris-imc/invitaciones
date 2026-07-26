@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SectionWrapper } from "./SectionWrapper";
 
 interface SongItem {
   id: string;
@@ -38,8 +39,6 @@ export function SongSuggestion({
   const [error, setError] = useState("");
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const sectionClass = `section${dark ? " dark" : ""}`;
 
   // Cargar canciones aprobadas
   useEffect(() => {
@@ -110,7 +109,7 @@ export function SongSuggestion({
   };
 
   return (
-    <section className={sectionClass} id="songs">
+    <SectionWrapper dark={dark} id="songs">
       <p className="t-kicker">{kicker}</p>
       <h2>{title}</h2>
       <p style={{ marginBottom: "var(--sp-5)" }}>
@@ -151,7 +150,7 @@ export function SongSuggestion({
               type="submit"
               className="t-btn"
               disabled={isSubmitting}
-              style={{ background: "var(--t-onpaper)", color: "var(--t-paper)", border: "none", width: "100%", padding: "12px", marginTop: "4px" }}
+              style={{ background: "var(--t-onpaper)", color: "var(--t-paper)", border: "none", width: "fit-content", padding: "10px 24px", marginTop: "8px", alignSelf: "flex-start" }}
             >
               {isSubmitting ? "Enviando…" : "Enviar sugerencia"}
             </button>
@@ -211,6 +210,6 @@ export function SongSuggestion({
             })}
         </div>
       )}
-    </section>
+    </SectionWrapper>
   );
 }

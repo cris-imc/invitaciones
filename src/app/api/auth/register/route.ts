@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, planTier } = body;
+    const { name, email, password, planTier, premiumCredits } = body;
 
     // Validate input
     if (!name || !email || !password) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.trim().toLowerCase() },
     });
 
     if (existingUser) {
@@ -37,14 +37,19 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const creditsToAssign = planTier === "PREMIUM" 
+        ? (typeof premiumCredits === 'number' && premiumCredits > 0 ? premiumCredits : 1) 
+        : 0;
+
     // Create user
     const user = await prisma.user.create({
       data: {
         name,
-        email,
+        email: email.trim().toLowerCase(),
         password: hashedPassword,
         planTier: planTier || "FREE",
-        subscriptionStatus: "TRIAL",
+        premiumCredits: creditsToAssign,
+        subscriptionStatus: planTier === "PREMIUM" ? "ACTIVE" : "TRIAL",
         role: "CLIENT",
       },
       select: {

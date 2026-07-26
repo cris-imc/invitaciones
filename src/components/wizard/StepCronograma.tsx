@@ -26,17 +26,38 @@ interface CronogramaEvent {
 export function StepCronograma() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
     
-    // Parse cronogramaEventos from JSON string
-    const parsedEvents: CronogramaEvent[] = data.cronogramaEventos 
-        ? JSON.parse(data.cronogramaEventos) 
-        : [
-            { time: "19:00", title: "Ceremonia", icon: "Heart" },
+    const getDefaultEvents = (): CronogramaEvent[] => {
+        if (data.type === 'CASAMIENTO') {
+            if (data.ceremoniaHabilitada) {
+                return [
+                    { time: "20:30", title: "Recepción", icon: "Music" },
+                    { time: "21:30", title: "Cena & Brindis", icon: "Utensils" },
+                    { time: "23:30", title: "Fiesta & Baile", icon: "Music" }
+                ];
+            }
+            return [
+                { time: "19:00", title: "Ceremonia & Recepción", icon: "Heart" },
+                { time: "21:00", title: "Cena", icon: "Utensils" },
+                { time: "23:00", title: "Fiesta", icon: "Music" }
+            ];
+        }
+        return [
             { time: "20:30", title: "Recepción", icon: "Music" },
-            { time: "21:00", title: "Cena", icon: "Utensils" },
-            { time: "23:00", title: "Fiesta", icon: "Music" }
+            { time: "21:30", title: "Cena", icon: "Utensils" },
+            { time: "23:30", title: "Fiesta", icon: "Music" }
         ];
+    };
 
-    const [events, setEvents] = useState<CronogramaEvent[]>(parsedEvents);
+    let initialEvents: CronogramaEvent[] = data.cronogramaEventos 
+        ? JSON.parse(data.cronogramaEventos) 
+        : getDefaultEvents();
+
+    // Si la ceremonia está habilitada en su paso propio, evitar item redundante "Ceremonia"
+    if (data.ceremoniaHabilitada) {
+        initialEvents = initialEvents.filter(e => e.title.toLowerCase().trim() !== "ceremonia");
+    }
+
+    const [events, setEvents] = useState<CronogramaEvent[]>(initialEvents);
 
     const addEvent = () => {
         setEvents([...events, { time: "", title: "", icon: "Clock" }]);
@@ -90,12 +111,17 @@ export function StepCronograma() {
                         <div className="grid md:grid-cols-[1fr_2fr_1.5fr] gap-3">
                             <div className="space-y-1">
                                 <Label>Hora</Label>
-                                <Input
-                                    type="time"
-                                    value={event.time}
-                                    onChange={(e) => updateEvent(index, "time", e.target.value)}
-                                    required
-                                />
+                                <div className="relative">
+                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
+                                    <Input
+                                        type="time"
+                                        value={event.time}
+                                        onChange={(e) => updateEvent(index, "time", e.target.value)}
+                                        required
+                                        className="pl-9 [&::-webkit-calendar-picker-indicator]:hidden cursor-pointer"
+                                        onClick={(e) => "showPicker" in e.currentTarget && typeof e.currentTarget.showPicker === 'function' && e.currentTarget.showPicker()}
+                                    />
+                                </div>
                             </div>
 
                             <div className="space-y-1">
