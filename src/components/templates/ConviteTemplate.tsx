@@ -258,23 +258,21 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
       if (novia && novio) return { title: `${novia} & ${novio}`, em: `& ${novio}` };
       return { title: String(invitation.nombreEvento ?? ""), em: undefined };
     }
-    if (tipo === "QUINCE_ANOS") {
-      return { title: String(invitation.nombreQuinceanera ?? invitation.nombreEvento ?? ""), em: undefined };
-    }
-    return { title: String(invitation.nombreEvento ?? ""), em: undefined };
+    return { title: String(invitation.nombreQuinceanera ?? invitation.nombreEvento ?? ""), em: undefined };
   };
 
   const { title, em } = getHeroTitle();
 
-  const eyebrow =
-    tipo === "CASAMIENTO"   ? "Nos casamos"
+  const eyebrow = invitation.nombreEvento 
+    ? String(invitation.nombreEvento)
+    : tipo === "CASAMIENTO" ? "Nos casamos"
     : tipo === "QUINCE_ANOS" ? "Mis quince años"
     : "Te invitamos";
 
   const monogram =
-    tipo === "CASAMIENTO"
-      ? `${String(invitation.nombreNovia ?? "?")[0]}${String(invitation.nombreNovio ?? "?")[0]}`
-      : String(title[0] ?? "✦");
+    tipo === "CASAMIENTO" ? "♥"
+    : tipo === "QUINCE_ANOS" ? "✦"
+    : "●";
 
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
@@ -304,7 +302,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   const guestPayStatus = (guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID";
 
   const showGiftSection = Boolean(invitation.regaloHabilitado);
-  const showBankDetails = Boolean(invitation.regaloMostrarDatos) && Boolean(
+  const showBankDetails = Boolean(invitation.regaloHabilitado) && Boolean(
     invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || paymentAmount
   );
 
@@ -655,8 +653,8 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300}>
-            <p className="t-kicker">{String(invitation.triviaTitulo ?? "Un juego para vos")}</p>
-            <h2>{String(invitation.triviaSubtitulo ?? "¿Cuánto sabés?")}</h2>
+            <p className="t-kicker">¿Cuánto sabés?</p>
+            <h2>{String(invitation.triviaTitulo ?? "Un juego para vos")}</h2>
             <ProgressiveQuiz 
               preguntas={triviaPreguntas} 
               invitationId={String(invitation.id ?? "")}

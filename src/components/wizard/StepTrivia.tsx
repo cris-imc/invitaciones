@@ -93,33 +93,12 @@ export function StepTrivia() {
                         {/* Configuración básica */}
                         <div className="space-y-4 border border-[var(--ink-2)] p-4 rounded-lg bg-[var(--ink-2)]">
                             <div className="space-y-2">
-                                <Label htmlFor="triviaIcono">Icono (emoji)</Label>
-                                <Input
-                                    id="triviaIcono"
-                                    value={data.triviaIcono || ""}
-                                    onChange={(e) => setData({ triviaIcono: e.target.value })}
-                                    placeholder="🎯"
-                                    maxLength={2}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
                                 <Label htmlFor="triviaTitulo">Título</Label>
                                 <Input
                                     id="triviaTitulo"
                                     value={data.triviaTitulo || ""}
                                     onChange={(e) => setData({ triviaTitulo: e.target.value })}
                                     placeholder="¿Cuánto nos conoces?"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="triviaSubtitulo">Subtítulo</Label>
-                                <Input
-                                    id="triviaSubtitulo"
-                                    value={data.triviaSubtitulo || ""}
-                                    onChange={(e) => setData({ triviaSubtitulo: e.target.value })}
-                                    placeholder="Responde estas preguntas y descubre cuánto sabes"
                                 />
                             </div>
                         </div>

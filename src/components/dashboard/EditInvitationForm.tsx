@@ -630,16 +630,6 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                         />
                                     </div>
 
-                                    <div className="flex items-center space-x-2 py-2">
-                                        <Switch
-                                            id="regaloMostrarDatos"
-                                            checked={formData.regaloMostrarDatos}
-                                            onCheckedChange={(checked) => handleInputChange('regaloMostrarDatos', checked)}
-                                        />
-                                        <Label htmlFor="regaloMostrarDatos">Mostrar Datos Bancarios</Label>
-                                    </div>
-
-                                    {formData.regaloMostrarDatos && (
                                         <div className="space-y-4 pl-6 border-l-2 border-blue-200 ml-1 bg-blue-50/50 p-4 rounded">
                                             <div className="space-y-2">
                                                 <Label htmlFor="regaloBanco">Banco</Label>
@@ -681,7 +671,6 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                                 />
                                             </div>
                                         </div>
-                                    )}
                                 </div>
                             )}
                         </div>

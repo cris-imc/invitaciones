@@ -52,72 +52,59 @@ export function StepBankDetails() {
                             />
                         </div>
 
-                        <div className="flex items-center justify-between py-2">
-                            <Label htmlFor="showBankDetails" className="font-medium">
-                                Mostrar Datos Bancarios
-                            </Label>
-                            <Switch
-                                id="showBankDetails"
-                                checked={data.regaloMostrarDatos}
-                                onCheckedChange={(checked) => setData({ regaloMostrarDatos: checked })}
-                            />
-                        </div>
-
-                        {data.regaloMostrarDatos && (
-                            <div className="grid gap-4 p-4 border border-[var(--ink-2)] rounded-md bg-[var(--ink)]">
-                                <div className="space-y-2">
-                                    <Label htmlFor="bankName">Banco</Label>
-                                    <Input
-                                        id="bankName"
-                                        placeholder="Ej: Banco Galicia"
-                                        value={data.regaloBanco || ""}
-                                        onChange={(e) => setData({ regaloBanco: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="cbu">CBU / CVU</Label>
-                                    <Input
-                                        id="cbu"
-                                        placeholder="0000000000000000000000"
-                                        value={data.regaloCbu || ""}
-                                        onChange={(e) => setData({ regaloCbu: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="alias">Alias</Label>
-                                    <Input
-                                        id="alias"
-                                        placeholder="mi.alias.mp"
-                                        value={data.regaloAlias || ""}
-                                        onChange={(e) => setData({ regaloAlias: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="titular">Titular de la cuenta</Label>
-                                    <Input
-                                        id="titular"
-                                        placeholder="Nombre Apellido"
-                                        value={data.regaloTitular || ""}
-                                        onChange={(e) => setData({ regaloTitular: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="regaloMonto">Monto de la tarjeta por persona (opcional)</Label>
-                                    <Input
-                                        id="regaloMonto"
-                                        type="number"
-                                        min={0}
-                                        step={100}
-                                        placeholder="Ej: 15000"
-                                        value={(data as any).regaloMonto || ""}
-                                        onChange={(e) => setData({ regaloMonto: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    />
-                                    <p className="text-xs text-muted-foreground">
-                                        Si cargás un monto, se mostrará en la invitación de cada invitado (salvo los que estén exentos de pago).
-                                    </p>
-                                </div>
+                        <div className="grid gap-4 p-4 border border-[var(--ink-2)] rounded-md bg-[var(--ink)]">
+                            <div className="space-y-2">
+                                <Label htmlFor="bankName">Banco</Label>
+                                <Input
+                                    id="bankName"
+                                    placeholder="Ej: Banco Galicia"
+                                    value={data.regaloBanco || ""}
+                                    onChange={(e) => setData({ regaloBanco: e.target.value })}
+                                />
                             </div>
-                        )}
+                            <div className="space-y-2">
+                                <Label htmlFor="cbu">CBU / CVU</Label>
+                                <Input
+                                    id="cbu"
+                                    placeholder="0000000000000000000000"
+                                    value={data.regaloCbu || ""}
+                                    onChange={(e) => setData({ regaloCbu: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="alias">Alias</Label>
+                                <Input
+                                    id="alias"
+                                    placeholder="mi.alias.mp"
+                                    value={data.regaloAlias || ""}
+                                    onChange={(e) => setData({ regaloAlias: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="titular">Titular de la cuenta</Label>
+                                <Input
+                                    id="titular"
+                                    placeholder="Nombre Apellido"
+                                    value={data.regaloTitular || ""}
+                                    onChange={(e) => setData({ regaloTitular: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="regaloMonto">Monto de la tarjeta por persona (opcional)</Label>
+                                <Input
+                                    id="regaloMonto"
+                                    type="number"
+                                    min={0}
+                                    step={100}
+                                    placeholder="Ej: 15000"
+                                    value={(data as any).regaloMonto || ""}
+                                    onChange={(e) => setData({ regaloMonto: e.target.value ? Number(e.target.value) : undefined } as any)}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Si cargás un monto, se mostrará en la invitación de cada invitado (salvo los que estén exentos de pago).
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

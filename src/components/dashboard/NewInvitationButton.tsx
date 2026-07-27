@@ -16,6 +16,7 @@ import { Sparkles } from "lucide-react";
 
 export function NewInvitationButton({ premiumCredits, totalInvitations }: { premiumCredits: number, totalInvitations: number }) {
     const [open, setOpen] = useState(false);
+    const [showError, setShowError] = useState(false);
     const router = useRouter();
     const setUsePremiumCredit = useWizardStore((state) => state.setUsePremiumCredit);
 
@@ -41,6 +42,11 @@ export function NewInvitationButton({ premiumCredits, totalInvitations }: { prem
     };
 
     const handleCreatePremium = () => {
+        if (premiumCredits <= 0) {
+            setOpen(false);
+            setShowError(true);
+            return;
+        }
         setUsePremiumCredit(true);
         setOpen(false);
         router.push("/dashboard/invitaciones/crear");
@@ -67,6 +73,24 @@ export function NewInvitationButton({ premiumCredits, totalInvitations }: { prem
                         <Button onClick={handleCreatePremium} className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white flex items-center justify-center gap-2">
                             <Sparkles className="w-4 h-4" />
                             Usar Crédito Premium
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={showError} onOpenChange={setShowError}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="text-red-600 flex items-center gap-2">
+                            <span>⚠️</span> Sin créditos premium
+                        </DialogTitle>
+                        <DialogDescription className="pt-2">
+                            No tienes créditos premium disponibles en tu cuenta. Por favor, comunícate con soporte (vía WhatsApp) para adquirir más créditos o crea una invitación gratis por ahora.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="mt-6">
+                        <Button variant="default" onClick={() => setShowError(false)} className="w-full sm:w-auto bg-slate-800 text-white">
+                            Entendido
                         </Button>
                     </DialogFooter>
                 </DialogContent>
