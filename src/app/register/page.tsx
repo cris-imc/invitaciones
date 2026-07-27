@@ -124,22 +124,35 @@ export default function RegisterPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  {PLAN_LIMITS.FREE.maxInvitations} evento
+                  Plantilla 100% personalizada
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  4 plantillas premium
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  RSVP básico
+                  Gestión de invitados y pagos
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
                   Cuenta regresiva
                 </li>
-                <li className="text-sm opacity-60 italic">
-                  * Incluye marca de agua
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-400" />
+                  Album de fotos
+                </li>
+                <li className="flex items-center gap-2 opacity-50">
+                  <span className="text-red-400 font-bold px-1">✕</span>
+                  Sin musica de fondo
+                </li>
+                <li className="flex items-center gap-2 opacity-50">
+                  <span className="text-red-400 font-bold px-1">✕</span>
+                  Sin LIVE (fotos transmitidas en vivo)
+                </li>
+                <li className="flex items-center gap-2 opacity-50">
+                  <span className="text-red-400 font-bold px-1">✕</span>
+                  Sin Trivia
+                </li>
+                <li className="flex items-center gap-2 opacity-50">
+                  <span className="text-red-400 font-bold px-1">✕</span>
+                  Sin sugerencias de musica para el DJ
                 </li>
               </ul>
             </button>
@@ -193,31 +206,39 @@ export default function RegisterPage() {
               <ul className="space-y-2 opacity-80">
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  <strong>Invitados ilimitados</strong>
+                  Invitados ilimitados
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  Todas las plantillas
+                  Plantilla 100% personalizada
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  Álbum de fotos colaborativo
+                  Gestión de invitados y pagos
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  Cuestionarios interactivos
+                  Cuenta regresiva
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  Música personalizada
+                  Album de fotos
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  <strong>Sin marca de agua</strong>
+                  Con musica de fondo
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400" />
-                  Soporte prioritario
+                  Con LIVE (fotos transmitidas en vivo)
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-400" />
+                  Con Trivia
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-400" />
+                  Con sugerencias de musica para el DJ
                 </li>
               </ul>
               <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-500">

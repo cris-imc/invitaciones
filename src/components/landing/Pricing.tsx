@@ -7,26 +7,33 @@ const plans = [
         price: "Gratis",
         description: "Ideal para eventos pequeños y pruebas.",
         features: [
-            "Hasta 50 invitados",
-            "Diseño estándar",
-            "RSVP básico",
+            "Hasta 20 invitados",
+            "Plantilla 100% personalizada",
+            "Gestión de invitados y pagos",
             "Cuenta regresiva",
-            "Mapa del evento"
+            "Album de fotos",
+            "Sin musica de fondo",
+            "Sin LIVE (fotos transmitidas en vivo)",
+            "Sin Trivia",
+            "Sin sugerencias de musica para el DJ",
         ],
         cta: "Comenzar Gratis",
         variant: "outline" as const,
     },
     {
         name: "Premium",
-        price: "$2.500",
+        price: "$50.000",
         description: "La experiencia completa para tu fiesta.",
         features: [
             "Invitados ilimitados",
-            "Álbum de fotos colaborativo",
-            "Cuestionarios interactivos",
-            "Música personalizada",
-            "Sin marca de agua",
-            "Soporte prioritario"
+            "Plantilla 100% personalizada",
+            "Gestión de invitados y pagos",
+            "Cuenta regresiva",
+            "Album de fotos",
+            "Con musica de fondo",
+            "Con LIVE (fotos transmitidas en vivo)",
+            "Con Trivia",
+            "Con sugerencias de musica para el DJ",
         ],
         cta: "Elegir Premium",
         variant: "default" as const,
@@ -90,12 +97,19 @@ export function Pricing() {
                             </div>
 
                             <ul className="flex-1 space-y-3 mb-6">
-                                {plan.features.map((feature, i) => (
-                                    <li key={i} className="flex items-center text-sm">
-                                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                                        {feature}
-                                    </li>
-                                ))}
+                                {plan.features.map((feature, i) => {
+                                    const isNegative = feature.startsWith("Sin ") && plan.name === "Básico";
+                                    return (
+                                        <li key={i} className={`flex items-center text-sm ${isNegative ? "opacity-50" : ""}`}>
+                                            {isNegative ? (
+                                                <span className="text-red-400 font-bold px-1 mr-1">✕</span>
+                                            ) : (
+                                                <Check className="w-4 h-4 mr-2 text-green-500" />
+                                            )}
+                                            {feature}
+                                        </li>
+                                    );
+                                })}
                             </ul>
 
                             <Button className="w-full" variant={plan.variant}>

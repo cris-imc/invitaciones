@@ -74,6 +74,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         regaloMonto={invitation.regaloMonto}
         precioNino={invitation.precioNino}
         rsvpEnabled={invitation.rsvpEnabled ?? invitation.confirmacionHabilitada ?? true}
+        planTier={invitation.planTier}
       />
     </div>
   );

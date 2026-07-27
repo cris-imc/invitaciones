@@ -178,9 +178,10 @@ export function LiveAdminPanel({ invitationId }: { invitationId: string }) {
                                         ) : (
                                             <div className="w-full h-40 flex flex-col items-center justify-center bg-indigo-500/10 text-indigo-500 p-4 text-center">
                                                 <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center mb-2">
-                                                    🎤
+                                                    💬
                                                 </div>
-                                                <span className="text-xs font-semibold">Audio Mensaje</span>
+                                                <span className="text-xs font-semibold">Mensaje</span>
+                                                <span className="text-[10px] mt-1 opacity-70 line-clamp-2">"{item.fileUrl}"</span>
                                             </div>
                                         )}
                                         

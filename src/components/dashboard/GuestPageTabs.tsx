@@ -6,6 +6,7 @@ import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPaymen
 import { SongModerationPanel } from "@/components/dashboard/SongModerationPanel";
 import { QuickEditPrice } from "@/components/dashboard/QuickEditPrice";
 import { LiveAdminPanel } from "@/components/dashboard/live/LiveAdminPanel";
+import { Lock } from "lucide-react";
 
 type Tab = "invitados" | "canciones" | "precio" | "agregar";
 
@@ -16,17 +17,18 @@ interface Props {
   regaloMonto: unknown;
   precioNino: unknown;
   rsvpEnabled: boolean;
+  planTier: string;
 }
 
-export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMonto, precioNino, rsvpEnabled }: Props) {
+export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMonto, precioNino, rsvpEnabled, planTier }: Props) {
   const [tab, setTab] = useState<Tab>("invitados");
 
   const tabs: { id: Tab; label: string; primary?: boolean }[] = [
     { id: "invitados", label: "Invitados & Pagos" },
     { id: "canciones", label: "Música" },
-    ...(regaloHabilitado ? [{ id: "precio" as Tab, label: "Precio Tarjeta" }] : []),
-    { id: "agregar", label: "Gestionar Invitados 📲", primary: true },
-    { id: "live" as Tab, label: "LIVE 📸", primary: true },
+    ...(regaloHabilitado ? [{ id: "precio" as Tab, label: "Precio" }] : []),
+    { id: "agregar", label: "Gestionar", primary: true },
+    { id: "live" as Tab, label: "LIVE", primary: true },
   ];
 
   return (
@@ -44,40 +46,75 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
           border: "1px solid var(--line)",
         }}
       >
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            style={{
-              flex: "1 1 auto",
-              minWidth: "120px",
-              height: "40px",
-              padding: "0 16px",
-              borderRadius: "10px",
-              border: t.primary ? "1px solid #4f46e5" : "1px solid transparent",
-              cursor: "pointer",
-              fontWeight: t.primary || tab === t.id ? 700 : 500,
-              fontSize: "13.5px",
-              fontFamily: "var(--font-ui)",
-              transition: "all 0.15s",
-              background: t.primary
-                ? tab === t.id
-                  ? "#3730a3"
-                  : "#4f46e5"
-                : tab === t.id
-                ? "var(--paper)"
-                : "transparent",
-              color: t.primary
-                ? "#fff"
-                : tab === t.id
-                ? "var(--ink)"
-                : "rgba(246,243,236,0.6)",
-              boxShadow: tab === t.id && !t.primary ? "0 1px 4px rgba(0,0,0,0.15)" : "none",
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
+        {tabs.map((t) => {
+          const isLocked = planTier === "FREE" && (t.id === "canciones" || t.id === "live");
+          
+          return (
+            <div key={t.id} className="relative group flex-1 min-w-[120px]">
+              <button
+                onClick={() => !isLocked && setTab(t.id)}
+                disabled={isLocked}
+                style={{
+                  width: "100%",
+                  minHeight: "40px",
+                  padding: "8px 16px",
+                  borderRadius: "10px",
+                  border: t.primary ? "1px solid #4f46e5" : "1px solid transparent",
+                  cursor: isLocked ? "not-allowed" : "pointer",
+                  fontWeight: t.primary || tab === t.id ? 700 : 500,
+                  fontSize: "13.5px",
+                  fontFamily: "var(--font-ui)",
+                  transition: "all 0.15s",
+                  background: t.primary
+                    ? tab === t.id
+                      ? "#3730a3"
+                      : "#4f46e5"
+                    : tab === t.id
+                    ? "var(--paper)"
+                    : "transparent",
+                  color: t.primary
+                    ? "#fff"
+                    : tab === t.id
+                    ? "var(--ink)"
+                    : "rgba(246,243,236,0.6)",
+                  boxShadow: tab === t.id && !t.primary ? "0 1px 4px rgba(0,0,0,0.15)" : "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  opacity: isLocked ? 0.5 : 1,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t.id === "live" ? (
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{
+                      display: "inline-block",
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: "#ef4444",
+                      animation: isLocked ? "none" : "liveRecPulse 1.5s ease-in-out infinite",
+                      flexShrink: 0,
+                    }} />
+                    LIVE
+                  </span>
+                ) : (
+                  t.label
+                )}
+                {isLocked && <Lock className="w-3.5 h-3.5 text-red-400" />}
+              </button>
+              
+              {/* Tooltip for locked tabs */}
+              {isLocked && (
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  Disponible en Premium
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Content */}

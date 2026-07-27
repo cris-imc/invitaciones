@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Lock } from "lucide-react";
 import Link from "next/link";
 
 import { MusicUploader } from "@/components/ui/MusicUploader";
@@ -35,6 +35,7 @@ interface Invitation {
     templateId: string;
     templateTipo?: string;
     temaColores: string;
+    planTier: string;
 
     // Music
     musicaHabilitada: boolean;
@@ -279,14 +280,24 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                 Sugerencia de Canciones
                             </h3>
                             <div className="space-y-4">
-                                <label className="flex items-center space-x-2">
+                                <label className={`flex items-center space-x-2 relative group w-fit ${invitation.planTier === "FREE" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
                                     <input
                                         type="checkbox"
-                                        checked={formData.sugerenciaMusicaHabilitada}
+                                        checked={formData.sugerenciaMusicaHabilitada && invitation.planTier !== "FREE"}
+                                        disabled={invitation.planTier === "FREE"}
                                         onChange={(e) => handleInputChange('sugerenciaMusicaHabilitada', e.target.checked)}
                                         className="rounded border-gray-300"
                                     />
-                                    <span className="text-sm font-medium">Permitir a los invitados sugerir canciones</span>
+                                    <span className="text-sm font-medium flex items-center gap-2">
+                                        Permitir a los invitados sugerir canciones
+                                        {invitation.planTier === "FREE" && <Lock className="w-4 h-4 text-red-400" />}
+                                    </span>
+                                    {invitation.planTier === "FREE" && (
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                            Disponible en Premium
+                                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                                        </div>
+                                    )}
                                 </label>
                             </div>
                         </div>
@@ -495,16 +506,25 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
                         {/* Música */}
                         <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
-                            {/* Note: I didn't add musicaHabilitada to state in previous step, checking... I missed it in formData init. I should add it. */}
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="musicaHabilitada"
-                                    checked={formData.musicaHabilitada}
-                                    onCheckedChange={(checked) => handleInputChange('musicaHabilitada', checked)}
-                                />
-                                <Label htmlFor="musicaHabilitada" className="font-semibold cursor-pointer">Música de Fondo</Label>
-                            </div>
-                            {formData.musicaHabilitada && (
+                            <div className="flex items-center space-x-2 relative group w-fit">
+                                    <Checkbox
+                                        id="musicaHabilitada"
+                                        checked={formData.musicaHabilitada && invitation.planTier !== "FREE"}
+                                        disabled={invitation.planTier === "FREE"}
+                                        onCheckedChange={(checked) => handleInputChange('musicaHabilitada', checked)}
+                                    />
+                                    <Label htmlFor="musicaHabilitada" className={`font-semibold flex items-center gap-2 ${invitation.planTier === "FREE" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
+                                        Música de Fondo
+                                        {invitation.planTier === "FREE" && <Lock className="w-4 h-4 text-red-400" />}
+                                    </Label>
+                                    {invitation.planTier === "FREE" && (
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                            Disponible en Premium
+                                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                                        </div>
+                                    )}
+                                </div>
+                            {formData.musicaHabilitada && invitation.planTier !== "FREE" && (
                                 <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
                                     <MusicUploader
                                         currentMusicUrl={formData.musicaUrl}
@@ -559,17 +579,25 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
                         {/* Quiz/Trivia Section */}
                         <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="triviaHabilitada"
-                                    checked={formData.triviaHabilitada}
-                                    onCheckedChange={(checked) => handleInputChange('triviaHabilitada', checked)}
-                                />
-                                <Label htmlFor="triviaHabilitada" className="font-semibold cursor-pointer">
-                                    Quiz/Trivia
-                                </Label>
-                            </div>
-                            {formData.triviaHabilitada && (
+                            <div className="flex items-center space-x-2 relative group w-fit">
+                                    <Checkbox
+                                        id="triviaHabilitada"
+                                        checked={formData.triviaHabilitada && invitation.planTier !== "FREE"}
+                                        disabled={invitation.planTier === "FREE"}
+                                        onCheckedChange={(checked) => handleInputChange('triviaHabilitada', checked)}
+                                    />
+                                    <Label htmlFor="triviaHabilitada" className={`font-semibold flex items-center gap-2 ${invitation.planTier === "FREE" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
+                                        Quiz/Trivia Interactivo
+                                        {invitation.planTier === "FREE" && <Lock className="w-4 h-4 text-red-400" />}
+                                    </Label>
+                                    {invitation.planTier === "FREE" && (
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                            Disponible en Premium
+                                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                                        </div>
+                                    )}
+                                </div>
+                            {formData.triviaHabilitada && invitation.planTier !== "FREE" && (
                                 <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
                                     <p className="text-sm text-muted-foreground mb-3">
                                         Edita las preguntas del quiz (formato JSON)

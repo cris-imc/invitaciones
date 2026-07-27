@@ -100,22 +100,27 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                     {item.type === "PHOTO" ? (
                                         <img src={item.fileUrl} alt="Live" className="w-full h-64 md:h-80 object-cover" />
                                     ) : (
-                                        <div className="w-full h-64 md:h-80 flex flex-col items-center justify-center bg-indigo-500/10 text-[#F6F3EC] p-6 text-center border border-indigo-500/20">
-                                            <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center mb-3">
-                                                <span className="text-2xl">🎤</span>
+                                        <div className="w-full h-64 md:h-80 flex flex-col items-center justify-center bg-indigo-500/10 text-[#F6F3EC] p-8 text-center border border-indigo-500/20">
+                                            <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center mb-6">
+                                                <svg className="w-8 h-8 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                                </svg>
                                             </div>
-                                            <div className="flex gap-1 items-end h-6 mb-2">
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_100ms] h-full"></div>
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_300ms] h-3/4"></div>
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_200ms] h-1/2"></div>
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_400ms] h-4/5"></div>
-                                            </div>
-                                            <span className="text-xs font-mono opacity-60">Mensaje de Audio</span>
+                                            <p className="text-xl md:text-2xl font-serif leading-snug">
+                                                "{item.fileUrl}"
+                                            </p>
                                         </div>
                                     )}
                                     {item.guestName && (
                                         <div className="p-3 border-t border-[#F6F3EC]/10 text-sm font-medium flex justify-between items-center bg-[#0F1613]">
-                                            <span className="truncate pr-2">{item.guestName}</span>
+                                            <span className="truncate pr-2 opacity-80 font-normal">
+                                                Enviado por <strong className="text-[#C79A4B] font-semibold">{item.guestName}</strong>
+                                            </span>
+                                            {item.createdAt && (
+                                                <span className="text-xs opacity-50 whitespace-nowrap font-mono">
+                                                    {new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                </span>
+                                            )}
                                         </div>
                                     )}
                                 </motion.div>
@@ -133,22 +138,27 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                     {item.type === "PHOTO" ? (
                                         <img src={item.fileUrl} alt="Live" className="w-full h-64 md:h-80 object-cover" />
                                     ) : (
-                                        <div className="w-full h-64 md:h-80 flex flex-col items-center justify-center bg-indigo-500/10 text-[#F6F3EC] p-6 text-center border border-indigo-500/20">
-                                            <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center mb-3">
-                                                <span className="text-2xl">🎤</span>
+                                        <div className="w-full h-64 md:h-80 flex flex-col items-center justify-center bg-indigo-500/10 text-[#F6F3EC] p-8 text-center border border-indigo-500/20">
+                                            <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center mb-6">
+                                                <svg className="w-8 h-8 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                                </svg>
                                             </div>
-                                            <div className="flex gap-1 items-end h-6 mb-2">
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_100ms] h-full"></div>
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_300ms] h-3/4"></div>
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_200ms] h-1/2"></div>
-                                                <div className="w-1 bg-[#C79A4B] rounded-full animate-[bounce_1s_infinite_400ms] h-4/5"></div>
-                                            </div>
-                                            <span className="text-xs font-mono opacity-60">Mensaje de Audio</span>
+                                            <p className="text-xl md:text-2xl font-serif leading-snug">
+                                                "{item.fileUrl}"
+                                            </p>
                                         </div>
                                     )}
                                     {item.guestName && (
                                         <div className="p-3 border-t border-[#F6F3EC]/10 text-sm font-medium flex justify-between items-center bg-[#0F1613]">
-                                            <span className="truncate pr-2">{item.guestName}</span>
+                                            <span className="truncate pr-2 opacity-80 font-normal">
+                                                Enviado por <strong className="text-[#C79A4B] font-semibold">{item.guestName}</strong>
+                                            </span>
+                                            {item.createdAt && (
+                                                <span className="text-xs opacity-50 whitespace-nowrap font-mono">
+                                                    {new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                </span>
+                                            )}
                                         </div>
                                     )}
                                 </div>

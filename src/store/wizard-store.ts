@@ -57,6 +57,8 @@ export const useWizardStore = create<WizardState>((set) => ({
 
         // RSVP configuration
         rsvpDaysBeforeEvent: 7, // Default 7 days before event
+
+        planTier: "FREE",
     },
     themeConfig: DEFAULT_THEME_CONFIG,
     usePremiumCredit: false,

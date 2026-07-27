@@ -65,12 +65,21 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
   const handleExport = () => {
     const approved = songs.filter((s) => s.status === "APPROVED");
     if (approved.length === 0) { alert("No hay canciones aprobadas para exportar."); return; }
-    const rows = ["Canción\tArtista\tVotos\tSugerida por", ...approved.map((s) => `${s.title}\t${s.artist}\t${s.votes}\t${s.guestName}`)];
-    const blob = new Blob([rows.join("\n")], { type: "text/plain;charset=utf-8" });
+    
+    // Create CSV content with BOM for Excel compatibility
+    const header = "Canción;Artista;Votos;Sugerida por\n";
+    const rows = approved.map(s => {
+      // Escape quotes and fields with semicolons
+      const escape = (str: string) => `"${str.replace(/"/g, '""')}"`;
+      return `${escape(s.title)};${escape(s.artist)};${s.votes};${escape(s.guestName)}`;
+    }).join("\n");
+    
+    const csvContent = "\uFEFF" + header + rows;
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
-    a.download = "playlist-evento.txt";
+    a.download = "playlist-evento.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -96,8 +105,9 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
           style={{
             padding: "8px 16px",
             borderRadius: "999px",
-            border: "1px solid var(--border)",
-            background: "#fff",
+            border: "none",
+            background: "#10b981", // Excel green
+            color: "#ffffff",
             fontSize: "12px",
             fontWeight: 600,
             cursor: "pointer",

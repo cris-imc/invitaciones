@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Trash2, Plus, Pencil } from "lucide-react";
+import { Trash2, Plus, Pencil, Lock } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 interface TriviaQuestion {
@@ -17,6 +18,11 @@ interface TriviaQuestion {
 
 export function StepTrivia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
+    const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
+
+    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
+    const isEditing = Boolean(data.id);
+    const isLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
 
     // Parse existing questions or initialize empty array
     const [preguntas, setPreguntas] = useState<TriviaQuestion[]>(() => {
@@ -78,18 +84,26 @@ export function StepTrivia() {
             </div>
 
             <div className="space-y-4">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 relative group w-fit">
                     <Checkbox
                         id="triviaHabilitada"
-                        checked={data.triviaHabilitada}
+                        checked={data.triviaHabilitada && !isLocked}
+                        disabled={isLocked}
                         onCheckedChange={(checked) => setData({ triviaHabilitada: Boolean(checked) })}
                     />
-                    <Label htmlFor="triviaHabilitada" className="cursor-pointer">
+                    <Label htmlFor="triviaHabilitada" className={`flex items-center gap-2 ${isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
                         Activar Quiz/Trivia
+                        {isLocked && <Lock className="w-4 h-4 text-red-400" />}
                     </Label>
+                    {isLocked && (
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                            Disponible en Premium
+                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                        </div>
+                    )}
                 </div>
 
-                {data.triviaHabilitada && (
+                {data.triviaHabilitada && !isLocked && (
                     <>
                         {/* Configuración básica */}
                         <div className="space-y-4 border border-[var(--ink-2)] p-4 rounded-lg bg-[var(--ink-2)]">

@@ -17,17 +17,38 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         }
 
         const formData = await req.formData();
-        const file = formData.get('file') as File | null;
-        const type = formData.get('type') as string; // 'PHOTO' | 'AUDIO'
+        const type = formData.get('type') as string; // 'PHOTO' | 'AUDIO' | 'TEXT'
+        const file = type !== 'TEXT' ? (formData.get('file') as File | null) : null;
         const guestName = formData.get('guestName') as string | null;
 
-        if (!file || !type) {
+        if (!type || (type !== 'TEXT' && !file)) {
             return NextResponse.json({ error: 'Falta archivo o tipo' }, { status: 400 });
         }
 
         // Basic validation
-        if (type !== 'PHOTO' && type !== 'AUDIO') {
+        if (type !== 'PHOTO' && type !== 'AUDIO' && type !== 'TEXT') {
             return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 });
+        }
+
+        if (type === 'TEXT') {
+            const message = formData.get('message') as string | null;
+            if (!message || message.trim() === '') {
+                return NextResponse.json({ error: 'Falta mensaje' }, { status: 400 });
+            }
+            if (message.length > 200) {
+                return NextResponse.json({ error: 'Mensaje muy largo (máximo 200 caracteres)' }, { status: 400 });
+            }
+            
+            const item = await prisma.liveItem.create({
+                data: {
+                    sessionId: liveSession.id,
+                    type: 'TEXT',
+                    fileUrl: message.trim(), // We store the text message here
+                    guestName: guestName || null,
+                    isActive: true
+                }
+            });
+            return NextResponse.json(item);
         }
         
         // 10MB limit for safety

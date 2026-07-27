@@ -3,6 +3,8 @@ export type PlanTier = "FREE" | "PREMIUM" | "ENTERPRISE" | "ADMIN";
 export interface PlanFeatures {
   customMusic: boolean;
   trivia: boolean;
+  live: boolean;
+  djSuggestions: boolean;
   sharedAlbum: boolean;
   analytics: boolean;
   noWatermark: boolean;
@@ -27,7 +29,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   FREE: {
     name: "Gratis",
     price: 0,
-    maxInvitations: 1,
+    maxInvitations: null, // unlimited free invitations
     maxGuests: 20,
     maxPhotos: 10,
     allowedTemplates: [
@@ -39,6 +41,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     features: {
       customMusic: false,
       trivia: false,
+      live: false,
+      djSuggestions: false,
       sharedAlbum: false,
       analytics: false,
       noWatermark: false,
@@ -52,13 +56,15 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   PREMIUM: {
     name: "Premium",
     price: 50000,
-    maxInvitations: 1,
+    maxInvitations: null, // unlimited
     maxGuests: null, // unlimited
     maxPhotos: 200,
     allowedTemplates: "all",
     features: {
       customMusic: true,
       trivia: true,
+      live: true,
+      djSuggestions: true,
       sharedAlbum: true,
       analytics: true,
       noWatermark: true,
@@ -79,6 +85,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     features: {
       customMusic: true,
       trivia: true,
+      live: true,
+      djSuggestions: true,
       sharedAlbum: true,
       analytics: true,
       noWatermark: true,
@@ -99,6 +107,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     features: {
       customMusic: true,
       trivia: true,
+      live: true,
+      djSuggestions: true,
       sharedAlbum: true,
       analytics: true,
       noWatermark: true,

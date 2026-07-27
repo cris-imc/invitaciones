@@ -108,6 +108,7 @@ export const invitationSchema = z.object({
     // IDs y metadata
     id: z.string().optional(),
     slug: z.string().optional(),
+    planTier: z.string().optional(),
 });
 
 export type InvitationFormData = z.infer<typeof invitationSchema>;
