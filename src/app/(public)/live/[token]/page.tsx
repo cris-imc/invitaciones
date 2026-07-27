@@ -20,6 +20,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
 
     const [guestName, setGuestName] = useState("");
     const [hasName, setHasName] = useState(false);
+    const [errorModal, setErrorModal] = useState<string | null>(null);
 
     useEffect(() => {
         const storedName = localStorage.getItem("live_guest_name");
@@ -125,12 +126,14 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             if (res.ok) {
                 const newItem = await res.json();
                 setItems(prev => [newItem, ...prev]);
+            } else if (res.status === 404) {
+                setErrorModal("El LIVE ha sido desactivado por el anfitrión.");
             } else {
-                alert("Error al subir la foto.");
+                setErrorModal("Error al subir la foto.");
             }
         } catch (error) {
             console.error(error);
-            alert("Hubo un problema al procesar la foto.");
+            setErrorModal("Hubo un problema al procesar la foto.");
         } finally {
             setUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -158,13 +161,15 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                 setItems(prev => [newItem, ...prev]);
                 setMessage("");
                 setShowTextForm(false);
+            } else if (res.status === 404) {
+                setErrorModal("El LIVE ha sido desactivado por el anfitrión.");
             } else {
-                const data = await res.json();
-                alert(data.error || "Error al enviar el mensaje.");
+                const data = await res.json().catch(() => ({}));
+                setErrorModal(data.error || "Error al enviar el mensaje.");
             }
         } catch (error) {
             console.error(error);
-            alert("Error al enviar el mensaje.");
+            setErrorModal("Error al enviar el mensaje.");
         } finally {
             setUploading(false);
         }
@@ -203,6 +208,30 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
 
     return (
         <div className="min-h-screen bg-[#050807] text-[#F6F3EC] pb-24 font-sans">
+            {errorModal && (
+                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-[#182420] border border-white/10 rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl">
+                        <div className="w-12 h-12 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold mb-2">Aviso</h3>
+                        <p className="text-sm text-white/70 mb-6">{errorModal}</p>
+                        <button
+                            onClick={() => {
+                                setErrorModal(null);
+                                if (errorModal.includes("desactivado")) {
+                                    setSession(false);
+                                }
+                            }}
+                            className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 font-semibold text-white transition-colors"
+                        >
+                            Entendido
+                        </button>
+                    </div>
+                </div>
+            )}
             {/* Header */}
             <div className="sticky top-0 bg-[#050807]/90 backdrop-blur-md border-b border-[#F6F3EC]/10 p-4 z-10 text-center">
                 <h1 className="font-serif text-xl text-[#C79A4B]">Comparte un Momento</h1>
