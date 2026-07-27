@@ -99,15 +99,40 @@ export function CountdownV2({
       <p className="t-kicker">{kicker}</p>
       {title && <h2>{title}</h2>}
 
-      <div className="t-cd" role="timer" aria-live="off" aria-label="Cuenta regresiva">
-        {boxes.map(({ label, value }) => (
-          <div key={label}>
-            <b aria-label={`${value} ${label}`}>
-              {value}
-            </b>
-            <span aria-hidden="true">{label}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: "2rem", margin: "3.5rem 0" }}>
+        <div style={{ fontSize: "6.5rem", fontFamily: "var(--t-font-d)", color: "var(--t-acc)", lineHeight: 0.75, letterSpacing: "-0.04em" }}>
+          {targetDate.getDate()}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", borderLeft: "1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)", paddingLeft: "2rem", gap: "0.4rem" }}>
+          <span style={{ fontSize: "1.2rem", fontWeight: 500, letterSpacing: "0.2em", textTransform: "uppercase", lineHeight: 1 }}>
+            {targetDate.toLocaleDateString('es-AR', { month: 'long' })}
+          </span>
+          <span style={{ fontSize: "1.1rem", letterSpacing: "0.25em", opacity: 0.6, lineHeight: 1 }}>
+            {targetDate.getFullYear()}
+          </span>
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "4rem", flexWrap: "wrap", margin: "0" }}>
+        <div className="flex items-center gap-2">
+          <span style={{ fontSize: "1.3rem", fontWeight: 600, letterSpacing: "0.15em", color: "var(--t-acc)", opacity: 0.9, lineHeight: 1 }}>
+            LOADING
+          </span>
+          <div className="flex gap-1 items-center opacity-80 h-[1.3rem]">
+            <span className="block w-1.5 h-1.5 rounded-full bg-[var(--t-acc)] animate-pulse" style={{ animationDelay: "0ms" }}></span>
+            <span className="block w-1.5 h-1.5 rounded-full bg-[var(--t-acc)] animate-pulse" style={{ animationDelay: "150ms" }}></span>
+            <span className="block w-1.5 h-1.5 rounded-full bg-[var(--t-acc)] animate-pulse" style={{ animationDelay: "300ms" }}></span>
           </div>
-        ))}
+        </div>
+        <div className="t-cd" role="timer" aria-live="off" aria-label="Cuenta regresiva" style={{ margin: 0, flex: 1 }}>
+          {boxes.map(({ label, value }) => (
+            <div key={label}>
+              <b aria-label={`${value} ${label}`}>
+                {value}
+              </b>
+              <span aria-hidden="true">{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
