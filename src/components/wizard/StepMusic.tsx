@@ -70,6 +70,25 @@ export function StepMusic() {
                         </div>
                     </>
                 )}
+
+                <div className="pt-6 pb-2 border-t mt-6">
+                    <h2 className="text-xl font-bold mb-2">Sugerencia de Canciones</h2>
+                    <p className="text-sm text-muted-foreground mb-4">
+                        Permite que tus invitados te sugieran canciones para la fiesta
+                    </p>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="sugerenciaMusicaHabilitada"
+                            checked={data.sugerenciaMusicaHabilitada}
+                            onCheckedChange={(checked) =>
+                                setData({ sugerenciaMusicaHabilitada: Boolean(checked) })
+                            }
+                        />
+                        <Label htmlFor="sugerenciaMusicaHabilitada">
+                            Activar sugerencia de música
+                        </Label>
+                    </div>
+                </div>
             </div>
 
             <div className="flex justify-between pt-6">

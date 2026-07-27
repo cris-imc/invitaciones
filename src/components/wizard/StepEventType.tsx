@@ -22,7 +22,10 @@ export function StepEventType() {
     });
 
     function onSubmit(values: z.infer<typeof eventTypeSchema>) {
-        setData(values);
+        setData({
+            ...values,
+            sugerenciaMusicaHabilitada: values.type === "CASAMIENTO" || values.type === "QUINCE_ANOS"
+        });
         nextStep();
     }
 

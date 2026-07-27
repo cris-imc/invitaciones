@@ -75,6 +75,7 @@ export function EditWizardContainer({ invitation }: { invitation: any }) {
                 galeriaPrincipalHabilitada: invitation.galeriaPrincipalHabilitada ?? true,
                 galeriaPrincipalFotos,
                 musicaHabilitada: Boolean(invitation.musicaHabilitada),
+                sugerenciaMusicaHabilitada: invitation.sugerenciaMusicaHabilitada ?? true,
                 musicaUrl: invitation.musicaUrl || "",
                 triviaHabilitada: Boolean(invitation.triviaHabilitada),
                 triviaPreguntas: invitation.triviaPreguntas || "",

@@ -70,6 +70,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 albumCompartidoHabilitado: true,
                 albumCompartidoTitulo: true,
                 albumCompartidoDescripcion: true,
+                sugerenciaMusicaHabilitada: true,
                 regaloHabilitado: true,
                 regaloTitulo: true,
                 regaloMensaje: true,

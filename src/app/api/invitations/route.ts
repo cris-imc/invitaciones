@@ -250,6 +250,10 @@ export async function POST(request: NextRequest) {
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada !== undefined ? body.galeriaPrincipalHabilitada : true,
                 galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : '[]',
+                galeriaPrincipalAutoplay: body.galeriaPrincipalAutoplay !== undefined ? Boolean(body.galeriaPrincipalAutoplay) : false,
+                galeriaPrincipalEstilo: body.galeriaPrincipalEstilo || 'carrusel',
+
+                sugerenciaMusicaHabilitada: body.sugerenciaMusicaHabilitada !== undefined ? body.sugerenciaMusicaHabilitada : true,
 
                 // 9. FRASE PERSONALIZADA
                 frasePersonalizadaHabilitada: body.frasePersonalizadaHabilitada !== undefined ? Boolean(body.frasePersonalizadaHabilitada) : false,
@@ -417,6 +421,8 @@ export async function PUT(request: NextRequest) {
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada,
                 galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : undefined,
+
+                sugerenciaMusicaHabilitada: body.sugerenciaMusicaHabilitada,
 
                 // 9. FRASE PERSONALIZADA
                 frasePersonalizadaHabilitada: body.frasePersonalizadaHabilitada,

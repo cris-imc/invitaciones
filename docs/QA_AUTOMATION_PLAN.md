@@ -35,10 +35,20 @@ Casos de prueba automatizados para detectar fallos en la navegación y experienc
 
 | ID Caso | Escenario de UX / Flujo de Usuario | Comprobación de QA Automation | Estado |
 | :--- | :--- | :--- | :--- |
-| **UX-01** | **Edición de Invitación**: El cliente necesita editar su evento luego de crearlo. | Verificar presencia de enlace **"Editar ✏️"** en `/dashboard/invitaciones` apuntando a `/editar/[id]`. | ✅ Implementado & Auditado |
-| **UX-02** | **Previsualización Directa**: Ver la plantilla en vivo desde el Dashboard. | Verificar presencia de enlace **"Ver 👁️"** apuntando a la URL pública `/i/[slug]`. | ✅ Implementado & Auditado |
-| **UX-03** | **Confirmación de Eliminación**: Evitar el borrado accidental de eventos. | Presencia de modal de alerta destructiva antes de ejecutar la eliminación. | ✅ Verificado |
-| **UX-04** | **Feedback de Carga (Loading States)**: Estado visual al guardar. | Botón con spinner "Guardando..." deshabilitado durante la petición. | ✅ Verificado |
+| **UX-01** | **Edición de Invitación**: Edición en Dashboard. | Verificar presencia de enlace **"Editar ✏️"** apuntando a `/editar/[id]`. | ✅ Verificado |
+| **UX-02** | **Previsualización Directa**: Ver en vivo. | Verificar presencia de enlace **"Ver 👁️"** apuntando a `/i/[slug]`. | ✅ Verificado |
+| **UX-03** | **Confirmación de Eliminación**: Eventos. | Presencia de modal de alerta destructiva antes de eliminar. | ✅ Verificado |
+| **UX-04** | **Feedback de Carga (Loading States)** | Botón con spinner "Guardando..." deshabilitado durante peticiones. | ✅ Verificado |
+| **UX-05** | **Wizard: Separación Portada/Recorte** | La portada de bienvenida y el recorte (Hero Images) son pasos separados. | ✅ Verificado |
+| **UX-06** | **Wizard: Portada Bienvenida Obligatoria** | Sin opción de apagar la portada de bienvenida; siempre existe. | ✅ Verificado |
+| **UX-07** | **Plantilla: Destaque Dress Code** | Visualizado con estilo glassmorphism en la portada de bienvenida. | ✅ Verificado |
+| **UX-08** | **Plantilla: Visualización Ciudad** | La ciudad se renderiza correctamente en la portada de la plantilla. | ✅ Verificado |
+| **UX-09** | **Plantilla: Footer Branding** | El pie de la invitación muestra "Invitaciones digitales". | ✅ Verificado |
+| **UX-10** | **Dashboard: Admin Invitados** | El listado de invitados (Guests) incluye buscador y paginación (3/pág). | ✅ Verificado |
+| **UX-11** | **Dashboard: Eliminación Invitados** | Modal Custom (Dialog de UI) para borrar invitados (no confirm nativo). | ✅ Verificado |
+| **UX-12** | **Sugerencia de Música** | Toggle independiente que refleja su estado real en la plantilla. | ✅ Verificado |
+| **UX-13** | **Quiz/Trivia Edición** | Botón lápiz que permite reeditar la pregunta sin borrarla por error. | ✅ Verificado |
+| **UX-14** | **Lógica Regalo Sin Datos Bancarios** | Oculta el subtítulo "Datos bancarios" si se apaga, manteniendo el mensaje. | ✅ Verificado |
 
 ---
 

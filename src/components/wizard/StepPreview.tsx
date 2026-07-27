@@ -31,6 +31,7 @@ export function StepPreview() {
                 galeriaSecundariaFotos: data.galeriaSecundariaFotos,
 
                 musicaHabilitada: data.musicaHabilitada,
+                sugerenciaMusicaHabilitada: data.sugerenciaMusicaHabilitada,
                 triviaHabilitada: data.triviaHabilitada,
                 triviaPreguntas: data.triviaPreguntas,
                 usePremiumCredit: usePremiumCredit,

@@ -23,6 +23,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         templateTipo: "ORIGINAL", // Default template
 
         // Initial values for new fields
+        sugerenciaMusicaHabilitada: true,
         portadaHabilitada: true,
         portadaKicker: "Con mucho cariño, para",
         portadaTitulo: "",
@@ -95,6 +96,7 @@ export const useWizardStore = create<WizardState>((set) => ({
             regaloHabilitado: false,
             triviaHabilitada: false,
             albumCompartidoHabilitado: true,
+            sugerenciaMusicaHabilitada: true,
         },
         themeConfig: DEFAULT_THEME_CONFIG,
         usePremiumCredit: state.usePremiumCredit

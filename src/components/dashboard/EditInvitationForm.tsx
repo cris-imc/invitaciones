@@ -38,6 +38,7 @@ interface Invitation {
 
     // Music
     musicaHabilitada: boolean;
+    sugerenciaMusicaHabilitada: boolean;
 
     // Cover
     portadaHabilitada: boolean;
@@ -105,6 +106,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
         // Music
         musicaHabilitada: invitation.musicaHabilitada,
+        sugerenciaMusicaHabilitada: invitation.sugerenciaMusicaHabilitada ?? true,
         musicaUrl: invitation.musicaUrl || '',
 
         // Cover
@@ -266,6 +268,25 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                     onChange={(e) => handleInputChange('hora', e.target.value)}
                                     className="w-full p-2 border rounded-md"
                                 />
+                            </div>
+                        </div>
+
+                        {/* Configuración de Sugerencia de Música */}
+                        <div className="border p-4 rounded-lg bg-slate-50">
+                            <h3 className="font-semibold mb-4 text-slate-800 flex items-center gap-2">
+                                <span className="text-xl">🎵</span>
+                                Sugerencia de Canciones
+                            </h3>
+                            <div className="space-y-4">
+                                <label className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.sugerenciaMusicaHabilitada}
+                                        onChange={(e) => handleInputChange('sugerenciaMusicaHabilitada', e.target.checked)}
+                                        className="rounded border-gray-300"
+                                    />
+                                    <span className="text-sm font-medium">Permitir a los invitados sugerir canciones</span>
+                                </label>
                             </div>
                         </div>
 

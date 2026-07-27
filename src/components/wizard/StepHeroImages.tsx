@@ -18,29 +18,29 @@ export function StepHeroImages() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                {/* Hero Background Image Mobile */}
-                <div className="space-y-2">
-                    <Label htmlFor="heroImagenFondo">Portada (Mobile - Vertical)</Label>
-                    <ImageUploader
-                        currentImage={data.portadaImagenFondo}
-                        onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
-                        aspectRatio={9 / 16}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                        Esta imagen se verá en dispositivos móviles (celulares).
-                    </p>
-                </div>
-
                 {/* Hero Background Image Desktop */}
                 <div className="space-y-2">
-                    <Label htmlFor="heroImagenFondoDesktop">Portada (Desktop - Horizontal)</Label>
+                    <Label htmlFor="heroImagenFondoDesktop">Portada (Desktop - Vertical)</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondoDesktop}
                         onImageUploaded={(url: string) => setData({ portadaImagenFondoDesktop: url })}
+                        aspectRatio={9 / 16}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                        Esta imagen se verá en computadoras o pantallas anchas (panel izquierdo).
+                    </p>
+                </div>
+
+                {/* Hero Background Image Mobile */}
+                <div className="space-y-2">
+                    <Label htmlFor="heroImagenFondo">Portada (Mobile - Horizontal)</Label>
+                    <ImageUploader
+                        currentImage={data.portadaImagenFondo}
+                        onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
                         aspectRatio={16 / 9}
                     />
                     <p className="text-xs text-muted-foreground">
-                        Esta imagen se verá en computadoras o pantallas anchas.
+                        Esta imagen se verá en dispositivos móviles (celulares) como cabecera.
                     </p>
                 </div>
             </div>

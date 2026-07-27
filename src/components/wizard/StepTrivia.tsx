@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Pencil } from "lucide-react";
 
 interface TriviaQuestion {
     pregunta: string;
@@ -44,6 +44,13 @@ export function StepTrivia() {
     };
 
     const handleDeleteQuestion = (index: number) => {
+        setPreguntas(preguntas.filter((_, i) => i !== index));
+    };
+
+    const handleEditQuestion = (index: number) => {
+        // Load the selected question into the form
+        setCurrentQuestion(preguntas[index]);
+        // Remove it from the saved list so they can replace it upon adding
         setPreguntas(preguntas.filter((_, i) => i !== index));
     };
 
@@ -141,13 +148,24 @@ export function StepTrivia() {
                                                     ))}
                                                 </div>
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDeleteQuestion(index)}
-                                            >
-                                                <Trash2 className="w-4 h-4 text-red-500" />
-                                            </Button>
+                                            <div className="flex flex-col gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEditQuestion(index)}
+                                                    className="h-8 w-8 p-0"
+                                                >
+                                                    <Pencil className="w-4 h-4 text-blue-500" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteQuestion(index)}
+                                                    className="h-8 w-8 p-0"
+                                                >
+                                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                                </Button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

@@ -303,14 +303,15 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   const paymentAmount  = Number(invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined);
   const guestPayStatus = (guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID";
 
-  const showBankData =
-    (Boolean(invitation.regaloHabilitado) && Boolean(invitation.regaloMostrarDatos) && Boolean(invitation.regaloCbu || invitation.regaloAlias)) ||
-    isPreview;
+  const showGiftSection = Boolean(invitation.regaloHabilitado);
+  const showBankDetails = Boolean(invitation.regaloMostrarDatos) && Boolean(
+    invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || paymentAmount
+  );
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: QuizQuestion[] = safeJson<QuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
 
-  const songsEnabled = Boolean(invitation.albumCompartidoHabilitado ?? true);
+  const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
   const portadaDressCode = String(invitation.portadaDressCode ?? "");
   const regaloMontoUpdatedAt = invitation.regaloMontoUpdatedAt ? new Date(String(invitation.regaloMontoUpdatedAt)) : null;
@@ -320,7 +321,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
     ...(mapUrl        ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
     ...(rsvpEnabled   ? [{ id: "rsvp",     label: "Confirmar", icon: <IconCheck /> }] : []),
-    ...(showBankData  ? [{ id: "banco",    label: "Regalo",    icon: <IconGift /> }]  : []),
+    ...(showGiftSection  ? [{ id: "banco",    label: "Regalo",    icon: <IconGift /> }]  : []),
     ...(triviaHabilitada && triviaPreguntas.length > 0 ? [{ id: "quiz", label: "Juego", icon: <IconQuiz /> }] : []),
     ...(songsEnabled  ? [{ id: "songs",    label: "Música",    icon: <IconMusic /> }] : []),
   ];
@@ -614,39 +615,41 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           </SectionWrapper>
         )}
 
-        {showBankData && (
+        {showGiftSection && (
           <SectionWrapper dark id="banco" delay={200}>
-            <p className="t-kicker">Datos bancarios</p>
+            {showBankDetails && <p className="t-kicker">Datos bancarios</p>}
             <h2>{String(invitation.regaloTitulo ?? "Si querés hacer tu aporte")}</h2>
             {Boolean(invitation.regaloMensaje) ? (
               <p style={{ opacity: 0.8, marginBottom: "var(--sp-4)" }}>
                 {String(invitation.regaloMensaje)}
               </p>
             ) : null}
-            <div className="bank-card">
-              {Boolean(invitation.regaloBanco) && (
-                <CopyField label="Banco" value={String(invitation.regaloBanco)} />
-              )}
-              {Boolean(invitation.regaloCbu) && (
-                <CopyField label="CBU" value={String(invitation.regaloCbu)} />
-              )}
-              {Boolean(invitation.regaloAlias) && (
-                <CopyField label="Alias" value={String(invitation.regaloAlias)} />
-              )}
-              {Boolean(invitation.regaloTitular) && (
-                <CopyField label="Titular" value={String(invitation.regaloTitular)} />
-              )}
-              {paymentAmount && (
-                <div className="relative">
-                  <CopyField label="Monto por persona" value={`$${paymentAmount.toLocaleString("es-AR")}`} />
-                  {isPriceRecentlyUpdated && (
-                    <span className="absolute -top-3 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-lg z-10">
-                      ¡Valor Actualizado!
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
+            {showBankDetails && (
+              <div className="bank-card">
+                {Boolean(invitation.regaloBanco) && (
+                  <CopyField label="Banco" value={String(invitation.regaloBanco)} />
+                )}
+                {Boolean(invitation.regaloCbu) && (
+                  <CopyField label="CBU" value={String(invitation.regaloCbu)} />
+                )}
+                {Boolean(invitation.regaloAlias) && (
+                  <CopyField label="Alias" value={String(invitation.regaloAlias)} />
+                )}
+                {Boolean(invitation.regaloTitular) && (
+                  <CopyField label="Titular" value={String(invitation.regaloTitular)} />
+                )}
+                {paymentAmount && (
+                  <div className="relative">
+                    <CopyField label="Monto por persona" value={`$${paymentAmount.toLocaleString("es-AR")}`} />
+                    {isPriceRecentlyUpdated && (
+                      <span className="absolute -top-3 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-lg z-10">
+                        ¡Valor Actualizado!
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </SectionWrapper>
         )}
 

@@ -147,6 +147,7 @@ model Invitation {
   albumCompartidoTitulo        String?
   albumCompartidoDescripcion   String?
   albumCompartidoBotonTexto    String?
+  sugerenciaMusicaHabilitada   Boolean          @default(true)
   regaloHabilitado             Boolean          @default(false)
   regaloIcono                  String?
   regaloTitulo                 String?
