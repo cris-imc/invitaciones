@@ -5,7 +5,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { WizardSteps } from "@/components/wizard/WizardSteps";
 
 export function EditWizardContainer({ invitation }: { invitation: any }) {
-    const { setData, setStep } = useWizardStore();
+    const { setData, setStep, setDirty } = useWizardStore();
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
@@ -84,10 +84,11 @@ export function EditWizardContainer({ invitation }: { invitation: any }) {
                 templateTipo: invitation.templateTipo || "ORIGINAL",
                 colorPrincipal: temaColores?.colorPrincipal || temaColores?.primaryColor || "#000000",
             });
+            setDirty(false); // Reset dirtiness after loading from DB
             setStep(0);
             setIsInitialized(true);
         }
-    }, [invitation, setData, setStep]);
+    }, [invitation, setData, setStep, setDirty]);
 
     if (!isInitialized) {
         return (

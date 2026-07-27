@@ -46,14 +46,7 @@ export function StepHeroImages() {
                 </div>
             </div>
 
-            <div className="flex justify-between pt-6">
-                <Button variant="outline" onClick={prevStep}>
-                    Anterior
-                </Button>
-                <Button onClick={nextStep}>
-                    Siguiente
-                </Button>
-            </div>
+            <SaveStepButtons />
         </div>
     );
 }

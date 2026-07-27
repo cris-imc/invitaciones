@@ -364,17 +364,14 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             </p>
 
             {/* Guest Name or Event Title */}
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4 text-[#F7F1E4] leading-tight">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-12 text-[#F7F1E4] leading-tight">
               {guestNameDisplay}
             </h2>
 
-            {/* Message / Phrase */}
-            <p className="text-sm sm:text-base opacity-85 leading-relaxed max-w-sm mb-6 font-light">
-              {portadaMensaje}
-            </p>
+
 
             {portadaDressCode && portadaDressCode !== "undefined" && (
-              <div className="mb-8 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 backdrop-blur-md border border-[var(--t-acc,#C79A4B)]/40 text-[var(--t-acc,#C79A4B)] shadow-[0_0_20px_rgba(0,0,0,0.3)] transform transition-transform hover:scale-105">
+              <div className="mb-12 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 backdrop-blur-md border border-[var(--t-acc,#C79A4B)]/40 text-[var(--t-acc,#C79A4B)] shadow-[0_0_20px_rgba(0,0,0,0.3)] transform transition-transform hover:scale-105">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 9.5l-4-4-3 3-2-2-2 2-3-3-4 4M21 9.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9" />
                 </svg>
@@ -396,7 +393,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               <span className="text-base">✦</span> {portadaBoton}
             </button>
 
-            <p className="mt-4 text-[11px] opacity-45 font-mono">Tocá para entrar</p>
           </div>
         </div>
       )}

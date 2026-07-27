@@ -61,22 +61,25 @@ export function StepCronograma() {
     const [events, setEvents] = useState<CronogramaEvent[]>(initialEvents);
 
     const addEvent = () => {
-        setEvents([...events, { time: "", title: "", icon: "Clock" }]);
+        const newEvents = [...events, { time: "", title: "", icon: "Clock" }];
+        setEvents(newEvents);
+        setData({ cronogramaEventos: JSON.stringify(newEvents) });
     };
 
     const removeEvent = (index: number) => {
-        setEvents(events.filter((_, i) => i !== index));
+        const newEvents = events.filter((_, i) => i !== index);
+        setEvents(newEvents);
+        setData({ cronogramaEventos: JSON.stringify(newEvents) });
     };
 
     const updateEvent = (index: number, field: keyof CronogramaEvent, value: string) => {
         const newEvents = [...events];
         newEvents[index] = { ...newEvents[index], [field]: value };
         setEvents(newEvents);
+        setData({ cronogramaEventos: JSON.stringify(newEvents) });
     };
 
     const handleNext = () => {
-        // Save events to store as JSON string
-        setData({ cronogramaEventos: JSON.stringify(events) });
         nextStep();
     };
 
@@ -178,14 +181,7 @@ export function StepCronograma() {
                 </p>
             </div>
 
-            <div className="flex justify-between pt-6">
-                <Button type="button" variant="outline" onClick={prevStep}>
-                    Anterior
-                </Button>
-                <Button onClick={handleNext}>
-                    Siguiente
-                </Button>
-            </div>
+            <SaveStepButtons onNext={handleNext} />
         </div>
     );
 }

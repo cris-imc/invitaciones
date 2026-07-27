@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { useToast } from "@/components/ui/Toast";
 import { Trash2, Plus, Pencil, Lock } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
@@ -18,6 +19,7 @@ interface TriviaQuestion {
 
 export function StepTrivia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
+    const { showToast } = useToast();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
 
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
@@ -47,6 +49,8 @@ export function StepTrivia() {
                 opciones: ["", "", "", ""],
                 respuestaCorrecta: 0,
             });
+        } else {
+            showToast("Debes completar la pregunta y todas las opciones.", "error");
         }
     };
 
@@ -67,7 +71,7 @@ export function StepTrivia() {
         if (currentQuestion.pregunta.trim() && currentQuestion.opciones.every(op => op.trim())) {
             finalPreguntas.push(currentQuestion);
             // Optional: alert user or just do it silently
-            // alert("Se agregó la última pregunta que estabas editando.");
+            // showToast("Se agregó la última pregunta que estabas editando.");
         }
 
         setData({ triviaPreguntas: JSON.stringify(finalPreguntas) });
@@ -223,14 +227,7 @@ export function StepTrivia() {
                 )}
             </div>
 
-            <div className="flex justify-between pt-6">
-                <Button variant="outline" onClick={prevStep}>
-                    Anterior
-                </Button>
-                <Button onClick={handleNext}>
-                    Siguiente
-                </Button>
-            </div>
+            <SaveStepButtons onNext={handleNext} />
         </div>
     );
 }

@@ -117,25 +117,28 @@ export async function POST(request: NextRequest) {
         console.log('DEBUG: POST /api/invitations body:', JSON.stringify(body, null, 2));
 
         let invitationPlanTier = 'FREE';
+        const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
 
         if (body.usePremiumCredit) {
-            const user = await prisma.user.findUnique({
-                where: { id: userId },
-                select: { premiumCredits: true }
-            });
+            if (!hasUnlimitedPremium) {
+                const user = await prisma.user.findUnique({
+                    where: { id: userId },
+                    select: { premiumCredits: true }
+                });
 
-            if (!user || user.premiumCredits <= 0) {
-                return NextResponse.json(
-                    { error: 'No tienes créditos premium disponibles' },
-                    { status: 403 }
-                );
+                if (!user || user.premiumCredits <= 0) {
+                    return NextResponse.json(
+                        { error: 'No tienes créditos premium disponibles' },
+                        { status: 403 }
+                    );
+                }
+
+                // Descontar 1 crédito
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { premiumCredits: { decrement: 1 } }
+                });
             }
-
-            // Descontar 1 crédito
-            await prisma.user.update({
-                where: { id: userId },
-                data: { premiumCredits: { decrement: 1 } }
-            });
 
             invitationPlanTier = 'PREMIUM';
         } else {

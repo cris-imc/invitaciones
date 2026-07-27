@@ -14,6 +14,14 @@ export async function saveInvitationFromWizard(data: any, themeConfig: any, useP
         usePremiumCredit: usePremiumCredit,
     };
 
+    if (payload.fecha instanceof Date) {
+        // Prevent UTC shifting by sending the local date as a string
+        const yyyy = payload.fecha.getFullYear();
+        const mm = String(payload.fecha.getMonth() + 1).padStart(2, '0');
+        const dd = String(payload.fecha.getDate()).padStart(2, '0');
+        payload.fecha = `${yyyy}-${mm}-${dd}`;
+    }
+
     const isEditing = Boolean(data.id);
     const url = isEditing ? `/api/invitations?id=${data.id}` : '/api/invitations';
     const method = isEditing ? 'PUT' : 'POST';

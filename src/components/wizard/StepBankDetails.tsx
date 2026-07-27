@@ -122,14 +122,7 @@ export function StepBankDetails() {
                 )}
             </div>
 
-            <div className="flex justify-between pt-6">
-                <Button type="button" variant="outline" onClick={prevStep}>
-                    Anterior
-                </Button>
-                <Button onClick={nextStep}>
-                    Siguiente
-                </Button>
-            </div>
+            <SaveStepButtons />
         </div>
     );
 }

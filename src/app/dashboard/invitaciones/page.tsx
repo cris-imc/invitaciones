@@ -21,7 +21,7 @@ async function getInvitations() {
     
     const dbUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { premiumCredits: true }
+        select: { premiumCredits: true, planTier: true }
     });
     
     const invitationsData = await prisma.invitation.findMany({
@@ -62,12 +62,15 @@ export default async function InvitacionesPage() {
                         Gestiona tus eventos y monitorea las confirmaciones.
                         {dbUser && (
                             <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
-                                Invitaciones Premium: {totalPremiumUsadas} en uso | {dbUser.premiumCredits || 0} disponibles.
+                                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE' ? 
+                                    `Invitaciones Premium: ${totalPremiumUsadas} en uso | Ilimitadas por tu plan.` :
+                                    `Invitaciones Premium: ${totalPremiumUsadas} en uso | ${dbUser.premiumCredits || 0} créditos disponibles.`
+                                }
                             </span>
                         )}
                     </p>
                 </div>
-                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} />
+                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} />
             </div>
 
             <div className="flex flex-col">
@@ -144,7 +147,7 @@ export default async function InvitacionesPage() {
                 ) : (
                     <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
                         <p className="text-muted-foreground mb-4 font-ui">No tienes invitaciones. Comienza creando tu primera invitación para un evento.</p>
-                        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} />
+                        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} />
                     </div>
                 )}
             </div>

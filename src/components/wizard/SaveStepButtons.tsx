@@ -7,16 +7,23 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useFormState } from "react-hook-form";
 
-export function SaveStepButtons({ form }: { form: any }) {
-    const { prevStep, currentStep, setDirty, setData } = useWizardStore();
+function FormTracker({ form, onDirtyChange }: { form: any, onDirtyChange: (d: boolean) => void }) {
+    const { isDirty } = useFormState({ control: form.control });
+    useEffect(() => {
+        onDirtyChange(isDirty);
+    }, [isDirty, onDirtyChange]);
+    return null;
+}
+
+export function SaveStepButtons({ form, onNext }: { form?: any, onNext?: () => void }) {
+    const { prevStep, nextStep, currentStep, setDirty, setData } = useWizardStore();
     const router = useRouter();
     const [showWarning, setShowWarning] = useState(false);
     const { saveChanges, isSaving, isEditing } = useSaveStep(form);
-    const { isDirty } = useFormState({ control: form.control });
-
-    useEffect(() => {
-        setDirty(isDirty);
-    }, [isDirty, setDirty]);
+    const storeIsDirty = useWizardStore((s) => s.isDirty);
+    const [formIsDirty, setFormIsDirty] = useState(false);
+    
+    const isDirty = storeIsDirty || formIsDirty;
 
     const handleBackClick = () => {
         if (currentStep === 1) { // Step 1 is "Información Básica". Going back means going to "Tipo de evento" (Step 0)
@@ -26,7 +33,7 @@ export function SaveStepButtons({ form }: { form: any }) {
                 proceedBack();
             }
         } else {
-            if (isDirty) {
+            if (isDirty && form) {
                 const values = form.getValues();
                 setData(values);
             }
@@ -35,7 +42,6 @@ export function SaveStepButtons({ form }: { form: any }) {
     };
 
     const proceedBack = () => {
-        setDirty(false);
         if (currentStep === 0) {
             router.push('/dashboard/invitaciones');
         } else {
@@ -45,6 +51,7 @@ export function SaveStepButtons({ form }: { form: any }) {
 
     return (
         <>
+            {form && <FormTracker form={form} onDirtyChange={setFormIsDirty} />}
             <Dialog open={showWarning} onOpenChange={setShowWarning}>
                 <DialogContent>
                     <DialogHeader>
@@ -88,7 +95,12 @@ export function SaveStepButtons({ form }: { form: any }) {
                         )}
                     </Button>
                 )}
-                <Button type="submit">Siguiente Paso</Button>
+                <Button 
+                    type={form ? "submit" : "button"} 
+                    onClick={onNext ? onNext : (!form ? nextStep : undefined)}
+                >
+                    Siguiente Paso
+                </Button>
             </div>
         </div>
         </>

@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/Toast";
 import { useWizardStore } from "@/store/wizard-store";
 import { saveInvitationFromWizard } from "./save-invitation";
 
-export function useSaveStep(form: any) {
+export function useSaveStep(form?: any) {
     const { data, themeConfig, setData, setDirty } = useWizardStore();
     const [isSaving, setIsSaving] = useState(false);
+    const { showToast } = useToast();
     
     useEffect(() => {
         // Prevent accidental tab close/refresh based on store state (which is synced by SaveStepButtons)
@@ -23,18 +25,29 @@ export function useSaveStep(form: any) {
     }, []);
     
     const saveChanges = async () => {
-        const isValid = await form.trigger();
+        let isValid = true;
+        let values = {};
+        
+        if (form) {
+            isValid = await form.trigger();
+            if (isValid) {
+                values = form.getValues();
+                setData(values);
+            }
+        }
+        
         if (isValid) {
             setIsSaving(true);
-            const values = form.getValues();
-            setData(values);
             try {
-                await saveInvitationFromWizard({ ...data, ...values }, themeConfig);
-                form.reset(values); // Reset default values so isDirty becomes false again
+                const dataToSave = form ? { ...data, ...values } : data;
+                await saveInvitationFromWizard(dataToSave, themeConfig);
+                if (form) {
+                    form.reset(values); // Reset default values so isDirty becomes false again
+                }
                 setDirty(false);
-                alert("¡Cambios guardados exitosamente!");
+                showToast("¡Cambios guardados exitosamente!", "success");
             } catch (e) {
-                alert("Error al guardar los cambios.");
+                showToast("Error al guardar los cambios.", "error");
                 console.error(e);
             }
             setIsSaving(false);

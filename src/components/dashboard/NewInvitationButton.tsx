@@ -14,16 +14,17 @@ import {
 } from "@/components/ui/dialog";
 import { Sparkles } from "lucide-react";
 
-export function NewInvitationButton({ premiumCredits, totalInvitations }: { premiumCredits: number, totalInvitations: number }) {
+export function NewInvitationButton({ premiumCredits, totalInvitations, planTier }: { premiumCredits: number, totalInvitations: number, planTier?: string }) {
     const [open, setOpen] = useState(false);
     const [showError, setShowError] = useState(false);
     const router = useRouter();
     const setUsePremiumCredit = useWizardStore((state) => state.setUsePremiumCredit);
+    const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
 
     const handleNewClick = () => {
         if (totalInvitations === 0) {
-            // Primera invitación: no pregunta, usa crédito si tiene o gratis si no
-            if (premiumCredits > 0) {
+            // Primera invitación: no pregunta, usa crédito/plan si tiene o gratis si no
+            if (hasUnlimitedPremium || premiumCredits > 0) {
                 setUsePremiumCredit(true);
             } else {
                 setUsePremiumCredit(false);
@@ -42,9 +43,9 @@ export function NewInvitationButton({ premiumCredits, totalInvitations }: { prem
     };
 
     const handleCreatePremium = () => {
-        if (premiumCredits <= 0) {
+        if (!hasUnlimitedPremium && premiumCredits <= 0) {
             setOpen(false);
-            setShowError(true);
+            setTimeout(() => setShowError(true), 150);
             return;
         }
         setUsePremiumCredit(true);
@@ -63,7 +64,11 @@ export function NewInvitationButton({ premiumCredits, totalInvitations }: { prem
                     <DialogHeader>
                         <DialogTitle>Elegí tu tipo de invitación</DialogTitle>
                         <DialogDescription className="pt-2">
-                            Tenés <strong>{premiumCredits} {premiumCredits === 1 ? 'invitación premium' : 'invitaciones premium'}</strong> disponible{premiumCredits === 1 ? '' : 's'}. ¿Qué tipo de invitación querés crear?
+                            {hasUnlimitedPremium ? (
+                                <span>Tu plan te permite crear <strong>invitaciones premium ilimitadas</strong>. ¿Qué tipo de invitación querés crear?</span>
+                            ) : (
+                                <span>Tenés <strong>{premiumCredits} {premiumCredits === 1 ? 'crédito premium' : 'créditos premium'}</strong> disponible{premiumCredits === 1 ? '' : 's'}. ¿Qué tipo de invitación querés crear?</span>
+                            )}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-2">

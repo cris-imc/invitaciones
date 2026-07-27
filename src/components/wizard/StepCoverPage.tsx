@@ -33,27 +33,9 @@ export function StepCoverPage() {
                             </p>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="portadaTitulo">Título / Mensaje Principal (Opcional)</Label>
-                            <Input
-                                id="portadaTitulo"
-                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
-                                placeholder="Ej: ¡Estás invitado! / Nuestra Boda"
-                                value={data.portadaTitulo || ""}
-                                onChange={(e) => setData({ portadaTitulo: e.target.value })}
-                            />
-                        </div>
+                        
 
-                        <div className="space-y-2">
-                            <Label htmlFor="portadaMensaje">Frase / Mensaje de Bienvenida</Label>
-                            <Input
-                                id="portadaMensaje"
-                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
-                                placeholder="Ej: Queremos compartir este momento único con vos."
-                                value={data.portadaMensaje || ""}
-                                onChange={(e) => setData({ portadaMensaje: e.target.value })}
-                            />
-                        </div>
+                        
 
                         <div className="space-y-2">
                             <Label htmlFor="portadaDressCode">Dress Code en Portada (Opcional)</Label>
@@ -78,14 +60,7 @@ export function StepCoverPage() {
                         </div>
             </div>
 
-            <div className="flex justify-between pt-6">
-                <Button variant="outline" onClick={prevStep}>
-                    Anterior
-                </Button>
-                <Button onClick={nextStep}>
-                    Siguiente
-                </Button>
-            </div>
+            <SaveStepButtons />
         </div>
     );
 }

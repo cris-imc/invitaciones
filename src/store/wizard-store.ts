@@ -64,12 +64,49 @@ export const useWizardStore = create<WizardState>((set) => ({
     usePremiumCredit: false,
     isDirty: false,
     setDirty: (val) => set({ isDirty: val }),
-    setData: (newData) => set((state) => ({
-        data: { ...state.data, ...newData }
-    })),
-    setThemeConfig: (config) => set((state) => ({
-        themeConfig: { ...state.themeConfig, ...config }
-    })),
+    setData: (newData) => set((state) => {
+        let hasChanges = false;
+        for (const key in newData) {
+            const newVal = newData[key as keyof typeof newData];
+            const oldVal = state.data[key as keyof typeof state.data];
+            
+            if (newVal instanceof Date && oldVal instanceof Date) {
+                if (newVal.getTime() !== oldVal.getTime()) {
+                    hasChanges = true;
+                    break;
+                }
+            } else if (newVal !== oldVal) {
+                // Ignore differences between falsy values (e.g. "" vs null)
+                if (!newVal && !oldVal) continue;
+                // Ignore identical objects/arrays
+                if (JSON.stringify(newVal) === JSON.stringify(oldVal)) continue;
+                
+                hasChanges = true;
+                break;
+            }
+        }
+        if (!hasChanges) return state; // Do nothing if data is identical
+        
+        return {
+            data: { ...state.data, ...newData },
+            isDirty: true
+        };
+    }),
+    setThemeConfig: (config) => set((state) => {
+        let hasChanges = false;
+        for (const key in config) {
+            if (config[key as keyof typeof config] !== state.themeConfig[key as keyof typeof state.themeConfig]) {
+                hasChanges = true;
+                break;
+            }
+        }
+        if (!hasChanges) return state;
+
+        return {
+            themeConfig: { ...state.themeConfig, ...config },
+            isDirty: true
+        };
+    }),
     setUsePremiumCredit: (usePremiumCredit) => set({ usePremiumCredit }),
     nextStep: () => set((state) => ({
         currentStep: state.currentStep + 1
