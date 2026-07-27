@@ -124,21 +124,14 @@ export function GuestListWithPayment({
   return (
     <div>
       {/* Resumen */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          borderBottom: "1px solid var(--line)",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5 pb-5 border-b" style={{ borderColor: "var(--line)" }}>
         {[
           { label: "Enviadas / Aceptadas", value: `${guests.length} / ${confirmed.length}` },
           { label: "Personas", value: totalPeople },
           { label: "Pagaron", value: paidCount },
           { label: "Pendientes de Pago", value: pendingPayCount },
         ].map(({ label, value }, index) => (
-          <div key={label} style={{ padding: "16px 12px", textAlign: "center", borderRight: index === 3 ? "none" : "1px solid var(--line)" }}>
+          <div key={label} className="text-center p-4 rounded-xl" style={{ backgroundColor: "rgba(0,0,0,0.03)", border: "1px solid var(--line)" }}>
             <b style={{ display: "block", fontFamily: "var(--font-display)", fontSize: "28px", color: "var(--accent)" }}>{value}</b>
             <span style={{ fontSize: "10.5px", textTransform: "uppercase", letterSpacing: ".05em", opacity: 0.7 }}>
               {label}
@@ -221,6 +214,7 @@ export function GuestListWithPayment({
           {filtered.map((guest) => (
             <div
               key={guest.id}
+              className="inv-guest-row"
               style={{
                 display: "flex",
                 alignItems: "center",

@@ -83,10 +83,15 @@ export default async function InvitacionesPage() {
                                 <div className="seal" style={{ borderColor: 'var(--line)', width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <span className="font-display text-accent font-bold">{mono}</span>
                                 </div>
-                                
-                                <div className="meta">
-                                    <b>{inv.nombreEvento}</b>
-                                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs opacity-80 mt-0.5">
+
+                                <div className="inv-info">
+                                    <div className="inv-title-row">
+                                        <b>{inv.nombreEvento}</b>
+                                        <div className={`tag ${inv.estado === "ACTIVA" ? "on" : "draft"}`}>
+                                            {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
+                                        </div>
+                                    </div>
+                                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs opacity-60 mt-1">
                                         <span>
                                             📅 {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
                                                 day: "2-digit",
@@ -101,48 +106,46 @@ export default async function InvitacionesPage() {
                                             <span>📍 {inv.direccion}</span>
                                         )}
                                     </span>
+                                    <div className="rsvp-mini flex items-center gap-2 mt-1">
+                                        <div className="dot" style={{ background: 'var(--accent)', width: 8, height: 8, borderRadius: '50%' }}></div>
+                                        {inv._count.guests} <span className="opacity-60 text-xs">/ {maxGuestsStr} confirmadas</span>
+                                    </div>
                                 </div>
 
-                                <div className={`tag ${inv.estado === "ACTIVA" ? "on" : "draft"}`}>
-                                    {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
-                                </div>
-
-                                <div className="rsvp-mini flex items-center gap-2">
-                                    <div className="dot" style={{ background: 'var(--accent)', width: 8, height: 8, borderRadius: '50%' }}></div>
-                                    {inv._count.guests} <span className="opacity-60 text-xs">/ {maxGuestsStr} confirmadas</span>
-                                </div>
-
-                                <div className="flex items-center gap-2 flex-wrap ml-auto">
+                                <div className="inv-actions">
                                   {inv.planTier === "FREE" ? (
                                     <button
                                       type="button"
-                                      className="hidden sm:inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-full bg-accent/10 text-accent border border-accent hover:bg-accent/20 transition-colors"
+                                      className="btn-premium inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-accent/10 text-accent border border-accent hover:bg-accent/20 transition-colors"
                                       title="Por ahora sin funcionar"
                                     >
                                       Mejorar a Premium
                                     </button>
                                   ) : (
-                                    <div className="hidden sm:inline-flex items-center justify-center h-6 px-3 text-[10px] uppercase tracking-widest font-bold rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">
+                                    <div className="btn-premium inline-flex items-center justify-center h-8 px-3 text-[10px] uppercase tracking-widest font-bold rounded-lg bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">
                                       Premium
                                     </div>
                                   )}
+                                  
                                   <Link
                                       href={`/i/${inv.slug}`}
                                       target="_blank"
-                                      className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors"
+                                      className="btn-action inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors"
                                   >
                                       Ver 👁️
                                   </Link>
                                   <Link
                                       href={`/dashboard/invitaciones/editar/${inv.id}`}
-                                      className="inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 transition-colors"
+                                      className="btn-action inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 transition-colors"
                                   >
                                       Editar ✏️
                                   </Link>
-                                  <DeleteInvitationButton invitationId={inv.id} />
-                                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="go !ml-0 text-xs">
+                                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors">
                                       Administrar →
                                   </Link>
+                                  <div className="btn-delete flex items-center justify-center">
+                                      <DeleteInvitationButton invitationId={inv.id} />
+                                  </div>
                                 </div>
                             </div>
                         );
