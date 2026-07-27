@@ -11,7 +11,7 @@ export default function Home() {
             <div className="seal">
               <span className="font-display">C</span>
             </div>
-            Convite
+            Invitaciones Digitales
           </div>
           <div className="l-nav-links">
             <Link href="#plantillas">Plantillas</Link>
@@ -142,7 +142,7 @@ export default function Home() {
 
         {/* FOOTER */}
         <div className="l-foot">
-          <small>Convite · Hecho con ❤️</small>
+          <small>Invitaciones Digitales · Hecho con ❤️</small>
           <small>
             Hecho para bodas, cumpleaños, eventos y todo lo que se celebra
           </small>

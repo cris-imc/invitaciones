@@ -115,7 +115,9 @@ export function Sidebar() {
                     <div className="seal" style={{ borderColor: "var(--line)", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)" }}>
                         <span className="font-display" style={{ color: "var(--paper)", fontSize: 15, fontWeight: 700 }}>C</span>
                     </div>
-                    Convite
+                    <span className="truncate font-semibold">
+                        Invitaciones Digitales
+                    </span>
                 </div>
 
                 <nav className="p-nav flex-1">
@@ -142,7 +144,7 @@ export function Sidebar() {
                     <div className="seal" style={{ borderColor: "var(--line)", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)" }}>
                         <span className="font-display" style={{ color: "var(--paper)", fontSize: 13, fontWeight: 700 }}>C</span>
                     </div>
-                    Convite
+                    Invitaciones Digitales
                 </div>
                 <button
                     className="p-hamburger"
@@ -165,7 +167,7 @@ export function Sidebar() {
                         <div className="seal" style={{ borderColor: "var(--line)", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)" }}>
                             <span className="font-display" style={{ color: "var(--paper)", fontSize: 13, fontWeight: 700 }}>C</span>
                         </div>
-                        Convite
+                        Invitaciones Digitales
                     </div>
                     <button className="p-hamburger" onClick={() => setOpen(false)} aria-label="Cerrar menú">
                         <X className="w-5 h-5" />

@@ -41,7 +41,7 @@ export async function generateMetadata({
   const invitation = await getInvitation(slug);
 
   if (!invitation) {
-    return { title: "Invitación no encontrada · Convite" };
+    return { title: "Invitación no encontrada · Invitaciones Digitales" };
   }
 
   const eventTitle = getEventTitle(invitation);
@@ -57,14 +57,14 @@ export async function generateMetadata({
     : undefined;
 
   return {
-    title: `${eventTitle} · Convite`,
+    title: `${eventTitle} · Invitaciones Digitales`,
     description,
     openGraph: {
       title: eventTitle,
       description,
       type: "website",
       locale: "es_AR",
-      siteName: "Convite",
+      siteName: "Invitaciones Digitales",
       images: ogImage,
     },
     twitter: {

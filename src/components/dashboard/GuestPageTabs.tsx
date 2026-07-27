@@ -5,6 +5,7 @@ import { GuestManager } from "@/components/dashboard/guests/GuestManager";
 import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPayment";
 import { SongModerationPanel } from "@/components/dashboard/SongModerationPanel";
 import { QuickEditPrice } from "@/components/dashboard/QuickEditPrice";
+import { LiveAdminPanel } from "@/components/dashboard/live/LiveAdminPanel";
 
 type Tab = "invitados" | "canciones" | "precio" | "agregar";
 
@@ -25,6 +26,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
     { id: "canciones", label: "Música" },
     ...(regaloHabilitado ? [{ id: "precio" as Tab, label: "Precio Tarjeta" }] : []),
     { id: "agregar", label: "Gestionar Invitados 📲", primary: true },
+    { id: "live" as Tab, label: "LIVE 📸", primary: true },
   ];
 
   return (
@@ -107,6 +109,12 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
       )}
       {tab === "agregar" && (
         <GuestManager slug={slug} initialRsvpEnabled={rsvpEnabled} />
+      )}
+      {tab === "live" && (
+        <div className="bg-card border rounded-lg p-4 md:p-6">
+          <h2 className="text-xl font-semibold mb-6">LIVE 📸</h2>
+          <LiveAdminPanel invitationId={invitationId} />
+        </div>
       )}
     </div>
   );

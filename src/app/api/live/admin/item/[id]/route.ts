@@ -1,0 +1,51 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/db";
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
+
+        const { id } = await params;
+
+        if (!id) {
+            return new NextResponse("Missing id", { status: 400 });
+        }
+
+        const liveItem = await prisma.liveItem.findUnique({
+            where: { id },
+            include: {
+                session: {
+                    include: {
+                        invitation: true
+                    }
+                }
+            }
+        });
+
+        if (!liveItem) {
+            return new NextResponse("Not Found", { status: 404 });
+        }
+
+        const invitation = liveItem.session.invitation;
+        
+        // Verify ownership or admin
+        if (invitation.userId !== session.user.id && session.user.role !== "ADMIN") {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
+
+        // We do logical delete for safety, so we just set isActive to false
+        await prisma.liveItem.update({
+            where: { id },
+            data: { isActive: false }
+        });
+
+        return new NextResponse("Deleted", { status: 200 });
+    } catch (error) {
+        console.error("[LIVE_ITEM_DELETE]", error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
+}

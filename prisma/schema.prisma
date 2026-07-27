@@ -196,6 +196,7 @@ model Invitation {
   user                         User             @relation(fields: [userId], references: [id])
   rsvps                        RSVP[]
   songSuggestions              SongSuggestion[]
+  liveSession                  LiveSession?
 }
 
 model Guest {
@@ -299,4 +300,29 @@ model SongSuggestion {
 
   @@index([invitationId])
   @@index([invitationId, status])
+}
+
+model LiveSession {
+  id           String      @id @default(cuid())
+  invitationId String      @unique
+  publicToken  String      @unique
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  invitation   Invitation  @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  items        LiveItem[]
+}
+
+model LiveItem {
+  id           String      @id @default(cuid())
+  sessionId    String
+  type         String      // "PHOTO" | "AUDIO"
+  fileUrl      String
+  duration     Int?        // Solo para AUDIO, en segundos
+  guestName    String?     // Opcional
+  isActive     Boolean     @default(true) // Para moderación (falso = no se muestra)
+  createdAt    DateTime    @default(now())
+  session      LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, isActive, createdAt(sort: Desc)])
 }

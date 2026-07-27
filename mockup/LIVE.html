@@ -121,6 +121,80 @@ a{color:inherit;}
 .inv-row .go{color:var(--accent); font-size:13px; text-decoration:none; font-family:var(--font-ui); font-weight:600;}
 
 /* ============================================================
+   LIVE — muro de fotos/audios en vivo con QR (herramienta del
+   shell del producto, usa los tokens fijos, no los 7 temas)
+   ============================================================ */
+.live-dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:#E0554B; box-shadow:0 0 0 0 rgba(224,85,75,.6); animation:liveDotPulse 1.8s ease-out infinite;}
+@keyframes liveDotPulse{ 0%{box-shadow:0 0 0 0 rgba(224,85,75,.55);} 70%{box-shadow:0 0 0 8px rgba(224,85,75,0);} 100%{box-shadow:0 0 0 0 rgba(224,85,75,0);} }
+
+.live-crumb{display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-family:var(--font-ui); font-size:12.5px; color:rgba(246,243,236,.4); margin-bottom:14px;}
+.live-crumb-tabs{display:flex; gap:4px; margin-left:4px; flex-wrap:wrap;}
+.live-crumb-tabs span{padding:6px 12px; border-radius:999px; color:rgba(246,243,236,.45);}
+.live-crumb-tabs span.active{background:var(--paper); color:var(--ink); font-weight:600; display:inline-flex; align-items:center; gap:6px;}
+.live-crumb-tabs span.active .live-dot{background:#C0453A;}
+
+.live-sub-switch{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+.live-sub-switch button{font-family:var(--font-ui); font-weight:600; font-size:12.5px; padding:9px 16px; border-radius:999px; border:1px solid var(--line); background:transparent; color:rgba(246,243,236,.55); cursor:pointer;}
+.live-sub-switch button.active{background:var(--accent); color:var(--ink); border-color:var(--accent);}
+
+.live-panel{display:none;}
+.live-panel.active{display:block;}
+.live-note{font-family:var(--font-mono); font-size:11px; color:rgba(246,243,236,.5); margin:0 0 16px; max-width:560px; line-height:1.6;}
+
+/* pantalla / proyector */
+.live-screen{background:var(--ink); border:1px solid var(--line); border-radius:var(--r-l); padding:36px; color:var(--paper);}
+.live-screen-head{display:flex; justify-content:space-between; align-items:flex-start; gap:32px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:28px; margin-bottom:22px;}
+.live-kicker{font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-2); display:flex; align-items:center; gap:8px; margin:0 0 10px;}
+.live-screen-head h2{font-family:var(--font-display); font-weight:700; font-size:32px; margin:0 0 6px;}
+.live-sub{font-family:var(--font-ui); font-size:13.5px; color:rgba(246,243,236,.6); margin:0;}
+.live-qr-box{background:var(--paper); border-radius:var(--r-m); padding:18px 22px; text-align:center; flex-shrink:0;}
+.live-qr-img{width:150px; height:150px; display:block; margin:0 auto 10px; border-radius:8px;}
+.live-qr-url{font-family:var(--font-mono); font-size:11.5px; color:var(--ink); font-weight:700; margin:0;}
+.live-qr-hint{font-family:var(--font-ui); font-size:10.5px; color:rgba(15,22,19,.55); margin:4px 0 0;}
+.live-stats{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.live-stats > span{font-family:var(--font-mono); font-size:12px; color:rgba(246,243,236,.55);}
+.live-reset{font-family:var(--font-ui); font-size:11.5px; font-weight:600; padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:transparent; color:rgba(246,243,236,.55); cursor:pointer;}
+.live-wall{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; min-height:120px;}
+.live-empty{grid-column:1/-1; font-family:var(--font-ui); font-size:13px; color:rgba(246,243,236,.4); text-align:center; padding:30px 10px;}
+.live-empty.small{padding:16px 4px; font-size:12px;}
+.live-item{border-radius:12px; overflow:hidden; animation:liveIn .4s ease; background:var(--paper-2);}
+@keyframes liveIn{ from{opacity:0; transform:scale(.92);} to{opacity:1; transform:scale(1);} }
+.live-item img{width:100%; height:150px; object-fit:cover; display:block;}
+.live-item.live-audio{height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(246,243,236,.06); border:1px solid var(--line); color:var(--paper);}
+.live-item.live-audio .wave{display:flex; gap:2px; align-items:flex-end; height:22px;}
+.live-item.live-audio .wave i{width:3px; background:var(--accent); border-radius:2px; display:block;}
+.live-item.live-audio span{font-family:var(--font-mono); font-size:10.5px; opacity:.6;}
+
+/* subir — encabezado / acciones compartidas entre mobile y desktop */
+.live-up-head{text-align:center; display:flex; flex-direction:column; align-items:center;}
+.live-up-kicker{font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin:0 0 6px;}
+.live-up-head h3{font-family:var(--font-display); font-weight:700; font-size:20px; margin:0 0 8px; color:var(--paper);}
+.live-up-desc{font-family:var(--font-ui); font-size:12.5px; line-height:1.55; color:rgba(246,243,236,.6); margin:0 0 22px; max-width:280px;}
+.live-up-actions{display:flex; flex-direction:column; gap:10px; width:100%;}
+.live-up-btn{display:flex; align-items:center; justify-content:center; gap:9px; font-family:var(--font-ui); font-weight:600; font-size:13.5px; padding:14px; border-radius:999px; background:var(--accent); color:var(--ink); border:1px solid var(--accent); cursor:pointer;}
+.live-up-btn--outline{background:transparent; color:var(--paper); border-color:var(--line);}
+.live-up-btn--outline.is-recording{background:#C0453A; border-color:#C0453A; color:#fff;}
+.live-up-icon{font-size:16px;}
+.live-up-feed-title{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:rgba(246,243,236,.45); margin:26px 0 10px;}
+.live-up-feed{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;}
+.live-up-feed .live-item img, .live-up-feed .live-item.live-audio{height:80px;}
+.live-up-feed--grid{grid-template-columns:repeat(4, 1fr);}
+
+/* subir — pantalla del teléfono (paleta del shell, no de los 7 temas) */
+.live-upload-screen{background:var(--ink); padding:32px 22px 26px; height:auto; overflow:visible;}
+.live-upload-screen .live-up-head{padding-top:6px;}
+
+/* subir — desktop */
+.live-desktop-upload{display:grid; grid-template-columns:340px 1fr; gap:0; border:1px solid var(--line); border-radius:var(--r-l); overflow:hidden;}
+.live-desktop-upload .live-up-head{background:var(--ink); padding:40px 32px;}
+.live-desktop-feed{background:var(--ink-2); padding:32px;}
+.live-desktop-feed .live-up-feed--grid .live-item img, .live-desktop-feed .live-up-feed--grid .live-item.live-audio{height:130px;}
+
+@media (max-width:760px){
+  .live-desktop-upload{grid-template-columns:1fr;}
+}
+
+/* ============================================================
    INVITACIÓN PÚBLICA — 7 temas + layout mobile y desktop coherentes
    ============================================================ */
 .inv-toolbar{margin-bottom:16px;}
@@ -329,6 +403,7 @@ body[data-bp="mobile"] .inv-bottom-nav{position:fixed; left:50%; bottom:14px; tr
       <button class="active" data-view="landing">Landing</button>
       <button data-view="panel">Panel interno</button>
       <button data-view="inv">Invitación pública</button>
+      <button data-view="live">LIVE</button>
     </div>
     <div class="bp-switch">
       <button class="active" data-bp="desktop">Desktop</button>
@@ -612,6 +687,105 @@ body[data-bp="mobile"] .inv-bottom-nav{position:fixed; left:50%; bottom:14px; tr
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ===================== LIVE ===================== -->
+  <div class="view" id="live">
+    <div class="live-crumb">
+      <span>Invitaciones</span><span>/</span><span>Martina &amp; Gonzalo</span><span>/</span>
+      <div class="live-crumb-tabs">
+        <span>Resumen</span><span>Invitados</span><span>Pagos</span><span>Música</span>
+        <span class="active">LIVE <i class="live-dot"></i></span>
+      </div>
+    </div>
+
+    <div class="live-sub-switch">
+      <button class="active" data-live-view="screen">Pantalla (proyector)</button>
+      <button data-live-view="upload-mobile">Subir — Mobile</button>
+      <button data-live-view="upload-desktop">Subir — Desktop</button>
+    </div>
+
+    <!-- PANTALLA / PROYECTOR -->
+    <div class="live-panel active" data-live="screen">
+      <div class="live-screen">
+        <div class="live-screen-head">
+          <div>
+            <p class="live-kicker"><i class="live-dot"></i> En vivo</p>
+            <h2>Martina &amp; Gonzalo</h2>
+            <p class="live-sub">Compartí tus fotos y audios de la noche</p>
+          </div>
+          <div class="live-qr-box">
+            <img class="live-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&bgcolor=247-243-236&color=15-22-19&data=https://convite.app/live/MG2027" alt="QR para subir fotos y audios">
+            <p class="live-qr-url">convite.app/live/MG2027</p>
+            <p class="live-qr-hint">Escaneá con la cámara del celular</p>
+          </div>
+        </div>
+        <div class="live-stats">
+          <span data-f="liveCount">0 fotos · 0 audios</span>
+          <button class="live-reset" type="button" data-live-reset>Reiniciar demo</button>
+        </div>
+        <div class="live-wall" data-f="liveWall">
+          <p class="live-empty">Las fotos y audios que suban tus invitados van a ir apareciendo acá, en el momento.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBIR — MOBILE (simulación de la pantalla post-escaneo) -->
+    <div class="live-panel" data-live="upload-mobile">
+      <p class="live-note">Simulación de lo que ve el invitado en su celular después de escanear el QR — probalo acá mismo sin necesitar el teléfono.</p>
+      <div class="mobile-stage" style="padding:0 0 20px;">
+        <div class="phone">
+          <div class="phone-screen live-upload-screen">
+            <div class="live-up-head">
+              <div class="seal" style="border-color:var(--accent); margin-bottom:14px;"><span style="color:var(--accent);">M&amp;G</span></div>
+              <p class="live-up-kicker">Martina &amp; Gonzalo</p>
+              <h3>¡Sumate a la fiesta!</h3>
+              <p class="live-up-desc">Subí tus fotos y mandá un audio para los novios. Se van a ver en la pantalla al instante.</p>
+            </div>
+            <div class="live-up-actions">
+              <label class="live-up-btn">
+                <input type="file" accept="image/*" data-live-upload hidden>
+                <span class="live-up-icon">📷</span> Subir foto
+              </label>
+              <button class="live-up-btn live-up-btn--outline" type="button" data-live-record>
+                <span class="live-up-icon">🎙️</span> Grabar audio
+              </button>
+            </div>
+            <p class="live-up-feed-title">Recién subido</p>
+            <div class="live-up-feed" data-f="liveFeedMobile">
+              <p class="live-empty small">Todavía no subiste nada.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBIR — DESKTOP -->
+    <div class="live-panel" data-live="upload-desktop">
+      <div class="live-desktop-upload">
+        <div class="live-up-head" style="text-align:left; align-items:flex-start;">
+          <div class="seal" style="border-color:var(--accent); margin-bottom:16px;"><span style="color:var(--accent);">M&amp;G</span></div>
+          <p class="live-up-kicker">Martina &amp; Gonzalo</p>
+          <h3>¡Sumate a la fiesta!</h3>
+          <p class="live-up-desc">Subí tus fotos y mandá un audio para los novios. Se van a ver en la pantalla al instante.</p>
+          <div class="live-up-actions" style="width:100%;">
+            <label class="live-up-btn">
+              <input type="file" accept="image/*" data-live-upload hidden>
+              <span class="live-up-icon">📷</span> Subir foto
+            </label>
+            <button class="live-up-btn live-up-btn--outline" type="button" data-live-record>
+              <span class="live-up-icon">🎙️</span> Grabar audio
+            </button>
+          </div>
+        </div>
+        <div class="live-desktop-feed">
+          <p class="live-up-feed-title">Feed en vivo</p>
+          <div class="live-up-feed live-up-feed--grid" data-f="liveFeedDesktop">
+            <p class="live-empty small">Todavía no se subió nada.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -981,6 +1155,77 @@ document.querySelectorAll('[data-bp]').forEach(b=>{
 
 renderInv('boda');
 setBreakpoint('desktop');
+
+/* ============================================================
+   LIVE — sub-tabs, subida simulada de fotos/audios y muro en vivo
+   ============================================================ */
+document.querySelectorAll('[data-live-view]').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-live-view]').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.live-panel').forEach(p=> p.classList.toggle('active', p.dataset.live === b.dataset.liveView));
+  });
+});
+
+let liveFeed = []; // { type:'photo'|'audio', src?, who, dur? }
+
+function liveItemHtml(item){
+  if(item.type === 'photo'){
+    return '<div class="live-item"><img src="'+item.src+'" alt="Foto subida por '+item.who+'"></div>';
+  }
+  return '<div class="live-item live-audio"><div class="wave"><i style="height:10px"></i><i style="height:18px"></i><i style="height:8px"></i><i style="height:20px"></i><i style="height:12px"></i></div><span>🎙️ '+item.dur+'s · '+item.who+'</span></div>';
+}
+
+function renderLiveFeed(){
+  const photos = liveFeed.filter(i=>i.type==='photo').length;
+  const audios = liveFeed.filter(i=>i.type==='audio').length;
+  setText('liveCount', photos+' fotos · '+audios+' audios');
+
+  const wallHtml = liveFeed.length ? liveFeed.map(liveItemHtml).join('') : '<p class="live-empty">Las fotos y audios que suban tus invitados van a ir apareciendo acá, en el momento.</p>';
+  document.querySelector('[data-f="liveWall"]').innerHTML = wallHtml;
+
+  const feedHtml = liveFeed.length ? liveFeed.slice().reverse().map(liveItemHtml).join('') : '<p class="live-empty small">Todavía no se subió nada.</p>';
+  document.querySelector('[data-f="liveFeedMobile"]').innerHTML = feedHtml;
+  document.querySelector('[data-f="liveFeedDesktop"]').innerHTML = feedHtml;
+}
+
+document.querySelectorAll('[data-live-upload]').forEach(input=>{
+  input.addEventListener('change', ()=>{
+    const file = input.files && input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      liveFeed.push({type:'photo', src:reader.result, who:'Invitado'});
+      renderLiveFeed();
+      input.value = '';
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+document.querySelectorAll('[data-live-record]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(btn.classList.contains('is-recording')) return;
+    const original = btn.innerHTML;
+    btn.classList.add('is-recording');
+    btn.innerHTML = '<span class="live-up-icon">●</span> Grabando…';
+    setTimeout(()=>{
+      btn.classList.remove('is-recording');
+      btn.innerHTML = original;
+      liveFeed.push({type:'audio', who:'Invitado', dur: (2 + Math.floor(Math.random()*6))});
+      renderLiveFeed();
+    }, 1800);
+  });
+});
+
+document.querySelectorAll('[data-live-reset]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    liveFeed = [];
+    renderLiveFeed();
+  });
+});
+
+renderLiveFeed();
 </script>
 
 </body>
