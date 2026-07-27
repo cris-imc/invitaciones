@@ -23,7 +23,7 @@ interface GuestListWithPaymentProps {
 const STATUS_LABELS: Record<string, string> = {
   PENDING: "Pendiente",
   CONFIRMED: "Confirmó",
-  DECLINED: "Declinó",
+  DECLINED: "No asistirá",
 };
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
@@ -225,9 +225,16 @@ export function GuestListWithPayment({
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: 2 }}>{guest.name}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: 4 }}>
+                  <div style={{ fontWeight: 600, fontSize: "14px" }}>{guest.name}</div>
+                  {guest.status === "DECLINED" && (
+                    <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", background: "rgba(239, 68, 68, 0.1)", color: "rgb(239, 68, 68)", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
+                      {guest.expectedCount > 1 ? "No asistirán" : "No asistirá"}
+                    </span>
+                  )}
+                </div>
                 <div style={{ fontSize: "11.5px", color: "#888" }}>
-                  {STATUS_LABELS[guest.status] ?? guest.status}
+                  {guest.status !== "DECLINED" && (STATUS_LABELS[guest.status] ?? guest.status)}
                   {guest.status === "CONFIRMED" && ` · ${guest.attendingCount} persona${guest.attendingCount !== 1 ? "s" : ""}`}
                   {guest.dietaryRestrictions && ` · ${guest.dietaryRestrictions}`}
                 </div>

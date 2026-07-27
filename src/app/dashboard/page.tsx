@@ -193,6 +193,11 @@ export default async function DashboardPage() {
                     <div className={`tag ${inv.estado === "ACTIVA" ? "on" : "draft"}`}>
                       {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
                     </div>
+                    {inv.planTier === "FREE" ? (
+                      <span className="plan-badge plan-badge--free">Gratis</span>
+                    ) : (
+                      <span className="plan-badge plan-badge--premium">✦ Premium</span>
+                    )}
                   </div>
                   <span className="font-mono text-[11px] text-paper/50 mt-0.5">
                     {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
@@ -208,24 +213,10 @@ export default async function DashboardPage() {
                 </div>
 
                 <div className="inv-actions">
-                  {inv.planTier === "FREE" ? (
-                    <button
-                      type="button"
-                      className="btn-premium inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-accent/10 text-accent border border-accent hover:bg-accent/20 transition-colors"
-                      title="Por ahora sin funcionar"
-                    >
-                      Mejorar a Premium
-                    </button>
-                  ) : (
-                    <div className="btn-premium inline-flex items-center justify-center h-8 px-3 text-[10px] uppercase tracking-widest font-bold rounded-lg bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">
-                      Premium
-                    </div>
-                  )}
-                  
                   <Link
                       href={`/i/${inv.slug}`}
                       target="_blank"
-                      className="btn-action inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors"
+                      className="btn-action go inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors"
                   >
                       Ver 👁️
                   </Link>

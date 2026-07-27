@@ -1035,6 +1035,9 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .inv-info { display: flex; flex-direction: column; min-width: 0; }
 .inv-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .inv-title-row b { font-family:var(--font-ui); font-weight:600; font-size:14.5px; color:var(--paper); }
+.plan-badge { font-family: var(--font-mono); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 999px; }
+.plan-badge--free { background: rgba(246,243,236,0.06); color: rgba(246,243,236,0.4); border: 1px solid rgba(246,243,236,0.12); }
+.plan-badge--premium { background: rgba(234,179,8,0.12); color: #ca8a04; border: 1px solid rgba(234,179,8,0.25); }
 .inv-row .meta b{display:block; font-family:var(--font-ui); font-weight:600; font-size:14.5px; color:var(--paper);}
 .inv-row .meta span{font-family:var(--font-mono); font-size:11px; color:rgba(246,243,236,.5);}
 .inv-row .tag { align-self: start; margin-top: 2px; white-space:nowrap; }
@@ -1061,8 +1064,6 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   .btn-action.go { grid-column: 1 / -1; }
   .btn-delete { grid-column: 1 / -1; margin-top: 4px; }
 }
-.inv-row .go{color:var(--accent); font-size:13px; text-decoration:none; font-family:var(--font-ui); font-weight:600;}
-
 
 /* ============================================================
    INVITACIÓN PÚBLICA — 7 temas + layout mobile y desktop coherentes

@@ -9,7 +9,6 @@ import { BarChart, Heart, Home, LogOut, Menu, X } from "lucide-react";
 const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
     { title: "Mis Invitaciones", href: "/dashboard/invitaciones", icon: Heart },
-    { title: "Analytics", href: "/dashboard/analytics", icon: BarChart },
 ];
 
 export function Sidebar() {
@@ -27,7 +26,7 @@ export function Sidebar() {
     }, [open]);
 
     const sidebarItems = allSidebarItems.filter(item => {
-        if (role === "ADMIN") return item.title === "Inicio" || item.title === "Analytics";
+        if (role === "ADMIN") return item.title === "Inicio";
         return true;
     });
 

@@ -309,13 +309,13 @@ export function RSVPWizardV2({
             </h4>
             <p style={{ opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
               {!guestToken ? (
-                precioNino != null && maxChildren !== 0
+                precioNino != null && maxGuests > 1 && maxChildren !== 0
                   ? `El valor es de ${formatARS(paymentAmount)} (Adultos) y ${formatARS(precioNino)} (Niños). Monto total calculado: ${formatARS(paymentAmount * adultCount + precioNino * childCount)}.`
                   : `Monto a pagar: ${formatARS(paymentAmount * count)}.`
               ) : (
                 paymentStatus === "PAID"
                 ? "Ya recibimos el pago de tu tarjeta. ¡Gracias!"
-                : (precioNino != null && (maxChildren === undefined || maxChildren > 0)
+                : (precioNino != null && maxGuests > 1 && (maxChildren === undefined || maxChildren > 0)
                     ? `El valor es de ${formatARS(paymentAmount)} (Adultos) y ${formatARS(precioNino)} (Niños). Monto total a pagar: ${formatARS(paymentAmount * adultCount + precioNino * childCount)}.`
                     : `Monto total a pagar: ${formatARS(paymentAmount * count)}.`
                   )
