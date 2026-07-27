@@ -21,11 +21,20 @@ export async function POST(
     // Actualizamos el Guest
     const status = body.asistencia === "CONFIRMA" ? "CONFIRMED" : "DECLINED";
     
+    // Lógica para paymentStatus si es exento
+    let paymentStatus = guest.paymentStatus;
+    if (status === "CONFIRMED" && guest.isExempt) {
+      paymentStatus = "EXEMPT";
+    }
+
     const updatedGuest = await prisma.guest.update({
       where: { id: guest.id },
       data: {
         status,
-        attendingCount: body.numeroAcompanantes + 1, // +1 por el titular
+        paymentStatus,
+        attendingCount: body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : (body.attendingAdults || 0) + (body.attendingChildren || 0),
+        attendingAdults: body.attendingAdults !== undefined ? body.attendingAdults : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 0),
+        attendingChildren: body.attendingChildren || 0,
         dietaryRestrictions: body.restricciones,
         responseDate: new Date(),
         name: body.nombre || guest.name, // Opcionalmente actualizar el nombre si lo cambió

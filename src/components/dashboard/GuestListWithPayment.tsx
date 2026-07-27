@@ -133,10 +133,10 @@ export function GuestListWithPayment({
         }}
       >
         {[
-          { label: "Confirmados", value: confirmed.length },
+          { label: "Enviadas / Aceptadas", value: `${guests.length} / ${confirmed.length}` },
           { label: "Personas", value: totalPeople },
           { label: "Pagaron", value: paidCount },
-          { label: "Pendientes", value: pendingPayCount },
+          { label: "Pendientes de Pago", value: pendingPayCount },
         ].map(({ label, value }, index) => (
           <div key={label} style={{ padding: "16px 12px", textAlign: "center", borderRight: index === 3 ? "none" : "1px solid var(--line)" }}>
             <b style={{ display: "block", fontFamily: "var(--font-display)", fontSize: "28px", color: "var(--accent)" }}>{value}</b>

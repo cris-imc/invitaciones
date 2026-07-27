@@ -51,6 +51,7 @@ async function getInvitation(slug: string) {
             regaloAlias: true,
             regaloTitular: true,
             regaloMonto: true,
+            precioNino: true,
             regaloMontoUpdatedAt: true,
             triviaHabilitada: true,
             triviaIcono: true,

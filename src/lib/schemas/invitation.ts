@@ -94,6 +94,7 @@ export const invitationSchema = z.object({
     regaloBanco: z.string().optional(),
     regaloTitular: z.string().optional(),
     regaloMonto: z.number().optional(),
+    precioNino: z.number().optional(),
 
     cronogramaEventos: z.string().optional(), // JSON string
 

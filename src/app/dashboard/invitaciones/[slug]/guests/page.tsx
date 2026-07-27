@@ -116,9 +116,10 @@ export default async function GuestManagementPage({ params }: { params: Promise<
                 Modifica rápidamente el valor por persona. Al cambiarlo aquí, aparecerá un indicador animado de &quot;¡Valor Actualizado!&quot; en la invitación de forma automática por 72 horas.
               </p>
               <QuickEditPrice 
-                invitationId={invitation.id}
-                slug={invitation.slug}
-                currentAmount={invitation.regaloMonto ?? null}
+                invitationId={invitation.id} 
+                slug={invitation.slug} 
+                currentAmount={invitation.regaloMonto}
+                currentPrecioNino={invitation.precioNino}
               />
             </div>
           </TabsContent>

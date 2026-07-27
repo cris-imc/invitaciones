@@ -90,7 +90,7 @@ export function StepBankDetails() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="regaloMonto">Monto de la tarjeta por persona (opcional)</Label>
+                                <Label htmlFor="regaloMonto">Monto de la tarjeta por adulto (opcional)</Label>
                                 <Input
                                     id="regaloMonto"
                                     type="number"
@@ -100,8 +100,20 @@ export function StepBankDetails() {
                                     value={(data as any).regaloMonto || ""}
                                     onChange={(e) => setData({ regaloMonto: e.target.value ? Number(e.target.value) : undefined } as any)}
                                 />
-                                <p className="text-xs text-muted-foreground">
-                                    Si cargás un monto, se mostrará en la invitación de cada invitado (salvo los que estén exentos de pago).
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="precioNino">Monto de la tarjeta por niño (opcional)</Label>
+                                <Input
+                                    id="precioNino"
+                                    type="number"
+                                    min={0}
+                                    step={100}
+                                    placeholder="Ej: 8000"
+                                    value={(data as any).precioNino || ""}
+                                    onChange={(e) => setData({ precioNino: e.target.value ? Number(e.target.value) : undefined } as any)}
+                                />
+                                <p className="text-xs text-muted-foreground mt-2">
+                                    Si cargás un monto, los invitados podrán indicar cuántos adultos y niños asisten, y el cálculo será automático (salvo para las familias exentas).
                                 </p>
                             </div>
                         </div>

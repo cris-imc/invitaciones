@@ -160,6 +160,7 @@ model Invitation {
   regaloTitular                String?
   regaloMonto                  Float?
   regaloMontoUpdatedAt         DateTime?
+  precioNino                   Float?
   galeriaSecundariaHabilitada  Boolean          @default(false)
   galeriaSecundariaFotos       String?
   mensajeFinalHabilitado       Boolean          @default(false)
@@ -203,9 +204,14 @@ model Guest {
   name                   String
   type                   String           @default("INDIVIDUAL")
   expectedCount          Int              @default(1)
+  expectedAdults         Int?
+  expectedChildren       Int?
   uniqueToken            String           @unique
   status                 String           @default("PENDING")
   attendingCount         Int              @default(0)
+  attendingAdults        Int              @default(0)
+  attendingChildren      Int              @default(0)
+  isExempt               Boolean          @default(false)
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

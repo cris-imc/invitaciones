@@ -5,7 +5,10 @@ import { useState } from "react";
 interface PaymentBadgeProps {
   paymentStatus: "PENDING" | "EXEMPT" | "PAID";
   amount?: number;          // monto por persona en ARS
-  attendingCount?: number;  // cantidad de personas confirmadas
+  precioNino?: number;
+  attendingCount?: number;  // cantidad de personas confirmadas (legacy)
+  attendingAdults?: number;
+  attendingChildren?: number;
   alias?: string;           // alias de transferencia
   cbu?: string;
   banco?: string;
@@ -15,7 +18,10 @@ interface PaymentBadgeProps {
 export function PaymentBadge({
   paymentStatus,
   amount,
+  precioNino,
   attendingCount = 1,
+  attendingAdults,
+  attendingChildren,
   alias,
   cbu,
   banco,
@@ -58,12 +64,13 @@ export function PaymentBadge({
   // PENDING
   if (!amount) return null;
 
-  const total = amount * attendingCount;
-  const formattedAmount = new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-  }).format(amount);
+  const hasSpecificCounts = (attendingAdults !== undefined && attendingAdults > 0) || (attendingChildren !== undefined && attendingChildren > 0);
+  const adults = hasSpecificCounts ? (attendingAdults || 0) : attendingCount;
+  const children = hasSpecificCounts ? (attendingChildren || 0) : 0;
+  const childPrice = precioNino != null ? precioNino : amount;
+
+  const total = (amount * adults) + (childPrice * children);
+
   const formattedTotal = new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "ARS",
@@ -82,8 +89,7 @@ export function PaymentBadge({
       <div className="inv-pay-dot" aria-hidden="true" />
       <div style={{ flex: 1 }}>
         <strong style={{ display: "block", fontSize: "13.5px", marginBottom: 4 }}>
-          Tarjeta: {formattedAmount} por persona
-          {attendingCount > 1 && ` · Total ${formattedTotal}`}
+          Monto a pagar: {formattedTotal}
         </strong>
 
         {alias && (

@@ -30,11 +30,21 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
+    const existingGuest = await prisma.guest.findUnique({ where: { id } });
+    if (!existingGuest) {
+      return NextResponse.json({ error: "Invitado no encontrado" }, { status: 404 });
+    }
+
     const updateData: Record<string, unknown> = {
       name: body.name,
       expectedCount: body.expectedCount,
+      expectedAdults: body.expectedAdults,
+      expectedChildren: body.expectedChildren,
       status: body.status,
       attendingCount: body.attendingCount,
+      attendingAdults: body.attendingAdults,
+      attendingChildren: body.attendingChildren,
+      isExempt: body.isExempt,
       message: body.message,
       dietaryRestrictions: body.dietaryRestrictions,
     };
@@ -43,6 +53,15 @@ export async function PUT(
     Object.keys(updateData).forEach((k) => {
       if (updateData[k] === undefined) delete updateData[k];
     });
+
+    // Lógica para paymentStatus al cambiar isExempt
+    if (body.isExempt !== undefined) {
+      if (body.isExempt === true) {
+        updateData.paymentStatus = "EXEMPT";
+      } else if (body.isExempt === false && existingGuest.paymentStatus === "EXEMPT") {
+        updateData.paymentStatus = "PENDING";
+      }
+    }
 
     // Si confirma/declina, registrar fecha de respuesta
     if (body.status && (body.status === "CONFIRMED" || body.status === "DECLINED")) {

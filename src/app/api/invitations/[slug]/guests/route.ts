@@ -92,9 +92,12 @@ export async function POST(
                 name: body.name,
                 type: body.type || "INDIVIDUAL",
                 expectedCount: body.expectedCount || 1,
+                expectedAdults: body.expectedAdults,
+                expectedChildren: body.expectedChildren,
                 uniqueToken,
                 status: "PENDING",
-                attendingCount: 0
+                attendingCount: 0,
+                isExempt: Boolean(body.isExempt)
             }
         });
 

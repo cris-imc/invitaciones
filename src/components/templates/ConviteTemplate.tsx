@@ -45,8 +45,15 @@ interface ConviteTemplateProps {
     uniqueToken: string;
     status: string;
     attendingCount: number;
+    attendingAdults?: number;
+    attendingChildren?: number;
+    isExempt?: boolean;
     paymentStatus: string;
     expectedCount: number;
+    expectedAdults?: number | null;
+    expectedChildren?: number | null;
+    attendingAdults?: number | null;
+    attendingChildren?: number | null;
   } | null;
   isPersonalized?: boolean;
 }
@@ -312,8 +319,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
   const portadaDressCode = String(invitation.portadaDressCode ?? "");
-  const regaloMontoUpdatedAt = invitation.regaloMontoUpdatedAt ? new Date(String(invitation.regaloMontoUpdatedAt)) : null;
-  const isPriceRecentlyUpdated = regaloMontoUpdatedAt ? (new Date().getTime() - regaloMontoUpdatedAt.getTime()) < 72 * 60 * 60 * 1000 : false;
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -585,6 +590,8 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             guestToken={guest?.uniqueToken}
             guestName={guest?.name}
             maxGuests={guest?.expectedCount ?? 6}
+            maxAdults={guest?.expectedAdults ?? undefined}
+            maxChildren={guest?.expectedChildren ?? undefined}
             dark
             hasPayment={paymentEnabled}
             paymentAmount={paymentAmount}
@@ -594,24 +601,16 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             paymentTitular={String(invitation.regaloTitular ?? "") || undefined}
             initialStatus={guest?.status as "PENDING" | "CONFIRMED" | "DECLINED" | undefined}
             initialAttendingCount={guest?.attendingCount ?? 1}
+            initialAttendingAdults={guest?.attendingAdults ?? undefined}
+            initialAttendingChildren={guest?.attendingChildren ?? undefined}
             initialPaymentStatus={guestPayStatus}
+            isExempt={guest?.isExempt ?? false}
+            precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
+            is15={invitation.tipo === "QUINCE_ANOS"}
           />
         )}
 
-        {isPersonalized && guest?.status === "CONFIRMED" && paymentEnabled && paymentAmount && (
-          <SectionWrapper id="payment" delay={0} dark={false}>
-            <p className="t-kicker">Estado de tu tarjeta</p>
-            <PaymentBadge
-              paymentStatus={guestPayStatus}
-              amount={paymentAmount}
-              attendingCount={guest.attendingCount}
-              alias={String(invitation.regaloAlias ?? "") || undefined}
-              cbu={String(invitation.regaloCbu ?? "") || undefined}
-              banco={String(invitation.regaloBanco ?? "") || undefined}
-              titular={String(invitation.regaloTitular ?? "") || undefined}
-            />
-          </SectionWrapper>
-        )}
+
 
         {showGiftSection && (
           <SectionWrapper dark id="banco" delay={200}>
@@ -635,16 +634,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 )}
                 {Boolean(invitation.regaloTitular) && (
                   <CopyField label="Titular" value={String(invitation.regaloTitular)} />
-                )}
-                {paymentAmount && (
-                  <div className="relative">
-                    <CopyField label="Monto por persona" value={`$${paymentAmount.toLocaleString("es-AR")}`} />
-                    {isPriceRecentlyUpdated && (
-                      <span className="absolute -top-3 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-lg z-10">
-                        ¡Valor Actualizado!
-                      </span>
-                    )}
-                  </div>
                 )}
               </div>
             )}

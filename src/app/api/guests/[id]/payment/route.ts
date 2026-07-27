@@ -42,6 +42,7 @@ export async function PATCH(
       where: { id: guestId },
       data: {
         paymentStatus: status,
+        isExempt: status === "EXEMPT",
         paymentStatusUpdatedAt: new Date(),
         paymentStatusUpdatedBy: String(session.user.id),
       },

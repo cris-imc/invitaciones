@@ -18,16 +18,19 @@ import {
 export function QuickEditPrice({ 
     invitationId, 
     slug,
-    currentAmount
+    currentAmount,
+    currentPrecioNino
 }: { 
     invitationId: string, 
     slug: string,
-    currentAmount: number | null
+    currentAmount: number | null,
+    currentPrecioNino?: number | null
 }) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [amount, setAmount] = useState(currentAmount ? currentAmount.toString() : "");
+    const [precioNino, setPrecioNino] = useState(currentPrecioNino ? currentPrecioNino.toString() : "");
 
     const handleSave = async () => {
         const numAmount = parseFloat(amount);
@@ -36,12 +39,18 @@ export function QuickEditPrice({
             return;
         }
 
+        const numPrecioNino = precioNino ? parseFloat(precioNino) : undefined;
+        if (precioNino && (isNaN(numPrecioNino!) || numPrecioNino! < 0)) {
+            alert("Por favor ingresa un monto válido para niños.");
+            return;
+        }
+
         try {
             setIsSaving(true);
             const response = await fetch(`/api/invitations/${slug}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ regaloMonto: numAmount }),
+                body: JSON.stringify({ regaloMonto: numAmount, precioNino: numPrecioNino }),
             });
 
             if (!response.ok) {
@@ -78,15 +87,28 @@ export function QuickEditPrice({
                     </DialogDescription>
                 </DialogHeader>
                 
-                <div className="my-4">
-                    <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Nuevo monto ($):</label>
-                    <Input 
-                        type="number" 
-                        min="0"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
-                    />
+                <div className="my-4 space-y-4">
+                    <div>
+                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Valor Adulto ($):</label>
+                        <Input 
+                            type="number" 
+                            min="0"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Valor Niño ($):</label>
+                        <Input 
+                            type="number" 
+                            min="0"
+                            placeholder="Opcional"
+                            value={precioNino}
+                            onChange={(e) => setPrecioNino(e.target.value)}
+                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                        />
+                    </div>
                 </div>
 
                 <DialogFooter className="flex gap-2 sm:justify-end mt-2">
