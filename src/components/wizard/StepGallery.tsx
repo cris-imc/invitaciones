@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { X } from "lucide-react";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepGallery() {
     const { data, setData, nextStep, prevStep } = useWizardStore();

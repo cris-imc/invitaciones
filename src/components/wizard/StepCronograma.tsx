@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus } from "lucide-react";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 const ICON_OPTIONS = [
     { value: "Heart", label: "Corazón", Icon: Heart },

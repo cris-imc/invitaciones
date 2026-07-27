@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CalendarHeart, Crown, PartyPopper } from "lucide-react";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepEventType() {
     const { data, setData, nextStep } = useWizardStore();

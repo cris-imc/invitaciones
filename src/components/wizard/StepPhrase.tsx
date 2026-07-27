@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepPhrase() {
     const { data, setData, nextStep, prevStep } = useWizardStore();

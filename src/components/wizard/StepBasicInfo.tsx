@@ -14,6 +14,7 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepBasicInfo() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
@@ -198,10 +199,9 @@ export function StepBasicInfo() {
                         />
                     )}
 
-                    <div className="flex justify-between pt-4">
-                        <Button type="button" variant="outline" onClick={prevStep}>Atrás</Button>
-                        <Button type="submit">Siguiente Paso</Button>
-                    </div>
+                    
+                        <SaveStepButtons form={form} />
+                    
                 </form>
             </Form>
         </div>

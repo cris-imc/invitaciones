@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { Church, MapPin, Clock } from "lucide-react";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepCeremonia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
@@ -173,14 +174,9 @@ export function StepCeremonia() {
                         </div>
                     )}
 
-                    <div className="flex justify-between pt-4">
-                        <Button type="button" variant="outline" onClick={prevStep}>
-                            Atrás
-                        </Button>
-                        <Button type="submit">
-                            Siguiente Paso
-                        </Button>
-                    </div>
+                    
+                        <SaveStepButtons form={form} />
+                    
                 </form>
             </Form>
         </div>

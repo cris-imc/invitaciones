@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { MapPin, Clock } from "lucide-react";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepDetails() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
@@ -106,10 +107,9 @@ export function StepDetails() {
                         />
                     </div>
 
-                    <div className="flex justify-between pt-4">
-                        <Button type="button" variant="outline" onClick={prevStep}>Atrás</Button>
-                        <Button type="submit">Siguiente Paso</Button>
-                    </div>
+                    
+                        <SaveStepButtons form={form} />
+                    
                 </form>
             </Form>
         </div>

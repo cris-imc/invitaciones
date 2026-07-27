@@ -4,6 +4,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepHeroImages() {
     const { data, setData, nextStep, prevStep } = useWizardStore();

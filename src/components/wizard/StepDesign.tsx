@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { AVAILABLE_TEMPLATES } from "@/lib/theme-config";
 import { TemplateSelector } from "@/components/dashboard/TemplateSelector";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 
 

@@ -14,6 +14,8 @@ interface WizardState {
     prevStep: () => void;
     setStep: (step: number) => void;
     reset: () => void;
+    isDirty: boolean;
+    setDirty: (val: boolean) => void;
 }
 
 export const useWizardStore = create<WizardState>((set) => ({
@@ -58,6 +60,8 @@ export const useWizardStore = create<WizardState>((set) => ({
     },
     themeConfig: DEFAULT_THEME_CONFIG,
     usePremiumCredit: false,
+    isDirty: false,
+    setDirty: (val) => set({ isDirty: val }),
     setData: (newData) => set((state) => ({
         data: { ...state.data, ...newData }
     })),

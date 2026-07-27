@@ -8,6 +8,7 @@ import { CheckCircle2, MapPin, Calendar, Clock, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { TemplateLoadingFallback } from "./TemplateLoadingFallback";
+import { saveInvitationFromWizard } from "@/lib/save-invitation";
 
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 
@@ -18,46 +19,7 @@ export function StepPreview() {
     const handleCreate = async () => {
         setIsCreating(true);
         try {
-            // Include themeConfig in the data sent to the server
-            const payload = {
-                ...data,
-                ...themeConfig, // This overwrites design fields in data if they overlap, or adds new ones
-
-                // Explicitly ensure objects are passed (some frameworks strip undefineds/partials weirdly)
-                portadaHabilitada: data.portadaHabilitada,
-                galeriaPrincipalHabilitada: data.galeriaPrincipalHabilitada,
-                galeriaPrincipalFotos: data.galeriaPrincipalFotos,
-                galeriaSecundariaHabilitada: data.galeriaSecundariaHabilitada,
-                galeriaSecundariaFotos: data.galeriaSecundariaFotos,
-
-                musicaHabilitada: data.musicaHabilitada,
-                sugerenciaMusicaHabilitada: data.sugerenciaMusicaHabilitada,
-                triviaHabilitada: data.triviaHabilitada,
-                triviaPreguntas: data.triviaPreguntas,
-                usePremiumCredit: usePremiumCredit,
-            };
-
-            const isEditing = Boolean(data.id);
-            const url = isEditing ? `/api/invitations?id=${data.id}` : '/api/invitations';
-            const method = isEditing ? 'PUT' : 'POST';
-
-            console.log('Datos enviados:', payload);
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-
-            const responseData = await response.json();
-            console.log('Respuesta de servidor:', responseData);
-
-            if (!response.ok) {
-                const errMsg = responseData.error || responseData.details || 'Error al crear la invitación';
-                console.error('Error retornado por /api/invitations:', responseData);
-                throw new Error(errMsg);
-            }
-
-            const invitation = responseData;
+            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit);
 
             // Redirigir a la invitación creada
             window.location.href = `/invitation/${invitation.slug}`;

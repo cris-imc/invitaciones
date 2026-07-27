@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { MusicUploader } from "@/components/ui/MusicUploader";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepMusic() {
     const { data, setData, nextStep, prevStep } = useWizardStore();

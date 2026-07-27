@@ -115,6 +115,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
         portadaTitulo: invitation.portadaTitulo || '',
         portadaMensaje: invitation.portadaMensaje || '',
         portadaTextoBoton: invitation.portadaTextoBoton || '',
+        portadaDressCode: invitation.portadaDressCode || '',
         portadaImagenFondo: invitation.portadaImagenFondo || '',
 
         // Gallery

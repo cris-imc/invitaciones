@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Trash2, Plus, Pencil } from "lucide-react";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 interface TriviaQuestion {
     pregunta: string;

@@ -4,6 +4,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepCoverPage() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
