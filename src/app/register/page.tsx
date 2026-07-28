@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,11 +13,26 @@ import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
 type PlanType = "FREE" | "PREMIUM";
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[var(--ink)]" />}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("FREE");
   const [premiumQuantity, setPremiumQuantity] = useState(1);
+
+  useEffect(() => {
+    if (searchParams?.get("plan") === "premium") {
+      setSelectedPlan("PREMIUM");
+    }
+  }, [searchParams]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",

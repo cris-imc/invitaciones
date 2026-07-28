@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 export default async function Home() {
   const session = await auth();
   const registerUrl = session ? "/dashboard?new=true" : "/register";
+  const premiumUrl = session ? "/dashboard?new=true&plan=premium" : "/register?plan=premium";
   return (
     <div className="flex min-h-screen items-center justify-center bg-black p-0 md:p-6">
       <div className="landing w-full max-w-[1180px]">
@@ -147,6 +148,82 @@ export default async function Home() {
                 RSVP, mapa y módulo social incluidos. Vas viendo las
                 confirmaciones a medida que entran.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* PRECIOS */}
+        <section id="precios" className="py-20 md:py-32 border-t border-zinc-900">
+          <div className="text-center mb-16">
+            <p className="kicker mx-auto mb-4">Precios Transparentes</p>
+            <h2 className="text-3xl md:text-5xl font-semibold mb-6 tracking-tight text-white">Elegí el plan para tu evento</h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto px-4">
+              Empezá completamente gratis o desbloqueá todas las funcionalidades con un único pago. Sin suscripciones.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto px-6">
+            {/* Gratis */}
+            <div className="bg-[var(--ink)]/40 border border-[var(--ink-2)] rounded-3xl p-8 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
+              <h3 className="text-2xl font-semibold text-white mb-2">Gratis</h3>
+              <div className="text-5xl font-display text-white mb-6">$0<span className="text-xl text-zinc-500 font-sans font-normal">/evento</span></div>
+              <p className="text-zinc-400 mb-8 flex-1">Ideal para eventos íntimos y para probar la plataforma.</p>
+              
+              <ul className="space-y-4 mb-8 text-zinc-300 text-sm">
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>Invitaciones personalizables completas</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>Gestión de confirmaciones (RSVP) y pagos</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>Hasta 20 invitados</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>Álbum colaborativo (hasta 10 fotos)</span>
+                </li>
+              </ul>
+              <Link href={registerUrl} className="w-full mt-auto">
+                <Button className="w-full rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 py-6 border border-zinc-700 font-sans">Crear cuenta gratis</Button>
+              </Link>
+            </div>
+
+            {/* Premium */}
+            <div className="bg-gradient-to-b from-zinc-800/80 to-[var(--ink)] border border-[var(--accent)]/40 rounded-3xl p-8 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1 shadow-[0_0_40px_rgba(202,171,115,0.1)]">
+              <div className="absolute top-0 right-0 bg-[var(--accent)] text-[var(--ink)] text-xs font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider font-sans">Recomendado</div>
+              <h3 className="text-2xl font-semibold text-[var(--accent)] mb-2">Premium</h3>
+              <div className="text-5xl font-display text-white mb-6">$50.000<span className="text-xl text-zinc-500 font-sans font-normal">/evento</span></div>
+              <p className="text-zinc-400 mb-8 flex-1">Para la experiencia definitiva. Acceso total a todas las herramientas interactivas.</p>
+              
+              <ul className="space-y-4 mb-8 text-zinc-300 text-sm">
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span className="font-medium text-white">Todo lo del plan Gratis, más:</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-white">Invitados ilimitados</strong> y sin restricciones</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-white">Interacción LIVE:</strong> proyección de fotos en vivo en tu fiesta</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-white">Álbum premium</strong> (hasta 200 fotos)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>Música de fondo, trivias y sugerencias de DJ</span>
+                </li>
+              </ul>
+              <Link href={premiumUrl} className="w-full mt-auto">
+                <Button className="w-full rounded-xl bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 py-6 font-semibold font-sans">Empezar con Premium</Button>
+              </Link>
             </div>
           </div>
         </section>
