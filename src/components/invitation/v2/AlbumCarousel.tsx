@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 
 interface AlbumCarouselProps {
   photos: string[];
@@ -10,6 +11,7 @@ interface AlbumCarouselProps {
 export function AlbumCarousel({ photos, dark = false }: AlbumCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
+  const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null);
 
   // Multiplicamos las fotos varias veces (x10) para asegurar que el carril tenga 
   // ancho suficiente y jamás llegue a su tope físico derecho en monitores anchos
@@ -79,10 +81,11 @@ export function AlbumCarousel({ photos, dark = false }: AlbumCarouselProps) {
           {duplicatedPhotos.map((url, i) => (
             <div
               key={i}
-              className="album-item"
+              className="album-item cursor-pointer hover:opacity-90 transition-opacity"
               style={{ backgroundImage: `url(${url})` }}
               role="img"
               aria-label={`Foto ${(i % photos.length) + 1}`}
+              onClick={() => setExpandedPhoto(url)}
             />
           ))}
         </div>
@@ -105,6 +108,31 @@ export function AlbumCarousel({ photos, dark = false }: AlbumCarouselProps) {
           </button>
         </div>
       </div>
+
+      {/* Lightbox Overlay */}
+      {expandedPhoto && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm cursor-zoom-out"
+          onClick={() => setExpandedPhoto(null)}
+        >
+          <button 
+            className="absolute top-4 right-4 md:top-8 md:right-8 text-white/70 hover:text-white p-2 rounded-full bg-black/50 hover:bg-black/80 transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpandedPhoto(null);
+            }}
+          >
+            <X className="w-8 h-8" />
+          </button>
+          
+          <img 
+            src={expandedPhoto} 
+            alt="Foto ampliada" 
+            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }

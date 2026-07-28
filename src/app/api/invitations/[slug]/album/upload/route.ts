@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { writeFile } from "fs/promises";
 import path from "path";
+import { checkPlanLimits, PlanTier } from "@/lib/plan-limits";
 
 export async function POST(
     request: NextRequest,
@@ -13,13 +14,36 @@ export async function POST(
         // Get invitation by slug
         const invitation = await prisma.invitation.findUnique({
             where: { slug },
-            include: { album: true },
+            include: { 
+                album: {
+                    include: {
+                        _count: {
+                            select: { fotos: true }
+                        }
+                    }
+                } 
+            },
         });
 
         if (!invitation || !invitation.album) {
             return NextResponse.json(
                 { error: "Invitation or album not found" },
                 { status: 404 }
+            );
+        }
+
+        // Check plan limits
+        const limitError = await checkPlanLimits(
+            invitation.userId,
+            invitation.planTier as PlanTier,
+            "add-photo",
+            invitation.album._count.fotos
+        );
+
+        if (limitError) {
+            return NextResponse.json(
+                { error: limitError.message },
+                { status: 403 }
             );
         }
 
