@@ -184,7 +184,7 @@ export default async function Home() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Álbum colaborativo (hasta 10 fotos)</span>
+                  <span>Álbum de fotos (hasta 10 fotos)</span>
                 </li>
               </ul>
               <Link href={registerUrl} className="w-full mt-auto">
@@ -214,7 +214,7 @@ export default async function Home() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Álbum premium</strong> (hasta 200 fotos)</span>
+                  <span><strong className="text-white">Álbum de fotos premium</strong> (hasta 200 fotos)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
