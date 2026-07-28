@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
-import { Sparkles, Mail, Lock, User, Check } from "lucide-react";
+import { Sparkles, Mail, Lock, User, Check, ArrowLeft } from "lucide-react";
 import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
 
 type PlanType = "FREE" | "PREMIUM";
@@ -70,7 +70,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 flex items-center justify-center bg-[var(--ink)]">
+    <div className="min-h-screen py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative">
+      <Link href="/" className="absolute top-6 left-6 md:top-12 md:left-12 flex items-center gap-2 text-sm text-[var(--paper)] opacity-70 hover:opacity-100 transition-opacity">
+        <ArrowLeft className="w-4 h-4" />
+        Volver al inicio
+      </Link>
       <div className="max-w-6xl mx-auto w-full relative z-10 text-[var(--on-ink)]">
         {/* Header */}
         <div className="text-center mb-12">

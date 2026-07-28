@@ -1,24 +1,33 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AnimatedMobileMockup } from "@/components/landing/AnimatedMobileMockup";
+import { Settings2, Users, Radio } from "lucide-react";
+import { auth } from "@/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  const registerUrl = session ? "/dashboard?new=true" : "/register";
   return (
     <div className="flex min-h-screen items-center justify-center bg-black p-0 md:p-6">
       <div className="landing w-full max-w-[1180px]">
         {/* NAV */}
         <nav className="l-nav">
           <div className="l-brand">
-            <div className="seal">
-              <span className="font-display">C</span>
-            </div>
-            Invitaciones Digitales
+            <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
+              <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
+                  Invitaciones
+              </span>
+              <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
+                  Digitales
+              </span>
+            </Link>
           </div>
           <div className="l-nav-links">
             <Link href="#plantillas">Plantillas</Link>
             <Link href="#como-funciona">Cómo funciona</Link>
             <Link href="#precios">Precios</Link>
           </div>
-          <Link href="/register">
+          <Link href={registerUrl}>
             <button className="l-cta">Crear invitación</button>
           </Link>
         </nav>
@@ -37,7 +46,7 @@ export default function Home() {
               de tus invitados, todo en un mismo lugar.
             </p>
             <div className="l-hero-ctas">
-              <Link href="/register">
+              <Link href={registerUrl}>
                 <Button className="rounded-full bg-accent text-ink hover:bg-accent/90 px-6">Empezar gratis</Button>
               </Link>
               <Link href="/dashboard">
@@ -45,67 +54,69 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="hero-preview">
-            <div className="seal">
-              <span>M&G</span>
-            </div>
-            <p className="ev-eyebrow">Nos casamos</p>
-            <h3>Martina & Gonzalo</h3>
-            <p className="ev-date">14 · 03 · 2027 — Córdoba, Argentina</p>
-            <div className="cd">
-              <div>
-                <b>62</b>
-                <span>días</span>
-              </div>
-              <div>
-                <b>14</b>
-                <span>hs</span>
-              </div>
-              <div>
-                <b>32</b>
-                <span>min</span>
-              </div>
+          <div className="relative w-full h-full min-h-[400px] flex items-center overflow-visible pointer-events-none scale-110 origin-right">
+            <div className="absolute inset-0 z-0" style={{
+                maskImage: 'linear-gradient(to right, transparent 0%, black 50%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 50%)'
+            }}>
+              <img src="/landing/novios2.jpg" alt="Novios" className="w-full h-full object-cover object-[center_30%] opacity-80" />
             </div>
           </div>
         </section>
 
-        {/* STRIP (PLANTILLAS) */}
-        <section className="l-strip" id="plantillas">
-          <p className="kicker">7 estilos, un mismo estándar de calidad</p>
-          <div className="l-strip-grid">
-            <div className="evcard">
-              <b>Boda</b>
-              <span>Elegante</span>
+        {/* STRIP (FEATURES) */}
+        <section className="l-strip" id="caracteristicas" style={{ padding: "6rem 2rem", background: "black" }}>
+          <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+            
+            <div className="flex-1 space-y-10">
+              <div>
+                <p className="text-accent uppercase tracking-widest text-sm font-semibold mb-2">Todo en uno</p>
+                <h2 className="text-4xl lg:text-5xl font-serif text-white leading-tight">Mucho más que una invitación</h2>
+              </div>
+
+              <div className="space-y-8">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                    <Settings2 className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Plantilla 100% Personalizable</h3>
+                    <p className="text-zinc-400">Adaptá colores, tipografías, fotos y estructura. Ya sea una boda, un 15 o un evento corporativo, el diseño se ajusta a tu estilo.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                    <Users className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Gestión de Invitados y Pagos</h3>
+                    <p className="text-zinc-400">Recibí confirmaciones (RSVP) al instante, administrá accesos y configurá tu mesa de regalos o cuenta bancaria sin comisiones.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                    <Radio className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Interacción en Vivo (LIVE)</h3>
+                    <p className="text-zinc-400">Tus invitados pueden subir fotos y dejar mensajes desde sus teléfonos durante la fiesta. Todo se proyecta y queda guardado de recuerdo.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <Link href="/register">
+                  <Button className="rounded-full bg-accent text-ink hover:bg-accent/90 px-8 py-6 text-lg">Probar gratis</Button>
+                </Link>
+              </div>
             </div>
-            <div className="evcard">
-              <b>15 años</b>
-              <span>Festivo</span>
+
+            <div className="flex-1 w-full flex justify-center lg:justify-end">
+              <AnimatedMobileMockup />
             </div>
-            <div className="evcard">
-              <b>Cumpleaños</b>
-              <span>Cálido</span>
-            </div>
-            <div className="evcard">
-              <b>Ejecutivo</b>
-              <span>Corporativo</span>
-            </div>
-            <div className="evcard">
-              <b>Bautismo</b>
-              <span>Sobrio</span>
-            </div>
-            <div className="evcard">
-              <b>Nacimiento</b>
-              <span>Tierno</span>
-            </div>
-            <div className="evcard">
-              <b>Infantil</b>
-              <span>Lúdico</span>
-            </div>
-            <Link href="/register" className="evcard flex items-center justify-center border-dashed">
-              <span className="font-ui font-semibold opacity-70">
-                Crear ahora →
-              </span>
-            </Link>
+
           </div>
         </section>
 

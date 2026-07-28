@@ -112,12 +112,14 @@ export function Sidebar() {
             {/* ── DESKTOP SIDEBAR ── */}
             <aside className="p-side">
                 <div className="p-brand">
-                    <div className="seal" style={{ borderColor: "var(--line)", width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)" }}>
-                        <span className="font-display" style={{ color: "var(--paper)", fontSize: 15, fontWeight: 700 }}>C</span>
-                    </div>
-                    <span className="truncate font-semibold">
-                        Invitaciones Digitales
-                    </span>
+                    <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
+                        <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
+                            Invitaciones
+                        </span>
+                        <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
+                            Digitales
+                        </span>
+                    </Link>
                 </div>
 
                 <nav className="p-nav flex-1">
@@ -141,10 +143,14 @@ export function Sidebar() {
             {/* ── MOBILE TOP BAR ── */}
             <header className="p-mobile-topbar md:hidden">
                 <div className="p-brand" style={{ margin: 0 }}>
-                    <div className="seal" style={{ borderColor: "var(--line)", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)" }}>
-                        <span className="font-display" style={{ color: "var(--paper)", fontSize: 13, fontWeight: 700 }}>C</span>
-                    </div>
-                    Invitaciones Digitales
+                    <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
+                        <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
+                            Invitaciones
+                        </span>
+                        <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
+                            Digitales
+                        </span>
+                    </Link>
                 </div>
                 <button
                     className="p-hamburger"
@@ -164,10 +170,14 @@ export function Sidebar() {
             <div className={`p-drawer md:hidden ${open ? "open" : ""}`}>
                 <div className="p-drawer-head">
                     <div className="p-brand" style={{ margin: 0 }}>
-                        <div className="seal" style={{ borderColor: "var(--line)", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)" }}>
-                            <span className="font-display" style={{ color: "var(--paper)", fontSize: 13, fontWeight: 700 }}>C</span>
-                        </div>
-                        Invitaciones Digitales
+                        <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
+                            <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
+                                Invitaciones
+                            </span>
+                            <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
+                                Digitales
+                            </span>
+                        </Link>
                     </div>
                     <button className="p-hamburger" onClick={() => setOpen(false)} aria-label="Cerrar menú">
                         <X className="w-5 h-5" />

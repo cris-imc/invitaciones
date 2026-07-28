@@ -61,7 +61,10 @@ async function getDashboardStats(userId: string) {
   };
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props: { searchParams?: Promise<{ new?: string }> }) {
+  const searchParams = props.searchParams ? await props.searchParams : {};
+  const isAutoOpen = searchParams?.new === "true";
+
   const session = await auth().catch(() => null);
   if (!session?.user || !session.user.id) redirect("/login");
 
@@ -151,7 +154,7 @@ export default async function DashboardPage() {
             )}
           </p>
         </div>
-        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} />
+        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} autoOpen={isAutoOpen} />
       </div>
 
       {/* KPIs */}
@@ -239,7 +242,7 @@ export default async function DashboardPage() {
         ) : (
           <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
             <p className="text-muted-foreground mb-4 font-ui">Todavía no tenés invitaciones.</p>
-            <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} />
+            <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} autoOpen={isAutoOpen} />
           </div>
         )}
       </div>

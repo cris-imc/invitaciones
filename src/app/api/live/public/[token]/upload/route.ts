@@ -51,6 +51,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
             return NextResponse.json(item);
         }
         
+        if (!file || typeof file === 'string') {
+            return NextResponse.json({ error: 'No se encontró archivo válido' }, { status: 400 });
+        }
+
         // 10MB limit for safety
         if (file.size > 10 * 1024 * 1024) {
             return NextResponse.json({ error: 'El archivo es demasiado grande (máx 10MB)' }, { status: 400 });

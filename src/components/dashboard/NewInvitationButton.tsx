@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { Sparkles } from "lucide-react";
 
-export function NewInvitationButton({ premiumCredits, totalInvitations, planTier }: { premiumCredits: number, totalInvitations: number, planTier?: string }) {
-    const [open, setOpen] = useState(false);
+export function NewInvitationButton({ premiumCredits, totalInvitations, planTier, autoOpen = false }: { premiumCredits: number, totalInvitations: number, planTier?: string, autoOpen?: boolean }) {
+    const [open, setOpen] = useState(autoOpen);
     const [showError, setShowError] = useState(false);
     const router = useRouter();
     const setUsePremiumCredit = useWizardStore((state) => state.setUsePremiumCredit);
