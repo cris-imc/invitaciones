@@ -27,7 +27,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
     { id: "invitados", label: "Invitados & Pagos" },
     { id: "canciones", label: "Música" },
     ...(regaloHabilitado ? [{ id: "precio" as Tab, label: "Precio" }] : []),
-    { id: "agregar", label: "Gestionar", primary: true },
+    { id: "agregar", label: "Gestionar invitados", primary: true },
     { id: "live" as Tab, label: "LIVE", primary: true },
   ];
 
@@ -139,13 +139,14 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
           <QuickEditPrice
             invitationId={invitationId}
             slug={slug}
-            currentAmount={regaloMonto}
-            currentPrecioNino={precioNino}
+            currentAmount={Number(regaloMonto)}
+            currentPrecioNino={Number(precioNino)}
+            planTier={planTier}
           />
         </div>
       )}
       {tab === "agregar" && (
-        <GuestManager slug={slug} initialRsvpEnabled={rsvpEnabled} />
+        <GuestManager slug={slug} initialRsvpEnabled={rsvpEnabled} planTier={planTier} />
       )}
       {tab === "live" && (
         <div className="bg-card border rounded-lg p-4 md:p-6">

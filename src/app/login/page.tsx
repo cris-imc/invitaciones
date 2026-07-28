@@ -56,9 +56,7 @@ export default function LoginPage() {
         <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-8 shadow-2xl text-[var(--on-ink)]">
           {/* Logo/Header */}
           <div className="text-center mb-8">
-            <div className="mx-auto seal mb-4" style={{ borderColor: 'var(--line)', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)' }}>
-              <span className="font-display" style={{ color: 'var(--paper)', fontSize: 32, fontWeight: 700 }}>C</span>
-            </div>
+
             <h1 className="font-display text-3xl mb-2">
               Iniciar Sesión
             </h1>

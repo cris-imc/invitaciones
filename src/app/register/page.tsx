@@ -78,9 +78,7 @@ export default function RegisterPage() {
       <div className="max-w-6xl mx-auto w-full relative z-10 text-[var(--on-ink)]">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="mx-auto seal mb-4" style={{ borderColor: 'var(--line)', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)' }}>
-            <span className="font-display" style={{ color: 'var(--paper)', fontSize: 32, fontWeight: 700 }}>C</span>
-          </div>
+
           <h1 className="text-4xl font-display mb-2">
             Crea tu cuenta
           </h1>

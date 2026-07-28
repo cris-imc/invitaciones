@@ -49,6 +49,7 @@ import {
   Clock,
   MessageCircle,
   Pencil,
+  Lock,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
@@ -71,9 +72,10 @@ interface Guest {
 interface GuestManagerProps {
   slug: string;
   initialRsvpEnabled: boolean;
+  planTier?: string;
 }
 
-export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
+export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManagerProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
@@ -345,16 +347,27 @@ export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
                     />
                     <Label htmlFor="individual">Individual</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 opacity-50 relative group">
                     <input
                       type="radio"
                       id="family"
                       name="type"
                       checked={newGuestType === "FAMILY"}
                       onChange={() => setNewGuestType("FAMILY")}
+                      disabled={planTier !== 'PREMIUM'}
                       className="accent-primary"
                     />
-                    <Label htmlFor="family">Familiar</Label>
+                    <Label htmlFor="family" className="flex items-center gap-2 cursor-not-allowed">
+                        Familiar
+                        {planTier !== 'PREMIUM' && <Lock className="w-4 h-4 text-red-400" />}
+                    </Label>
+
+                    {planTier !== 'PREMIUM' && (
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                          Disponible en Premium
+                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                        </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -634,16 +647,27 @@ export function GuestManager({ slug, initialRsvpEnabled }: GuestManagerProps) {
                   />
                   <Label htmlFor="edit-individual">Individual</Label>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 opacity-50 relative group">
                   <input
                     type="radio"
                     id="edit-family"
                     name="edit-type"
                     checked={editGuestType === "FAMILY"}
                     onChange={() => setEditGuestType("FAMILY")}
+                    disabled={planTier !== 'PREMIUM'}
                     className="accent-primary"
                   />
-                  <Label htmlFor="edit-family">Familiar</Label>
+                  <Label htmlFor="edit-family" className="flex items-center gap-2 cursor-not-allowed">
+                      Familiar
+                      {planTier !== 'PREMIUM' && <Lock className="w-4 h-4 text-red-400" />}
+                  </Label>
+
+                  {planTier !== 'PREMIUM' && (
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                        Disponible en Premium
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                      </div>
+                  )}
                 </div>
               </div>
             </div>

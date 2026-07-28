@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Coins, Loader2 } from "lucide-react";
+import { Coins, Loader2, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
     Dialog,
@@ -19,12 +19,14 @@ export function QuickEditPrice({
     invitationId, 
     slug,
     currentAmount,
-    currentPrecioNino
+    currentPrecioNino,
+    planTier
 }: { 
     invitationId: string, 
     slug: string,
     currentAmount: number | null,
-    currentPrecioNino?: number | null
+    currentPrecioNino?: number | null,
+    planTier?: string
 }) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
@@ -98,16 +100,26 @@ export function QuickEditPrice({
                             className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
                         />
                     </div>
-                    <div>
-                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Valor Niño ($):</label>
+                    <div className="relative group">
+                        <label className="text-sm font-medium mb-2 flex items-center gap-2 text-[var(--on-ink)]/80">
+                            Valor Niño ($):
+                            {planTier !== 'PREMIUM' && <Lock className="w-3.5 h-3.5 text-red-400" />}
+                        </label>
                         <Input 
                             type="number" 
                             min="0"
                             placeholder="Opcional"
                             value={precioNino}
                             onChange={(e) => setPrecioNino(e.target.value)}
-                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                            disabled={planTier !== 'PREMIUM'}
+                            className="bg-[var(--ink)] border-none text-[var(--on-ink)] disabled:opacity-50"
                         />
+                        {planTier !== 'PREMIUM' && (
+                            <div className="absolute -top-10 left-16 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                              Disponible en Premium
+                              <div className="absolute -bottom-1 left-4 border-4 border-transparent border-t-black"></div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
