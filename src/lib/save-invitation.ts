@@ -35,7 +35,7 @@ export async function saveInvitationFromWizard(data: any, themeConfig: any, useP
     const responseData = await response.json();
 
     if (!response.ok) {
-        const errMsg = responseData.error || responseData.details || 'Error al guardar la invitación';
+        const errMsg = responseData.details || responseData.error || 'Error al guardar la invitación';
         throw new Error(errMsg);
     }
 
