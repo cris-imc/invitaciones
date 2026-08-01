@@ -191,12 +191,12 @@ export function StepBasicInfo() {
                             name="nombreQuinceanera"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Tu Nombre</FormLabel>
+                                    <FormLabel>Nombre o Apodo de la Quinceañera</FormLabel>
                                     <FormControl>
-                                         <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Ej: María, Sofía, Valentina..." {...field} />
+                                         <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Ej: Sofi, Valentina, Mafe..." {...field} />
                                     </FormControl>
                                     <p className="text-xs text-muted-foreground">
-                                        Este nombre aparecerá destacado en la invitación.
+                                        Ingresá el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.
                                     </p>
                                 </FormItem>
                             )}

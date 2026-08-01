@@ -354,16 +354,16 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
 
                         {formData.type === 'QUINCE_ANOS' && (
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Tu Nombre</label>
+                                <label className="text-sm font-medium">Nombre o Apodo de la Quinceañera</label>
                                 <input
                                     type="text"
                                     value={formData.nombreQuinceanera}
                                     onChange={(e) => handleInputChange('nombreQuinceanera', e.target.value)}
                                     className="w-full p-2 border rounded-md"
-                                    placeholder="Ej: María, Sofía, Valentina..."
+                                    placeholder="Ej: Sofi, Valentina, Mafe..."
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Este nombre aparecerá destacado en la invitación.
+                                    Ingresá el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.
                                 </p>
                             </div>
                         )}
