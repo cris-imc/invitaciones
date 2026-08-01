@@ -98,6 +98,16 @@ export const invitationSchema = z.object({
     regaloMonto: z.number().optional(),
     precioNino: z.number().optional(),
 
+    pagoTarjetaHabilitado: z.boolean().default(false),
+    pagoTarjetaTitulo: z.string().optional(),
+    pagoTarjetaMensaje: z.string().optional(),
+    pagoTarjetaMostrarDatos: z.boolean().default(false),
+    pagoTarjetaCbu: z.string().optional(),
+    pagoTarjetaAlias: z.string().optional(),
+    pagoTarjetaBanco: z.string().optional(),
+    pagoTarjetaTitular: z.string().optional(),
+    pagoTarjetaMonto: z.number().optional(),
+
     cronogramaEventos: z.string().optional(), // JSON string
 
     // Propiedades opcionales de plantillas

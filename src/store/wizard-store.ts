@@ -36,13 +36,22 @@ export const useWizardStore = create<WizardState>((set) => ({
         frasePersonalizadaTexto: "",
 
         regaloHabilitado: false,
-        regaloTitulo: "Regalo",
+        regaloTitulo: "Regalos",
         regaloMensaje: "",
         regaloMostrarDatos: false,
         regaloCbu: "",
         regaloAlias: "",
         regaloBanco: "",
         regaloTitular: "",
+
+        pagoTarjetaHabilitado: false,
+        pagoTarjetaTitulo: "Pago de Tarjetas / Pases",
+        pagoTarjetaMensaje: "",
+        pagoTarjetaMostrarDatos: false,
+        pagoTarjetaCbu: "",
+        pagoTarjetaAlias: "",
+        pagoTarjetaBanco: "",
+        pagoTarjetaTitular: "",
 
         // Cronograma events
         cronogramaEventos: JSON.stringify([

@@ -5,12 +5,13 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUploader } from "@/components/ui/ImageUploader";
-import { X, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Info, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepGallery() {
     const { data, setData } = useWizardStore();
     const [showInfo, setShowInfo] = useState(false);
+    const [showRedWarning, setShowRedWarning] = useState(false);
 
     const galeriaPrincipal = data.galeriaPrincipalFotos
         ? (typeof data.galeriaPrincipalFotos === 'string'
@@ -76,8 +77,31 @@ export function StepGallery() {
 
                 {data.galeriaPrincipalHabilitada && (
                     <>
-                        <div className="space-y-2 pt-2">
-                            <Label className="text-sm font-medium">Agregar nueva foto</Label>
+                        {/* Burbuja Roja / Alerta Destacada sobre carga individual (Collapsible - Minimizada por defecto) */}
+                        <div className="rounded-2xl bg-rose-500/15 border border-rose-500/40 text-rose-200 text-xs overflow-hidden transition-all duration-200 shadow-md">
+                            <button
+                                type="button"
+                                onClick={() => setShowRedWarning(!showRedWarning)}
+                                className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-rose-500/20 transition-colors cursor-pointer"
+                            >
+                                <div className="flex items-center gap-2 font-bold text-rose-300 text-sm">
+                                    <AlertCircle className="w-4.5 h-4.5 shrink-0 text-rose-400" />
+                                    <span>Importante sobre la selección de fotos</span>
+                                </div>
+                                <div className="text-rose-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                                    {showRedWarning ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                </div>
+                            </button>
+
+                            {showRedWarning && (
+                                <div className="px-4 pb-4 pt-1 border-t border-rose-500/25 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                                    Las fotos deben seleccionarse <strong>una a una</strong>. Al subir cada imagen, el sistema te permitirá ajustar y elegir el encuadre exacto en <strong>formato cuadrado (1:1)</strong> para que se adapte perfectamente al carrusel.
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-2 pt-1">
+                            <Label className="text-sm font-medium">Agregar nueva foto (de a una)</Label>
                             <ImageUploader
                                 onImageUploaded={handleImageUploaded}
                                 aspectRatio={1}

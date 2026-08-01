@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
                 galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada !== undefined ? body.galeriaSecundariaHabilitada : false,
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : '[]',
 
-                // 11. REGALO
+                // 11. REGALO Y PAGO DE TARJETAS
                 regaloHabilitado: body.regaloHabilitado !== undefined ? body.regaloHabilitado : false,
                 regaloTitulo: body.regaloTitulo,
                 regaloMensaje: body.regaloMensaje,
@@ -278,6 +278,17 @@ export async function POST(request: NextRequest) {
                 regaloTitular: body.regaloTitular,
                 regaloMonto: body.regaloMonto ? parseFloat(body.regaloMonto) : null,
                 regaloMontoUpdatedAt: body.regaloMonto ? new Date() : null,
+
+                pagoTarjetaHabilitado: body.pagoTarjetaHabilitado !== undefined ? body.pagoTarjetaHabilitado : false,
+                pagoTarjetaTitulo: body.pagoTarjetaTitulo,
+                pagoTarjetaMensaje: body.pagoTarjetaMensaje,
+                pagoTarjetaMostrarDatos: body.pagoTarjetaMostrarDatos,
+                pagoTarjetaCbu: body.pagoTarjetaCbu,
+                pagoTarjetaAlias: body.pagoTarjetaAlias,
+                pagoTarjetaBanco: body.pagoTarjetaBanco,
+                pagoTarjetaTitular: body.pagoTarjetaTitular,
+                pagoTarjetaMonto: body.pagoTarjetaMonto ? parseFloat(body.pagoTarjetaMonto) : null,
+                precioNino: body.precioNino ? parseFloat(body.precioNino) : null,
 
                 // 2. MÚSICA
                 musicaHabilitada: body.musicaHabilitada !== undefined ? body.musicaHabilitada : false,
@@ -445,7 +456,7 @@ export async function PUT(request: NextRequest) {
                 galeriaSecundariaHabilitada: body.galeriaSecundariaHabilitada,
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : undefined,
 
-                // 11. REGALO
+                // 11. REGALO Y PAGO DE TARJETAS
                 regaloHabilitado: body.regaloHabilitado,
                 regaloTitulo: body.regaloTitulo,
                 regaloMensaje: body.regaloMensaje,
@@ -456,6 +467,17 @@ export async function PUT(request: NextRequest) {
                 regaloTitular: body.regaloTitular,
                 regaloMonto: newRegaloMonto,
                 ...(regaloMontoUpdatedAt && { regaloMontoUpdatedAt }),
+
+                pagoTarjetaHabilitado: body.pagoTarjetaHabilitado,
+                pagoTarjetaTitulo: body.pagoTarjetaTitulo,
+                pagoTarjetaMensaje: body.pagoTarjetaMensaje,
+                pagoTarjetaMostrarDatos: body.pagoTarjetaMostrarDatos,
+                pagoTarjetaCbu: body.pagoTarjetaCbu,
+                pagoTarjetaAlias: body.pagoTarjetaAlias,
+                pagoTarjetaBanco: body.pagoTarjetaBanco,
+                pagoTarjetaTitular: body.pagoTarjetaTitular,
+                pagoTarjetaMonto: body.pagoTarjetaMonto !== undefined ? (body.pagoTarjetaMonto ? parseFloat(body.pagoTarjetaMonto) : null) : undefined,
+                precioNino: body.precioNino !== undefined ? (body.precioNino ? parseFloat(body.precioNino) : null) : undefined,
 
 
                 // 2. MÚSICA

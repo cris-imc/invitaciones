@@ -309,9 +309,15 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   const paymentAmount  = Number(invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined);
   const guestPayStatus = (guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID";
 
-  const showGiftSection = Boolean(invitation.regaloHabilitado);
-  const showBankDetails = Boolean(invitation.regaloHabilitado) && Boolean(
-    invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || paymentAmount
+  const regaloHabilitado = Boolean(invitation.regaloHabilitado);
+  const pagoTarjetaHabilitado = Boolean(invitation.pagoTarjetaHabilitado);
+  const showGiftSection = regaloHabilitado || pagoTarjetaHabilitado;
+  const bothAccounts = regaloHabilitado && pagoTarjetaHabilitado;
+
+  const showBankDetails = showGiftSection && Boolean(
+    invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || 
+    invitation.pagoTarjetaCbu || invitation.pagoTarjetaAlias || invitation.pagoTarjetaTitular || 
+    paymentAmount
   );
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
@@ -325,7 +331,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
     ...(mapUrl        ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
     ...(rsvpEnabled   ? [{ id: "rsvp",     label: "Confirmar", icon: <IconCheck /> }] : []),
-    ...(showGiftSection  ? [{ id: "banco",    label: "Regalo",    icon: <IconGift /> }]  : []),
+    ...(showGiftSection  ? [{ id: "banco",    label: "Banco",     icon: <IconGift /> }]  : []),
     ...(triviaHabilitada && triviaPreguntas.length > 0 ? [{ id: "quiz", label: "Juego", icon: <IconQuiz /> }] : []),
     ...(songsEnabled  ? [{ id: "songs",    label: "Música",    icon: <IconMusic /> }] : []),
   ];
@@ -678,28 +684,93 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
         {showGiftSection && (
           <SectionWrapper dark id="banco" delay={200}>
-            {showBankDetails && <p className="t-kicker">Datos bancarios</p>}
-            <h2>{String(invitation.regaloTitulo ?? "Si querés hacer tu aporte")}</h2>
-            {Boolean(invitation.regaloMensaje) ? (
-              <p style={{ opacity: 0.8, marginBottom: "var(--sp-4)" }}>
-                {String(invitation.regaloMensaje)}
-              </p>
-            ) : null}
-            {showBankDetails && (
-              <div className="bank-card">
-                {Boolean(invitation.regaloBanco) && (
-                  <CopyField label="Banco" value={String(invitation.regaloBanco)} />
+            {bothAccounts ? (
+              <>
+                <p className="t-kicker">Cuentas Bancarias del Evento</p>
+                <h2>Transferencias & Regalos</h2>
+                <p style={{ opacity: 0.85, marginBottom: "var(--sp-4)" }} className="max-w-xl mx-auto text-sm">
+                  Disponemos de dos cuentas bancarias independientes: una para la acreditación / pago de tarjetas de la fiesta y otra para los regalos.
+                </p>
+                {showBankDetails && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-4xl mx-auto mt-4">
+                    {/* Tarjeta 1: Pago de Tarjetas */}
+                    {pagoTarjetaHabilitado && (
+                      <div className="bank-card p-5 rounded-2xl bg-white/5 border border-amber-500/20 space-y-3">
+                        <div className="flex items-center gap-2 font-bold text-amber-300 text-lg">
+                          <span>💳</span> {String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases")}
+                        </div>
+                        {Boolean((invitation as any).pagoTarjetaMensaje) && (
+                          <p style={{ opacity: 0.8 }} className="text-xs">
+                            {String((invitation as any).pagoTarjetaMensaje)}
+                          </p>
+                        )}
+                        {Boolean((invitation as any).pagoTarjetaBanco) && (
+                          <CopyField label="Banco" value={String((invitation as any).pagoTarjetaBanco)} />
+                        )}
+                        {Boolean((invitation as any).pagoTarjetaCbu) && (
+                          <CopyField label="CBU / CVU" value={String((invitation as any).pagoTarjetaCbu)} />
+                        )}
+                        {Boolean((invitation as any).pagoTarjetaAlias) && (
+                          <CopyField label="Alias" value={String((invitation as any).pagoTarjetaAlias)} />
+                        )}
+                        {Boolean((invitation as any).pagoTarjetaTitular) && (
+                          <CopyField label="Titular" value={String((invitation as any).pagoTarjetaTitular)} />
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tarjeta 2: Regalos */}
+                    {regaloHabilitado && (
+                      <div className="bank-card p-5 rounded-2xl bg-white/5 border border-amber-500/20 space-y-3">
+                        <div className="flex items-center gap-2 font-bold text-amber-300 text-lg">
+                          <span>🎁</span> {String((invitation as any).regaloTitulo || "Regalos del Evento")}
+                        </div>
+                        {Boolean((invitation as any).regaloMensaje) && (
+                          <p style={{ opacity: 0.8 }} className="text-xs">
+                            {String((invitation as any).regaloMensaje)}
+                          </p>
+                        )}
+                        {Boolean((invitation as any).regaloBanco) && (
+                          <CopyField label="Banco" value={String((invitation as any).regaloBanco)} />
+                        )}
+                        {Boolean((invitation as any).regaloCbu) && (
+                          <CopyField label="CBU / CVU" value={String((invitation as any).regaloCbu)} />
+                        )}
+                        {Boolean((invitation as any).regaloAlias) && (
+                          <CopyField label="Alias" value={String((invitation as any).regaloAlias)} />
+                        )}
+                        {Boolean((invitation as any).regaloTitular) && (
+                          <CopyField label="Titular" value={String((invitation as any).regaloTitular)} />
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )}
-                {Boolean(invitation.regaloCbu) && (
-                  <CopyField label="CBU" value={String(invitation.regaloCbu)} />
+              </>
+            ) : (
+              <>
+                <p className="t-kicker">Datos Bancarios Unificados</p>
+                <h2>Cuenta Única para Pagos y Regalos</h2>
+                <p style={{ opacity: 0.85, marginBottom: "var(--sp-4)" }} className="max-w-xl mx-auto text-sm">
+                  {String((invitation as any).pagoTarjetaMensaje || (invitation as any).regaloMensaje || "Esta cuenta se utilizará tanto para el pago/confirmación de pases como para quienes deseen realizar un regalo.")}
+                </p>
+                {showBankDetails && (
+                  <div className="bank-card max-w-lg mx-auto">
+                    {Boolean((invitation as any).pagoTarjetaBanco || (invitation as any).regaloBanco) && (
+                      <CopyField label="Banco" value={String((invitation as any).pagoTarjetaBanco || (invitation as any).regaloBanco)} />
+                    )}
+                    {Boolean((invitation as any).pagoTarjetaCbu || (invitation as any).regaloCbu) && (
+                      <CopyField label="CBU / CVU" value={String((invitation as any).pagoTarjetaCbu || (invitation as any).regaloCbu)} />
+                    )}
+                    {Boolean((invitation as any).pagoTarjetaAlias || (invitation as any).regaloAlias) && (
+                      <CopyField label="Alias" value={String((invitation as any).pagoTarjetaAlias || (invitation as any).regaloAlias)} />
+                    )}
+                    {Boolean((invitation as any).pagoTarjetaTitular || (invitation as any).regaloTitular) && (
+                      <CopyField label="Titular" value={String((invitation as any).pagoTarjetaTitular || (invitation as any).regaloTitular)} />
+                    )}
+                  </div>
                 )}
-                {Boolean(invitation.regaloAlias) && (
-                  <CopyField label="Alias" value={String(invitation.regaloAlias)} />
-                )}
-                {Boolean(invitation.regaloTitular) && (
-                  <CopyField label="Titular" value={String(invitation.regaloTitular)} />
-                )}
-              </div>
+              </>
             )}
           </SectionWrapper>
         )}

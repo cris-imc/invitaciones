@@ -160,6 +160,15 @@ model Invitation {
   regaloTitular                String?
   regaloMonto                  Float?
   regaloMontoUpdatedAt         DateTime?
+  pagoTarjetaHabilitado        Boolean          @default(false)
+  pagoTarjetaTitulo            String?
+  pagoTarjetaMensaje           String?
+  pagoTarjetaMostrarDatos      Boolean          @default(false)
+  pagoTarjetaAlias             String?
+  pagoTarjetaCbu               String?
+  pagoTarjetaBanco             String?
+  pagoTarjetaTitular           String?
+  pagoTarjetaMonto             Float?
   precioNino                   Float?
   galeriaSecundariaHabilitada  Boolean          @default(false)
   galeriaSecundariaFotos       String?
