@@ -1,18 +1,18 @@
 "use client";
+import { useState } from "react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 import { useWizardStore } from "@/store/wizard-store";
-import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MusicUploader } from "@/components/ui/MusicUploader";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Lock } from "lucide-react";
+import { Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
 
 export function StepMusic() {
-    const { data, setData, nextStep, prevStep } = useWizardStore();
+    const { data, setData } = useWizardStore();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
+    const [showMusicInfo, setShowMusicInfo] = useState(false);
     
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
     const isEditing = Boolean(data.id);
@@ -87,12 +87,38 @@ export function StepMusic() {
                     </>
                 )}
 
-                <div className="pt-6 pb-2 border-t mt-6">
-                    <h2 className="text-xl font-bold mb-2">Sugerencia de Canciones</h2>
-                    <p className="text-sm text-muted-foreground mb-4">
-                        Permite que tus invitados te sugieran canciones para la fiesta
-                    </p>
-                    <div className="flex items-center space-x-2 relative group w-fit">
+                <div className="pt-6 pb-2 border-t mt-6 space-y-4">
+                    <div>
+                        <h2 className="text-xl font-bold mb-1">Sugerencia de Canciones</h2>
+                        <p className="text-sm text-muted-foreground">
+                            Permite que tus invitados te sugieran temas para la fiesta
+                        </p>
+                    </div>
+
+                    {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
+                    <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs overflow-hidden transition-all duration-200 shadow-sm">
+                        <button
+                            type="button"
+                            onClick={() => setShowMusicInfo(!showMusicInfo)}
+                            className="w-full p-3.5 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+                        >
+                            <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
+                                <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                                <span>¿Para qué sirven las sugerencias de música?</span>
+                            </div>
+                            <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                                {showMusicInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </div>
+                        </button>
+
+                        {showMusicInfo && (
+                            <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                                Todas las canciones que tus invitados sugieran desde la tarjeta digital quedarán almacenadas en tu panel. Podrás exportar o compartir este listado directamente con el <strong>salón de fiestas o el DJ del evento</strong> para que arme la playlist de la fiesta considerando los temas más pedidos.
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center space-x-2 relative group w-fit pt-1">
                         <Checkbox
                             id="sugerenciaMusicaHabilitada"
                             checked={data.sugerenciaMusicaHabilitada && !isLocked}

@@ -5,7 +5,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus } from "lucide-react";
+import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 const ICON_OPTIONS = [
@@ -25,7 +25,8 @@ interface CronogramaEvent {
 }
 
 export function StepCronograma() {
-    const { data, setData, nextStep, prevStep } = useWizardStore();
+    const { data, setData, nextStep } = useWizardStore();
+    const [showInfo, setShowInfo] = useState(false);
     
     const getDefaultEvents = (): CronogramaEvent[] => {
         if (data.type === 'CASAMIENTO') {
@@ -84,20 +85,43 @@ export function StepCronograma() {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Cronograma del Evento</h2>
-                <p className="text-muted-foreground">
-                    Define la secuencia de actividades de tu celebración
+        <div className="space-y-6">
+            <div className="text-center space-y-1">
+                <h2 className="text-2xl font-bold">Cronograma del Evento</h2>
+                <p className="text-muted-foreground text-sm">
+                    Definí los momentos principales de tu celebración
                 </p>
             </div>
 
-            <div className="space-y-4">
+            {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
+            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs overflow-hidden transition-all duration-200 shadow-sm max-w-2xl mx-auto">
+                <button
+                    type="button"
+                    onClick={() => setShowInfo(!showInfo)}
+                    className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+                >
+                    <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
+                        <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                        <span>¿Cómo funciona el Cronograma?</span>
+                    </div>
+                    <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                        {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                </button>
+
+                {showInfo && (
+                    <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                        El cronograma organiza y comunica las distintas etapas de tu fiesta (ej: Recepción, Cena, Brindis, Baile). Podés personalizar los horarios, editar los títulos e iconos de cada momento, agregar nuevas etapas o eliminar las que no necesites.
+                    </div>
+                )}
+            </div>
+
+            <div className="space-y-4 max-w-2xl mx-auto">
                 {events.map((event, index) => (
-                    <div key={index} className="p-4 border rounded-lg space-y-3 bg-[var(--ink-2)] shadow-sm">
+                    <div key={index} className="p-4 border rounded-xl space-y-3 bg-[var(--ink-2)] border-white/10 shadow-sm">
                         <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-muted-foreground">
-                                Evento #{index + 1}
+                            <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                                Etapa #{index + 1}
                             </span>
                             {events.length > 1 && (
                                 <Button
@@ -105,16 +129,17 @@ export function StepCronograma() {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => removeEvent(index)}
-                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 px-2"
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-4 h-4 mr-1" />
+                                    <span className="text-xs">Eliminar</span>
                                 </Button>
                             )}
                         </div>
 
                         <div className="grid md:grid-cols-[1fr_2fr_1.5fr] gap-3">
                             <div className="space-y-1">
-                                <Label>Hora</Label>
+                                <Label className="text-xs">Hora</Label>
                                 <div className="relative">
                                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
                                     <Input
@@ -129,10 +154,10 @@ export function StepCronograma() {
                             </div>
 
                             <div className="space-y-1">
-                                <Label>Actividad</Label>
+                                <Label className="text-xs">Actividad / Momento</Label>
                                 <Input
                                     type="text"
-                                    placeholder="Ej: Ceremonia"
+                                    placeholder="Ej: Recepción / Cena"
                                     value={event.title}
                                     onChange={(e) => updateEvent(index, "title", e.target.value)}
                                     required
@@ -140,7 +165,7 @@ export function StepCronograma() {
                             </div>
 
                             <div className="space-y-1">
-                                <Label>Icono</Label>
+                                <Label className="text-xs">Icono</Label>
                                 <div className="grid grid-cols-4 gap-1 p-1 border border-white/10 rounded-xl bg-[var(--ink)]">
                                     {ICON_OPTIONS.map(({ value, Icon }) => (
                                         <button
@@ -150,7 +175,7 @@ export function StepCronograma() {
                                             className={`
                                                 p-2 rounded-lg transition-all flex items-center justify-center
                                                 ${event.icon === value
-                                                    ? 'bg-accent text-accent-foreground'
+                                                    ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
                                                     : 'hover:bg-white/5 text-muted-foreground'
                                                 }
                                             `}
@@ -168,17 +193,11 @@ export function StepCronograma() {
                     type="button"
                     variant="outline"
                     onClick={addEvent}
-                    className="w-full border-dashed"
+                    className="w-full border-dashed h-11 border-amber-500/40 hover:bg-amber-500/10 text-amber-300"
                 >
                     <Plus className="w-4 h-4 mr-2" />
-                    Agregar Evento
+                    Agregar Etapa al Cronograma
                 </Button>
-            </div>
-
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                <p className="text-sm text-yellow-500">
-                    💡 <strong>Tip:</strong> El cronograma ayuda a tus invitados a planificar su llegada y saber qué esperar durante el evento.
-                </p>
             </div>
 
             <SaveStepButtons onNext={handleNext} />

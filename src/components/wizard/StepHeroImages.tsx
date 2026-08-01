@@ -1,47 +1,72 @@
 "use client";
 
+import { useState } from "react";
 import { useWizardStore } from "@/store/wizard-store";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
+import { Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepHeroImages() {
-    const { data, setData, nextStep, prevStep } = useWizardStore();
+    const { data, setData } = useWizardStore();
+    const [showInfo, setShowInfo] = useState(false);
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold mb-2">Fotos de Portada</h2>
-                <p className="text-muted-foreground">
-                    Estas son las imágenes de fondo principales que se verán al abrir la invitación.
+            <div className="text-center space-y-1">
+                <h2 className="text-2xl font-bold">Fotos de Portada y Fondo</h2>
+                <p className="text-muted-foreground text-sm">
+                    Imágenes de fondo principales que vestirán la presentación de tu tarjeta.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
+            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs overflow-hidden transition-all duration-200 shadow-sm max-w-2xl mx-auto">
+                <button
+                    type="button"
+                    onClick={() => setShowInfo(!showInfo)}
+                    className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+                >
+                    <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
+                        <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                        <span>¿Para qué sirven las Fotos de Portada y Fondo?</span>
+                    </div>
+                    <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                        {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                </button>
+
+                {showInfo && (
+                    <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                        Son las imágenes de fondo de la portada inicial. Te recomendamos cargar la versión optimizada para móviles (horizontal 16:9) y la versión optimizada para pantallas anchas de escritorio (vertical 9:16) para que se adapte perfectamente al dispositivo de cada invitado.
+                    </div>
+                )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 max-w-4xl mx-auto">
                 {/* Hero Background Image Desktop */}
-                <div className="space-y-2">
-                    <Label htmlFor="heroImagenFondoDesktop">Portada (Desktop - Vertical)</Label>
+                <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
+                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm">Portada Desktop (Vertical - 9:16)</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondoDesktop}
                         onImageUploaded={(url: string) => setData({ portadaImagenFondoDesktop: url })}
                         aspectRatio={9 / 16}
                     />
-                    <p className="text-xs text-muted-foreground">
-                        Esta imagen se verá en computadoras o pantallas anchas (panel izquierdo).
+                    <p className="text-xs text-muted-foreground leading-normal">
+                        Se verá en computadoras o pantallas anchas como panel lateral izquierdo de bienvenida.
                     </p>
                 </div>
 
                 {/* Hero Background Image Mobile */}
-                <div className="space-y-2">
-                    <Label htmlFor="heroImagenFondo">Portada (Mobile - Horizontal)</Label>
+                <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
+                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm">Portada Mobile (Horizontal - 16:9)</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondo}
                         onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
                         aspectRatio={16 / 9}
                     />
-                    <p className="text-xs text-muted-foreground">
-                        Esta imagen se verá en dispositivos móviles (celulares) como cabecera.
+                    <p className="text-xs text-muted-foreground leading-normal">
+                        Se verá en teléfonos celulares como cabecera o fondo de pantalla previa.
                     </p>
                 </div>
             </div>

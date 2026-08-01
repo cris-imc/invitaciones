@@ -1,15 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useWizardStore } from "@/store/wizard-store";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepPhrase() {
-    const { data, setData, nextStep, prevStep } = useWizardStore();
+    const { data, setData } = useWizardStore();
+    const [showInfo, setShowInfo] = useState(false);
 
     const tipo = data.type || "OTRO";
     const phraseHelp =
@@ -46,17 +47,40 @@ export function StepPhrase() {
 
     return (
         <div className="space-y-6">
-            <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Frase Personalizada</h2>
-                <p className="text-muted-foreground">
+            <div className="text-center space-y-1">
+                <h2 className="text-2xl font-bold">Frase Personalizada</h2>
+                <p className="text-muted-foreground text-sm">
                     {phraseHelp}
                 </p>
             </div>
 
-            <div className="space-y-4 bg-[var(--ink-2)] border-[var(--ink-2)] p-4 rounded-lg border">
+            {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
+            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs overflow-hidden transition-all duration-200 shadow-sm max-w-2xl mx-auto">
+                <button
+                    type="button"
+                    onClick={() => setShowInfo(!showInfo)}
+                    className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+                >
+                    <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
+                        <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                        <span>¿Cómo se muestra la Frase Personalizada?</span>
+                    </div>
+                    <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                        {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                </button>
+
+                {showInfo && (
+                    <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                        Esta frase o poema se desplegará como cita destacada en el cuerpo de la invitación. Podés redactar tu propio mensaje sentimental o elegir una de nuestras sugerencias predefinidas listas para usar.
+                    </div>
+                )}
+            </div>
+
+            <div className="space-y-4 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl max-w-2xl mx-auto">
                 <div className="flex items-center justify-between">
-                    <Label htmlFor="enablePhrase" className="text-lg font-medium">
-                        Habilitar Frase
+                    <Label htmlFor="enablePhrase" className="text-base font-semibold cursor-pointer">
+                        Habilitar Frase Personalizada
                     </Label>
                     <Switch
                         id="enablePhrase"
@@ -66,15 +90,15 @@ export function StepPhrase() {
                 </div>
 
                 {data.frasePersonalizadaHabilitada && (
-                    <div className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                         <div className="space-y-2">
-                            <Label htmlFor="phraseText">Tu Frase</Label>
+                            <Label htmlFor="phraseText" className="text-sm font-medium">Tu Frase</Label>
                             <Textarea
                                 id="phraseText"
                                 placeholder={phrasePlaceholder}
                                 value={data.frasePersonalizadaTexto || ""}
                                 onChange={(e) => setData({ frasePersonalizadaTexto: e.target.value })}
-                                className="min-h-[100px] resize-none text-lg"
+                                className="min-h-[110px] resize-none text-base bg-[var(--ink)] border border-white/15 rounded-xl p-3"
                                 maxLength={300}
                             />
                             <p className="text-xs text-muted-foreground text-right">
@@ -83,14 +107,15 @@ export function StepPhrase() {
                         </div>
                         
                         {suggestedPhrases.length > 0 && (
-                            <div className="space-y-2 mt-4 pt-4 border-t border-border">
-                                <Label className="text-sm font-semibold text-muted-foreground">Sugerencias (haz clic para usar):</Label>
+                            <div className="space-y-2 pt-2 border-t border-white/10">
+                                <Label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Sugerencias (hacé clic para aplicar):</Label>
                                 <div className="grid gap-2">
                                     {suggestedPhrases.map((phrase, idx) => (
                                         <button
                                             key={idx}
+                                            type="button"
                                             onClick={() => setData({ frasePersonalizadaTexto: phrase })}
-                                            className="text-left text-sm p-3 rounded-md bg-background/50 hover:bg-muted border border-border text-foreground transition-colors"
+                                            className="text-left text-xs p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-colors"
                                         >
                                             &quot;{phrase}&quot;
                                         </button>

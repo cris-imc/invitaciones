@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Lock } from "lucide-react";
+import { CalendarIcon, Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { isEventDateLocked } from "@/lib/expiration";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -19,6 +20,7 @@ import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepBasicInfo() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
+    const [showInfo, setShowInfo] = useState(false);
 
     const form = useForm<z.infer<typeof basicInfoSchema>>({
         resolver: zodResolver(basicInfoSchema),
@@ -42,9 +44,32 @@ export function StepBasicInfo() {
 
     return (
         <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="text-center space-y-1">
                 <h2 className="text-2xl font-bold">Información Básica</h2>
-                <p className="text-muted-foreground">Contanos los detalles principales del evento.</p>
+                <p className="text-muted-foreground text-sm">Contanos los detalles principales del evento.</p>
+            </div>
+
+            {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
+            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs overflow-hidden transition-all duration-200 shadow-sm max-w-2xl mx-auto">
+                <button
+                    type="button"
+                    onClick={() => setShowInfo(!showInfo)}
+                    className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+                >
+                    <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
+                        <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                        <span>¿Para qué sirve la Información Básica?</span>
+                    </div>
+                    <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                        {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                </button>
+
+                {showInfo && (
+                    <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                        Esta información establece los cimientos de tu invitación: el nombre del evento, la fecha de celebración y los nombres de los agasajados. Con estos datos se calcula la cuenta regresiva, se encabeza la portada y se organiza la agenda de tus invitados.
+                    </div>
+                )}
             </div>
 
             <Form {...form}>

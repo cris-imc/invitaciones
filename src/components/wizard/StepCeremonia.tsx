@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { Church, MapPin, Clock } from "lucide-react";
+import { Church, MapPin, Clock, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepCeremonia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
+    const [showInfo, setShowInfo] = useState(false);
 
     const form = useForm<any>({
         resolver: zodResolver(ceremoniaSchema),
@@ -36,7 +38,7 @@ export function StepCeremonia() {
 
     return (
         <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="text-center">
                 <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center mb-3">
                     <Church className="w-6 h-6 text-accent" />
                 </div>
@@ -44,6 +46,29 @@ export function StepCeremonia() {
                 <p className="text-muted-foreground text-sm max-w-md mx-auto">
                     Si la ceremonia o el matrimonio civil se realiza en una ubicación o fecha/hora distinta al salón de fiesta, activa esta sección.
                 </p>
+            </div>
+
+            {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
+            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs overflow-hidden transition-all duration-200 shadow-sm max-w-2xl mx-auto">
+                <button
+                    type="button"
+                    onClick={() => setShowInfo(!showInfo)}
+                    className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+                >
+                    <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
+                        <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                        <span>¿Cuándo activar la sección de Ceremonia?</span>
+                    </div>
+                    <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                        {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                </button>
+
+                {showInfo && (
+                    <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                        Activá esta sección únicamente si la misa, bendición de anillos o firma en el registro civil ocurre en una ubicación, iglesia o templo distinto del salón donde será la fiesta principal. Podrás ingresar la dirección, horario propio y mapa interactivo.
+                    </div>
+                )}
             </div>
 
             <Form {...form}>

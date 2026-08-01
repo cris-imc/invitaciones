@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { useToast } from "@/components/ui/Toast";
-import { Trash2, Plus, Pencil, Lock } from "lucide-react";
+import { Trash2, Plus, Pencil, Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
@@ -21,6 +21,7 @@ export function StepTrivia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
     const { showToast } = useToast();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
+    const [showTriviaInfo, setShowTriviaInfo] = useState(false);
 
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
     const isEditing = Boolean(data.id);
@@ -79,12 +80,35 @@ export function StepTrivia() {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Quiz/Trivia</h2>
-                <p className="text-muted-foreground">
-                    Crea un quiz divertido para que tus invitados conozcan más sobre {data.type === 'CASAMIENTO' ? 'la pareja' : 'la quinceañera'}
+        <div className="space-y-6">
+            <div className="text-center space-y-1">
+                <h2 className="text-2xl font-bold">Quiz / Trivia</h2>
+                <p className="text-muted-foreground text-sm">
+                    Crea un juego divertido para que tus invitados demuestren cuánto conocen sobre {data.type === 'CASAMIENTO' ? 'la pareja' : 'la quinceañera'}
                 </p>
+            </div>
+
+            {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
+            <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs overflow-hidden transition-all duration-200 shadow-sm max-w-2xl mx-auto">
+                <button
+                    type="button"
+                    onClick={() => setShowTriviaInfo(!showTriviaInfo)}
+                    className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+                >
+                    <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
+                        <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                        <span>¿Cómo funciona el Quiz o Juego de Trivia?</span>
+                    </div>
+                    <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                        {showTriviaInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                </button>
+
+                {showTriviaInfo && (
+                    <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
+                        El juego de Trivia permite a tus invitados responder preguntas divertidas sobre {data.type === 'CASAMIENTO' ? 'la pareja' : data.type === 'QUINCE_ANOS' ? 'la quinceañera' : 'el agasajado'} directamente desde la tarjeta digital. Podés cargar preguntas con opciones múltiples, marcar la respuesta correcta y desafiar a tus amigos y familiares a demostrar cuánto los conocen durante la fiesta.
+                    </div>
+                )}
             </div>
 
             <div className="space-y-4">
