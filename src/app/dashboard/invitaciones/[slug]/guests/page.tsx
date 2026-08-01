@@ -71,6 +71,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         invitationId={invitation.id}
         slug={slug}
         regaloHabilitado={!!invitation.regaloHabilitado}
+        pagoTarjetaHabilitado={!!invitation.pagoTarjetaHabilitado}
         regaloMonto={invitation.regaloMonto}
         precioAdolescente={invitation.precioAdolescente}
         precioNino={invitation.precioNino}

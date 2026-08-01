@@ -59,11 +59,13 @@ interface Guest {
   type: "INDIVIDUAL" | "FAMILY";
   expectedCount: number;
   expectedAdults?: number;
+  expectedTeens?: number;
   expectedChildren?: number;
   uniqueToken: string;
   status: "PENDING" | "CONFIRMED" | "DECLINED";
   attendingCount: number;
   attendingAdults: number;
+  attendingTeens: number;
   attendingChildren: number;
   isExempt: boolean;
   invitationId: string;
@@ -71,11 +73,16 @@ interface Guest {
 
 interface GuestManagerProps {
   slug: string;
+  invitationId?: string;
   initialRsvpEnabled: boolean;
   planTier?: string;
+  pagoTarjetaHabilitado?: boolean;
+  pagoTarjetaMonto?: number | null;
+  precioAdolescente?: number | null;
+  precioNino?: number | null;
 }
 
-export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManagerProps) {
+export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino }: GuestManagerProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
@@ -91,9 +98,30 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
     "INDIVIDUAL",
   );
   const [editGuestAdultCount, setEditGuestAdultCount] = useState(2);
+  const [editGuestTeenCount, setEditGuestTeenCount] = useState(0);
   const [editGuestChildCount, setEditGuestChildCount] = useState(0);
   const [editGuestIsExempt, setEditGuestIsExempt] = useState(false);
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+
+  // Prices state (local, updated after saving via modal)
+  const [currentPrecioAdolescente, setCurrentPrecioAdolescente] = useState<number | null>(initPrecioAdolescente ?? null);
+  const [currentPrecioNino, setCurrentPrecioNino] = useState<number | null>(initPrecioNino ?? null);
+  const [currentAdultPrice, setCurrentAdultPrice] = useState<number | null>(pagoTarjetaMonto ?? null);
+
+  // Price-set modal state
+  const [priceModal, setPriceModal] = useState<{ open: boolean; category: 'adult' | 'teen' | 'child'; targetForm: 'new' | 'edit' }>({ open: false, category: 'adult', targetForm: 'new' });
+  const [priceModalValue, setPriceModalValue] = useState("");
+  const [isSavingPrice, setIsSavingPrice] = useState(false);
+
+  // ADD FORM — category switches
+  const [newAdultsEnabled, setNewAdultsEnabled] = useState(true);
+  const [newTeensEnabled, setNewTeensEnabled] = useState((initPrecioAdolescente ?? 0) > 0);
+  const [newChildrenEnabled, setNewChildrenEnabled] = useState((initPrecioNino ?? 0) > 0);
+
+  // EDIT FORM — category switches
+  const [editAdultsEnabled, setEditAdultsEnabled] = useState(true);
+  const [editTeensEnabled, setEditTeensEnabled] = useState(false);
+  const [editChildrenEnabled, setEditChildrenEnabled] = useState(false);
 
   const itemsPerPage = 3;
   const { showToast } = useToast();
@@ -104,9 +132,70 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
     "INDIVIDUAL",
   );
   const [newGuestAdultCount, setNewGuestAdultCount] = useState(2);
+  const [newGuestTeenCount, setNewGuestTeenCount] = useState(0);
   const [newGuestChildCount, setNewGuestChildCount] = useState(0);
   const [newGuestIsExempt, setNewGuestIsExempt] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Helper: attempt to toggle a category switch — open price modal if no price set
+  const tryToggle = (
+    category: 'adult' | 'teen' | 'child',
+    currentEnabled: boolean,
+    setEnabled: (v: boolean) => void,
+    form: 'new' | 'edit'
+  ) => {
+    if (currentEnabled) { setEnabled(false); return; }
+    const price = category === 'adult' ? currentAdultPrice : category === 'teen' ? currentPrecioAdolescente : currentPrecioNino;
+    if (!price || price <= 0) {
+      // No price configured — open modal
+      setPriceModalValue("");
+      setPriceModal({ open: true, category, targetForm: form });
+    } else {
+      setEnabled(true);
+    }
+  };
+
+  // Save price from modal
+  const handleSavePrice = async () => {
+    const val = parseFloat(priceModalValue);
+    if (isNaN(val) || val <= 0) { showToast("Ingresá un monto válido", "error"); return; }
+    setIsSavingPrice(true);
+    try {
+      const body: Record<string, number> = {};
+      if (priceModal.category === 'adult') body.regaloMonto = val;
+      if (priceModal.category === 'teen') body.precioAdolescente = val;
+      if (priceModal.category === 'child') body.precioNino = val;
+
+      const res = await fetch(`/api/invitations/${slug}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error('Error al guardar precio');
+
+      // Update local price state
+      if (priceModal.category === 'adult') setCurrentAdultPrice(val);
+      if (priceModal.category === 'teen') setCurrentPrecioAdolescente(val);
+      if (priceModal.category === 'child') setCurrentPrecioNino(val);
+
+      // Enable the switch in the target form
+      if (priceModal.targetForm === 'new') {
+        if (priceModal.category === 'adult') setNewAdultsEnabled(true);
+        if (priceModal.category === 'teen') setNewTeensEnabled(true);
+        if (priceModal.category === 'child') setNewChildrenEnabled(true);
+      } else {
+        if (priceModal.category === 'adult') setEditAdultsEnabled(true);
+        if (priceModal.category === 'teen') setEditTeensEnabled(true);
+        if (priceModal.category === 'child') setEditChildrenEnabled(true);
+      }
+      setPriceModal(m => ({ ...m, open: false }));
+      showToast("Precio guardado correctamente", "success");
+    } catch {
+      showToast("Error al guardar el precio", "error");
+    } finally {
+      setIsSavingPrice(false);
+    }
+  };
 
   useEffect(() => {
     fetchGuests();
@@ -130,6 +219,10 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
     e.preventDefault();
     setIsSubmitting(true);
 
+    const effectiveAdults = newAdultsEnabled ? newGuestAdultCount : 0;
+    const effectiveTeens  = newTeensEnabled  ? newGuestTeenCount  : 0;
+    const effectiveChildren = newChildrenEnabled ? newGuestChildCount : 0;
+
     try {
       const res = await fetch(`/api/invitations/${slug}/guests`, {
         method: "POST",
@@ -139,10 +232,11 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
           type: newGuestType,
           expectedCount:
             newGuestType === "FAMILY"
-              ? newGuestAdultCount + newGuestChildCount
+              ? Math.max(1, effectiveAdults + effectiveTeens + effectiveChildren)
               : 1,
-          expectedAdults: newGuestType === "FAMILY" ? newGuestAdultCount : 1,
-          expectedChildren: newGuestType === "FAMILY" ? newGuestChildCount : 0,
+          expectedAdults: newGuestType === "FAMILY" ? effectiveAdults : 1,
+          expectedTeens: newGuestType === "FAMILY" ? effectiveTeens : 0,
+          expectedChildren: newGuestType === "FAMILY" ? effectiveChildren : 0,
           isExempt: newGuestIsExempt,
         }),
       });
@@ -152,6 +246,7 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
         setGuests([newGuest, ...guests]);
         setNewGuestName("");
         setNewGuestAdultCount(2);
+        setNewGuestTeenCount(0);
         setNewGuestChildCount(0);
         setNewGuestIsExempt(false);
         showToast("Invitado agregado exitosamente", "success");
@@ -170,10 +265,15 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
     setGuestToEdit(guest);
     setEditGuestName(guest.name);
     setEditGuestType(guest.type);
-    setEditGuestAdultCount(
-      guest.expectedAdults ?? (guest.type === "FAMILY" ? 2 : 1),
-    );
-    setEditGuestChildCount(guest.expectedChildren ?? 0);
+    const adults = guest.expectedAdults ?? (guest.type === "FAMILY" ? 2 : 1);
+    const teens  = guest.expectedTeens  ?? 0;
+    const children = guest.expectedChildren ?? 0;
+    setEditGuestAdultCount(adults);
+    setEditGuestTeenCount(teens);
+    setEditGuestChildCount(children);
+    setEditAdultsEnabled(adults > 0);
+    setEditTeensEnabled(teens > 0);
+    setEditChildrenEnabled(children > 0);
     setEditGuestIsExempt(guest.isExempt ?? false);
   };
 
@@ -183,9 +283,12 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
     setIsEditSubmitting(true);
 
     try {
+      const effectiveAdults   = editAdultsEnabled   ? editGuestAdultCount : 0;
+      const effectiveTeens    = editTeensEnabled    ? editGuestTeenCount  : 0;
+      const effectiveChildren = editChildrenEnabled ? editGuestChildCount : 0;
       const expectedCount =
         editGuestType === "FAMILY"
-          ? editGuestAdultCount + editGuestChildCount
+          ? Math.max(1, effectiveAdults + effectiveTeens + effectiveChildren)
           : 1;
       const res = await fetch(`/api/guests/${guestToEdit.id}`, {
         method: "PUT",
@@ -194,9 +297,10 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
           name: editGuestName,
           type: editGuestType,
           expectedCount: expectedCount,
-          expectedAdults: editGuestType === "FAMILY" ? editGuestAdultCount : 1,
+          expectedAdults: editGuestType === "FAMILY" ? effectiveAdults : 1,
+          expectedTeens: editGuestType === "FAMILY" ? effectiveTeens : 0,
           expectedChildren:
-            editGuestType === "FAMILY" ? editGuestChildCount : 0,
+            editGuestType === "FAMILY" ? effectiveChildren : 0,
           isExempt: editGuestIsExempt,
         }),
       });
@@ -373,65 +477,82 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
               </div>
 
               {newGuestType === "FAMILY" && (
-                <div className="space-y-4 pt-2">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="adultCount"
-                      className="text-sm text-muted-foreground"
-                    >
-                      Adultos esperados
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="adultCount"
-                        type="number"
-                        min="1"
-                        max="10"
-                        value={newGuestAdultCount}
-                        onChange={(e) =>
-                          setNewGuestAdultCount(parseInt(e.target.value) || 1)
-                        }
+                <div className="space-y-3 pt-2">
+                  {/* ADULTOS */}
+                  <div className={`rounded-lg border p-3 transition-opacity ${!newAdultsEnabled ? "opacity-50" : ""}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm font-medium flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        Adultos
+                        {currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                      </Label>
+                      <Switch
+                        checked={newAdultsEnabled}
+                        onCheckedChange={() => tryToggle('adult', newAdultsEnabled, setNewAdultsEnabled, 'new')}
                       />
                     </div>
+                    {newAdultsEnabled && (
+                      <Input id="adultCount" type="number" min="1" max="20" value={newGuestAdultCount}
+                        onChange={(e) => setNewGuestAdultCount(parseInt(e.target.value) || 1)} />
+                    )}
                   </div>
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="childCount"
-                      className="text-sm text-muted-foreground"
-                    >
-                      Niños esperados
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="childCount"
-                        type="number"
-                        min="0"
-                        max="10"
-                        value={newGuestChildCount}
-                        onChange={(e) =>
-                          setNewGuestChildCount(parseInt(e.target.value) || 0)
-                        }
+
+                  {/* ADOLESCENTES */}
+                  <div className={`rounded-lg border p-3 transition-opacity ${!newTeensEnabled ? "opacity-50" : ""}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm font-medium flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        Adolescentes
+                        {currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                      </Label>
+                      <Switch
+                        checked={newTeensEnabled}
+                        onCheckedChange={() => tryToggle('teen', newTeensEnabled, setNewTeensEnabled, 'new')}
                       />
                     </div>
+                    {newTeensEnabled && (
+                      <Input id="teenCount" type="number" min="0" max="20" value={newGuestTeenCount}
+                        onChange={(e) => setNewGuestTeenCount(parseInt(e.target.value) || 0)} />
+                    )}
+                  </div>
+
+                  {/* NIÑOS */}
+                  <div className={`rounded-lg border p-3 transition-opacity ${!newChildrenEnabled ? "opacity-50" : ""}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm font-medium flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        Niños
+                        {currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                      </Label>
+                      <Switch
+                        checked={newChildrenEnabled}
+                        onCheckedChange={() => tryToggle('child', newChildrenEnabled, setNewChildrenEnabled, 'new')}
+                      />
+                    </div>
+                    {newChildrenEnabled && (
+                      <Input id="childCount" type="number" min="0" max="20" value={newGuestChildCount}
+                        onChange={(e) => setNewGuestChildCount(parseInt(e.target.value) || 0)} />
+                    )}
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center space-x-2 pt-2">
-                <Switch
-                  id="newGuestIsExempt"
-                  checked={newGuestIsExempt}
-                  onCheckedChange={setNewGuestIsExempt}
-                />
-                <Label
-                  htmlFor="newGuestIsExempt"
-                  className="text-sm text-muted-foreground"
-                >
-                  Exento de pago
-                </Label>
-              </div>
+
+              {pagoTarjetaHabilitado && (
+                <div className="flex items-center space-x-2 pt-2">
+                  <Switch
+                    id="newGuestIsExempt"
+                    checked={newGuestIsExempt}
+                    onCheckedChange={setNewGuestIsExempt}
+                  />
+                  <Label
+                    htmlFor="newGuestIsExempt"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Exento de pago
+                  </Label>
+                </div>
+              )}
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Agregando..." : "Agregar a la lista"}
@@ -673,67 +794,84 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
             </div>
 
             {editGuestType === "FAMILY" && (
-              <div className="space-y-4 pt-2">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="editAdultCount"
-                    className="text-sm text-muted-foreground"
-                  >
-                    Adultos esperados
-                  </Label>
-                  <div className="flex items-center space-x-2">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="editAdultCount"
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={editGuestAdultCount}
-                      onChange={(e) =>
-                        setEditGuestAdultCount(parseInt(e.target.value) || 1)
-                      }
+              <div className="space-y-3 pt-2">
+                {/* ADULTOS */}
+                <div className={`rounded-lg border p-3 transition-opacity ${!editAdultsEnabled ? "opacity-50" : ""}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Adultos
+                      {currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                    </Label>
+                    <Switch
+                      checked={editAdultsEnabled}
+                      onCheckedChange={() => tryToggle('adult', editAdultsEnabled, setEditAdultsEnabled, 'edit')}
                     />
                   </div>
+                  {editAdultsEnabled && (
+                    <Input id="editAdultCount" type="number" min="1" max="20" value={editGuestAdultCount}
+                      onChange={(e) => setEditGuestAdultCount(parseInt(e.target.value) || 1)} />
+                  )}
                 </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="editChildCount"
-                    className="text-sm text-muted-foreground"
-                  >
-                    Niños esperados
-                  </Label>
-                  <div className="flex items-center space-x-2">
-                    <UserPlus className="w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="editChildCount"
-                      type="number"
-                      min="0"
-                      max="10"
-                      value={editGuestChildCount}
-                      onChange={(e) =>
-                        setEditGuestChildCount(parseInt(e.target.value) || 0)
-                      }
+
+                {/* ADOLESCENTES */}
+                <div className={`rounded-lg border p-3 transition-opacity ${!editTeensEnabled ? "opacity-50" : ""}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Adolescentes
+                      {currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                    </Label>
+                    <Switch
+                      checked={editTeensEnabled}
+                      onCheckedChange={() => tryToggle('teen', editTeensEnabled, setEditTeensEnabled, 'edit')}
                     />
                   </div>
+                  {editTeensEnabled && (
+                    <Input id="editTeenCount" type="number" min="0" max="20" value={editGuestTeenCount}
+                      onChange={(e) => setEditGuestTeenCount(parseInt(e.target.value) || 0)} />
+                  )}
+                </div>
+
+                {/* NIÑOS */}
+                <div className={`rounded-lg border p-3 transition-opacity ${!editChildrenEnabled ? "opacity-50" : ""}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Niños
+                      {currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                    </Label>
+                    <Switch
+                      checked={editChildrenEnabled}
+                      onCheckedChange={() => tryToggle('child', editChildrenEnabled, setEditChildrenEnabled, 'edit')}
+                    />
+                  </div>
+                  {editChildrenEnabled && (
+                    <Input id="editChildCount" type="number" min="0" max="20" value={editGuestChildCount}
+                      onChange={(e) => setEditGuestChildCount(parseInt(e.target.value) || 0)} />
+                  )}
                 </div>
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-2">
-              <div className="space-y-0.5">
-                <Label htmlFor="edit-exempt" className="font-medium">
-                  Exento de pago
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  El invitado no tendrá que abonar tarjeta.
-                </p>
+
+            {pagoTarjetaHabilitado && (
+              <div className="flex items-center justify-between pt-2">
+                <div className="space-y-0.5">
+                  <Label htmlFor="edit-exempt" className="font-medium">
+                    Exento de pago
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    El invitado no tendrá que abonar tarjeta.
+                  </p>
+                </div>
+                <Switch
+                  id="edit-exempt"
+                  checked={editGuestIsExempt}
+                  onCheckedChange={setEditGuestIsExempt}
+                />
               </div>
-              <Switch
-                id="edit-exempt"
-                checked={editGuestIsExempt}
-                onCheckedChange={setEditGuestIsExempt}
-              />
-            </div>
+            )}
 
             <DialogFooter className="pt-4">
               <Button
@@ -748,6 +886,40 @@ export function GuestManager({ slug, initialRsvpEnabled, planTier }: GuestManage
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Price-set Modal */}
+      <Dialog open={priceModal.open} onOpenChange={(open) => !open && setPriceModal(m => ({ ...m, open: false }))}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {priceModal.category === 'adult' ? '💰 Precio Adulto' : priceModal.category === 'teen' ? '🎓 Precio Adolescente' : '👶 Precio Niño'}
+            </DialogTitle>
+            <DialogDescription>
+              No hay precio configurado para esta categoría. Ingresá el monto para habilitarla.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-3">
+            <Label className="text-sm mb-2 block">Monto ($)</Label>
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Ej: 5000"
+              value={priceModalValue}
+              onChange={(e) => setPriceModalValue(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setPriceModal(m => ({ ...m, open: false }))} disabled={isSavingPrice}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSavePrice} disabled={isSavingPrice}>
+              {isSavingPrice ? "Guardando..." : "Guardar y Habilitar"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

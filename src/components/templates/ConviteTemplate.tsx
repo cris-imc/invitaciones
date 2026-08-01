@@ -316,19 +316,21 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
   const isPreview = !guest;
   const rsvpEnabled = Boolean(invitation.rsvpEnabled ?? invitation.confirmacionHabilitada ?? true);
-  const paymentEnabled = Boolean(invitation.regaloHabilitado) || isPreview;
-  const paymentAmount  = Number(invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined);
-  const guestPayStatus = (guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID";
 
   const regaloHabilitado = Boolean(invitation.regaloHabilitado);
   const pagoTarjetaHabilitado = Boolean(invitation.pagoTarjetaHabilitado);
   const showGiftSection = regaloHabilitado || pagoTarjetaHabilitado;
   const bothAccounts = regaloHabilitado && pagoTarjetaHabilitado;
 
+  // PAGOS Y COBROS DE TARJETAS SOLO ACTIVOS SI PAGO DE TARJETAS ESTÁ HABILITADO
+  const paymentEnabled = pagoTarjetaHabilitado;
+  const paymentAmount  = paymentEnabled ? (Number((invitation as any).pagoTarjetaMonto ?? invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined)) : undefined;
+  const guestPayStatus = paymentEnabled ? ((guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID") : undefined;
+
   const showBankDetails = showGiftSection && Boolean(
     invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || 
     invitation.pagoTarjetaCbu || invitation.pagoTarjetaAlias || invitation.pagoTarjetaTitular || 
-    paymentAmount
+    paymentAmount || regaloHabilitado
   );
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
@@ -710,7 +712,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                     {/* Tarjeta 1: Pago de Tarjetas */}
                     {pagoTarjetaHabilitado && (
                       <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/20 shadow-sm space-y-3">
-                        <div className="flex items-center gap-2 font-bold text-amber-300 text-base border-b border-white/10 pb-2.5">
+                        <div className="flex items-center gap-2 font-semibold text-white/80 text-sm border-b border-white/10 pb-2">
                           <span>💳</span>
                           <span>{String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases")}</span>
                         </div>
@@ -737,7 +739,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                     {/* Tarjeta 2: Regalos */}
                     {regaloHabilitado && (
                       <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/20 shadow-sm space-y-3">
-                        <div className="flex items-center gap-2 font-bold text-amber-300 text-base border-b border-white/10 pb-2.5">
+                        <div className="flex items-center gap-2 font-semibold text-white/80 text-sm border-b border-white/10 pb-2">
                           <span>🎁</span>
                           <span>{String((invitation as any).regaloTitulo || "Regalos del Evento")}</span>
                         </div>
@@ -765,33 +767,52 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               </>
             ) : (
               <>
-                <p className="t-kicker">Datos Bancarios</p>
-                <h2>Cuenta de Transferencia</h2>
-                <p style={{ opacity: 0.8, marginBottom: "20px" }} className="text-sm max-w-xl">
-                  {String((invitation as any).pagoTarjetaMensaje || (invitation as any).regaloMensaje || "Esta cuenta se utilizará tanto para el pago/confirmación de pases como para quienes deseen realizar un regalo.")}
-                </p>
-                {showBankDetails && (
-                  <div className="w-full max-w-lg text-left mt-4">
-                    <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/20 shadow-sm space-y-3">
-                      <div className="flex items-center gap-2 font-bold text-amber-300 text-base border-b border-white/10 pb-2.5">
-                        <span>💳</span>
-                        <span>Datos de Transferencia</span>
-                      </div>
-                      {Boolean((invitation as any).pagoTarjetaBanco || (invitation as any).regaloBanco) && (
-                        <InfoRow label="BANCO" value={String((invitation as any).pagoTarjetaBanco || (invitation as any).regaloBanco)} />
+                {(() => {
+                  const isTarjetaActive = pagoTarjetaHabilitado;
+                  const activeBank = isTarjetaActive ? {
+                    titulo: String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    mensaje: String((invitation as any).pagoTarjetaMensaje || ""),
+                    banco: String((invitation as any).pagoTarjetaBanco || ""),
+                    cbu: String((invitation as any).pagoTarjetaCbu || ""),
+                    alias: String((invitation as any).pagoTarjetaAlias || ""),
+                    titular: String((invitation as any).pagoTarjetaTitular || ""),
+                  } : {
+                    titulo: String((invitation as any).regaloTitulo || "Regalos del Evento"),
+                    mensaje: String((invitation as any).regaloMensaje || ""),
+                    banco: String((invitation as any).regaloBanco || ""),
+                    cbu: String((invitation as any).regaloCbu || ""),
+                    alias: String((invitation as any).regaloAlias || ""),
+                    titular: String((invitation as any).regaloTitular || ""),
+                  };
+
+                  return (
+                    <>
+                      <p className="t-kicker">Datos Bancarios</p>
+                      <h2>{activeBank.titulo}</h2>
+                      <p style={{ opacity: 0.8, marginBottom: "20px" }} className="text-sm max-w-xl">
+                        {activeBank.mensaje || (isTarjetaActive ? "Cuenta para el pago de tarjetas y pases de la fiesta." : "Esta cuenta se utilizará exclusivamente para quienes deseen realizar un regalo.")}
+                      </p>
+                      {showBankDetails && (
+                        <div className="w-full max-w-lg text-left mt-4">
+                          <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/20 shadow-sm space-y-1">
+                            {Boolean(activeBank.banco) && (
+                              <InfoRow label="BANCO" value={activeBank.banco} />
+                            )}
+                            {Boolean(activeBank.cbu) && (
+                              <CopyField label="CBU / CVU" value={activeBank.cbu} />
+                            )}
+                            {Boolean(activeBank.alias) && (
+                              <CopyField label="ALIAS" value={activeBank.alias} />
+                            )}
+                            {Boolean(activeBank.titular) && (
+                              <InfoRow label="TITULAR" value={activeBank.titular} />
+                            )}
+                          </div>
+                        </div>
                       )}
-                      {Boolean((invitation as any).pagoTarjetaCbu || (invitation as any).regaloCbu) && (
-                        <CopyField label="CBU / CVU" value={String((invitation as any).pagoTarjetaCbu || (invitation as any).regaloCbu)} />
-                      )}
-                      {Boolean((invitation as any).pagoTarjetaAlias || (invitation as any).regaloAlias) && (
-                        <CopyField label="ALIAS" value={String((invitation as any).pagoTarjetaAlias || (invitation as any).regaloAlias)} />
-                      )}
-                      {Boolean((invitation as any).pagoTarjetaTitular || (invitation as any).regaloTitular) && (
-                        <InfoRow label="TITULAR" value={String((invitation as any).pagoTarjetaTitular || (invitation as any).regaloTitular)} />
-                      )}
-                    </div>
-                  </div>
-                )}
+                    </>
+                  );
+                })()}
               </>
             )}
           </SectionWrapper>

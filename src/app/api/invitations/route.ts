@@ -351,8 +351,8 @@ export async function PUT(request: NextRequest) {
 
         const body = await request.json();
 
-        // Generar nuevo slug si cambió el nombre del evento
-        const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+        // NUNCA regenerar el slug en actualizaciones — los links enviados a invitados deben ser permanentes.
+        // El slug solo se genera una vez al crear la invitación (POST).
 
         // Combinar fecha y hora correctamente preservando la zona horaria local
         let fechaEvento: Date;
@@ -410,7 +410,6 @@ export async function PUT(request: NextRequest) {
                 hora: body.hora || null,
                 mapUrl: body.mapUrl || null,
                 musicaUrl: body.musicaUrl || null,
-                slug, // Nuevo slug
                 templateTipo: body.templateTipo || 'ORIGINAL',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',

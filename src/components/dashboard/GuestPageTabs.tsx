@@ -14,6 +14,7 @@ interface Props {
   invitationId: string;
   slug: string;
   regaloHabilitado: boolean;
+  pagoTarjetaHabilitado?: boolean;
   regaloMonto: unknown;
   precioAdolescente?: unknown;
   precioNino: unknown;
@@ -21,13 +22,13 @@ interface Props {
   planTier: string;
 }
 
-export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier }: Props) {
+export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier }: Props) {
   const [tab, setTab] = useState<Tab>("invitados");
 
   const tabs: { id: Tab; label: string; primary?: boolean }[] = [
-    { id: "invitados", label: "Invitados & Pagos" },
+    { id: "invitados", label: pagoTarjetaHabilitado ? "Invitados & Pagos" : "Invitados" },
     { id: "canciones", label: "Música" },
-    ...(regaloHabilitado ? [{ id: "precio" as Tab, label: "Precio" }] : []),
+    ...(pagoTarjetaHabilitado ? [{ id: "precio" as Tab, label: "Precios Tarjetas" }] : []),
     { id: "agregar", label: "Gestionar invitados", primary: true },
     { id: "live" as Tab, label: "LIVE", primary: true },
   ];
@@ -131,7 +132,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
           <SongModerationPanel invitationId={invitationId} />
         </div>
       )}
-      {tab === "precio" && regaloHabilitado && (
+      {tab === "precio" && pagoTarjetaHabilitado && (
         <div className="bg-card border rounded-lg p-4 md:p-6 max-w-lg">
           <h2 className="text-xl font-semibold mb-4">Actualizar Precio de Tarjeta</h2>
           <p className="text-muted-foreground text-sm mb-6">
@@ -148,7 +149,16 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
         </div>
       )}
       {tab === "agregar" && (
-        <GuestManager slug={slug} initialRsvpEnabled={rsvpEnabled} planTier={planTier} />
+        <GuestManager
+          slug={slug}
+          invitationId={invitationId}
+          initialRsvpEnabled={rsvpEnabled}
+          planTier={planTier}
+          pagoTarjetaHabilitado={pagoTarjetaHabilitado}
+          pagoTarjetaMonto={Number(regaloMonto) || null}
+          precioAdolescente={precioAdolescente != null ? Number(precioAdolescente) : null}
+          precioNino={precioNino != null ? Number(precioNino) : null}
+        />
       )}
       {tab === "live" && (
         <div className="bg-card border rounded-lg p-4 md:p-6">

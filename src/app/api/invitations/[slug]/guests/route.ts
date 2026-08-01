@@ -93,6 +93,7 @@ export async function POST(
                 type: body.type || "INDIVIDUAL",
                 expectedCount: body.expectedCount || 1,
                 expectedAdults: body.expectedAdults,
+                expectedTeens: body.expectedTeens ?? 0,
                 expectedChildren: body.expectedChildren,
                 uniqueToken,
                 status: "PENDING",
