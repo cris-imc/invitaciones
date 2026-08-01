@@ -15,7 +15,7 @@ import { SaveStepButtons } from "./SaveStepButtons";
 export function StepCeremonia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
 
-    const form = useForm<z.infer<typeof ceremoniaSchema>>({
+    const form = useForm<any>({
         resolver: zodResolver(ceremoniaSchema),
         defaultValues: {
             ceremoniaHabilitada: data.ceremoniaHabilitada ?? false,

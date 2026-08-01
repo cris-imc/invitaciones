@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Lock } from "lucide-react";
+import { isEventDateLocked } from "@/lib/expiration";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -76,43 +77,62 @@ export function StepBasicInfo() {
                     <FormField
                         control={form.control}
                         name="fecha"
-                        render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                                <FormLabel>Fecha del Evento</FormLabel>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <FormControl>
-                                             <Button
-                                                variant={"outline"}
-                                                className={cn(
-                                                    "w-full pl-3 text-left font-normal bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl hover:bg-[var(--ink-2)]/80 hover:text-[var(--on-ink)]",
-                                                    !field.value && "text-white/30"
-                                                )}
-                                            >
-                                                {field.value ? (
-                                                    format(field.value, "PPP", { locale: es })
-                                                ) : (
-                                                    <span>Selecciona una fecha</span>
-                                                )}
-                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            disabled={(date) =>
-                                                date < new Date()
-                                            }
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        render={({ field }) => {
+                            const isDateLocked = data.fecha ? isEventDateLocked(data.fecha) : false;
+
+                            return (
+                                <FormItem className="flex flex-col">
+                                    <FormLabel className="flex items-center justify-between">
+                                        <span>Fecha del Evento</span>
+                                        {isDateLocked && (
+                                            <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 font-semibold">
+                                                <Lock className="w-3 h-3" /> Bloqueada (30d)
+                                            </span>
+                                        )}
+                                    </FormLabel>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                 <Button
+                                                    variant={"outline"}
+                                                    disabled={isDateLocked}
+                                                    className={cn(
+                                                        "w-full pl-3 text-left font-normal bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl hover:bg-[var(--ink-2)]/80 hover:text-[var(--on-ink)] disabled:opacity-60 disabled:cursor-not-allowed",
+                                                        !field.value && "text-white/30"
+                                                    )}
+                                                >
+                                                    {field.value ? (
+                                                        format(field.value, "PPP", { locale: es })
+                                                    ) : (
+                                                        <span>Selecciona una fecha</span>
+                                                    )}
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        {!isDateLocked && (
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    disabled={(date) =>
+                                                        date < new Date()
+                                                    }
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        )}
+                                    </Popover>
+                                    {isDateLocked && (
+                                        <p className="text-xs text-amber-600 dark:text-amber-400">
+                                            Fecha bloqueada por seguridad. Faltan 30 días o menos para la fecha del evento.
+                                        </p>
+                                    )}
+                                    <FormMessage />
+                                </FormItem>
+                            );
+                        }}
                     />
 
                     <FormField

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { auth } from '@/auth';
 import { checkPlanLimits } from '@/lib/plan-limits';
 import type { PlanTier } from '@/lib/plan-limits';
+import { checkAndCleanupIfExpired, isEventDateLocked } from '@/lib/expiration-server';
 
 // GET - Obtener invitaciones del usuario o invitación pública por slug
 export async function GET(request: NextRequest) {
@@ -356,8 +357,17 @@ export async function PUT(request: NextRequest) {
 
         const existingInvitation = await prisma.invitation.findUnique({
             where: { id },
-            select: { regaloMonto: true }
+            select: { regaloMonto: true, fechaEvento: true }
         });
+
+        if (existingInvitation && fechaEvento && fechaEvento.getTime() !== new Date(existingInvitation.fechaEvento).getTime()) {
+            if (isEventDateLocked(existingInvitation.fechaEvento)) {
+                return NextResponse.json(
+                    { error: 'La fecha del evento no se puede modificar cuando faltan 30 días o menos por motivos de seguridad.' },
+                    { status: 400 }
+                );
+            }
+        }
 
         // Parse new regalo monto
         const newRegaloMonto = body.regaloMonto !== undefined && body.regaloMonto !== null 

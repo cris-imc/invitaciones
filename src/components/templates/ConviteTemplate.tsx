@@ -11,6 +11,7 @@ import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { MusicPlayer } from "@/components/invitation/MusicPlayer";
 import { Clock, MapPin, Trophy, Star, ThumbsUp, Users } from "lucide-react";
+import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
@@ -45,8 +46,6 @@ interface ConviteTemplateProps {
     uniqueToken: string;
     status: string;
     attendingCount: number;
-    attendingAdults?: number;
-    attendingChildren?: number;
     isExempt?: boolean;
     paymentStatus: string;
     expectedCount: number;
@@ -89,6 +88,7 @@ interface QuizQuestion {
   pregunta: string;
   opciones: string[];
   respuestaCorrecta?: number;
+  correcta?: number;
 }
 
 function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string; tipo?: string }) {
@@ -298,7 +298,8 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
   const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
-  const allPhotos = [...new Set([...galeria, ...albumFotos])];
+  const liveFotos = (invitation.liveSession as { items?: { fileUrl: string }[] } | null)?.items?.map((i) => i.fileUrl) ?? [];
+  const allPhotos = [...new Set([...galeria, ...albumFotos, ...liveFotos].filter(Boolean))];
 
   const cronograma: CronoItem[] = safeJson<CronoItem[]>(String(invitation.cronogramaEventos ?? ""), []);
 
@@ -337,6 +338,73 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
     : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio 
         ? `${invitation.nombreNovia} & ${invitation.nombreNovio}` 
         : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+
+  const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
+  const eventStatus = getEventStatus(fechaEventoDate);
+  const expirationDate = getInvitationExpirationDate(fechaEventoDate);
+  const expirationDateStr = expirationDate.toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
+
+  const liveItems = (invitation.liveSession as { items?: { fileUrl: string; type?: string }[] } | null)?.items ?? [];
+  const livePhotos: string[] = liveItems
+    .filter((item) => item.fileUrl && (item.type === "PHOTO" || !item.type || item.fileUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)))
+    .map((item) => item.fileUrl);
+
+  if (eventStatus === "POST_EVENT") {
+    return (
+      <div className="min-h-screen w-full bg-gradient-to-b from-[#0d1412] via-[#121c19] to-[#090e0d] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+        {/* Decorative Background Overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-25 bg-cover bg-center"
+          style={heroBgDesktop ? { backgroundImage: `url(${heroBgDesktop})` } : undefined}
+        />
+        <div className="absolute inset-0 pointer-events-none bg-black/50 backdrop-blur-[2px]" />
+
+        <main className="relative z-10 max-w-5xl mx-auto w-full px-6 py-12 lg:py-20 space-y-12">
+          {/* Header Card */}
+          <div className="p-8 sm:p-14 rounded-3xl bg-[#172420]/95 border border-amber-500/30 shadow-2xl backdrop-blur-2xl text-center max-w-4xl mx-auto space-y-6">
+            <span className="text-6xl sm:text-7xl block transform hover:scale-110 transition-transform duration-300 drop-shadow-md">✨🥳</span>
+            
+            <h1 className="text-3xl sm:text-5xl font-serif font-bold text-amber-300 tracking-tight drop-shadow-md">
+              ¡Esperamos que la hayan pasado genial!
+            </h1>
+            
+            <p className="text-lg sm:text-2xl text-slate-100 leading-relaxed font-sans max-w-2xl mx-auto font-normal drop-shadow-sm">
+              Gracias por habernos acompañado en este día tan especial y compartir momentos inolvidables con nosotros. ❤️
+            </p>
+
+            <div className="pt-2">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-mono tracking-wide shadow-lg backdrop-blur-md">
+                <span>⏳ Tarjeta y fotos LIVE disponibles hasta el <strong className="text-amber-300 font-bold">{expirationDateStr}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          {/* Carrusel de Fotos LIVE */}
+          <SectionWrapper id="album" className="w-full">
+            {livePhotos.length > 0 ? (
+              <div className="w-full overflow-hidden rounded-2xl bg-black/50 p-4 border border-amber-500/20 shadow-2xl">
+                <AlbumCarousel photos={livePhotos} hideHeader={true} />
+              </div>
+            ) : (
+              <div className="p-10 sm:p-14 rounded-3xl bg-[#172420]/95 border border-amber-500/30 text-center max-w-lg mx-auto shadow-2xl backdrop-blur-2xl space-y-4">
+                <span className="text-6xl block drop-shadow-md">📸</span>
+                <h3 className="font-serif font-bold text-2xl text-amber-300 drop-shadow-sm">
+                  Fotos LIVE de la Fiesta
+                </h3>
+                <p className="text-base text-slate-200 leading-relaxed font-sans font-medium">
+                  No se registraron fotografías subidas durante la transmisión LIVE del evento.
+                </p>
+              </div>
+            )}
+          </SectionWrapper>
+        </main>
+
+        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 font-sans">
+          Invitaciones Digitales · Recuerdos del Evento
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -493,7 +561,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               <span className="t-kicker" style={{ display: "block", marginBottom: "6px" }}>
                 {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
               </span>
-              {invitation.ceremoniaNombre && (
+              {Boolean(invitation.ceremoniaNombre) && (
                 <h4 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: "4px" }}>
                   {String(invitation.ceremoniaNombre)}
                 </h4>

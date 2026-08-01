@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 import { Metadata } from 'next';
+import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 
 // Generate metadata for social sharing
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -127,6 +128,12 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                             orderBy: { createdAt: 'desc' },
                         },
                     },
+                    liveSession: {
+                        select: {
+                            id: true,
+                            items: true,
+                        },
+                    },
                 },
             } as any,
         }),
@@ -153,10 +160,11 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         }),
     ]);
 
-    if (!invitation) return notFound();
+    const validInvitation = await checkAndCleanupIfExpired(invitation as any);
+    if (!validInvitation) return notFound();
 
     // Security check: Ensure token matches the invitation
-    if (!guest || guest.invitationId !== String(invitation.id)) {
+    if (!guest || guest.invitationId !== String(validInvitation.id)) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
                 <h1 className="text-2xl font-bold mb-2">Enlace no válido</h1>

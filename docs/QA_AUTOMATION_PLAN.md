@@ -1,11 +1,12 @@
 # 🧪 Plan de QA Automation — Plataforma de Invitaciones Digitales
 
-## 🎯 1. Pilar Principal: Verificación Mapeo Wizard ↔ Plantilla, UX & Calidad Estética Clase Mundial
+## 🎯 1. Pilar Principal: Verificación Mapeo Wizard ↔ Plantilla, UX, Reglas de Negocio & Calidad Estética Clase Mundial
 
 Este plan de QA Automation está diseñado específicamente para auditar, probar y garantizar que:
 1. **Mapeo de Integridad de Datos (Wizard ↔ Plantilla)**: Toda la información que se solicita en los 5 pasos del Wizard se refleje de forma exacta, funcional y completa en el renderizado de las plantillas públicas (`/i/[slug]`).
 2. **Auditoría de UX y Flujos Defectuosos**: Se identifiquen y corrijan cuellos de botella en la experiencia de usuario (por ejemplo: falta de botones de edición en el Dashboard, navegación bloqueada, falta de feedback en formularios).
-3. **Calidad Estética y Visual de Clase Mundial**: Se verifique la excelencia visual en múltiples dispositivos (responsive mobile-first), contraste, tipografía, micro-animaciones y manejo elegante de estados vacíos.
+3. **Auditoría de Reglas de Negocio & Ciclo de Vida**: Se verifiquen las reglas sobre vigencia de 3 meses, borrado automático de archivos, vista post-evento exclusiva, mensaje motivacional el día del evento y bloqueo anti-fraude de fecha a los 30 días.
+4. **Calidad Estética y Visual de Clase Mundial**: Se verifique la excelencia visual en múltiples dispositivos (responsive mobile-first), contraste, tipografía, micro-animaciones y manejo elegante de estados vacíos.
 
 ---
 
@@ -29,12 +30,26 @@ La suite automatizada verifica la correspondencia campo por campo entre lo ingre
 
 ---
 
-## 🚨 3. Auditoría de UX y Detección de Flujos Defectuosos (User Flows Audit)
+## ⌛ 3. Auditoría de Reglas de Negocio & Ciclo de Vida de Tarjeta Digital
+
+Casos de prueba automatizados para verificar la vigencia, ciclo de vida del evento y reglas anti-fraude:
+
+| ID Caso | Regla de Negocio / Escenario | Comprobación de QA Automation | Estado |
+| :--- | :--- | :--- | :---: |
+| **RULE-01** | **Mensaje Motivacional Día del Evento** | `EVENT_DAY`: Muestra `"¡Llegó el día! 🎉"` y mensaje motivacional de celebración. | ✅ Verificado |
+| **RULE-02** | **Vigencia de 3 Meses y Borrado Físico** | `EXPIRED`: Transcurridos 3 meses de `fechaEvento`, borra archivos físicos (`public/uploads/...`) y ejecuta `prisma.invitation.delete`. | ✅ Verificado |
+| **RULE-03** | **Vista Post-Evento (Día Siguiente)** | `POST_EVENT`: Renderiza únicamente mensaje de agradecimiento (*"✨ ¡Esperamos que la hayan pasado genial! ✨"*) y el álbum de fotos. | ✅ Verificado |
+| **RULE-04** | **Archivos LIVE Disponibles por 3 Meses** | Las fotos y notas de voz compartidas en vivo en la sesión LIVE continúan disponibles en el álbum post-evento por 3 meses. | ✅ Verificado |
+| **RULE-05** | **Bloqueo de Fecha a los 30 Días** | Faltando 30 días o menos para el evento (`daysUntilEvent <= 30`), deshabilita el campo en UI y retorna error HTTP 400 en API (Anti-Fraude). | ✅ Verificado |
+
+---
+
+## 🚨 4. Auditoría de UX y Detección de Flujos Defectuosos (User Flows Audit)
 
 Casos de prueba automatizados para detectar fallos en la navegación y experiencia del usuario:
 
 | ID Caso | Escenario de UX / Flujo de Usuario | Comprobación de QA Automation | Estado |
-| :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- | :---: |
 | **UX-01** | **Edición de Invitación**: Edición en Dashboard. | Verificar presencia de enlace **"Editar ✏️"** apuntando a `/editar/[id]`. | ✅ Verificado |
 | **UX-02** | **Previsualización Directa**: Ver en vivo. | Verificar presencia de enlace **"Ver 👁️"** apuntando a `/i/[slug]`. | ✅ Verificado |
 | **UX-03** | **Confirmación de Eliminación**: Eventos. | Presencia de modal de alerta destructiva antes de eliminar. | ✅ Verificado |
@@ -52,7 +67,7 @@ Casos de prueba automatizados para detectar fallos en la navegación y experienc
 
 ---
 
-## ⭐ 4. Estándar de Excelencia Estética de Clase Mundial
+## ⭐ 5. Estándar de Excelencia Estética de Clase Mundial
 
 Criterios visuales evaluados mediante capturas automatizadas (*Visual Regression Testing*):
 
@@ -63,7 +78,7 @@ Criterios visuales evaluados mediante capturas automatizadas (*Visual Regression
 
 ---
 
-## 🏗️ 5. Arquitectura del Proyecto & Suite de Automatización
+## 🏗️ 6. Arquitectura del Proyecto & Suite de Automatización
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -83,7 +98,7 @@ Criterios visuales evaluados mediante capturas automatizadas (*Visual Regression
 
 ---
 
-## 🤖 6. Integración CI/CD (GitHub Actions)
+## 🤖 7. Integración CI/CD (GitHub Actions)
 
 Workflow en `.github/workflows/qa-automation.yml`:
 
@@ -114,11 +129,11 @@ jobs:
 
 ---
 
-## 📌 7. Ejecución y Comandos
+## 📌 8. Ejecución y Comandos
 
 Para ejecutar la suite automatizada de QA:
 
 ```bash
-# Ejecutar la prueba automatizada de QA, mapeo e inspección de UX
+# Ejecutar la prueba automatizada de QA, mapeo, reglas de negocio e inspección de UX
 node scripts/execute-qa-automation.js
 ```

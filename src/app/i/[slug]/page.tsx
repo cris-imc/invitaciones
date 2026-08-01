@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
+import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 
 // ── Helpers ──────────────────────────────────────────────────────
 async function getInvitation(slug: string) {
@@ -14,6 +15,11 @@ async function getInvitation(slug: string) {
             where: { aprobada: true },
             orderBy: { createdAt: "desc" },
           },
+        },
+      },
+      liveSession: {
+        include: {
+          items: true,
         },
       },
     },
@@ -83,12 +89,12 @@ export default async function InvitationPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const invitation = await getInvitation(slug);
+  const rawInvitation = await getInvitation(slug);
+  const invitation = await checkAndCleanupIfExpired(rawInvitation);
 
   if (!invitation) notFound();
 
   // Usar el nuevo ConviteTemplate para todas las invitaciones
-  // Las invitaciones existentes con templates viejos se migran automáticamente
   return (
     <ConviteTemplate
       invitation={invitation as Record<string, unknown>}

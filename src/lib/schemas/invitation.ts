@@ -41,6 +41,7 @@ export const gallerySchema = z.object({
 
 export const musicSchema = z.object({
     musicaHabilitada: z.boolean().default(false),
+    sugerenciaMusicaHabilitada: z.boolean().default(true),
     musicaUrl: z.string().optional(),
     musicaAutoplay: z.boolean().default(false),
     musicaLoop: z.boolean().default(true),
@@ -81,6 +82,7 @@ export const invitationSchema = z.object({
     ...designSchema.shape,
     ...triviaSchema.shape,
     // Nuevas secciones
+    sugerenciaMusicaHabilitada: z.boolean().default(true),
     frasePersonalizadaHabilitada: z.boolean().default(false),
     frasePersonalizadaTexto: z.string().optional(),
     frasePersonalizadaEstilo: z.string().optional(),

@@ -6,9 +6,10 @@ import { X } from "lucide-react";
 interface AlbumCarouselProps {
   photos: string[];
   dark?: boolean;
+  hideHeader?: boolean;
 }
 
-export function AlbumCarousel({ photos, dark = false }: AlbumCarouselProps) {
+export function AlbumCarousel({ photos, dark = false, hideHeader = false }: AlbumCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
   const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null);
@@ -68,8 +69,12 @@ export function AlbumCarousel({ photos, dark = false }: AlbumCarouselProps) {
 
   return (
     <div className={sectionClass}>
-      <p className="t-kicker">Álbum</p>
-      <h2>Un poco de nuestra historia</h2>
+      {!hideHeader && (
+        <>
+          <p className="t-kicker">Álbum</p>
+          <h2>Un poco de nuestra historia</h2>
+        </>
+      )}
       <div 
         className="album-wrap"
         onMouseEnter={() => (isHovered.current = true)}

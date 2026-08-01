@@ -38,8 +38,15 @@ export function CountdownV2({
   title,
   dark = false,
 }: CountdownV2Props) {
-  const isPast = targetDate.getTime() < Date.now();
-  const isToday = !isPast && (targetDate.getTime() - Date.now()) < 86400000;
+  const now = new Date();
+  const target = new Date(targetDate);
+  const isEventDay =
+    now.getFullYear() === target.getFullYear() &&
+    now.getMonth() === target.getMonth() &&
+    now.getDate() === target.getDate();
+
+  const isPast = target.getTime() < now.getTime() && !isEventDay;
+  const isToday = isEventDay || (!isPast && (target.getTime() - now.getTime()) < 86400000);
 
   const [time, setTime] = useState<TimeLeft>(() => calcTimeLeft(targetDate));
   const [hasEnded, setHasEnded] = useState(isPast);
@@ -70,6 +77,23 @@ export function CountdownV2({
     { label: "Seg",  value: pad(time.seg) },
   ];
 
+  if (isEventDay || (isToday && (time.dias === 0 && time.hs === 0))) {
+    return (
+      <section className={sectionClass} id="countdown">
+        <p className="t-kicker">{kicker}</p>
+        <div className="cd-past p-8 rounded-2xl bg-[color-mix(in_srgb,var(--t-acc)_15%,transparent)] border border-[var(--t-acc)] text-center shadow-lg">
+          <span className="cd-past-emoji text-5xl mb-3 block">🎉</span>
+          <h3 className="text-2xl sm:text-3xl font-bold font-serif mb-2 text-[var(--t-acc)]">
+            ¡Llegó el día!
+          </h3>
+          <p className="cd-past-text text-base sm:text-lg font-medium opacity-90 leading-relaxed">
+            ¡Hoy es el gran día! Prepárate para festejar, reír y disfrutar cada instante inolvidable. ✨🥳
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   if (hasEnded || isPast) {
     return (
       <section className={sectionClass} id="countdown">
@@ -77,18 +101,6 @@ export function CountdownV2({
         <div className="cd-past">
           <span className="cd-past-emoji">🎉</span>
           <p className="cd-past-text">¡Ya fue una noche increíble!</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (isToday) {
-    return (
-      <section className={sectionClass} id="countdown">
-        <p className="t-kicker">{kicker}</p>
-        <div className="cd-past">
-          <span className="cd-past-emoji">✨</span>
-          <p className="cd-past-text">¡Hoy es el gran día!</p>
         </div>
       </section>
     );

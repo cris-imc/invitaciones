@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
+import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 
 async function getInvitation(slug: string) {
     const invitation = await prisma.invitation.findUnique({
@@ -87,6 +88,12 @@ async function getInvitation(slug: string) {
                     },
                 },
             },
+            liveSession: {
+                select: {
+                    id: true,
+                    items: true,
+                },
+            },
         },
     });
 
@@ -95,7 +102,8 @@ async function getInvitation(slug: string) {
 
 export default async function InvitationPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const invitation = await getInvitation(slug);
+    const rawInvitation = await getInvitation(slug);
+    const invitation = await checkAndCleanupIfExpired(rawInvitation);
 
     if (!invitation) {
         notFound();

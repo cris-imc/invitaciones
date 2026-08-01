@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save, Loader2, Lock } from "lucide-react";
 import Link from "next/link";
+import { isEventDateLocked } from "@/lib/expiration";
 
 import { MusicUploader } from "@/components/ui/MusicUploader";
 import { ImageUploader } from "@/components/ui/ImageUploader";
@@ -253,14 +254,27 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         {/* Fecha y hora */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Fecha</label>
+                                <label className="text-sm font-medium flex items-center justify-between">
+                                    <span>Fecha</span>
+                                    {isEventDateLocked(invitation.fechaEvento) && (
+                                        <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 font-semibold">
+                                            <Lock className="w-3 h-3" /> Bloqueada (30d)
+                                        </span>
+                                    )}
+                                </label>
                                 <input
                                     type="date"
                                     value={formData.fecha}
                                     onChange={(e) => handleInputChange('fecha', e.target.value)}
-                                    className="w-full p-2 border rounded-md"
+                                    disabled={isEventDateLocked(invitation.fechaEvento)}
+                                    className="w-full p-2 border rounded-md disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-slate-800"
                                     required
                                 />
+                                {isEventDateLocked(invitation.fechaEvento) && (
+                                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                                        No se puede modificar la fecha cuando faltan 30 días o menos para el evento.
+                                    </p>
+                                )}
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Hora</label>

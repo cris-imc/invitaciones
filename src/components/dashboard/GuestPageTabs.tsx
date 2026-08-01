@@ -8,7 +8,7 @@ import { QuickEditPrice } from "@/components/dashboard/QuickEditPrice";
 import { LiveAdminPanel } from "@/components/dashboard/live/LiveAdminPanel";
 import { Lock } from "lucide-react";
 
-type Tab = "invitados" | "canciones" | "precio" | "agregar";
+type Tab = "invitados" | "canciones" | "precio" | "agregar" | "live";
 
 interface Props {
   invitationId: string;
