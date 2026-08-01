@@ -11,6 +11,7 @@ interface RSVPWizardV2Props {
   guestName?: string;            // prefill nombre
   maxGuests?: number;            // límite total de acompañantes
   maxAdults?: number;
+  maxTeens?: number;
   maxChildren?: number;
   dark?: boolean;
   // Configuración de pago
@@ -22,11 +23,13 @@ interface RSVPWizardV2Props {
   paymentTitular?: string;
   isExempt?: boolean;
   precioNino?: number;
+  precioAdolescente?: number;
   is15?: boolean;
   // Estado previo (si ya confirmó)
   initialStatus?: "PENDING" | "CONFIRMED" | "DECLINED";
   initialAttendingCount?: number;
   initialAttendingAdults?: number;
+  initialAttendingTeens?: number;
   initialAttendingChildren?: number;
   initialPaymentStatus?: PaymentStatus;
   // Callbacks
@@ -41,6 +44,7 @@ export function RSVPWizardV2({
   guestName = "",
   maxGuests = 6,
   maxAdults,
+  maxTeens,
   maxChildren,
   dark = true,
   hasPayment = false,
@@ -51,10 +55,12 @@ export function RSVPWizardV2({
   paymentTitular,
   isExempt = false,
   precioNino,
+  precioAdolescente,
   is15 = false,
   initialStatus,
   initialAttendingCount = 1,
   initialAttendingAdults,
+  initialAttendingTeens,
   initialAttendingChildren,
   initialPaymentStatus = "PENDING",
   onConfirmed,
@@ -66,14 +72,20 @@ export function RSVPWizardV2({
     return "decision";
   });
 
-  const hasSpecificCounts = (initialAttendingAdults !== undefined && initialAttendingAdults > 0) || (initialAttendingChildren !== undefined && initialAttendingChildren > 0);
+  const hasSpecificCounts =
+    (initialAttendingAdults !== undefined && initialAttendingAdults > 0) ||
+    (initialAttendingTeens !== undefined && initialAttendingTeens > 0) ||
+    (initialAttendingChildren !== undefined && initialAttendingChildren > 0);
+
   const initialAdults = hasSpecificCounts ? (initialAttendingAdults || 0) : (initialAttendingCount > 0 ? initialAttendingCount : 1);
+  const initialTeens = hasSpecificCounts ? (initialAttendingTeens || 0) : 0;
   const initialChildren = hasSpecificCounts ? (initialAttendingChildren || 0) : 0;
 
   const [adultCount, setAdultCount] = useState(initialAdults);
+  const [teenCount, setTeenCount] = useState(initialTeens);
   const [childCount, setChildCount] = useState(initialChildren);
-  const count = adultCount + childCount; // Total calculation
-  
+  const count = adultCount + teenCount + childCount; // Total calculation
+
   const [dietary, setDietary] = useState("");
   const [name, setName] = useState(guestName);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,13 +93,14 @@ export function RSVPWizardV2({
   const [paymentStatus] = useState<PaymentStatus>(initialPaymentStatus);
 
   const sectionClass = `section${dark ? " dark" : ""}`;
-  
+
   let totalPayment = 0;
   if (!isExempt) {
     const adultPrice = paymentAmount ?? 0;
+    const teenPrice = precioAdolescente != null ? precioAdolescente : adultPrice;
     const childPrice = precioNino != null ? precioNino : adultPrice;
     if (maxGuests > 1) {
-      totalPayment = (adultPrice * adultCount) + (childPrice * childCount);
+      totalPayment = (adultPrice * adultCount) + (teenPrice * teenCount) + (childPrice * childCount);
     } else {
       totalPayment = adultPrice * count;
     }
@@ -145,6 +158,7 @@ export function RSVPWizardV2({
               </label>
               <div style={{ marginTop: "16px" }}>
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                  {/* ADULTOS */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>Adultos</span>
                     <div className="stepper" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
@@ -158,12 +172,35 @@ export function RSVPWizardV2({
                       <button
                         type="button"
                         style={{ width: "36px", height: "36px", borderRadius: "50%", border: "1px solid currentColor", background: "transparent", fontSize: "18px", cursor: "pointer", color: "inherit", opacity: (maxAdults !== undefined ? adultCount >= maxAdults : count >= maxGuests) ? 0.3 : 0.8 }}
-                        onClick={() => setAdultCount(Math.min(maxAdults !== undefined ? maxAdults : maxGuests - childCount, adultCount + 1))}
+                        onClick={() => setAdultCount(Math.min(maxAdults !== undefined ? maxAdults : maxGuests - (teenCount + childCount), adultCount + 1))}
                         disabled={maxAdults !== undefined ? adultCount >= maxAdults : count >= maxGuests}
                       >+</button>
                     </div>
                   </div>
 
+                  {/* ADOLESCENTES */}
+                  {maxTeens !== 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>Adolescentes</span>
+                    <div className="stepper" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                      <button
+                        type="button"
+                        style={{ width: "36px", height: "36px", borderRadius: "50%", border: "1px solid currentColor", background: "transparent", fontSize: "18px", cursor: "pointer", color: "inherit", opacity: teenCount <= 0 ? 0.3 : 0.8 }}
+                        onClick={() => setTeenCount(Math.max(0, teenCount - 1))}
+                        disabled={teenCount <= 0}
+                      >−</button>
+                      <span className="n" style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "16px", minWidth: "20px", textAlign: "center", color: "inherit" }}>{teenCount}</span>
+                      <button
+                        type="button"
+                        style={{ width: "36px", height: "36px", borderRadius: "50%", border: "1px solid currentColor", background: "transparent", fontSize: "18px", cursor: "pointer", color: "inherit", opacity: (maxTeens !== undefined ? teenCount >= maxTeens : count >= maxGuests) ? 0.3 : 0.8 }}
+                        onClick={() => setTeenCount(Math.min(maxTeens !== undefined ? maxTeens : maxGuests - (adultCount + childCount), teenCount + 1))}
+                        disabled={maxTeens !== undefined ? teenCount >= maxTeens : count >= maxGuests}
+                      >+</button>
+                    </div>
+                  </div>
+                  )}
+
+                  {/* NIÑOS */}
                   {maxChildren !== 0 && (
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>Niños</span>
@@ -178,7 +215,7 @@ export function RSVPWizardV2({
                       <button
                         type="button"
                         style={{ width: "36px", height: "36px", borderRadius: "50%", border: "1px solid currentColor", background: "transparent", fontSize: "18px", cursor: "pointer", color: "inherit", opacity: (maxChildren !== undefined ? childCount >= maxChildren : count >= maxGuests) ? 0.3 : 0.8 }}
-                        onClick={() => setChildCount(Math.min(maxChildren !== undefined ? maxChildren : maxGuests - adultCount, childCount + 1))}
+                        onClick={() => setChildCount(Math.min(maxChildren !== undefined ? maxChildren : maxGuests - (adultCount + teenCount), childCount + 1))}
                         disabled={maxChildren !== undefined ? childCount >= maxChildren : count >= maxGuests}
                       >+</button>
                     </div>
@@ -248,10 +285,10 @@ export function RSVPWizardV2({
         <div role="status" aria-live="polite">
           <h3 style={{ marginBottom: "12px", fontFamily: "var(--t-font-d)", color: "inherit" }}>{is15 ? "Te espero 🎉" : "Te esperamos 🎉"}</h3>
           <p style={{ marginBottom: "12px", fontSize: "14px", opacity: 0.9 }}>
-            {maxGuests > 1 && (adultCount > 0 || childCount > 0) ? (
-              childCount > 0
-                ? `Confirmaste ${adultCount} ${adultCount === 1 ? "adulto" : "adultos"} y ${childCount} ${childCount === 1 ? "niño" : "niños"}.`
-                : `Confirmaste ${adultCount} ${adultCount === 1 ? "adulto" : "adultos"}.`
+            {maxGuests > 1 && (adultCount > 0 || teenCount > 0 || childCount > 0) ? (
+              `Confirmaste ${adultCount} ${adultCount === 1 ? "adulto" : "adultos"}` +
+              (teenCount > 0 ? `, ${teenCount} ${teenCount === 1 ? "adolescente" : "adolescentes"}` : "") +
+              (childCount > 0 ? ` y ${childCount} ${childCount === 1 ? "niño" : "niños"}.` : ".")
             ) : (
               `Confirmaste ${count} ${count === 1 ? "persona" : "personas"}.`
             )}
@@ -308,18 +345,11 @@ export function RSVPWizardV2({
               {!guestToken ? "Valor de la tarjeta (vista previa)" : (paymentStatus === "PAID" ? "Tarjeta abonada ✓" : "Valor de la tarjeta")}
             </h4>
             <p style={{ opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
-              {!guestToken ? (
-                precioNino != null && maxGuests > 1 && maxChildren !== 0
-                  ? `El valor es de ${formatARS(paymentAmount)} (Adultos) y ${formatARS(precioNino)} (Niños). Monto total calculado: ${formatARS(paymentAmount * adultCount + precioNino * childCount)}.`
-                  : `Monto a pagar: ${formatARS(paymentAmount * count)}.`
-              ) : (
-                paymentStatus === "PAID"
-                ? "Ya recibimos el pago de tu tarjeta. ¡Gracias!"
-                : (precioNino != null && maxGuests > 1 && (maxChildren === undefined || maxChildren > 0)
-                    ? `El valor es de ${formatARS(paymentAmount)} (Adultos) y ${formatARS(precioNino)} (Niños). Monto total a pagar: ${formatARS(paymentAmount * adultCount + precioNino * childCount)}.`
-                    : `Monto total a pagar: ${formatARS(paymentAmount * count)}.`
-                  )
-              )}
+              Monto total a pagar: <b>{formatARS(totalPayment)}</b>
+              <br />
+              <span style={{ fontSize: "12px", opacity: 0.8 }}>
+                ({adultCount} adultos{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} adolescentes` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} niños` : ""})
+              </span>
             </p>
           </div>
         )}
@@ -344,6 +374,7 @@ export function RSVPWizardV2({
           nombre: name || guestName,
           asistencia: "CONFIRMA",
           attendingAdults: adultCount,
+          attendingTeens: teenCount,
           attendingChildren: childCount,
           numeroAcompanantes: count - 1,
           restricciones: dietary,

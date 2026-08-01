@@ -661,6 +661,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             guestName={guest?.name}
             maxGuests={guest?.expectedCount ?? 6}
             maxAdults={guest?.expectedAdults ?? undefined}
+            maxTeens={(guest as any)?.expectedTeens ?? undefined}
             maxChildren={guest?.expectedChildren ?? undefined}
             dark
             hasPayment={paymentEnabled}
@@ -672,10 +673,12 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             initialStatus={guest?.status as "PENDING" | "CONFIRMED" | "DECLINED" | undefined}
             initialAttendingCount={guest?.attendingCount ?? 1}
             initialAttendingAdults={guest?.attendingAdults ?? undefined}
+            initialAttendingTeens={(guest as any)?.attendingTeens ?? undefined}
             initialAttendingChildren={guest?.attendingChildren ?? undefined}
             initialPaymentStatus={guestPayStatus}
             isExempt={guest?.isExempt ?? false}
             precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
+            precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
             is15={invitation.tipo === "QUINCE_ANOS"}
           />
         )}

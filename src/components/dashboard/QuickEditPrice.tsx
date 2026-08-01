@@ -19,12 +19,14 @@ export function QuickEditPrice({
     invitationId, 
     slug,
     currentAmount,
+    currentPrecioAdolescente,
     currentPrecioNino,
     planTier
 }: { 
     invitationId: string, 
     slug: string,
     currentAmount: number | null,
+    currentPrecioAdolescente?: number | null,
     currentPrecioNino?: number | null,
     planTier?: string
 }) {
@@ -32,12 +34,19 @@ export function QuickEditPrice({
     const [open, setOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [amount, setAmount] = useState(currentAmount ? currentAmount.toString() : "");
+    const [precioAdolescente, setPrecioAdolescente] = useState(currentPrecioAdolescente ? currentPrecioAdolescente.toString() : "");
     const [precioNino, setPrecioNino] = useState(currentPrecioNino ? currentPrecioNino.toString() : "");
 
     const handleSave = async () => {
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount < 0) {
-            alert("Por favor ingresa un monto válido.");
+            alert("Por favor ingresa un monto válido para adultos.");
+            return;
+        }
+
+        const numPrecioAdolescente = precioAdolescente ? parseFloat(precioAdolescente) : undefined;
+        if (precioAdolescente && (isNaN(numPrecioAdolescente!) || numPrecioAdolescente! < 0)) {
+            alert("Por favor ingresa un monto válido para adolescentes.");
             return;
         }
 
@@ -52,19 +61,23 @@ export function QuickEditPrice({
             const response = await fetch(`/api/invitations/${slug}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ regaloMonto: numAmount, precioNino: numPrecioNino }),
+                body: JSON.stringify({
+                    regaloMonto: numAmount,
+                    precioAdolescente: numPrecioAdolescente,
+                    precioNino: numPrecioNino,
+                }),
             });
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || 'Error al actualizar el precio');
+                throw new Error(data.error || 'Error al actualizar los precios');
             }
 
             setOpen(false);
-            router.refresh(); // Refresca los datos del servidor (como el Server Component)
+            router.refresh();
         } catch (error) {
             console.error('Error:', error);
-            alert(error instanceof Error ? error.message : 'Error al actualizar el precio');
+            alert(error instanceof Error ? error.message : 'Error al actualizar los precios');
         } finally {
             setIsSaving(false);
         }
@@ -75,17 +88,17 @@ export function QuickEditPrice({
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2 border-[var(--ink-2)] text-[var(--on-ink)] hover:bg-[var(--ink-2)] bg-transparent w-full sm:w-auto mt-2 sm:mt-0" onClick={(e) => e.stopPropagation()}>
                     <Coins className="w-4 h-4 text-green-500" />
-                    Actualizar Precio
+                    Actualizar Precios
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md bg-[var(--ink-2)] text-[var(--on-ink)] border-none" onClick={(e) => e.stopPropagation()}>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Coins className="w-5 h-5 text-green-500" />
-                        Actualizar Valor de Tarjeta
+                        Actualizar Valores de Tarjeta
                     </DialogTitle>
                     <DialogDescription className="text-[var(--on-ink)]/70 pt-2">
-                        Modifica rápidamente el monto que deben abonar tus invitados. Al cambiarlo, se activará un aviso de actualización en la invitación.
+                        Modificá rápidamente los montos por categoría que deben abonar tus invitados.
                     </DialogDescription>
                 </DialogHeader>
                 
@@ -97,6 +110,17 @@ export function QuickEditPrice({
                             min="0"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
+                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Valor Adolescente ($):</label>
+                        <Input 
+                            type="number" 
+                            min="0"
+                            placeholder="Opcional"
+                            value={precioAdolescente}
+                            onChange={(e) => setPrecioAdolescente(e.target.value)}
                             className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
                         />
                     </div>
@@ -145,7 +169,7 @@ export function QuickEditPrice({
                                 Actualizando...
                             </>
                         ) : (
-                            'Guardar Precio'
+                            'Guardar Precios'
                         )}
                     </Button>
                 </DialogFooter>

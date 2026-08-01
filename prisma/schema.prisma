@@ -170,6 +170,9 @@ model Invitation {
   pagoTarjetaTitular           String?
   pagoTarjetaMonto             Float?
   precioNino                   Float?
+  precioAdolescente            Float?
+  precioNinoHabilitado         Boolean          @default(true)
+  precioAdolescenteHabilitado  Boolean          @default(false)
   galeriaSecundariaHabilitada  Boolean          @default(false)
   galeriaSecundariaFotos       String?
   mensajeFinalHabilitado       Boolean          @default(false)
@@ -215,11 +218,13 @@ model Guest {
   type                   String           @default("INDIVIDUAL")
   expectedCount          Int              @default(1)
   expectedAdults         Int?
+  expectedTeens          Int?
   expectedChildren       Int?
   uniqueToken            String           @unique
   status                 String           @default("PENDING")
   attendingCount         Int              @default(0)
   attendingAdults        Int              @default(0)
+  attendingTeens         Int              @default(0)
   attendingChildren      Int              @default(0)
   isExempt               Boolean          @default(false)
   message                String?

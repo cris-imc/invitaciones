@@ -297,10 +297,17 @@ export function StepBankDetails() {
                             </div>
                         </div>
 
-                        {/* Montos por pase / tarjeta */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-white/10">
-                            <div className="space-y-1.5">
-                                <Label htmlFor="regaloMonto" className="text-xs font-medium">Monto de tarjeta por Adulto ($ ARS)</Label>
+                        {/* Configuración de Categorías de Precios (Adultos, Adolescentes, Niños) */}
+                        <div className="space-y-4 pt-3 border-t border-white/10">
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                                Tarifas por Categoría de Invitado ($ ARS)
+                            </h4>
+
+                            {/* Categoria 1: ADULTOS (Obligatoria si se cobra tarjeta) */}
+                            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2">
+                                <Label htmlFor="regaloMonto" className="text-xs font-semibold text-slate-200">
+                                    1. Valor de la Tarjeta por ADULTO ($ ARS)
+                                </Label>
                                 <Input
                                     id="regaloMonto"
                                     type="number"
@@ -309,19 +316,70 @@ export function StepBankDetails() {
                                     placeholder="Ej: 15000"
                                     value={d.regaloMonto || ""}
                                     onChange={(e) => setData({ regaloMonto: e.target.value ? Number(e.target.value) : undefined } as any)}
+                                    className="bg-[var(--ink)] border-white/15"
                                 />
                             </div>
-                            <div className="space-y-1.5">
-                                <Label htmlFor="precioNino" className="text-xs font-medium">Monto de tarjeta por Niño ($ ARS)</Label>
-                                <Input
-                                    id="precioNino"
-                                    type="number"
-                                    min={0}
-                                    step={100}
-                                    placeholder="Ej: 8000"
-                                    value={d.precioNino || ""}
-                                    onChange={(e) => setData({ precioNino: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                />
+
+                            {/* Categoria 2: ADOLESCENTES (Opcional con Switch) */}
+                            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                        <Label htmlFor="precioAdolescenteHabilitado" className="text-xs font-semibold text-slate-200 cursor-pointer">
+                                            2. Tarifa diferenciada para ADOLESCENTES
+                                        </Label>
+                                        <p className="text-[11px] text-muted-foreground">
+                                            Permite ingresar un valor específico para jóvenes / adolescentes
+                                        </p>
+                                    </div>
+                                    <Switch
+                                        id="precioAdolescenteHabilitado"
+                                        checked={d.precioAdolescenteHabilitado ?? false}
+                                        onCheckedChange={(checked) => setData({ precioAdolescenteHabilitado: checked })}
+                                    />
+                                </div>
+                                {d.precioAdolescenteHabilitado && (
+                                    <Input
+                                        id="precioAdolescente"
+                                        type="number"
+                                        min={0}
+                                        step={100}
+                                        placeholder="Ej: 11000"
+                                        value={d.precioAdolescente || ""}
+                                        onChange={(e) => setData({ precioAdolescente: e.target.value ? Number(e.target.value) : undefined } as any)}
+                                        className="bg-[var(--ink)] border-white/15 animate-in fade-in duration-200"
+                                    />
+                                )}
+                            </div>
+
+                            {/* Categoria 3: NIÑOS (Opcional con Switch) */}
+                            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                        <Label htmlFor="precioNinoHabilitado" className="text-xs font-semibold text-slate-200 cursor-pointer">
+                                            3. Tarifa diferenciada para NIÑOS
+                                        </Label>
+                                        <p className="text-[11px] text-muted-foreground">
+                                            Permite ingresar un valor específico para niños de menor edad
+                                        </p>
+                                    </div>
+                                    <Switch
+                                        id="precioNinoHabilitado"
+                                        checked={d.precioNinoHabilitado ?? true}
+                                        onCheckedChange={(checked) => setData({ precioNinoHabilitado: checked })}
+                                    />
+                                </div>
+                                {d.precioNinoHabilitado && (
+                                    <Input
+                                        id="precioNino"
+                                        type="number"
+                                        min={0}
+                                        step={100}
+                                        placeholder="Ej: 8000"
+                                        value={d.precioNino || ""}
+                                        onChange={(e) => setData({ precioNino: e.target.value ? Number(e.target.value) : undefined } as any)}
+                                        className="bg-[var(--ink)] border-white/15 animate-in fade-in duration-200"
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>

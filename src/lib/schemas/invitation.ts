@@ -97,6 +97,9 @@ export const invitationSchema = z.object({
     regaloTitular: z.string().optional(),
     regaloMonto: z.number().optional(),
     precioNino: z.number().optional(),
+    precioAdolescente: z.number().optional(),
+    precioNinoHabilitado: z.boolean().default(true),
+    precioAdolescenteHabilitado: z.boolean().default(false),
 
     pagoTarjetaHabilitado: z.boolean().default(false),
     pagoTarjetaTitulo: z.string().optional(),

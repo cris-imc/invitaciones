@@ -68,6 +68,21 @@ export function EditWizardContainer({ invitation }: { invitation: any }) {
                 regaloTitular: invitation.regaloTitular || "",
                 regaloMonto: invitation.regaloMonto || undefined,
 
+                // Pago Tarjetas
+                pagoTarjetaHabilitado: Boolean(invitation.pagoTarjetaHabilitado),
+                pagoTarjetaTitulo: invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases",
+                pagoTarjetaMensaje: invitation.pagoTarjetaMensaje || "",
+                pagoTarjetaMostrarDatos: Boolean(invitation.pagoTarjetaMostrarDatos),
+                pagoTarjetaCbu: invitation.pagoTarjetaCbu || "",
+                pagoTarjetaAlias: invitation.pagoTarjetaAlias || "",
+                pagoTarjetaBanco: invitation.pagoTarjetaBanco || "",
+                pagoTarjetaTitular: invitation.pagoTarjetaTitular || "",
+                pagoTarjetaMonto: invitation.pagoTarjetaMonto || undefined,
+                precioNino: invitation.precioNino || undefined,
+                precioAdolescente: invitation.precioAdolescente || undefined,
+                precioNinoHabilitado: invitation.precioNinoHabilitado ?? true,
+                precioAdolescenteHabilitado: invitation.precioAdolescenteHabilitado ?? Boolean(invitation.precioAdolescente),
+
                 // Cronograma
                 cronogramaEventos: invitation.cronogramaEventos || "[]",
 

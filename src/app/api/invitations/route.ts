@@ -289,6 +289,9 @@ export async function POST(request: NextRequest) {
                 pagoTarjetaTitular: body.pagoTarjetaTitular,
                 pagoTarjetaMonto: body.pagoTarjetaMonto ? parseFloat(body.pagoTarjetaMonto) : null,
                 precioNino: body.precioNino ? parseFloat(body.precioNino) : null,
+                precioAdolescente: body.precioAdolescente ? parseFloat(body.precioAdolescente) : null,
+                precioNinoHabilitado: body.precioNinoHabilitado !== undefined ? Boolean(body.precioNinoHabilitado) : true,
+                precioAdolescenteHabilitado: body.precioAdolescenteHabilitado !== undefined ? Boolean(body.precioAdolescenteHabilitado) : false,
 
                 // 2. MÚSICA
                 musicaHabilitada: body.musicaHabilitada !== undefined ? body.musicaHabilitada : false,
@@ -478,6 +481,9 @@ export async function PUT(request: NextRequest) {
                 pagoTarjetaTitular: body.pagoTarjetaTitular,
                 pagoTarjetaMonto: body.pagoTarjetaMonto !== undefined ? (body.pagoTarjetaMonto ? parseFloat(body.pagoTarjetaMonto) : null) : undefined,
                 precioNino: body.precioNino !== undefined ? (body.precioNino ? parseFloat(body.precioNino) : null) : undefined,
+                precioAdolescente: body.precioAdolescente !== undefined ? (body.precioAdolescente ? parseFloat(body.precioAdolescente) : null) : undefined,
+                precioNinoHabilitado: body.precioNinoHabilitado !== undefined ? Boolean(body.precioNinoHabilitado) : undefined,
+                precioAdolescenteHabilitado: body.precioAdolescenteHabilitado !== undefined ? Boolean(body.precioAdolescenteHabilitado) : undefined,
 
 
                 // 2. MÚSICA

@@ -15,12 +15,13 @@ interface Props {
   slug: string;
   regaloHabilitado: boolean;
   regaloMonto: unknown;
+  precioAdolescente?: unknown;
   precioNino: unknown;
   rsvpEnabled: boolean;
   planTier: string;
 }
 
-export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMonto, precioNino, rsvpEnabled, planTier }: Props) {
+export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier }: Props) {
   const [tab, setTab] = useState<Tab>("invitados");
 
   const tabs: { id: Tab; label: string; primary?: boolean }[] = [
@@ -140,6 +141,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, regaloMont
             invitationId={invitationId}
             slug={slug}
             currentAmount={Number(regaloMonto)}
+            currentPrecioAdolescente={Number(precioAdolescente)}
             currentPrecioNino={Number(precioNino)}
             planTier={planTier}
           />
