@@ -9,14 +9,19 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
 
+import { useSession } from "next-auth/react";
+
 export function StepMusic() {
     const { data, setData } = useWizardStore();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
     const [showMusicInfo, setShowMusicInfo] = useState(false);
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
     
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
     const isEditing = Boolean(data.id);
-    const isLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    const isLocked = !isAdmin && rawLocked;
 
     return (
         <div className="space-y-6">
@@ -28,10 +33,16 @@ export function StepMusic() {
             </div>
 
             <div className="space-y-4">
+                {rawLocked && isAdmin && (
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
+                        👑 <strong>Modo Administrador:</strong> Esta invitación está en Plan Gratis (bloqueada para el cliente), pero tenés permiso de Admin para editar/activar la música.
+                    </div>
+                )}
+
                 <div className="flex items-center space-x-2 relative group w-fit">
                     <Checkbox
                         id="musicaHabilitada"
-                        checked={data.musicaHabilitada && !isLocked}
+                        checked={data.musicaHabilitada && (!isLocked || isAdmin)}
                         disabled={isLocked}
                         onCheckedChange={(checked) =>
                             setData({ musicaHabilitada: Boolean(checked) })

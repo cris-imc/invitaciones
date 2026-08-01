@@ -22,10 +22,13 @@ export function StepTrivia() {
     const { showToast } = useToast();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
     const [showTriviaInfo, setShowTriviaInfo] = useState(false);
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
     const isEditing = Boolean(data.id);
-    const isLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    const isLocked = !isAdmin && rawLocked;
 
     // Parse existing questions or initialize empty array
     const [preguntas, setPreguntas] = useState<TriviaQuestion[]>(() => {
@@ -112,10 +115,16 @@ export function StepTrivia() {
             </div>
 
             <div className="space-y-4">
+                {rawLocked && isAdmin && (
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
+                        👑 <strong>Modo Administrador:</strong> Esta función está en Plan Gratis para el cliente, pero tenés permiso Admin para activarla y cargar preguntas.
+                    </div>
+                )}
+
                 <div className="flex items-center space-x-2 relative group w-fit">
                     <Checkbox
                         id="triviaHabilitada"
-                        checked={data.triviaHabilitada && !isLocked}
+                        checked={data.triviaHabilitada && (!isLocked || isAdmin)}
                         disabled={isLocked}
                         onCheckedChange={(checked) => setData({ triviaHabilitada: Boolean(checked) })}
                     />
@@ -131,7 +140,7 @@ export function StepTrivia() {
                     )}
                 </div>
 
-                {data.triviaHabilitada && !isLocked && (
+                {data.triviaHabilitada && (!isLocked || isAdmin) && (
                     <>
                         {/* Configuración básica */}
                         <div className="space-y-4 border border-[var(--ink-2)] p-4 rounded-lg bg-[var(--ink-2)]">

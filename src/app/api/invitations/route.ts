@@ -369,13 +369,16 @@ export async function PUT(request: NextRequest) {
             fechaEvento = new Date(year, month - 1, day, 0, 0, 0);
         }
 
+        const session = await auth().catch(() => null);
+        const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+
         const existingInvitation = await prisma.invitation.findUnique({
             where: { id },
             select: { regaloMonto: true, fechaEvento: true }
         });
 
         if (existingInvitation && fechaEvento && fechaEvento.getTime() !== new Date(existingInvitation.fechaEvento).getTime()) {
-            if (isEventDateLocked(existingInvitation.fechaEvento)) {
+            if (!isAdmin && isEventDateLocked(existingInvitation.fechaEvento)) {
                 return NextResponse.json(
                     { error: 'La fecha del evento no se puede modificar cuando faltan 30 días o menos por motivos de seguridad.' },
                     { status: 400 }

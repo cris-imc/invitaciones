@@ -16,11 +16,14 @@ import { isEventDateLocked } from "@/lib/expiration";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepBasicInfo() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
     const [showInfo, setShowInfo] = useState(false);
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
     const form = useForm<z.infer<typeof basicInfoSchema>>({
         resolver: zodResolver(basicInfoSchema),
@@ -103,15 +106,16 @@ export function StepBasicInfo() {
                         control={form.control}
                         name="fecha"
                         render={({ field }) => {
-                            const isDateLocked = data.fecha ? isEventDateLocked(data.fecha) : false;
+                            const rawLocked = data.fecha ? isEventDateLocked(data.fecha) : false;
+                            const isDateLocked = !isAdmin && rawLocked;
 
                             return (
                                 <FormItem className="flex flex-col">
                                     <FormLabel className="flex items-center justify-between">
                                         <span>Fecha del Evento</span>
-                                        {isDateLocked && (
-                                            <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 font-semibold">
-                                                <Lock className="w-3 h-3" /> Bloqueada (30d)
+                                        {rawLocked && (
+                                            <span className={`text-xs flex items-center gap-1 font-semibold ${isAdmin ? 'text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                                <Lock className="w-3 h-3" /> {isAdmin ? "👑 Desbloqueado (Admin)" : "Bloqueada (30d)"}
                                             </span>
                                         )}
                                     </FormLabel>
@@ -142,16 +146,21 @@ export function StepBasicInfo() {
                                                     selected={field.value}
                                                     onSelect={field.onChange}
                                                     disabled={(date) =>
-                                                        date < new Date()
+                                                        !isAdmin && date < new Date()
                                                     }
                                                     initialFocus
                                                 />
                                             </PopoverContent>
                                         )}
                                     </Popover>
-                                    {isDateLocked && (
+                                    {rawLocked && !isAdmin && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400">
                                             Fecha bloqueada por seguridad. Faltan 30 días o menos para la fecha del evento.
+                                        </p>
+                                    )}
+                                    {rawLocked && isAdmin && (
+                                        <p className="text-xs text-green-400 font-medium">
+                                            👑 Habilitado por rol Administrador: tenés permiso para editar la fecha aunque falten menos de 30 días.
                                         </p>
                                     )}
                                     <FormMessage />

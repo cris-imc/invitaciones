@@ -74,6 +74,8 @@ interface Invitation {
     rsvpDaysBeforeEvent?: number | null;
 }
 
+import { useSession } from "next-auth/react";
+
 interface EditInvitationFormProps {
     invitation: Invitation;
 }
@@ -81,6 +83,8 @@ interface EditInvitationFormProps {
 export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
     const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
     // Parse temaColores
     const temaColores = typeof invitation.temaColores === 'string'
@@ -254,27 +258,40 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         {/* Fecha y hora */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center justify-between">
-                                    <span>Fecha</span>
-                                    {isEventDateLocked(invitation.fechaEvento) && (
-                                        <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 font-semibold">
-                                            <Lock className="w-3 h-3" /> Bloqueada (30d)
-                                        </span>
-                                    )}
-                                </label>
-                                <input
-                                    type="date"
-                                    value={formData.fecha}
-                                    onChange={(e) => handleInputChange('fecha', e.target.value)}
-                                    disabled={isEventDateLocked(invitation.fechaEvento)}
-                                    className="w-full p-2 border rounded-md disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-slate-800"
-                                    required
-                                />
-                                {isEventDateLocked(invitation.fechaEvento) && (
-                                    <p className="text-xs text-amber-600 dark:text-amber-400">
-                                        No se puede modificar la fecha cuando faltan 30 días o menos para el evento.
-                                    </p>
-                                )}
+                                {(() => {
+                                    const rawLocked = isEventDateLocked(invitation.fechaEvento);
+                                    const isLocked = !isAdmin && rawLocked;
+                                    return (
+                                        <>
+                                            <label className="text-sm font-medium flex items-center justify-between">
+                                                <span>Fecha</span>
+                                                {rawLocked && (
+                                                    <span className={`text-xs flex items-center gap-1 font-semibold ${isAdmin ? 'text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                                        <Lock className="w-3 h-3" /> {isAdmin ? "👑 Desbloqueado (Admin)" : "Bloqueada (30d)"}
+                                                    </span>
+                                                )}
+                                            </label>
+                                            <input
+                                                type="date"
+                                                value={formData.fecha}
+                                                onChange={(e) => handleInputChange('fecha', e.target.value)}
+                                                disabled={isLocked}
+                                                className="w-full p-2 border rounded-md disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-slate-800"
+                                                required
+                                            />
+                                            {rawLocked && !isAdmin && (
+                                                <p className="text-xs text-amber-600 dark:text-amber-400">
+                                                    No se puede modificar la fecha cuando faltan 30 días o menos para el evento.
+                                                </p>
+                                            )}
+                                            {rawLocked && isAdmin && (
+                                                <p className="text-xs text-green-400 font-medium">
+                                                    👑 Modo Administrador: podés modificar la fecha libremente.
+                                                </p>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Hora</label>

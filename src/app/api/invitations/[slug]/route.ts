@@ -55,6 +55,8 @@ export async function GET(
     }
 }
 
+import { auth } from "@/auth";
+
 // PATCH - Actualizar invitación (edición visual)
 export async function PATCH(
     request: NextRequest,
@@ -63,6 +65,8 @@ export async function PATCH(
     try {
         const { slug } = await params;
         const body = await request.json();
+        const session = await auth().catch(() => null);
+        const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
         const existing = await prisma.invitation.findUnique({
             where: { slug },
@@ -75,9 +79,9 @@ export async function PATCH(
             );
         }
 
-        // Si se intenta modificar la fecha y faltan 30 días o menos para la fecha original
+        // Si se intenta modificar la fecha y faltan 30 días o menos para la fecha original (exento si es ADMIN)
         if (body.fechaEvento && new Date(body.fechaEvento).getTime() !== new Date(existing.fechaEvento).getTime()) {
-            if (isEventDateLocked(existing.fechaEvento)) {
+            if (!isAdmin && isEventDateLocked(existing.fechaEvento)) {
                 return NextResponse.json(
                     { error: 'La fecha del evento no se puede modificar cuando faltan 30 días o menos por seguridad anti-fraude.' },
                     { status: 400 }

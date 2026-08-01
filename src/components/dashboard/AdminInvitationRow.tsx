@@ -8,7 +8,11 @@ import { DeleteInvitationButton } from "./DeleteInvitationButton";
 
 import { AdminPlanSelect } from "./AdminPlanSelect";
 
+import { useRouter } from "next/navigation";
+import { Pencil, Eye, Users } from "lucide-react";
+
 export function AdminInvitationRow({ invitation }: { invitation: any }) {
+    const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [status, setStatus] = useState(invitation.estado);
     const [maxGuests, setMaxGuests] = useState(invitation.maxGuestsOverride || "");
@@ -45,8 +49,36 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                     <strong className="block truncate text-lg" title={invitation.nombreEvento}>{invitation.nombreEvento}</strong>
                     <span className="text-xs opacity-60 truncate block">/{invitation.slug}</span>
                 </div>
-                <div className={`tag whitespace-nowrap shrink-0 ${status === "ACTIVA" ? "on" : "draft"}`}>
-                    {status === "ACTIVA" ? "Activa" : status === "BORRADOR" ? "Borrador" : "Finalizada"}
+                
+                {/* Botones de Acción Directa para Admin */}
+                <div className="flex items-center gap-2 shrink-0">
+                    <button
+                        onClick={() => router.push(`/dashboard/invitaciones/editar/${invitation.id}`)}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        title="Editar invitación en el Wizard como Admin"
+                    >
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Editar</span>
+                    </button>
+                    <button
+                        onClick={() => window.open(`/invitation/${invitation.slug}`, '_blank')}
+                        className="px-3 py-1.5 rounded-lg bg-white/10 text-white border border-white/15 hover:bg-white/20 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        title="Ver invitación pública"
+                    >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Ver</span>
+                    </button>
+                    <button
+                        onClick={() => router.push(`/dashboard/invitaciones/${invitation.slug}/guests`)}
+                        className="px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        title="Gestionar invitados y precios"
+                    >
+                        <Users className="w-3.5 h-3.5" />
+                        <span>Invitados</span>
+                    </button>
+                    <div className={`tag whitespace-nowrap shrink-0 ${status === "ACTIVA" ? "on" : "draft"}`}>
+                        {status === "ACTIVA" ? "Activa" : status === "BORRADOR" ? "Borrador" : "Finalizada"}
+                    </div>
                 </div>
             </div>
             
