@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef, use } from "react";
-import { Camera, MessageSquare, Loader2 } from "lucide-react";
+import { Camera, MessageSquare, Loader2, Smile } from "lucide-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 
 import { LiveItem } from "@prisma/client";
 
@@ -15,6 +16,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
     // Text message state
     const [message, setMessage] = useState("");
     const [showTextForm, setShowTextForm] = useState(false);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -267,19 +269,48 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                     </button>
                 ) : (
                     <form onSubmit={sendMessage} className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col gap-3">
-                        <textarea
-                            className="w-full bg-transparent text-white outline-none resize-none placeholder:text-white/30 text-sm"
-                            rows={3}
-                            placeholder="Escribe tu mensaje (máx 200 caracteres)..."
-                            maxLength={200}
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            disabled={uploading}
-                        />
+                        <div className="relative">
+                            <textarea
+                                className="w-full bg-transparent text-white outline-none resize-none placeholder:text-white/30 text-sm"
+                                rows={3}
+                                placeholder="Escribe tu mensaje (máx 200 caracteres)..."
+                                maxLength={200}
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                disabled={uploading}
+                            />
+                            {showEmojiPicker && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowEmojiPicker(false)} />
+                                    <div className="relative w-full max-w-[320px] shadow-2xl rounded-2xl overflow-hidden border border-white/10">
+                                        <EmojiPicker
+                                            theme={Theme.DARK}
+                                            width="100%"
+                                            height={400}
+                                            searchDisabled={true}
+                                            skinTonesDisabled={true}
+                                            onEmojiClick={(emojiData) => {
+                                                setMessage(prev => (prev + emojiData.emoji).slice(0, 200));
+                                                setShowEmojiPicker(false);
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <div className="flex items-center justify-between mt-2">
-                            <span className={`text-xs ${message.length > 180 ? 'text-red-400' : 'text-white/40'}`}>
-                                {message.length}/200
-                            </span>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                    className="text-white/60 hover:text-white transition-colors"
+                                >
+                                    <Smile className="w-5 h-5" />
+                                </button>
+                                <span className={`text-xs ${message.length > 180 ? 'text-red-400' : 'text-white/40'}`}>
+                                    {message.length}/200
+                                </span>
+                            </div>
                             <div className="flex gap-2">
                                 <button
                                     type="button"

@@ -18,12 +18,14 @@ interface LiveItem {
     fileUrl: string;
     guestName: string | null;
     createdAt: string;
+    isActive: boolean;
 }
 
 interface LiveSession {
     id: string;
     publicToken: string;
     isActive: boolean;
+    isModerated: boolean;
     items: LiveItem[];
 }
 
@@ -83,6 +85,47 @@ export function LiveAdminPanel({ invitationId }: { invitationId: string }) {
             setErrorMsg("Error de conexión");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const toggleModeration = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/live/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ invitationId, action: "toggleModeration" })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setSession(data);
+            } else {
+                const errText = await res.text();
+                setErrorMsg("Error al cambiar moderación.\n\nProbá detener la terminal y volver a correr `npm run dev` para que tome los últimos cambios de la base de datos.");
+            }
+        } catch (err) {
+            console.error("Error toggling moderation", err);
+            setErrorMsg("Error de conexión");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const toggleItemActive = async (id: string, currentActive: boolean) => {
+        try {
+            const res = await fetch(`/api/live/admin/item/${id}`, { 
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ isActive: !currentActive })
+            });
+            if (res.ok) {
+                setSession(prev => prev ? { 
+                    ...prev, 
+                    items: prev.items.map(i => i.id === id ? { ...i, isActive: !currentActive } : i) 
+                } : prev);
+            }
+        } catch (err) {
+            console.error("Error toggling item", err);
         }
     };
 
@@ -160,6 +203,26 @@ export function LiveAdminPanel({ invitationId }: { invitationId: string }) {
                         </div>
                     </div>
 
+                    <div className="p-4 bg-muted/20 border rounded-lg flex items-center justify-between">
+                        <div>
+                            <h4 className="font-semibold text-sm">Moderación de contenido</h4>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                Si está activado, las fotos y mensajes no aparecerán en pantalla hasta que los apruebes.
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium">{session.isModerated ? 'Activado' : 'Desactivado'}</span>
+                            <button
+                                type="button"
+                                onClick={toggleModeration}
+                                disabled={loading}
+                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${session.isModerated ? 'bg-primary' : 'bg-input'}`}
+                            >
+                                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow ring-0 transition duration-200 ease-in-out ${session.isModerated ? 'translate-x-5' : 'translate-x-0'}`} />
+                            </button>
+                        </div>
+                    </div>
+
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <h4 className="font-semibold text-lg">Contenido en Pantalla</h4>
@@ -184,19 +247,32 @@ export function LiveAdminPanel({ invitationId }: { invitationId: string }) {
                                                 <span className="text-[10px] mt-1 opacity-70 line-clamp-2">"{item.fileUrl}"</span>
                                             </div>
                                         )}
-                                        
+                                            {/* Etiqueta de estado (pendiente/oculto) */}
+                                            {!item.isActive && (
+                                                <div className="absolute top-2 left-2 bg-black/70 backdrop-blur text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded">
+                                                    Pendiente / Oculto
+                                                </div>
+                                            )}
                                         <div className="p-2 border-t text-xs text-muted-foreground flex justify-between items-center bg-background/95 backdrop-blur-sm">
                                             <span className="truncate pr-2">{item.guestName || "Anónimo"}</span>
                                             <span>{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                         </div>
 
                                         {/* Overlay de moderación */}
-                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                                            <Button 
+                                                variant={item.isActive ? "secondary" : "default"} 
+                                                size="sm"
+                                                onClick={() => toggleItemActive(item.id, item.isActive)}
+                                                className="w-32 font-semibold"
+                                            >
+                                                {item.isActive ? "Ocultar" : "Aprobar"}
+                                            </Button>
                                             <Button 
                                                 variant="destructive" 
                                                 size="sm"
                                                 onClick={() => setDeleteItemId(item.id)}
-                                                className="gap-2"
+                                                className="w-32 gap-2"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                                 Eliminar

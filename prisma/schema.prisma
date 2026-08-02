@@ -321,6 +321,7 @@ model LiveSession {
   invitationId String      @unique
   publicToken  String      @unique
   isActive     Boolean     @default(true)
+  isModerated  Boolean     @default(false)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   invitation   Invitation  @relation(fields: [invitationId], references: [id], onDelete: Cascade)

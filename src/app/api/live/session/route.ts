@@ -31,7 +31,6 @@ export async function GET(req: Request) {
             where: { invitationId },
             include: {
                 items: {
-                    where: { isActive: true },
                     orderBy: { createdAt: "desc" }
                 }
             }
@@ -86,6 +85,15 @@ export async function POST(req: Request) {
                 data: {
                     isActive: !liveSession.isActive,
                 },
+                include: { items: { orderBy: { createdAt: "desc" } } }
+            });
+        } else if (action === "toggleModeration" && liveSession) {
+            liveSession = await prisma.liveSession.update({
+                where: { invitationId },
+                data: {
+                    isModerated: !liveSession.isModerated,
+                },
+                include: { items: { orderBy: { createdAt: "desc" } } }
             });
         }
 
