@@ -23,14 +23,14 @@ interface Props {
 }
 
 export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier }: Props) {
-  const [tab, setTab] = useState<Tab>("invitados");
+  const [tab, setTab] = useState<Tab>("agregar");
 
-  const tabs: { id: Tab; label: string; primary?: boolean }[] = [
-    { id: "invitados", label: pagoTarjetaHabilitado ? "Invitados & Pagos" : "Invitados" },
-    { id: "canciones", label: "Música" },
-    ...(pagoTarjetaHabilitado ? [{ id: "precio" as Tab, label: "Precios Tarjetas" }] : []),
-    { id: "agregar", label: "Gestionar invitados", primary: true },
-    { id: "live" as Tab, label: "LIVE", primary: true },
+  const tabs: { id: Tab; label: string; highlight?: "gold" | "live" | "default" }[] = [
+    { id: "agregar", label: "Gestionar invitados", highlight: "gold" },
+    { id: "invitados", label: pagoTarjetaHabilitado ? "Gestionar pagos" : "Lista de invitados", highlight: "default" },
+    ...(pagoTarjetaHabilitado ? [{ id: "precio" as Tab, label: "Gestionar precios", highlight: "default" as const }] : []),
+    { id: "canciones", label: "Música sugerida", highlight: "default" },
+    { id: "live" as Tab, label: "LIVE", highlight: "live" },
   ];
 
   return (
@@ -54,57 +54,39 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
           return (
             <div key={t.id} className="relative group flex-1 min-w-[120px]">
               <button
+                type="button"
                 onClick={() => !isLocked && setTab(t.id)}
                 disabled={isLocked}
-                style={{
-                  width: "100%",
-                  minHeight: "40px",
-                  padding: "8px 16px",
-                  borderRadius: "10px",
-                  border: t.primary ? "1px solid #4f46e5" : "1px solid transparent",
-                  cursor: isLocked ? "not-allowed" : "pointer",
-                  fontWeight: t.primary || tab === t.id ? 700 : 500,
-                  fontSize: "13.5px",
-                  fontFamily: "var(--font-ui)",
-                  transition: "all 0.15s",
-                  background: t.primary
-                    ? tab === t.id
-                      ? "#3730a3"
-                      : "#4f46e5"
+                className={`
+                  w-full min-h-[42px] px-4 py-2 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap
+                  transition-all duration-300 cursor-pointer text-[13.5px] border relative overflow-hidden
+                  ${isLocked ? "opacity-50 cursor-not-allowed grayscale" : "hover:-translate-y-0.5"}
+                  ${t.highlight === "gold" ? 
+                      tab === t.id 
+                        ? "bg-amber-500 border-amber-400 text-black font-bold shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+                        : "bg-amber-500/15 border-amber-500/30 text-amber-300 font-semibold hover:bg-amber-500/25"
+                    : t.highlight === "live" ?
+                      tab === t.id
+                        ? "bg-red-500 border-red-400 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                        : "bg-red-500/10 border-red-500/30 text-red-400 font-semibold hover:bg-red-500/20 hover:border-red-400/50 shadow-[0_0_8px_rgba(239,68,68,0.1)]"
                     : tab === t.id
-                    ? "var(--paper)"
-                    : "transparent",
-                  color: t.primary
-                    ? "#fff"
-                    : tab === t.id
-                    ? "var(--ink)"
-                    : "rgba(246,243,236,0.6)",
-                  boxShadow: tab === t.id && !t.primary ? "0 1px 4px rgba(0,0,0,0.15)" : "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
-                  opacity: isLocked ? 0.5 : 1,
-                  whiteSpace: "nowrap",
-                }}
+                      ? "bg-[var(--paper)] border-transparent text-[var(--ink)] font-bold shadow-sm"
+                      : "bg-transparent border-transparent text-white/60 font-medium hover:bg-white/5"
+                  }
+                `}
               >
                 {t.id === "live" ? (
-                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{
-                      display: "inline-block",
-                      width: "8px",
-                      height: "8px",
-                      borderRadius: "50%",
-                      background: "#ef4444",
-                      animation: isLocked ? "none" : "liveRecPulse 1.5s ease-in-out infinite",
-                      flexShrink: 0,
-                    }} />
+                  <span className="flex items-center gap-2 relative z-10">
+                    <div className="relative flex items-center justify-center w-2 h-2">
+                        {!isLocked && <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>}
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </div>
                     LIVE
                   </span>
                 ) : (
-                  t.label
+                  <span className="relative z-10">{t.label}</span>
                 )}
-                {isLocked && <Lock className="w-3.5 h-3.5 text-red-400" />}
+                {isLocked && <Lock className="w-3.5 h-3.5 text-red-400 relative z-10" />}
               </button>
               
               {/* Tooltip for locked tabs */}
