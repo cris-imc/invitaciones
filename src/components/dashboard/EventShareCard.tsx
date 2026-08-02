@@ -35,11 +35,9 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
         </div>
         
         <div className="flex gap-2 w-full md:w-auto flex-wrap">
-          <Link href={`/i/${slug}`} target="_blank">
-            <Button variant="default" size="sm" className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Link href={`/i/${slug}`} target="_blank" className="btn-action go inline-flex items-center justify-center h-8 px-3 gap-2 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors">
               <Eye className="w-4 h-4" />
               Ver Vista Previa
-            </Button>
           </Link>
           
           {invitationId && (
