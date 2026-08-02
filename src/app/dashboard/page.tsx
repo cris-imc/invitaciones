@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { AdminDashboardClient } from "@/components/dashboard/AdminDashboardClient";
 import { DeleteInvitationButton } from "@/components/dashboard/DeleteInvitationButton";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
+import { GreetingText } from "@/components/dashboard/GreetingText";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
 
 async function getDashboardStats(userId: string) {
@@ -143,7 +144,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
       <div className="p-topbar flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 !items-start w-full text-left">
         <div className="w-full text-left flex flex-col items-start">
           <div className="flex items-center gap-3 mb-1">
-            <h2 className="m-0">Hola, {userName} 👋</h2>
+            <GreetingText userName={userName} />
           </div>
           <p>
             Acá tenés el resumen de tus eventos en tiempo real.
@@ -231,7 +232,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
                       <Pencil className="w-3.5 h-3.5" />
                       <span>Editar</span>
                   </Link>
-                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors">
+                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go btn-admin-glow inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg text-indigo-300 transition-colors">
                       Administrar →
                   </Link>
                   <div className="btn-delete flex items-center justify-center">

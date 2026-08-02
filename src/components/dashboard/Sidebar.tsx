@@ -104,6 +104,13 @@ export function Sidebar() {
                     {item.title}
                 </Link>
             ))}
+            
+            <div className="mt-4 px-2">
+                <button onClick={handleSignOut} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 py-2 rounded-lg text-sm font-semibold transition-colors">
+                    <LogOut className="w-4 h-4" />
+                    Cerrar Sesión
+                </button>
+            </div>
         </>
     );
 
@@ -126,17 +133,16 @@ export function Sidebar() {
                     <NavLinks />
                 </nav>
 
-                <div className="p-side-foot">
-                    <div className="seal">
-                        <span className="font-display">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</span>
+                <div className="p-side-foot flex-col gap-3 items-start">
+                    <div className="flex items-center gap-3 w-full">
+                        <div className="seal shrink-0">
+                            <span className="font-display">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</span>
+                        </div>
+                        <div className="who flex-1 overflow-hidden">
+                            <b className="truncate block">{session?.user?.name || "Mi Cuenta"}</b>
+                            <span className="text-xs opacity-70 truncate block">{session?.user?.email || "Ver Perfil"}</span>
+                        </div>
                     </div>
-                    <div className="who flex-1">
-                        <b>{session?.user?.name || "Mi Cuenta"}</b>
-                        <span className="text-xs opacity-70 truncate">{session?.user?.email || "Ver Perfil"}</span>
-                    </div>
-                    <button onClick={() => signOut({ callbackUrl: "/login" })} className="text-danger hover:text-danger/80">
-                        <LogOut className="w-4 h-4" />
-                    </button>
                 </div>
             </aside>
 
@@ -188,17 +194,16 @@ export function Sidebar() {
                     <NavLinks onClick={() => setOpen(false)} />
                 </nav>
 
-                <div className="p-side-foot">
-                    <div className="seal">
-                        <span className="font-display">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</span>
+                <div className="p-side-foot flex-col gap-3 items-start">
+                    <div className="flex items-center gap-3 w-full">
+                        <div className="seal shrink-0">
+                            <span className="font-display">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</span>
+                        </div>
+                        <div className="who flex-1 overflow-hidden">
+                            <b className="truncate block">{session?.user?.name || "Mi Cuenta"}</b>
+                            <span className="text-xs opacity-70 truncate block">{session?.user?.email || "Ver Perfil"}</span>
+                        </div>
                     </div>
-                    <div className="who flex-1">
-                        <b>{session?.user?.name || "Mi Cuenta"}</b>
-                        <span className="text-xs opacity-70 truncate">{session?.user?.email || "Ver Perfil"}</span>
-                    </div>
-                    <button onClick={() => signOut({ callbackUrl: "/login" })} className="text-danger hover:text-danger/80">
-                        <LogOut className="w-4 h-4" />
-                    </button>
                 </div>
             </div>
         </>

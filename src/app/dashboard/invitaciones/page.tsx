@@ -136,7 +136,7 @@ export default async function InvitacionesPage() {
                                       <Pencil className="w-3.5 h-3.5" />
                                       <span>Editar</span>
                                   </Link>
-                                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors">
+                                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go btn-admin-glow inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg text-indigo-300 transition-colors">
                                       Administrar →
                                   </Link>
                                   <div className="btn-delete flex items-center justify-center">
