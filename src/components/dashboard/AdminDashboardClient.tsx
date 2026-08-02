@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { AdminInvitationRow } from "@/components/dashboard/AdminInvitationRow";
@@ -12,10 +12,32 @@ import { Button } from "@/components/ui/button";
 export function AdminDashboardClient({ clients }: { clients: any[] }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [expandedClients, setExpandedClients] = useState<string[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 10;
 
-    const filteredClients = clients.filter(c => 
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+    let filteredClients = clients.filter(c => 
         c.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         c.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Sort alphabetically by name
+    filteredClients.sort((a, b) => {
+        const nameA = a.name?.toLowerCase() || "";
+        const nameB = b.name?.toLowerCase() || "";
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+    });
+
+    const totalPages = Math.ceil(filteredClients.length / ITEMS_PER_PAGE);
+    const paginatedClients = filteredClients.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
     );
 
     const toggleClient = (clientId: string) => {
@@ -35,13 +57,13 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                     type="text"
                     placeholder="Buscar cliente por nombre o email..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={handleSearch}
                     className="pl-10 h-12 w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 rounded-xl"
                 />
             </div>
 
             <div className="flex flex-col gap-4">
-                {filteredClients.map(client => {
+                {paginatedClients.map(client => {
                     const isExpanded = expandedClients.includes(client.id);
                     return (
                         <div key={client.id} className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-[var(--ink-2)] text-[var(--on-ink)] transition-all">
@@ -91,6 +113,32 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                 {filteredClients.length === 0 && (
                     <div className="text-center p-10 opacity-50">
                         No se encontraron clientes con "{searchTerm}".
+                    </div>
+                )}
+
+                {totalPages > 1 && (
+                    <div className="flex justify-center items-center gap-4 mt-6">
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                        >
+                            Anterior
+                        </Button>
+                        <span className="text-sm opacity-50">
+                            Página {currentPage} de {totalPages}
+                        </span>
+                        <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                        >
+                            Siguiente
+                        </Button>
                     </div>
                 )}
             </div>
