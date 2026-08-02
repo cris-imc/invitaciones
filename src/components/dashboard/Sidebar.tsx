@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { BarChart, Heart, Home, LogOut, Menu, X } from "lucide-react";
+import { BarChart, Heart, Home, LogOut, Menu, X, User } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
     { title: "Mis Invitaciones", href: "/dashboard/invitaciones", icon: Heart },
+    { title: "Mis Datos", href: "/dashboard/perfil", icon: User },
 ];
 
 export function Sidebar() {
@@ -34,7 +35,7 @@ export function Sidebar() {
     }, [open]);
 
     const sidebarItems = allSidebarItems.filter(item => {
-        if (role === "ADMIN") return item.title === "Inicio";
+        if (role === "ADMIN") return item.title === "Inicio" || item.title === "Mis Datos";
         return true;
     });
 
@@ -133,17 +134,6 @@ export function Sidebar() {
                     <NavLinks />
                 </nav>
 
-                <div className="p-side-foot flex-col gap-3 items-start">
-                    <div className="flex items-center gap-3 w-full">
-                        <div className="seal shrink-0">
-                            <span className="font-display">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</span>
-                        </div>
-                        <div className="who flex-1 overflow-hidden">
-                            <b className="truncate block">{session?.user?.name || "Mi Cuenta"}</b>
-                            <span className="text-xs opacity-70 truncate block">{session?.user?.email || "Ver Perfil"}</span>
-                        </div>
-                    </div>
-                </div>
             </aside>
 
             {/* ── MOBILE TOP BAR ── */}
@@ -194,17 +184,6 @@ export function Sidebar() {
                     <NavLinks onClick={() => setOpen(false)} />
                 </nav>
 
-                <div className="p-side-foot flex-col gap-3 items-start">
-                    <div className="flex items-center gap-3 w-full">
-                        <div className="seal shrink-0">
-                            <span className="font-display">{session?.user?.name?.charAt(0).toUpperCase() || "U"}</span>
-                        </div>
-                        <div className="who flex-1 overflow-hidden">
-                            <b className="truncate block">{session?.user?.name || "Mi Cuenta"}</b>
-                            <span className="text-xs opacity-70 truncate block">{session?.user?.email || "Ver Perfil"}</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </>
     );

@@ -62,3 +62,34 @@ export async function updateInvitationMaxGuests(invitationId: string, maxGuestsO
         return { success: false, error: "Failed to update max guests" };
     }
 }
+
+import bcrypt from "bcryptjs";
+
+export async function adminUpdateUser(userId: string, data: { name?: string; email?: string; password?: string }) {
+    try {
+        const session = await auth();
+        
+        if (session?.user?.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const updateData: any = {};
+        if (data.name && data.name.trim().length > 0) updateData.name = data.name.trim();
+        if (data.email && data.email.trim().length > 0) updateData.email = data.email.trim().toLowerCase();
+        
+        if (data.password && data.password.trim().length > 0) {
+            updateData.password = await bcrypt.hash(data.password.trim(), 10);
+        }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: updateData
+        });
+
+        revalidatePath("/dashboard");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating user as admin:", error);
+        return { success: false, error: error.message || "Failed to update user" };
+    }
+}
