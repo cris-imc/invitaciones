@@ -45,7 +45,7 @@ export function BottomNavPill({ sections }: BottomNavPillProps) {
 
   return (
     <nav
-      className="bottom-nav"
+      className="bottom-nav hide-desktop"
       aria-label="Navegación de la invitación"
       role="navigation"
     >

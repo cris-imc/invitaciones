@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Info, ChevronUp, ChevronDown } from "lucide-react";
 
 interface Guest {
   id: string;
@@ -50,6 +51,7 @@ export function GuestListWithPayment({
   const [filter, setFilter] = useState<"all" | "CONFIRMED" | "PENDING" | "DECLINED">("all");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false);
 
   useEffect(() => {
     fetch(`/api/guests?invitationId=${invitationId}`)
@@ -145,28 +147,59 @@ export function GuestListWithPayment({
       </div>
 
       {/* Totales de recaudación */}
-      {/* Totales de recaudación */}
-      {pagoTarjetaHabilitado && paymentAmount && (
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            flexWrap: "wrap",
-            marginBottom: "20px",
-            padding: "12px 16px",
-            background: "var(--ink)",
-            border: "1px solid var(--ink-2)",
-            color: "var(--on-ink)",
-            borderRadius: "12px",
-            fontSize: "13px",
-          }}
-        >
-          <span>💰 Recaudado: <b style={{ color: "var(--accent)" }}>{formatARS(collectedTotal)}</b></span>
-          <span style={{ opacity: .5 }}>·</span>
-          <span>⏳ Estimado total: <b>{formatARS(estimatedTotal)}</b></span>
-          <span style={{ opacity: .5 }}>·</span>
-          <span style={{ opacity: .6 }}>⊘ Exentos: {exemptCount}</span>
-        </div>
+      {pagoTarjetaHabilitado && (
+        <>
+          {paymentAmount && (
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                flexWrap: "wrap",
+                marginBottom: "12px",
+                padding: "12px 16px",
+                background: "var(--ink)",
+                border: "1px solid var(--ink-2)",
+                color: "var(--on-ink)",
+                borderRadius: "12px",
+                fontSize: "13px",
+              }}
+            >
+              <span>💰 Recaudado: <b style={{ color: "var(--accent)" }}>{formatARS(collectedTotal)}</b></span>
+              <span style={{ opacity: .5 }}>·</span>
+              <span>⏳ Estimado total: <b>{formatARS(estimatedTotal)}</b></span>
+              <span style={{ opacity: .5 }}>·</span>
+              <span style={{ opacity: .6 }}>⊘ Exentos: {exemptCount}</span>
+            </div>
+          )}
+
+          {/* Burbuja informativa colapsable */}
+          <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200/90 text-xs overflow-hidden transition-all duration-200 mb-5">
+            <button
+                type="button"
+                onClick={() => setShowPaymentInfo(!showPaymentInfo)}
+                className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+            >
+                <div className="flex items-center gap-2 font-medium">
+                    <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
+                    <span>Gestión de pagos</span>
+                </div>
+                <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                    {showPaymentInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
+            </button>
+
+            {showPaymentInfo && (
+                <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200 space-y-2">
+                    <p>
+                        Tocá un estado de pago (Pendiente / Exento / Pagado) en la lista para cambiarlo de manera rápida.
+                    </p>
+                    <p className="font-medium text-amber-300">
+                        💡 El invitado verá el cambio reflejado automáticamente cuando abra su invitación.
+                    </p>
+                </div>
+            )}
+          </div>
+        </>
       )}
 
       {/* Filtros + búsqueda */}
@@ -237,52 +270,56 @@ export function GuestListWithPayment({
                       {guest.expectedCount > 1 ? "No asistirán" : "No asistirá"}
                     </span>
                   )}
+                  {guest.status === "CONFIRMED" && (
+                    <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", background: "rgba(16, 185, 129, 0.1)", color: "rgb(16, 185, 129)", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
+                      {guest.attendingCount > 1 ? "Asistirán" : "Asistirá"}
+                    </span>
+                  )}
                 </div>
-                <div style={{ fontSize: "11.5px", color: "#888" }}>
-                  {guest.status !== "DECLINED" && (STATUS_LABELS[guest.status] ?? guest.status)}
-                  {guest.status === "CONFIRMED" && ` · ${guest.attendingCount} persona${guest.attendingCount !== 1 ? "s" : ""}`}
-                  {guest.dietaryRestrictions && ` · ${guest.dietaryRestrictions}`}
+                <div style={{ fontSize: "11.5px", color: "#888", marginTop: "4px" }}>
+                  {guest.status === "PENDING" && (STATUS_LABELS[guest.status] ?? guest.status)}
+                  {guest.status === "CONFIRMED" && `${guest.attendingCount} persona${guest.attendingCount !== 1 ? "s" : ""}`}
+                  {guest.dietaryRestrictions && (guest.status === "CONFIRMED" ? ` · ${guest.dietaryRestrictions}` : guest.dietaryRestrictions)}
                 </div>
               </div>
 
               {/* Toggle de pago — solo visible si confirmó y si está habilitado */}
               {guest.status === "CONFIRMED" && pagoTarjetaHabilitado && (
-                <div
-                  className="inv-status-toggle"
-                  role="group"
-                  aria-label={`Estado de pago de ${guest.name}`}
-                >
-                  {(["PENDING", "EXEMPT", "PAID"] as const).map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => handlePaymentChange(guest.id, s)}
-                      disabled={updatingId === guest.id}
-                      style={{
-                        padding: "6px 12px",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        border: "none",
-                        background: guest.paymentStatus === s ? PAYMENT_STATUS_COLORS[s] : "transparent",
-                        color: guest.paymentStatus === s ? "#fff" : "#888",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                        opacity: updatingId === guest.id ? 0.5 : 1,
-                      }}
-                      aria-pressed={guest.paymentStatus === s}
-                    >
-                      {PAYMENT_STATUS_LABELS[s]}
-                    </button>
-                  ))}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
+                  <span style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#888", fontWeight: 600, paddingRight: "4px" }}>Estado de pago</span>
+                  <div
+                    className="inv-status-toggle"
+                    role="group"
+                    aria-label={`Estado de pago de ${guest.name}`}
+                  >
+                    {(["PENDING", "EXEMPT", "PAID"] as const).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => handlePaymentChange(guest.id, s)}
+                        disabled={updatingId === guest.id}
+                        style={{
+                          padding: "6px 12px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          border: "none",
+                          background: guest.paymentStatus === s ? PAYMENT_STATUS_COLORS[s] : "transparent",
+                          color: guest.paymentStatus === s ? "#fff" : "#888",
+                          cursor: "pointer",
+                          transition: "all 0.2s",
+                          opacity: updatingId === guest.id ? 0.5 : 1,
+                        }}
+                        aria-pressed={guest.paymentStatus === s}
+                      >
+                        {PAYMENT_STATUS_LABELS[s]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           ))}
         </div>
       )}
-
-      <p style={{ fontSize: "11.5px", color: "#999", marginTop: "16px", lineHeight: 1.5 }}>
-        Tocá un estado para cambiarlo. El invitado ve el cambio reflejado automáticamente en su invitación.
-      </p>
     </div>
   );
 }
