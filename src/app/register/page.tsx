@@ -102,74 +102,75 @@ function RegisterForm() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 font-body">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 font-body max-w-6xl mx-auto w-full items-stretch">
           {/* Plan Selection */}
-          <div className="space-y-4">
+          <div className="w-full flex flex-col">
             <h2 className="text-2xl font-display mb-6">
               Elige tu plan
             </h2>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 flex-1">
 
             {/* Free Plan */}
             <button
               type="button"
               onClick={() => setSelectedPlan("FREE")}
-              className={`w-full text-left p-6 rounded-3xl border transition-all ${
+              className={`w-full h-full flex flex-col text-left p-3 sm:p-4 rounded-2xl border transition-all duration-300 ${
                 selectedPlan === "FREE"
-                  ? "border-[var(--paper)] bg-[var(--ink-2)] shadow-[0_0_20px_rgba(246,243,236,0.1)]"
-                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md"
+                  ? "border-[var(--paper)] ring-2 ring-[var(--paper)] bg-[var(--ink-2)] shadow-[0_15px_40px_rgba(246,243,236,0.2)] scale-[1.04] -translate-y-1.5 z-20"
+                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md opacity-70 hover:opacity-100"
               }`}
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2 w-full">
                 <div>
-                  <h3 className="text-2xl font-display">
+                  <h3 className="text-base sm:text-lg font-display leading-tight">
                     {PLAN_LIMITS.FREE.name}
                   </h3>
-                  <p className="text-3xl font-display text-[var(--paper)] mt-2">
+                  <p className="text-lg sm:text-xl font-display text-[var(--paper)] mt-1">
                     {formatPrice(PLAN_LIMITS.FREE.price)}
                   </p>
                 </div>
                 {selectedPlan === "FREE" && (
-                  <div className="w-8 h-8 bg-[var(--paper)] rounded-full flex items-center justify-center">
-                    <Check className="w-5 h-5 text-[var(--ink)]" />
+                  <div className="w-6 h-6 bg-[var(--paper)] rounded-full flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-[var(--ink)]" />
                   </div>
                 )}
               </div>
-              <ul className="space-y-2 opacity-80">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Hasta {PLAN_LIMITS.FREE.maxGuests} invitados
+              <ul className="space-y-1.5 opacity-80 text-[11px] sm:text-xs flex-1">
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Hasta {PLAN_LIMITS.FREE.maxGuests} invitados</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Plantilla 100% personalizada
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Plantilla 100% personalizada</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Gestión de invitados y pagos
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Gestión de invitados y pagos</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Cuenta regresiva
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Cuenta regresiva</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Album de fotos
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Album de fotos</span>
                 </li>
-                <li className="flex items-center gap-2 opacity-50">
-                  <span className="text-red-400 font-bold px-1">✕</span>
-                  Sin musica de fondo
+                <li className="flex items-center gap-1.5 opacity-50">
+                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
+                  <span>Sin musica de fondo</span>
                 </li>
-                <li className="flex items-center gap-2 opacity-50">
-                  <span className="text-red-400 font-bold px-1">✕</span>
-                  Sin LIVE (fotos transmitidas en vivo)
+                <li className="flex items-center gap-1.5 opacity-50">
+                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
+                  <span>Sin LIVE (fotos en vivo)</span>
                 </li>
-                <li className="flex items-center gap-2 opacity-50">
-                  <span className="text-red-400 font-bold px-1">✕</span>
-                  Sin Trivia
+                <li className="flex items-center gap-1.5 opacity-50">
+                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
+                  <span>Sin Trivia</span>
                 </li>
-                <li className="flex items-center gap-2 opacity-50">
-                  <span className="text-red-400 font-bold px-1">✕</span>
-                  Sin sugerencias de musica para el DJ
+                <li className="flex items-center gap-1.5 opacity-50">
+                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
+                  <span>Sin sugerencias DJ</span>
                 </li>
               </ul>
             </button>
@@ -178,94 +179,78 @@ function RegisterForm() {
             <button
               type="button"
               onClick={() => setSelectedPlan("PREMIUM")}
-              className={`w-full text-left p-6 rounded-3xl border transition-all relative ${
+              className={`w-full h-full flex flex-col text-left p-3 sm:p-4 rounded-2xl border transition-all duration-300 relative ${
                 selectedPlan === "PREMIUM"
-                  ? "border-[var(--paper)] bg-[var(--ink-2)] shadow-[0_0_20px_rgba(246,243,236,0.1)]"
-                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md"
+                  ? "border-[var(--paper)] ring-2 ring-[var(--paper)] bg-[var(--ink-2)] shadow-[0_15px_40px_rgba(246,243,236,0.2)] scale-[1.04] -translate-y-1.5 z-20"
+                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md opacity-70 hover:opacity-100"
               }`}
             >
-              <div className="absolute -top-3 right-6 bg-[var(--paper)] text-[var(--ink)] px-4 py-1 rounded-full text-sm font-semibold font-mono tracking-wide uppercase">
+              <div className="absolute -top-2.5 right-3 bg-[var(--paper)] text-[var(--ink)] px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold font-mono tracking-wide uppercase">
                 Más Popular
               </div>
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2 w-full">
                 <div>
-                  <h3 className="text-2xl font-display">
-                    Invitaciones Premium
+                  <h3 className="text-base sm:text-lg font-display leading-tight">
+                    Premium
                   </h3>
-                  <p className="text-3xl font-display text-[var(--paper)] mt-2">
-                    {formatPrice(PLAN_LIMITS.PREMIUM.price)} <span className="text-sm opacity-60 font-body">c/u</span>
+                  <p className="text-lg sm:text-xl font-display text-[var(--paper)] mt-1">
+                    {formatPrice(PLAN_LIMITS.PREMIUM.price)}
                   </p>
                 </div>
                 {selectedPlan === "PREMIUM" && (
-                  <div className="w-8 h-8 bg-[var(--paper)] rounded-full flex items-center justify-center">
-                    <Check className="w-5 h-5 text-[var(--ink)]" />
+                  <div className="w-6 h-6 bg-[var(--paper)] rounded-full flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-[var(--ink)]" />
                   </div>
                 )}
               </div>
               
-              {selectedPlan === "PREMIUM" && (
-                <div className="mb-6 bg-[var(--ink)] p-4 rounded-2xl border border-[var(--ink-2)]" onClick={(e) => e.stopPropagation()}>
-                  <label className="block text-sm font-semibold opacity-70 mb-2">Cantidad de invitaciones a comprar:</label>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-[var(--ink-2)] rounded-full p-1">
-                        <button type="button" onClick={() => setPremiumQuantity(Math.max(1, premiumQuantity - 1))} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">-</button>
-                        <span className="w-12 text-center font-bold text-lg">{premiumQuantity}</span>
-                        <button type="button" onClick={() => setPremiumQuantity(premiumQuantity + 1)} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">+</button>
-                    </div>
-                    <div className="ml-auto text-right">
-                        <span className="text-xs opacity-60 block">Total a pagar</span>
-                        <span className="font-display text-xl text-[var(--accent)]">{formatPrice(PLAN_LIMITS.PREMIUM.price * premiumQuantity)}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              <ul className="space-y-2 opacity-80">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Invitados ilimitados
+              <ul className="space-y-1.5 opacity-80 text-[11px] sm:text-xs flex-1">
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Invitados ilimitados</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Plantilla 100% personalizada
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Plantilla 100% personalizada</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Gestión de invitados y pagos
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Gestión de invitados y pagos</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Cuenta regresiva
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Cuenta regresiva</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Album de fotos
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Album de fotos</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Con musica de fondo
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Con musica de fondo</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Con LIVE (fotos transmitidas en vivo)
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Con LIVE (fotos en vivo)</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Con Trivia
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Con Trivia</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  Con sugerencias de musica para el DJ
+                <li className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                  <span>Con sugerencias DJ</span>
                 </li>
               </ul>
-              <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-500">
+              <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-md text-[10px] sm:text-[11px] text-yellow-500 leading-tight w-full mt-auto">
                 ⚠️ El pago se habilitará próximamente con Mercado Pago
               </div>
             </button>
+            </div>
           </div>
 
           {/* Registration Form */}
-          <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-8 shadow-2xl">
+          <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-6 sm:p-8 shadow-2xl w-full">
             <h2 className="text-2xl font-display mb-6">
               Datos de tu cuenta
             </h2>

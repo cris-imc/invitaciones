@@ -8,6 +8,7 @@ import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
 import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
 import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
+import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { MusicPlayer } from "@/components/invitation/MusicPlayer";
 import { Clock, MapPin, Trophy, Star, ThumbsUp, Users } from "lucide-react";
@@ -378,44 +379,55 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         />
         <div className="absolute inset-0 pointer-events-none bg-black/50 backdrop-blur-[2px]" />
 
-        <main className="relative z-10 max-w-5xl mx-auto w-full px-6 py-12 lg:py-20 space-y-12">
-          {/* Header Card */}
-          <div className="p-8 sm:p-14 rounded-3xl bg-[#172420]/95 border border-amber-500/30 shadow-2xl backdrop-blur-2xl text-center max-w-4xl mx-auto space-y-6">
-            <span className="text-6xl sm:text-7xl block transform hover:scale-110 transition-transform duration-300 drop-shadow-md">✨🥳</span>
+        <main className="relative z-10 max-w-5xl mx-auto w-full px-4 md:px-6 py-12 lg:py-20">
+          <div className="rounded-[2rem] bg-black/40 border border-white/10 shadow-2xl backdrop-blur-3xl text-center max-w-4xl mx-auto relative overflow-hidden flex flex-col">
+            {/* Elegant top accent line */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-amber-200/50 to-transparent" />
             
-            <h1 className="text-3xl sm:text-5xl font-serif font-bold text-amber-300 tracking-tight drop-shadow-md">
-              ¡Esperamos que la hayan pasado genial!
-            </h1>
-            
-            <p className="text-lg sm:text-2xl text-slate-100 leading-relaxed font-sans max-w-2xl mx-auto font-normal drop-shadow-sm">
-              Gracias por habernos acompañado en este día tan especial y compartir momentos inolvidables con nosotros. ❤️
-            </p>
+            {/* Header Content */}
+            <div className="p-10 md:p-16 space-y-8">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white tracking-wide drop-shadow-md">
+                Un momento <AnimatedSynonyms words={["inolvidable", "único", "eterno", "mágico"]} className="italic text-amber-200/90 font-serif" />
+              </h1>
+              
+              <div className="flex justify-center items-center gap-4 py-2 opacity-60">
+                <div className="h-[1px] w-12 bg-white/20" />
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-200/50" />
+                <div className="h-[1px] w-12 bg-white/20" />
+              </div>
 
-            <div className="pt-2">
-              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-mono tracking-wide shadow-lg backdrop-blur-md">
-                <span>⏳ Tarjeta y fotos LIVE disponibles hasta el <strong className="text-amber-300 font-bold">{expirationDateStr}</strong></span>
+              <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide">
+                Gracias por acompañarnos en este día tan especial y compartir la alegría de crear recuerdos que perdurarán para siempre.
+              </p>
+
+              <div className="pt-6">
+                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-sans tracking-widest uppercase backdrop-blur-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
+                  <span>Álbum disponible hasta el {expirationDateStr}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Carrusel de Fotos LIVE */}
-          <SectionWrapper id="album" className="w-full">
-            {livePhotos.length > 0 ? (
-              <div className="w-full overflow-hidden rounded-2xl bg-black/50 p-4 border border-amber-500/20 shadow-2xl">
-                <AlbumCarousel photos={livePhotos} hideHeader={true} />
+            {/* Carrusel de Fotos LIVE integrado */}
+            <SectionWrapper id="album" className="w-full bg-black/20 border-t border-white/5 py-8 md:py-12">
+              <div className="px-4 md:px-10">
+                {livePhotos.length > 0 ? (
+                  <div className="w-full overflow-hidden rounded-2xl shadow-xl ring-1 ring-white/10">
+                    <AlbumCarousel photos={livePhotos} hideHeader={true} />
+                  </div>
+                ) : (
+                  <div className="text-center space-y-3">
+                    <h3 className="font-serif font-light text-xl text-slate-200 tracking-wide">
+                      Álbum Fotográfico
+                    </h3>
+                    <p className="text-sm text-slate-400 font-sans font-light tracking-wide">
+                      No se registraron capturas durante la velada.
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="p-10 sm:p-14 rounded-3xl bg-[#172420]/95 border border-amber-500/30 text-center max-w-lg mx-auto shadow-2xl backdrop-blur-2xl space-y-4">
-                <span className="text-6xl block drop-shadow-md">📸</span>
-                <h3 className="font-serif font-bold text-2xl text-amber-300 drop-shadow-sm">
-                  Fotos LIVE de la Fiesta
-                </h3>
-                <p className="text-base text-slate-200 leading-relaxed font-sans font-medium">
-                  No se registraron fotografías subidas durante la transmisión LIVE del evento.
-                </p>
-              </div>
-            )}
-          </SectionWrapper>
+            </SectionWrapper>
+          </div>
         </main>
 
         <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 font-sans">

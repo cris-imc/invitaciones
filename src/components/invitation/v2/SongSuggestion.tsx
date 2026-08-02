@@ -187,24 +187,15 @@ export function SongSuggestion({
               const alreadyVoted = votedIds.has(song.id);
               return (
                 <div key={song.id} className="mod-item">
-                  <div className="meta" style={{ flex: 1, minWidth: 0, paddingRight: 8 }}>
-                    <b style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div className="meta" style={{ flex: 1, minWidth: 0, paddingRight: 8, color: "var(--t-onpaper)" }}>
+                    <b style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", color: "var(--t-onpaper)" }}>
                       {song.title}
                     </b>
-                    <span>
+                    <span style={{ color: "var(--t-onpaper)", opacity: 0.8 }}>
                       {song.artist}
                       {song.guestName ? ` · sugerida por ${song.guestName}` : ""}
                     </span>
                   </div>
-                  <button
-                    className="t-badge"
-                    onClick={() => handleVote(song.id)}
-                    disabled={alreadyVoted}
-                    aria-label={`${alreadyVoted ? "Ya votaste" : "Votar"} "${song.title}" — ${song.votes} votos`}
-                    style={alreadyVoted ? { opacity: 0.5, cursor: "not-allowed" } : {}}
-                  >
-                    ♥ {song.votes}
-                  </button>
                 </div>
               );
             })}

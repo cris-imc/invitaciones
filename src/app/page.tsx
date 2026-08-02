@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AnimatedMobileMockup } from "@/components/landing/AnimatedMobileMockup";
+import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
 
@@ -37,10 +38,7 @@ export default async function Home() {
         <section className="l-hero">
           <div>
             <p className="kicker">Invitaciones digitales</p>
-            <h1>
-              Cada evento tiene <em>su propia</em> historia. La invitación
-              también debería.
-            </h1>
+            <AnimatedHeroText />
             <p className="sub">
               Elegí una plantilla pensada para tu tipo de evento, personalizá
               cada detalle y compartí un link. Confirmaciones, mapa y mensajes

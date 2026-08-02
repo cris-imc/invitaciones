@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { GuestManager } from "@/components/dashboard/guests/GuestManager";
 import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPayment";
 import { SongModerationPanel } from "@/components/dashboard/SongModerationPanel";
@@ -102,52 +103,62 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
       </div>
 
       {/* Content */}
-      {tab === "invitados" && (
-        <div className="bg-card border rounded-lg p-4 md:p-6">
-          <h2 className="text-xl font-semibold mb-6">Lista de Invitados</h2>
-          <GuestListWithPayment invitationId={invitationId} pagoTarjetaHabilitado={pagoTarjetaHabilitado} />
-        </div>
-      )}
-      {tab === "canciones" && (
-        <div className="bg-card border rounded-lg p-4 md:p-6">
-          <h2 className="text-xl font-semibold mb-6">Moderación de Canciones</h2>
-          <SongModerationPanel invitationId={invitationId} />
-        </div>
-      )}
-      {tab === "precio" && pagoTarjetaHabilitado && (
-        <div className="bg-card border rounded-lg p-4 md:p-6 max-w-lg">
-          <h2 className="text-xl font-semibold mb-4">Actualizar Precio de Tarjeta</h2>
-          <p className="text-muted-foreground text-sm mb-6">
-            Modifica rápidamente el valor por persona. Al cambiarlo aquí, aparecerá un indicador animado de &quot;¡Valor Actualizado!&quot; en la invitación de forma automática por 72 horas.
-          </p>
-          <QuickEditPrice
-            invitationId={invitationId}
-            slug={slug}
-            currentAmount={Number(regaloMonto)}
-            currentPrecioAdolescente={Number(precioAdolescente)}
-            currentPrecioNino={Number(precioNino)}
-            planTier={planTier}
-          />
-        </div>
-      )}
-      {tab === "agregar" && (
-        <GuestManager
-          slug={slug}
-          invitationId={invitationId}
-          initialRsvpEnabled={rsvpEnabled}
-          planTier={planTier}
-          pagoTarjetaHabilitado={pagoTarjetaHabilitado}
-          pagoTarjetaMonto={Number(regaloMonto) || null}
-          precioAdolescente={precioAdolescente != null ? Number(precioAdolescente) : null}
-          precioNino={precioNino != null ? Number(precioNino) : null}
-        />
-      )}
-      {tab === "live" && (
-        <div className="bg-card border rounded-lg p-4 md:p-6">
-          <h2 className="text-xl font-semibold mb-6">LIVE 📸</h2>
-          <LiveAdminPanel invitationId={invitationId} />
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0, filter: "blur(4px)", y: 10 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          exit={{ opacity: 0, filter: "blur(4px)", y: -10 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+        >
+          {tab === "invitados" && (
+            <div className="bg-card border rounded-lg p-4 md:p-6">
+              <h2 className="text-xl font-semibold mb-6">Lista de Invitados</h2>
+              <GuestListWithPayment invitationId={invitationId} pagoTarjetaHabilitado={pagoTarjetaHabilitado} />
+            </div>
+          )}
+          {tab === "canciones" && (
+            <div className="bg-card border rounded-lg p-4 md:p-6">
+              <h2 className="text-xl font-semibold mb-6">Moderación de Canciones</h2>
+              <SongModerationPanel invitationId={invitationId} />
+            </div>
+          )}
+          {tab === "precio" && pagoTarjetaHabilitado && (
+            <div className="bg-card border rounded-lg p-4 md:p-6 max-w-lg">
+              <h2 className="text-xl font-semibold mb-4">Actualizar Precio de Tarjeta</h2>
+              <p className="text-muted-foreground text-sm mb-6">
+                Modifica rápidamente el valor por persona. Al cambiarlo aquí, aparecerá un indicador animado de &quot;¡Valor Actualizado!&quot; en la invitación de forma automática por 72 horas.
+              </p>
+              <QuickEditPrice
+                invitationId={invitationId}
+                slug={slug}
+                currentAmount={Number(regaloMonto)}
+                currentPrecioAdolescente={Number(precioAdolescente)}
+                currentPrecioNino={Number(precioNino)}
+                planTier={planTier}
+              />
+            </div>
+          )}
+          {tab === "agregar" && (
+            <GuestManager
+              slug={slug}
+              invitationId={invitationId}
+              initialRsvpEnabled={rsvpEnabled}
+              planTier={planTier}
+              pagoTarjetaHabilitado={pagoTarjetaHabilitado}
+              pagoTarjetaMonto={Number(regaloMonto) || null}
+              precioAdolescente={precioAdolescente != null ? Number(precioAdolescente) : null}
+              precioNino={precioNino != null ? Number(precioNino) : null}
+            />
+          )}
+          {tab === "live" && (
+            <div className="bg-card border rounded-lg p-4 md:p-6">
+              <h2 className="text-xl font-semibold mb-6">LIVE 📸</h2>
+              <LiveAdminPanel invitationId={invitationId} />
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

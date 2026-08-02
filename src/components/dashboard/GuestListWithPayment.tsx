@@ -51,7 +51,15 @@ export function GuestListWithPayment({
   const [filter, setFilter] = useState<"all" | "CONFIRMED" | "PENDING" | "DECLINED">("all");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [showPaymentInfo, setShowPaymentInfo] = useState(false);
+  const [showPaymentInfo, setShowPaymentInfo] = useState(true);
+
+  useEffect(() => {
+    if (showPaymentInfo) {
+      const timer = setTimeout(() => setShowPaymentInfo(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPaymentInfo]);
+
 
   useEffect(() => {
     fetch(`/api/guests?invitationId=${invitationId}`)
@@ -149,6 +157,42 @@ export function GuestListWithPayment({
       {/* Totales de recaudación */}
       {pagoTarjetaHabilitado && (
         <>
+          {/* Burbuja informativa colapsable animada */}
+          <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-900/10 border border-amber-500/30 text-amber-200/90 text-xs overflow-hidden transition-all duration-300 mb-5 shadow-[0_0_15px_rgba(245,158,11,0.05)]">
+            <button
+                type="button"
+                onClick={() => setShowPaymentInfo(!showPaymentInfo)}
+                className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
+            >
+                <div className="flex items-center gap-2 font-medium">
+                    <Info className={`w-5 h-5 shrink-0 text-amber-400 ${showPaymentInfo ? 'animate-pulse' : ''}`} />
+                    <span className="text-amber-400 text-[13px]">Aviso Importante y Gestión de Pagos</span>
+                </div>
+                <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
+                    {showPaymentInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
+            </button>
+
+            {showPaymentInfo && (
+                <div className="px-4 pb-5 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in slide-in-from-top-4 duration-300 space-y-3">
+                    <p>
+                      <strong>Aviso importante:</strong> Los pagos gestionados aquí son solamente figurativos para que puedas llevar un control. Esta plataforma <strong>no moviliza dinero</strong> y cualquier dato mal cargado es responsabilidad del cliente.
+                    </p>
+                    <div className="w-full h-px bg-amber-500/20" />
+                    <div className="space-y-1">
+                      <p className="flex gap-2">
+                          <span>👉</span>
+                          <span>Tocá un estado de pago (No pago aún / Exento / Pagado) en la lista para cambiarlo de manera rápida.</span>
+                      </p>
+                      <p className="font-medium text-amber-300 flex gap-2">
+                          <span>💡</span>
+                          <span>El invitado verá el cambio reflejado automáticamente cuando abra su invitación.</span>
+                      </p>
+                    </div>
+                </div>
+            )}
+          </div>
+
           {paymentAmount && (
             <div
               style={{
@@ -171,34 +215,6 @@ export function GuestListWithPayment({
               <span style={{ opacity: .6 }}>⊘ Exentos: {exemptCount}</span>
             </div>
           )}
-
-          {/* Burbuja informativa colapsable */}
-          <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200/90 text-xs overflow-hidden transition-all duration-200 mb-5">
-            <button
-                type="button"
-                onClick={() => setShowPaymentInfo(!showPaymentInfo)}
-                className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
-            >
-                <div className="flex items-center gap-2 font-medium">
-                    <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                    <span>Gestión de pagos</span>
-                </div>
-                <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
-                    {showPaymentInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </div>
-            </button>
-
-            {showPaymentInfo && (
-                <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200 space-y-2">
-                    <p>
-                        Tocá un estado de pago (No pago aún / Exento / Pagado) en la lista para cambiarlo de manera rápida.
-                    </p>
-                    <p className="font-medium text-amber-300">
-                        💡 El invitado verá el cambio reflejado automáticamente cuando abra su invitación.
-                    </p>
-                </div>
-            )}
-          </div>
         </>
       )}
 

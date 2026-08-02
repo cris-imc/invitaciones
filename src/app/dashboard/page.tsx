@@ -217,21 +217,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
                 </div>
 
                 <div className="inv-actions">
-                  <Link
-                      href={`/i/${inv.slug}`}
-                      target="_blank"
-                      className="btn-action go inline-flex items-center gap-1.5 justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors"
-                  >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Ver</span>
-                  </Link>
-                  <Link
-                      href={`/dashboard/invitaciones/editar/${inv.id}`}
-                      className="btn-action inline-flex items-center gap-1.5 justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 transition-colors"
-                  >
-                      <Pencil className="w-3.5 h-3.5" />
-                      <span>Editar</span>
-                  </Link>
                   <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go btn-admin-glow inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg text-indigo-300 transition-colors">
                       Administrar →
                   </Link>
