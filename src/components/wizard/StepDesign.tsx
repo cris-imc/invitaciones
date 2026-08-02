@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -7,11 +7,13 @@ import { ImageUploader } from "@/components/ui/ImageUploader";
 import { AVAILABLE_TEMPLATES } from "@/lib/theme-config";
 import { TemplateSelector } from "@/components/dashboard/TemplateSelector";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { saveInvitationFromWizard } from "@/lib/save-invitation";
 
 
 
 export function StepDesign() {
-    const { data, setData, setThemeConfig, nextStep, prevStep } = useWizardStore();
+    const { data, setData, setThemeConfig, themeConfig, usePremiumCredit } = useWizardStore();
+    const [isCreating, setIsCreating] = useState(false);
     const selectedTemplate = data.templateTipo || "ORIGINAL";
 
     const handleTemplateSelect = (templateId: string) => {
@@ -21,6 +23,18 @@ export function StepDesign() {
         if (template?.layoutId) {
             // @ts-ignore - Valid layout id check implied
             setThemeConfig({ layout: template.layoutId as any });
+        }
+    };
+
+    const handleCreate = async () => {
+        setIsCreating(true);
+        try {
+            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit);
+            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
+        } catch (error) {
+            console.error('Error creating invitation:', error);
+            alert(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+            setIsCreating(false);
         }
     };
 
@@ -58,7 +72,7 @@ export function StepDesign() {
                 </div>
             )}
 
-            <SaveStepButtons />
+            <SaveStepButtons isLastStep={true} onCreate={handleCreate} isCreating={isCreating} />
         </div>
     );
 }

@@ -15,7 +15,7 @@ function FormTracker({ form, onDirtyChange }: { form: any, onDirtyChange: (d: bo
     return null;
 }
 
-export function SaveStepButtons({ form, onNext }: { form?: any, onNext?: () => void }) {
+export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating }: { form?: any, onNext?: () => void, isLastStep?: boolean, onCreate?: () => void, isCreating?: boolean }) {
     const { prevStep, nextStep, currentStep, setDirty, setData } = useWizardStore();
     const router = useRouter();
     const [showWarning, setShowWarning] = useState(false);
@@ -95,12 +95,31 @@ export function SaveStepButtons({ form, onNext }: { form?: any, onNext?: () => v
                         )}
                     </Button>
                 )}
-                <Button 
-                    type={form ? "submit" : "button"} 
-                    onClick={onNext ? onNext : (!form ? nextStep : undefined)}
-                >
-                    Siguiente Paso
-                </Button>
+                {isLastStep ? (
+                    <Button 
+                        type="button" 
+                        size="lg"
+                        className="px-8 gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
+                        onClick={onCreate}
+                        disabled={isSaving || isCreating}
+                    >
+                        {isCreating ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Creando...
+                            </>
+                        ) : (
+                            'Crear Invitación'
+                        )}
+                    </Button>
+                ) : (
+                    <Button 
+                        type={form ? "submit" : "button"} 
+                        onClick={onNext ? onNext : (!form ? nextStep : undefined)}
+                    >
+                        Siguiente Paso
+                    </Button>
+                )}
             </div>
         </div>
         </>

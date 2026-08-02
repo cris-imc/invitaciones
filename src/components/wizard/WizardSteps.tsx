@@ -36,7 +36,6 @@ export function WizardSteps() {
         { component: StepTrivia, label: "Trivia" },
         { component: StepBankDetails, label: "Regalo (CBU)" },
         { component: StepDesign, label: "Plantilla" },
-        { component: StepPreview, label: "Vista Previa" },
     ];
 
     const CurrentComponent = steps[currentStep].component;

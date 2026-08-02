@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GuestManager } from "@/components/dashboard/guests/GuestManager";
 import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPayment";
 import { SongModerationPanel } from "@/components/dashboard/SongModerationPanel";
 import { QuickEditPrice } from "@/components/dashboard/QuickEditPrice";
 import { LiveAdminPanel } from "@/components/dashboard/live/LiveAdminPanel";
-import { Lock } from "lucide-react";
+import { Lock, Info } from "lucide-react";
 
 type Tab = "invitados" | "canciones" | "precio" | "agregar" | "live";
 
@@ -21,6 +21,39 @@ interface Props {
   precioNino: unknown;
   rsvpEnabled: boolean;
   planTier: string;
+}
+
+const TAB_DESCRIPTIONS: Record<Tab, string> = {
+  agregar: "Agregá invitados, familias y enviales su enlace único por WhatsApp...",
+  invitados: "Revisá quién confirmó asistencia y llevá el control exacto de los pagos...",
+  precio: "Modificá el precio del cubierto y notificá automáticamente a tus invitados...",
+  canciones: "Escuchá, aprobá o rechazá las canciones que sugieren para la fiesta...",
+  live: "Modo Fiesta: Proyectá fotos en vivo y moderá la pantalla gigante...",
+};
+
+function AnimatedTabDescription({ text }: { text: string }) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    let i = 0;
+    setDisplayed("");
+    const interval = setInterval(() => {
+      setDisplayed(text.slice(0, i));
+      i++;
+      if (i > text.length) clearInterval(interval);
+    }, 40);
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return (
+    <div className="flex items-center gap-2 px-1 mb-5 text-sm text-amber-600 dark:text-amber-400/90 font-medium min-h-[24px]">
+      <Info className="w-4 h-4 shrink-0" />
+      <span>
+        {displayed}
+        <span className="animate-pulse ml-0.5">|</span>
+      </span>
+    </div>
+  );
 }
 
 export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier }: Props) {
@@ -101,6 +134,8 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
           );
         })}
       </div>
+
+      <AnimatedTabDescription text={TAB_DESCRIPTIONS[tab]} />
 
       {/* Content */}
       <AnimatePresence mode="wait">

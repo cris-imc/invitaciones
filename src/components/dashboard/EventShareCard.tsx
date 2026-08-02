@@ -1,9 +1,31 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Eye, Pencil, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, Eye, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+
+function TypewriterText() {
+  const text = "Previsualizá el diseño o modificá los detalles en Editar Info...";
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayed(text.slice(0, i));
+      i++;
+      if (i > text.length) clearInterval(interval);
+    }, 45); // Velocidad de escritura
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span className="font-medium text-sm text-slate-600 dark:text-slate-300">
+      {displayed}
+      <span className="animate-pulse text-amber-500 font-bold ml-0.5">|</span>
+    </span>
+  );
+}
 
 interface EventShareCardProps {
   slug: string;
@@ -12,77 +34,40 @@ interface EventShareCardProps {
 }
 
 export function EventShareCard({ slug, eventName, invitationId }: EventShareCardProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsExpanded(false);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
-    <div className="space-y-4">
-      {/* Control Box: Preview & Quick Edit */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between p-5 bg-card border rounded-2xl shadow-sm">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-base">Vista Previa & Acciones de la Tarjeta</span>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Revisá cómo se ve tu invitación pública o editá sus contenidos desde el Wizard.
-          </p>
-        </div>
+    <div className="w-full mb-4">
+      <div className="relative group w-full">
+        {/* Efecto de aura/brillo sutil animado */}
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/30 to-amber-500/30 rounded-full blur-md opacity-50 group-hover:opacity-75 transition duration-1000 animate-pulse"></div>
         
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <Link href={`/i/${slug}`} target="_blank" className="w-full sm:w-auto btn-action go inline-flex items-center justify-center h-8 px-3 gap-2 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors">
-              <Eye className="w-4 h-4" />
-              Ver Vista Previa
-          </Link>
+        {/* Burbuja Principal */}
+        <div className="relative flex flex-col sm:flex-row items-center justify-between p-1.5 sm:pl-5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200/50 dark:border-slate-800/50 rounded-3xl sm:rounded-full shadow-sm gap-3 sm:gap-6 transition-all duration-300 hover:shadow-md">
           
-          {invitationId && (
-            <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="w-full sm:w-auto">
-              <Button variant="outline" size="sm" className="w-full h-8 gap-2 border-amber-500/40 text-amber-600 dark:text-amber-300 hover:bg-amber-500/10">
-                <Pencil className="w-4 h-4" />
-                Editar Datos (Wizard)
-              </Button>
+          <div className="flex items-center gap-2.5 min-w-0 pt-2 sm:pt-0">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+            </span>
+            <div className="truncate">
+              <TypewriterText />
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+            <Link href={`/i/${slug}`} target="_blank" className="flex-1 sm:flex-none inline-flex items-center justify-center h-9 px-4 gap-2 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700">
+                <Eye className="w-3.5 h-3.5" />
+                <span>Ver Diseño</span>
             </Link>
-          )}
-
-        </div>
-      </div>
-
-      {/* UX Explanation Banner for WhatsApp Personalization */}
-      <div 
-        className={`rounded-xl border transition-all duration-700 overflow-hidden ${
-          isExpanded ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-800" : "bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
-        }`}
-        onClick={() => !isExpanded && setIsExpanded(true)}
-      >
-        <div className="p-4 flex items-start gap-3">
-          <Info className={`w-5 h-5 shrink-0 mt-0.5 transition-colors duration-500 ${isExpanded ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500"}`} />
-          <div className="space-y-1 text-xs leading-relaxed flex-1">
-            <div className="flex justify-between items-center">
-              <p className={`font-bold text-sm transition-colors duration-500 ${isExpanded ? "text-indigo-900 dark:text-indigo-200" : "text-slate-600 dark:text-slate-300"}`}>
-                📲 ¿Cómo enviar las invitaciones por WhatsApp?
-              </p>
-              {isExpanded ? (
-                <button onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }} className="text-indigo-400 hover:text-indigo-700">
-                  <ChevronUp className="w-4 h-4" />
-                </button>
-              ) : (
-                <ChevronDown className="w-4 h-4 text-slate-400" />
-              )}
-            </div>
             
-            <div className={`transition-all duration-700 overflow-hidden ${isExpanded ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0 m-0"}`}>
-              <p className="text-indigo-800 dark:text-indigo-300">
-                Para que cada invitado o familia reciba su <strong>enlace personalizado único</strong> (que permite registrar quiénes confirman, cuántos cupos asisten y controlar los pagos), <strong>usá la lista de invitados de abajo</strong>.
-              </p>
-              <p className="text-indigo-700 dark:text-indigo-400 opacity-90 mt-1">
-                Cada invitado tiene su propio botón <strong>📲 Enviar por WhatsApp</strong> al lado de su nombre.
-              </p>
-            </div>
+            {invitationId && (
+              <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="flex-1 sm:flex-none">
+                <Button size="sm" className="w-full h-9 px-5 rounded-full gap-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm border-0">
+                  <Pencil className="w-3.5 h-3.5" />
+                  Editar Info
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
