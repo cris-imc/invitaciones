@@ -72,14 +72,25 @@ export function RSVPWizardV2({
     return "decision";
   });
 
-  const hasSpecificCounts =
-    (initialAttendingAdults !== undefined && initialAttendingAdults > 0) ||
-    (initialAttendingTeens !== undefined && initialAttendingTeens > 0) ||
-    (initialAttendingChildren !== undefined && initialAttendingChildren > 0);
+  const hasSpecificAttending =
+    (initialStatus === "CONFIRMED") && (
+      (initialAttendingAdults !== undefined && initialAttendingAdults > 0) ||
+      (initialAttendingTeens !== undefined && initialAttendingTeens > 0) ||
+      (initialAttendingChildren !== undefined && initialAttendingChildren > 0)
+    );
 
-  const initialAdults = hasSpecificCounts ? (initialAttendingAdults || 0) : (initialAttendingCount > 0 ? initialAttendingCount : 1);
-  const initialTeens = hasSpecificCounts ? (initialAttendingTeens || 0) : 0;
-  const initialChildren = hasSpecificCounts ? (initialAttendingChildren || 0) : 0;
+  // Si ya RSVP'd (hasSpecificAttending), usamos lo que confirmó. Si no, usamos lo esperado (max...).
+  const initialAdults = hasSpecificAttending
+    ? (initialAttendingAdults || 0)
+    : (maxAdults !== undefined ? maxAdults : (initialAttendingCount > 0 ? initialAttendingCount : 1));
+
+  const initialTeens = hasSpecificAttending
+    ? (initialAttendingTeens || 0)
+    : (maxTeens || 0);
+
+  const initialChildren = hasSpecificAttending
+    ? (initialAttendingChildren || 0)
+    : (maxChildren || 0);
 
   const [adultCount, setAdultCount] = useState(initialAdults);
   const [teenCount, setTeenCount] = useState(initialTeens);
@@ -99,11 +110,8 @@ export function RSVPWizardV2({
     const adultPrice = paymentAmount ?? 0;
     const teenPrice = precioAdolescente != null ? precioAdolescente : adultPrice;
     const childPrice = precioNino != null ? precioNino : adultPrice;
-    if (maxGuests > 1) {
-      totalPayment = (adultPrice * adultCount) + (teenPrice * teenCount) + (childPrice * childCount);
-    } else {
-      totalPayment = adultPrice * count;
-    }
+    
+    totalPayment = (adultPrice * adultCount) + (teenPrice * teenCount) + (childPrice * childCount);
   }
 
   const formatARS = (n: number) =>
@@ -345,7 +353,7 @@ export function RSVPWizardV2({
               {!guestToken ? "Valor de la tarjeta (vista previa)" : (paymentStatus === "PAID" ? "Tarjeta abonada ✓" : "Valor de la tarjeta")}
             </h4>
             <p style={{ opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
-              Monto total a pagar: <b>{formatARS(totalPayment)}</b>
+              {paymentStatus === "PAID" ? "Monto pagado:" : "Monto total a pagar:"} <b>{formatARS(totalPayment)}</b>
               <br />
               <span style={{ fontSize: "12px", opacity: 0.8 }}>
                 ({adultCount} adultos{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} adolescentes` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} niños` : ""})

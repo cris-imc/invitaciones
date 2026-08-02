@@ -32,8 +32,11 @@ export async function POST(
       data: {
         status,
         paymentStatus,
-        attendingCount: body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : (body.attendingAdults || 0) + (body.attendingChildren || 0),
+        attendingCount: (body.attendingAdults || 0) + (body.attendingTeens || 0) + (body.attendingChildren || 0) > 0
+          ? (body.attendingAdults || 0) + (body.attendingTeens || 0) + (body.attendingChildren || 0)
+          : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 1),
         attendingAdults: body.attendingAdults !== undefined ? body.attendingAdults : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 0),
+        attendingTeens: body.attendingTeens || 0,
         attendingChildren: body.attendingChildren || 0,
         dietaryRestrictions: body.restricciones,
         responseDate: new Date(),

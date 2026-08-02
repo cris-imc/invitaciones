@@ -131,11 +131,15 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [newGuestType, setNewGuestType] = useState<"INDIVIDUAL" | "FAMILY">(
     "INDIVIDUAL",
   );
+  const [newIndividualCategory, setNewIndividualCategory] = useState<'adult' | 'teen'>('adult');
   const [newGuestAdultCount, setNewGuestAdultCount] = useState(2);
   const [newGuestTeenCount, setNewGuestTeenCount] = useState(0);
   const [newGuestChildCount, setNewGuestChildCount] = useState(0);
   const [newGuestIsExempt, setNewGuestIsExempt] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Edit form individual category
+  const [editIndividualCategory, setEditIndividualCategory] = useState<'adult' | 'teen'>('adult');
 
   // Helper: attempt to toggle a category switch — open price modal if no price set
   const tryToggle = (
@@ -234,8 +238,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
             newGuestType === "FAMILY"
               ? Math.max(1, effectiveAdults + effectiveTeens + effectiveChildren)
               : 1,
-          expectedAdults: newGuestType === "FAMILY" ? effectiveAdults : 1,
-          expectedTeens: newGuestType === "FAMILY" ? effectiveTeens : 0,
+          expectedAdults: newGuestType === "FAMILY" ? effectiveAdults : (newIndividualCategory === 'adult' ? 1 : 0),
+          expectedTeens:  newGuestType === "FAMILY" ? effectiveTeens  : (newIndividualCategory === 'teen'  ? 1 : 0),
           expectedChildren: newGuestType === "FAMILY" ? effectiveChildren : 0,
           isExempt: newGuestIsExempt,
         }),
@@ -249,6 +253,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         setNewGuestTeenCount(0);
         setNewGuestChildCount(0);
         setNewGuestIsExempt(false);
+        setNewIndividualCategory('adult');
         showToast("Invitado agregado exitosamente", "success");
       } else {
         showToast("Error al agregar invitado", "error");
@@ -275,6 +280,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     setEditTeensEnabled(teens > 0);
     setEditChildrenEnabled(children > 0);
     setEditGuestIsExempt(guest.isExempt ?? false);
+    // Individual category
+    if (guest.type === "INDIVIDUAL") {
+      setEditIndividualCategory((guest.expectedTeens ?? 0) > 0 ? 'teen' : 'adult');
+    }
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -297,8 +306,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           name: editGuestName,
           type: editGuestType,
           expectedCount: expectedCount,
-          expectedAdults: editGuestType === "FAMILY" ? effectiveAdults : 1,
-          expectedTeens: editGuestType === "FAMILY" ? effectiveTeens : 0,
+          expectedAdults: editGuestType === "FAMILY" ? effectiveAdults : (editIndividualCategory === 'adult' ? 1 : 0),
+          expectedTeens:  editGuestType === "FAMILY" ? effectiveTeens  : (editIndividualCategory === 'teen'  ? 1 : 0),
           expectedChildren:
             editGuestType === "FAMILY" ? effectiveChildren : 0,
           isExempt: editGuestIsExempt,
@@ -451,7 +460,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     />
                     <Label htmlFor="individual">Individual</Label>
                   </div>
-                  <div className="flex items-center space-x-2 opacity-50 relative group">
+                  <div className={`flex items-center space-x-2 relative group${planTier !== 'PREMIUM' ? ' opacity-50' : ''}`}>
                     <input
                       type="radio"
                       id="family"
@@ -461,7 +470,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       disabled={planTier !== 'PREMIUM'}
                       className="accent-primary"
                     />
-                    <Label htmlFor="family" className="flex items-center gap-2 cursor-not-allowed">
+                    <Label htmlFor="family" className={`flex items-center gap-2${planTier !== 'PREMIUM' ? ' cursor-not-allowed' : ''}`}>
                         Familiar
                         {planTier !== 'PREMIUM' && <Lock className="w-4 h-4 text-red-400" />}
                     </Label>
@@ -476,10 +485,35 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 </div>
               </div>
 
+              {/* INDIVIDUAL: selector adulto/adolescente */}
+              {newGuestType === "INDIVIDUAL" && (
+                <div className="space-y-2 pt-1">
+                  <Label className="text-sm text-muted-foreground">Categoría</Label>
+                  <div className="flex gap-3">
+                  <button
+                      type="button"
+                      onClick={() => setNewIndividualCategory('adult')}
+                      className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${newIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
+                    >
+                      <span>Adulto</span>
+                      {currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewIndividualCategory('teen')}
+                      className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${newIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
+                    >
+                      <span>Adolescente</span>
+                      {currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {newGuestType === "FAMILY" && (
                 <div className="space-y-3 pt-2">
                   {/* ADULTOS */}
-                  <div className={`rounded-lg border p-3 transition-opacity ${!newAdultsEnabled ? "opacity-50" : ""}`}>
+                <div className={`rounded-lg p-3 transition-opacity ${!newAdultsEnabled ? "opacity-50" : ""}`}>
                     <div className="flex items-center justify-between mb-2">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
@@ -498,7 +532,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   </div>
 
                   {/* ADOLESCENTES */}
-                  <div className={`rounded-lg border p-3 transition-opacity ${!newTeensEnabled ? "opacity-50" : ""}`}>
+                <div className={`rounded-lg p-3 transition-opacity ${!newTeensEnabled ? "opacity-50" : ""}`}>
                     <div className="flex items-center justify-between mb-2">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
@@ -517,7 +551,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   </div>
 
                   {/* NIÑOS */}
-                  <div className={`rounded-lg border p-3 transition-opacity ${!newChildrenEnabled ? "opacity-50" : ""}`}>
+                <div className={`rounded-lg p-3 transition-opacity ${!newChildrenEnabled ? "opacity-50" : ""}`}>
                     <div className="flex items-center justify-between mb-2">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
@@ -768,7 +802,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   />
                   <Label htmlFor="edit-individual">Individual</Label>
                 </div>
-                <div className="flex items-center space-x-2 opacity-50 relative group">
+                <div className={`flex items-center space-x-2 relative group${planTier !== 'PREMIUM' ? ' opacity-50' : ''}`}>
                   <input
                     type="radio"
                     id="edit-family"
@@ -778,7 +812,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     disabled={planTier !== 'PREMIUM'}
                     className="accent-primary"
                   />
-                  <Label htmlFor="edit-family" className="flex items-center gap-2 cursor-not-allowed">
+                  <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier !== 'PREMIUM' ? ' cursor-not-allowed' : ''}`}>
                       Familiar
                       {planTier !== 'PREMIUM' && <Lock className="w-4 h-4 text-red-400" />}
                   </Label>
@@ -793,10 +827,35 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
               </div>
             </div>
 
+            {/* INDIVIDUAL: selector adulto/adolescente */}
+            {editGuestType === "INDIVIDUAL" && (
+              <div className="space-y-2 pt-1">
+                <Label className="text-sm text-muted-foreground">Categoría</Label>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditIndividualCategory('adult')}
+                    className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${editIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
+                  >
+                    <span>Adulto</span>
+                    {currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditIndividualCategory('teen')}
+                    className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${editIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
+                  >
+                    <span>Adolescente</span>
+                    {currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {editGuestType === "FAMILY" && (
               <div className="space-y-3 pt-2">
                 {/* ADULTOS */}
-                <div className={`rounded-lg border p-3 transition-opacity ${!editAdultsEnabled ? "opacity-50" : ""}`}>
+              <div className={`rounded-lg p-3 transition-opacity ${!editAdultsEnabled ? "opacity-50" : ""}`}>
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
@@ -815,7 +874,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 </div>
 
                 {/* ADOLESCENTES */}
-                <div className={`rounded-lg border p-3 transition-opacity ${!editTeensEnabled ? "opacity-50" : ""}`}>
+              <div className={`rounded-lg p-3 transition-opacity ${!editTeensEnabled ? "opacity-50" : ""}`}>
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
@@ -834,7 +893,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 </div>
 
                 {/* NIÑOS */}
-                <div className={`rounded-lg border p-3 transition-opacity ${!editChildrenEnabled ? "opacity-50" : ""}`}>
+              <div className={`rounded-lg p-3 transition-opacity ${!editChildrenEnabled ? "opacity-50" : ""}`}>
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />

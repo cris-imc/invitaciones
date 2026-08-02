@@ -17,6 +17,7 @@ interface Guest {
 interface GuestListWithPaymentProps {
   invitationId: string;
   paymentAmount?: number;
+  pagoTarjetaHabilitado?: boolean;
   onPaymentChange?: (guestId: string, newStatus: string) => void;
 }
 
@@ -41,6 +42,7 @@ const PAYMENT_STATUS_COLORS: Record<string, string> = {
 export function GuestListWithPayment({
   invitationId,
   paymentAmount,
+  pagoTarjetaHabilitado = false,
   onPaymentChange,
 }: GuestListWithPaymentProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -124,12 +126,14 @@ export function GuestListWithPayment({
   return (
     <div>
       {/* Resumen */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5 pb-5 border-b" style={{ borderColor: "var(--line)" }}>
+      <div className={`grid grid-cols-2 ${pagoTarjetaHabilitado ? 'md:grid-cols-4' : ''} gap-4 mb-5 pb-5 border-b`} style={{ borderColor: "var(--line)" }}>
         {[
           { label: "Enviadas / Aceptadas", value: `${guests.length} / ${confirmed.length}` },
           { label: "Personas", value: totalPeople },
-          { label: "Pagaron", value: paidCount },
-          { label: "Pendientes de Pago", value: pendingPayCount },
+          ...(pagoTarjetaHabilitado ? [
+            { label: "Pagaron", value: paidCount },
+            { label: "Pendientes de Pago", value: pendingPayCount }
+          ] : []),
         ].map(({ label, value }, index) => (
           <div key={label} className="text-center p-4 rounded-xl" style={{ backgroundColor: "rgba(0,0,0,0.03)", border: "1px solid var(--line)" }}>
             <b style={{ display: "block", fontFamily: "var(--font-display)", fontSize: "28px", color: "var(--accent)" }}>{value}</b>
@@ -141,7 +145,8 @@ export function GuestListWithPayment({
       </div>
 
       {/* Totales de recaudación */}
-      {paymentAmount && (
+      {/* Totales de recaudación */}
+      {pagoTarjetaHabilitado && paymentAmount && (
         <div
           style={{
             display: "flex",
@@ -240,8 +245,8 @@ export function GuestListWithPayment({
                 </div>
               </div>
 
-              {/* Toggle de pago — solo visible si confirmó */}
-              {guest.status === "CONFIRMED" && (
+              {/* Toggle de pago — solo visible si confirmó y si está habilitado */}
+              {guest.status === "CONFIRMED" && pagoTarjetaHabilitado && (
                 <div
                   className="inv-status-toggle"
                   role="group"
@@ -250,17 +255,20 @@ export function GuestListWithPayment({
                   {(["PENDING", "EXEMPT", "PAID"] as const).map((s) => (
                     <button
                       key={s}
-                      className={`inv-status-btn ${guest.paymentStatus === s ? `active-${s.toLowerCase()}` : ""}`}
                       onClick={() => handlePaymentChange(guest.id, s)}
                       disabled={updatingId === guest.id}
-                      aria-pressed={guest.paymentStatus === s}
-                      aria-label={`Marcar ${PAYMENT_STATUS_LABELS[s]}`}
                       style={{
-                        ...(guest.paymentStatus === s
-                          ? { background: PAYMENT_STATUS_COLORS[s], color: "#fff", border: "none" }
-                          : {}),
-                        opacity: updatingId === guest.id ? .5 : 1,
+                        padding: "6px 12px",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        border: "none",
+                        background: guest.paymentStatus === s ? PAYMENT_STATUS_COLORS[s] : "transparent",
+                        color: guest.paymentStatus === s ? "#fff" : "#888",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                        opacity: updatingId === guest.id ? 0.5 : 1,
                       }}
+                      aria-pressed={guest.paymentStatus === s}
                     >
                       {PAYMENT_STATUS_LABELS[s]}
                     </button>

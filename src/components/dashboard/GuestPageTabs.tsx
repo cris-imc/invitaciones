@@ -123,7 +123,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
       {tab === "invitados" && (
         <div className="bg-card border rounded-lg p-4 md:p-6">
           <h2 className="text-xl font-semibold mb-6">Lista de Invitados</h2>
-          <GuestListWithPayment invitationId={invitationId} />
+          <GuestListWithPayment invitationId={invitationId} pagoTarjetaHabilitado={pagoTarjetaHabilitado} />
         </div>
       )}
       {tab === "canciones" && (

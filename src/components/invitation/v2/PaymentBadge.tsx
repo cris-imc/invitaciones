@@ -6,8 +6,10 @@ interface PaymentBadgeProps {
   paymentStatus: "PENDING" | "EXEMPT" | "PAID";
   amount?: number;          // monto por persona en ARS
   precioNino?: number;
+  precioAdolescente?: number;
   attendingCount?: number;  // cantidad de personas confirmadas (legacy)
   attendingAdults?: number;
+  attendingTeens?: number;
   attendingChildren?: number;
   alias?: string;           // alias de transferencia
   cbu?: string;
@@ -19,8 +21,10 @@ export function PaymentBadge({
   paymentStatus,
   amount,
   precioNino,
+  precioAdolescente,
   attendingCount = 1,
   attendingAdults,
+  attendingTeens,
   attendingChildren,
   alias,
   cbu,
@@ -64,12 +68,14 @@ export function PaymentBadge({
   // PENDING
   if (!amount) return null;
 
-  const hasSpecificCounts = (attendingAdults !== undefined && attendingAdults > 0) || (attendingChildren !== undefined && attendingChildren > 0);
+  const hasSpecificCounts = (attendingAdults !== undefined && attendingAdults > 0) || (attendingTeens !== undefined && attendingTeens > 0) || (attendingChildren !== undefined && attendingChildren > 0);
   const adults = hasSpecificCounts ? (attendingAdults || 0) : attendingCount;
+  const teens = hasSpecificCounts ? (attendingTeens || 0) : 0;
   const children = hasSpecificCounts ? (attendingChildren || 0) : 0;
+  const teenPrice = precioAdolescente != null ? precioAdolescente : amount;
   const childPrice = precioNino != null ? precioNino : amount;
 
-  const total = (amount * adults) + (childPrice * children);
+  const total = (amount * adults) + (teenPrice * teens) + (childPrice * children);
 
   const formattedTotal = new Intl.NumberFormat("es-AR", {
     style: "currency",
