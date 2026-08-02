@@ -29,7 +29,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
-  PENDING: "Pendiente",
+  PENDING: "No pago aún",
   EXEMPT: "Exento",
   PAID: "Pagado",
 };
@@ -191,7 +191,7 @@ export function GuestListWithPayment({
             {showPaymentInfo && (
                 <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200 space-y-2">
                     <p>
-                        Tocá un estado de pago (Pendiente / Exento / Pagado) en la lista para cambiarlo de manera rápida.
+                        Tocá un estado de pago (No pago aún / Exento / Pagado) en la lista para cambiarlo de manera rápida.
                     </p>
                     <p className="font-medium text-amber-300">
                         💡 El invitado verá el cambio reflejado automáticamente cuando abra su invitación.
@@ -275,9 +275,13 @@ export function GuestListWithPayment({
                       {guest.attendingCount > 1 ? "Asistirán" : "Asistirá"}
                     </span>
                   )}
+                  {guest.status === "PENDING" && (
+                    <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", background: "rgba(234, 179, 8, 0.1)", color: "rgb(234, 179, 8)", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
+                      Pendiente
+                    </span>
+                  )}
                 </div>
                 <div style={{ fontSize: "11.5px", color: "#888", marginTop: "4px" }}>
-                  {guest.status === "PENDING" && (STATUS_LABELS[guest.status] ?? guest.status)}
                   {guest.status === "CONFIRMED" && `${guest.attendingCount} persona${guest.attendingCount !== 1 ? "s" : ""}`}
                   {guest.dietaryRestrictions && (guest.status === "CONFIRMED" ? ` · ${guest.dietaryRestrictions}` : guest.dietaryRestrictions)}
                 </div>

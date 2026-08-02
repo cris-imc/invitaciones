@@ -94,17 +94,21 @@ export function Sidebar() {
                 </DialogContent>
             </Dialog>
 
-            {sidebarItems.map((item, index) => (
-                <Link
-                    key={index}
-                    href={item.href}
-                    className={pathname === item.href || pathname.startsWith(item.href + "/") ? "active" : ""}
-                    onClick={(e) => handleNavClick(e, item.href, onClick)}
-                >
-                    <b><item.icon className="w-4 h-4" /></b>
-                    {item.title}
-                </Link>
-            ))}
+            {sidebarItems.map((item, index) => {
+                const isActive = pathname === item.href;
+
+                return (
+                    <Link
+                        key={index}
+                        href={item.href}
+                        className={isActive ? "active" : ""}
+                        onClick={(e) => handleNavClick(e, item.href, onClick)}
+                    >
+                        <b><item.icon className="w-4 h-4" /></b>
+                        {item.title}
+                    </Link>
+                );
+            })}
             
             <div className="mt-4 px-2">
                 <button onClick={handleSignOut} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 py-2 rounded-lg text-sm font-semibold transition-colors">

@@ -381,46 +381,34 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
         {/* Stats Cards */}
-        <Card className="flex-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Invitados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalGuests}</div>
-            <p className="text-xs text-muted-foreground">Registros en lista</p>
-          </CardContent>
+        <Card className="flex flex-col justify-center py-4 px-4 md:py-6 md:px-6 gap-1 md:gap-2">
+          <div className="text-xs md:text-sm font-medium text-muted-foreground leading-none">
+            Total Invitados
+          </div>
+          <div className="text-2xl md:text-3xl font-bold leading-none mt-1">{totalGuests}</div>
+          <p className="text-[10px] md:text-xs text-muted-foreground leading-none">Registros en lista</p>
         </Card>
-        <Card className="flex-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Confirmados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {totalAttending}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Personas asistirán ({confirmedGuests} grupos)
-            </p>
-          </CardContent>
+        <Card className="flex flex-col justify-center py-4 px-4 md:py-6 md:px-6 gap-1 md:gap-2">
+          <div className="text-xs md:text-sm font-medium text-muted-foreground leading-none">
+            Confirmados
+          </div>
+          <div className="text-2xl md:text-3xl font-bold text-green-600 leading-none mt-1">
+            {totalAttending}
+          </div>
+          <p className="text-[10px] md:text-xs text-muted-foreground leading-tight">
+            Asistirán ({confirmedGuests} grupos)
+          </p>
         </Card>
-        <Card className="flex-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pendientes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {pendingGuests}
-            </div>
-            <p className="text-xs text-muted-foreground">Sin responder</p>
-          </CardContent>
+        <Card className="col-span-2 md:col-span-1 flex flex-col justify-center py-4 px-4 md:py-6 md:px-6 gap-1 md:gap-2">
+          <div className="text-xs md:text-sm font-medium text-muted-foreground leading-none">
+            Pendientes
+          </div>
+          <div className="text-2xl md:text-3xl font-bold text-yellow-600 leading-none mt-1">
+            {pendingGuests}
+          </div>
+          <p className="text-[10px] md:text-xs text-muted-foreground leading-none">Sin responder</p>
         </Card>
       </div>
 

@@ -34,15 +34,15 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
           </p>
         </div>
         
-        <div className="flex gap-2 w-full md:w-auto flex-wrap">
-          <Link href={`/i/${slug}`} target="_blank" className="btn-action go inline-flex items-center justify-center h-8 px-3 gap-2 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors">
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <Link href={`/i/${slug}`} target="_blank" className="w-full sm:w-auto btn-action go inline-flex items-center justify-center h-8 px-3 gap-2 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors">
               <Eye className="w-4 h-4" />
               Ver Vista Previa
           </Link>
           
           {invitationId && (
-            <Link href={`/dashboard/invitaciones/editar/${invitationId}`}>
-              <Button variant="outline" size="sm" className="gap-2 border-amber-500/40 text-amber-600 dark:text-amber-300 hover:bg-amber-500/10">
+            <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="w-full sm:w-auto">
+              <Button variant="outline" size="sm" className="w-full h-8 gap-2 border-amber-500/40 text-amber-600 dark:text-amber-300 hover:bg-amber-500/10">
                 <Pencil className="w-4 h-4" />
                 Editar Datos (Wizard)
               </Button>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -76,6 +76,9 @@ export function EditUserButton({ userId, initialName, initialEmail }: { userId: 
                             </label>
                             <Input
                                 type="email"
+                                name="admin-edit-email"
+                                autoComplete="off"
+                                data-lpignore="true"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
@@ -89,6 +92,9 @@ export function EditUserButton({ userId, initialName, initialEmail }: { userId: 
                             </label>
                             <Input
                                 type="password"
+                                name="admin-edit-password"
+                                autoComplete="new-password"
+                                data-lpignore="true"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="bg-white/5 border-white/10 text-white placeholder:text-white/30"

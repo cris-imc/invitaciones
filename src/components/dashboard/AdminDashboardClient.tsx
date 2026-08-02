@@ -55,6 +55,10 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50" />
                 <Input 
                     type="text"
+                    name="admin-search-clients"
+                    autoComplete="off"
+                    data-lpignore="true"
+                    data-form-type="other"
                     placeholder="Buscar cliente por nombre o email..."
                     value={searchTerm}
                     onChange={handleSearch}
