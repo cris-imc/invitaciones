@@ -29,24 +29,29 @@ export function StepCronograma() {
     const [showInfo, setShowInfo] = useState(false);
     
     const getDefaultEvents = (): CronogramaEvent[] => {
+        const startHourStr = data.hora || "21:00";
+        let startHour = parseInt(startHourStr.split(":")[0]);
+        if (isNaN(startHour)) startHour = 21;
+        
+        const nextHour = (startHour + 2) % 24;
+        const nextHourStr = `${nextHour.toString().padStart(2, '0')}:00`;
+        const initialHourStr = startHourStr;
+
         if (data.type === 'CASAMIENTO') {
             if (data.ceremoniaHabilitada) {
                 return [
-                    { time: "20:30", title: "Recepción", icon: "Music" },
-                    { time: "21:30", title: "Cena & Brindis", icon: "Utensils" },
-                    { time: "23:30", title: "Fiesta & Baile", icon: "Music" }
+                    { time: initialHourStr, title: "Recepción", icon: "Music" },
+                    { time: nextHourStr, title: "Cena & Brindis", icon: "Utensils" }
                 ];
             }
             return [
-                { time: "19:00", title: "Ceremonia & Recepción", icon: "Heart" },
-                { time: "21:00", title: "Cena", icon: "Utensils" },
-                { time: "23:00", title: "Fiesta", icon: "Music" }
+                { time: initialHourStr, title: "Ceremonia & Recepción", icon: "Heart" },
+                { time: nextHourStr, title: "Cena", icon: "Utensils" }
             ];
         }
         return [
-            { time: "20:30", title: "Recepción", icon: "Music" },
-            { time: "21:30", title: "Cena", icon: "Utensils" },
-            { time: "23:30", title: "Fiesta", icon: "Music" }
+            { time: initialHourStr, title: "Recepción", icon: "Music" },
+            { time: nextHourStr, title: "Cena", icon: "Utensils" }
         ];
     };
 

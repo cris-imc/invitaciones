@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SaveStepButtons } from "./SaveStepButtons";
-import { Sparkles, Info, Smartphone, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, Info, Smartphone, ChevronDown, ChevronUp, PenLine } from "lucide-react";
 
 export function StepCoverPage() {
     const { data, setData } = useWizardStore();
@@ -35,7 +35,6 @@ export function StepCoverPage() {
         monogram = d.nombreQuinceanera[0]?.toUpperCase() || "15";
     }
 
-    // Dynamic preset kickers per event type
     const presetsKicker = d.tipo === "CASAMIENTO"
         ? [
             "Con mucho cariño, para",
@@ -59,6 +58,25 @@ export function StepCoverPage() {
             "Reservá la fecha para celebrar con",
             "Especialmente preparado para",
           ];
+
+    const presetsDressCode = [
+        "Elegante",
+        "Elegante Sport",
+        "Formal",
+        "Gala",
+        "Casual"
+    ];
+
+    const presetsBoton = [
+        "Abrir invitación",
+        "Ver detalles",
+        "Entrar",
+        "Comenzar"
+    ];
+
+    const [customKicker, setCustomKicker] = useState(!presetsKicker.includes(kicker) && kicker !== "");
+    const [customDress, setCustomDress] = useState(!presetsDressCode.includes(dressCode) && dressCode !== "");
+    const [customBoton, setCustomBoton] = useState(!presetsBoton.includes(textoBoton) && textoBoton !== "");
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
@@ -118,61 +136,159 @@ export function StepCoverPage() {
                             <Label htmlFor="portadaKicker" className="font-semibold text-sm">
                                 Encabezado / Frase de Portada
                             </Label>
-                            <Input
-                                id="portadaKicker"
-                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm"
-                                placeholder="Ej: Con mucho cariño, para / ¡Te invitamos!"
-                                value={d.portadaKicker || ""}
-                                onChange={(e) => setData({ portadaKicker: e.target.value })}
-                            />
                             
-                            {/* Preset Buttons */}
-                            <div className="space-y-2 pt-1">
-                                <p className="text-xs text-muted-foreground font-medium">Sugerencias rápidas para tu evento (hacé clic para aplicar):</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {presetsKicker.map((preset, idx) => (
-                                        <button
-                                            key={idx}
-                                            type="button"
-                                            onClick={() => setData({ portadaKicker: preset })}
-                                            className={`text-xs px-3 py-1.5 rounded-xl border transition-all duration-200 ${
-                                                d.portadaKicker === preset
-                                                    ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
-                                                    : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
-                                            }`}
-                                        >
-                                            {preset}
-                                        </button>
-                                    ))}
-                                </div>
+                            <div className="flex flex-wrap gap-2">
+                                {presetsKicker.map((preset, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={() => {
+                                            setCustomKicker(false);
+                                            setData({ portadaKicker: preset });
+                                        }}
+                                        className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
+                                            !customKicker && d.portadaKicker === preset
+                                                ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                        }`}
+                                    >
+                                        {preset}
+                                    </button>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setCustomKicker(true)}
+                                    className={`text-xs px-3 py-2 rounded-xl border transition-all duration-300 flex items-center gap-1.5 ${
+                                        customKicker
+                                            ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                            : "bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:scale-105 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                                    }`}
+                                >
+                                    <PenLine className={`w-3.5 h-3.5 ${!customKicker && "animate-bounce"}`} />
+                                    <span>Personalizado</span>
+                                </button>
                             </div>
+
+                            {customKicker && (
+                                <Input
+                                    id="portadaKicker"
+                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
+                                    placeholder="Escribí tu propio encabezado..."
+                                    value={d.portadaKicker || ""}
+                                    onChange={(e) => setData({ portadaKicker: e.target.value })}
+                                />
+                            )}
                         </div>
 
                         {/* Campo DressCode */}
-                        <div className="space-y-2.5">
-                            <Label htmlFor="portadaDressCode" className="font-semibold text-sm">Dress Code en Portada (Opcional)</Label>
-                            <Input
-                                id="portadaDressCode"
-                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm"
-                                placeholder="Ej: Elegante Sport / Black Tie"
-                                value={d.portadaDressCode || ""}
-                                onChange={(e) => setData({ portadaDressCode: e.target.value })}
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                Si lo completás, aparecerá como un distintivo destacado en la portada inicial.
-                            </p>
+                        <div className="space-y-3.5 pt-2 border-t border-slate-800/80">
+                            <Label htmlFor="portadaDressCode" className="font-semibold text-sm flex flex-col gap-1">
+                                <span>Dress Code en Portada (Opcional)</span>
+                                <span className="text-xs text-muted-foreground font-normal">Aparecerá como un distintivo en la pantalla inicial.</span>
+                            </Label>
+
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setCustomDress(false);
+                                        setData({ portadaDressCode: "" });
+                                    }}
+                                    className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
+                                        !customDress && !d.portadaDressCode
+                                            ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                            : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                    }`}
+                                >
+                                    Ninguno
+                                </button>
+                                {presetsDressCode.map((preset, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={() => {
+                                            setCustomDress(false);
+                                            setData({ portadaDressCode: preset });
+                                        }}
+                                        className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
+                                            !customDress && d.portadaDressCode === preset
+                                                ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                        }`}
+                                    >
+                                        {preset}
+                                    </button>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setCustomDress(true)}
+                                    className={`text-xs px-3 py-2 rounded-xl border transition-all duration-300 flex items-center gap-1.5 ${
+                                        customDress
+                                            ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                            : "bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:scale-105 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                                    }`}
+                                >
+                                    <PenLine className={`w-3.5 h-3.5 ${!customDress && "animate-bounce"}`} />
+                                    <span>Personalizado</span>
+                                </button>
+                            </div>
+
+                            {customDress && (
+                                <Input
+                                    id="portadaDressCode"
+                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
+                                    placeholder="Ej: Total Black / Fiesta de Disfraces"
+                                    value={d.portadaDressCode || ""}
+                                    onChange={(e) => setData({ portadaDressCode: e.target.value })}
+                                />
+                            )}
                         </div>
 
                         {/* Campo Texto Botón */}
-                        <div className="space-y-2.5">
+                        <div className="space-y-3.5 pt-2 border-t border-slate-800/80">
                             <Label htmlFor="portadaTextoBoton" className="font-semibold text-sm">Texto del Botón de Entrada</Label>
-                            <Input
-                                id="portadaTextoBoton"
-                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm"
-                                placeholder="Ej: Abrir invitación / Ver detalles"
-                                value={d.portadaTextoBoton || ""}
-                                onChange={(e) => setData({ portadaTextoBoton: e.target.value })}
-                            />
+                            
+                            <div className="flex flex-wrap gap-2">
+                                {presetsBoton.map((preset, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={() => {
+                                            setCustomBoton(false);
+                                            setData({ portadaTextoBoton: preset });
+                                        }}
+                                        className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
+                                            !customBoton && (d.portadaTextoBoton || "Abrir invitación") === preset
+                                                ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                        }`}
+                                    >
+                                        {preset}
+                                    </button>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setCustomBoton(true)}
+                                    className={`text-xs px-3 py-2 rounded-xl border transition-all duration-300 flex items-center gap-1.5 ${
+                                        customBoton
+                                            ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                            : "bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:scale-105 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                                    }`}
+                                >
+                                    <PenLine className={`w-3.5 h-3.5 ${!customBoton && "animate-bounce"}`} />
+                                    <span>Personalizado</span>
+                                </button>
+                            </div>
+
+                            {customBoton && (
+                                <Input
+                                    id="portadaTextoBoton"
+                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
+                                    placeholder="Ej: Ingresar a la fiesta"
+                                    value={d.portadaTextoBoton || ""}
+                                    onChange={(e) => setData({ portadaTextoBoton: e.target.value })}
+                                />
+                            )}
                         </div>
                     </div>
 

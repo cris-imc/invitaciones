@@ -1,12 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+
+function TypewriterText({ text }: { text: string }) {
+    const [displayText, setDisplayText] = useState("");
+
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        if (displayText.length < text.length) {
+            timeout = setTimeout(() => {
+                setDisplayText(text.slice(0, displayText.length + 1));
+            }, 60);
+        } else {
+            timeout = setTimeout(() => {
+                setDisplayText("");
+            }, 4000);
+        }
+        return () => clearTimeout(timeout);
+    }, [displayText, text]);
+
+    return (
+        <span>
+            {displayText}
+            <span className="animate-[pulse_1s_ease-in-out_infinite] border-r-[2px] border-amber-400 h-[1em] ml-[1px] inline-block align-middle"></span>
+            <span className="invisible">{text.slice(displayText.length)}</span>
+        </span>
+    );
+}
 
 export function StepPhrase() {
     const { data, setData } = useWizardStore();
@@ -44,6 +70,9 @@ export function StepPhrase() {
     ];
 
     const suggestedPhrases = tipo === "CASAMIENTO" ? WEDDING_PHRASES : tipo === "QUINCE_ANOS" ? QUINCE_PHRASES : [];
+    
+    const phraseValue = data.frasePersonalizadaTexto || "";
+    const [customPhrase, setCustomPhrase] = useState(!suggestedPhrases.includes(phraseValue) && phraseValue !== "");
 
     return (
         <div className="space-y-6">
@@ -91,36 +120,56 @@ export function StepPhrase() {
 
                 {data.frasePersonalizadaHabilitada && (
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
-                        <div className="space-y-2">
-                            <Label htmlFor="phraseText" className="text-sm font-medium">Tu Frase</Label>
-                            <Textarea
-                                id="phraseText"
-                                placeholder={phrasePlaceholder}
-                                value={data.frasePersonalizadaTexto || ""}
-                                onChange={(e) => setData({ frasePersonalizadaTexto: e.target.value })}
-                                className="min-h-[110px] resize-none text-base bg-[var(--ink)] border border-white/15 rounded-xl p-3"
-                                maxLength={300}
-                            />
-                            <p className="text-xs text-muted-foreground text-right">
-                                {(data.frasePersonalizadaTexto || "").length}/300
-                            </p>
-                        </div>
-                        
                         {suggestedPhrases.length > 0 && (
-                            <div className="space-y-2 pt-2 border-t border-white/10">
-                                <Label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Sugerencias (hacé clic para aplicar):</Label>
+                            <div className="space-y-3">
+                                <Label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Elegí una frase o escribí la tuya:</Label>
                                 <div className="grid gap-2">
                                     {suggestedPhrases.map((phrase, idx) => (
                                         <button
                                             key={idx}
                                             type="button"
-                                            onClick={() => setData({ frasePersonalizadaTexto: phrase })}
-                                            className="text-left text-xs p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-colors"
+                                            onClick={() => {
+                                                setCustomPhrase(false);
+                                                setData({ frasePersonalizadaTexto: phrase });
+                                            }}
+                                            className={`text-left text-sm p-3 rounded-xl border transition-all duration-200 ${
+                                                !customPhrase && phraseValue === phrase
+                                                    ? "bg-amber-500/25 border-amber-400 text-amber-200 shadow-sm"
+                                                    : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                            }`}
                                         >
-                                            &quot;{phrase}&quot;
+                                            "{phrase}"
                                         </button>
                                     ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => setCustomPhrase(true)}
+                                        className={`text-left text-sm p-3 rounded-xl border transition-all duration-200 ${
+                                            customPhrase
+                                                ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300 font-semibold"
+                                        }`}
+                                    >
+                                        <TypewriterText text="Escribir mi propia frase..." />
+                                    </button>
                                 </div>
+                            </div>
+                        )}
+
+                        {(customPhrase || suggestedPhrases.length === 0) && (
+                            <div className="space-y-2 pt-4 mt-2 border-t border-white/10 animate-in fade-in zoom-in-95">
+                                <Label htmlFor="phraseText" className="text-sm font-medium">Tu Frase Personalizada</Label>
+                                <Textarea
+                                    id="phraseText"
+                                    placeholder={phrasePlaceholder}
+                                    value={phraseValue}
+                                    onChange={(e) => setData({ frasePersonalizadaTexto: e.target.value })}
+                                    className="min-h-[110px] resize-none text-base bg-[var(--ink)] border border-white/15 rounded-xl p-3"
+                                    maxLength={300}
+                                />
+                                <p className="text-xs text-muted-foreground text-right">
+                                    {phraseValue.length}/300
+                                </p>
                             </div>
                         )}
                     </div>
