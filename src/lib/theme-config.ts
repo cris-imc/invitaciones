@@ -1,4 +1,12 @@
 // Plantillas de colores predefinidas
+export const MODERNO_COLORS = [
+    { id: 'Azul', name: 'Azul Noche y Dorados', color: '#050B14' },
+    { id: 'Bordo', name: 'Bordó y Dorados', color: '#120406' },
+    { id: 'Purpura', name: 'Púrpura y Dorados', color: '#0D0412' },
+    { id: 'Verde', name: 'Verde y Dorados', color: '#05120B' },
+    { id: 'Negro', name: 'Negro y Dorados', color: '#050505' }
+];
+
 export const COLOR_TEMPLATES = {
   'dorado': {
     id: 'dorado',

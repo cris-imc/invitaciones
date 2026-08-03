@@ -10,7 +10,7 @@ import { es } from "date-fns/locale";
 import { TemplateLoadingFallback } from "./TemplateLoadingFallback";
 import { saveInvitationFromWizard } from "@/lib/save-invitation";
 
-import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
+import { TemplateRouter } from "@/components/templates/TemplateRouter";
 
 export function StepPreview() {
     const { data, themeConfig, prevStep, usePremiumCredit } = useWizardStore();
@@ -32,7 +32,10 @@ export function StepPreview() {
 
     // Cast data to InvitationFormData for the templates
     // In a real app we might want to validate here
-    const formData = data as any;
+    const previewData = {
+        ...data,
+        temaColores: themeConfig
+    } as any;
 
     return (
         <div className="space-y-6">
@@ -46,7 +49,7 @@ export function StepPreview() {
                     <Suspense fallback={<TemplateLoadingFallback />}>
                         {/* Render using the unified ConviteTemplate */}
                         <div style={{ transform: "scale(0.8)", transformOrigin: "top center", height: "125%" }}>
-                             <ConviteTemplate invitation={formData} />
+                             <TemplateRouter invitation={previewData} />
                         </div>
                     </Suspense>
                 </div>

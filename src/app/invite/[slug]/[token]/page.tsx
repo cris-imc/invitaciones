@@ -1,15 +1,6 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
-import { ElegantTemplate } from "@/components/templates/ElegantTemplate";
-import { ElegantTemplateGreen } from "@/components/templates/ElegantTemplateGreen";
-import { ElegantTemplateRed } from "@/components/templates/ElegantTemplateRed";
-import { ElegantTemplateBlue } from "@/components/templates/ElegantTemplateBlue";
-import { ElegantTemplateOrange } from "@/components/templates/ElegantTemplateOrange";
-import { ElegantTemplateViolet } from "@/components/templates/ElegantTemplateViolet";
-import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray";
-import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
-import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
+import { TemplateRouter } from "@/components/templates/TemplateRouter";
 import { Metadata } from 'next';
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 
@@ -181,6 +172,8 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         }),
     ]);
 
+    if (!invitation) return notFound();
+
     const validInvitation = await checkAndCleanupIfExpired(invitation as any);
     if (!validInvitation) return notFound();
 
@@ -197,37 +190,8 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         );
     }
 
-    let temaColoresObj = { colorPrincipal: 'default' };
-    try {
-        if (typeof invitation.temaColores === 'string') {
-            temaColoresObj = JSON.parse(invitation.temaColores);
-        } else if (invitation.temaColores) {
-            temaColoresObj = invitation.temaColores as any;
-        }
-    } catch (e) {
-        // Fallback
-    }
-
-    if (invitation.tipo === 'CASAMIENTO' || invitation.tipo === 'QUINCE_ANOS') {
-        const color = temaColoresObj.colorPrincipal || 'default';
-        const invRecord = invitation as Record<string, unknown>;
-        const guestRecord = guest as any;
-        
-        switch (color) {
-            case 'Green': return <ElegantTemplateGreen invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            case 'Red': return <ElegantTemplateRed invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            case 'Blue': return <ElegantTemplateBlue invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            case 'Orange': return <ElegantTemplateOrange invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            case 'Violet': return <ElegantTemplateViolet invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            case 'Gray': return <ElegantTemplateGray invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            case 'DarkYellow': return <ElegantTemplateDarkYellow invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            case 'Pink': return <ElegantTemplatePink invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            default: return <ElegantTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-        }
-    }
-
     return (
-        <ConviteTemplate
+        <TemplateRouter
             invitation={invitation as Record<string, unknown>}
             guest={guest as any}
             isPersonalized={true}
