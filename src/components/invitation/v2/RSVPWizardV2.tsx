@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PartyPopper, Heart } from "lucide-react";
 
 type PaymentStatus = "PENDING" | "EXEMPT" | "PAID";
 
@@ -124,18 +125,18 @@ export function RSVPWizardV2({
           <button
             className="t-btn"
             onClick={() => setStep("details")}
-            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px" }}
+            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}
             aria-label="Confirmar asistencia"
           >
-            ✓ Sí, {maxGuests > 1 ? "vamos a estar" : "voy a estar"}
+            Confirmar
           </button>
           <button
             className="t-btn"
             onClick={() => handleDecline()}
-            style={{ width: "100%", justifyContent: "center", background: "transparent" }}
+            style={{ width: "100%", justifyContent: "center", background: "transparent", fontWeight: 600 }}
             aria-label="Declinar invitación"
           >
-            No puedo ir esta vez
+            Rechazar
           </button>
         </div>
       );
@@ -291,8 +292,14 @@ export function RSVPWizardV2({
     if (step === "done") {
       return (
         <div role="status" aria-live="polite">
-          <h3 style={{ marginBottom: "12px", fontFamily: "var(--t-font-d)", color: "inherit" }}>{is15 ? "Te espero 🎉" : "Te esperamos 🎉"}</h3>
-          <p style={{ marginBottom: "12px", fontSize: "14px", opacity: 0.9 }}>
+
+          <p style={{ 
+            marginBottom: "12px", 
+            fontSize: "26px", 
+            lineHeight: "1.2",
+            fontFamily: "var(--font-cormorant), serif",
+            textAlign: "center"
+          }}>
             {maxGuests > 1 && (adultCount > 0 || teenCount > 0 || childCount > 0) ? (
               `Confirmaste ${adultCount} ${adultCount === 1 ? "adulto" : "adultos"}` +
               (teenCount > 0 ? `, ${teenCount} ${teenCount === 1 ? "adolescente" : "adolescentes"}` : "") +
@@ -317,8 +324,10 @@ export function RSVPWizardV2({
     if (step === "declined") {
       return (
         <div role="status">
-          <h3 style={{ marginBottom: "12px", fontFamily: "var(--t-font-d)", color: "inherit" }}>Qué pena 💙</h3>
-          <p style={{ fontSize: "14px", opacity: 0.9 }}>
+          <h3 style={{ marginBottom: "16px", fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", color: "inherit", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            Qué pena <Heart className="w-6 h-6" strokeWidth={1.5} />
+          </h3>
+          <p style={{ fontSize: "16px", opacity: 0.9, lineHeight: 1.5 }}>
             Gracias por avisarnos. Si cambiás de idea, el link sigue activo.
           </p>
           <button

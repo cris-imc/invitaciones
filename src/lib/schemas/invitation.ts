@@ -19,6 +19,7 @@ export const detailsSchema = z.object({
     direccion: z.string().min(5, "La dirección es requerida"),
     hora: z.string().min(1, "La hora es requerida"),
     mapUrl: z.string().optional(),
+    portadaDressCode: z.string().optional(),
 });
 
 export const coverPageSchema = z.object({

@@ -37,6 +37,24 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
 
   return (
     <div className="w-full mb-4">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes colorCycle {
+          0% { background-position: 0% 50%; }
+          100% { background-position: -300% 50%; }
+        }
+        .btn-color-cycle {
+          background: linear-gradient(90deg, #f43f5e, #f59e0b, #10b981, #3b82f6, #8b5cf6, #f43f5e);
+          background-size: 300% 100%;
+          animation: colorCycle 5s linear infinite;
+          color: white;
+          border: none;
+          transition: transform 0.2s ease, filter 0.2s ease;
+        }
+        .btn-color-cycle:hover {
+          transform: scale(1.02);
+          filter: brightness(1.1);
+        }
+      `}} />
       <div className="relative group w-full">
         {/* Efecto de aura/brillo sutil animado */}
         <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/30 to-amber-500/30 rounded-full blur-md opacity-50 group-hover:opacity-75 transition duration-1000 animate-pulse"></div>
@@ -61,12 +79,19 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
             </Link>
             
             {invitationId && (
-              <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="flex-1 sm:flex-none">
-                <Button size="sm" className="w-full h-9 px-5 rounded-full gap-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm border-0">
-                  <Pencil className="w-3.5 h-3.5" />
-                  Editar Info
-                </Button>
-              </Link>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="flex-1 sm:flex-none">
+                  <Button size="sm" className="w-full h-9 px-5 rounded-full gap-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm border-0">
+                    <Pencil className="w-3.5 h-3.5" />
+                    Editar Info
+                  </Button>
+                </Link>
+                <Link href={`/dashboard/invitaciones/editar/${invitationId}?step=design`} className="flex-1 sm:flex-none">
+                  <Button size="sm" className="w-full h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm btn-color-cycle">
+                    Cambiar Color
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>

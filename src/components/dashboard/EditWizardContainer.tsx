@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useWizardStore } from "@/store/wizard-store";
 import { WizardSteps } from "@/components/wizard/WizardSteps";
+import { useSearchParams } from "next/navigation";
 
-export function EditWizardContainer({ invitation }: { invitation: any }) {
+function WizardContent({ invitation }: { invitation: any }) {
     const { setData, setStep, setDirty } = useWizardStore();
     const [isInitialized, setIsInitialized] = useState(false);
+    const searchParams = useSearchParams();
+    const initialStepParam = searchParams.get("step");
 
     useEffect(() => {
         if (invitation) {
@@ -22,6 +25,7 @@ export function EditWizardContainer({ invitation }: { invitation: any }) {
 
             setData({
                 id: invitation.id,
+                planTier: invitation.planTier || "FREE",
                 slug: invitation.slug,
                 type: invitation.tipo,
                 nombreEvento: invitation.nombreEvento,
@@ -100,7 +104,12 @@ export function EditWizardContainer({ invitation }: { invitation: any }) {
                 colorPrincipal: temaColores?.colorPrincipal || temaColores?.primaryColor || "#000000",
             });
             setDirty(false); // Reset dirtiness after loading from DB
-            setStep(0);
+            
+            if (initialStepParam === 'design') {
+                setStep(invitation.tipo === 'CASAMIENTO' ? 11 : 10);
+            } else {
+                setStep(0);
+            }
             setIsInitialized(true);
         }
     }, [invitation, setData, setStep, setDirty]);
@@ -114,4 +123,12 @@ export function EditWizardContainer({ invitation }: { invitation: any }) {
     }
 
     return <WizardSteps />;
+}
+
+export function EditWizardContainer({ invitation }: { invitation: any }) {
+    return (
+        <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Cargando datos de la invitación desde la base de datos...</div>}>
+            <WizardContent invitation={invitation} />
+        </Suspense>
+    );
 }

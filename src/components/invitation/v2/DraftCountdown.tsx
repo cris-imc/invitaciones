@@ -115,11 +115,11 @@ export function DraftCountdown({
 
         <div className="flex flex-wrap items-center justify-between sm:justify-start sm:gap-6 w-full">
           {boxes.map(({ label, value }) => (
-            <div key={label} className="flex flex-col items-center justify-center w-[4.5rem] h-[5.5rem] sm:w-[5.5rem] sm:h-[6.5rem] bg-transparent border border-[#C79A4B]/40 rounded-2xl shadow-sm">
+            <div key={label} className="flex flex-col items-center justify-center w-[4.5rem] h-[5.5rem] sm:w-[5.5rem] sm:h-[6.5rem] bg-transparent rounded-2xl shadow-sm" style={{ border: '1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)' }}>
               <b aria-label={`${value} ${label}`} className="text-[1.8rem] sm:text-4xl font-light text-[#2C2C2C]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
                 {value}
               </b>
-              <span aria-hidden="true" className="text-[0.65rem] sm:text-xs font-sans font-medium uppercase tracking-widest text-[#C79A4B]/70 mt-1 sm:mt-2">
+              <span aria-hidden="true" className="text-[0.65rem] sm:text-xs font-sans font-medium uppercase tracking-widest mt-1 sm:mt-2" style={{ color: 'var(--t-acc)', opacity: 0.7 }}>
                 {label}
               </span>
             </div>

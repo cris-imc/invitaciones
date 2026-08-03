@@ -46,12 +46,16 @@ export function useSaveStep(form?: any) {
                 }
                 setDirty(false);
                 showToast("¡Cambios guardados exitosamente!", "success");
+                setIsSaving(false);
+                return true;
             } catch (e) {
                 showToast("Error al guardar los cambios.", "error");
                 console.error(e);
+                setIsSaving(false);
+                return false;
             }
-            setIsSaving(false);
         }
+        return false;
     };
     
     return { saveChanges, isSaving, isEditing: Boolean(data.id) };

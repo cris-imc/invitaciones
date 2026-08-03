@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useWizardStore } from "@/store/wizard-store";
 import { useSaveStep } from "@/lib/use-save-step";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useFormState } from "react-hook-form";
 
@@ -24,6 +25,18 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
     const [formIsDirty, setFormIsDirty] = useState(false);
     
     const isDirty = storeIsDirty || formIsDirty;
+    const [hasJustSaved, setHasJustSaved] = useState(false);
+
+    useEffect(() => {
+        if (isDirty) setHasJustSaved(false);
+    }, [isDirty]);
+
+    const handleSaveClick = async () => {
+        const success = await saveChanges();
+        if (success) {
+            setHasJustSaved(true);
+        }
+    };
 
     const handleBackClick = () => {
         if (currentStep === 1) { // Step 1 is "Información Básica". Going back means going to "Tipo de evento" (Step 0)
@@ -71,50 +84,89 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                 </DialogContent>
             </Dialog>
 
-            <div className="flex flex-col sm:flex-row justify-between pt-4 gap-4">
-                <Button type="button" variant="outline" onClick={handleBackClick} className="order-2 sm:order-1">
+            <div className="flex flex-col sm:flex-row sm:flex-nowrap justify-between pt-4 gap-4">
+                <Button 
+                    type="button" 
+                    variant="outline" 
+                    size={isEditing ? "sm" : "default"}
+                    onClick={handleBackClick} 
+                    className="order-2 sm:order-1"
+                >
                     Atrás
                 </Button>
             
-            <div className="flex flex-col sm:flex-row gap-2 order-1 sm:order-2">
+            <div className="flex flex-col sm:flex-row sm:flex-nowrap justify-end gap-1.5 order-1 sm:order-2">
                 {isEditing && (
-                    <Button 
-                        type="button" 
-                        variant={isDirty ? "default" : "secondary"}
-                        className={isDirty ? "bg-amber-500 hover:bg-amber-600 text-black font-semibold" : ""}
-                        onClick={saveChanges}
-                        disabled={isSaving || !isDirty}
-                    >
+                    <div className="flex flex-wrap sm:flex-nowrap gap-1.5 w-full sm:w-auto">
+                        {hasJustSaved && (
+                            <>
+                                <Link href={`/dashboard/invitaciones/${useWizardStore.getState().data.slug}/guests`}>
+                                    <Button 
+                                        type="button" 
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-orange-500 text-orange-500 hover:bg-orange-500/10 gap-1.5 font-bold px-2.5"
+                                    >
+                                        <Settings className="w-3.5 h-3.5" />
+                                        Ir al administrador
+                                    </Button>
+                                </Link>
+                                <Link href={`/i/${useWizardStore.getState().data.slug}`} target="_blank">
+                                    <Button 
+                                        type="button" 
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-amber-500 text-amber-500 hover:bg-amber-500/10 gap-1.5 font-bold px-2.5"
+                                    >
+                                        <Eye className="w-3.5 h-3.5" />
+                                        Ver cambios
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
+                        <Button 
+                            type="button" 
+                            variant={isDirty ? "default" : "secondary"}
+                            size="sm"
+                            className={isDirty ? "bg-amber-500 hover:bg-amber-600 text-black font-semibold w-full sm:w-auto px-3" : "w-full sm:w-auto px-3"}
+                            onClick={handleSaveClick}
+                            disabled={isSaving || !isDirty}
+                        >
                         {isSaving ? (
                             <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                                 Guardando...
                             </>
                         ) : (
                             'Aplicar cambios'
                         )}
-                    </Button>
+                        </Button>
+                    </div>
                 )}
                 {isLastStep ? (
-                    <Button 
-                        type="button" 
-                        size="lg"
-                        className="px-8 gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
-                        onClick={onCreate}
-                        disabled={isSaving || isCreating}
-                    >
-                        {isCreating ? (
-                            <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Creando...
-                            </>
-                        ) : (
-                            'Crear Invitación'
-                        )}
-                    </Button>
+                    !isEditing && (
+                        <Button 
+                            type="button" 
+                            size="lg"
+                            className="px-8 gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
+                            onClick={onCreate}
+                            disabled={isSaving || isCreating}
+                        >
+                            {isCreating ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Creando...
+                                </>
+                            ) : (
+                                'Crear Invitación'
+                            )}
+                        </Button>
+                    )
                 ) : (
                     <Button 
                         type={form ? "submit" : "button"} 
+                        size={isEditing ? "sm" : "default"}
+                        className={isEditing ? "px-3" : ""}
                         onClick={onNext ? onNext : (!form ? nextStep : undefined)}
                     >
                         Siguiente Paso

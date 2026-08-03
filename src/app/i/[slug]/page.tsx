@@ -2,6 +2,15 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
+import { ElegantTemplate } from "@/components/templates/ElegantTemplate";
+import { ElegantTemplateGreen } from "@/components/templates/ElegantTemplateGreen";
+import { ElegantTemplateRed } from "@/components/templates/ElegantTemplateRed";
+import { ElegantTemplateBlue } from "@/components/templates/ElegantTemplateBlue";
+import { ElegantTemplateOrange } from "@/components/templates/ElegantTemplateOrange";
+import { ElegantTemplateViolet } from "@/components/templates/ElegantTemplateViolet";
+import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray";
+import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
+import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -93,6 +102,34 @@ export default async function InvitationPage({
   const invitation = await checkAndCleanupIfExpired(rawInvitation);
 
   if (!invitation) notFound();
+
+  let temaColoresObj = { colorPrincipal: 'default' };
+  try {
+      if (typeof invitation.temaColores === 'string') {
+          temaColoresObj = JSON.parse(invitation.temaColores);
+      } else if (invitation.temaColores) {
+          temaColoresObj = invitation.temaColores as any;
+      }
+  } catch (e) {
+      // Fallback
+  }
+
+  if (invitation.tipo === 'CASAMIENTO' || invitation.tipo === 'QUINCE_ANOS') {
+      const color = temaColoresObj.colorPrincipal || 'default';
+      const invRecord = invitation as Record<string, unknown>;
+      
+      switch (color) {
+          case 'Green': return <ElegantTemplateGreen invitation={invRecord} guest={null} isPersonalized={false} />;
+          case 'Red': return <ElegantTemplateRed invitation={invRecord} guest={null} isPersonalized={false} />;
+          case 'Blue': return <ElegantTemplateBlue invitation={invRecord} guest={null} isPersonalized={false} />;
+          case 'Orange': return <ElegantTemplateOrange invitation={invRecord} guest={null} isPersonalized={false} />;
+          case 'Violet': return <ElegantTemplateViolet invitation={invRecord} guest={null} isPersonalized={false} />;
+          case 'Gray': return <ElegantTemplateGray invitation={invRecord} guest={null} isPersonalized={false} />;
+          case 'DarkYellow': return <ElegantTemplateDarkYellow invitation={invRecord} guest={null} isPersonalized={false} />;
+          case 'Pink': return <ElegantTemplatePink invitation={invRecord} guest={null} isPersonalized={false} />;
+          default: return <ElegantTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+      }
+  }
 
   // Usar el nuevo ConviteTemplate para todas las invitaciones
   return (

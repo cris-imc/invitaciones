@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Brillo animado para el boton de Administrar */
@@ -15,21 +15,21 @@
   top: -50%;
   width: 200%;
   height: 200%;
-  background: conic-gradient(from 0deg, transparent 70%, rgba(99,102,241, 0.9) 100%);
+  background: conic-gradient(from 0deg, transparent 70%, rgba(253, 224, 71, 1) 100%);
   animation: spin 3s linear infinite;
   z-index: -2;
 }
 .btn-admin-glow::after {
   content: '';
   position: absolute;
-  inset: 1px;
-  background-color: #1a1a2e; /* dark inner matching dashboard */
+  inset: 2px;
+  background-color: #f59e0b; /* amber-500 for orange background */
   border-radius: inherit;
   z-index: -1;
   transition: background-color 0.2s ease;
 }
 .btn-admin-glow:hover::after {
-  background-color: #242442;
+  background-color: #fbbf24; /* amber-400 on hover */
 }
 
 /* ================================================

@@ -296,7 +296,7 @@ const formatNumber = (num: number) => {
   return new Intl.NumberFormat("es-AR").format(num);
 };
 
-export function DraftTemplate({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
+export function ElegantTemplate({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
 
@@ -537,9 +537,15 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           border-radius: 0 !important;
         }
 
-        /* RSVP Custom Aesthetics for DraftTemplate */
+        /* RSVP Custom Aesthetics for ElegantTemplate */
+          #rsvp.section.dark h2,
+          #rsvp.section.dark h3,
+          #rsvp.section.dark p,
+          #rsvp.section.dark div[role='status'] {
+            color: #ffffff !important;
+          }
         #rsvp.section.dark {
-          background-color: #1A1512 !important; /* Dark brown/black */
+          background-color: #A37B5C !important; /* Dark brown/black */
           color: #EAE5D9 !important;
           border: none !important;
           padding: 48px !important;
@@ -1019,7 +1025,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         document.body
       )}
 
-      <div className="desktop-stage" data-theme={theme}>
+      <div className="desktop-stage" data-theme={theme} style={{ '--t-acc': '#C79A4B', '--t-acc2': '#C79A4B', '--c-accent': '#C79A4B' } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
           className="hero-photo"
@@ -1443,3 +1449,4 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
       </>
   );
 }
+

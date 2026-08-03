@@ -75,9 +75,9 @@ function CopyField({ label, value }: { label: string; value: string }) {
     });
   };
   return (
-    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#C79A4B]/20 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#7B6282]/20 last:border-b-0">
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold text-[#A37B5C] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="block text-[10px] font-semibold text-[#58465D] uppercase tracking-wider mb-0.5">{label}</span>
         <span className="text-xs sm:text-sm font-mono text-[#1A2B33] break-all">{value}</span>
       </div>
       <button 
@@ -93,9 +93,9 @@ function CopyField({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#C79A4B]/20 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#7B6282]/20 last:border-b-0">
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold text-[#A37B5C] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="block text-[10px] font-semibold text-[#58465D] uppercase tracking-wider mb-0.5">{label}</span>
         <span className="text-sm font-medium text-[#1A2B33] break-words">{value}</span>
       </div>
     </div>
@@ -296,7 +296,7 @@ const formatNumber = (num: number) => {
   return new Intl.NumberFormat("es-AR").format(num);
 };
 
-export function DraftTemplate({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
+export function ElegantTemplateViolet({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
 
@@ -513,7 +513,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
           font-family: var(--font-inter), sans-serif !important;
-          color: #C79A4B !important;
+          color: #7B6282 !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -537,10 +537,16 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           border-radius: 0 !important;
         }
 
-        /* RSVP Custom Aesthetics for DraftTemplate */
+        /* RSVP Custom Aesthetics for ElegantTemplateViolet */
+          #rsvp.section.dark h2,
+          #rsvp.section.dark h3,
+          #rsvp.section.dark p,
+          #rsvp.section.dark div[role='status'] {
+            color: #ffffff !important;
+          }
         #rsvp.section.dark {
-          background-color: #1A1512 !important; /* Dark brown/black */
-          color: #EAE5D9 !important;
+          background-color: #58465D !important; /* Dark brown/black */
+          color: #EAE7EB !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -583,8 +589,8 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
-          background-color: #EAE5D9 !important;
-          color: #1A1512 !important;
+          background-color: #EAE7EB !important;
+          color: #201A22 !important;
           border-radius: 0 !important;
           border: none !important;
           padding: 16px 20px !important;
@@ -592,7 +598,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           font-size: 15px !important;
         }
         #rsvp.section.dark input::placeholder {
-          color: #1A1512 !important;
+          color: #201A22 !important;
           opacity: 0.5;
         }
         #rsvp.section.dark .t-btn {
@@ -650,7 +656,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #EAE5D9 !important;
+          color: #EAE7EB !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
@@ -682,7 +688,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         }
         #songs.d-sec.dark .t-kicker {
           font-family: var(--font-inter), sans-serif !important;
-          color: #C79A4B !important; /* Gold/Orange */
+          color: #7B6282 !important; /* Gold/Orange */
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -704,7 +710,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         #songs.d-sec.dark input {
           width: 100% !important;
           box-sizing: border-box !important;
-          background-color: #EAE5D9 !important; /* Pastel */
+          background-color: #EAE7EB !important; /* Pastel */
           color: #1A2B33 !important; /* Dark text */
           border-radius: 0 !important;
           border: none !important;
@@ -718,8 +724,8 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           opacity: 0.5;
         }
         #songs.d-sec.dark button[type="submit"] {
-          background-color: #D0B8A8 !important;
-          color: #1A1512 !important;
+          background-color: #B5A4BA !important;
+          color: #201A22 !important;
           border-radius: 0 !important;
           border: none !important;
           padding: 14px 24px !important;
@@ -749,8 +755,8 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
-          background-color: #EAE5D9 !important;
-          color: #1A1512 !important;
+          background-color: #EAE7EB !important;
+          color: #201A22 !important;
           border-radius: 0 !important;
           border: none !important;
           padding: 16px 20px !important;
@@ -758,7 +764,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           font-size: 15px !important;
         }
         #rsvp.section.dark input::placeholder {
-          color: #1A1512 !important;
+          color: #201A22 !important;
           opacity: 0.5;
         }
         #rsvp.section.dark .t-btn {
@@ -819,7 +825,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #EAE5D9 !important;
+          color: #EAE7EB !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
@@ -851,7 +857,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         }
         #songs.d-sec.dark .t-kicker {
           font-family: var(--font-inter), sans-serif !important;
-          color: #C79A4B !important; /* Gold/Orange */
+          color: #7B6282 !important; /* Gold/Orange */
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -873,7 +879,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         #songs.d-sec.dark input {
           width: 100% !important;
           box-sizing: border-box !important;
-          background-color: #EAE5D9 !important; /* Pastel */
+          background-color: #EAE7EB !important; /* Pastel */
           color: #1A2B33 !important; /* Dark text */
           border-radius: 0 !important;
           border: none !important;
@@ -887,8 +893,8 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           opacity: 0.5;
         }
         #songs.d-sec.dark button[type="submit"] {
-          background-color: #D0B8A8 !important;
-          color: #1A1512 !important;
+          background-color: #B5A4BA !important;
+          color: #201A22 !important;
           border-radius: 0 !important;
           border: none !important;
           padding: 14px 24px !important;
@@ -908,7 +914,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           text-align: center;
         }
         .desktop-stage .d-foot .mono {
-          color: #C79A4B !important;
+          color: #7B6282 !important;
           font-family: var(--font-cormorant), serif !important;
           font-size: 20px !important;
           margin-bottom: 8px !important;
@@ -919,8 +925,8 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           text-align: left !important;
         }
         #banco .copy-btn {
-          background-color: #D0B8A8 !important;
-          color: #1A1512 !important;
+          background-color: #B5A4BA !important;
+          color: #201A22 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;
@@ -955,7 +961,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         }
         .desktop-stage .bottom-nav a[aria-current="true"] {
           opacity: 1 !important;
-          color: #C79A4B !important;
+          color: #7B6282 !important;
         }
       `}</style>
       
@@ -996,30 +1002,30 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
         <div 
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#C79A4B]/40 shadow-md ${isTicketMaximized ? 'bg-[#F9F7F1]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#1A2B33]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
+          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#7B6282]/40 shadow-md ${isTicketMaximized ? 'bg-[#F9F7F1]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#1A2B33]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
         >
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
-                <span className="font-sans text-[8px] font-semibold uppercase tracking-[0.2em] text-[#C79A4B] leading-none mb-1">Pase Especial</span>
+                <span className="font-sans text-[8px] font-semibold uppercase tracking-[0.2em] text-[#7B6282] leading-none mb-1">Pase Especial</span>
                 <span className="text-[#1A2B33] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
               </div>
-              <div className="flex flex-col items-end border-l border-[#C79A4B]/20 pl-3">
+              <div className="flex flex-col items-end border-l border-[#7B6282]/20 pl-3">
                 <span className="text-[#1A2B33] font-bold text-sm leading-none">{guest.expectedCount}</span>
                 <span className="text-[#4A5568] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
-              <Ticket className="w-4 h-4 text-[#C79A4B]" />
-              <span className="text-[#EAE5D9] font-sans text-[10px] font-semibold tracking-wider uppercase">Pase</span>
+              <Ticket className="w-4 h-4 text-[#7B6282]" />
+              <span className="text-[#EAE7EB] font-sans text-[10px] font-semibold tracking-wider uppercase">Pase</span>
             </div>
           )}
         </div>,
         document.body
       )}
 
-      <div className="desktop-stage" data-theme={theme}>
+      <div className="desktop-stage" data-theme={theme} style={{ '--t-acc': '#7B6282', '--t-acc2': '#7B6282', '--c-accent': '#7B6282' } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
           className="hero-photo"
@@ -1066,14 +1072,14 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#F9F7F1]">
           {/* Text Container */}
           <div className="px-8 pt-16 pb-12 text-left bg-[#F9F7F1] z-10 relative">
-            <p className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-[#C79A4B] mb-6">
+            <p className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-[#7B6282] mb-6">
               {eyebrow}
             </p>
             <h1 className="text-[4rem] font-light text-[#2C2C2C] leading-[1.0] mb-8" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
-                  <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', color: '#C79A4B' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
+                  <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', color: '#7B6282' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
                 </>
               ) : (
                 <span className="block">{title}</span>
@@ -1083,7 +1089,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
               {fechaStr}{lugarNombre ? ` · ${lugarNombre}` : ""}{ciudad ? ` — ${ciudad}` : ""}
             </p>
             {Boolean(activeDressCode) && (
-              <p className="font-sans text-xs font-semibold text-[#C79A4B] tracking-widest uppercase mt-4">
+              <p className="font-sans text-xs font-semibold text-[#7B6282] tracking-widest uppercase mt-4">
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1112,7 +1118,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full bg-[#EAE5D9] py-24 px-6 md:px-12 flex items-center justify-center">
+          <SectionWrapper id="quote" delay={100} className="w-full bg-[#EAE7EB] py-24 px-6 md:px-12 flex items-center justify-center">
             <div className="max-w-2xl mx-auto text-center">
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
@@ -1131,9 +1137,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
             {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
-              <div className="bg-[#FAF8F5] border border-[#C79A4B]/20 rounded-xl p-5 sm:p-7 mb-6 shadow-sm transition-all hover:shadow-md">
+              <div className="bg-[#FAF8F5] border border-[#7B6282]/20 rounded-xl p-5 sm:p-7 mb-6 shadow-sm transition-all hover:shadow-md">
                 <div>
-                  <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A37B5C] block mb-3">
+                  <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#58465D] block mb-3">
                     {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
                   </span>
                   {Boolean(invitation.ceremoniaNombre) && (
@@ -1143,16 +1149,16 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
                   )}
                   {Boolean(invitation.ceremoniaHora) && (
                     <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-3">
-                      <Clock className="w-4 h-4 text-[#A37B5C]" /> {String(invitation.ceremoniaHora)} hs
+                      <Clock className="w-4 h-4 text-[#58465D]" /> {String(invitation.ceremoniaHora)} hs
                     </p>
                   )}
                   {Boolean(invitation.ceremoniaDireccion) && (
                     <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-4">
-                      <MapPin className="w-4 h-4 text-[#A37B5C]" /> {String(invitation.ceremoniaDireccion)}
+                      <MapPin className="w-4 h-4 text-[#58465D]" /> {String(invitation.ceremoniaDireccion)}
                     </p>
                   )}
                   {Boolean(invitation.ceremoniaMapUrl) && (
-                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#C79A4B] hover:text-[#C79A4B] transition-colors">
+                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#7B6282] hover:text-[#7B6282] transition-colors">
                       Ver mapa ceremonia ↗
                     </a>
                   )}
@@ -1162,8 +1168,8 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
 
             {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
             {(lugarNombre || direccion) && (
-              <div className="bg-[#FAF8F5] border border-[#C79A4B]/20 rounded-xl p-5 sm:p-7 mb-10 shadow-sm transition-all hover:shadow-md">
-                <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A37B5C] block mb-3">
+              <div className="bg-[#FAF8F5] border border-[#7B6282]/20 rounded-xl p-5 sm:p-7 mb-10 shadow-sm transition-all hover:shadow-md">
+                <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#58465D] block mb-3">
                   Fiesta / Salón
                 </span>
                 {lugarNombre && (
@@ -1173,16 +1179,16 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
                 )}
                 {hora && (
                   <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-3">
-                    <Clock className="w-4 h-4 text-[#A37B5C]" /> {hora} hs
+                    <Clock className="w-4 h-4 text-[#58465D]" /> {hora} hs
                   </p>
                 )}
                 {direccion && (
                   <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-4">
-                    <MapPin className="w-4 h-4 text-[#A37B5C]" /> {direccion}
+                    <MapPin className="w-4 h-4 text-[#58465D]" /> {direccion}
                   </p>
                 )}
                 {mapUrl && (
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#C79A4B] hover:text-[#C79A4B] transition-colors">
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#7B6282] hover:text-[#7B6282] transition-colors">
                     Ver mapa fiesta ↗
                   </a>
                 )}
@@ -1197,9 +1203,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
                 </p>
                 <div className="flex flex-col w-full">
                   {cronograma.map((item, i) => (
-                    <div key={i} className="flex items-center py-5 border-b border-[#C79A4B]/30 last:border-b-0">
+                    <div key={i} className="flex items-center py-5 border-b border-[#7B6282]/30 last:border-b-0">
                       {item.time && (
-                        <span className="font-sans text-lg sm:text-xl text-[#C79A4B]/90 font-light tracking-widest w-28 sm:w-32 flex-shrink-0">
+                        <span className="font-sans text-lg sm:text-xl text-[#7B6282]/90 font-light tracking-widest w-28 sm:w-32 flex-shrink-0">
                           {item.time}
                         </span>
                       )}
@@ -1215,7 +1221,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? true) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#EAE5D9] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#EAE7EB] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-10">
                 ÁLBUM
@@ -1275,7 +1281,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#F9F7F1] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
-                <p className="t-kicker mb-10 text-[#C79A4B]">
+                <p className="t-kicker mb-10 text-[#7B6282]">
                   DATOS BANCARIOS DEL EVENTO
                 </p>
                 
@@ -1285,9 +1291,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
                       <div className="grid grid-cols-1 gap-6 text-left w-full mt-4 items-stretch">
                         {/* Tarjeta 1: Pago de Tarjetas */}
                         {pagoTarjetaHabilitado && (
-                          <div className="px-4 py-5 sm:p-5 bg-[#EAE5D9] space-y-2">
-                            <div className="flex items-center gap-2 font-semibold text-[#1A2B33] text-sm border-b border-[#C79A4B]/20 pb-2">
-                              <CreditCard className="w-5 h-5 text-[#C79A4B]" strokeWidth={1.5} />
+                          <div className="px-4 py-5 sm:p-5 bg-[#EAE7EB] space-y-2">
+                            <div className="flex items-center gap-2 font-semibold text-[#1A2B33] text-sm border-b border-[#7B6282]/20 pb-2">
+                              <CreditCard className="w-5 h-5 text-[#7B6282]" strokeWidth={1.5} />
                               <span>{String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases")}</span>
                             </div>
                             {Boolean((invitation as any).pagoTarjetaMensaje) && (
@@ -1312,9 +1318,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
 
                         {/* Tarjeta 2: Regalos */}
                         {regaloHabilitado && (
-                          <div className="px-4 py-5 sm:p-5 bg-[#EAE5D9] space-y-2">
-                            <div className="flex items-center gap-2 font-semibold text-[#1A2B33] text-sm border-b border-[#C79A4B]/20 pb-2">
-                              <Gift className="w-5 h-5 text-[#C79A4B]" strokeWidth={1.5} />
+                          <div className="px-4 py-5 sm:p-5 bg-[#EAE7EB] space-y-2">
+                            <div className="flex items-center gap-2 font-semibold text-[#1A2B33] text-sm border-b border-[#7B6282]/20 pb-2">
+                              <Gift className="w-5 h-5 text-[#7B6282]" strokeWidth={1.5} />
                               <span>{String((invitation as any).regaloTitulo || "Regalos del Evento")}</span>
                             </div>
                             {Boolean((invitation as any).regaloMensaje) && (
@@ -1367,7 +1373,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
                           </p>
                           {showBankDetails && (
                             <div className="w-full text-left mt-4">
-                              <div className="px-4 py-5 sm:p-5 bg-[#EAE5D9] space-y-1">
+                              <div className="px-4 py-5 sm:p-5 bg-[#EAE7EB] space-y-1">
                                 {Boolean(activeBank.banco) && (
                                   <InfoRow label="BANCO" value={activeBank.banco} />
                                 )}
@@ -1393,7 +1399,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         )}
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
-          <SectionWrapper id="quiz" delay={300} className="w-full bg-[#EAE5D9] py-20 px-6 md:px-12">
+          <SectionWrapper id="quiz" delay={300} className="w-full bg-[#EAE7EB] py-20 px-6 md:px-12">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-8">
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
@@ -1443,3 +1449,4 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
       </>
   );
 }
+
