@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface BottomNavPillProps {
   sections: {
@@ -43,7 +44,12 @@ export function BottomNavPill({ sections }: BottomNavPillProps) {
     setActiveId(id);
   };
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <nav
       className="bottom-nav hide-desktop"
       aria-label="Navegación de la invitación"
@@ -65,6 +71,7 @@ export function BottomNavPill({ sections }: BottomNavPillProps) {
           {label}
         </a>
       ))}
-    </nav>
+    </nav>,
+    document.body
   );
 }

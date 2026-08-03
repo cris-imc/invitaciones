@@ -1,0 +1,1420 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { DraftCountdown as CountdownV2 } from "@/components/invitation/v2/DraftCountdown";
+import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
+import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
+import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
+import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
+import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
+import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
+import { HeroV2 } from "@/components/invitation/v2/HeroV2";
+import { MusicPlayer } from "@/components/invitation/MusicPlayer";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift } from "lucide-react";
+import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
+
+const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
+const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
+const IconMusic = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
+const IconMap   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
+const IconGift  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>;
+const IconQuiz  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
+
+const CRONO_ICONS: Record<string, string> = {
+  Heart: "💛", Music: "🎵", Utensils: "🍽️", Calendar: "📅",
+  Gift: "🎁", Camera: "📷", Clock: "🕐",
+};
+
+type Theme = "boda" | "xv" | "ejecutivo";
+
+function getThemeFromTipo(tipo: string): Theme {
+  if (tipo === "CASAMIENTO") return "boda";
+  if (tipo === "QUINCE_ANOS") return "xv";
+  return "ejecutivo";
+}
+
+function safeJson<T>(val: string | null | undefined, fallback: T): T {
+  if (!val) return fallback;
+  try { return JSON.parse(val) as T; } catch { return fallback; }
+}
+
+interface ConviteTemplateProps {
+  invitation: Record<string, unknown>;
+  guest?: {
+    id: string;
+    name: string;
+    uniqueToken: string;
+    status: string;
+    attendingCount: number;
+    isExempt?: boolean;
+    paymentStatus: string;
+    expectedCount: number;
+    expectedAdults?: number | null;
+    expectedChildren?: number | null;
+    attendingAdults?: number | null;
+    attendingChildren?: number | null;
+  } | null;
+  isPersonalized?: boolean;
+}
+
+interface CronoItem {
+  time?: string;
+  title: string;
+  icon?: string;
+}
+
+function CopyField({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+  const handle = () => {
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#C79A4B]/20 last:border-b-0">
+      <div className="min-w-0 flex-1">
+        <span className="block text-[10px] font-semibold text-[#A37B5C] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="text-xs sm:text-sm font-mono text-[#1A2B33] break-all">{value}</span>
+      </div>
+      <button 
+        className={`copy-btn shrink-0 px-4 py-2 transition-all ${copied ? "copied" : ""}`} 
+        type="button" 
+        onClick={handle}
+      >
+        {copied ? "✓ Copiado" : "Copiar"}
+      </button>
+    </div>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#C79A4B]/20 last:border-b-0">
+      <div className="min-w-0 flex-1">
+        <span className="block text-[10px] font-semibold text-[#A37B5C] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="text-sm font-medium text-[#1A2B33] break-words">{value}</span>
+      </div>
+    </div>
+  );
+}
+
+interface QuizQuestion {
+  pregunta: string;
+  opciones: string[];
+  respuestaCorrecta?: number;
+  correcta?: number;
+}
+
+function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string; tipo?: string }) {
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [picks, setPicks] = useState<Record<number, number>>({});
+  const [finished, setFinished] = useState(false);
+  const [stats, setStats] = useState<{ avg: number; count: number } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!invitationId) {
+      setHasLoaded(true);
+      return;
+    }
+    
+    // Fetch latest stats and guest past response from database
+    const params = new URLSearchParams({ invitationId });
+    if (guestToken) params.append("guestToken", guestToken);
+    
+    fetch(`/api/quiz?${params.toString()}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data.averagePercentage === 'number') {
+          setStats({ avg: data.averagePercentage, count: data.totalResponses });
+        }
+        if (data && data.hasAnswered && data.guestScore) {
+          setPicks(data.guestScore.answers || {});
+          setFinished(true);
+        }
+      })
+      .catch(e => console.error("Error fetching quiz data", e))
+      .finally(() => setHasLoaded(true));
+  }, [invitationId, guestToken]);
+
+  const pick = async (oi: number) => {
+    if (picks[currentIdx] !== undefined) return;
+    const newPicks = { ...picks, [currentIdx]: oi };
+    setPicks(newPicks);
+    
+    setTimeout(async () => {
+      if (currentIdx < preguntas.length - 1) {
+        setCurrentIdx(currentIdx + 1);
+      } else {
+        setFinished(true);
+        // Save to backend and get stats
+        if (invitationId) {
+          setIsSaving(true);
+          try {
+            // Compute score
+            let score = 0;
+            preguntas.forEach((q, i) => {
+              if (newPicks[i] === q.respuestaCorrecta) score++;
+            });
+            const res = await fetch('/api/quiz', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                invitationId,
+                guestName: guestName || 'Invitado Anónimo',
+                guestToken: guestToken || null,
+                answers: Object.values(newPicks),
+                score,
+                totalQuestions: preguntas.length
+              })
+            });
+            
+            // fetch stats
+            const params = new URLSearchParams({ invitationId });
+            if (guestToken) params.append("guestToken", guestToken);
+            const statsRes = await fetch(`/api/quiz?${params.toString()}`);
+            if (statsRes.ok) {
+              const data = await statsRes.json();
+              setStats({ avg: data.averagePercentage, count: data.totalResponses });
+            }
+          } catch (e) {
+            console.error(e);
+          } finally {
+            setIsSaving(false);
+          }
+        }
+      }
+    }, 400);
+  };
+
+  if (!hasLoaded) return null;
+
+  if (finished) {
+    let score = 0;
+    preguntas.forEach((q, i) => { if (picks[i] === q.respuestaCorrecta) score++; });
+    const percent = Math.round((score / preguntas.length) * 100);
+    
+    return (
+      <div className="quiz-box text-center">
+        <div className="flex justify-center mb-4 text-amber-500">
+          {percent === 100 ? <Trophy className="w-16 h-16" strokeWidth={1.5} /> : percent >= 70 ? <Star className="w-16 h-16" strokeWidth={1.5} /> : <ThumbsUp className="w-16 h-16" strokeWidth={1.5} />}
+        </div>
+        <h3 style={{ fontFamily: "var(--t-font-d)", fontSize: "28px", color: "var(--t-onpaper)" }}>¡Quiz Completado!</h3>
+        <p style={{ marginTop: "12px", opacity: 0.9 }}>
+          Respondiste {score} de {preguntas.length} correctamente ({percent}%).
+        </p>
+        
+        {isSaving ? (
+          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7 }}>Guardando tus resultados...</p>
+        ) : (
+          stats && stats.count > 0 && (
+            <div style={{ marginTop: "28px" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "var(--t-paper2)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(0,0,0,0.06)", textAlign: "left", maxWidth: "90%" }}>
+                <Users className="w-5 h-5 opacity-60 shrink-0" />
+                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4 }}>
+                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong>{stats.avg}%</strong>.
+                </p>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    );
+  }
+
+  const q = preguntas[currentIdx];
+  if (!q) return null;
+
+  return (
+    <div className="quiz-box">
+      <p style={{ fontSize: "13px", opacity: 0.6, marginBottom: "12px", fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pregunta {currentIdx + 1} de {preguntas.length}</p>
+      <div className="quiz-q" key={currentIdx}>
+        <p className="quiz-q-text">{q.pregunta}</p>
+        <div className="quiz-opts">
+          {q.opciones.map((opt, oi) => {
+            const chosen = picks[currentIdx] === oi;
+            let className = "quiz-opt";
+            if (chosen) {
+              if (q.correcta !== undefined) {
+                className += (q.correcta === oi) ? " picked" : " picked-wrong";
+              } else {
+                className += " picked";
+              }
+            }
+            return (
+              <button
+                key={oi}
+                type="button"
+                className={className}
+                disabled={picks[currentIdx] !== undefined}
+                onClick={() => pick(oi)}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function DraftTemplate({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
+  const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const tipo   = String(invitation.tipo ?? "OTRO");
+  const theme  = getThemeFromTipo(tipo);
+
+  useEffect(() => {
+    if (!isCoverOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isCoverOpen]);
+
+  // Cover / Welcome Overlay data
+  const portadaHabilitada = Boolean(invitation.portadaHabilitada ?? true);
+  const ciudad = String(invitation.ciudad ?? "");
+  const portadaKicker = String(invitation.portadaKicker || "Con mucho cariño, para");
+  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || "Te invitamos a compartir este día tan especial con nosotros");
+  const portadaBoton = String(invitation.portadaTextoBoton || "Abrir invitación");
+
+  const getHeroTitle = () => {
+    if (tipo === "CASAMIENTO") {
+      const novia = String(invitation.nombreNovia ?? "");
+      const novio = String(invitation.nombreNovio ?? "");
+      if (novia && novio) return { title: `${novia} & ${novio}`, em: `& ${novio}` };
+      return { title: String(invitation.nombreEvento ?? ""), em: undefined };
+    }
+    return { title: String(invitation.nombreQuinceanera ?? invitation.nombreEvento ?? ""), em: undefined };
+  };
+
+  const { title, em } = getHeroTitle();
+
+  const eyebrow = invitation.nombreEvento 
+    ? String(invitation.nombreEvento)
+    : tipo === "CASAMIENTO" ? "Nos casamos"
+    : tipo === "QUINCE_ANOS" ? "Mis quince años"
+    : "Te invitamos";
+
+  const monogram =
+    tipo === "CASAMIENTO" ? "♥"
+    : tipo === "QUINCE_ANOS" ? "✦"
+    : "●";
+
+  const fechaEvento = invitation.fechaEvento
+    ? new Date(String(invitation.fechaEvento))
+    : new Date();
+
+  const fechaStr = fechaEvento.toLocaleDateString("es-AR", {
+    day: "2-digit", month: "2-digit", year: "numeric",
+  }).replace(/\//g, " · ");
+
+  const lugarNombre = String(invitation.lugarNombre ?? "");
+  const direccion   = String(invitation.direccion ?? "");
+  const hora        = String(invitation.hora ?? "");
+  const mapUrl      = String(invitation.mapUrl ?? "");
+
+  const quoteKicker = "Unas palabras";
+
+  const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+  const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
+  const liveFotos = (invitation.liveSession as { items?: { fileUrl: string }[] } | null)?.items?.map((i) => i.fileUrl) ?? [];
+  const allPhotos = [...new Set([...galeria, ...albumFotos, ...liveFotos].filter(Boolean))];
+
+  const cronograma: CronoItem[] = safeJson<CronoItem[]>(String(invitation.cronogramaEventos ?? ""), []);
+
+  const isPreview = !guest;
+  const rsvpEnabled = Boolean(invitation.rsvpEnabled ?? invitation.confirmacionHabilitada ?? true);
+
+  const regaloHabilitado = Boolean(invitation.regaloHabilitado);
+  const pagoTarjetaHabilitado = Boolean(invitation.pagoTarjetaHabilitado);
+  const showGiftSection = regaloHabilitado || pagoTarjetaHabilitado;
+  const bothAccounts = regaloHabilitado && pagoTarjetaHabilitado;
+
+  // PAGOS Y COBROS DE TARJETAS SOLO ACTIVOS SI PAGO DE TARJETAS ESTÁ HABILITADO
+  const paymentEnabled = pagoTarjetaHabilitado;
+  const paymentAmount  = paymentEnabled ? (Number((invitation as any).pagoTarjetaMonto ?? invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined)) : undefined;
+  const guestPayStatus = paymentEnabled ? ((guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID") : undefined;
+
+  const showBankDetails = showGiftSection && Boolean(
+    invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || 
+    invitation.pagoTarjetaCbu || invitation.pagoTarjetaAlias || invitation.pagoTarjetaTitular || 
+    paymentAmount || regaloHabilitado
+  );
+
+  const triviaHabilitada = Boolean(invitation.triviaHabilitada);
+  const triviaPreguntas: QuizQuestion[] = safeJson<QuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
+
+  const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
+
+  const portadaDressCode = String(invitation.portadaDressCode ?? "");
+
+  const navSections = [
+    { id: "details",   label: "Detalles", icon: <IconInfo /> },
+    ...(mapUrl        ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
+    ...(rsvpEnabled   ? [{ id: "rsvp",     label: "Confirmar", icon: <IconCheck /> }] : []),
+    ...(showGiftSection  ? [{ id: "banco",    label: "Banco",     icon: <IconGift /> }]  : []),
+    ...(triviaHabilitada && triviaPreguntas.length > 0 ? [{ id: "quiz", label: "Juego", icon: <IconQuiz /> }] : []),
+    ...(songsEnabled  ? [{ id: "songs",    label: "Música",    icon: <IconMusic /> }] : []),
+  ];
+
+  const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
+  const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const guestNameDisplay = guest?.name
+    ? guest.name
+    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio 
+        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}` 
+        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+
+  const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
+  const eventStatus = getEventStatus(fechaEventoDate);
+  const expirationDate = getInvitationExpirationDate(fechaEventoDate);
+  const expirationDateStr = expirationDate.toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
+
+  const liveItems = (invitation.liveSession as { items?: { fileUrl: string; type?: string }[] } | null)?.items ?? [];
+  const livePhotos: string[] = liveItems
+    .filter((item) => item.fileUrl && (item.type === "PHOTO" || !item.type || item.fileUrl.match(/\.(jpg|jpeg|png|webp|gif)$/i)))
+    .map((item) => item.fileUrl);
+
+  if (eventStatus === "POST_EVENT") {
+    return (
+      <div className="min-h-screen w-full bg-gradient-to-b from-[#0d1412] via-[#121c19] to-[#090e0d] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+        {/* Decorative Background Overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-25 bg-cover bg-center"
+          style={heroBgDesktop ? { backgroundImage: `url(${heroBgDesktop})` } : undefined}
+        />
+        <div className="absolute inset-0 pointer-events-none bg-black/50 backdrop-blur-[2px]" />
+
+        <main className="relative z-10 max-w-5xl mx-auto w-full px-4 md:px-6 py-12 lg:py-20">
+          <div className="rounded-[2rem] bg-black/40 border border-white/10 shadow-2xl backdrop-blur-3xl text-center max-w-4xl mx-auto relative overflow-hidden flex flex-col">
+            {/* Elegant top accent line */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-amber-200/50 to-transparent" />
+            
+            {/* Header Content */}
+            <div className="p-10 md:p-16 space-y-8">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white tracking-wide drop-shadow-md">
+                Un momento <AnimatedSynonyms words={["inolvidable", "único", "eterno", "mágico"]} className="italic text-amber-200/90 font-serif" />
+              </h1>
+              
+              <div className="flex justify-center items-center gap-4 py-2 opacity-60">
+                <div className="h-[1px] w-12 bg-white/20" />
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-200/50" />
+                <div className="h-[1px] w-12 bg-white/20" />
+              </div>
+
+              <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide">
+                Gracias por acompañarnos en este día tan especial y compartir la alegría de crear recuerdos que perdurarán para siempre.
+              </p>
+
+              <div className="pt-6">
+                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-sans tracking-widest uppercase backdrop-blur-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
+                  <span>Álbum disponible hasta el {expirationDateStr}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Carrusel de Fotos LIVE integrado */}
+            <SectionWrapper id="album" className="w-full bg-black/20 border-t border-white/5 py-8 md:py-12">
+              <div className="px-4 md:px-10">
+                {livePhotos.length > 0 ? (
+                  <div className="w-full overflow-hidden rounded-2xl shadow-xl ring-1 ring-white/10">
+                    <AlbumCarousel photos={livePhotos} hideHeader={true} />
+                  </div>
+                ) : (
+                  <div className="text-center space-y-3">
+                    <h3 className="font-serif font-light text-xl text-slate-200 tracking-wide">
+                      Álbum Fotográfico
+                    </h3>
+                    <p className="text-sm text-slate-400 font-sans font-light tracking-wide">
+                      No se registraron capturas durante la velada.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </SectionWrapper>
+          </div>
+        </main>
+
+        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 font-sans">
+          Invitaciones Digitales · Recuerdos del Evento
+        </footer>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <style>{`
+        .desktop-stage .tpl h2, 
+        .desktop-stage .tpl h3, 
+        .desktop-stage .tpl h4,
+        .desktop-stage .tpl .rsvp-container h2,
+        .desktop-stage .tpl .rsvp-container h3,
+        .desktop-stage .tpl .quiz-container h2,
+        .desktop-stage .tpl .quiz-container h3 {
+          font-family: var(--font-cormorant), serif !important;
+          color: #1A2B33 !important;
+        }
+        .desktop-stage .tpl .t-kicker,
+        .desktop-stage .tpl p.kicker {
+          font-family: var(--font-inter), sans-serif !important;
+          color: #C79A4B !important;
+          font-size: 11px !important;
+          font-weight: 600 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.2em !important;
+          display: block;
+        }
+        .desktop-stage .tpl .t-kicker::before,
+        .desktop-stage .tpl p.kicker::before {
+          display: none !important;
+        }
+        
+        /* Remove ALL rounded corners for the sharp, formal aesthetic */
+        .desktop-stage .tpl div,
+        .desktop-stage .tpl section,
+        .desktop-stage .tpl button,
+        .desktop-stage .tpl input,
+        .desktop-stage .tpl iframe,
+        .desktop-stage .tpl .t-btn,
+        .desktop-stage .tpl .album-item,
+        .desktop-stage .tpl .album-btn {
+          border-radius: 0 !important;
+        }
+
+        /* RSVP Custom Aesthetics for DraftTemplate */
+        #rsvp.section.dark {
+          background-color: #1A1512 !important; /* Dark brown/black */
+          color: #EAE5D9 !important;
+          border: none !important;
+          padding: 48px !important;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        #rsvp.section.dark > p.t-kicker,
+        #rsvp.section.dark > h2,
+        #rsvp.section.dark > .d-rsvp-grid {
+          width: 100% !important;
+          max-width: 340px !important;
+          text-align: left !important;
+        }
+        @media (min-width: 640px) {
+          #rsvp.section.dark > p.t-kicker,
+          #rsvp.section.dark > h2,
+          #rsvp.section.dark > .d-rsvp-grid {
+            max-width: 36rem !important; /* 576px to match sm:max-w-xl */
+          }
+        }
+        #rsvp.section.dark .t-kicker {
+          font-family: var(--font-inter), sans-serif !important;
+          color: #ffffff !important;
+          font-size: 11px !important;
+          font-weight: 600 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.2em !important;
+          margin-bottom: 30px !important;
+          display: block !important;
+        }
+        #rsvp.section.dark h2 {
+          display: none !important;
+        }
+        #rsvp.section.dark label {
+          text-transform: uppercase !important;
+          font-size: 10px !important;
+          font-family: var(--font-inter), sans-serif !important;
+          letter-spacing: 0.15em !important;
+          color: rgba(234, 229, 217, 0.4) !important;
+          font-weight: 600 !important;
+        }
+        #rsvp.section.dark input {
+          background-color: #EAE5D9 !important;
+          color: #1A1512 !important;
+          border-radius: 0 !important;
+          border: none !important;
+          padding: 16px 20px !important;
+          font-weight: 500 !important;
+          font-size: 15px !important;
+        }
+        #rsvp.section.dark input::placeholder {
+          color: #1A1512 !important;
+          opacity: 0.5;
+        }
+        #rsvp.section.dark .t-btn {
+          border-radius: 0 !important;
+          padding: 14px 24px !important;
+          flex: 1 !important;
+          min-width: 120px !important;
+        }
+        /* Make decision buttons side-by-side */
+        #rsvp.section.dark div:has(> button[aria-label="Confirmar asistencia"]) {
+          flex-direction: row !important;
+          gap: 12px !important;
+        }
+        
+        /* Change text of buttons using CSS */
+        #rsvp.section.dark button[aria-label="Confirmar asistencia"],
+        #rsvp.section.dark button[style*="var(--t-acc2)"] {
+          background-color: #D0B8A8 !important; /* Matches gold/sand button */
+          color: #1A1512 !important;
+          border: none !important;
+          font-size: 0 !important;
+        }
+        #rsvp.section.dark button[aria-label="Confirmar asistencia"]::after,
+        #rsvp.section.dark button[style*="var(--t-acc2)"]::after {
+          content: "Confirmar";
+          font-size: 14px !important;
+          text-transform: uppercase !important;
+          font-weight: 700 !important;
+          letter-spacing: 0.05em !important;
+        }
+        
+        #rsvp.section.dark button[aria-label="Declinar invitación"],
+        #rsvp.section.dark button[style*="transparent"] {
+          background-color: transparent !important;
+          border: 1px solid rgba(234, 229, 217, 0.4) !important;
+          color: #EAE5D9 !important;
+          font-size: 0 !important;
+        }
+        #rsvp.section.dark button[aria-label="Declinar invitación"]::after,
+        #rsvp.section.dark button[style*="transparent"]::after {
+          content: "Rechazar";
+          font-size: 14px !important;
+          font-weight: 600 !important;
+        }
+        
+        /* Subtle Calculated Prices Styling Below the Form */
+        .desktop-stage .tpl .d-rsvp-grid {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 24px !important;
+          align-items: flex-start !important;
+        }
+        .desktop-stage .tpl .d-rsvp-grid > div {
+          width: 100% !important;
+        }
+        
+        #rsvp.section.dark .t-detail {
+          background-color: transparent !important;
+          border: none !important;
+          border-radius: 0 !important;
+          padding: 16px 0 0 0 !important;
+          border-top: 1px solid rgba(234, 229, 217, 0.1) !important;
+          text-align: left !important;
+          box-shadow: none !important;
+          width: 100% !important;
+        }
+        #rsvp.section.dark .t-detail h4 {
+          color: rgba(234, 229, 217, 0.5) !important;
+          font-family: var(--font-inter), sans-serif !important;
+          text-transform: uppercase !important;
+          font-size: 10px !important;
+          letter-spacing: 0.05em !important;
+          font-weight: 600 !important;
+          opacity: 1 !important;
+          margin-bottom: 6px !important;
+        }
+        #rsvp.section.dark .t-detail p {
+          color: rgba(234, 229, 217, 0.7) !important;
+          font-size: 13px !important;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        #rsvp.section.dark .t-detail p b {
+          font-size: 1.1rem !important;
+          color: #EAE5D9 !important;
+          font-weight: 600 !important;
+        }
+        #rsvp.section.dark .t-detail span {
+          color: rgba(234, 229, 217, 0.4) !important;
+          font-size: 12px !important;
+        }
+        
+        /* SongSuggestion Custom Aesthetics */
+        #songs.d-sec.dark {
+          background-color: #F9F7F1 !important; /* Light theme */
+          padding: 80px 24px !important;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        #songs.d-sec.dark > p.t-kicker,
+        #songs.d-sec.dark > form,
+        #songs.d-sec.dark > div {
+          width: 100% !important;
+          max-width: 340px !important;
+          text-align: left !important;
+        }
+        @media (min-width: 640px) {
+          #songs.d-sec.dark > p.t-kicker,
+          #songs.d-sec.dark > form,
+          #songs.d-sec.dark > div {
+            max-width: 36rem !important; /* 576px */
+          }
+        }
+        #songs.d-sec.dark .t-kicker {
+          font-family: var(--font-inter), sans-serif !important;
+          color: #C79A4B !important; /* Gold/Orange */
+          font-size: 11px !important;
+          font-weight: 600 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.2em !important;
+          margin-bottom: 30px !important;
+          display: block !important;
+        }
+        #songs.d-sec.dark h2,
+        #songs.d-sec.dark > p:not(.t-kicker) {
+          display: none !important;
+        }
+        /* Fix Input Row Overflow */
+        #songs.d-sec.dark .mod-input-row {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 0 !important;
+          width: 100% !important;
+        }
+        #songs.d-sec.dark input {
+          width: 100% !important;
+          box-sizing: border-box !important;
+          background-color: #EAE5D9 !important; /* Pastel */
+          color: #1A2B33 !important; /* Dark text */
+          border-radius: 0 !important;
+          border: none !important;
+          padding: 16px 20px !important;
+          font-weight: 500 !important;
+          font-size: 15px !important;
+          margin-bottom: 12px !important;
+        }
+        #songs.d-sec.dark input::placeholder {
+          color: #1A2B33 !important;
+          opacity: 0.5;
+        }
+        #songs.d-sec.dark button[type="submit"] {
+          background-color: #D0B8A8 !important;
+          color: #1A1512 !important;
+          border-radius: 0 !important;
+          border: none !important;
+          padding: 14px 24px !important;
+          text-transform: uppercase !important;
+          font-weight: 700 !important;
+          letter-spacing: 0.05em !important;
+          font-size: 13px !important;
+          width: 100% !important;
+          margin-top: 8px !important;
+        }
+        
+        /* Footer Aesthetics */
+        .desktop-stage .d-foot {
+          background-color: #F9F7F1 !important; /* Matches light sections */
+          color: #1A2B33 !important;
+          padding: 24px 24px 38px 24px !important;
+          text-align: center;
+        #rsvp.section.dark h2 {
+          display: none !important;
+        }
+        #rsvp.section.dark label {
+          text-transform: uppercase !important;
+          font-size: 10px !important;
+          font-family: var(--font-inter), sans-serif !important;
+          letter-spacing: 0.15em !important;
+          color: rgba(234, 229, 217, 0.4) !important;
+          font-weight: 600 !important;
+        }
+        #rsvp.section.dark input {
+          background-color: #EAE5D9 !important;
+          color: #1A1512 !important;
+          border-radius: 0 !important;
+          border: none !important;
+          padding: 16px 20px !important;
+          font-weight: 500 !important;
+          font-size: 15px !important;
+        }
+        #rsvp.section.dark input::placeholder {
+          color: #1A1512 !important;
+          opacity: 0.5;
+        }
+        #rsvp.section.dark .t-btn {
+          border-radius: 0 !important;
+          padding: 14px 24px !important;
+          flex: 1 !important;
+          min-width: 120px !important;
+        }
+        /* Make decision buttons side-by-side */
+        #rsvp.section.dark div:has(> button[aria-label="Confirmar asistencia"]) {
+          flex-direction: row !important;
+          gap: 12px !important;
+        }
+        
+        /* Change text of buttons using CSS */
+        #rsvp.section.dark button[aria-label="Confirmar asistencia"],
+        #rsvp.section.dark button[style*="var(--t-acc2)"] {
+          background-color: #D0B8A8 !important; /* Matches gold/sand button */
+          color: #1A1512 !important;
+          border: none !important;
+          font-size: 0 !important;
+        }
+        #rsvp.section.dark button[aria-label="Confirmar asistencia"]::after,
+        #rsvp.section.dark button[style*="var(--t-acc2)"]::after {
+          content: "Confirmar";
+          font-size: 14px !important;
+          text-transform: uppercase !important;
+          font-weight: 700 !important;
+          letter-spacing: 0.05em !important;
+        }
+        
+        #rsvp.section.dark button[aria-label="Declinar invitación"],
+        #rsvp.section.dark button[style*="transparent"] {
+          background-color: transparent !important;
+          border: 1px solid rgba(234, 229, 217, 0.4) !important;
+          color: #EAE5D9 !important;
+          font-size: 0 !important;
+        }
+        #rsvp.section.dark button[aria-label="Declinar invitación"]::after,
+        #rsvp.section.dark button[style*="transparent"]::after {
+          content: "Rechazar";
+          font-size: 14px !important;
+          font-weight: 600 !important;
+        }
+        
+        /* Subtle Calculated Prices Styling Below the Form */
+        .desktop-stage .tpl .d-rsvp-grid {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 24px !important;
+          align-items: flex-start !important;
+          max-width: 340px !important;
+          width: 100% !important;
+          margin: 0 auto !important;
+        }
+        .desktop-stage .tpl .d-rsvp-grid > div {
+          width: 100% !important;
+        }
+        
+        #rsvp.section.dark .t-detail {
+          background-color: transparent !important;
+          border: none !important;
+          border-radius: 0 !important;
+          padding: 16px 0 0 0 !important;
+          border-top: 1px solid rgba(234, 229, 217, 0.1) !important;
+          text-align: left !important;
+          box-shadow: none !important;
+          width: 100% !important;
+        }
+        #rsvp.section.dark .t-detail h4 {
+          color: rgba(234, 229, 217, 0.5) !important;
+          font-family: var(--font-inter), sans-serif !important;
+          text-transform: uppercase !important;
+          font-size: 10px !important;
+          letter-spacing: 0.05em !important;
+          font-weight: 600 !important;
+          opacity: 1 !important;
+          margin-bottom: 6px !important;
+        }
+        #rsvp.section.dark .t-detail p {
+          color: rgba(234, 229, 217, 0.7) !important;
+          font-size: 13px !important;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        #rsvp.section.dark .t-detail p b {
+          font-size: 1.1rem !important;
+          color: #EAE5D9 !important;
+          font-weight: 600 !important;
+        }
+        #rsvp.section.dark .t-detail span {
+          color: rgba(234, 229, 217, 0.4) !important;
+          font-size: 12px !important;
+        }
+        
+        /* SongSuggestion Custom Aesthetics */
+        #songs.d-sec.dark {
+          background-color: #F9F7F1 !important; /* Light theme */
+          padding: 80px 24px !important;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        #songs.d-sec.dark > p.t-kicker,
+        #songs.d-sec.dark > form,
+        #songs.d-sec.dark > div {
+          width: 100% !important;
+          max-width: 340px !important;
+          text-align: left !important;
+        }
+        @media (min-width: 640px) {
+          #songs.d-sec.dark > p.t-kicker,
+          #songs.d-sec.dark > form,
+          #songs.d-sec.dark > div {
+            max-width: 36rem !important; /* 576px */
+          }
+        }
+        #songs.d-sec.dark .t-kicker {
+          font-family: var(--font-inter), sans-serif !important;
+          color: #C79A4B !important; /* Gold/Orange */
+          font-size: 11px !important;
+          font-weight: 600 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.2em !important;
+          margin-bottom: 30px !important;
+          display: block !important;
+        }
+        #songs.d-sec.dark h2,
+        #songs.d-sec.dark > p:not(.t-kicker) {
+          display: none !important;
+        }
+        /* Fix Input Row Overflow */
+        #songs.d-sec.dark .mod-input-row {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 0 !important;
+          width: 100% !important;
+        }
+        #songs.d-sec.dark input {
+          width: 100% !important;
+          box-sizing: border-box !important;
+          background-color: #EAE5D9 !important; /* Pastel */
+          color: #1A2B33 !important; /* Dark text */
+          border-radius: 0 !important;
+          border: none !important;
+          padding: 16px 20px !important;
+          font-weight: 500 !important;
+          font-size: 15px !important;
+          margin-bottom: 12px !important;
+        }
+        #songs.d-sec.dark input::placeholder {
+          color: #1A2B33 !important;
+          opacity: 0.5;
+        }
+        #songs.d-sec.dark button[type="submit"] {
+          background-color: #D0B8A8 !important;
+          color: #1A1512 !important;
+          border-radius: 0 !important;
+          border: none !important;
+          padding: 14px 24px !important;
+          text-transform: uppercase !important;
+          font-weight: 700 !important;
+          letter-spacing: 0.05em !important;
+          font-size: 13px !important;
+          width: 100% !important;
+          margin-top: 8px !important;
+        }
+        
+        /* Footer Aesthetics */
+        .desktop-stage .d-foot {
+          background-color: #F9F7F1 !important; /* Matches light sections */
+          color: #1A2B33 !important;
+          padding: 24px 24px 38px 24px !important;
+          text-align: center;
+        }
+        .desktop-stage .d-foot .mono {
+          color: #C79A4B !important;
+          font-family: var(--font-cormorant), serif !important;
+          font-size: 20px !important;
+          margin-bottom: 8px !important;
+        }
+
+        /* Bank Section Overrides */
+        #banco .t-kicker {
+          text-align: left !important;
+        }
+        #banco .copy-btn {
+          background-color: #D0B8A8 !important;
+          color: #1A1512 !important;
+          border: none !important;
+          border-radius: 0 !important;
+          font-weight: 700 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.05em !important;
+        }
+        #banco .copy-btn.copied {
+          background-color: #1A2B33 !important;
+          color: #F9F7F1 !important;
+        }
+
+        /* Bottom Nav Pill - Liquid Glass Sticky */
+        .desktop-stage .bottom-nav {
+          position: fixed !important;
+          bottom: 24px !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          background: rgba(26, 21, 18, 0.95) !important;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+          backdrop-filter: blur(12px) !important;
+          width: calc(100% - 32px) !important;
+          max-width: 360px !important;
+          padding: 14px 10px !important;
+          border-radius: 999px !important;
+          z-index: 999999 !important;
+        }
+        .desktop-stage .bottom-nav a {
+          color: #ffffff !important;
+          opacity: 0.6 !important;
+        }
+        .desktop-stage .bottom-nav a[aria-current="true"] {
+          opacity: 1 !important;
+          color: #C79A4B !important;
+        }
+      `}</style>
+      
+      {/* PORTADA / WELCOME OVERLAY (Elegante y sencilla) */}
+      {!isCoverOpen && (
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F9F7F1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh' }}
+          className="text-[#2C2C2C] transition-all duration-1000 animate-in fade-in"
+        >
+          <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem' }}>
+            
+            {/* Guest Name */}
+            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#2C2C2C] leading-relaxed" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+              {guestNameDisplay}
+            </h2>
+
+            {/* Thin Open Button */}
+            <button
+              type="button"
+              onClick={() => setIsCoverOpen(true)}
+              className="inline-block font-sans font-medium text-xs tracking-[0.2em] px-10 py-3 border border-[#2C2C2C] text-[#2C2C2C] hover:bg-[#2C2C2C] hover:text-[#F9F7F1] transition-colors duration-500 cursor-pointer"
+            >
+              ABRIR INVITACIÓN
+            </button>
+
+          </div>
+        </div>
+      )}
+
+      <div className="desktop-stage" data-theme={theme}>
+      <aside className="d-left hide-mobile">
+        <div
+          className="hero-photo"
+          style={heroBgDesktop ? {
+            backgroundImage: `url(${heroBgDesktop})`,
+            backgroundSize: "cover",
+            backgroundPosition: `${Number(invitation.portadaImagenDesktopPosX ?? 50)}% ${Number(invitation.portadaImagenDesktopPosY ?? 50)}%`,
+            backgroundRepeat: "no-repeat"
+          } : undefined}
+        />
+        <div className="d-left-top drop-shadow-md">
+          <div className="seal" style={{ borderColor: "#C79A4B" }}>
+            <span style={{ color: "#C79A4B", fontFamily: "var(--font-cormorant), serif" }}>{monogram}</span>
+          </div>
+          <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C79A4B] mb-6 drop-shadow-sm">{eyebrow}</p>
+          <h1 className="text-5xl font-light text-white leading-tight mb-4 drop-shadow-md" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            {em ? (
+              <>
+                <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
+                <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
+              </>
+            ) : (
+              <span className="block">{title}</span>
+            )}
+          </h1>
+          <p className="font-sans text-sm font-medium text-white/90 tracking-wide drop-shadow-sm">{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
+        </div>
+
+        <nav className="d-nav">
+          {navSections.map((sec, i) => (
+            <a key={sec.id} href={`#${sec.id}`}>
+              <b>0{i + 1}</b> {sec.label}
+            </a>
+          ))}
+        </nav>
+      </aside>
+
+      <div className="d-right tpl">
+        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#F9F7F1]">
+          {/* Text Container */}
+          <div className="px-8 pt-16 pb-12 text-left bg-[#F9F7F1] z-10 relative">
+            <p className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-[#C79A4B] mb-6">
+              {eyebrow}
+            </p>
+            <h1 className="text-[4rem] font-light text-[#2C2C2C] leading-[1.0] mb-8" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+              {em ? (
+                <>
+                  <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
+                  <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
+                </>
+              ) : (
+                <span className="block">{title}</span>
+              )}
+            </h1>
+            <p className="font-sans text-sm font-medium text-[#7D786F] tracking-wide">
+              {fechaStr}{lugarNombre ? ` · ${lugarNombre}` : ""}{ciudad ? ` — ${ciudad}` : ""}
+            </p>
+          </div>
+          
+          {/* Image Container */}
+          <div className="flex-1 w-full relative">
+            <div
+              className="absolute inset-0 w-full h-full"
+              style={heroBgMobile ? {
+                backgroundImage: `url(${heroBgMobile})`,
+                backgroundSize: "cover",
+                backgroundPosition: `${Number(invitation.portadaImagenPosX ?? 50)}% ${Number(invitation.portadaImagenPosY ?? 50)}%`,
+                backgroundRepeat: "no-repeat"
+              } : { backgroundColor: '#e2dfd5' }}
+            />
+          </div>
+        </div>
+
+        {(invitation.contadorHabilitado ?? true) ? (
+          <CountdownV2
+            targetDate={fechaEvento}
+            kicker="Cuenta regresiva"
+            title={tipo === "CASAMIENTO" ? "Faltan poquitos días" : "La cuenta ya empezó"}
+          />
+        ) : null}
+
+        {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
+          <SectionWrapper id="quote" delay={100} className="w-full bg-[#EAE5D9] py-24 px-6 md:px-12 flex items-center justify-center">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-[#2C2C2C] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500 }}>
+                &ldquo;{String(invitation.frasePersonalizadaTexto)}&rdquo;
+              </h2>
+            </div>
+          </SectionWrapper>
+        ) : null}
+
+        <SectionWrapper id="details" delay={150} className="w-full bg-[#F9F7F1] py-20 px-6 md:px-12">
+          <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <p className="t-kicker mb-8">
+              CUÁNDO Y DÓNDE
+            </p>
+
+            {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
+            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+              <div className="bg-[#FAF8F5] border border-[#C79A4B]/20 rounded-xl p-5 sm:p-7 mb-6 shadow-sm transition-all hover:shadow-md">
+                <div>
+                  <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A37B5C] block mb-3">
+                    {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
+                  </span>
+                  {Boolean(invitation.ceremoniaNombre) && (
+                    <h4 className="text-2xl font-bold text-[#1A2B33] mb-4" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                      {String(invitation.ceremoniaNombre)}
+                    </h4>
+                  )}
+                  {Boolean(invitation.ceremoniaHora) && (
+                    <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-3">
+                      <Clock className="w-4 h-4 text-[#A37B5C]" /> {String(invitation.ceremoniaHora)} hs
+                    </p>
+                  )}
+                  {Boolean(invitation.ceremoniaDireccion) && (
+                    <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-4">
+                      <MapPin className="w-4 h-4 text-[#A37B5C]" /> {String(invitation.ceremoniaDireccion)}
+                    </p>
+                  )}
+                  {Boolean(invitation.ceremoniaMapUrl) && (
+                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#C79A4B] hover:text-[#C79A4B] transition-colors">
+                      Ver mapa ceremonia ↗
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
+            {(lugarNombre || direccion) && (
+              <div className="bg-[#FAF8F5] border border-[#C79A4B]/20 rounded-xl p-5 sm:p-7 mb-10 shadow-sm transition-all hover:shadow-md">
+                <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A37B5C] block mb-3">
+                  Fiesta / Salón
+                </span>
+                {lugarNombre && (
+                  <h4 className="text-2xl font-bold text-[#1A2B33] mb-4" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                    {lugarNombre}
+                  </h4>
+                )}
+                {hora && (
+                  <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-3">
+                    <Clock className="w-4 h-4 text-[#A37B5C]" /> {hora} hs
+                  </p>
+                )}
+                {direccion && (
+                  <p className="flex items-center gap-2 text-[#4A5568] font-medium text-sm sm:text-base mb-4">
+                    <MapPin className="w-4 h-4 text-[#A37B5C]" /> {direccion}
+                  </p>
+                )}
+                {mapUrl && (
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#C79A4B] hover:text-[#C79A4B] transition-colors">
+                    Ver mapa fiesta ↗
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
+            {cronograma.length > 0 && (
+              <div className="mt-16">
+                <p className="t-kicker mb-6">
+                  CRONOGRAMA
+                </p>
+                <div className="flex flex-col w-full">
+                  {cronograma.map((item, i) => (
+                    <div key={i} className="flex items-center py-5 border-b border-[#C79A4B]/30 last:border-b-0">
+                      {item.time && (
+                        <span className="font-sans text-lg sm:text-xl text-[#C79A4B]/90 font-light tracking-widest w-28 sm:w-32 flex-shrink-0">
+                          {item.time}
+                        </span>
+                      )}
+                      <span className="font-sans text-[1.1rem] sm:text-xl text-[#1A2B33] font-normal">
+                        {item.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isPersonalized && guest && (
+              <div className="mt-10 bg-black/5 border border-dashed border-[#C79A4B] rounded-2xl p-6 text-center">
+                <h4 className="text-xl font-bold text-[#1A2B33] mb-2" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                  Tu invitación: {guest.name}
+                </h4>
+                <p className="text-[#4A5568] font-medium">
+                  {guest.expectedCount} {guest.expectedCount === 1 ? "lugar reservado" : "lugares reservados"}
+                </p>
+              </div>
+            )}
+          </div>
+        </SectionWrapper>
+
+        {(invitation.galeriaPrincipalHabilitada ?? true) && allPhotos.length > 0 && (
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#EAE5D9] py-20 overflow-hidden">
+            <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <p className="t-kicker mb-10">
+                ÁLBUM
+              </p>
+            </div>
+            <div className="w-full">
+              <AlbumCarousel photos={allPhotos} hideHeader />
+            </div>
+          </SectionWrapper>
+        )}
+
+        {mapUrl && (
+          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+            <iframe
+              src={mapUrl.replace("maps.google.com", "maps.google.com/maps?output=embed&")}
+              width="100%"
+              height="220"
+              style={{ border: 0, display: "block" }}
+              loading="lazy"
+              title={`Mapa: ${lugarNombre}`}
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </section>
+        )}
+
+        {rsvpEnabled && (
+          <RSVPWizardV2
+            invitationId={String(invitation.id ?? "")}
+            guestToken={guest?.uniqueToken}
+            guestName={guest?.name}
+            maxGuests={guest?.expectedCount ?? 6}
+            maxAdults={guest?.expectedAdults ?? undefined}
+            maxTeens={(guest as any)?.expectedTeens ?? undefined}
+            maxChildren={guest?.expectedChildren ?? undefined}
+            dark
+            hasPayment={paymentEnabled}
+            paymentAmount={paymentAmount}
+            paymentAlias={String(invitation.regaloAlias ?? "") || undefined}
+            paymentCbu={String(invitation.regaloCbu ?? "") || undefined}
+            paymentBanco={String(invitation.regaloBanco ?? "") || undefined}
+            paymentTitular={String(invitation.regaloTitular ?? "") || undefined}
+            initialStatus={guest?.status as "PENDING" | "CONFIRMED" | "DECLINED" | undefined}
+            initialAttendingCount={guest?.attendingCount ?? 1}
+            initialAttendingAdults={guest?.attendingAdults ?? undefined}
+            initialAttendingTeens={(guest as any)?.attendingTeens ?? undefined}
+            initialAttendingChildren={guest?.attendingChildren ?? undefined}
+            initialPaymentStatus={guestPayStatus}
+            isExempt={guest?.isExempt ?? false}
+            precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
+            precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
+            is15={invitation.tipo === "QUINCE_ANOS"}
+          />
+        )}
+
+
+
+        {showGiftSection && (
+          <SectionWrapper id="banco" delay={200} className="w-full bg-[#F9F7F1] py-20 px-6 md:px-12 overflow-hidden">
+            <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <p className="t-kicker mb-10 text-[#C79A4B]">
+                  DATOS BANCARIOS DEL EVENTO
+                </p>
+                
+                {bothAccounts ? (
+                  <>
+                    {showBankDetails && (
+                      <div className="grid grid-cols-1 gap-6 text-left w-full mt-4 items-stretch">
+                        {/* Tarjeta 1: Pago de Tarjetas */}
+                        {pagoTarjetaHabilitado && (
+                          <div className="px-4 py-5 sm:p-5 bg-[#EAE5D9] space-y-2">
+                            <div className="flex items-center gap-2 font-semibold text-[#1A2B33] text-sm border-b border-[#C79A4B]/20 pb-2">
+                              <CreditCard className="w-5 h-5 text-[#C79A4B]" strokeWidth={1.5} />
+                              <span>{String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases")}</span>
+                            </div>
+                            {Boolean((invitation as any).pagoTarjetaMensaje) && (
+                              <p className="text-xs text-[#4A5568] italic py-1">
+                                {String((invitation as any).pagoTarjetaMensaje)}
+                              </p>
+                            )}
+                            {Boolean((invitation as any).pagoTarjetaBanco) && (
+                              <InfoRow label="BANCO" value={String((invitation as any).pagoTarjetaBanco)} />
+                            )}
+                            {Boolean((invitation as any).pagoTarjetaCbu) && (
+                              <CopyField label="CBU / CVU" value={String((invitation as any).pagoTarjetaCbu)} />
+                            )}
+                            {Boolean((invitation as any).pagoTarjetaAlias) && (
+                              <CopyField label="ALIAS" value={String((invitation as any).pagoTarjetaAlias)} />
+                            )}
+                            {Boolean((invitation as any).pagoTarjetaTitular) && (
+                              <InfoRow label="TITULAR" value={String((invitation as any).pagoTarjetaTitular)} />
+                            )}
+                          </div>
+                        )}
+
+                        {/* Tarjeta 2: Regalos */}
+                        {regaloHabilitado && (
+                          <div className="px-4 py-5 sm:p-5 bg-[#EAE5D9] space-y-2">
+                            <div className="flex items-center gap-2 font-semibold text-[#1A2B33] text-sm border-b border-[#C79A4B]/20 pb-2">
+                              <Gift className="w-5 h-5 text-[#C79A4B]" strokeWidth={1.5} />
+                              <span>{String((invitation as any).regaloTitulo || "Regalos del Evento")}</span>
+                            </div>
+                            {Boolean((invitation as any).regaloMensaje) && (
+                              <p className="text-xs text-[#4A5568] italic py-1">
+                                {String((invitation as any).regaloMensaje)}
+                              </p>
+                            )}
+                            {Boolean((invitation as any).regaloBanco) && (
+                              <InfoRow label="BANCO" value={String((invitation as any).regaloBanco)} />
+                            )}
+                            {Boolean((invitation as any).regaloCbu) && (
+                              <CopyField label="CBU / CVU" value={String((invitation as any).regaloCbu)} />
+                            )}
+                            {Boolean((invitation as any).regaloAlias) && (
+                              <CopyField label="ALIAS" value={String((invitation as any).regaloAlias)} />
+                            )}
+                            {Boolean((invitation as any).regaloTitular) && (
+                              <InfoRow label="TITULAR" value={String((invitation as any).regaloTitular)} />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {(() => {
+                      const isTarjetaActive = pagoTarjetaHabilitado;
+                      const activeBank = isTarjetaActive ? {
+                        titulo: String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                        mensaje: String((invitation as any).pagoTarjetaMensaje || ""),
+                        banco: String((invitation as any).pagoTarjetaBanco || ""),
+                        cbu: String((invitation as any).pagoTarjetaCbu || ""),
+                        alias: String((invitation as any).pagoTarjetaAlias || ""),
+                        titular: String((invitation as any).pagoTarjetaTitular || ""),
+                      } : {
+                        titulo: String((invitation as any).regaloTitulo || "Regalos del Evento"),
+                        mensaje: String((invitation as any).regaloMensaje || ""),
+                        banco: String((invitation as any).regaloBanco || ""),
+                        cbu: String((invitation as any).regaloCbu || ""),
+                        alias: String((invitation as any).regaloAlias || ""),
+                        titular: String((invitation as any).regaloTitular || ""),
+                      };
+
+                      return (
+                        <>
+                          <h2 className="mb-8 text-2xl text-[#1A2B33]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{activeBank.titulo}</h2>
+                          <p style={{ opacity: 0.8, marginBottom: "20px" }} className="text-sm text-[#4A5568]">
+                            {activeBank.mensaje || (isTarjetaActive ? "Cuenta para el pago de tarjetas y pases de la fiesta." : "Esta cuenta se utilizará exclusivamente para quienes deseen realizar un regalo.")}
+                          </p>
+                          {showBankDetails && (
+                            <div className="w-full text-left mt-4">
+                              <div className="px-4 py-5 sm:p-5 bg-[#EAE5D9] space-y-1">
+                                {Boolean(activeBank.banco) && (
+                                  <InfoRow label="BANCO" value={activeBank.banco} />
+                                )}
+                                {Boolean(activeBank.cbu) && (
+                                  <CopyField label="CBU / CVU" value={activeBank.cbu} />
+                                )}
+                                {Boolean(activeBank.alias) && (
+                                  <CopyField label="ALIAS" value={activeBank.alias} />
+                                )}
+                                {Boolean(activeBank.titular) && (
+                                  <InfoRow label="TITULAR" value={activeBank.titular} />
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </>
+                )}
+                </div>
+          </SectionWrapper>
+        )}
+
+        {triviaHabilitada && triviaPreguntas.length > 0 && (
+          <SectionWrapper id="quiz" delay={300} className="w-full bg-[#EAE5D9] py-20 px-6 md:px-12 flex flex-col items-center justify-center text-center">
+            <p className="t-kicker mb-2">
+              ¿CUÁNTO SABÉS?
+            </p>
+            <h2 className="text-[2.5rem] font-bold text-[#1A2B33] mb-10" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{String(invitation.triviaTitulo ?? "Un juego para vos")}</h2>
+            <ProgressiveQuiz 
+              preguntas={triviaPreguntas} 
+              invitationId={String(invitation.id ?? "")}
+              guestToken={guest?.uniqueToken}
+              guestName={guest?.name}
+              tipo={tipo}
+            />
+          </SectionWrapper>
+        )}
+
+        {songsEnabled && (
+          <SongSuggestion
+            invitationId={String(invitation.id ?? "")}
+            guestToken={guest?.uniqueToken}
+            guestName={guest?.name ?? "Invitado"}
+            kicker="SUGERÍ UNA CANCIÓN"
+            hideHeader
+            dark
+            showPublicList
+          />
+        )}
+
+        {Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl) && (
+          <MusicPlayer 
+            musicaUrl={String(invitation.musicaUrl)} 
+            autoplay={Boolean(invitation.musicaAutoplay ?? true)}
+            loop={Boolean(invitation.musicaLoop ?? true)}
+          />
+        )}
+
+        <footer className="d-foot">
+          <div className="mono">{monogram}</div>
+          <small>
+            Con cariño, gracias por ser parte de este día ✦{" "}
+            <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
+          </small>
+        </footer>
+        </div>
+      </div>
+      
+      <BottomNavPill sections={navSections} />
+      </>
+  );
+}

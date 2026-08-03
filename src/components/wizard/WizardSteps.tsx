@@ -4,7 +4,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { StepEventType } from "./StepEventType";
 import { StepBasicInfo } from "./StepBasicInfo";
 import { StepDetails } from "./StepDetails";
-import { StepCoverPage } from "./StepCoverPage";
+
 import { StepHeroImages } from "./StepHeroImages";
 import { StepGallery } from "./StepGallery";
 import { StepMusic } from "./StepMusic";
@@ -28,7 +28,7 @@ export function WizardSteps() {
         { component: StepDetails, label: "Detalles del Salón" },
         ...(isCasamiento ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
         { component: StepCronograma, label: "Cronograma" },
-        { component: StepCoverPage, label: "Bienvenida" },
+
         { component: StepHeroImages, label: "Portada" },
         { component: StepGallery, label: "Galería" },
         { component: StepPhrase, label: "Frase" },
