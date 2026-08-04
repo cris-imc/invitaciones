@@ -122,6 +122,9 @@ export async function POST(request: NextRequest) {
 
         if (body.usePremiumCredit) {
             if (!hasUnlimitedPremium) {
+                // Chequeo rápido para devolver 403 antes de armar la invitación.
+                // El descuento real y atómico pasa dentro de la transacción de
+                // creación más abajo, para no perder el crédito si la creación falla.
                 const user = await prisma.user.findUnique({
                     where: { id: userId },
                     select: { premiumCredits: true }
@@ -133,12 +136,6 @@ export async function POST(request: NextRequest) {
                         { status: 403 }
                     );
                 }
-
-                // Descontar 1 crédito
-                await prisma.user.update({
-                    where: { id: userId },
-                    data: { premiumCredits: { decrement: 1 } }
-                });
             }
 
             invitationPlanTier = 'PREMIUM';
@@ -189,10 +186,32 @@ export async function POST(request: NextRequest) {
             fechaEvento = new Date();
         }
 
-        const invitation = await prisma.invitation.create({
+        // Solo marca premiumCreditSpent cuando realmente se descontó un
+        // crédito (no para cuentas con plan ilimitado) — así el refund al
+        // borrar la invitación (deleteInvitation) sabe si corresponde o no.
+        const willSpendCredit = Boolean(body.usePremiumCredit) && !hasUnlimitedPremium;
+
+        let invitation;
+        try {
+            invitation = await prisma.$transaction(async (tx) => {
+                // Descuento atómico junto con la creación: si la creación
+                // falla más abajo, la transacción entera se revierte y el
+                // crédito no se pierde.
+                if (willSpendCredit) {
+                    const result = await tx.user.updateMany({
+                        where: { id: userId, premiumCredits: { gt: 0 } },
+                        data: { premiumCredits: { decrement: 1 } },
+                    });
+                    if (result.count === 0) {
+                        throw new Error('INSUFFICIENT_CREDITS');
+                    }
+                }
+
+                return tx.invitation.create({
             data: {
                 userId,
                 planTier: invitationPlanTier, // Asignar el plan correspondiente
+                premiumCreditSpent: willSpendCredit,
                 tipo: body.type || 'CASAMIENTO',
                 estado: 'ACTIVA',
                 slug,
@@ -317,10 +336,20 @@ export async function POST(request: NextRequest) {
                     },
                 },
             } as any, // Cast to any because Prisma Client might be stale due to file locks
-            include: {
-                album: true,
-            },
-        });
+                    include: {
+                        album: true,
+                    },
+                });
+            });
+        } catch (txError) {
+            if (txError instanceof Error && txError.message === 'INSUFFICIENT_CREDITS') {
+                return NextResponse.json(
+                    { error: 'No tienes créditos premium disponibles' },
+                    { status: 403 }
+                );
+            }
+            throw txError;
+        }
 
         return NextResponse.json(invitation, { status: 201 });
     } catch (error) {

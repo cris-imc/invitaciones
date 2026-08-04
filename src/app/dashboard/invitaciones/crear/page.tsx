@@ -6,21 +6,32 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useWizardStore } from "@/store/wizard-store";
 import { useEffect, Suspense } from "react";
-import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
-import { TemplateLoadingFallback } from "@/components/wizard/TemplateLoadingFallback";
+import { useSearchParams } from "next/navigation";
 
-export default function CrearInvitacionPage() {
-    const { reset, data, themeConfig } = useWizardStore();
+// Sincroniza el store con la elección gratis/premium hecha en el modal de
+// NewInvitationButton, leída de la URL en vez de confiar en el estado que
+// haya quedado en memoria del wizard-store (evita "premium" pegado de una
+// invitación anterior si se navega directo a esta página).
+function WizardBootstrap() {
+    const { reset, setUsePremiumCredit } = useWizardStore();
+    const searchParams = useSearchParams();
+    const premiumParam = searchParams.get("premium");
 
-    // Reiniciar el wizard al entrar a la página
     useEffect(() => {
         reset();
-    }, [reset]);
+        setUsePremiumCredit(premiumParam === "1");
+    }, [reset, setUsePremiumCredit, premiumParam]);
 
-    const formData = { ...data, ...themeConfig } as any;
+    return null;
+}
 
+export default function CrearInvitacionPage() {
     return (
         <div className="py-8 px-4 md:px-8 max-w-4xl mx-auto min-h-screen">
+            <Suspense fallback={null}>
+                <WizardBootstrap />
+            </Suspense>
+
             <div className="mb-6 flex items-center">
                 <Link href="/dashboard/invitaciones">
                     <Button variant="ghost" size="sm" className="gap-1">

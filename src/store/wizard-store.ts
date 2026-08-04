@@ -56,12 +56,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         precioAdolescenteHabilitado: false,
 
         // Cronograma events
-        cronogramaEventos: JSON.stringify([
-            { time: "19:00", title: "Ceremonia", icon: "Heart" },
-            { time: "20:30", title: "Recepción", icon: "Music" },
-            { time: "21:00", title: "Cena", icon: "Utensils" },
-            { time: "23:00", title: "Fiesta", icon: "Music" }
-        ]),
+        cronogramaEventos: JSON.stringify([]),
 
         // Parallax template specific
         imagenCelebremosJuntos: "",
@@ -131,12 +126,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         data: {
             colorPrincipal: "#000000",
             templateTipo: "ORIGINAL",
-            cronogramaEventos: JSON.stringify([
-                { time: "19:00", title: "Ceremonia", icon: "Heart" },
-                { time: "20:30", title: "Recepción", icon: "Music" },
-                { time: "21:00", title: "Cena", icon: "Utensils" },
-                { time: "23:00", title: "Fiesta", icon: "Music" }
-            ]),
+            cronogramaEventos: JSON.stringify([]),
             rsvpDaysBeforeEvent: 7,
             
             // Booleans Defaults

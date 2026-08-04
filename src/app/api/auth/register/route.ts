@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, planTier, premiumCredits } = body;
+    const { name, email, password, planTier } = body;
 
     // Validate input
     if (!name || !email || !password) {
@@ -37,9 +37,12 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const creditsToAssign = planTier === "PREMIUM" 
-        ? (typeof premiumCredits === 'number' && premiumCredits > 0 ? premiumCredits : 1) 
-        : 0;
+    // "Premium" en el registro es una compra de UN crédito para hacer UNA
+    // invitación premium, nunca un plan de invitaciones ilimitadas. El
+    // planTier de la cuenta queda siempre FREE acá — un plan ilimitado
+    // (PREMIUM/ENTERPRISE/ADMIN) solo se asigna manualmente desde el admin.
+    const wantsPremium = planTier === "PREMIUM";
+    const creditsToAssign = wantsPremium ? 1 : 0;
 
     // Create user
     const user = await prisma.user.create({
@@ -47,9 +50,9 @@ export async function POST(request: NextRequest) {
         name,
         email: email.trim().toLowerCase(),
         password: hashedPassword,
-        planTier: planTier || "FREE",
+        planTier: "FREE",
         premiumCredits: creditsToAssign,
-        subscriptionStatus: planTier === "PREMIUM" ? "ACTIVE" : "TRIAL",
+        subscriptionStatus: wantsPremium ? "ACTIVE" : "TRIAL",
         role: "CLIENT",
       },
       select: {

@@ -25,6 +25,17 @@ export function StepBasicInfo() {
     const { data: session } = useSession();
     const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
+    const predefinedCasamiento = ["Nuestra Boda", "Nos Casamos", "¡Nos Casamos!"];
+    const predefinedQuince = ["Mis 15 Años", "Mis Quince", "¡Mis 15!"];
+
+    const [isCustomTitle, setIsCustomTitle] = useState(() => {
+        if (data.type === 'CUMPLEANOS') return true;
+        if (!data.nombreEvento) return false;
+        if (data.type === 'CASAMIENTO' && !predefinedCasamiento.includes(data.nombreEvento)) return true;
+        if (data.type === 'QUINCE_ANOS' && !predefinedQuince.includes(data.nombreEvento)) return true;
+        return false;
+    });
+
     const form = useForm<z.infer<typeof basicInfoSchema>>({
         resolver: zodResolver(basicInfoSchema),
         defaultValues: {
@@ -80,26 +91,73 @@ export function StepBasicInfo() {
                     <FormField
                         control={form.control}
                         name="nombreEvento"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Título de la Invitación</FormLabel>
-                                <FormControl>
-                                     <Input 
-                                        className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
-                                        placeholder={
-                                            tipo === 'CASAMIENTO' ? "Ej: Nuestra Boda" :
-                                                tipo === 'QUINCE_ANOS' ? "Ej: Mis 15 Años" :
-                                                    "Ej: Mi Cumpleaños, Mi Bautismo, etc."
-                                        } {...field} />
-                                </FormControl>
-                                <p className="text-xs text-muted-foreground">
-                                    {tipo === 'QUINCE_ANOS'
-                                        ? "Este es el título general de la invitación. Tu nombre lo ingresarás en el siguiente campo."
-                                        : "Este es el título general que aparecerá en la invitación."}
-                                </p>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        render={({ field }) => {
+                            const options = tipo === 'CASAMIENTO' ? predefinedCasamiento : (tipo === 'QUINCE_ANOS' ? predefinedQuince : []);
+                            return (
+                                <FormItem>
+                                    <FormLabel>Título de la Invitación</FormLabel>
+                                    <FormControl>
+                                        <div className="flex flex-col gap-3">
+                                            {options.length > 0 && (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {options.map(opt => (
+                                                        <button
+                                                            key={opt}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                field.onChange(opt);
+                                                                setIsCustomTitle(false);
+                                                            }}
+                                                            className={cn(
+                                                                "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                                                field.value === opt && !isCustomTitle
+                                                                    ? "bg-amber-500 text-white border-amber-600"
+                                                                    : "bg-[var(--ink-2)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                                            )}
+                                                        >
+                                                            {opt}
+                                                        </button>
+                                                    ))}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setIsCustomTitle(true);
+                                                            if (options.includes(field.value)) {
+                                                                field.onChange("");
+                                                            }
+                                                        }}
+                                                        className={cn(
+                                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                                            isCustomTitle
+                                                                ? "bg-amber-500 text-white border-amber-600"
+                                                                : "bg-[var(--ink-2)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                                        )}
+                                                    >
+                                                        Personalizado
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {(isCustomTitle || options.length === 0) && (
+                                                <Input 
+                                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl mt-2"
+                                                    placeholder={
+                                                        tipo === 'CASAMIENTO' ? "Ej: Nuestra Boda" :
+                                                            tipo === 'QUINCE_ANOS' ? "Ej: Mis 15 Años" :
+                                                                "Ej: Mi Cumpleaños, Mi Bautismo, etc."
+                                                    } {...field} 
+                                                />
+                                            )}
+                                        </div>
+                                    </FormControl>
+                                    <p className="text-xs text-muted-foreground">
+                                        {tipo === 'QUINCE_ANOS'
+                                            ? "Este es el título general de la invitación. Tu nombre lo ingresarás en el siguiente campo."
+                                            : "Este es el título general que aparecerá en la invitación."}
+                                    </p>
+                                    <FormMessage />
+                                </FormItem>
+                            );
+                        }}
                     />
 
                     <FormField

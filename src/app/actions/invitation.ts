@@ -14,7 +14,7 @@ export async function deleteInvitation(invitationId: string) {
 
         const invitation = await prisma.invitation.findUnique({
             where: { id: invitationId },
-            select: { userId: true, planTier: true }
+            select: { userId: true, planTier: true, premiumCreditSpent: true }
         });
 
         if (!invitation) {
@@ -25,7 +25,10 @@ export async function deleteInvitation(invitationId: string) {
             return { success: false, error: "No tienes permisos para eliminar esta invitación" };
         }
 
-        if (invitation.planTier === "PREMIUM") {
+        // Solo reembolsa si esta invitación puntual efectivamente consumió un
+        // crédito al crearse (no para cuentas con plan ilimitado, ni para
+        // invitaciones que un admin pasó a PREMIUM manualmente sin gastar uno).
+        if (invitation.premiumCreditSpent) {
             await prisma.user.update({
                 where: { id: invitation.userId },
                 data: { premiumCredits: { increment: 1 } }

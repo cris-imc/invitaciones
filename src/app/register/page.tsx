@@ -26,7 +26,6 @@ function RegisterForm() {
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("FREE");
-  const [premiumQuantity, setPremiumQuantity] = useState(1);
 
   useEffect(() => {
     if (searchParams?.get("plan") === "premium") {
@@ -64,7 +63,6 @@ function RegisterForm() {
           email: formData.email,
           password: formData.password,
           planTier: selectedPlan,
-          premiumCredits: selectedPlan === "PREMIUM" ? premiumQuantity : 0,
         }),
       });
 
@@ -341,7 +339,7 @@ function RegisterForm() {
                 {isLoading ? (
                   "Creando cuenta..."
                 ) : selectedPlan === "PREMIUM" ? (
-                  `Pagar ${formatPrice(PLAN_LIMITS.PREMIUM.price * premiumQuantity)} y Registrarme`
+                  `Pagar ${formatPrice(PLAN_LIMITS.PREMIUM.price)} y Registrarme`
                 ) : (
                   "Crear Cuenta Gratis"
                 )}

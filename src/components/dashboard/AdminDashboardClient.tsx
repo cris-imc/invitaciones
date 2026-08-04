@@ -69,6 +69,7 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
             <div className="flex flex-col gap-4">
                 {paginatedClients.map(client => {
                     const isExpanded = expandedClients.includes(client.id);
+                    const premiumEnUso = client.invitations.filter((inv: any) => inv.planTier === "PREMIUM").length;
                     return (
                         <div key={client.id} className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-[var(--ink-2)] text-[var(--on-ink)] transition-all">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -88,6 +89,11 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                                     <div className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-[10px] font-medium opacity-70">
                                         {client.invitations.length} invitaciones
                                     </div>
+                                    {premiumEnUso > 0 && (
+                                        <div className="px-2 py-0.5 bg-green-500/15 text-green-500 rounded-full text-[10px] font-medium">
+                                            {premiumEnUso} premium en uso
+                                        </div>
+                                    )}
                                 </div>
                                 
                                 <div className="flex gap-2 items-center flex-wrap">

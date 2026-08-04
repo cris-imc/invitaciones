@@ -82,6 +82,7 @@ model Invitation {
   id                           String           @id @default(cuid())
   userId                       String
   planTier                     String           @default("FREE")
+  premiumCreditSpent           Boolean          @default(false)
   maxGuestsOverride            Int?
   tipo                         String
   estado                       String           @default("BORRADOR")

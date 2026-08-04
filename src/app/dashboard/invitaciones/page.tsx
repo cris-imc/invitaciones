@@ -45,14 +45,11 @@ async function getInvitations() {
             guests: inv.guests.reduce((sum, g) => sum + (g.attendingCount || 0), 0)
         }
     }));
-    const totalPremiumUsadas = invitations.filter((i) => i.planTier === "PREMIUM").length;
-
-    return { invitations, dbUser, totalPremiumUsadas };
+    return { invitations, dbUser };
 }
 
 export default async function InvitacionesPage() {
-    const { invitations, dbUser, totalPremiumUsadas } = await getInvitations();
-    const totalPremiumCompradas = totalPremiumUsadas + (dbUser?.premiumCredits || 0);
+    const { invitations, dbUser } = await getInvitations();
     return (
         <>
             <div className="p-topbar">
@@ -62,9 +59,9 @@ export default async function InvitacionesPage() {
                         Gestiona tus eventos y monitorea las confirmaciones.
                         {dbUser && (
                             <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
-                                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE' ? 
-                                    `Invitaciones Premium: ${totalPremiumUsadas} en uso | Ilimitadas por tu plan.` :
-                                    `Invitaciones Premium: ${totalPremiumUsadas} en uso | ${dbUser.premiumCredits || 0} créditos disponibles.`
+                                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE' ?
+                                    `Invitaciones Premium: ilimitadas por tu plan.` :
+                                    `Invitaciones Premium disponibles: ${dbUser.premiumCredits || 0}.`
                                 }
                             </span>
                         )}

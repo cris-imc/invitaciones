@@ -150,12 +150,14 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
             Acá tenés el resumen de tus eventos en tiempo real.
             {dbUser && (
               <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
-                Invitaciones Premium: {stats.totalPremiumUsadas} en uso | {dbUser.premiumCredits || 0} disponibles.
+                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE'
+                  ? 'Invitaciones Premium: ilimitadas por tu plan.'
+                  : `Invitaciones Premium disponibles: ${dbUser.premiumCredits || 0}.`}
               </span>
             )}
           </p>
         </div>
-        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} autoOpen={isAutoOpen} />
+        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} planTier={dbUser?.planTier} autoOpen={isAutoOpen} />
       </div>
 
       {/* KPIs */}
@@ -230,7 +232,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
         ) : (
           <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
             <p className="text-muted-foreground mb-4 font-ui">Todavía no tenés invitaciones.</p>
-            <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} autoOpen={isAutoOpen} />
+            <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} planTier={dbUser?.planTier} autoOpen={isAutoOpen} />
           </div>
         )}
       </div>

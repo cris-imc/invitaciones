@@ -13,6 +13,9 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Sparkles } from "lucide-react";
+import Link from "next/link";
+
+const WHATSAPP_SUPPORT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent("Hola! Quiero comprar créditos premium para crear una invitación")}`;
 
 export function NewInvitationButton({ premiumCredits, totalInvitations, planTier, autoOpen = false }: { premiumCredits: number, totalInvitations: number, planTier?: string, autoOpen?: boolean }) {
     const [open, setOpen] = useState(autoOpen);
@@ -22,24 +25,14 @@ export function NewInvitationButton({ premiumCredits, totalInvitations, planTier
     const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
 
     const handleNewClick = () => {
-        if (totalInvitations === 0) {
-            // Primera invitación: no pregunta, usa crédito/plan si tiene o gratis si no
-            if (hasUnlimitedPremium || premiumCredits > 0) {
-                setUsePremiumCredit(true);
-            } else {
-                setUsePremiumCredit(false);
-            }
-            router.push("/dashboard/invitaciones/crear");
-        } else {
-            // A partir de la segunda: siempre pregunta
-            setOpen(true);
-        }
+        // Siempre pregunta gratis/premium, incluida la primera invitación.
+        setOpen(true);
     };
 
     const handleCreateFree = () => {
         setUsePremiumCredit(false);
         setOpen(false);
-        router.push("/dashboard/invitaciones/crear");
+        router.push("/dashboard/invitaciones/crear?premium=0");
     };
 
     const handleCreatePremium = () => {
@@ -50,7 +43,7 @@ export function NewInvitationButton({ premiumCredits, totalInvitations, planTier
         }
         setUsePremiumCredit(true);
         setOpen(false);
-        router.push("/dashboard/invitaciones/crear");
+        router.push("/dashboard/invitaciones/crear?premium=1");
     };
 
     return (
@@ -90,13 +83,18 @@ export function NewInvitationButton({ premiumCredits, totalInvitations, planTier
                             <span>⚠️</span> Sin créditos premium
                         </DialogTitle>
                         <DialogDescription className="pt-2">
-                            No tienes créditos premium disponibles en tu cuenta. Por favor, comunícate con soporte (vía WhatsApp) para adquirir más créditos o crea una invitación gratis por ahora.
+                            No tenés créditos premium disponibles en tu cuenta. Comunicate con nosotros para adquirir más, o creá una invitación gratis por ahora.
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter className="mt-6">
-                        <Button variant="default" onClick={() => setShowError(false)} className="w-full sm:w-auto bg-slate-800 text-white">
-                            Entendido
+                    <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-2">
+                        <Button variant="outline" onClick={handleCreateFree} className="w-full sm:w-auto">
+                            Crear Gratis
                         </Button>
+                        <Link href={WHATSAPP_SUPPORT_URL} target="_blank" className="w-full sm:w-auto">
+                            <Button variant="default" className="w-full bg-slate-800 text-white">
+                                Contactar por WhatsApp
+                            </Button>
+                        </Link>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

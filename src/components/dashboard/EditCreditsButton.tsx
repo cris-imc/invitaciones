@@ -56,7 +56,7 @@ export function EditCreditsButton({ userId, currentCredits }: { userId: string, 
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2 border-[var(--ink-2)] text-[var(--on-ink)] hover:bg-[var(--ink-2)]">
                     <Coins className="w-4 h-4 text-yellow-500" />
-                    Créditos: {currentCredits}
+                    Disponible: {currentCredits}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md bg-[var(--ink-2)] text-[var(--on-ink)] border-none">
