@@ -52,6 +52,7 @@ function WizardContent({ invitation }: { invitation: any }) {
                 portadaHabilitada: invitation.portadaHabilitada ?? true,
                 portadaKicker: invitation.portadaKicker || "",
                 portadaTitulo: invitation.portadaTitulo || "",
+                portadaDressCode: invitation.portadaDressCode || "",
                 portadaMensaje: invitation.portadaMensaje || "",
                 portadaTextoBoton: invitation.portadaTextoBoton || "",
                 portadaImagenFondo: invitation.portadaImagenFondo || "",
