@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg, PixelCrop } from '@/lib/image-processing';
 import { Button } from '@/components/ui/button';
-import { X, Check } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { X, Check, ZoomIn } from 'lucide-react';
 
 interface ImageCropperProps {
     image: string;
@@ -23,13 +25,18 @@ export default function ImageCropper({
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelCrop | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    // El PageTransition global (template.tsx) anima filter/transform sobre
+    // toda la app, lo que crea un containing block nuevo para position:fixed
+    // — un fixed inset-0 adentro deja de anclarse a la pantalla real y se
+    // ancla al alto de esa página. Un portal a <body> lo escapa del todo.
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const onCropChange = (crop: { x: number; y: number }) => {
         setCrop(crop);
-    };
-
-    const onZoomChange = (zoom: number) => {
-        setZoom(zoom);
     };
 
     const onCropCompleteCallback = useCallback((croppedArea: any, croppedAreaPixels: PixelCrop) => {
@@ -50,82 +57,82 @@ export default function ImageCropper({
         }
     };
 
-    return (
-        <div className="fixed inset-0 z-[60] bg-black/90 flex flex-col animate-in fade-in duration-200">
-            <div className="bg-black/50 p-4 flex justify-between items-center z-10 backdrop-blur-sm">
-                <h3 className="text-white font-medium">Ajustar imagen</h3>
-                <Button variant="ghost" size="icon" onClick={onCancel} className="text-white hover:bg-white/10">
-                    <X className="w-6 h-6" />
+    if (!mounted) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col animate-in fade-in duration-200">
+            {/* Header */}
+            <div className="shrink-0 px-4 py-3 flex justify-between items-center border-b border-white/10">
+                <h3 className="text-white text-sm font-medium">Ajustar imagen</h3>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onCancel}
+                    className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+                >
+                    <X className="w-5 h-5" />
                 </Button>
             </div>
 
-            <div className="flex-1 relative">
+            {/* Área de recorte: min-h-0 es clave para que este panel se achique
+                correctamente dentro del flex column y nunca empuje los
+                controles de abajo fuera de la pantalla en viewports bajos. */}
+            <div className="flex-1 min-h-0 relative">
                 <Cropper
                     image={image}
                     crop={crop}
                     zoom={zoom}
                     aspect={aspectRatio}
                     onCropChange={onCropChange}
-                    onZoomChange={onZoomChange}
+                    onZoomChange={setZoom}
                     onCropComplete={onCropCompleteCallback}
                     showGrid={true}
                 />
             </div>
 
-            <div className="bg-black/80 p-6 space-y-6 backdrop-blur-md">
-                <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs text-gray-400 mb-2">
-                        <span>Zoom</span>
-                        <span>{zoom.toFixed(1)}x</span>
+            {/* Controles: max-w-sm + mx-auto para que en desktop (donde este
+                overlay ocupa todo el ancho de pantalla) los botones no se
+                estiren de punta a punta — en mobile igual ocupan el ancho
+                disponible porque el contenedor es más angosto que max-w-sm. */}
+            <div className="shrink-0 px-4 py-4 border-t border-white/10 bg-black/40">
+                <div className="max-w-sm mx-auto space-y-4">
+                    <div className="flex items-center gap-3">
+                        <ZoomIn className="w-4 h-4 text-white/50 shrink-0" />
+                        <Slider
+                            value={[zoom]}
+                            onValueChange={([v]) => setZoom(v)}
+                            min={1}
+                            max={3}
+                            step={0.05}
+                            className="flex-1"
+                        />
+                        <span className="text-xs text-white/50 w-9 text-right tabular-nums shrink-0">{zoom.toFixed(1)}x</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="w-10 h-10 rounded-full border-white/20 text-white hover:bg-white/10 flex-shrink-0"
-                            onClick={() => setZoom(Math.max(1, zoom - 0.2))}
-                        >
-                            -
-                        </Button>
-                        <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden relative">
-                            <div 
-                                className="absolute top-0 left-0 h-full bg-white transition-all" 
-                                style={{ width: `${((zoom - 1) / 2) * 100}%` }}
-                            />
-                        </div>
-                        <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="w-10 h-10 rounded-full border-white/20 text-white hover:bg-white/10 flex-shrink-0"
-                            onClick={() => setZoom(Math.min(3, zoom + 0.2))}
-                        >
-                            +
-                        </Button>
-                    </div>
-                </div>
 
-                <div className="flex gap-3">
-                    <Button
-                        variant="outline"
-                        className="flex-1 border-white/20 text-white hover:bg-white/10 bg-transparent"
-                        onClick={onCancel}
-                    >
-                        Cancelar
-                    </Button>
-                    <Button
-                        className="flex-1 gap-2"
-                        onClick={handleCropConfirm}
-                        disabled={isProcessing}
-                    >
-                        {isProcessing ? 'Procesando...' : (
-                            <>
-                                <Check className="w-4 h-4" />
-                                Confirmar Recorte
-                            </>
-                        )}
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            className="flex-1 h-11 border-white/15 text-white hover:bg-white/10 bg-transparent"
+                            onClick={onCancel}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            className="flex-1 h-11 gap-2"
+                            onClick={handleCropConfirm}
+                            disabled={isProcessing}
+                        >
+                            {isProcessing ? 'Procesando...' : (
+                                <>
+                                    <Check className="w-4 h-4" />
+                                    Confirmar
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
