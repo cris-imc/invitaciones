@@ -65,10 +65,23 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
 
   if (!photos.length) return null;
 
-  const sectionClass = `d-sec${dark ? " dark" : ""}`;
+  const sectionClass = `d-sec album-sec${dark ? " dark" : ""}`;
 
   return (
     <div className={sectionClass}>
+      <style>{`
+        div.d-sec > div.album-wrap {
+          width: 100% !important;
+          max-width: 1000px !important;
+          margin: 0 auto !important;
+        }
+        @media (max-width: 640px) {
+          div.d-sec.album-sec {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+          }
+        }
+      `}</style>
       {!hideHeader && (
         <>
           <p className="t-kicker">Álbum</p>
@@ -76,7 +89,7 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
         </>
       )}
       <div 
-        className="album-wrap"
+        className="album-wrap w-full !max-w-[1000px] mx-auto"
         onMouseEnter={() => (isHovered.current = true)}
         onMouseLeave={() => (isHovered.current = false)}
         onTouchStart={() => (isHovered.current = true)}
