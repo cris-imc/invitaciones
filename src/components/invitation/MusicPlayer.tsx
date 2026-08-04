@@ -59,16 +59,16 @@ export function MusicPlayer({
             <Button
                 onClick={togglePlay}
                 size="icon"
-                className="fixed bottom-6 right-6 z-40 rounded-full w-14 h-14 shadow-lg"
+                className="fixed top-4 right-4 z-40 rounded-full w-10 h-10 shadow-md opacity-80 hover:opacity-100 transition-opacity"
                 style={{
                     backgroundColor: 'var(--color-primary)',
                     color: 'var(--color-text-light)',
                 }}
             >
                 {isPlaying ? (
-                    <Volume2 className="w-6 h-6" />
+                    <Volume2 className="w-4 h-4" />
                 ) : (
-                    <VolumeX className="w-6 h-6" />
+                    <VolumeX className="w-4 h-4" />
                 )}
             </Button>
         </>
