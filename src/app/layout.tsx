@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/components/providers/AuthProvider";
-import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2, Sora } from 'next/font/google';
+import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2 } from 'next/font/google';
 
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
 const spaceMono = Space_Mono({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-space-mono', display: 'swap' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const sora = Sora({ subsets: ['latin'], variable: '--font-sora', display: 'swap' });
 
 const cormorant = Cormorant_Garamond({ weight: ['500'], subsets: ['latin'], variable: '--font-cormorant', display: 'swap' });
 const bricolage = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-bricolage', display: 'swap' });
@@ -36,7 +35,7 @@ export default function RootLayout({
     <html lang="es-AR">
       <head>
       </head>
-      <body className={`antialiased ${fraunces.variable} ${spaceGrotesk.variable} ${spaceMono.variable} ${inter.variable} ${cormorant.variable} ${bricolage.variable} ${fredoka.variable} ${baloo.variable} ${sora.variable}`}>
+      <body className={`antialiased ${fraunces.variable} ${spaceGrotesk.variable} ${spaceMono.variable} ${inter.variable} ${cormorant.variable} ${bricolage.variable} ${fredoka.variable} ${baloo.variable}`}>
         <AuthProvider>
           <ToastProvider>
             {children}

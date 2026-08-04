@@ -4,7 +4,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
-import { AVAILABLE_TEMPLATES, MODERNO_COLORS } from "@/lib/theme-config";
+import { AVAILABLE_TEMPLATES } from "@/lib/theme-config";
 import { TemplateSelector } from "@/components/dashboard/TemplateSelector";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { saveInvitationFromWizard } from "@/lib/save-invitation";
@@ -41,90 +41,43 @@ export function StepDesign() {
     return (
         <div className="space-y-8">
             <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Diseño y Colores</h2>
+                <h2 className="text-2xl font-bold mb-2">Selecciona tu Plantilla</h2>
                 <p className="text-muted-foreground">
                     {['CASAMIENTO', 'QUINCE_ANOS'].includes(data.type ?? '') 
-                        ? 'Elige el estilo de tu invitación y la gama de colores'
+                        ? 'Elige la gama de colores para tu invitación Elegant'
                         : 'Elige el estilo que mejor represente tu evento'}
                 </p>
             </div>
 
             {['CASAMIENTO', 'QUINCE_ANOS'].includes(data.type ?? '') ? (
-                <div className="space-y-6">
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">1. Elige el Estilo</Label>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div 
-                                onClick={() => setData({ templateTipo: 'ELEGANT' })}
-                                className={`cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center gap-3 transition-all ${
-                                    (!data.templateTipo || data.templateTipo === 'ELEGANT' || data.templateTipo === 'ORIGINAL')
-                                        ? 'border-primary bg-primary/5 shadow-sm' 
-                                        : 'border-border hover:border-primary/50'
-                                }`}
-                            >
-                                <div className="w-full h-12 rounded bg-white shadow-sm border border-slate-200" />
-                                <span className="text-sm font-bold text-center">Elegante (Clásico)</span>
-                            </div>
-                            <div 
-                                onClick={() => setData({ templateTipo: 'MODERNO' })}
-                                className={`cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center gap-3 transition-all ${
-                                    data.templateTipo === 'MODERNO'
-                                        ? 'border-primary bg-primary/5 shadow-sm' 
-                                        : 'border-border hover:border-primary/50'
-                                }`}
-                            >
-                                <div className="w-full h-12 rounded bg-[#0F0E13] shadow-sm border border-slate-800" />
-                                <span className="text-sm font-bold text-center">Moderno (Oscuro)</span>
-                            </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {[
+                        { id: 'default', name: 'Dorados (Original)', color: '#C79A4B' },
+                        { id: 'Green', name: 'Verdes', color: '#5C8A7A' },
+                        { id: 'Red', name: 'Rojos', color: '#8A4A54' },
+                        { id: 'Blue', name: 'Azules', color: '#52718A' },
+                        { id: 'Orange', name: 'Naranjas', color: '#B86A4C' },
+                        { id: 'Violet', name: 'Violetas', color: '#7B6282' },
+                        { id: 'Gray', name: 'Grises', color: '#70767B' },
+                        { id: 'DarkYellow', name: 'Amarillo Oscuro', color: '#B8964C' },
+                        { id: 'Pink', name: 'Rosas', color: '#A87082' }
+                    ].map((gamut) => (
+                        <div 
+                            key={gamut.id}
+                            onClick={() => {
+                                setData({ templateTipo: 'ELEGANT' });
+                                setThemeConfig({ colorPrincipal: gamut.id });
+                            }}
+                            className={`cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center gap-3 transition-all ${
+                                themeConfig?.colorPrincipal === gamut.id || (!themeConfig?.colorPrincipal && gamut.id === 'default')
+                                    ? 'border-primary bg-primary/5' 
+                                    : 'border-border hover:border-primary/50'
+                            }`}
+                        >
+                            <div className="w-12 h-12 rounded-full shadow-sm" style={{ backgroundColor: gamut.color }} />
+                            <span className="text-sm font-medium text-center">{gamut.name}</span>
                         </div>
-                    </div>
-
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">2. Elige la Gama de Colores</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            {data.templateTipo === 'MODERNO' ? (
-                                MODERNO_COLORS.map((gamut) => (
-                                    <div 
-                                        key={gamut.id}
-                                        onClick={() => setData({ colorPrincipal: gamut.id })}
-                                        className={`cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center gap-3 transition-all ${
-                                            data?.colorPrincipal === gamut.id || (!data?.colorPrincipal && gamut.id === 'Azul')
-                                                ? 'border-primary bg-primary/5 shadow-sm' 
-                                                : 'border-border hover:border-primary/50'
-                                        }`}
-                                    >
-                                        <div className="w-12 h-12 rounded-full shadow-sm ring-2 ring-slate-800 ring-offset-2" style={{ backgroundColor: gamut.color }} />
-                                        <span className="text-sm font-medium text-center">{gamut.name}</span>
-                                    </div>
-                                ))
-                            ) : (
-                                [
-                                    { id: 'default', name: 'Dorados (Original)', color: '#C79A4B' },
-                                    { id: 'Green', name: 'Verdes', color: '#5C8A7A' },
-                                    { id: 'Red', name: 'Rojos', color: '#8A4A54' },
-                                    { id: 'Blue', name: 'Azules', color: '#52718A' },
-                                    { id: 'Orange', name: 'Naranjas', color: '#B86A4C' },
-                                    { id: 'Violet', name: 'Violetas', color: '#7B6282' },
-                                    { id: 'Gray', name: 'Grises', color: '#70767B' },
-                                    { id: 'DarkYellow', name: 'Amarillo Oscuro', color: '#B8964C' },
-                                    { id: 'Pink', name: 'Rosas', color: '#A87082' }
-                                ].map((gamut) => (
-                                    <div 
-                                        key={gamut.id}
-                                        onClick={() => setData({ colorPrincipal: gamut.id })}
-                                        className={`cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center gap-3 transition-all ${
-                                            data?.colorPrincipal === gamut.id || (!data?.colorPrincipal && gamut.id === 'default')
-                                                ? 'border-primary bg-primary/5 shadow-sm' 
-                                                : 'border-border hover:border-primary/50'
-                                        }`}
-                                    >
-                                        <div className="w-12 h-12 rounded-full shadow-sm" style={{ backgroundColor: gamut.color }} />
-                                        <span className="text-sm font-medium text-center">{gamut.name}</span>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
+                    ))}
                 </div>
             ) : (
                 <>
