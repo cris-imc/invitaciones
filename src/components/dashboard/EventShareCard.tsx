@@ -88,7 +88,7 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
                 </Link>
                 <Link href={`/dashboard/invitaciones/editar/${invitationId}?step=design`} className="flex-1 sm:flex-none">
                   <Button size="sm" className="w-full h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm btn-color-cycle">
-                    Cambiar Color
+                    Cambiar Plantilla
                   </Button>
                 </Link>
               </div>

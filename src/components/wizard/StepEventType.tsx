@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +15,7 @@ import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepEventType() {
     const { data, setData, nextStep } = useWizardStore();
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof eventTypeSchema>>({
         resolver: zodResolver(eventTypeSchema),
@@ -86,7 +88,10 @@ export function StepEventType() {
                         )}
                     />
 
-                    <div className="flex justify-end">
+                    <div className="flex justify-between items-center mt-8">
+                        <Button type="button" variant="outline" size="lg" onClick={() => router.back()}>
+                            Atrás
+                        </Button>
                         <Button type="submit" size="lg">Siguiente Paso</Button>
                     </div>
                 </form>
