@@ -107,7 +107,7 @@ export function DraftCountdown({
   }
 
   return (
-    <section className={`w-full py-20 px-6 md:px-12 bg-[#F9F7F1] flex flex-col items-center justify-center ${dark ? "dark" : ""}`} id="countdown">
+    <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-[#15131B] dark" : "bg-[#F9F7F1]"}`} id="countdown">
       <div className="w-full max-w-[340px] sm:max-w-xl text-left mx-auto">
         <p className="t-kicker mb-8">
           {kicker.toUpperCase() === "CUENTA REGRESIVA" ? "CUENTA REGRESIVA EN VIVO" : kicker.toUpperCase()}
@@ -115,8 +115,8 @@ export function DraftCountdown({
 
         <div className="flex flex-wrap items-center justify-between sm:justify-start sm:gap-6 w-full">
           {boxes.map(({ label, value }) => (
-            <div key={label} className="flex flex-col items-center justify-center w-[4.5rem] h-[5.5rem] sm:w-[5.5rem] sm:h-[6.5rem] bg-transparent rounded-2xl shadow-sm" style={{ border: '1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)' }}>
-              <b aria-label={`${value} ${label}`} className="text-[1.8rem] sm:text-4xl font-light text-[#2C2C2C]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            <div key={label} className={`flex flex-col items-center justify-center w-[4.5rem] h-[5.5rem] sm:w-[5.5rem] sm:h-[6.5rem] rounded-2xl shadow-sm ${dark ? "bg-[#1C1926]" : "bg-transparent"}`} style={{ border: '1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)' }}>
+              <b aria-label={`${value} ${label}`} className={`text-[1.8rem] sm:text-4xl font-light ${dark ? "text-[#EDE9F4]" : "text-[#2C2C2C]"}`} style={{ fontFamily: 'var(--font-cormorant), serif' }}>
                 {value}
               </b>
               <span aria-hidden="true" className="text-[0.65rem] sm:text-xs font-sans font-medium uppercase tracking-widest mt-1 sm:mt-2" style={{ color: 'var(--t-acc)', opacity: 0.7 }}>

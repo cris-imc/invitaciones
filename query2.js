@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); async function main() { const invs = await prisma.invitation.findMany({ where: { templateTipo: 'MODERNO' } }); console.log('Modernos:', invs.length); if(invs.length > 0) { console.log('COLOR:', invs[0].temaColores); } } main().finally(() => prisma.$disconnect());

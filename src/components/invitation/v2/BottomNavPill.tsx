@@ -9,9 +9,10 @@ interface BottomNavPillProps {
     label: string;
     icon: React.ReactNode;
   }[];
+  variant?: "default" | "moderno";
 }
 
-export function BottomNavPill({ sections }: BottomNavPillProps) {
+export function BottomNavPill({ sections, variant = "default" }: BottomNavPillProps) {
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "");
 
   // Observa qué sección está visible y marca el nav activo
@@ -51,7 +52,10 @@ export function BottomNavPill({ sections }: BottomNavPillProps) {
 
   return createPortal(
     <nav
-      className="bottom-nav hide-desktop"
+      className={variant === "moderno" 
+        ? "fixed bottom-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-nowrap overflow-x-auto items-center justify-start sm:justify-center gap-x-3 sm:gap-x-4 px-4 sm:px-6 py-3.5 rounded-[2rem] bg-[#151219]/95 border border-[#C9A876]/20 shadow-xl backdrop-blur-md w-[95%] max-w-max hide-desktop" 
+        : "bottom-nav hide-desktop"}
+      style={variant === "moderno" ? { scrollbarWidth: 'none', msOverflowStyle: 'none' } : undefined}
       aria-label="Navegación de la invitación"
       role="navigation"
     >
@@ -65,9 +69,12 @@ export function BottomNavPill({ sections }: BottomNavPillProps) {
           }}
           aria-label={`Ir a ${label}`}
           aria-current={activeId === id ? "true" : undefined}
-          style={activeId === id ? { opacity: 1 } : undefined}
+          className={variant === "moderno" 
+            ? `font-sans text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em] transition-colors whitespace-nowrap ${activeId === id ? "text-[#C9A876]" : "text-[#C9A876]/60 hover:text-[#C9A876]"}`
+            : undefined}
+          style={variant !== "moderno" && activeId === id ? { opacity: 1 } : undefined}
         >
-          <b>{icon}</b>
+          {variant !== "moderno" && <b>{icon}</b>}
           {label}
         </a>
       ))}

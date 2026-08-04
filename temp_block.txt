@@ -1,0 +1,108 @@
+              />
+            </div>
+          </SectionWrapper>
+        ) : null}
+
+        <SectionWrapper id="details" delay={150} className="w-full bg-[#0F0E13] py-20 px-6 md:px-12">
+          <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <p className="t-kicker mb-8">
+              CUÁNDO Y DÓNDE
+            </p>
+
+            {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
+            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+              <div className="bg-[#151219] border-l-2 border-l-[#C9A876] border-t border-r border-b border-white/5 rounded-md p-6 mb-8 shadow-lg transition-all hover:shadow-xl">
+                <div>
+                  <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A876] block mb-3">
+                    {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
+                  </span>
+                  {Boolean(invitation.ceremoniaNombre) && (
+                    <h4 className="text-2xl sm:text-3xl font-medium text-[#FFFFFF] mb-4" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                      {String(invitation.ceremoniaNombre)}
+                    </h4>
+                  )}
+                  {Boolean(invitation.ceremoniaHora) && (
+                    <p className="flex items-center gap-2 text-[#9B92AF] font-medium text-sm sm:text-base mb-3">
+                      <Clock className="w-4 h-4 text-[#C9A876]" /> {String(invitation.ceremoniaHora)} hs
+                    </p>
+                  )}
+                  {Boolean(invitation.ceremoniaDireccion) && (
+                    <p className="flex items-center gap-2 text-[#9B92AF] font-medium text-sm sm:text-base mb-4">
+                      <MapPin className="w-4 h-4 text-[#C9A876]" /> {String(invitation.ceremoniaDireccion)}
+                    </p>
+                  )}
+                  {Boolean(invitation.ceremoniaMapUrl) && (
+                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#FFFFFF] uppercase underline underline-offset-4 decoration-[#C9A876] hover:text-[#C9A876] transition-colors">
+                      Ver mapa ceremonia ?
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
+            {(lugarNombre || direccion) && (
+              <div className="bg-[#151219] border-l-2 border-l-[#C9A876] border-t border-r border-b border-white/5 rounded-md p-6 mb-12 shadow-lg transition-all hover:shadow-xl">
+                <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A876] block mb-3">
+                  Fiesta / Salón
+                </span>
+                {lugarNombre && (
+                  <h4 className="text-2xl sm:text-3xl font-medium text-[#FFFFFF] mb-4" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                    {lugarNombre}
+                  </h4>
+                )}
+                {hora && (
+                  <p className="flex items-center gap-2 text-[#9B92AF] font-medium text-sm sm:text-base mb-3">
+                    <Clock className="w-4 h-4 text-[#C9A876]" /> {hora} hs
+                  </p>
+                )}
+                {direccion && (
+                  <p className="flex items-center gap-2 text-[#9B92AF] font-medium text-sm sm:text-base mb-4">
+                    <MapPin className="w-4 h-4 text-[#C9A876]" /> {direccion}
+                  </p>
+                )}
+                {mapUrl && (
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#FFFFFF] uppercase underline underline-offset-4 decoration-[#C9A876] hover:text-[#C9A876] transition-colors">
+                    Ver mapa fiesta ?
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
+            {cronograma.length > 0 && (
+              <div className="mt-16">
+                <p className="t-kicker mb-6">
+                  CRONOGRAMA
+                </p>
+                <div className="flex flex-col w-full">
+                  {cronograma.map((item, i) => (
+                    <div key={i} className="flex items-center py-5 border-b border-[#C9A876]/30 last:border-b-0">
+                      {item.time && (
+                        <span className="font-sans text-[1.1rem] sm:text-xl text-[#C9A876] font-bold tracking-[0.2em] w-28 sm:w-32 flex-shrink-0">
+                          {item.time}
+                        </span>
+                      )}
+                      <span className="font-sans text-[1.1rem] sm:text-xl text-[#FFFFFF] font-bold">
+                        {item.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </SectionWrapper>
+
+        {(invitation.galeriaPrincipalHabilitada ?? true) && allPhotos.length > 0 && (
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#1C1926] py-20 overflow-hidden">
+            <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <p className="t-kicker mb-10">
+                ÁLBUM
+              </p>
+            </div>
+            <div className="w-full">
+              <AlbumCarousel photos={allPhotos} hideHeader />
+            </div>
+          </SectionWrapper>
+        )}

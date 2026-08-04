@@ -36,7 +36,7 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
 
   useEffect(() => {
     // El admin llama con auth y ve todas
-    fetch(`/api/songs?invitationId=${invitationId}`)
+    fetch(`/api/songs?invitationId=${invitationId}&admin=true`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) setSongs(data);

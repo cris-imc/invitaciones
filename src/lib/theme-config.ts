@@ -237,6 +237,7 @@ export const LINE_HEIGHT_OPTIONS = {
 
 // Interface para la configuración del tema
 export interface ThemeConfig {
+  colorPrincipal?: string;
   // Colores
   colorTemplate: ColorTemplateId;
   primaryColor: string;

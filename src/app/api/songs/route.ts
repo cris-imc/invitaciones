@@ -6,6 +6,8 @@ import { auth } from "@/auth";
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const invitationId = searchParams.get("invitationId");
+  const guestToken = searchParams.get("guestToken");
+  const adminRequest = searchParams.get("admin") === "true";
 
   if (!invitationId) {
     return NextResponse.json({ error: "invitationId requerido" }, { status: 400 });
@@ -15,11 +17,26 @@ export async function GET(request: NextRequest) {
     const session = await auth().catch(() => null);
     const isAdmin = Boolean(session?.user);
 
+    const whereClause: any = { invitationId };
+    let statusFilter: any = { status: "APPROVED" };
+
+    if (adminRequest && isAdmin) {
+      // Admin en el dashboard: ve todo
+      statusFilter = {}; // sin filtro de estado
+    } else {
+      // Vista de invitado (o admin probando la vista de invitado)
+      if (guestToken) {
+        whereClause.guestToken = guestToken;
+        statusFilter = {}; // el invitado puede ver sus propias canciones en cualquier estado
+      } else {
+        return NextResponse.json([]);
+      }
+    }
+
     const songs = await prisma.songSuggestion.findMany({
       where: {
-        invitationId,
-        // Invitados solo ven APPROVED; admin ve todo
-        ...(isAdmin ? {} : { status: "APPROVED" }),
+        ...whereClause,
+        ...statusFilter
       },
       orderBy: { votes: "desc" },
       select: {
@@ -62,7 +79,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
     }
 
-    // Buscar guest si hay token
+    // Buscar guest si hay token y verificar límite
     let guestId: string | null = null;
     if (guestToken) {
       const guest = await prisma.guest.findUnique({
@@ -70,6 +87,24 @@ export async function POST(request: NextRequest) {
         select: { id: true },
       });
       if (guest) guestId = guest.id;
+
+      const currentCount = await prisma.songSuggestion.count({
+        where: { invitationId, guestToken }
+      });
+      
+      if (currentCount >= 3) {
+        return NextResponse.json({ error: "Ya alcanzaste el máximo de 3 sugerencias." }, { status: 400 });
+      }
+    } else {
+      // Si es un link genérico, podríamos limitar por nombre de invitado para evitar spam
+      if (guestName) {
+         const currentCount = await prisma.songSuggestion.count({
+            where: { invitationId, guestName: String(guestName).slice(0, 80) }
+         });
+         if (currentCount >= 3) {
+            return NextResponse.json({ error: "Ya alcanzaste el máximo de 3 sugerencias." }, { status: 400 });
+         }
+      }
     }
 
     // Crear sugerencia

@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); async function main() { const inv = await prisma.invitation.findFirst({ orderBy: { updatedAt: 'desc' } }); console.log('TIPO:', inv.templateTipo); console.log('COLORS:', inv.temaColores); } main().finally(() => prisma.$disconnect());
