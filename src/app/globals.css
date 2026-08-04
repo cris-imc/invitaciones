@@ -1243,3 +1243,6 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   100% { transform: scale(0.95); opacity: 1; }
 }
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
