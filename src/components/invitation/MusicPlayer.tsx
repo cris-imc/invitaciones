@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Volume2, VolumeX } from "lucide-react";
+import { Music2 } from "lucide-react";
 
 interface MusicPlayerProps {
     musicaUrl: string;
@@ -59,17 +59,16 @@ export function MusicPlayer({
             <Button
                 onClick={togglePlay}
                 size="icon"
-                className="fixed top-4 right-4 z-40 rounded-full w-10 h-10 shadow-md opacity-80 hover:opacity-100 transition-opacity"
+                aria-label={isPlaying ? "Pausar música" : "Reproducir música"}
+                className="fixed top-3 right-3 z-[99999] rounded-full w-9 h-9 shadow-md backdrop-blur-md border transition-opacity hover:opacity-100"
                 style={{
-                    backgroundColor: 'var(--color-primary)',
-                    color: 'var(--color-text-light)',
+                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.15)',
+                    borderColor: 'rgba(var(--color-primary-rgb), 0.35)',
+                    color: 'var(--color-primary)',
+                    opacity: isPlaying ? 1 : 0.55,
                 }}
             >
-                {isPlaying ? (
-                    <Volume2 className="w-4 h-4" />
-                ) : (
-                    <VolumeX className="w-4 h-4" />
-                )}
+                <Music2 className="w-4 h-4" strokeWidth={1.75} />
             </Button>
         </>
     );
