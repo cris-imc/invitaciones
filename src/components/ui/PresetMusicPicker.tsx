@@ -2,8 +2,7 @@
 
 import { useRef, useState } from "react";
 import { PRESET_SONGS, type PresetSong } from "@/lib/preset-music";
-import { Button } from "./button";
-import { Play, Pause, Check, Music } from "lucide-react";
+import { Play, Pause, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PresetMusicPickerProps {
@@ -35,7 +34,7 @@ export function PresetMusicPicker({ selectedUrl, onSelect }: PresetMusicPickerPr
         <div className="space-y-2">
             <audio ref={audioRef} onEnded={() => setPreviewingId(null)} onPause={() => setPreviewingId(null)} />
 
-            <div className="max-h-72 overflow-y-auto rounded-xl border divide-y bg-white">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1">
                 {PRESET_SONGS.map((song) => {
                     const isSelected = selectedUrl === song.url;
                     const isPreviewing = previewingId === song.id;
@@ -47,33 +46,36 @@ export function PresetMusicPicker({ selectedUrl, onSelect }: PresetMusicPickerPr
                             onClick={() => onSelect(song)}
                             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(song); }}
                             className={cn(
-                                "flex items-center gap-3 p-3 cursor-pointer hover:bg-slate-50 transition-colors",
-                                isSelected && "bg-primary/5"
+                                "group flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1.5 border cursor-pointer transition-colors",
+                                isSelected
+                                    ? "border-primary bg-primary/15"
+                                    : "border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-800/60"
                             )}
                         >
-                            <Button
+                            <button
                                 type="button"
-                                size="icon"
-                                variant="ghost"
-                                className="shrink-0 rounded-full text-slate-500 hover:text-primary hover:bg-primary/10"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     togglePreview(song);
                                 }}
+                                className={cn(
+                                    "shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors",
+                                    isPreviewing
+                                        ? "bg-primary text-white"
+                                        : "bg-slate-800 text-slate-300 group-hover:text-primary"
+                                )}
                             >
-                                {isPreviewing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                            </Button>
+                                {isPreviewing ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
+                            </button>
 
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-slate-900 truncate">{song.title}</p>
-                                <p className="text-xs text-muted-foreground truncate">{song.artist}</p>
+                            <div className="min-w-0 flex-1">
+                                <p className={cn("text-xs font-medium truncate", isSelected ? "text-white" : "text-slate-200")}>
+                                    {song.title}
+                                </p>
+                                <p className="text-[10px] text-slate-500 truncate">{song.artist}</p>
                             </div>
 
-                            {isSelected ? (
-                                <Check className="w-4 h-4 text-primary shrink-0" />
-                            ) : (
-                                <Music className="w-4 h-4 text-slate-300 shrink-0" />
-                            )}
+                            {isSelected && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
                         </div>
                     );
                 })}
