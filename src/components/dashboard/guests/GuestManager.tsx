@@ -71,6 +71,30 @@ interface Guest {
   invitationId: string;
 }
 
+// Construye el nombre final que se guarda: para individuales, "Nombre Apellido";
+// para familias, siempre antepone "Familia" al apellido cargado, así ese prefijo
+// queda consistente en todos lados donde se muestre guest.name (lista, WhatsApp,
+// la tarjeta que ve el invitado, etc.) sin tener que tocar cada lugar por separado.
+function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido: string): string {
+  const trimmedApellido = apellido.trim();
+  if (type === "FAMILY") {
+    return `Familia ${trimmedApellido}`.trim();
+  }
+  return `${nombre.trim()} ${trimmedApellido}`.trim();
+}
+
+// Intenta separar un nombre ya guardado en Nombre/Apellido para precargar el
+// formulario de edición. Es un mejor-esfuerzo: invitados cargados antes de esta
+// separación pueden no partirse de forma perfecta.
+function parseGuestName(guest: Pick<Guest, "name" | "type">): { nombre: string; apellido: string } {
+  if (guest.type === "FAMILY") {
+    return { nombre: "", apellido: guest.name.replace(/^Familia\s+/i, "").trim() };
+  }
+  const parts = guest.name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length <= 1) return { nombre: guest.name.trim(), apellido: "" };
+  return { nombre: parts.slice(0, -1).join(" "), apellido: parts[parts.length - 1] };
+}
+
 interface GuestManagerProps {
   slug: string;
   invitationId?: string;
@@ -93,7 +117,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [guestToEdit, setGuestToEdit] = useState<Guest | null>(null);
 
   // Edit Form States
-  const [editGuestName, setEditGuestName] = useState("");
+  const [editGuestNombre, setEditGuestNombre] = useState("");
+  const [editGuestApellido, setEditGuestApellido] = useState("");
   const [editGuestType, setEditGuestType] = useState<"INDIVIDUAL" | "FAMILY">(
     "INDIVIDUAL",
   );
@@ -127,7 +152,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const { showToast } = useToast();
 
   // Form States
-  const [newGuestName, setNewGuestName] = useState("");
+  const [newGuestNombre, setNewGuestNombre] = useState("");
+  const [newGuestApellido, setNewGuestApellido] = useState("");
   const [newGuestType, setNewGuestType] = useState<"INDIVIDUAL" | "FAMILY">(
     "INDIVIDUAL",
   );
@@ -232,7 +258,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: newGuestName,
+          name: buildGuestName(newGuestType, newGuestNombre, newGuestApellido),
           type: newGuestType,
           expectedCount:
             newGuestType === "FAMILY"
@@ -248,7 +274,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       if (res.ok) {
         const newGuest = await res.json();
         setGuests([newGuest, ...guests]);
-        setNewGuestName("");
+        setNewGuestNombre("");
+        setNewGuestApellido("");
         setNewGuestAdultCount(2);
         setNewGuestTeenCount(0);
         setNewGuestChildCount(0);
@@ -268,7 +295,9 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
   const handleEditClick = (guest: Guest) => {
     setGuestToEdit(guest);
-    setEditGuestName(guest.name);
+    const { nombre, apellido } = parseGuestName(guest);
+    setEditGuestNombre(nombre);
+    setEditGuestApellido(apellido);
     setEditGuestType(guest.type);
     const adults = guest.expectedAdults ?? (guest.type === "FAMILY" ? 2 : 1);
     const teens  = guest.expectedTeens  ?? 0;
@@ -303,7 +332,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: editGuestName,
+          name: buildGuestName(editGuestType, editGuestNombre, editGuestApellido),
           type: editGuestType,
           expectedCount: expectedCount,
           expectedAdults: editGuestType === "FAMILY" ? effectiveAdults : (editIndividualCategory === 'adult' ? 1 : 0),
@@ -424,17 +453,6 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           <CardContent>
             <form onSubmit={handleAddGuest} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="guestName">Nombre / Familia</Label>
-                <Input
-                  id="guestName"
-                  placeholder="Ej: Familia Pérez o Juan García"
-                  value={newGuestName}
-                  onChange={(e) => setNewGuestName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label>Tipo de Invitación</Label>
                 <div className="flex gap-4">
                   <div className="flex items-center space-x-2">
@@ -472,6 +490,45 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   </div>
                 </div>
               </div>
+
+              {newGuestType === "FAMILY" ? (
+                <div className="space-y-2">
+                  <Label htmlFor="guestApellido">Apellido de la Familia</Label>
+                  <Input
+                    id="guestApellido"
+                    placeholder="Ej: Pérez"
+                    value={newGuestApellido}
+                    onChange={(e) => setNewGuestApellido(e.target.value)}
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Se va a mostrar como <strong>&quot;Familia {newGuestApellido.trim() || "..."}&quot;</strong>.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="guestNombre">Nombre</Label>
+                    <Input
+                      id="guestNombre"
+                      placeholder="Ej: Juan"
+                      value={newGuestNombre}
+                      onChange={(e) => setNewGuestNombre(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="guestApellidoIndividual">Apellido</Label>
+                    <Input
+                      id="guestApellidoIndividual"
+                      placeholder="Ej: García"
+                      value={newGuestApellido}
+                      onChange={(e) => setNewGuestApellido(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* INDIVIDUAL: selector adulto/adolescente */}
               {newGuestType === "INDIVIDUAL" && (
@@ -654,33 +711,33 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <StatusBadge status={guest.status} />
 
                         <a
                           href={waHref}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#128C7E] text-white text-xs font-semibold shadow-sm transition-colors"
+                          title="Enviar WhatsApp"
+                          className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white shadow-sm transition-colors"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
-                          Enviar WhatsApp
                         </a>
 
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                          className="h-8 w-8 rounded-full text-blue-600 hover:bg-blue-50"
                           title="Editar"
                           onClick={() => handleEditClick(guest)}
                         >
-                          <Pencil className="w-4 h-4" />
+                          <Pencil className="w-3.5 h-3.5" />
                         </Button>
 
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 px-2.5 text-xs gap-1"
+                          className="h-8 px-3 rounded-full text-xs gap-1.5"
                           title="Copiar enlace personalizado"
                           onClick={() => copyLink(guest.uniqueToken)}
                         >
@@ -691,11 +748,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          className="h-8 w-8 rounded-full text-red-500 hover:text-red-700 hover:bg-red-50"
                           title="Eliminar"
                           onClick={() => setGuestToDelete(guest)}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     </div>
@@ -767,16 +824,6 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           </DialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="editGuestName">Nombre / Familia</Label>
-              <Input
-                id="editGuestName"
-                value={editGuestName}
-                onChange={(e) => setEditGuestName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label>Tipo de Invitación</Label>
               <div className="flex gap-4">
                 <div className="flex items-center space-x-2">
@@ -814,6 +861,45 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 </div>
               </div>
             </div>
+
+            {editGuestType === "FAMILY" ? (
+              <div className="space-y-2">
+                <Label htmlFor="editGuestApellido">Apellido de la Familia</Label>
+                <Input
+                  id="editGuestApellido"
+                  placeholder="Ej: Pérez"
+                  value={editGuestApellido}
+                  onChange={(e) => setEditGuestApellido(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Se va a mostrar como <strong>&quot;Familia {editGuestApellido.trim() || "..."}&quot;</strong>.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="editGuestNombre">Nombre</Label>
+                  <Input
+                    id="editGuestNombre"
+                    placeholder="Ej: Juan"
+                    value={editGuestNombre}
+                    onChange={(e) => setEditGuestNombre(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editGuestApellidoIndividual">Apellido</Label>
+                  <Input
+                    id="editGuestApellidoIndividual"
+                    placeholder="Ej: García"
+                    value={editGuestApellido}
+                    onChange={(e) => setEditGuestApellido(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            )}
 
             {/* INDIVIDUAL: selector adulto/adolescente */}
             {editGuestType === "INDIVIDUAL" && (
