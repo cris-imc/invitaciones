@@ -216,7 +216,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         // Fallback
     }
 
-    if (validInvitation.tipo === 'CASAMIENTO' || validInvitation.tipo === 'QUINCE_ANOS') {
+    if (validInvitation.tipo === 'CASAMIENTO' || validInvitation.tipo === 'QUINCE_ANOS' || validInvitation.tipo === 'CUMPLEANOS') {
         const color = temaColoresObj.colorPrincipal || 'default';
         const invRecord = validInvitation as Record<string, unknown>;
         const guestRecord = guest as any;

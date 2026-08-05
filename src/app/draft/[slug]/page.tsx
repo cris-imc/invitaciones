@@ -114,7 +114,7 @@ export default async function InvitationPage({
       // Fallback
   }
 
-  if (invitation.tipo === 'CASAMIENTO' || invitation.tipo === 'QUINCE_ANOS') {
+  if (invitation.tipo === 'CASAMIENTO' || invitation.tipo === 'QUINCE_ANOS' || invitation.tipo === 'CUMPLEANOS') {
       const color = temaColoresObj.colorPrincipal || 'default';
       const invRecord = invitation as Record<string, unknown>;
       

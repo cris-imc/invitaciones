@@ -6,7 +6,7 @@ import { WizardSteps } from "@/components/wizard/WizardSteps";
 import { useSearchParams } from "next/navigation";
 
 function WizardContent({ invitation }: { invitation: any }) {
-    const { setData, setStep, setDirty } = useWizardStore();
+    const { setData, setThemeConfig, setStep, setDirty } = useWizardStore();
     const [isInitialized, setIsInitialized] = useState(false);
     const searchParams = useSearchParams();
     const initialStepParam = searchParams.get("step");
@@ -108,6 +108,17 @@ function WizardContent({ invitation }: { invitation: any }) {
                 colorPrincipal: temaColores?.colorPrincipal || temaColores?.primaryColor || "#000000",
                 imagenCelebremosJuntos: invitation.imagenCelebremosJuntos || "",
             });
+
+            // themeConfig es un slice separado de data (legacy). StepDesign lee
+            // el color actual desde themeConfig.colorPrincipal, no desde
+            // data.colorPrincipal: sin este sync, el modal de "Cambiar
+            // plantilla" arrancaba siempre en "default" en vez del color
+            // guardado, y confirmar sin cambiar nada pisaba el color real.
+            setThemeConfig({
+                colorPrincipal: temaColores?.colorPrincipal || temaColores?.primaryColor || "default",
+                layout: temaColores?.layout || "classic",
+            });
+
             setDirty(false); // Reset dirtiness after loading from DB
             
             if (initialStepParam === 'design') {

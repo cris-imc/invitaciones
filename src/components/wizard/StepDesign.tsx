@@ -24,7 +24,7 @@ export function StepDesign() {
     const [previewOpen, setPreviewOpen] = useState(false);
     const selectedTemplate = data.templateTipo || "ORIGINAL";
 
-    const isDesignEvent = ['CASAMIENTO', 'QUINCE_ANOS'].includes(data.type ?? '');
+    const isDesignEvent = ['CASAMIENTO', 'QUINCE_ANOS', 'CUMPLEANOS'].includes(data.type ?? '');
     const activeTemplateTipo: TemplateTipo = data.templateTipo === 'MODERNO' ? 'MODERNO' : 'ELEGANT';
     const activeColorId = themeConfig?.colorPrincipal || 'default';
     const activeColorList = activeTemplateTipo === 'MODERNO' ? MODERNO_COLORS : ELEGANT_COLORS;

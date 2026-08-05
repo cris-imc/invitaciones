@@ -179,12 +179,39 @@ function buildQuinceSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string)
   };
 }
 
+function buildEventoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string): Record<string, unknown> {
+  // No hay pool de fotos propio para eventos genéricos (Evento/Cumpleaños);
+  // reusamos el de casamiento (fotos de salón/celebración, no específicas de
+  // novios) con la misma rotación por plantilla/color.
+  const fotos = getCasamientoFotos(templateTipo, colorId);
+  return {
+    tipo: "CUMPLEANOS",
+    nombreEvento: "Fiesta de Fin de Año",
+    fechaEvento: fechaEjemplo,
+    ciudad: "Buenos Aires",
+    lugarNombre: "Salón Terraza Norte",
+    lugarDireccion: "Av. del Libertador 1450, Buenos Aires",
+    portadaHabilitada: true,
+    portadaKicker: "Te esperamos en",
+    portadaMensaje: "Vení a celebrar con nosotros este día tan especial",
+    portadaTextoBoton: "Abrir invitación",
+    portadaImagenFondo: fotos[0],
+    portadaImagenFondoDesktop: fotos[0],
+    galeriaPrincipalFotos: JSON.stringify(fotos),
+    cronogramaEventos: JSON.stringify([
+      { time: "20:00", title: "Recepción", icon: "Heart" },
+      { time: "21:00", title: "Cena", icon: "Utensils" },
+      { time: "23:00", title: "Fiesta", icon: "Music" },
+    ]),
+  };
+}
+
 export function getTemplatePreviewSample(
   eventType: string | undefined,
   templateTipo: "ELEGANT" | "MODERNO",
   colorId: string
 ): Record<string, unknown> {
-  return eventType === "QUINCE_ANOS"
-    ? buildQuinceSample(templateTipo, colorId)
-    : buildCasamientoSample(templateTipo, colorId);
+  if (eventType === "QUINCE_ANOS") return buildQuinceSample(templateTipo, colorId);
+  if (eventType === "CUMPLEANOS") return buildEventoSample(templateTipo, colorId);
+  return buildCasamientoSample(templateTipo, colorId);
 }
