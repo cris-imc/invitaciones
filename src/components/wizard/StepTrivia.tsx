@@ -10,6 +10,11 @@ import { useToast } from "@/components/ui/Toast";
 import { Trash2, Plus, Pencil, Lock, Info, ChevronDown, ChevronUp, Check, AlertTriangle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { cn } from "@/lib/utils";
+
+const PREDEFINED_TITULOS_CASAMIENTO = ["¿Cuánto Nos Conocés?", "Trivia de los Novios", "¿Qué Tanto Sabés de Nosotros?"];
+const PREDEFINED_TITULOS_QUINCE = ["¿Cuánto Me Conocés?", "Trivia de mis 15", "¿Qué Tanto Sabés de Mí?"];
+const PREDEFINED_TITULOS_OTRO = ["Trivia del Festejo", "¿Cuánto Sabés?", "Pon a Prueba tu Memoria"];
 
 interface TriviaQuestion {
     pregunta: string;
@@ -43,6 +48,21 @@ export function StepTrivia() {
         pregunta: "",
         opciones: ["", "", "", ""],
         respuestaCorrecta: 0,
+    });
+
+    // El formulario de nueva pregunta arranca cerrado si ya hay preguntas cargadas
+    // (típico al entrar a editar una invitación existente), para no mostrar un
+    // formulario en blanco sin motivo.
+    const [showAddForm, setShowAddForm] = useState(() => preguntas.length === 0);
+
+    const tituloOptions =
+        data.type === 'CASAMIENTO' ? PREDEFINED_TITULOS_CASAMIENTO :
+        data.type === 'QUINCE_ANOS' ? PREDEFINED_TITULOS_QUINCE :
+        PREDEFINED_TITULOS_OTRO;
+
+    const [isCustomTitulo, setIsCustomTitulo] = useState(() => {
+        if (!data.triviaTitulo) return false;
+        return !tituloOptions.includes(data.triviaTitulo);
     });
 
     // Estado de la pregunta que se está tipeando: vacía, completa, o a medio llenar.
@@ -165,12 +185,52 @@ export function StepTrivia() {
                         <div className="space-y-4 border border-[var(--ink-2)] p-4 rounded-lg bg-[var(--ink-2)]">
                             <div className="space-y-2">
                                 <Label htmlFor="triviaTitulo">Título</Label>
-                                <Input
-                                    id="triviaTitulo"
-                                    value={data.triviaTitulo || ""}
-                                    onChange={(e) => setData({ triviaTitulo: e.target.value })}
-                                    placeholder="¿Cuánto nos conoces?"
-                                />
+                                <div className="flex flex-wrap gap-2">
+                                    {tituloOptions.map((opt) => (
+                                        <button
+                                            key={opt}
+                                            type="button"
+                                            onClick={() => {
+                                                setData({ triviaTitulo: opt });
+                                                setIsCustomTitulo(false);
+                                            }}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                                data.triviaTitulo === opt && !isCustomTitulo
+                                                    ? "bg-amber-500 text-white border-amber-600"
+                                                    : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                            )}
+                                        >
+                                            {opt}
+                                        </button>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsCustomTitulo(true);
+                                            if (tituloOptions.includes(data.triviaTitulo || "")) {
+                                                setData({ triviaTitulo: "" });
+                                            }
+                                        }}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                            isCustomTitulo
+                                                ? "bg-amber-500 text-white border-amber-600"
+                                                : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                        )}
+                                    >
+                                        Personalizado
+                                    </button>
+                                </div>
+                                {isCustomTitulo && (
+                                    <Input
+                                        id="triviaTitulo"
+                                        value={data.triviaTitulo || ""}
+                                        onChange={(e) => setData({ triviaTitulo: e.target.value })}
+                                        placeholder="Escribí un título personalizado"
+                                        className="mt-2"
+                                    />
+                                )}
                             </div>
                         </div>
 
@@ -223,8 +283,32 @@ export function StepTrivia() {
                         )}
 
                         {/* Formulario para nueva pregunta */}
+                        {!showAddForm ? (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setShowAddForm(true)}
+                                className="w-full border-dashed h-11 border-amber-500/40 hover:bg-amber-500/10 text-amber-300"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Agregar nueva pregunta
+                            </Button>
+                        ) : (
                         <div className="border border-[var(--ink-2)] p-4 rounded-lg space-y-4 bg-yellow-500/10">
-                            <h3 className="font-semibold text-yellow-500">Agregar nueva pregunta</h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="font-semibold text-yellow-500">Agregar nueva pregunta</h3>
+                                {!hasPendingContent && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowAddForm(false)}
+                                        className="h-7 px-2 text-xs text-muted-foreground"
+                                    >
+                                        Cancelar
+                                    </Button>
+                                )}
+                            </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="pregunta">Pregunta</Label>
@@ -292,6 +376,7 @@ export function StepTrivia() {
                                 </Button>
                             </div>
                         </div>
+                        )}
                     </>
                 )}
             </div>
