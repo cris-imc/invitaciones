@@ -36,15 +36,21 @@ export function HeroParallaxPhoto() {
   return (
     <div className="hidden md:flex relative md:h-full md:min-h-[400px] md:items-center overflow-visible pointer-events-none md:scale-110 md:origin-right">
       <div className="relative w-full md:w-full md:h-full overflow-hidden">
-        <div className="absolute inset-0 z-0 l-hero-photo-mask">
-          <img
-            ref={imgRef}
-            src="/landing/novios2.jpg"
-            alt="Novios"
-            className="w-full h-full object-cover object-[center_30%] opacity-80"
-            style={{ willChange: "transform", transform: "scale(1.15)" }}
-          />
-        </div>
+        <img
+          ref={imgRef}
+          src="/landing/novios2.jpg"
+          alt="Novios"
+          className="absolute inset-0 w-full h-full object-cover object-[center_30%] opacity-90"
+          style={{ willChange: "transform", transform: "scale(1.15)" }}
+        />
+        {/* Degradado real (no solo una máscara de transparencia, que contra
+            una foto clara casi no se notaba) para que la foto se funda de
+            forma visible hacia el fondo oscuro del panel por la izquierda. */}
+        <div
+          className="absolute inset-0 z-10"
+          style={{ background: "linear-gradient(to right, var(--ink) 0%, var(--ink) 12%, transparent 60%)" }}
+          aria-hidden="true"
+        />
       </div>
     </div>
   );

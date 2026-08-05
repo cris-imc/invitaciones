@@ -921,14 +921,6 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .l-foot{padding:34px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; color:var(--paper);}
 .l-foot small{font-family:var(--font-mono); font-size:11px; opacity:.4;}
 
-.l-hero-photo-mask{}
-@media (min-width: 768px) {
-  .l-hero-photo-mask{
-    mask-image: linear-gradient(to right, transparent 0%, black 50%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 50%);
-  }
-}
-
 /* Menú hamburguesa mobile de la landing (misma técnica que .p-hamburger /
    .p-drawer del dashboard, con clases propias para poder ajustar cada uno
    por separado). */
@@ -950,7 +942,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   .l-nav-links{ display:none; }
   .l-hamburger{ display:flex; }
   .l-hero{ grid-template-columns:1fr; padding:36px 20px 8px; gap:32px; }
-  .l-hero h1{ font-size:32px; }
+  .l-hero h1{ font-size:42px; }
   .l-hero p.sub{ max-width:none; font-size:14.5px; }
   .l-hero-ctas{ flex-wrap:wrap; }
   .l-strip-grid{ grid-template-columns:1fr; }
