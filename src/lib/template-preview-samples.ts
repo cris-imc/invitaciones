@@ -16,6 +16,15 @@ const CASAMIENTO_FOTOS = [
   "/mockup-preview/casamiento/watermarked_img_8428878371330858127.jpg",
 ];
 
+const EVENTO_FOTOS = [
+  "/mockup-preview/evento/watermarked_img_1215185753765141526.jpg",
+  "/mockup-preview/evento/watermarked_img_1370624865937633976.jpg",
+  "/mockup-preview/evento/watermarked_img_1482629838507027044.jpg",
+  "/mockup-preview/evento/watermarked_img_12176265081736345566.jpg",
+  "/mockup-preview/evento/watermarked_img_17729993219468427008.jpg",
+  "/mockup-preview/evento/watermarked_img_9792634984836670783.jpg",
+];
+
 const QUINCE_FOTOS_POR_COLOR: Record<"rojo" | "amarillo" | "verde" | "azul" | "rosa" | "violeta", string[]> = {
   rojo: [
     "/mockup-preview/quince/rojo/watermarked_img_1386756256672415103.jpg",
@@ -122,6 +131,13 @@ function getCasamientoFotos(templateTipo: "ELEGANT" | "MODERNO", colorId: string
   return rotate(CASAMIENTO_FOTOS, offset);
 }
 
+// Tampoco hay fotos de evento genérico por color (no hay un "vestido" que
+// varíe), misma rotación por plantilla/color que casamiento.
+function getEventoFotos(templateTipo: "ELEGANT" | "MODERNO", colorId: string): string[] {
+  const offset = hashString(`${templateTipo}:${colorId}`);
+  return rotate(EVENTO_FOTOS, offset);
+}
+
 const fechaEjemplo = (() => {
   const d = new Date();
   d.setMonth(d.getMonth() + 4);
@@ -180,10 +196,7 @@ function buildQuinceSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string)
 }
 
 function buildEventoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string): Record<string, unknown> {
-  // No hay pool de fotos propio para eventos genéricos (Evento/Cumpleaños);
-  // reusamos el de casamiento (fotos de salón/celebración, no específicas de
-  // novios) con la misma rotación por plantilla/color.
-  const fotos = getCasamientoFotos(templateTipo, colorId);
+  const fotos = getEventoFotos(templateTipo, colorId);
   return {
     tipo: "CUMPLEANOS",
     nombreEvento: "Fiesta de Fin de Año",
