@@ -60,38 +60,38 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
         <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/30 to-amber-500/30 rounded-full blur-md opacity-50 group-hover:opacity-75 transition duration-1000 animate-pulse"></div>
         
         {/* Burbuja Principal */}
-        <div className="relative flex flex-col sm:flex-row items-center justify-between p-1.5 sm:pl-5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200/50 dark:border-slate-800/50 rounded-3xl sm:rounded-full shadow-sm gap-3 sm:gap-6 transition-all duration-300 hover:shadow-md">
-          
+        <div className="relative w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-1.5 sm:pl-5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200/50 dark:border-slate-800/50 rounded-3xl sm:rounded-full shadow-sm gap-3 sm:gap-6 transition-all duration-300 hover:shadow-md overflow-hidden">
+
           <div className="flex items-center gap-2.5 min-w-0 pt-2 sm:pt-0">
             <span className="relative flex h-2.5 w-2.5 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
             </span>
-            <div className="truncate">
+            <div className="min-w-0 flex-1 truncate">
               <TypewriterText />
             </div>
           </div>
-          
-          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
-            <Link href={`/i/${slug}`} target="_blank" className="flex-1 sm:flex-none inline-flex items-center justify-center h-9 px-4 gap-2 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700">
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0 w-full sm:w-auto">
+            <Link href={`/i/${slug}`} target="_blank" className="w-full sm:w-auto inline-flex items-center justify-center h-9 px-4 gap-2 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700">
                 <Eye className="w-3.5 h-3.5" />
                 <span>Ver Diseño</span>
             </Link>
-            
+
             {invitationId && (
-              <div className="flex gap-2 w-full sm:w-auto">
-                <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="flex-1 sm:flex-none">
+              <>
+                <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="w-full sm:w-auto">
                   <Button size="sm" className="w-full h-9 px-5 rounded-full gap-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm border-0">
                     <Pencil className="w-3.5 h-3.5" />
                     Editar Info
                   </Button>
                 </Link>
-                <Link href={`/dashboard/invitaciones/editar/${invitationId}?step=design`} className="flex-1 sm:flex-none">
+                <Link href={`/dashboard/invitaciones/editar/${invitationId}?step=design`} className="w-full sm:w-auto">
                   <Button size="sm" className="w-full h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm btn-color-cycle">
                     Cambiar Plantilla
                   </Button>
                 </Link>
-              </div>
+              </>
             )}
           </div>
         </div>

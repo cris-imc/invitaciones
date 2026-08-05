@@ -133,12 +133,12 @@ export function StepBankDetails() {
 
             {/* SECCIÓN 1: CUENTA PARA REGALOS */}
             <div className="space-y-4 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl shadow-sm">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
                             <Gift className="w-5 h-5" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <Label htmlFor="enableGift" className="text-base font-semibold cursor-pointer">
                                 1. Cuenta para Regalos del Evento
                             </Label>
@@ -149,6 +149,7 @@ export function StepBankDetails() {
                     </div>
                     <Switch
                         id="enableGift"
+                        className="self-end sm:self-auto"
                         checked={isRegaloActive}
                         onCheckedChange={(checked) => setData({ regaloHabilitado: checked })}
                     />
@@ -267,12 +268,12 @@ export function StepBankDetails() {
 
             {/* SECCIÓN 2: CUENTA PARA PAGO DE TARJETAS / PASES */}
             <div className="space-y-4 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl shadow-sm">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
                             <CreditCard className="w-5 h-5" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <Label htmlFor="enableCardPayment" className="text-base font-semibold cursor-pointer">
                                 2. Cuenta para Pago de Tarjetas / Pases
                             </Label>
@@ -283,6 +284,7 @@ export function StepBankDetails() {
                     </div>
                     <Switch
                         id="enableCardPayment"
+                        className="self-end sm:self-auto"
                         checked={isPagoTarjetaActive}
                         onCheckedChange={(checked) => setData({ pagoTarjetaHabilitado: checked })}
                     />

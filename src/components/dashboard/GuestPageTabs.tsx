@@ -46,9 +46,9 @@ function AnimatedTabDescription({ text }: { text: string }) {
   }, [text]);
 
   return (
-    <div className="flex items-center gap-2 px-1 mb-5 text-sm text-amber-600 dark:text-amber-400/90 font-medium min-h-[24px]">
+    <div className="flex items-center gap-2 px-1 mb-5 w-full text-sm text-amber-600 dark:text-amber-400/90 font-medium min-h-[24px]">
       <Info className="w-4 h-4 shrink-0" />
-      <span>
+      <span className="min-w-0 flex-1 break-words">
         {displayed}
         <span className="animate-pulse ml-0.5">|</span>
       </span>
