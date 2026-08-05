@@ -93,10 +93,29 @@ export function StepTrivia() {
     };
 
     const handleEditQuestion = (index: number) => {
+        if (isPendingPartial) {
+            showToast(
+                "Tenés una pregunta a medio completar en el formulario. Completala o borrá el texto antes de editar otra.",
+                "error"
+            );
+            return;
+        }
+
+        // Si había una pregunta completa sin agregar, la guardamos antes de
+        // cargar la que se va a editar, para no perderla.
+        let restantes = preguntas;
+        if (isPendingComplete) {
+            restantes = [...preguntas, currentQuestion];
+        }
+
         // Load the selected question into the form
         setCurrentQuestion(preguntas[index]);
         // Remove it from the saved list so they can replace it upon adding
-        setPreguntas(preguntas.filter((_, i) => i !== index));
+        setPreguntas(restantes.filter((_, i) => i !== index));
+        // El formulario puede estar colapsado (ya había preguntas cargadas);
+        // sin esto, la pregunta desaparecía de la lista sin ningún form
+        // visible para seguir editándola.
+        setShowAddForm(true);
     };
 
     // Devuelve true si pudo avanzar (o no había nada pendiente que lo bloquee).
