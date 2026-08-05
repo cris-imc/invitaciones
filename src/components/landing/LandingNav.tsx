@@ -58,7 +58,9 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
           ))}
         </div>
 
-        <div className="l-drawer-foot flex flex-col gap-2">
+        {/* Justo debajo de los links, no pegados abajo del todo: mismo lugar
+            donde vive "Cerrar sesión" en el drawer del dashboard. */}
+        <div className="px-3 pt-1 flex flex-col gap-2">
           {isLoggedIn ? (
             <>
               <Link href={registerUrl} onClick={() => setOpen(false)}>
