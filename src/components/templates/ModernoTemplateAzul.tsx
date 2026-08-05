@@ -336,7 +336,6 @@ export function ModernoTemplateAzul({ invitation, guest, isPersonalized = false 
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
     musicaUrl: String(invitation.musicaUrl ?? ""),
     autoplay: musicaHabilitada && Boolean(invitation.musicaAutoplay ?? true),
-    loop: Boolean(invitation.musicaLoop ?? true),
   });
 
   const [mounted, setMounted] = useState(false);

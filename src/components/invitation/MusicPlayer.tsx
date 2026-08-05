@@ -8,10 +8,9 @@ import { Music2 } from "lucide-react";
 interface UseMusicPlayerOptions {
     musicaUrl: string;
     autoplay?: boolean;
-    loop?: boolean;
 }
 
-export function useMusicPlayer({ musicaUrl, autoplay = true, loop = true }: UseMusicPlayerOptions) {
+export function useMusicPlayer({ musicaUrl, autoplay = true }: UseMusicPlayerOptions) {
     const audioRef = useRef<HTMLAudioElement>(null);
     const [isPlaying, setIsPlaying] = useState(autoplay);
 
@@ -25,18 +24,35 @@ export function useMusicPlayer({ musicaUrl, autoplay = true, loop = true }: UseM
         audio.addEventListener('play', handlePlay);
         audio.addEventListener('pause', handlePause);
 
-        if (autoplay) {
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(() => {
-                    setIsPlaying(false);
-                });
-            }
+        if (!autoplay) {
+            return () => {
+                audio.removeEventListener('play', handlePlay);
+                audio.removeEventListener('pause', handlePause);
+            };
         }
+
+        // Intento inmediato. La mayoría de los navegadores bloquean el
+        // autoplay con sonido si todavía no hubo ninguna interacción del
+        // usuario en la página, así que esto suele fallar en silencio.
+        audio.play().catch(() => setIsPlaying(false));
+
+        // Reintenta en la primera interacción real (click/touch/tecla) en
+        // cualquier parte de la página -por ejemplo, al tocar "Abrir
+        // invitación"-, que sí cuenta como gesto válido para el navegador.
+        const removeGestureListeners = () => {
+            document.removeEventListener('pointerdown', retryOnGesture);
+            document.removeEventListener('keydown', retryOnGesture);
+        };
+        const retryOnGesture = () => {
+            audio.play().then(removeGestureListeners).catch(() => {});
+        };
+        document.addEventListener('pointerdown', retryOnGesture);
+        document.addEventListener('keydown', retryOnGesture);
 
         return () => {
             audio.removeEventListener('play', handlePlay);
             audio.removeEventListener('pause', handlePause);
+            removeGestureListeners();
         };
     }, [autoplay]);
 
@@ -50,7 +66,7 @@ export function useMusicPlayer({ musicaUrl, autoplay = true, loop = true }: UseM
         }
     };
 
-    const audioElement = <audio ref={audioRef} loop={loop} src={musicaUrl} />;
+    const audioElement = <audio ref={audioRef} loop={false} src={musicaUrl} />;
 
     return { isPlaying, togglePlay, audioElement };
 }
@@ -83,7 +99,6 @@ export function MusicToggleButton({ isPlaying, onToggle, className = "" }: Music
 interface MusicPlayerProps {
     musicaUrl: string;
     autoplay?: boolean;
-    loop?: boolean;
 }
 
 /**
@@ -95,9 +110,8 @@ interface MusicPlayerProps {
 export function MusicPlayer({
     musicaUrl,
     autoplay = true,
-    loop = true,
 }: MusicPlayerProps) {
-    const { isPlaying, togglePlay, audioElement } = useMusicPlayer({ musicaUrl, autoplay, loop });
+    const { isPlaying, togglePlay, audioElement } = useMusicPlayer({ musicaUrl, autoplay });
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 

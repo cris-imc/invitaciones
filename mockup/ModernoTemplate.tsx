@@ -1474,7 +1474,6 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
           <MusicPlayer 
             musicaUrl={String(invitation.musicaUrl)} 
             autoplay={Boolean(invitation.musicaAutoplay ?? true)}
-            loop={Boolean(invitation.musicaLoop ?? true)}
           />
         )}
 

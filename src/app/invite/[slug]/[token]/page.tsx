@@ -207,21 +207,21 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
 
     let temaColoresObj = { colorPrincipal: 'default' };
     try {
-        if (typeof invitation.temaColores === 'string') {
-            temaColoresObj = JSON.parse(invitation.temaColores);
-        } else if (invitation.temaColores) {
-            temaColoresObj = invitation.temaColores as any;
+        if (typeof validInvitation.temaColores === 'string') {
+            temaColoresObj = JSON.parse(validInvitation.temaColores);
+        } else if (validInvitation.temaColores) {
+            temaColoresObj = validInvitation.temaColores as any;
         }
     } catch (e) {
         // Fallback
     }
 
-    if (invitation.tipo === 'CASAMIENTO' || invitation.tipo === 'QUINCE_ANOS') {
+    if (validInvitation.tipo === 'CASAMIENTO' || validInvitation.tipo === 'QUINCE_ANOS') {
         const color = temaColoresObj.colorPrincipal || 'default';
-        const invRecord = invitation as Record<string, unknown>;
+        const invRecord = validInvitation as Record<string, unknown>;
         const guestRecord = guest as any;
-        
-        if (invitation.templateTipo === 'MODERNO') {
+
+        if (validInvitation.templateTipo === 'MODERNO') {
             switch (color) {
                 case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 case 'Bordo': return <ModernoTemplateBordo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;

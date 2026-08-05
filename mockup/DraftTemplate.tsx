@@ -1425,7 +1425,6 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           <MusicPlayer 
             musicaUrl={String(invitation.musicaUrl)} 
             autoplay={Boolean(invitation.musicaAutoplay ?? true)}
-            loop={Boolean(invitation.musicaLoop ?? true)}
           />
         )}
 

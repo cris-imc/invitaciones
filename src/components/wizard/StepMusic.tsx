@@ -104,19 +104,6 @@ export function StepMusic() {
                                 Reproducir automáticamente
                             </Label>
                         </div>
-
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="musicaLoop"
-                                checked={data.musicaLoop}
-                                onCheckedChange={(checked) =>
-                                    setData({ musicaLoop: Boolean(checked) })
-                                }
-                            />
-                            <Label htmlFor="musicaLoop">
-                                Repetir en bucle
-                            </Label>
-                        </div>
                     </>
                 )}
 
