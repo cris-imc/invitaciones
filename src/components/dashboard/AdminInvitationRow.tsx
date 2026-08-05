@@ -44,14 +44,14 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
 
     return (
         <div className="flex flex-col gap-3 bg-black/20 border border-[var(--ink-2)] rounded-xl p-4">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
                 <div className="min-w-0 flex-1">
                     <strong className="block truncate text-lg" title={invitation.nombreEvento}>{invitation.nombreEvento}</strong>
                     <span className="text-xs opacity-60 truncate block">/{invitation.slug}</span>
                 </div>
-                
+
                 {/* Botones de Acción Directa para Admin */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 flex-wrap sm:shrink-0">
                     <button
                         onClick={() => router.push(`/dashboard/invitaciones/editar/${invitation.id}`)}
                         className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"

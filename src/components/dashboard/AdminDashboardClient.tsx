@@ -73,24 +73,24 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                     return (
                         <div key={client.id} className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-[var(--ink-2)] text-[var(--on-ink)] transition-all">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                <div 
-                                    className="flex items-center gap-2 cursor-pointer flex-1"
+                                <div
+                                    className="flex items-center gap-2 flex-wrap cursor-pointer flex-1 min-w-0"
                                     onClick={() => toggleClient(client.id)}
                                 >
-                                    <div className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                                    <div className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors shrink-0">
                                         {isExpanded ? <ChevronUp className="w-5 h-5 opacity-70" /> : <ChevronDown className="w-5 h-5 opacity-70" />}
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-xl leading-none">
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold text-xl leading-none truncate">
                                             {client.name}
                                         </h3>
-                                        <span className="text-sm opacity-50 font-normal">{client.email}</span>
+                                        <span className="text-sm opacity-50 font-normal truncate block">{client.email}</span>
                                     </div>
-                                    <div className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-[10px] font-medium opacity-70">
+                                    <div className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-[10px] font-medium opacity-70 shrink-0">
                                         {client.invitations.length} invitaciones
                                     </div>
                                     {premiumEnUso > 0 && (
-                                        <div className="px-2 py-0.5 bg-green-500/15 text-green-500 rounded-full text-[10px] font-medium">
+                                        <div className="px-2 py-0.5 bg-green-500/15 text-green-500 rounded-full text-[10px] font-medium shrink-0">
                                             {premiumEnUso} premium en uso
                                         </div>
                                     )}
