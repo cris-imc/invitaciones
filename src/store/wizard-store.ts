@@ -52,7 +52,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         pagoTarjetaAlias: "",
         pagoTarjetaBanco: "",
         pagoTarjetaTitular: "",
-        precioNinoHabilitado: true,
+        precioNinoHabilitado: false,
         precioAdolescenteHabilitado: false,
 
         // Cronograma events

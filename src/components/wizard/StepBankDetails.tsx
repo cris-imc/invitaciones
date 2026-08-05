@@ -5,11 +5,14 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/Toast";
 import { Info, ChevronDown, ChevronUp, Gift, CreditCard, ShieldAlert } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { cn } from "@/lib/utils";
+
+const PREDEFINED_TITULOS_REGALO = ["Regalo", "Mesa de Regalos", "Colaboración"];
+const PREDEFINED_TITULOS_TARJETA = ["Pago de Tarjetas / Pases", "Tarjetero", "Entrada al Evento"];
 
 export function StepBankDetails() {
     const { data, setData, nextStep } = useWizardStore();
@@ -26,6 +29,15 @@ export function StepBankDetails() {
 
     const d = data as any;
     const isEditing = Boolean(d.id);
+
+    const [isCustomRegaloTitulo, setIsCustomRegaloTitulo] = useState(() => {
+        const current = d.regaloTitulo || "Regalo";
+        return !PREDEFINED_TITULOS_REGALO.includes(current);
+    });
+    const [isCustomTarjetaTitulo, setIsCustomTarjetaTitulo] = useState(() => {
+        const current = d.pagoTarjetaTitulo || "Pago de Tarjetas / Pases";
+        return !PREDEFINED_TITULOS_TARJETA.includes(current);
+    });
 
     // Default toggle logic:
     // When CREATING (!isEditing): starts disabled (false) by default.
@@ -144,35 +156,62 @@ export function StepBankDetails() {
 
                 {isRegaloActive && (
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="giftTitle" className="text-xs font-medium">Título de la Sección</Label>
+                        <div className="space-y-2">
+                            <Label className="text-xs font-medium">Título de la Sección</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {PREDEFINED_TITULOS_REGALO.map((opt) => (
+                                    <button
+                                        key={opt}
+                                        type="button"
+                                        onClick={() => {
+                                            setData({ regaloTitulo: opt });
+                                            setIsCustomRegaloTitulo(false);
+                                        }}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                            (d.regaloTitulo || "Regalo") === opt && !isCustomRegaloTitulo
+                                                ? "bg-amber-500 text-white border-amber-600"
+                                                : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                        )}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsCustomRegaloTitulo(true);
+                                        if (PREDEFINED_TITULOS_REGALO.includes(d.regaloTitulo || "Regalo")) {
+                                            setData({ regaloTitulo: "" });
+                                        }
+                                    }}
+                                    className={cn(
+                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                        isCustomRegaloTitulo
+                                            ? "bg-amber-500 text-white border-amber-600"
+                                            : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                    )}
+                                >
+                                    Personalizado
+                                </button>
+                            </div>
+                            {isCustomRegaloTitulo && (
                                 <Input
-                                    id="giftTitle"
-                                    placeholder="Ej: Regalo / Mesa de Regalos"
-                                    value={d.regaloTitulo || "Regalo"}
+                                    placeholder="Escribí un título personalizado"
+                                    value={d.regaloTitulo || ""}
                                     onChange={(e) => setData({ regaloTitulo: e.target.value })}
+                                    className="mt-2"
                                 />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="bankName" className="text-xs font-medium">Banco / Billetera Virtual</Label>
-                                <Input
-                                    id="bankName"
-                                    placeholder="Ej: Mercado Pago / Banco Galicia"
-                                    value={d.regaloBanco || ""}
-                                    onChange={(e) => setData({ regaloBanco: e.target.value })}
-                                />
-                            </div>
+                            )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="giftMessage" className="text-xs font-medium">Mensaje para Invitados (Opcional)</Label>
-                            <Textarea
-                                id="giftMessage"
-                                placeholder="Tu presencia es nuestro mejor regalo, pero si deseas colaborar..."
-                                value={d.regaloMensaje || ""}
-                                onChange={(e) => setData({ regaloMensaje: e.target.value })}
-                                className="min-h-[70px] resize-none text-sm"
+                            <Label htmlFor="bankName" className="text-xs font-medium">Banco / Billetera Virtual</Label>
+                            <Input
+                                id="bankName"
+                                placeholder="Ej: Mercado Pago / Banco Galicia"
+                                value={d.regaloBanco || ""}
+                                onChange={(e) => setData({ regaloBanco: e.target.value })}
                             />
                         </div>
 
@@ -251,35 +290,62 @@ export function StepBankDetails() {
 
                 {isPagoTarjetaActive && (
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="cardTitle" className="text-xs font-medium">Título de la Sección</Label>
+                        <div className="space-y-2">
+                            <Label className="text-xs font-medium">Título de la Sección</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {PREDEFINED_TITULOS_TARJETA.map((opt) => (
+                                    <button
+                                        key={opt}
+                                        type="button"
+                                        onClick={() => {
+                                            setData({ pagoTarjetaTitulo: opt });
+                                            setIsCustomTarjetaTitulo(false);
+                                        }}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                            (d.pagoTarjetaTitulo || "Pago de Tarjetas / Pases") === opt && !isCustomTarjetaTitulo
+                                                ? "bg-amber-500 text-white border-amber-600"
+                                                : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                        )}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsCustomTarjetaTitulo(true);
+                                        if (PREDEFINED_TITULOS_TARJETA.includes(d.pagoTarjetaTitulo || "Pago de Tarjetas / Pases")) {
+                                            setData({ pagoTarjetaTitulo: "" });
+                                        }
+                                    }}
+                                    className={cn(
+                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                        isCustomTarjetaTitulo
+                                            ? "bg-amber-500 text-white border-amber-600"
+                                            : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                    )}
+                                >
+                                    Personalizado
+                                </button>
+                            </div>
+                            {isCustomTarjetaTitulo && (
                                 <Input
-                                    id="cardTitle"
-                                    placeholder="Ej: Pago de Tarjetas / Tarjetero"
-                                    value={d.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"}
+                                    placeholder="Escribí un título personalizado"
+                                    value={d.pagoTarjetaTitulo || ""}
                                     onChange={(e) => setData({ pagoTarjetaTitulo: e.target.value })}
+                                    className="mt-2"
                                 />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="cardBank" className="text-xs font-medium">Banco / Billetera Virtual</Label>
-                                <Input
-                                    id="cardBank"
-                                    placeholder="Ej: Banco BBVA / Mercado Pago"
-                                    value={d.pagoTarjetaBanco || ""}
-                                    onChange={(e) => setData({ pagoTarjetaBanco: e.target.value })}
-                                />
-                            </div>
+                            )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="cardMessage" className="text-xs font-medium">Instrucciones o Mensaje (Opcional)</Label>
-                            <Textarea
-                                id="cardMessage"
-                                placeholder="Por favor enviar el comprobante de pago indicando el nombre de los asistentes..."
-                                value={d.pagoTarjetaMensaje || ""}
-                                onChange={(e) => setData({ pagoTarjetaMensaje: e.target.value })}
-                                className="min-h-[70px] resize-none text-sm"
+                            <Label htmlFor="cardBank" className="text-xs font-medium">Banco / Billetera Virtual</Label>
+                            <Input
+                                id="cardBank"
+                                placeholder="Ej: Banco BBVA / Mercado Pago"
+                                value={d.pagoTarjetaBanco || ""}
+                                onChange={(e) => setData({ pagoTarjetaBanco: e.target.value })}
                             />
                         </div>
 
@@ -400,7 +466,7 @@ export function StepBankDetails() {
                                     </div>
                                     <Switch
                                         id="precioNinoHabilitado"
-                                        checked={d.precioNinoHabilitado ?? true}
+                                        checked={d.precioNinoHabilitado ?? false}
                                         onCheckedChange={(checked) => setData({ precioNinoHabilitado: checked })}
                                     />
                                 </div>
