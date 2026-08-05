@@ -75,12 +75,18 @@ interface Guest {
 // para familias, siempre antepone "Familia" al apellido cargado, así ese prefijo
 // queda consistente en todos lados donde se muestre guest.name (lista, WhatsApp,
 // la tarjeta que ve el invitado, etc.) sin tener que tocar cada lugar por separado.
+// Si el cliente ya escribió "Familia", "Flia", "Flia.", "F.", "Fam", etc. al
+// principio del apellido, lo sacamos antes de anteponer "Familia" nosotros,
+// para no terminar con cosas como "Familia Familia Pérez".
+function stripFamiliaPrefix(text: string): string {
+  return text.trim().replace(/^(familia|flia|fam|f)\.?\s+/i, "").trim();
+}
+
 function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido: string): string {
-  const trimmedApellido = apellido.trim();
   if (type === "FAMILY") {
-    return `Familia ${trimmedApellido}`.trim();
+    return `Familia ${stripFamiliaPrefix(apellido)}`.trim();
   }
-  return `${nombre.trim()} ${trimmedApellido}`.trim();
+  return `${nombre.trim()} ${apellido.trim()}`.trim();
 }
 
 // Intenta separar un nombre ya guardado en Nombre/Apellido para precargar el
@@ -88,7 +94,7 @@ function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido:
 // separación pueden no partirse de forma perfecta.
 function parseGuestName(guest: Pick<Guest, "name" | "type">): { nombre: string; apellido: string } {
   if (guest.type === "FAMILY") {
-    return { nombre: "", apellido: guest.name.replace(/^Familia\s+/i, "").trim() };
+    return { nombre: "", apellido: stripFamiliaPrefix(guest.name) };
   }
   const parts = guest.name.trim().split(/\s+/).filter(Boolean);
   if (parts.length <= 1) return { nombre: guest.name.trim(), apellido: "" };
@@ -502,7 +508,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    Se va a mostrar como <strong>&quot;Familia {newGuestApellido.trim() || "..."}&quot;</strong>.
+                    Se va a mostrar como <strong>&quot;Familia {stripFamiliaPrefix(newGuestApellido) || "..."}&quot;</strong>.
                   </p>
                 </div>
               ) : (
@@ -727,7 +733,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-full text-blue-600 hover:bg-blue-50"
+                          className="h-8 w-8 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 hover:bg-blue-500/20"
                           title="Editar"
                           onClick={() => handleEditClick(guest)}
                         >
@@ -748,7 +754,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-full text-red-500 hover:text-red-700 hover:bg-red-50"
+                          className="h-8 w-8 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20 hover:text-red-600"
                           title="Eliminar"
                           onClick={() => setGuestToDelete(guest)}
                         >
@@ -873,7 +879,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Se va a mostrar como <strong>&quot;Familia {editGuestApellido.trim() || "..."}&quot;</strong>.
+                  Se va a mostrar como <strong>&quot;Familia {stripFamiliaPrefix(editGuestApellido) || "..."}&quot;</strong>.
                 </p>
               </div>
             ) : (
