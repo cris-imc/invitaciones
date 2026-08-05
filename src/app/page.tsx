@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AnimatedMobileMockup } from "@/components/landing/AnimatedMobileMockup";
 import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
+import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
 
@@ -53,19 +54,25 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative w-full h-full min-h-[400px] flex items-center overflow-visible pointer-events-none scale-110 origin-right">
-            <div className="absolute inset-0 z-0" style={{
-                maskImage: 'linear-gradient(to right, transparent 0%, black 50%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 50%)'
-            }}>
-              <img src="/landing/novios2.jpg" alt="Novios" className="w-full h-full object-cover object-[center_30%] opacity-80" />
+          <div className="relative w-full md:h-full md:min-h-[400px] md:flex md:items-center overflow-visible pointer-events-none md:scale-110 md:origin-right">
+            {/* En mobile la foto se muestra como una tarjeta redondeada con un
+                glow ambient detrás; en desktop se estira a pantalla completa
+                y se desvanece hacia el fondo oscuro con una máscara. */}
+            <div className="absolute -inset-6 rounded-[40px] bg-[var(--accent)]/25 blur-3xl opacity-60 md:hidden" aria-hidden="true"></div>
+            <div className="relative w-full aspect-[4/5] md:aspect-auto md:w-full md:h-full rounded-[28px] md:rounded-none overflow-hidden shadow-2xl md:shadow-none ring-1 ring-white/10 md:ring-0">
+              <div className="absolute inset-0 z-0 l-hero-photo-mask">
+                <img src="/landing/novios2.jpg" alt="Novios" className="w-full h-full object-cover object-[center_30%] opacity-100 md:opacity-80" />
+              </div>
             </div>
           </div>
         </section>
 
+        {/* PLANTILLAS (showcase animado) */}
+        <TemplateShowcase />
+
         {/* STRIP (FEATURES) */}
-        <section className="l-strip" id="caracteristicas" style={{ padding: "6rem 2rem", background: "black" }}>
-          <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+        <section className="l-strip px-6 py-16 md:px-8 md:py-24" id="caracteristicas" style={{ background: "black" }}>
+          <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
             
             <div className="flex-1 space-y-10">
               <div>

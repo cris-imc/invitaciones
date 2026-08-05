@@ -23,7 +23,7 @@ export function AnimatedMobileMockup() {
     }, []);
 
     return (
-        <div className="relative mx-auto w-[280px] h-[580px] bg-black rounded-[3rem] border-[8px] border-zinc-900 shadow-2xl overflow-hidden ring-1 ring-white/10">
+        <div className="relative mx-auto w-[240px] h-[497px] sm:w-[280px] sm:h-[580px] bg-black rounded-[3rem] border-[8px] border-zinc-900 shadow-2xl overflow-hidden ring-1 ring-white/10">
             {/* Notch */}
             <div className="absolute top-0 inset-x-0 h-6 bg-zinc-900 rounded-b-2xl w-32 mx-auto z-50"></div>
             

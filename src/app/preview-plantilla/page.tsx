@@ -19,6 +19,10 @@ function PreviewPlantillaContent() {
   const evento = params.get("evento") ?? "CASAMIENTO";
   const tipo: TemplateTipo = params.get("tipo") === "MODERNO" ? "MODERNO" : "ELEGANT";
   const color = params.get("color") ?? "default";
+  // El showcase de la landing (a diferencia del preview del wizard) quiere
+  // poder hacer scroll para mostrar más contenido de la plantilla en vez de
+  // quedarse fijo en la portada.
+  const scrollable = params.get("scroll") === "1";
 
   const componentsMap = tipo === "MODERNO" ? MODERNO_COMPONENTS : ELEGANT_COMPONENTS;
   const Template = componentsMap[color] ?? componentsMap.default;
@@ -29,8 +33,10 @@ function PreviewPlantillaContent() {
   // un flash roto: la portada fixed/z-99999 tapando todo, o el spinner
   // desapareciendo antes de que el componente real termine de montar.
   useEffect(() => {
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
+    if (!scrollable) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+    }
 
     let settled = false;
     const notifyReady = () => {
@@ -67,7 +73,7 @@ function PreviewPlantillaContent() {
       observer.disconnect();
       clearTimeout(timeout);
     };
-  }, [evento, tipo, color]);
+  }, [evento, tipo, color, scrollable]);
 
   return <Template invitation={sample} guest={null} isPersonalized={false} />;
 }
