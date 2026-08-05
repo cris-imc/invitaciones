@@ -108,7 +108,7 @@ export function MusicPlayer({
                 <MusicToggleButton
                     isPlaying={isPlaying}
                     onToggle={togglePlay}
-                    className="fixed top-3 right-3 z-[99999]"
+                    className="fixed top-3 right-3 z-[99998]"
                 />,
                 document.body
             )}

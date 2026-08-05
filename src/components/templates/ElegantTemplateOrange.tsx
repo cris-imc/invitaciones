@@ -1037,7 +1037,7 @@ export function ElegantTemplateOrange({ invitation, guest, isPersonalized = fals
         <MusicToggleButton
           isPlaying={isMusicPlaying}
           onToggle={toggleMusic}
-          className="fixed top-3 right-3 z-[99999]"
+          className="fixed top-3 right-3 z-[99998]"
         />,
         document.body
       )}
