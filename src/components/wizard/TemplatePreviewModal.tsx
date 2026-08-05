@@ -144,8 +144,8 @@ function TemplatePreviewModalBody({
           {/* Lista de colores: en mobile, solo las pastillas de color (sin
               nombre) en una grilla angosta, para dejarle más ancho a la
               vista previa del teléfono. En desktop, swatch + nombre. */}
-          <div className="w-16 md:w-56 shrink-0 border-r overflow-y-auto px-2 md:px-4 pb-4">
-            <div className="grid grid-cols-2 md:flex md:flex-col gap-2">
+          <div className="w-20 md:w-56 shrink-0 border-r overflow-y-auto px-3 md:px-4 pb-4">
+            <div className="flex flex-col h-full justify-between md:h-auto md:justify-start md:gap-2">
               {colors.map((c) => (
                 <button
                   key={c.id}
@@ -156,14 +156,17 @@ function TemplatePreviewModalBody({
                     setPreviewLoading(true);
                   }}
                   className={cn(
-                    "relative flex items-center justify-center md:justify-start gap-3 rounded-lg border-2 px-1.5 py-1.5 md:px-3 md:py-2.5 text-left transition-all",
+                    "flex items-center justify-center md:justify-start gap-3 rounded-full md:rounded-lg md:border-2 p-1 md:px-3 md:py-2.5 text-left transition-all",
                     previewColor === c.id
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40"
+                      ? "md:border-primary md:bg-primary/5"
+                      : "md:border-border md:hover:border-primary/40"
                   )}
                 >
                   <span
-                    className="h-7 w-7 rounded-full shadow-sm shrink-0"
+                    className={cn(
+                      "h-9 w-9 md:h-7 md:w-7 rounded-full shadow-sm shrink-0 transition-all",
+                      previewColor === c.id && "ring-2 ring-offset-2 ring-offset-background ring-primary"
+                    )}
                     style={{
                       backgroundColor: c.color,
                       border: activeTab === "MODERNO" ? "2px solid #C9A876" : "1px solid rgba(0,0,0,.1)",
@@ -172,11 +175,6 @@ function TemplatePreviewModalBody({
                   <span className="hidden md:inline text-sm font-medium flex-1">{c.name}</span>
                   {previewColor === c.id && (
                     <Check className="hidden md:block h-4 w-4 text-primary shrink-0" />
-                  )}
-                  {previewColor === c.id && (
-                    <span className="md:hidden absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                      <Check className="h-2.5 w-2.5" />
-                    </span>
                   )}
                 </button>
               ))}
@@ -221,8 +219,8 @@ function TemplatePreviewModalBody({
           </div>
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4 border-t shrink-0 bg-background">
-          <p className="text-xs text-muted-foreground">
+        <div className="flex items-center justify-end md:justify-between px-6 py-4 border-t shrink-0 bg-background">
+          <p className="hidden md:block text-xs text-muted-foreground">
             Vista previa real con contenido de ejemplo. Tus fotos y datos se verán así de organizados.
           </p>
           <div className="flex gap-2">
