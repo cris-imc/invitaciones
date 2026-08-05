@@ -58,9 +58,20 @@ export function StepCronograma() {
         ];
     };
 
-    let initialEvents: CronogramaEvent[] = data.cronogramaEventos 
-        ? JSON.parse(data.cronogramaEventos) 
-        : getDefaultEvents();
+    // El store inicializa cronogramaEventos en "[]" (string truthy) para invitaciones
+    // nuevas, así que no alcanza con chequear que el string exista: hay que ver si el
+    // array ya parseado tiene contenido antes de descartar los eventos por defecto.
+    let initialEvents: CronogramaEvent[] = getDefaultEvents();
+    if (data.cronogramaEventos) {
+        try {
+            const parsed = JSON.parse(data.cronogramaEventos);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                initialEvents = parsed;
+            }
+        } catch {
+            // Si el JSON guardado está corrupto, se usan los eventos por defecto.
+        }
+    }
 
     // Si la ceremonia está habilitada en su paso propio, evitar item redundante "Ceremonia"
     if (data.ceremoniaHabilitada) {
