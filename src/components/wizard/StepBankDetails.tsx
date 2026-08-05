@@ -7,13 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/Toast";
 import { Info, ChevronDown, ChevronUp, Gift, CreditCard, ShieldAlert } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepBankDetails() {
-    const { data, setData } = useWizardStore();
+    const { data, setData, nextStep } = useWizardStore();
+    const { showToast } = useToast();
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
+    const [attemptedNext, setAttemptedNext] = useState(false);
 
     // Helper for CBU formatting (digits only, max 22 characters)
     const handleCbuChange = (field: "regaloCbu" | "pagoTarjetaCbu", rawValue: string) => {
@@ -29,6 +32,24 @@ export function StepBankDetails() {
     // When EDITING (isEditing): active if enabled explicitly or if data is present.
     const isRegaloActive = d.regaloHabilitado ?? (isEditing && Boolean(d.regaloCbu || d.regaloAlias || d.regaloBanco || d.regaloTitular));
     const isPagoTarjetaActive = d.pagoTarjetaHabilitado ?? (isEditing && Boolean(d.pagoTarjetaCbu || d.pagoTarjetaAlias || d.pagoTarjetaBanco || d.pagoTarjetaTitular));
+
+    const missingRegaloTitular = isRegaloActive && !String(d.regaloTitular || "").trim();
+    const missingRegaloCbuAlias = isRegaloActive && !String(d.regaloCbu || "").trim() && !String(d.regaloAlias || "").trim();
+    const missingTarjetaTitular = isPagoTarjetaActive && !String(d.pagoTarjetaTitular || "").trim();
+    const missingTarjetaCbuAlias = isPagoTarjetaActive && !String(d.pagoTarjetaCbu || "").trim() && !String(d.pagoTarjetaAlias || "").trim();
+    const missingRegaloMonto = isPagoTarjetaActive && !d.regaloMonto;
+
+    const hasMissingRequired = missingRegaloTitular || missingRegaloCbuAlias || missingTarjetaTitular || missingTarjetaCbuAlias || missingRegaloMonto;
+
+    const handleNext = () => {
+        if (hasMissingRequired) {
+            setAttemptedNext(true);
+            showToast("Completá los datos bancarios obligatorios (titular y CBU/CVU o alias) antes de continuar.", "error");
+            return;
+        }
+        setAttemptedNext(false);
+        nextStep();
+    };
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
@@ -169,7 +190,7 @@ export function StepBankDetails() {
                                     value={d.regaloCbu || ""}
                                     maxLength={22}
                                     onChange={(e) => handleCbuChange("regaloCbu", e.target.value)}
-                                    className="font-mono text-sm tracking-wider"
+                                    className={`font-mono text-sm tracking-wider ${attemptedNext && missingRegaloCbuAlias ? 'border-red-500/60' : ''}`}
                                 />
                             </div>
 
@@ -180,8 +201,11 @@ export function StepBankDetails() {
                                     placeholder="Ej: novios.fiesta.mp"
                                     value={d.regaloAlias || ""}
                                     onChange={(e) => setData({ regaloAlias: e.target.value })}
-                                    className="text-sm"
+                                    className={`text-sm ${attemptedNext && missingRegaloCbuAlias ? 'border-red-500/60' : ''}`}
                                 />
+                                {attemptedNext && missingRegaloCbuAlias && (
+                                    <p className="text-[11px] text-red-400">Cargá el CBU/CVU o el Alias.</p>
+                                )}
                             </div>
 
                             <div className="space-y-1.5 md:col-span-1">
@@ -191,8 +215,11 @@ export function StepBankDetails() {
                                     placeholder="Ej: María Pérez"
                                     value={d.regaloTitular || ""}
                                     onChange={(e) => setData({ regaloTitular: e.target.value })}
-                                    className="text-sm"
+                                    className={`text-sm ${attemptedNext && missingRegaloTitular ? 'border-red-500/60' : ''}`}
                                 />
+                                {attemptedNext && missingRegaloTitular && (
+                                    <p className="text-[11px] text-red-400">El titular es obligatorio.</p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -270,7 +297,7 @@ export function StepBankDetails() {
                                     value={d.pagoTarjetaCbu || ""}
                                     maxLength={22}
                                     onChange={(e) => handleCbuChange("pagoTarjetaCbu", e.target.value)}
-                                    className="font-mono text-sm tracking-wider"
+                                    className={`font-mono text-sm tracking-wider ${attemptedNext && missingTarjetaCbuAlias ? 'border-red-500/60' : ''}`}
                                 />
                             </div>
 
@@ -281,8 +308,11 @@ export function StepBankDetails() {
                                     placeholder="Ej: tarjetas.salon.mp"
                                     value={d.pagoTarjetaAlias || ""}
                                     onChange={(e) => setData({ pagoTarjetaAlias: e.target.value })}
-                                    className="text-sm"
+                                    className={`text-sm ${attemptedNext && missingTarjetaCbuAlias ? 'border-red-500/60' : ''}`}
                                 />
+                                {attemptedNext && missingTarjetaCbuAlias && (
+                                    <p className="text-[11px] text-red-400">Cargá el CBU/CVU o el Alias.</p>
+                                )}
                             </div>
 
                             <div className="space-y-1.5 md:col-span-1">
@@ -292,8 +322,11 @@ export function StepBankDetails() {
                                     placeholder="Ej: Salón Los Olivos"
                                     value={d.pagoTarjetaTitular || ""}
                                     onChange={(e) => setData({ pagoTarjetaTitular: e.target.value })}
-                                    className="text-sm"
+                                    className={`text-sm ${attemptedNext && missingTarjetaTitular ? 'border-red-500/60' : ''}`}
                                 />
+                                {attemptedNext && missingTarjetaTitular && (
+                                    <p className="text-[11px] text-red-400">El titular es obligatorio.</p>
+                                )}
                             </div>
                         </div>
 
@@ -316,8 +349,11 @@ export function StepBankDetails() {
                                     placeholder="Ej: 15000"
                                     value={d.regaloMonto || ""}
                                     onChange={(e) => setData({ regaloMonto: e.target.value ? Number(e.target.value) : undefined } as any)}
-                                    className="bg-[var(--ink)] border-white/15"
+                                    className={`bg-[var(--ink)] border-white/15 ${attemptedNext && missingRegaloMonto ? 'border-red-500/60' : ''}`}
                                 />
+                                {attemptedNext && missingRegaloMonto && (
+                                    <p className="text-[11px] text-red-400">El valor por adulto es obligatorio si vas a cobrar la tarjeta.</p>
+                                )}
                             </div>
 
                             {/* Categoria 2: ADOLESCENTES (Opcional con Switch) */}
@@ -386,7 +422,7 @@ export function StepBankDetails() {
                 )}
             </div>
 
-            <SaveStepButtons />
+            <SaveStepButtons onNext={handleNext} />
         </div>
     );
 }

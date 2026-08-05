@@ -5,7 +5,8 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus, Info, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 const ICON_OPTIONS = [
@@ -26,7 +27,9 @@ interface CronogramaEvent {
 
 export function StepCronograma() {
     const { data, setData, nextStep } = useWizardStore();
+    const { showToast } = useToast();
     const [showInfo, setShowInfo] = useState(false);
+    const [attemptedNext, setAttemptedNext] = useState(false);
     
     const getDefaultEvents = (): CronogramaEvent[] => {
         const startHourStr = data.hora || "21:00";
@@ -85,7 +88,17 @@ export function StepCronograma() {
         setData({ cronogramaEventos: JSON.stringify(newEvents) });
     };
 
+    const incompleteIndexes = events
+        .map((e, i) => (!e.time.trim() || !e.title.trim() ? i : -1))
+        .filter((i) => i !== -1);
+
     const handleNext = () => {
+        if (events.length === 0 || incompleteIndexes.length > 0) {
+            setAttemptedNext(true);
+            showToast("Completá la hora y el título de todas las etapas del cronograma antes de continuar.", "error");
+            return;
+        }
+        setAttemptedNext(false);
         nextStep();
     };
 
@@ -122,8 +135,10 @@ export function StepCronograma() {
             </div>
 
             <div className="space-y-4 max-w-2xl mx-auto">
-                {events.map((event, index) => (
-                    <div key={index} className="p-4 border rounded-xl space-y-3 bg-[var(--ink-2)] border-white/10 shadow-sm">
+                {events.map((event, index) => {
+                    const isIncomplete = attemptedNext && (!event.time.trim() || !event.title.trim());
+                    return (
+                    <div key={index} className={`p-4 border rounded-xl space-y-3 bg-[var(--ink-2)] shadow-sm ${isIncomplete ? 'border-red-500/60' : 'border-white/10'}`}>
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
                                 Etapa #{index + 1}
@@ -191,8 +206,15 @@ export function StepCronograma() {
                                 </div>
                             </div>
                         </div>
+                        {isIncomplete && (
+                            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
+                                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                                <span>Completá la hora y el título de esta etapa, o eliminala.</span>
+                            </div>
+                        )}
                     </div>
-                ))}
+                    );
+                })}
 
                 <Button
                     type="button"

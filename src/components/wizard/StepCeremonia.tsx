@@ -17,8 +17,21 @@ export function StepCeremonia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
     const [showInfo, setShowInfo] = useState(false);
 
+    const ceremoniaSchemaValidated = ceremoniaSchema.superRefine((values, ctx) => {
+        if (!values.ceremoniaHabilitada) return;
+        if (!values.ceremoniaNombre?.trim()) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaNombre'], message: 'El nombre del lugar es obligatorio' });
+        }
+        if (!values.ceremoniaDireccion?.trim()) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaDireccion'], message: 'La dirección es obligatoria' });
+        }
+        if (!values.ceremoniaHora?.trim()) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaHora'], message: 'El horario es obligatorio' });
+        }
+    });
+
     const form = useForm<any>({
-        resolver: zodResolver(ceremoniaSchema),
+        resolver: zodResolver(ceremoniaSchemaValidated),
         defaultValues: {
             ceremoniaHabilitada: data.ceremoniaHabilitada ?? false,
             ceremoniaTitulo: data.ceremoniaTitulo || "Ceremonia Religiosa / Civil",

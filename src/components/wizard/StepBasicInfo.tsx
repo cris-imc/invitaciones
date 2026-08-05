@@ -36,8 +36,24 @@ export function StepBasicInfo() {
         return false;
     });
 
+    const tipo = data.type;
+
+    const basicInfoSchemaForType = basicInfoSchema.superRefine((values, ctx) => {
+        if (tipo === 'CASAMIENTO') {
+            if (!values.nombreNovia?.trim()) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nombreNovia'], message: 'El nombre de la novia es obligatorio' });
+            }
+            if (!values.nombreNovio?.trim()) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nombreNovio'], message: 'El nombre del novio es obligatorio' });
+            }
+        }
+        if (tipo === 'QUINCE_ANOS' && !values.nombreQuinceanera?.trim()) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nombreQuinceanera'], message: 'El nombre o apodo de la quinceañera es obligatorio' });
+        }
+    });
+
     const form = useForm<z.infer<typeof basicInfoSchema>>({
-        resolver: zodResolver(basicInfoSchema),
+        resolver: zodResolver(basicInfoSchemaForType),
         defaultValues: {
             nombreEvento: data.nombreEvento || "",
             fecha: data.fecha,
@@ -53,8 +69,6 @@ export function StepBasicInfo() {
         setData(values);
         nextStep();
     }
-
-    const tipo = data.type;
 
     return (
         <div className="space-y-6">
@@ -259,6 +273,7 @@ export function StepBasicInfo() {
                                         <FormControl>
                                              <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
                                         </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -271,6 +286,7 @@ export function StepBasicInfo() {
                                         <FormControl>
                                              <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
                                         </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -290,6 +306,7 @@ export function StepBasicInfo() {
                                     <p className="text-xs text-muted-foreground">
                                         Ingresá el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.
                                     </p>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />

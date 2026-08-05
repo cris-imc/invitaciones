@@ -4,12 +4,25 @@ import { useState } from "react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
-import { Info, ChevronDown, ChevronUp } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { Info, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepHeroImages() {
-    const { data, setData } = useWizardStore();
+    const { data, setData, nextStep } = useWizardStore();
+    const { showToast } = useToast();
     const [showInfo, setShowInfo] = useState(false);
+    const [showMissingImageError, setShowMissingImageError] = useState(false);
+
+    const handleNext = () => {
+        if (!data.portadaImagenFondo) {
+            setShowMissingImageError(true);
+            showToast("Cargá la imagen de portada mobile antes de continuar.", "error");
+            return;
+        }
+        setShowMissingImageError(false);
+        nextStep();
+    };
 
     return (
         <div className="space-y-6">
@@ -58,20 +71,26 @@ export function StepHeroImages() {
                 </div>
 
                 {/* Hero Background Image Mobile */}
-                <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
-                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm">Portada Mobile (Horizontal - 16:9)</Label>
+                <div className={`space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border ${showMissingImageError && !data.portadaImagenFondo ? 'border-red-500/60' : 'border-white/10'}`}>
+                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm">Portada Mobile (Horizontal - 16:9) *</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondo}
-                        onImageUploaded={(url: string) => setData({ portadaImagenFondo: url })}
+                        onImageUploaded={(url: string) => { setData({ portadaImagenFondo: url }); setShowMissingImageError(false); }}
                         aspectRatio={16 / 9}
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
-                        Se verá en teléfonos celulares como cabecera o fondo de pantalla previa.
+                        Se verá en teléfonos celulares como cabecera o fondo de pantalla previa. Obligatoria: todos los templates la usan como imagen principal.
                     </p>
+                    {showMissingImageError && !data.portadaImagenFondo && (
+                        <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
+                            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                            <span>Esta imagen es obligatoria para poder continuar.</span>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            <SaveStepButtons />
+            <SaveStepButtons onNext={handleNext} />
         </div>
     );
 }
