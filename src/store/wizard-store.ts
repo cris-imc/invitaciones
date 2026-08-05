@@ -2,6 +2,14 @@ import { create } from 'zustand';
 import { InvitationFormData } from '@/lib/schemas/invitation';
 import { ThemeConfig, DEFAULT_THEME_CONFIG } from '@/lib/theme-config';
 
+// Solo "" / null / undefined cuentan como equivalentes a vacío. OJO: `false`
+// y `0` son valores reales y con significado propio (ej: un checkbox
+// explícitamente destildado) — tratarlos como "lo mismo que undefined" hacía
+// que setData() abortara el guardado entero cuando ese era el único campo
+// que cambiaba (ej: "Reproducir automáticamente" pasando de undefined a
+// false nunca llegaba a guardarse).
+const isEmptyish = (v: unknown) => v === "" || v === null || v === undefined;
+
 interface WizardState {
     currentStep: number;
     data: Partial<InvitationFormData>;
@@ -82,11 +90,13 @@ export const useWizardStore = create<WizardState>((set) => ({
                     break;
                 }
             } else if (newVal !== oldVal) {
-                // Ignore differences between falsy values (e.g. "" vs null)
-                if (!newVal && !oldVal) continue;
+                // Ignore differences between empty-ish values (e.g. "" vs null vs undefined).
+                // `false` and `0` are real, meaningful values and must NOT be treated as
+                // equivalent to "unset" here.
+                if (isEmptyish(newVal) && isEmptyish(oldVal)) continue;
                 // Ignore identical objects/arrays
                 if (JSON.stringify(newVal) === JSON.stringify(oldVal)) continue;
-                
+
                 hasChanges = true;
                 break;
             }

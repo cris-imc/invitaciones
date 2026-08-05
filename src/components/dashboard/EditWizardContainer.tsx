@@ -35,6 +35,7 @@ function WizardContent({ invitation }: { invitation: any }) {
                 nombreNovio: invitation.nombreNovio || "",
                 nombreNovia: invitation.nombreNovia || "",
                 nombreQuinceanera: invitation.nombreQuinceanera || "",
+                rsvpDaysBeforeEvent: invitation.rsvpDaysBeforeEvent ?? 7,
 
                 lugarNombre: invitation.lugarNombre || "",
                 direccion: invitation.direccion || "",
@@ -95,14 +96,17 @@ function WizardContent({ invitation }: { invitation: any }) {
                 galeriaPrincipalHabilitada: invitation.galeriaPrincipalHabilitada ?? true,
                 galeriaPrincipalFotos,
                 musicaHabilitada: Boolean(invitation.musicaHabilitada),
+                musicaAutoplay: invitation.musicaAutoplay ?? true,
                 sugerenciaMusicaHabilitada: invitation.sugerenciaMusicaHabilitada ?? true,
                 musicaUrl: invitation.musicaUrl || "",
                 triviaHabilitada: Boolean(invitation.triviaHabilitada),
+                triviaTitulo: invitation.triviaTitulo || "",
                 triviaPreguntas: invitation.triviaPreguntas || "",
 
                 // Design
                 templateTipo: invitation.templateTipo || "ORIGINAL",
                 colorPrincipal: temaColores?.colorPrincipal || temaColores?.primaryColor || "#000000",
+                imagenCelebremosJuntos: invitation.imagenCelebremosJuntos || "",
             });
             setDirty(false); // Reset dirtiness after loading from DB
             
