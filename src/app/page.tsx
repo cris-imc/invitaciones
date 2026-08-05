@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { AnimatedMobileMockup } from "@/components/landing/AnimatedMobileMockup";
 import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
 import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { Settings2, Users, Radio } from "lucide-react";
@@ -72,55 +71,42 @@ export default async function Home() {
 
         {/* STRIP (FEATURES) */}
         <section className="l-strip px-6 py-16 md:px-8 md:py-24" id="caracteristicas" style={{ background: "black" }}>
-          <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            
-            <div className="flex-1 space-y-10">
-              <div>
-                <p className="text-accent uppercase tracking-widest text-sm font-semibold mb-2">Todo en uno</p>
-                <h2 className="text-4xl lg:text-5xl font-serif text-white leading-tight">Mucho más que una invitación</h2>
-              </div>
-
-              <div className="space-y-8">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                    <Settings2 className="w-6 h-6 text-accent" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Plantilla 100% Personalizable</h3>
-                    <p className="text-zinc-400">Adaptá colores, tipografías, fotos y estructura. Ya sea una boda, un 15 o un evento corporativo, el diseño se ajusta a tu estilo.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                    <Users className="w-6 h-6 text-accent" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Gestión de Invitados y Pagos</h3>
-                    <p className="text-zinc-400">Recibí confirmaciones (RSVP) al instante, administrá accesos y configurá tu mesa de regalos o cuenta bancaria sin comisiones.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                    <Radio className="w-6 h-6 text-accent" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Interacción en Vivo (LIVE)</h3>
-                    <p className="text-zinc-400">Tus invitados pueden subir fotos y dejar mensajes desde sus teléfonos durante la fiesta. Todo se proyecta y queda guardado de recuerdo.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <Link href="/register">
-                  <Button className="rounded-full bg-accent text-ink hover:bg-accent/90 px-8 py-6 text-lg">Probar gratis</Button>
-                </Link>
-              </div>
+          <div className="max-w-2xl mx-auto space-y-10">
+            <div className="text-center">
+              <p className="text-accent uppercase tracking-widest text-sm font-semibold mb-2">Todo en uno</p>
+              <h2 className="text-4xl lg:text-5xl font-serif text-white leading-tight">Mucho más que una invitación</h2>
             </div>
 
-            <div className="flex-1 w-full flex justify-center lg:justify-end">
-              <AnimatedMobileMockup />
+            <div className="space-y-8">
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                  <Settings2 className="w-6 h-6 text-accent" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Plantilla 100% Personalizable</h3>
+                  <p className="text-zinc-400">Adaptá colores, tipografías, fotos y estructura. Ya sea una boda, un 15 o un evento corporativo, el diseño se ajusta a tu estilo.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                  <Users className="w-6 h-6 text-accent" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Gestión de Invitados y Pagos</h3>
+                  <p className="text-zinc-400">Recibí confirmaciones (RSVP) al instante, administrá accesos y configurá tu mesa de regalos o cuenta bancaria sin comisiones.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                  <Radio className="w-6 h-6 text-accent" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Interacción en Vivo (LIVE)</h3>
+                  <p className="text-zinc-400">Tus invitados pueden subir fotos y dejar mensajes desde sus teléfonos durante la fiesta. Todo se proyecta y queda guardado de recuerdo.</p>
+                </div>
+              </div>
             </div>
 
           </div>
