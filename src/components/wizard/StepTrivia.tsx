@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { useToast } from "@/components/ui/Toast";
-import { Trash2, Plus, Pencil, Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { Trash2, Plus, Pencil, Lock, Info, ChevronDown, ChevronUp, Check, AlertTriangle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
@@ -45,14 +45,24 @@ export function StepTrivia() {
         respuestaCorrecta: 0,
     });
 
+    // Estado de la pregunta que se está tipeando: vacía, completa, o a medio llenar.
+    const hasPendingContent = Boolean(
+        currentQuestion.pregunta.trim() || currentQuestion.opciones.some((op) => op.trim())
+    );
+    const isPendingComplete = Boolean(
+        currentQuestion.pregunta.trim() && currentQuestion.opciones.every((op) => op.trim())
+    );
+    const isPendingPartial = hasPendingContent && !isPendingComplete;
+
     const handleAddQuestion = () => {
-        if (currentQuestion.pregunta.trim() && currentQuestion.opciones.every(op => op.trim())) {
+        if (isPendingComplete) {
             setPreguntas([...preguntas, currentQuestion]);
             setCurrentQuestion({
                 pregunta: "",
                 opciones: ["", "", "", ""],
                 respuestaCorrecta: 0,
             });
+            showToast("Pregunta agregada.", "success");
         } else {
             showToast("Debes completar la pregunta y todas las opciones.", "error");
         }
@@ -69,17 +79,26 @@ export function StepTrivia() {
         setPreguntas(preguntas.filter((_, i) => i !== index));
     };
 
-    const handleNext = () => {
-        // If there is a pending question (has text), add it effectively
+    // Devuelve true si pudo avanzar (o no había nada pendiente que lo bloquee).
+    const handleNext = (): boolean => {
+        if (isPendingPartial) {
+            showToast(
+                "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
+                "error"
+            );
+            return false;
+        }
+
         let finalPreguntas = [...preguntas];
-        if (currentQuestion.pregunta.trim() && currentQuestion.opciones.every(op => op.trim())) {
+        if (isPendingComplete) {
             finalPreguntas.push(currentQuestion);
-            // Optional: alert user or just do it silently
-            // showToast("Se agregó la última pregunta que estabas editando.");
+            setCurrentQuestion({ pregunta: "", opciones: ["", "", "", ""], respuestaCorrecta: 0 });
+            showToast("Se agregó tu última pregunta antes de continuar.", "success");
         }
 
         setData({ triviaPreguntas: JSON.stringify(finalPreguntas) });
         nextStep();
+        return true;
     };
 
     return (
@@ -246,15 +265,32 @@ export function StepTrivia() {
                                 ))}
                             </div>
 
-                            <Button
-                                type="button"
-                                onClick={handleAddQuestion}
-                                variant="outline"
-                                className="w-full"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Agregar pregunta
-                            </Button>
+                            {isPendingPartial && (
+                                <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
+                                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                                    <span>Esta pregunta está a medio completar. Completá la pregunta y las 4 opciones, o borrá el texto para descartarla, antes de continuar.</span>
+                                </div>
+                            )}
+
+                            <div className="flex flex-col sm:flex-row gap-2">
+                                <Button
+                                    type="button"
+                                    onClick={handleAddQuestion}
+                                    variant="outline"
+                                    className="flex-1"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Agregar y cargar otra
+                                </Button>
+                                <Button
+                                    type="button"
+                                    onClick={handleNext}
+                                    className="flex-1"
+                                >
+                                    <Check className="w-4 h-4 mr-2" />
+                                    Listo, continuar
+                                </Button>
+                            </div>
                         </div>
                     </>
                 )}
