@@ -51,7 +51,7 @@ export function StepHeroImages() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        Son las imágenes de fondo de la portada inicial. Te recomendamos cargar la versión optimizada para móviles (horizontal 16:9) y la versión optimizada para pantallas anchas de escritorio (vertical 9:16) para que se adapte perfectamente al dispositivo de cada invitado.
+                        Son las imágenes de fondo de la portada inicial. Ambas se ven verticales: la de mobile ocupa la pantalla completa del teléfono (el recorte exacto varía un poco según el tamaño de cada celular) y la de escritorio se ve como panel lateral. Elegí fotos donde el sujeto principal quede centrado para que se adapten bien en cualquier dispositivo.
                     </div>
                 )}
             </div>
@@ -59,11 +59,11 @@ export function StepHeroImages() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 max-w-4xl mx-auto">
                 {/* Hero Background Image Desktop */}
                 <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
-                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm">Portada Desktop (Vertical - 9:16)</Label>
+                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm">Portada Desktop (Vertical)</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondoDesktop}
                         onImageUploaded={(url: string) => setData({ portadaImagenFondoDesktop: url })}
-                        aspectRatio={9 / 16}
+                        aspectRatio={400 / 640}
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
                         Se verá en computadoras o pantallas anchas como panel lateral izquierdo de bienvenida.
@@ -72,11 +72,11 @@ export function StepHeroImages() {
 
                 {/* Hero Background Image Mobile */}
                 <div className={`space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border ${showMissingImageError && !data.portadaImagenFondo ? 'border-red-500/60' : 'border-white/10'}`}>
-                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm">Portada Mobile (Horizontal - 16:9) *</Label>
+                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm">Portada Mobile (Vertical) *</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondo}
                         onImageUploaded={(url: string) => { setData({ portadaImagenFondo: url }); setShowMissingImageError(false); }}
-                        aspectRatio={16 / 9}
+                        aspectRatio={4 / 5}
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
                         Se verá en teléfonos celulares como cabecera o fondo de pantalla previa. Obligatoria: todos los templates la usan como imagen principal.
