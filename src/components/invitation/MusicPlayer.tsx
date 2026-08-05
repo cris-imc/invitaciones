@@ -36,18 +36,20 @@ export function useMusicPlayer({ musicaUrl, autoplay = true }: UseMusicPlayerOpt
         // usuario en la página, así que esto suele fallar en silencio.
         audio.play().catch(() => setIsPlaying(false));
 
-        // Reintenta en la primera interacción real (click/touch/tecla) en
-        // cualquier parte de la página -por ejemplo, al tocar "Abrir
-        // invitación"-, que sí cuenta como gesto válido para el navegador.
+        // Reintenta en la primera interacción real del usuario en cualquier
+        // parte de la página -por ejemplo, al tocar "Abrir invitación"-, que
+        // sí cuenta como gesto válido para el navegador. En mobile (sobre
+        // todo Safari/iOS) el tipo de evento que "cuenta" como gesto válido
+        // es inconsistente entre navegadores, así que se escuchan varios;
+        // el primero que logre reproducir saca a todos los demás.
+        const gestureEvents = ['touchend', 'click', 'pointerdown', 'keydown'] as const;
         const removeGestureListeners = () => {
-            document.removeEventListener('pointerdown', retryOnGesture);
-            document.removeEventListener('keydown', retryOnGesture);
+            gestureEvents.forEach((eventName) => document.removeEventListener(eventName, retryOnGesture));
         };
         const retryOnGesture = () => {
             audio.play().then(removeGestureListeners).catch(() => {});
         };
-        document.addEventListener('pointerdown', retryOnGesture);
-        document.addEventListener('keydown', retryOnGesture);
+        gestureEvents.forEach((eventName) => document.addEventListener(eventName, retryOnGesture, { passive: true }));
 
         return () => {
             audio.removeEventListener('play', handlePlay);
@@ -66,7 +68,7 @@ export function useMusicPlayer({ musicaUrl, autoplay = true }: UseMusicPlayerOpt
         }
     };
 
-    const audioElement = <audio ref={audioRef} loop={false} src={musicaUrl} />;
+    const audioElement = <audio ref={audioRef} loop={false} preload="auto" src={musicaUrl} />;
 
     return { isPlaying, togglePlay, audioElement };
 }
