@@ -145,7 +145,7 @@ function TemplatePreviewModalBody({
               nombre) en una grilla angosta, para dejarle más ancho a la
               vista previa del teléfono. En desktop, swatch + nombre. */}
           <div className="w-20 md:w-56 shrink-0 border-r overflow-y-auto px-3 md:px-4 pb-4">
-            <div className="flex flex-col h-full justify-between md:h-auto md:justify-start md:gap-2">
+            <div className="flex flex-col gap-3 md:gap-2">
               {colors.map((c) => (
                 <button
                   key={c.id}
