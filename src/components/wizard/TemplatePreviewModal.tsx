@@ -141,19 +141,22 @@ function TemplatePreviewModalBody({
         </div>
 
         <div className="flex flex-1 min-h-0 mt-4">
-          {/* Lista de colores */}
-          <div className="w-56 shrink-0 border-r overflow-y-auto px-4 pb-4">
-            <div className="flex flex-col gap-2">
+          {/* Lista de colores: en mobile, solo las pastillas de color (sin
+              nombre) en una grilla angosta, para dejarle más ancho a la
+              vista previa del teléfono. En desktop, swatch + nombre. */}
+          <div className="w-16 md:w-56 shrink-0 border-r overflow-y-auto px-2 md:px-4 pb-4">
+            <div className="grid grid-cols-2 md:flex md:flex-col gap-2">
               {colors.map((c) => (
                 <button
                   key={c.id}
                   type="button"
+                  title={c.name}
                   onClick={() => {
                     setPreviewColor(c.id);
                     setPreviewLoading(true);
                   }}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-left transition-all",
+                    "relative flex items-center justify-center md:justify-start gap-3 rounded-lg border-2 px-1.5 py-1.5 md:px-3 md:py-2.5 text-left transition-all",
                     previewColor === c.id
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/40"
@@ -166,8 +169,15 @@ function TemplatePreviewModalBody({
                       border: activeTab === "MODERNO" ? "2px solid #C9A876" : "1px solid rgba(0,0,0,.1)",
                     }}
                   />
-                  <span className="text-sm font-medium flex-1">{c.name}</span>
-                  {previewColor === c.id && <Check className="h-4 w-4 text-primary shrink-0" />}
+                  <span className="hidden md:inline text-sm font-medium flex-1">{c.name}</span>
+                  {previewColor === c.id && (
+                    <Check className="hidden md:block h-4 w-4 text-primary shrink-0" />
+                  )}
+                  {previewColor === c.id && (
+                    <span className="md:hidden absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <Check className="h-2.5 w-2.5" />
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
