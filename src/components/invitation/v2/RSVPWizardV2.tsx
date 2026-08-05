@@ -37,7 +37,7 @@ interface RSVPWizardV2Props {
   onConfirmed?: (data: { attending: boolean; count: number }) => void;
 }
 
-type Step = "decision" | "details" | "finish" | "done" | "declined";
+type Step = "decision" | "details" | "done" | "declined";
 
 export function RSVPWizardV2({
   invitationId,
@@ -133,7 +133,7 @@ export function RSVPWizardV2({
           <button
             className="t-btn"
             onClick={() => handleDecline()}
-            style={{ width: "100%", justifyContent: "center", background: "transparent", fontWeight: 600 }}
+            style={{ width: "100%", justifyContent: "center", background: "transparent", fontWeight: 600, color: dark ? "#FFFFFF" : "inherit", borderColor: "currentColor" }}
             aria-label="Declinar invitación"
           >
             Rechazar
@@ -143,12 +143,12 @@ export function RSVPWizardV2({
     }
 
     if (step === "details") {
+      const textColor = dark ? "#FFFFFF" : "inherit";
       return (
-        <div>
-          <p className="t-kicker" style={{ margin: "0 0 12px 0" }}>Paso 2 de 3</p>
+        <div style={{ color: textColor }}>
           {!guestToken && (
             <div className="t-field" style={{ marginBottom: "14px" }}>
-              <label htmlFor="rsvp-name">Tu nombre y apellido</label>
+              <label htmlFor="rsvp-name" style={{ color: textColor }}>Tu nombre y apellido</label>
               <input
                 id="rsvp-name"
                 type="text"
@@ -162,7 +162,7 @@ export function RSVPWizardV2({
           )}
           {maxGuests > 1 && (
             <div className="t-field" style={{ marginBottom: "14px" }}>
-              <label id="count-label" style={{ marginBottom: "8px", display: "block" }}>
+              <label id="count-label" style={{ marginBottom: "8px", display: "block", color: textColor, opacity: 1 }}>
                 ¿Cuántos asisten? {maxGuests > 1 ? `(máx. ${maxGuests})` : ""}
               </label>
               <div style={{ marginTop: "16px" }}>
@@ -236,8 +236,8 @@ export function RSVPWizardV2({
           )}
 
           <div className="t-field" style={{ marginBottom: "14px" }}>
-            <label htmlFor="rsvp-dietary">
-              Restricción alimentaria <span style={{ opacity: .5 }}>(opcional)</span>
+            <label htmlFor="rsvp-dietary" style={{ color: textColor }}>
+              Restricción alimentaria <span style={{ opacity: .7 }}>(opcional)</span>
             </label>
             <input
               id="rsvp-dietary"
@@ -248,24 +248,8 @@ export function RSVPWizardV2({
             />
           </div>
 
-          <button
-            className="t-btn"
-            onClick={() => setStep("finish")}
-            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", marginTop: "14px" }}
-            disabled={!guestToken && !name.trim()}
-          >
-            Continuar →
-          </button>
-        </div>
-      );
-    }
-
-    if (step === "finish") {
-      return (
-        <div>
-          <p className="t-kicker" style={{ margin: "0 0 12px 0" }}>Último paso</p>
           {error && (
-            <p role="alert" style={{ color: "var(--c-accent)", fontSize: "13px", marginBottom: "var(--sp-3)" }}>
+            <p role="alert" style={{ color: "var(--c-accent)", fontSize: "13px", marginBottom: "12px" }}>
               {error}
             </p>
           )}
@@ -273,17 +257,10 @@ export function RSVPWizardV2({
           <button
             className="t-btn"
             onClick={handleConfirm}
-            disabled={isSubmitting}
-            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px" }}
+            disabled={isSubmitting || (!guestToken && !name.trim())}
+            style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px", marginTop: "14px" }}
           >
             {isSubmitting ? "Guardando…" : "✓ Confirmar asistencia"}
-          </button>
-          <button
-            className="t-btn"
-            onClick={() => setStep("details")}
-            style={{ width: "100%", justifyContent: "center", marginTop: "14px", background: "transparent" }}
-          >
-            ← Volver
           </button>
         </div>
       );
