@@ -31,46 +31,12 @@ export function StepCronograma() {
     const [showInfo, setShowInfo] = useState(false);
     const [attemptedNext, setAttemptedNext] = useState(false);
     
-    const getDefaultEvents = (): CronogramaEvent[] => {
-        const startHourStr = data.hora || "21:00";
-        let startHour = parseInt(startHourStr.split(":")[0]);
-        if (isNaN(startHour)) startHour = 21;
-        
-        const nextHour = (startHour + 2) % 24;
-        const nextHourStr = `${nextHour.toString().padStart(2, '0')}:00`;
-        const initialHourStr = startHourStr;
-
-        if (data.type === 'CASAMIENTO') {
-            if (data.ceremoniaHabilitada) {
-                return [
-                    { time: initialHourStr, title: "Recepción", icon: "Music" },
-                    { time: nextHourStr, title: "Cena & Brindis", icon: "Utensils" }
-                ];
-            }
-            return [
-                { time: initialHourStr, title: "Ceremonia & Recepción", icon: "Heart" },
-                { time: nextHourStr, title: "Cena", icon: "Utensils" }
-            ];
-        }
-        return [
-            { time: initialHourStr, title: "Recepción", icon: "Music" },
-            { time: nextHourStr, title: "Cena", icon: "Utensils" }
-        ];
-    };
-
-    // El store inicializa cronogramaEventos en "[]" (string truthy) para invitaciones
-    // nuevas, así que no alcanza con chequear que el string exista: hay que ver si el
-    // array ya parseado tiene contenido antes de descartar los eventos por defecto.
-    let initialEvents: CronogramaEvent[] = getDefaultEvents();
-    if (data.cronogramaEventos) {
-        try {
-            const parsed = JSON.parse(data.cronogramaEventos);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                initialEvents = parsed;
-            }
-        } catch {
-            // Si el JSON guardado está corrupto, se usan los eventos por defecto.
-        }
+    let initialEvents: CronogramaEvent[] = [];
+    try {
+        const parsed = data.cronogramaEventos ? JSON.parse(data.cronogramaEventos) : [];
+        if (Array.isArray(parsed)) initialEvents = parsed;
+    } catch {
+        // Si el JSON guardado está corrupto, se arranca vacío.
     }
 
     // Si la ceremonia está habilitada en su paso propio, evitar item redundante "Ceremonia"
@@ -104,7 +70,12 @@ export function StepCronograma() {
         .filter((i) => i !== -1);
 
     const handleNext = () => {
-        if (events.length === 0 || incompleteIndexes.length > 0) {
+        if (events.length === 0) {
+            setAttemptedNext(true);
+            showToast("Agregá al menos una etapa al cronograma antes de continuar.", "error");
+            return;
+        }
+        if (incompleteIndexes.length > 0) {
             setAttemptedNext(true);
             showToast("Completá la hora y el título de todas las etapas del cronograma antes de continuar.", "error");
             return;
@@ -146,6 +117,12 @@ export function StepCronograma() {
             </div>
 
             <div className="space-y-4 max-w-2xl mx-auto">
+                {events.length === 0 && (
+                    <div className="flex items-start gap-2 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+                        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                        <span>Todavía no agregaste ninguna etapa. Agregá al menos una para poder continuar.</span>
+                    </div>
+                )}
                 {events.map((event, index) => {
                     const isIncomplete = attemptedNext && (!event.time.trim() || !event.title.trim());
                     return (
@@ -154,18 +131,16 @@ export function StepCronograma() {
                             <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
                                 Etapa #{index + 1}
                             </span>
-                            {events.length > 1 && (
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeEvent(index)}
-                                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 px-2"
-                                >
-                                    <Trash2 className="w-4 h-4 mr-1" />
-                                    <span className="text-xs">Eliminar</span>
-                                </Button>
-                            )}
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeEvent(index)}
+                                className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 px-2"
+                            >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                <span className="text-xs">Eliminar</span>
+                            </Button>
                         </div>
 
                         <div className="grid md:grid-cols-[1fr_2fr_1.5fr] gap-3">
