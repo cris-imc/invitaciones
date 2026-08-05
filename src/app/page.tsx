@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
 import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
+import { LandingNav } from "@/components/landing/LandingNav";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
 
@@ -13,26 +14,7 @@ export default async function Home() {
     <div className="flex min-h-screen items-center justify-center bg-black p-0 md:p-6">
       <div className="landing w-full max-w-[1180px]">
         {/* NAV */}
-        <nav className="l-nav">
-          <div className="l-brand">
-            <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
-              <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
-                  Invitaciones
-              </span>
-              <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
-                  Digitales
-              </span>
-            </Link>
-          </div>
-          <div className="l-nav-links">
-            <Link href="#plantillas">Plantillas</Link>
-            <Link href="#como-funciona">Cómo funciona</Link>
-            <Link href="#precios">Precios</Link>
-          </div>
-          <Link href={registerUrl}>
-            <button className="l-cta">Crear invitación</button>
-          </Link>
-        </nav>
+        <LandingNav registerUrl={registerUrl} />
 
         {/* HERO */}
         <section className="l-hero">
@@ -49,7 +31,7 @@ export default async function Home() {
                 <Button className="rounded-full bg-accent text-ink hover:bg-accent/90 px-6">Empezar gratis</Button>
               </Link>
               <Link href="/dashboard">
-                <Button variant="ghost" className="rounded-full text-paper hover:text-paper hover:bg-white/10 px-6">Ingresar ↗</Button>
+                <Button variant="ghost" className="rounded-full border border-white/25 text-paper hover:text-paper hover:bg-white/10 hover:border-white/40 px-6">Ingresar ↗</Button>
               </Link>
             </div>
           </div>
