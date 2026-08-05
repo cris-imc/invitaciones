@@ -19,7 +19,7 @@ import { Wand2 } from "lucide-react";
 
 
 export function StepDesign() {
-    const { data, setData, setThemeConfig, themeConfig, usePremiumCredit } = useWizardStore();
+    const { data, setData, setThemeConfig, themeConfig, usePremiumCredit, setDirty } = useWizardStore();
     const [isCreating, setIsCreating] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
     const selectedTemplate = data.templateTipo || "ORIGINAL";
@@ -44,6 +44,10 @@ export function StepDesign() {
         setIsCreating(true);
         try {
             const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit);
+            // Evita que el listener de beforeunload dispare el aviso nativo del
+            // navegador ("los cambios no se guardarán") durante esta redirección,
+            // ya que la invitación recién se guardó con éxito.
+            setDirty(false);
             window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
         } catch (error) {
             console.error('Error creating invitation:', error);
