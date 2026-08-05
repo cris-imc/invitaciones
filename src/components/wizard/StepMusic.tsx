@@ -3,11 +3,13 @@ import { useState } from "react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 import { useWizardStore } from "@/store/wizard-store";
-import { Input } from "@/components/ui/input";
 import { MusicUploader } from "@/components/ui/MusicUploader";
+import { PresetMusicPicker } from "@/components/ui/PresetMusicPicker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { PRESET_SONGS } from "@/lib/preset-music";
 
 import { useSession } from "next-auth/react";
 
@@ -15,6 +17,10 @@ export function StepMusic() {
     const { data, setData } = useWizardStore();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
     const [showMusicInfo, setShowMusicInfo] = useState(false);
+    const isPresetUrl = PRESET_SONGS.some((song) => song.url === data.musicaUrl);
+    const [musicTab, setMusicTab] = useState<"preset" | "upload">(
+        !data.musicaUrl || isPresetUrl ? "preset" : "upload"
+    );
     const { data: session } = useSession();
     const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
     
@@ -63,11 +69,27 @@ export function StepMusic() {
                 {data.musicaHabilitada && !isLocked && (
                     <>
                         <div className="space-y-2">
-                            <Label htmlFor="musicaUrl">Archivo de Audio</Label>
-                            <MusicUploader
-                                currentMusicUrl={data.musicaUrl}
-                                onMusicUploaded={(url) => setData({ musicaUrl: url })}
-                            />
+                            <Label>Archivo de Audio</Label>
+                            <Tabs value={musicTab} onValueChange={(v) => setMusicTab(v as "preset" | "upload")}>
+                                <TabsList>
+                                    <TabsTrigger value="preset">Elegir de la lista</TabsTrigger>
+                                    <TabsTrigger value="upload">Subir mi canción</TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent value="preset" className="pt-3">
+                                    <PresetMusicPicker
+                                        selectedUrl={data.musicaUrl}
+                                        onSelect={(song) => setData({ musicaUrl: song.url })}
+                                    />
+                                </TabsContent>
+
+                                <TabsContent value="upload" className="pt-3">
+                                    <MusicUploader
+                                        currentMusicUrl={isPresetUrl ? undefined : data.musicaUrl}
+                                        onMusicUploaded={(url) => setData({ musicaUrl: url })}
+                                    />
+                                </TabsContent>
+                            </Tabs>
                         </div>
 
                         <div className="flex items-center space-x-2">
