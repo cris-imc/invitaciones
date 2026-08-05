@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
 interface LandingNavProps {
   registerUrl: string;
+  isLoggedIn: boolean;
 }
 
 const LINKS = [
@@ -15,7 +17,7 @@ const LINKS = [
   { href: "#precios", label: "Precios" },
 ];
 
-export function LandingNav({ registerUrl }: LandingNavProps) {
+export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -56,10 +58,32 @@ export function LandingNav({ registerUrl }: LandingNavProps) {
           ))}
         </div>
 
-        <div className="l-drawer-foot">
-          <Link href={registerUrl} onClick={() => setOpen(false)}>
-            <button className="l-cta">Crear invitación</button>
-          </Link>
+        <div className="l-drawer-foot flex flex-col gap-2">
+          {isLoggedIn ? (
+            <>
+              <Link href={registerUrl} onClick={() => setOpen(false)}>
+                <button className="l-cta">Crear invitación</button>
+              </Link>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="w-full rounded-full border border-white/25 text-paper text-sm font-semibold py-2.5 transition-all hover:bg-white/10 hover:border-white/40"
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href={registerUrl} onClick={() => setOpen(false)}>
+                <button className="l-cta">Registrarse</button>
+              </Link>
+              <Link href="/login" onClick={() => setOpen(false)}>
+                <button className="w-full rounded-full border border-white/25 text-paper text-sm font-semibold py-2.5 transition-all hover:bg-white/10 hover:border-white/40">
+                  Ingresar
+                </button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </>

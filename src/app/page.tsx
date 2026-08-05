@@ -15,7 +15,7 @@ export default async function Home() {
     <div className="flex min-h-screen items-center justify-center bg-black p-0 md:p-6">
       <div className="landing w-full max-w-[1180px]">
         {/* NAV */}
-        <LandingNav registerUrl={registerUrl} />
+        <LandingNav registerUrl={registerUrl} isLoggedIn={Boolean(session)} />
 
         {/* HERO */}
         <section className="l-hero">
@@ -29,10 +29,10 @@ export default async function Home() {
             </p>
             <div className="l-hero-ctas">
               <Link href={registerUrl}>
-                <Button className="rounded-full bg-accent text-ink hover:bg-accent/90 px-6">Empezar gratis</Button>
+                <Button className="rounded-full bg-accent text-ink transition-all duration-200 hover:bg-accent/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent/20 px-6">Empezar gratis</Button>
               </Link>
               <Link href="/dashboard">
-                <Button variant="ghost" className="rounded-full border border-white/25 text-paper hover:text-paper hover:bg-white/10 hover:border-white/40 px-6">Ingresar ↗</Button>
+                <Button variant="ghost" className="rounded-full border border-white/25 text-paper transition-all duration-200 hover:text-paper hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5 px-6">Ingresar</Button>
               </Link>
             </div>
           </div>
