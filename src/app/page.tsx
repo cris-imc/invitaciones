@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
 import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { LandingNav } from "@/components/landing/LandingNav";
+import { HeroParallaxPhoto } from "@/components/landing/HeroParallaxPhoto";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
 
@@ -35,17 +36,10 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative w-full md:h-full md:min-h-[400px] md:flex md:items-center overflow-visible pointer-events-none md:scale-110 md:origin-right">
-            {/* En mobile la foto se muestra como una tarjeta redondeada con un
-                glow ambient detrás; en desktop se estira a pantalla completa
-                y se desvanece hacia el fondo oscuro con una máscara. */}
-            <div className="absolute -inset-6 rounded-[40px] bg-[var(--accent)]/25 blur-3xl opacity-60 md:hidden" aria-hidden="true"></div>
-            <div className="relative w-full aspect-[4/5] md:aspect-auto md:w-full md:h-full rounded-[28px] md:rounded-none overflow-hidden shadow-2xl md:shadow-none ring-1 ring-white/10 md:ring-0">
-              <div className="absolute inset-0 z-0 l-hero-photo-mask">
-                <img src="/landing/novios2.jpg" alt="Novios" className="w-full h-full object-cover object-[center_30%] opacity-100 md:opacity-80" />
-              </div>
-            </div>
-          </div>
+          {/* En mobile no se muestra: la foto suelta quedaba colgada al lado
+              del texto. En desktop se mantiene, con un efecto parallax al
+              hacer scroll (ver HeroParallaxPhoto). */}
+          <HeroParallaxPhoto />
         </section>
 
         {/* PLANTILLAS (showcase animado) */}
