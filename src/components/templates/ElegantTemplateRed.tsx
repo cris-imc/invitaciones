@@ -12,7 +12,7 @@ import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
 import { TypewriterText } from "@/components/ui/TypewriterText";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
-import { MusicPlayer } from "@/components/invitation/MusicPlayer";
+import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 
@@ -299,6 +299,13 @@ const formatNumber = (num: number) => {
 export function ElegantTemplateRed({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
+  const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
+    musicaUrl: String(invitation.musicaUrl ?? ""),
+    autoplay: musicaHabilitada && Boolean(invitation.musicaAutoplay ?? true),
+    loop: Boolean(invitation.musicaLoop ?? true),
+  });
 
   const [mounted, setMounted] = useState(false);
 
@@ -1025,6 +1032,16 @@ export function ElegantTemplateRed({ invitation, guest, isPersonalized = false }
         document.body
       )}
 
+      {/* Burbuja de música, independiente de la burbuja de pase */}
+      {mounted && musicaHabilitada && isCoverOpen && createPortal(
+        <MusicToggleButton
+          isPlaying={isMusicPlaying}
+          onToggle={toggleMusic}
+          className="fixed top-3 right-3 z-[99999]"
+        />,
+        document.body
+      )}
+
       <div className="desktop-stage" data-theme={theme} style={{ '--t-acc': '#8A4A54', '--t-acc2': '#8A4A54', '--c-accent': '#8A4A54' } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
@@ -1427,13 +1444,7 @@ export function ElegantTemplateRed({ invitation, guest, isPersonalized = false }
           />
         )}
 
-        {Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl) && (
-          <MusicPlayer 
-            musicaUrl={String(invitation.musicaUrl)} 
-            autoplay={Boolean(invitation.musicaAutoplay ?? true)}
-            loop={Boolean(invitation.musicaLoop ?? true)}
-          />
-        )}
+        {musicaHabilitada && musicAudioElement}
 
         <footer className="d-foot">
           <div className="mono">{monogram}</div>

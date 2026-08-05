@@ -12,7 +12,7 @@ import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
 import { TypewriterText } from "@/components/ui/TypewriterText";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
-import { MusicPlayer } from "@/components/invitation/MusicPlayer";
+import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 
@@ -299,6 +299,13 @@ const formatNumber = (num: number) => {
 export function ElegantTemplate({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
+  const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
+    musicaUrl: String(invitation.musicaUrl ?? ""),
+    autoplay: musicaHabilitada && Boolean(invitation.musicaAutoplay ?? true),
+    loop: Boolean(invitation.musicaLoop ?? true),
+  });
 
   const [mounted, setMounted] = useState(false);
 
@@ -1000,7 +1007,7 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
 
       {/* Sticky Ticket Bubble via Portal */}
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
-        <div 
+        <div
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
           className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#C79A4B]/40 shadow-md ${isTicketMaximized ? 'bg-[#F9F7F1]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#1A2B33]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
         >
@@ -1022,6 +1029,16 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
             </div>
           )}
         </div>,
+        document.body
+      )}
+
+      {/* Burbuja de música, independiente de la burbuja de pase */}
+      {mounted && musicaHabilitada && isCoverOpen && createPortal(
+        <MusicToggleButton
+          isPlaying={isMusicPlaying}
+          onToggle={toggleMusic}
+          className="fixed top-3 right-3 z-[99999]"
+        />,
         document.body
       )}
 
@@ -1427,13 +1444,7 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
           />
         )}
 
-        {Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl) && (
-          <MusicPlayer 
-            musicaUrl={String(invitation.musicaUrl)} 
-            autoplay={Boolean(invitation.musicaAutoplay ?? true)}
-            loop={Boolean(invitation.musicaLoop ?? true)}
-          />
-        )}
+        {musicaHabilitada && musicAudioElement}
 
         <footer className="d-foot">
           <div className="mono">{monogram}</div>
