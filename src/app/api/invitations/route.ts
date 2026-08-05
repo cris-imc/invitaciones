@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import { checkPlanLimits } from '@/lib/plan-limits';
 import type { PlanTier } from '@/lib/plan-limits';
 import { checkAndCleanupIfExpired, isEventDateLocked } from '@/lib/expiration-server';
+import { slugify } from '@/lib/slugify';
 
 // GET - Obtener invitaciones del usuario o invitación pública por slug
 export async function GET(request: NextRequest) {
@@ -160,8 +161,11 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Generar slug único
-        const slug = `${body.nombreEvento.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+        // Generar slug único (sanitizado: solo minúsculas, números y guiones,
+        // sin acentos ni símbolos, para que el ruteo dinámico de Next.js
+        // siempre pueda resolverlo correctamente)
+        const slugBase = slugify(String(body.nombreEvento || '')) || 'invitacion';
+        const slug = `${slugBase}-${Date.now()}`;
 
         // Combinar fecha y hora correctamente preservando la zona horaria local
         let fechaEvento: Date;
