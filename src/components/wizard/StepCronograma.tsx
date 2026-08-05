@@ -70,11 +70,6 @@ export function StepCronograma() {
         .filter((i) => i !== -1);
 
     const handleNext = () => {
-        if (events.length === 0) {
-            setAttemptedNext(true);
-            showToast("Agregá al menos una etapa al cronograma antes de continuar.", "error");
-            return;
-        }
         if (incompleteIndexes.length > 0) {
             setAttemptedNext(true);
             showToast("Completá la hora y el título de todas las etapas del cronograma antes de continuar.", "error");
@@ -117,12 +112,6 @@ export function StepCronograma() {
             </div>
 
             <div className="space-y-4 max-w-2xl mx-auto">
-                {events.length === 0 && (
-                    <div className="flex items-start gap-2 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
-                        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                        <span>Todavía no agregaste ninguna etapa. Agregá al menos una para poder continuar.</span>
-                    </div>
-                )}
                 {events.map((event, index) => {
                     const isIncomplete = attemptedNext && (!event.time.trim() || !event.title.trim());
                     return (
