@@ -12,7 +12,7 @@ import { SaveStepButtons } from "./SaveStepButtons";
 import { cn } from "@/lib/utils";
 
 const PREDEFINED_TITULOS_REGALO = ["Regalo", "Mesa de Regalos", "Colaboración"];
-const PREDEFINED_TITULOS_TARJETA = ["Pago de Tarjetas / Pases", "Tarjetero", "Entrada al Evento"];
+const PREDEFINED_TITULOS_TARJETA = ["Pago de Tarjetas", "Pago de Invitaciones", "Entrada al Evento"];
 
 export function StepBankDetails() {
     const { data, setData, nextStep } = useWizardStore();
@@ -35,7 +35,7 @@ export function StepBankDetails() {
         return !PREDEFINED_TITULOS_REGALO.includes(current);
     });
     const [isCustomTarjetaTitulo, setIsCustomTarjetaTitulo] = useState(() => {
-        const current = d.pagoTarjetaTitulo || "Pago de Tarjetas / Pases";
+        const current = d.pagoTarjetaTitulo || "Pago de Tarjetas";
         return !PREDEFINED_TITULOS_TARJETA.includes(current);
     });
 
@@ -97,7 +97,7 @@ export function StepBankDetails() {
                             Además, en cumpleaños de 15, las billeteras virtuales juveniles (ej: MercadoPago o Ualá) suelen tener límites mensuales de recepción de dinero. Al usar dos cuentas, evitás superar dichos límites o mezclar las finanzas.
                         </p>
                         <p className="text-amber-300 font-medium">
-                            💡 Si activás una sola cuenta, la tarjeta mostrará unificadamente que esa cuenta se utilizará tanto para regalos como para pagos. Si activás ambas, la tarjeta las dividirá en columnas (Desktop) o una sobre otra (Mobile).
+                            💡 Si activás una sola cuenta, la tarjeta mostrará unificadamente que esa cuenta se utilizará tanto para regalos como para pagos.
                         </p>
                     </div>
                 )}
@@ -305,7 +305,7 @@ export function StepBankDetails() {
                                         }}
                                         className={cn(
                                             "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
-                                            (d.pagoTarjetaTitulo || "Pago de Tarjetas / Pases") === opt && !isCustomTarjetaTitulo
+                                            (d.pagoTarjetaTitulo || "Pago de Tarjetas") === opt && !isCustomTarjetaTitulo
                                                 ? "bg-amber-500 text-white border-amber-600"
                                                 : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
                                         )}
@@ -317,7 +317,7 @@ export function StepBankDetails() {
                                     type="button"
                                     onClick={() => {
                                         setIsCustomTarjetaTitulo(true);
-                                        if (PREDEFINED_TITULOS_TARJETA.includes(d.pagoTarjetaTitulo || "Pago de Tarjetas / Pases")) {
+                                        if (PREDEFINED_TITULOS_TARJETA.includes(d.pagoTarjetaTitulo || "Pago de Tarjetas")) {
                                             setData({ pagoTarjetaTitulo: "" });
                                         }
                                     }}
