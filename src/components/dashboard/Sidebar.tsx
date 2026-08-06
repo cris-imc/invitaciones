@@ -159,7 +159,7 @@ export function Sidebar() {
             </header>
 
             {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ── */}
-            <div className="p-bottom-nav md:hidden">
+            <div className="p-bottom-nav md:hidden" data-debug-role={role}>
                 <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label="Cerrar sesión">
                     <LogOut className="w-5 h-5" />
                     <span>Salir</span>
