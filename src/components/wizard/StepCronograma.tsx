@@ -79,7 +79,7 @@ export function StepCronograma() {
         }
 
         // La primera etapa no puede empezar antes de la hora de inicio del
-        // evento (cargada en el paso "Detalles del Salón"). Comparación de
+        // evento (cargada en el paso "Detalles de la Fiesta"). Comparación de
         // strings "HH:MM" funciona directo porque ambos vienen del mismo
         // formato de <input type="time">.
         const eventoHora = (data.hora || "").trim();
@@ -233,7 +233,7 @@ export function StepCronograma() {
                             cronograma ({events[0]?.title || "Etapa #1"}) está cargada a las{" "}
                             <strong>{events[0]?.time}</strong>, antes de esa hora.
                             <br /><br />
-                            Revisá el horario del evento en el paso &quot;Detalles del Salón&quot;, o ajustá la
+                            Revisá el horario del evento en el paso &quot;Detalles de la Fiesta&quot;, o ajustá la
                             hora de esta etapa para que no sea anterior al inicio del evento.
                         </DialogDescription>
                     </DialogHeader>
