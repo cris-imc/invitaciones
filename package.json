@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "build:railway": "node ./scripts/prepare-railway.js && npx prisma generate && npx prisma migrate deploy && next build",
+    "build:railway": "node ./scripts/prepare-railway.js && npx prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start",
+    "start:railway": "npx prisma migrate deploy && next start",
     "lint": "eslint"
   },
   "dependencies": {
