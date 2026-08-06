@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useWizardStore } from "@/store/wizard-store";
 import { useSaveStep } from "@/lib/use-save-step";
-import { Loader2, Eye, Settings } from "lucide-react";
+import { Loader2, Eye, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -101,14 +101,14 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                         {hasJustSaved && (
                             <>
                                 <Link href={`/dashboard/invitaciones/${useWizardStore.getState().data.slug}/guests`}>
-                                    <Button 
-                                        type="button" 
+                                    <Button
+                                        type="button"
                                         variant="outline"
                                         size="sm"
                                         className="border-orange-500 text-orange-500 hover:bg-orange-500/10 gap-1.5 font-bold px-2.5"
                                     >
-                                        <Settings className="w-3.5 h-3.5" />
-                                        Ir al administrador
+                                        <LogOut className="w-3.5 h-3.5" />
+                                        Salir
                                     </Button>
                                 </Link>
                                 <Link href={`/i/${useWizardStore.getState().data.slug}`} target="_blank">
