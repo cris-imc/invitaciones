@@ -85,14 +85,27 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        // Get all responses for this invitation
-        const responses = await prisma.quizResponse.findMany({
-            where: { invitationId },
-            select: {
-                score: true,
-                totalQuestions: true,
-            }
-        });
+        // Get all responses for this invitation, excluding las de invitados que
+        // ya fueron eliminados (QuizResponse no tiene relacion/cascade con
+        // Guest, asi que sin este filtro sus respuestas quedan huerfanas y
+        // siguen contando en el promedio para siempre).
+        const [allResponses, currentGuests] = await Promise.all([
+            prisma.quizResponse.findMany({
+                where: { invitationId },
+                select: {
+                    guestToken: true,
+                    score: true,
+                    totalQuestions: true,
+                }
+            }),
+            prisma.guest.findMany({
+                where: { invitationId },
+                select: { uniqueToken: true },
+            }),
+        ]);
+
+        const validTokens = new Set(currentGuests.map((g) => g.uniqueToken));
+        const responses = allResponses.filter((r) => !r.guestToken || validTokens.has(r.guestToken));
 
         if (responses.length === 0) {
             return NextResponse.json({

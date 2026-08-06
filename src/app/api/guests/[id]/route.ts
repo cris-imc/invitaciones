@@ -10,6 +10,15 @@ export async function DELETE(
   try {
     const { id } = await params;
 
+    const guest = await prisma.guest.findUnique({ where: { id }, select: { uniqueToken: true } });
+
+    // QuizResponse no tiene relacion (ni cascade) con Guest -- sin este borrado
+    // manual, las respuestas de trivia de un invitado eliminado quedan
+    // huerfanas y siguen contando en el promedio de aciertos.
+    if (guest) {
+      await prisma.quizResponse.deleteMany({ where: { guestToken: guest.uniqueToken } });
+    }
+
     await prisma.guest.delete({
       where: { id },
     });
