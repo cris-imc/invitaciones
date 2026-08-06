@@ -57,6 +57,12 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
+// TEMPORAL: deshabilita la burbuja animada del primer invitado (y su halo
+// en "Copiar Link") para descartar si es la causa del bug de scroll extra
+// en Chrome-iOS. Volver a poner en "true" para reactivarla una vez
+// descartado/confirmado.
+const HINT_BUBBLE_ENABLED = false;
+
 interface Guest {
   id: string;
   name: string;
@@ -289,7 +295,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   // burbuja, la mostramos, la desvanecemos sola a los pocos segundos, y la
   // volvemos a mostrar al minuto como recordatorio.
   useEffect(() => {
-    if (firstGuestHintDismissed || guests.length !== 1) {
+    if (!HINT_BUBBLE_ENABLED || firstGuestHintDismissed || guests.length !== 1) {
       setHintVisible(false);
       return;
     }
@@ -811,7 +817,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   );
                   const waHref = `https://wa.me/?text=${waMsg}`;
 
-                  const isFirstGuestHintCandidate = guest.id === firstGuestId && guests.length === 1 && !firstGuestHintDismissed;
+                  const isFirstGuestHintCandidate = HINT_BUBBLE_ENABLED && guest.id === firstGuestId && guests.length === 1 && !firstGuestHintDismissed;
                   const isHintActive = isFirstGuestHintCandidate && hintVisible;
 
                   return (
