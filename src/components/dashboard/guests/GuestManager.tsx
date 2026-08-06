@@ -816,19 +816,18 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             <span className="absolute -inset-1.5 rounded-full bg-amber-400/60 blur-md animate-pulse pointer-events-none"></span>
                           )}
                           <Button
-                            variant="outline"
                             size="sm"
-                            className={`relative h-8 px-3 rounded-full text-xs gap-1.5 transition-shadow duration-300 ${isHintActive ? "ring-2 ring-amber-400 shadow-[0_0_10px_2px_rgba(251,191,36,0.6)]" : ""}`}
+                            className={`relative h-8 px-3 rounded-full text-xs gap-1.5 font-semibold border-0 shadow-sm bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white transition-shadow duration-300 ${isHintActive ? "ring-2 ring-amber-300 shadow-[0_0_10px_2px_rgba(251,191,36,0.6)]" : ""}`}
                             title="Copiar enlace personalizado"
                             onClick={() => copyLink(guest.uniqueToken)}
                           >
-                            <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
+                            <LinkIcon className="w-3.5 h-3.5" />
                             Copiar Link
                           </Button>
 
                           {isFirstGuestHintCandidate && (
                             <div
-                              className={`absolute top-full left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 mt-2 w-64 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-amber-950 border border-amber-500/50 text-amber-100 text-xs shadow-xl z-50 transition-opacity duration-700 ${isHintActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                              className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 sm:bottom-auto sm:top-full sm:mt-2 sm:mb-0 sm:left-auto sm:right-0 sm:translate-x-0 w-64 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-amber-950 border border-amber-500/50 text-amber-100 text-xs shadow-xl z-50 transition-opacity duration-700 ${isHintActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                             >
                               <button
                                 type="button"
@@ -844,7 +843,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                                   <strong className="text-amber-300">¡Así se comparte!</strong> Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.
                                 </span>
                               </p>
-                              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 w-3 h-3 bg-amber-950 border-l border-t border-amber-500/50 rotate-45"></div>
+                              {/* Flecha apuntando hacia abajo (mobile: burbuja arriba del botón) */}
+                              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-950 border-r border-b border-amber-500/50 rotate-45 sm:hidden"></div>
+                              {/* Flecha apuntando hacia arriba (desktop: burbuja debajo del botón) */}
+                              <div className="hidden sm:block absolute -top-1.5 right-6 w-3 h-3 bg-amber-950 border-l border-t border-amber-500/50 rotate-45"></div>
                             </div>
                           )}
                         </div>
