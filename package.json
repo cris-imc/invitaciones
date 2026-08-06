@@ -8,7 +8,7 @@
     "build:railway": "node ./scripts/prepare-railway.js && npx prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "start:railway": "npx --yes prisma migrate deploy && next start",
+    "start:railway": "node ./scripts/prepare-railway.js && npx --yes prisma migrate deploy && next start",
     "lint": "eslint"
   },
   "dependencies": {
