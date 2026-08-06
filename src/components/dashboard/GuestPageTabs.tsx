@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GuestManager } from "@/components/dashboard/guests/GuestManager";
 import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPayment";
@@ -60,6 +60,7 @@ function AnimatedTabDescription({ text }: { text: string }) {
 export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier, fechaEvento }: Props) {
   const [tab, setTab] = useState<Tab>("agregar");
   const [liveActive, setLiveActive] = useState(false);
+  const tabContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -163,11 +164,15 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
       {/* Content */}
       <AnimatePresence mode="wait">
         <motion.div
+          ref={tabContentRef}
           key={tab}
           initial={{ opacity: 0, filter: "blur(4px)", y: 10 }}
-          animate={{ opacity: 1, filter: "none", y: 0 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
           exit={{ opacity: 0, filter: "blur(4px)", y: -10 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
+          onAnimationComplete={() => {
+            if (tabContentRef.current) tabContentRef.current.style.filter = "none";
+          }}
         >
           {tab === "invitados" && (
             <div className="bg-card border rounded-lg p-4 md:p-6">
