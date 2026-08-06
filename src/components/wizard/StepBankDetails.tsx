@@ -7,16 +7,20 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/Toast";
-import { Info, ChevronDown, ChevronUp, Gift, CreditCard, ShieldAlert } from "lucide-react";
+import { Info, ChevronDown, ChevronUp, Gift, CreditCard, ShieldAlert, Lock } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 const PREDEFINED_TITULOS_REGALO = ["Regalo", "Mesa de Regalos", "Colaboración"];
 const PREDEFINED_TITULOS_TARJETA = ["Pago de Tarjetas", "Pago de Invitaciones", "Entrada al Evento"];
 
 export function StepBankDetails() {
     const { data, setData, nextStep } = useWizardStore();
+    const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
     const { showToast } = useToast();
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
     const [attemptedNext, setAttemptedNext] = useState(false);
@@ -29,6 +33,10 @@ export function StepBankDetails() {
 
     const d = data as any;
     const isEditing = Boolean(d.id);
+
+    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
+    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    const isLocked = !isAdmin && rawLocked;
 
     const [isCustomRegaloTitulo, setIsCustomRegaloTitulo] = useState(() => {
         const current = d.regaloTitulo || "Regalo";
@@ -131,6 +139,12 @@ export function StepBankDetails() {
                 )}
             </div>
 
+            {rawLocked && isAdmin && (
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
+                    👑 <strong>Modo Administrador:</strong> Esta invitación está en Plan Gratis (bloqueada para el cliente), pero tenés permiso de Admin para editar/activar las cuentas bancarias.
+                </div>
+            )}
+
             {/* SECCIÓN 1: CUENTA PARA REGALOS */}
             <div className="space-y-4 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -139,23 +153,32 @@ export function StepBankDetails() {
                             <Gift className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
-                            <Label htmlFor="enableGift" className="text-base font-semibold cursor-pointer">
+                            <Label htmlFor="enableGift" className={`flex items-center gap-2 text-base font-semibold ${isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
                                 1. Cuenta para Regalos del Evento
+                                {isLocked && <Lock className="w-4 h-4 text-red-400" />}
                             </Label>
                             <p className="text-xs text-muted-foreground">
                                 CBU/Alias para que tus invitados te hagan un regalo voluntario
                             </p>
                         </div>
                     </div>
-                    <Switch
-                        id="enableGift"
-                        className="self-end sm:self-auto"
-                        checked={isRegaloActive}
-                        onCheckedChange={(checked) => setData({ regaloHabilitado: checked })}
-                    />
+                    <div className="relative group self-end sm:self-auto">
+                        <Switch
+                            id="enableGift"
+                            checked={isRegaloActive && (!isLocked || isAdmin)}
+                            disabled={isLocked}
+                            onCheckedChange={(checked) => setData({ regaloHabilitado: checked })}
+                        />
+                        {isLocked && (
+                            <div className="absolute -top-10 right-0 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                Disponible en Premium
+                                <div className="absolute -bottom-1 right-3 border-4 border-transparent border-t-black"></div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {isRegaloActive && (
+                {isRegaloActive && !isLocked && (
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                         <div className="space-y-2">
                             <Label className="text-xs font-medium">Título de la Sección</Label>
@@ -274,23 +297,32 @@ export function StepBankDetails() {
                             <CreditCard className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
-                            <Label htmlFor="enableCardPayment" className="text-base font-semibold cursor-pointer">
+                            <Label htmlFor="enableCardPayment" className={`flex items-center gap-2 text-base font-semibold ${isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
                                 2. Cuenta para Pago de Tarjetas / Pases
+                                {isLocked && <Lock className="w-4 h-4 text-red-400" />}
                             </Label>
                             <p className="text-xs text-muted-foreground">
                                 CBU/Alias destinado a saldar la tarjeta de invitación o pase del evento
                             </p>
                         </div>
                     </div>
-                    <Switch
-                        id="enableCardPayment"
-                        className="self-end sm:self-auto"
-                        checked={isPagoTarjetaActive}
-                        onCheckedChange={(checked) => setData({ pagoTarjetaHabilitado: checked })}
-                    />
+                    <div className="relative group self-end sm:self-auto">
+                        <Switch
+                            id="enableCardPayment"
+                            checked={isPagoTarjetaActive && (!isLocked || isAdmin)}
+                            disabled={isLocked}
+                            onCheckedChange={(checked) => setData({ pagoTarjetaHabilitado: checked })}
+                        />
+                        {isLocked && (
+                            <div className="absolute -top-10 right-0 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                Disponible en Premium
+                                <div className="absolute -bottom-1 right-3 border-4 border-transparent border-t-black"></div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {isPagoTarjetaActive && (
+                {isPagoTarjetaActive && !isLocked && (
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                         <div className="space-y-2">
                             <Label className="text-xs font-medium">Título de la Sección</Label>

@@ -50,6 +50,8 @@ import {
   MessageCircle,
   Pencil,
   Lock,
+  Plus,
+  X,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
@@ -69,22 +71,12 @@ interface Guest {
   attendingChildren: number;
   isExempt: boolean;
   invitationId: string;
-}
-
-// Construye el nombre final que se guarda: para individuales, "Nombre Apellido";
-// para familias, siempre antepone "Familia" al apellido cargado, así ese prefijo
-// queda consistente en todos lados donde se muestre guest.name (lista, WhatsApp,
-// la tarjeta que ve el invitado, etc.) sin tener que tocar cada lugar por separado.
-// Si el cliente ya escribió "Familia", "Flia", "Flia.", "F.", "Fam", etc. al
-// principio del apellido, lo sacamos antes de anteponer "Familia" nosotros,
-// para no terminar con cosas como "Familia Familia Pérez".
-function stripFamiliaPrefix(text: string): string {
-  return text.trim().replace(/^(familia|flia|fam|f)\.?\s+/i, "").trim();
+  createdAt: string;
 }
 
 function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido: string): string {
   if (type === "FAMILY") {
-    return `Familia ${stripFamiliaPrefix(apellido)}`.trim();
+    return apellido.trim();
   }
   return `${nombre.trim()} ${apellido.trim()}`.trim();
 }
@@ -94,7 +86,7 @@ function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido:
 // separación pueden no partirse de forma perfecta.
 function parseGuestName(guest: Pick<Guest, "name" | "type">): { nombre: string; apellido: string } {
   if (guest.type === "FAMILY") {
-    return { nombre: "", apellido: stripFamiliaPrefix(guest.name) };
+    return { nombre: "", apellido: guest.name.trim() };
   }
   const parts = guest.name.trim().split(/\s+/).filter(Boolean);
   if (parts.length <= 1) return { nombre: guest.name.trim(), apellido: "" };
@@ -121,6 +113,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [currentPage, setCurrentPage] = useState(1);
   const [guestToDelete, setGuestToDelete] = useState<Guest | null>(null);
   const [guestToEdit, setGuestToEdit] = useState<Guest | null>(null);
+  const [firstGuestHintDismissed, setFirstGuestHintDismissed] = useState(true);
 
   // Edit Form States
   const [editGuestNombre, setEditGuestNombre] = useState("");
@@ -158,10 +151,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const { showToast } = useToast();
 
   // Form States
+  const [addGuestOpen, setAddGuestOpen] = useState(false);
   const [newGuestNombre, setNewGuestNombre] = useState("");
   const [newGuestApellido, setNewGuestApellido] = useState("");
-  const [newGuestType, setNewGuestType] = useState<"INDIVIDUAL" | "FAMILY">(
-    "INDIVIDUAL",
+  const [newGuestType, setNewGuestType] = useState<"INDIVIDUAL" | "FAMILY" | null>(
+    null,
   );
   const [newIndividualCategory, setNewIndividualCategory] = useState<'adult' | 'teen'>('adult');
   const [newGuestAdultCount, setNewGuestAdultCount] = useState(2);
@@ -237,6 +231,16 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     fetchGuests();
   }, [slug]);
 
+  useEffect(() => {
+    const dismissed = localStorage.getItem(`guestLinkHintDismissed_${slug}`) === "1";
+    setFirstGuestHintDismissed(dismissed);
+  }, [slug]);
+
+  const dismissFirstGuestHint = () => {
+    localStorage.setItem(`guestLinkHintDismissed_${slug}`, "1");
+    setFirstGuestHintDismissed(true);
+  };
+
   const fetchGuests = async () => {
     try {
       const res = await fetch(`/api/invitations/${slug}/guests`);
@@ -253,6 +257,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newGuestType) return;
+    const guestType = newGuestType;
     setIsSubmitting(true);
 
     const effectiveAdults = newAdultsEnabled ? newGuestAdultCount : 0;
@@ -264,15 +270,15 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: buildGuestName(newGuestType, newGuestNombre, newGuestApellido),
-          type: newGuestType,
+          name: buildGuestName(guestType, newGuestNombre, newGuestApellido),
+          type: guestType,
           expectedCount:
-            newGuestType === "FAMILY"
+            guestType === "FAMILY"
               ? Math.max(1, effectiveAdults + effectiveTeens + effectiveChildren)
               : 1,
-          expectedAdults: newGuestType === "FAMILY" ? effectiveAdults : (newIndividualCategory === 'adult' ? 1 : 0),
-          expectedTeens:  newGuestType === "FAMILY" ? effectiveTeens  : (newIndividualCategory === 'teen'  ? 1 : 0),
-          expectedChildren: newGuestType === "FAMILY" ? effectiveChildren : 0,
+          expectedAdults: guestType === "FAMILY" ? effectiveAdults : (newIndividualCategory === 'adult' ? 1 : 0),
+          expectedTeens:  guestType === "FAMILY" ? effectiveTeens  : (newIndividualCategory === 'teen'  ? 1 : 0),
+          expectedChildren: guestType === "FAMILY" ? effectiveChildren : 0,
           isExempt: newGuestIsExempt,
         }),
       });
@@ -414,6 +420,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   );
   const pendingGuests = guests.filter((g) => g.status === "PENDING").length;
 
+  // El primer invitado creado es el de menor createdAt (la lista viene ordenada desc del servidor)
+  const firstGuestId = guests.length > 0
+    ? guests.reduce((oldest, g) => (new Date(g.createdAt) < new Date(oldest.createdAt) ? g : oldest), guests[0]).id
+    : null;
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
@@ -457,58 +468,80 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAddGuest} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Tipo de Invitación</Label>
-                <div className="flex gap-4">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      id="individual"
-                      name="type"
-                      checked={newGuestType === "INDIVIDUAL"}
-                      onChange={() => setNewGuestType("INDIVIDUAL")}
-                      className="accent-primary"
-                    />
-                    <Label htmlFor="individual">Individual</Label>
-                  </div>
-                  <div className={`flex items-center space-x-2 relative group${planTier !== 'PREMIUM' ? ' opacity-50' : ''}`}>
-                    <input
-                      type="radio"
-                      id="family"
-                      name="type"
-                      checked={newGuestType === "FAMILY"}
-                      onChange={() => setNewGuestType("FAMILY")}
+            {!addGuestOpen ? (
+              <button
+                type="button"
+                onClick={() => setAddGuestOpen(true)}
+                className="w-full flex flex-col items-center justify-center gap-2 py-10 rounded-xl border-2 border-dashed border-muted-foreground/30 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors"
+              >
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                  <Plus className="w-5 h-5" />
+                </span>
+                <span className="font-medium">Agrega un invitado</span>
+              </button>
+            ) : newGuestType === null ? (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">¿Qué tipo de invitación querés crear?</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setNewGuestType("INDIVIDUAL")}
+                    className="flex flex-col items-center gap-2 py-6 px-3 rounded-xl border-2 border-muted-foreground/20 hover:border-primary hover:bg-primary/5 transition-colors text-sm font-medium"
+                  >
+                    <UserPlus className="w-6 h-6" />
+                    Individual
+                  </button>
+                  <div className="relative group">
+                    <button
+                      type="button"
                       disabled={planTier !== 'PREMIUM'}
-                      className="accent-primary"
-                    />
-                    <Label htmlFor="family" className={`flex items-center gap-2${planTier !== 'PREMIUM' ? ' cursor-not-allowed' : ''}`}>
-                        Familiar
-                        {planTier !== 'PREMIUM' && <Lock className="w-4 h-4 text-red-400" />}
-                    </Label>
-
+                      onClick={() => setNewGuestType("FAMILY")}
+                      className={`w-full h-full flex flex-col items-center gap-2 py-6 px-3 rounded-xl border-2 text-sm font-medium transition-colors ${planTier !== 'PREMIUM' ? 'opacity-50 cursor-not-allowed border-muted-foreground/20' : 'border-muted-foreground/20 hover:border-primary hover:bg-primary/5'}`}
+                    >
+                      <Users className="w-6 h-6" />
+                      <span className="flex items-center gap-1.5">
+                        Familia/Grupo
+                        {planTier !== 'PREMIUM' && <Lock className="w-3.5 h-3.5 text-red-400" />}
+                      </span>
+                    </button>
                     {planTier !== 'PREMIUM' && (
-                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                          Disponible en Premium
-                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
-                        </div>
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                        Disponible en Premium
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                      </div>
                     )}
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setAddGuestOpen(false)}
+                  className="text-xs text-muted-foreground hover:text-foreground underline"
+                >
+                  Cancelar
+                </button>
               </div>
+            ) : (
+            <form onSubmit={handleAddGuest} className="space-y-4">
+              <button
+                type="button"
+                onClick={() => setNewGuestType(null)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                ← Cambiar tipo de invitación
+              </button>
 
               {newGuestType === "FAMILY" ? (
                 <div className="space-y-2">
-                  <Label htmlFor="guestApellido">Apellido de la Familia</Label>
+                  <Label htmlFor="guestApellido">Nombre del Grupo/Familia</Label>
                   <Input
                     id="guestApellido"
-                    placeholder="Ej: Pérez"
+                    placeholder="Ej: Pérez, o Amigos del Trabajo"
                     value={newGuestApellido}
                     onChange={(e) => setNewGuestApellido(e.target.value)}
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    Se va a mostrar como <strong>&quot;Familia {stripFamiliaPrefix(newGuestApellido) || "..."}&quot;</strong>.
+                    Se va a mostrar como <strong>&quot;{newGuestApellido || "..."}&quot;</strong>.
                   </p>
                 </div>
               ) : (
@@ -643,6 +676,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 {isSubmitting ? "Agregando..." : "Agregar a la lista"}
               </Button>
             </form>
+            )}
           </CardContent>
         </Card>
 
@@ -682,7 +716,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
             ) : (
               <div className="space-y-4">
                 {paginatedGuests.map((guest) => {
-                  const guestUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/i/${slug}?t=${guest.uniqueToken}`;
+                  const guestUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/invite/${slug}/${guest.uniqueToken}`;
                   const waMsg = encodeURIComponent(
                     `¡Hola ${guest.name}! Te invitamos a nuestra celebración. Hacé clic en tu link personalizado para ver la invitación y confirmar tu asistencia: ${guestUrl}`,
                   );
@@ -740,16 +774,35 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           <Pencil className="w-3.5 h-3.5" />
                         </Button>
 
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 px-3 rounded-full text-xs gap-1.5"
-                          title="Copiar enlace personalizado"
-                          onClick={() => copyLink(guest.uniqueToken)}
-                        >
-                          <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
-                          Copiar Link
-                        </Button>
+                        <div className="relative">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-3 rounded-full text-xs gap-1.5"
+                            title="Copiar enlace personalizado"
+                            onClick={() => copyLink(guest.uniqueToken)}
+                          >
+                            <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
+                            Copiar Link
+                          </Button>
+
+                          {guest.id === firstGuestId && !firstGuestHintDismissed && (
+                            <div className="absolute top-full right-0 mt-2 w-60 p-3 rounded-lg bg-gray-900 text-white text-xs shadow-lg z-50">
+                              <button
+                                type="button"
+                                onClick={dismissFirstGuestHint}
+                                className="absolute top-1.5 right-1.5 text-white/60 hover:text-white"
+                                title="Cerrar"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                              <p className="pr-4 leading-snug">
+                                <strong>¡Así se comparte!</strong> Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.
+                              </p>
+                              <div className="absolute -top-1.5 right-6 w-3 h-3 bg-gray-900 rotate-45"></div>
+                            </div>
+                          )}
+                        </div>
 
                         <Button
                           variant="ghost"
@@ -854,7 +907,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     className="accent-primary"
                   />
                   <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier !== 'PREMIUM' ? ' cursor-not-allowed' : ''}`}>
-                      Familiar
+                      Familia/Grupo
                       {planTier !== 'PREMIUM' && <Lock className="w-4 h-4 text-red-400" />}
                   </Label>
 
@@ -870,16 +923,16 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
             {editGuestType === "FAMILY" ? (
               <div className="space-y-2">
-                <Label htmlFor="editGuestApellido">Apellido de la Familia</Label>
+                <Label htmlFor="editGuestApellido">Nombre del Grupo/Familia</Label>
                 <Input
                   id="editGuestApellido"
-                  placeholder="Ej: Pérez"
+                  placeholder="Ej: Pérez, o Amigos del Trabajo"
                   value={editGuestApellido}
                   onChange={(e) => setEditGuestApellido(e.target.value)}
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Se va a mostrar como <strong>&quot;Familia {stripFamiliaPrefix(editGuestApellido) || "..."}&quot;</strong>.
+                  Se va a mostrar como <strong>&quot;{editGuestApellido || "..."}&quot;</strong>.
                 </p>
               </div>
             ) : (
