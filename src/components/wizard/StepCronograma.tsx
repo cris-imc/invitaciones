@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/Toast";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus, Info, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 
@@ -30,6 +31,7 @@ export function StepCronograma() {
     const { showToast } = useToast();
     const [showInfo, setShowInfo] = useState(false);
     const [attemptedNext, setAttemptedNext] = useState(false);
+    const [showTimeError, setShowTimeError] = useState(false);
     
     let initialEvents: CronogramaEvent[] = [];
     try {
@@ -75,6 +77,18 @@ export function StepCronograma() {
             showToast("Completá la hora y el título de todas las etapas del cronograma antes de continuar.", "error");
             return;
         }
+
+        // La primera etapa no puede empezar antes de la hora de inicio del
+        // evento (cargada en el paso "Detalles del Salón"). Comparación de
+        // strings "HH:MM" funciona directo porque ambos vienen del mismo
+        // formato de <input type="time">.
+        const eventoHora = (data.hora || "").trim();
+        const primeraEtapaHora = events[0]?.time?.trim();
+        if (primeraEtapaHora && eventoHora && primeraEtapaHora < eventoHora) {
+            setShowTimeError(true);
+            return;
+        }
+
         setAttemptedNext(false);
         nextStep();
     };
@@ -82,7 +96,10 @@ export function StepCronograma() {
     return (
         <div className="space-y-6">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">Cronograma del Evento</h2>
+                <h2 className="text-2xl font-bold">
+                    Cronograma del Evento
+                    <span className="text-base font-normal text-muted-foreground ml-2">(Opcional)</span>
+                </h2>
                 <p className="text-muted-foreground text-sm">
                     Definí los momentos principales de tu celebración
                 </p>
@@ -203,6 +220,28 @@ export function StepCronograma() {
             </div>
 
             <SaveStepButtons onNext={handleNext} />
+
+            <Dialog open={showTimeError} onOpenChange={setShowTimeError}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-red-500">
+                            <AlertTriangle className="w-5 h-5 shrink-0" />
+                            La primera etapa empieza antes que el evento
+                        </DialogTitle>
+                        <DialogDescription>
+                            Tu evento empieza a las <strong>{data.hora}</strong>, pero la primera etapa del
+                            cronograma ({events[0]?.title || "Etapa #1"}) está cargada a las{" "}
+                            <strong>{events[0]?.time}</strong>, antes de esa hora.
+                            <br /><br />
+                            Revisá el horario del evento en el paso &quot;Detalles del Salón&quot;, o ajustá la
+                            hora de esta etapa para que no sea anterior al inicio del evento.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button onClick={() => setShowTimeError(false)}>Entendido</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
