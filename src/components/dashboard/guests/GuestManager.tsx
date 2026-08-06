@@ -57,11 +57,10 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
-// TEMPORAL: deshabilita la burbuja animada del primer invitado (y su halo
-// en "Copiar Link") para descartar si es la causa del bug de scroll extra
-// en Chrome-iOS. Volver a poner en "true" para reactivarla una vez
-// descartado/confirmado.
-const HINT_BUBBLE_ENABLED = false;
+// Burbuja animada del primer invitado (y su halo en "Copiar Link"). Se
+// descartó como causa del bug de scroll extra en Chrome-iOS (persistía con
+// esto deshabilitado), así que queda reactivada.
+const HINT_BUBBLE_ENABLED = true;
 
 interface Guest {
   id: string;

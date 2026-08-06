@@ -27,8 +27,8 @@ interface Props {
 const TAB_DESCRIPTIONS: Record<Tab, string> = {
   agregar: "Agregá invitados, familias y enviales su enlace único por WhatsApp...",
   invitados: "Revisá quién confirmó asistencia y llevá el control exacto de los pagos...",
-  precio: "Modificá el precio del cubierto y notificá automáticamente a tus invitados...",
-  canciones: "Escuchá, aprobá o rechazá las canciones que sugieren para la fiesta...",
+  precio: "Modificá el precio de la tarjeta y mantené informado a tus invitados...",
+  canciones: "Aprobá o rechazá las canciones que sugieren para la fiesta...",
   live: "Modo Fiesta: Proyectá fotos en vivo y moderá la pantalla gigante...",
 };
 

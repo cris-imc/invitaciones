@@ -1,9 +1,7 @@
 "use client";
 
 import { WizardSteps } from "@/components/wizard/WizardSteps";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
+import { BackLink } from "@/components/ui/BackLink";
 import { useWizardStore } from "@/store/wizard-store";
 import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -33,11 +31,7 @@ export default function CrearInvitacionPage() {
             </Suspense>
 
             <div className="mb-6 flex items-center">
-                <Link href="/dashboard/invitaciones">
-                    <Button variant="ghost" size="sm" className="gap-1">
-                        <ChevronLeft className="w-4 h-4" /> Volver
-                    </Button>
-                </Link>
+                <BackLink href="/dashboard" confirmIfDirty />
             </div>
 
             <div className="w-full">

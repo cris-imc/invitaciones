@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Loader2, Lock } from "lucide-react";
-import Link from "next/link";
+import { Save, Loader2, Lock } from "lucide-react";
+import { BackLink } from "@/components/ui/BackLink";
 import { isEventDateLocked } from "@/lib/expiration";
 
 import { MusicUploader } from "@/components/ui/MusicUploader";
@@ -162,7 +162,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                 throw new Error(error.details || 'Error al actualizar invitación');
             }
 
-            router.push('/dashboard/invitaciones');
+            router.push('/dashboard');
         } catch (error) {
             console.error('Error updating invitation:', error);
             alert(`Error al actualizar la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`);
@@ -177,12 +177,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
     return (
         <div className="max-w-2xl space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/dashboard">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Volver
-                    </Button>
-                </Link>
+                <BackLink href="/dashboard" />
             </div>
 
             <Card>

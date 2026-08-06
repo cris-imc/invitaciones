@@ -2,9 +2,7 @@ import { prisma } from "@/lib/db";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { BackLink } from "@/components/ui/BackLink";
 import { EventShareCard } from "@/components/dashboard/EventShareCard";
 import { GuestPageTabs } from "@/components/dashboard/GuestPageTabs";
 
@@ -31,15 +29,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
   return (
     <div className="p-4 md:p-8 space-y-6">
       {/* Volver, sola arriba a la izquierda */}
-      <Link href="/dashboard" title="Volver a Inicio" className="inline-block">
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full border-white/15 bg-white/5 hover:bg-white/10"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-      </Link>
+      <BackLink href="/dashboard" />
 
       {/* Header — siempre en fila, título y cupos libres uno al lado del
           otro, también en mobile (apilados se veía desprolijo) */}

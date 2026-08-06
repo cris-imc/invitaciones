@@ -45,18 +45,22 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
             } else {
                 proceedBack();
             }
+            return;
+        }
+        if (isDirty && form) {
+            const values = form.getValues();
+            setData(values);
+        }
+        if (currentStep === 0 && isDirty) { // Step 0 -> "Atrás" sale del wizard entero, hay que avisar
+            setShowWarning(true);
         } else {
-            if (isDirty && form) {
-                const values = form.getValues();
-                setData(values);
-            }
             proceedBack();
         }
     };
 
     const proceedBack = () => {
         if (currentStep === 0) {
-            router.push('/dashboard/invitaciones');
+            router.push('/dashboard');
         } else {
             prevStep();
         }
