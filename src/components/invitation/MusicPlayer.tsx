@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Music2 } from "lucide-react";
+import { Play, Pause } from "lucide-react";
 
 interface UseMusicPlayerOptions {
     musicaUrl: string;
@@ -87,13 +87,17 @@ export function MusicToggleButton({ isPlaying, onToggle, className = "" }: Music
             aria-label={isPlaying ? "Pausar música" : "Reproducir música"}
             className={`rounded-full w-9 h-9 shrink-0 shadow-md backdrop-blur-md border transition-opacity hover:opacity-100 ${className}`}
             style={{
-                backgroundColor: 'rgba(var(--color-primary-rgb), 0.15)',
-                borderColor: 'rgba(var(--color-primary-rgb), 0.35)',
+                backgroundColor: 'rgba(var(--color-primary-rgb), 0.35)',
+                borderColor: 'rgba(var(--color-primary-rgb), 0.55)',
                 color: 'var(--color-primary)',
-                opacity: isPlaying ? 1 : 0.55,
+                opacity: isPlaying ? 1 : 0.8,
             }}
         >
-            <Music2 className="w-4 h-4" strokeWidth={1.75} />
+            {isPlaying ? (
+                <Pause className="w-4 h-4" strokeWidth={1.75} fill="currentColor" />
+            ) : (
+                <Play className="w-4 h-4 ml-0.5" strokeWidth={1.75} fill="currentColor" />
+            )}
         </Button>
     );
 }
