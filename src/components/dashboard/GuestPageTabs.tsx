@@ -59,6 +59,24 @@ function AnimatedTabDescription({ text }: { text: string }) {
 
 export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier, fechaEvento }: Props) {
   const [tab, setTab] = useState<Tab>("agregar");
+  const [liveActive, setLiveActive] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchLiveStatus = async () => {
+      try {
+        const res = await fetch(`/api/live/session?invitationId=${invitationId}`);
+        if (!res.ok) { if (!cancelled) setLiveActive(false); return; }
+        const data = await res.json();
+        if (!cancelled) setLiveActive(Boolean(data?.isActive));
+      } catch {
+        if (!cancelled) setLiveActive(false);
+      }
+    };
+    fetchLiveStatus();
+    const interval = setInterval(fetchLiveStatus, 5000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [invitationId]);
 
   const tabs: { id: Tab; label: string; highlight?: "gold" | "live" | "default" }[] = [
     { id: "agregar", label: "Gestionar invitados", highlight: "gold" },
@@ -96,14 +114,18 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
                   w-full min-h-[42px] px-4 py-2 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap
                   transition-all duration-300 cursor-pointer text-[13.5px] border relative overflow-hidden
                   ${isLocked ? "opacity-50 cursor-not-allowed grayscale" : "hover:-translate-y-0.5"}
-                  ${t.highlight === "gold" ? 
-                      tab === t.id 
+                  ${t.highlight === "gold" ?
+                      tab === t.id
                         ? "bg-amber-500 border-amber-400 text-black font-bold shadow-[0_0_12px_rgba(245,158,11,0.4)]"
                         : "bg-amber-500/15 border-amber-500/30 text-amber-300 font-semibold hover:bg-amber-500/25"
                     : t.highlight === "live" ?
-                      tab === t.id
-                        ? "bg-red-500 border-red-400 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-                        : "bg-red-500/10 border-red-500/30 text-red-400 font-semibold hover:bg-red-500/20 hover:border-red-400/50 shadow-[0_0_8px_rgba(239,68,68,0.1)]"
+                      (liveActive
+                        ? tab === t.id
+                          ? "bg-green-500 border-green-400 text-white font-bold shadow-[0_0_15px_rgba(34,197,94,0.5)]"
+                          : "bg-green-500/10 border-green-500/30 text-green-400 font-semibold hover:bg-green-500/20 hover:border-green-400/50 shadow-[0_0_8px_rgba(34,197,94,0.1)]"
+                        : tab === t.id
+                          ? "bg-red-500 border-red-400 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                          : "bg-red-500/10 border-red-500/30 text-red-400 font-semibold hover:bg-red-500/20 hover:border-red-400/50 shadow-[0_0_8px_rgba(239,68,68,0.1)]")
                     : tab === t.id
                       ? "bg-[var(--paper)] border-transparent text-[var(--ink)] font-bold shadow-sm"
                       : "bg-transparent border-transparent text-white/60 font-medium hover:bg-white/5"
@@ -113,8 +135,8 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
                 {t.id === "live" ? (
                   <span className="flex items-center gap-2 relative z-10">
                     <div className="relative flex items-center justify-center w-2 h-2">
-                        {!isLocked && <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>}
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        {!isLocked && liveActive && <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping"></span>}
+                        <span className={`relative inline-flex rounded-full h-2 w-2 ${liveActive ? "bg-green-500" : "bg-red-500"}`}></span>
                     </div>
                     LIVE
                   </span>
