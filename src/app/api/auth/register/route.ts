@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { REGISTRATION_ENABLED } from "@/lib/features";
 
 export async function POST(request: NextRequest) {
+  if (!REGISTRATION_ENABLED) {
+    return NextResponse.json(
+      { error: "El registro de cuentas nuevas está deshabilitado por ahora" },
+      { status: 403 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { name, email, password, planTier } = body;

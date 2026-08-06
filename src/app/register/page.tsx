@@ -9,10 +9,33 @@ import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
 import { Sparkles, Mail, Lock, User, Check, ChevronLeft } from "lucide-react";
 import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
+import { REGISTRATION_ENABLED } from "@/lib/features";
 
 type PlanType = "FREE" | "PREMIUM";
 
 export default function RegisterPage() {
+  if (!REGISTRATION_ENABLED) {
+    return (
+      <div className="min-h-dvh py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative text-[var(--on-ink)]">
+        <Link href="/" className="absolute top-6 left-6 md:top-12 md:left-12 flex items-center gap-2 text-sm text-[var(--paper)] opacity-70 hover:opacity-100 transition-opacity">
+          <ChevronLeft className="w-4 h-4" />
+          Volver al inicio
+        </Link>
+        <div className="max-w-md w-full text-center bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-8 shadow-2xl">
+          <h1 className="text-2xl font-display mb-3">Registro no disponible</h1>
+          <p className="opacity-70 mb-6">
+            Por ahora no se pueden crear cuentas nuevas de forma pública. Si ya tenés una cuenta, iniciá sesión; si necesitás una, contactanos.
+          </p>
+          <Link href="/login">
+            <Button className="w-full l-cta bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--paper)]/90 border-none">
+              Ir a Iniciar Sesión
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Suspense fallback={<div className="min-h-dvh bg-[var(--ink)]" />}>
       <RegisterForm />

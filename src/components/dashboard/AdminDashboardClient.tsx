@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminInvitationRow } from "@/components/dashboard/AdminInvitationRow";
+import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
 import { DeleteUserButton } from "@/components/dashboard/DeleteUserButton";
 import { EditCreditsButton } from "@/components/dashboard/EditCreditsButton";
 import { EditUserButton } from "@/components/dashboard/EditUserButton";
@@ -50,20 +51,23 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
 
     return (
         <div>
-            {/* Buscador */}
-            <div className="relative mb-6">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50" />
-                <Input 
-                    type="text"
-                    name="admin-search-clients"
-                    autoComplete="off"
-                    data-lpignore="true"
-                    data-form-type="other"
-                    placeholder="Buscar cliente por nombre o email..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    className="pl-10 h-12 w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 rounded-xl"
-                />
+            {/* Buscador + alta de usuario */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50" />
+                    <Input
+                        type="text"
+                        name="admin-search-clients"
+                        autoComplete="off"
+                        data-lpignore="true"
+                        data-form-type="other"
+                        placeholder="Buscar cliente por nombre o email..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className="pl-10 h-12 w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 rounded-xl"
+                    />
+                </div>
+                <CreateUserButton />
             </div>
 
             <div className="flex flex-col gap-4">

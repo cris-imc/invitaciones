@@ -93,3 +93,53 @@ export async function adminUpdateUser(userId: string, data: { name?: string; ema
         return { success: false, error: error.message || "Failed to update user" };
     }
 }
+
+export async function adminCreateUser(data: { name: string; email: string; password: string; planTier?: "FREE" | "PREMIUM" }) {
+    try {
+        const session = await auth();
+
+        if (session?.user?.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const name = data.name?.trim();
+        const email = data.email?.trim().toLowerCase();
+        const password = data.password?.trim();
+
+        if (!name || !email || !password) {
+            return { success: false, error: "Nombre, email y contraseña son obligatorios" };
+        }
+        if (password.length < 6) {
+            return { success: false, error: "La contraseña debe tener al menos 6 caracteres" };
+        }
+
+        const existing = await prisma.user.findUnique({ where: { email } });
+        if (existing) {
+            return { success: false, error: "Ya existe una cuenta con ese email" };
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        // Igual que en el registro público: "Premium" acá es un credito para
+        // UNA invitacion premium, nunca un plan ilimitado (eso se asigna a
+        // mano despues, si corresponde).
+        const wantsPremium = data.planTier === "PREMIUM";
+
+        await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                planTier: "FREE",
+                premiumCredits: wantsPremium ? 1 : 0,
+                subscriptionStatus: wantsPremium ? "ACTIVE" : "TRIAL",
+                role: "CLIENT",
+            },
+        });
+
+        revalidatePath("/dashboard");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error creating user as admin:", error);
+        return { success: false, error: error.message || "Failed to create user" };
+    }
+}
