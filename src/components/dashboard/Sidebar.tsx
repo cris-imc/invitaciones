@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Archive, Home, LogOut, User, Plus } from "lucide-react";
+import { Archive, BarChart3, Home, LogOut, User, UserPlus, Plus } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
+import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
 
 const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
@@ -164,7 +165,16 @@ export function Sidebar() {
                     <span>Salir</span>
                 </button>
 
-                {role !== "ADMIN" && (
+                {role === "ADMIN" ? (
+                    <CreateUserButton
+                        renderTrigger={(onClick) => (
+                            <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nuevo Usuario">
+                                <UserPlus className="w-5 h-5" />
+                                <span>Alta</span>
+                            </button>
+                        )}
+                    />
+                ) : (
                     <Link
                         href="/dashboard/invitaciones"
                         className={`p-bottom-nav-item ${pathname === "/dashboard/invitaciones" ? "active" : ""}`}
@@ -198,7 +208,17 @@ export function Sidebar() {
                     <span>Datos</span>
                 </Link>
 
-                {role !== "ADMIN" && (
+                {role === "ADMIN" ? (
+                    <Link
+                        href="/dashboard/registros"
+                        className={`p-bottom-nav-item ${pathname === "/dashboard/registros" ? "active" : ""}`}
+                        onClick={(e) => handleNavClick(e, "/dashboard/registros")}
+                        aria-label="Registros"
+                    >
+                        <BarChart3 className="w-5 h-5" />
+                        <span>Registros</span>
+                    </Link>
+                ) : (
                     <NewInvitationButton
                         premiumCredits={premiumCredits}
                         totalInvitations={0}

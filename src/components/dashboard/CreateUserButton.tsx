@@ -8,7 +8,7 @@ import { UserPlus, Loader2, Mail, Lock, User } from "lucide-react";
 import { adminCreateUser } from "@/app/actions/admin";
 import { useToast } from "@/components/ui/Toast";
 
-export function CreateUserButton() {
+export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: () => void) => React.ReactNode } = {}) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -53,13 +53,15 @@ export function CreateUserButton() {
 
     return (
         <>
-            <Button
-                onClick={() => setOpen(true)}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white"
-            >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Nuevo Usuario
-            </Button>
+            {renderTrigger ? renderTrigger(() => setOpen(true)) : (
+                <Button
+                    onClick={() => setOpen(true)}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                >
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Nuevo Usuario
+                </Button>
+            )}
 
             <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
                 <DialogContent className="bg-black/90 border-white/10 text-white">

@@ -63,6 +63,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
+        // Para las estadisticas de admin (registros/tarjetas/logueos). Sesion
+        // en JWT, sin tabla de Session persistida, asi que esto es lo unico
+        // que deja rastro de cada login exitoso.
+        await prisma.loginEvent.create({ data: { userId: user.id } }).catch((e) => {
+          console.error("[AUTH] No se pudo registrar el login event:", e);
+        });
 
         return {
           id: user.id,

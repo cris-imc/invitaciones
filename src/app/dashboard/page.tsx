@@ -100,7 +100,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
         {/* Topbar */}
         <div className="p-topbar">
           <div>
-            <h2>Panel de Administrador 👋</h2>
+            <GreetingText userName={userName} />
             <p>Gestiona los clientes activos y sus invitaciones.</p>
           </div>
         </div>
