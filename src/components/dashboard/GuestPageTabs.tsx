@@ -7,7 +7,7 @@ import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPaymen
 import { SongModerationPanel } from "@/components/dashboard/SongModerationPanel";
 import { QuickEditPrice } from "@/components/dashboard/QuickEditPrice";
 import { LiveAdminPanel } from "@/components/dashboard/live/LiveAdminPanel";
-import { Lock, Info } from "lucide-react";
+import { Lock, Info, Camera } from "lucide-react";
 
 type Tab = "invitados" | "canciones" | "precio" | "agregar" | "live";
 
@@ -211,7 +211,10 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
           )}
           {tab === "live" && (
             <div className="bg-card border rounded-lg p-4 md:p-6">
-              <h2 className="text-xl font-semibold mb-6">LIVE 📸</h2>
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                LIVE
+                <Camera className="w-5 h-5 text-muted-foreground" strokeWidth={1.75} />
+              </h2>
               <LiveAdminPanel invitationId={invitationId} fechaEvento={fechaEvento} />
             </div>
           )}
