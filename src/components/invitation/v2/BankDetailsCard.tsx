@@ -78,9 +78,9 @@ export function BankDetailsCard({
               {expanded ? "Ocultar" : "Ver datos"}
             </span>
             {expanded ? (
-              <EyeOff className="w-[18px] h-[18px]" strokeWidth={1.75} />
-            ) : (
               <Eye className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            ) : (
+              <EyeOff className="w-[18px] h-[18px]" strokeWidth={1.75} />
             )}
           </button>
         )}
