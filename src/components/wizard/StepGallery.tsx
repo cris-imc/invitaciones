@@ -124,7 +124,8 @@ export function StepGallery() {
                                             <button
                                                 type="button"
                                                 onClick={() => removePhoto(index)}
-                                                className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                aria-label="Eliminar foto"
+                                                className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white rounded-full p-1.5 shadow-lg"
                                             >
                                                 <X className="w-4 h-4" />
                                             </button>
