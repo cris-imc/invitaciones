@@ -52,6 +52,7 @@ import {
   Lock,
   Plus,
   X,
+  Info,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
@@ -725,7 +726,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   return (
                     <div
                       key={guest.id}
-                      className="flex items-center justify-between p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors flex-wrap gap-3"
+                      className="relative flex items-center justify-between p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors flex-wrap gap-3"
                     >
                       <div>
                         <h4 className="font-semibold">{guest.name}</h4>
@@ -774,35 +775,16 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           <Pencil className="w-3.5 h-3.5" />
                         </Button>
 
-                        <div className="relative">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 px-3 rounded-full text-xs gap-1.5"
-                            title="Copiar enlace personalizado"
-                            onClick={() => copyLink(guest.uniqueToken)}
-                          >
-                            <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
-                            Copiar Link
-                          </Button>
-
-                          {guest.id === firstGuestId && !firstGuestHintDismissed && (
-                            <div className="absolute top-full right-0 mt-2 w-60 p-3 rounded-lg bg-gray-900 text-white text-xs shadow-lg z-50">
-                              <button
-                                type="button"
-                                onClick={dismissFirstGuestHint}
-                                className="absolute top-1.5 right-1.5 text-white/60 hover:text-white"
-                                title="Cerrar"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                              <p className="pr-4 leading-snug">
-                                <strong>¡Así se comparte!</strong> Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.
-                              </p>
-                              <div className="absolute -top-1.5 right-6 w-3 h-3 bg-gray-900 rotate-45"></div>
-                            </div>
-                          )}
-                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 rounded-full text-xs gap-1.5"
+                          title="Copiar enlace personalizado"
+                          onClick={() => copyLink(guest.uniqueToken)}
+                        >
+                          <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
+                          Copiar Link
+                        </Button>
 
                         <Button
                           variant="ghost"
@@ -814,6 +796,26 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
+
+                      {guest.id === firstGuestId && !firstGuestHintDismissed && (
+                        <div className="absolute top-full inset-x-0 mt-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-100 text-xs shadow-lg z-50">
+                          <button
+                            type="button"
+                            onClick={dismissFirstGuestHint}
+                            className="absolute top-1.5 right-1.5 text-amber-400/70 hover:text-amber-200"
+                            title="Cerrar"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                          <p className="pr-5 leading-relaxed flex items-start gap-2">
+                            <Info className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+                            <span>
+                              <strong className="text-amber-300">¡Así se comparte!</strong> Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.
+                            </span>
+                          </p>
+                          <div className="absolute -top-1.5 right-8 w-3 h-3 bg-amber-500/10 border-l border-t border-amber-500/30 rotate-45"></div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
