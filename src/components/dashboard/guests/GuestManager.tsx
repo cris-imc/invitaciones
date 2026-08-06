@@ -116,6 +116,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [guestToEdit, setGuestToEdit] = useState<Guest | null>(null);
   const [firstGuestHintDismissed, setFirstGuestHintDismissed] = useState(true);
   const [hintVisible, setHintVisible] = useState(false);
+  const [hintMounted, setHintMounted] = useState(false);
 
   // Edit Form States
   const [editGuestNombre, setEditGuestNombre] = useState("");
@@ -274,6 +275,20 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       clearTimeout(showTimeout);
     };
   }, [guests.length, firstGuestHintDismissed]);
+
+  // La burbuja solo debe existir en el DOM mientras es visible o se está
+  // desvaneciendo (dura la transición). El resto del tiempo (la mayor parte
+  // del ciclo) no debe montarse: al ser "position: absolute", aunque quede en
+  // opacity-0 sigue ocupando espacio y estira el scroll de la página aunque
+  // no se vea nada ahí.
+  useEffect(() => {
+    if (hintVisible) {
+      setHintMounted(true);
+      return;
+    }
+    const unmountTimeout = setTimeout(() => setHintMounted(false), 700);
+    return () => clearTimeout(unmountTimeout);
+  }, [hintVisible]);
 
   const fetchGuests = async () => {
     try {
@@ -827,7 +842,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             Copiar Link
                           </Button>
 
-                          {isFirstGuestHintCandidate && (
+                          {isFirstGuestHintCandidate && hintMounted && (
                             <div
                               className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 sm:bottom-auto sm:top-full sm:mt-2 sm:mb-0 sm:left-auto sm:right-0 sm:translate-x-0 w-64 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-amber-950 border border-amber-500/50 text-amber-100 text-xs shadow-xl z-50 transition-opacity duration-700 ${isHintActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                             >
