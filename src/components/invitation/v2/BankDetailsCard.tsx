@@ -70,7 +70,12 @@ export function BankDetailsCard({
             >
               {expanded ? "Ocultar" : "Ver datos"}
             </span>
-            <Switch checked={expanded} onCheckedChange={setExpanded} size="sm" />
+            <Switch
+              checked={expanded}
+              onCheckedChange={setExpanded}
+              size="lg"
+              style={expanded ? { backgroundColor: accentColor } : undefined}
+            />
           </label>
         )}
       </div>
