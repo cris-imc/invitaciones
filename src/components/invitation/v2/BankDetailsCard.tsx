@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ComponentType, type ReactNode } from "react";
-import { Switch } from "@/components/ui/switch";
+import { Eye, EyeOff } from "lucide-react";
 
 export interface BankAccountData {
   titulo: string;
@@ -60,9 +60,16 @@ export function BankDetailsCard({
           <span className="truncate">{data.titulo}</span>
         </div>
         {hasDetails && (
-          <label
-            className="flex items-center gap-2 cursor-pointer shrink-0"
-            onClick={(e) => e.stopPropagation()}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded((v) => !v);
+            }}
+            className="flex items-center gap-1.5 shrink-0 transition-opacity hover:opacity-70"
+            style={{ color: accentColor }}
+            aria-label={expanded ? "Ocultar datos" : "Ver datos"}
+            aria-pressed={expanded}
           >
             <span
               className="text-[9px] font-semibold uppercase tracking-wider hidden sm:inline"
@@ -70,13 +77,12 @@ export function BankDetailsCard({
             >
               {expanded ? "Ocultar" : "Ver datos"}
             </span>
-            <Switch
-              checked={expanded}
-              onCheckedChange={setExpanded}
-              size="lg"
-              style={expanded ? { backgroundColor: accentColor } : undefined}
-            />
-          </label>
+            {expanded ? (
+              <EyeOff className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            ) : (
+              <Eye className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            )}
+          </button>
         )}
       </div>
 

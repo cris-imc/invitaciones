@@ -920,15 +920,6 @@ export function ElegantTemplateBlue({ invitation, guest, isPersonalized = false 
           margin-bottom: 8px !important;
         }
 
-        /* Fuerza el switch de datos bancarios a ser redondo: el reset global
-           de bordes cuadrados de esta plantilla (border-radius:0 !important
-           en todos los <button>) rompe la forma del switch, que es un
-           <button role="switch">. */
-        #banco [data-slot="switch"],
-        #banco [data-slot="switch-thumb"] {
-          border-radius: 999px !important;
-        }
-
         /* Bank Section Overrides */
         #banco .t-kicker {
           text-align: left !important;
