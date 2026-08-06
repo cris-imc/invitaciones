@@ -7,6 +7,7 @@ import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
 import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
+import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
@@ -327,12 +328,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   const paymentEnabled = pagoTarjetaHabilitado;
   const paymentAmount  = paymentEnabled ? (Number((invitation as any).pagoTarjetaMonto ?? invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined)) : undefined;
   const guestPayStatus = paymentEnabled ? ((guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID") : undefined;
-
-  const showBankDetails = showGiftSection && Boolean(
-    invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || 
-    invitation.pagoTarjetaCbu || invitation.pagoTarjetaAlias || invitation.pagoTarjetaTitular || 
-    paymentAmount || regaloHabilitado
-  );
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: QuizQuestion[] = safeJson<QuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
@@ -712,121 +707,61 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
         {showGiftSection && (
           <SectionWrapper dark id="banco" delay={200}>
-            {bothAccounts ? (
-              <>
-                <p className="t-kicker">Datos Bancarios del Evento</p>
-                <h2>Transferencias & Regalos</h2>
-                <p style={{ opacity: 0.8, marginBottom: "20px" }} className="text-sm max-w-2xl">
-                  Disponemos de dos cuentas bancarias independientes: una para la acreditación / pago de tarjetas de la fiesta y otra para los regalos.
-                </p>
-                {showBankDetails && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left w-full mt-4 items-stretch">
-                    {/* Tarjeta 1: Pago de Tarjetas */}
-                    {pagoTarjetaHabilitado && (
-                      <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/20 shadow-sm space-y-3">
-                        <div className="flex items-center gap-2 font-semibold text-white/80 text-sm border-b border-white/10 pb-2">
-                          <span>💳</span>
-                          <span>{String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases")}</span>
-                        </div>
-                        {Boolean((invitation as any).pagoTarjetaMensaje) && (
-                          <p className="text-xs text-white/70 italic py-1">
-                            {String((invitation as any).pagoTarjetaMensaje)}
-                          </p>
-                        )}
-                        {Boolean((invitation as any).pagoTarjetaBanco) && (
-                          <InfoRow label="BANCO" value={String((invitation as any).pagoTarjetaBanco)} />
-                        )}
-                        {Boolean((invitation as any).pagoTarjetaCbu) && (
-                          <CopyField label="CBU / CVU" value={String((invitation as any).pagoTarjetaCbu)} />
-                        )}
-                        {Boolean((invitation as any).pagoTarjetaAlias) && (
-                          <CopyField label="ALIAS" value={String((invitation as any).pagoTarjetaAlias)} />
-                        )}
-                        {Boolean((invitation as any).pagoTarjetaTitular) && (
-                          <InfoRow label="TITULAR" value={String((invitation as any).pagoTarjetaTitular)} />
-                        )}
-                      </div>
-                    )}
+            <p className="t-kicker">{bothAccounts ? "Datos Bancarios del Evento" : "Datos Bancarios"}</p>
+            <h2>{bothAccounts ? "Transferencias & Regalos" : (pagoTarjetaHabilitado ? String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases") : String((invitation as any).regaloTitulo || "Regalos del Evento"))}</h2>
+            <p style={{ opacity: 0.8, marginBottom: "20px" }} className="text-sm max-w-2xl">
+              {bothAccounts
+                ? "Disponemos de dos cuentas bancarias independientes: una para la acreditación / pago de tarjetas de la fiesta y otra para los regalos."
+                : (pagoTarjetaHabilitado
+                    ? String((invitation as any).pagoTarjetaMensaje || "Cuenta para el pago de tarjetas y pases de la fiesta.")
+                    : String((invitation as any).regaloMensaje || "Esta cuenta se utilizará exclusivamente para quienes deseen realizar un regalo."))}
+            </p>
 
-                    {/* Tarjeta 2: Regalos */}
-                    {regaloHabilitado && (
-                      <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/20 shadow-sm space-y-3">
-                        <div className="flex items-center gap-2 font-semibold text-white/80 text-sm border-b border-white/10 pb-2">
-                          <span>🎁</span>
-                          <span>{String((invitation as any).regaloTitulo || "Regalos del Evento")}</span>
-                        </div>
-                        {Boolean((invitation as any).regaloMensaje) && (
-                          <p className="text-xs text-white/70 italic py-1">
-                            {String((invitation as any).regaloMensaje)}
-                          </p>
-                        )}
-                        {Boolean((invitation as any).regaloBanco) && (
-                          <InfoRow label="BANCO" value={String((invitation as any).regaloBanco)} />
-                        )}
-                        {Boolean((invitation as any).regaloCbu) && (
-                          <CopyField label="CBU / CVU" value={String((invitation as any).regaloCbu)} />
-                        )}
-                        {Boolean((invitation as any).regaloAlias) && (
-                          <CopyField label="ALIAS" value={String((invitation as any).regaloAlias)} />
-                        )}
-                        {Boolean((invitation as any).regaloTitular) && (
-                          <InfoRow label="TITULAR" value={String((invitation as any).regaloTitular)} />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                {(() => {
-                  const isTarjetaActive = pagoTarjetaHabilitado;
-                  const activeBank = isTarjetaActive ? {
+            <div className={`grid grid-cols-1 ${bothAccounts ? "md:grid-cols-2" : "max-w-lg"} gap-6 text-left w-full mt-4 items-stretch`}>
+              {pagoTarjetaHabilitado && (
+                <BankDetailsCard
+                  icon={<span>💳</span>}
+                  data={{
                     titulo: String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
                     mensaje: String((invitation as any).pagoTarjetaMensaje || ""),
                     banco: String((invitation as any).pagoTarjetaBanco || ""),
                     cbu: String((invitation as any).pagoTarjetaCbu || ""),
                     alias: String((invitation as any).pagoTarjetaAlias || ""),
                     titular: String((invitation as any).pagoTarjetaTitular || ""),
-                  } : {
+                  }}
+                  accentColor="#f59e0b"
+                  cardBg="rgba(255,255,255,0.05)"
+                  cardBorder="rgba(245,158,11,0.2)"
+                  textPrimary="rgba(255,255,255,0.8)"
+                  textSecondary="rgba(255,255,255,0.7)"
+                  rounded
+                  InfoRow={InfoRow}
+                  CopyField={CopyField}
+                />
+              )}
+
+              {regaloHabilitado && (
+                <BankDetailsCard
+                  icon={<span>🎁</span>}
+                  data={{
                     titulo: String((invitation as any).regaloTitulo || "Regalos del Evento"),
                     mensaje: String((invitation as any).regaloMensaje || ""),
                     banco: String((invitation as any).regaloBanco || ""),
                     cbu: String((invitation as any).regaloCbu || ""),
                     alias: String((invitation as any).regaloAlias || ""),
                     titular: String((invitation as any).regaloTitular || ""),
-                  };
-
-                  return (
-                    <>
-                      <p className="t-kicker">Datos Bancarios</p>
-                      <h2>{activeBank.titulo}</h2>
-                      <p style={{ opacity: 0.8, marginBottom: "20px" }} className="text-sm max-w-xl">
-                        {activeBank.mensaje || (isTarjetaActive ? "Cuenta para el pago de tarjetas y pases de la fiesta." : "Esta cuenta se utilizará exclusivamente para quienes deseen realizar un regalo.")}
-                      </p>
-                      {showBankDetails && (
-                        <div className="w-full max-w-lg text-left mt-4">
-                          <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/20 shadow-sm space-y-1">
-                            {Boolean(activeBank.banco) && (
-                              <InfoRow label="BANCO" value={activeBank.banco} />
-                            )}
-                            {Boolean(activeBank.cbu) && (
-                              <CopyField label="CBU / CVU" value={activeBank.cbu} />
-                            )}
-                            {Boolean(activeBank.alias) && (
-                              <CopyField label="ALIAS" value={activeBank.alias} />
-                            )}
-                            {Boolean(activeBank.titular) && (
-                              <InfoRow label="TITULAR" value={activeBank.titular} />
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
-              </>
-            )}
+                  }}
+                  accentColor="#f59e0b"
+                  cardBg="rgba(255,255,255,0.05)"
+                  cardBorder="rgba(245,158,11,0.2)"
+                  textPrimary="rgba(255,255,255,0.8)"
+                  textSecondary="rgba(255,255,255,0.7)"
+                  rounded
+                  InfoRow={InfoRow}
+                  CopyField={CopyField}
+                />
+              )}
+            </div>
           </SectionWrapper>
         )}
 
