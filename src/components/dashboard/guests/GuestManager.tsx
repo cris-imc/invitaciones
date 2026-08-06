@@ -115,6 +115,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [guestToDelete, setGuestToDelete] = useState<Guest | null>(null);
   const [guestToEdit, setGuestToEdit] = useState<Guest | null>(null);
   const [firstGuestHintDismissed, setFirstGuestHintDismissed] = useState(true);
+  const [hintVisible, setHintVisible] = useState(false);
 
   // Edit Form States
   const [editGuestNombre, setEditGuestNombre] = useState("");
@@ -241,6 +242,38 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     localStorage.setItem(`guestLinkHintDismissed_${slug}`, "1");
     setFirstGuestHintDismissed(true);
   };
+
+  // Mientras haya un único invitado (el primero creado) y no se haya cerrado la
+  // burbuja, la mostramos, la desvanecemos sola a los pocos segundos, y la
+  // volvemos a mostrar al minuto como recordatorio.
+  useEffect(() => {
+    if (firstGuestHintDismissed || guests.length !== 1) {
+      setHintVisible(false);
+      return;
+    }
+
+    let cancelled = false;
+    let hideTimeout: ReturnType<typeof setTimeout>;
+    let showTimeout: ReturnType<typeof setTimeout>;
+
+    const showThenScheduleHide = () => {
+      if (cancelled) return;
+      setHintVisible(true);
+      hideTimeout = setTimeout(() => {
+        if (cancelled) return;
+        setHintVisible(false);
+        showTimeout = setTimeout(showThenScheduleHide, 60000);
+      }, 8000);
+    };
+
+    showThenScheduleHide();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(hideTimeout);
+      clearTimeout(showTimeout);
+    };
+  }, [guests.length, firstGuestHintDismissed]);
 
   const fetchGuests = async () => {
     try {
@@ -723,10 +756,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   );
                   const waHref = `https://wa.me/?text=${waMsg}`;
 
+                  const isFirstGuestHintCandidate = guest.id === firstGuestId && guests.length === 1 && !firstGuestHintDismissed;
+                  const isHintActive = isFirstGuestHintCandidate && hintVisible;
+
                   return (
                     <div
                       key={guest.id}
-                      className="relative flex items-center justify-between p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors flex-wrap gap-3"
+                      className="flex items-center justify-between p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors flex-wrap gap-3"
                     >
                       <div>
                         <h4 className="font-semibold">{guest.name}</h4>
@@ -775,16 +811,43 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           <Pencil className="w-3.5 h-3.5" />
                         </Button>
 
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 px-3 rounded-full text-xs gap-1.5"
-                          title="Copiar enlace personalizado"
-                          onClick={() => copyLink(guest.uniqueToken)}
-                        >
-                          <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
-                          Copiar Link
-                        </Button>
+                        <div className="relative">
+                          {isHintActive && (
+                            <span className="absolute -inset-1.5 rounded-full bg-amber-400/60 blur-md animate-pulse pointer-events-none"></span>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={`relative h-8 px-3 rounded-full text-xs gap-1.5 transition-shadow duration-300 ${isHintActive ? "ring-2 ring-amber-400 shadow-[0_0_10px_2px_rgba(251,191,36,0.6)]" : ""}`}
+                            title="Copiar enlace personalizado"
+                            onClick={() => copyLink(guest.uniqueToken)}
+                          >
+                            <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
+                            Copiar Link
+                          </Button>
+
+                          {isFirstGuestHintCandidate && (
+                            <div
+                              className={`absolute top-full left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 mt-2 w-64 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-amber-950 border border-amber-500/50 text-amber-100 text-xs shadow-xl z-50 transition-opacity duration-700 ${isHintActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                            >
+                              <button
+                                type="button"
+                                onClick={dismissFirstGuestHint}
+                                className="absolute top-1.5 right-1.5 text-amber-400/70 hover:text-amber-200"
+                                title="Cerrar"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                              <p className="pr-5 leading-relaxed flex items-start gap-2">
+                                <Info className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+                                <span>
+                                  <strong className="text-amber-300">¡Así se comparte!</strong> Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.
+                                </span>
+                              </p>
+                              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 w-3 h-3 bg-amber-950 border-l border-t border-amber-500/50 rotate-45"></div>
+                            </div>
+                          )}
+                        </div>
 
                         <Button
                           variant="ghost"
@@ -796,26 +859,6 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
-
-                      {guest.id === firstGuestId && !firstGuestHintDismissed && (
-                        <div className="absolute top-full inset-x-0 mt-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-100 text-xs shadow-lg z-50">
-                          <button
-                            type="button"
-                            onClick={dismissFirstGuestHint}
-                            className="absolute top-1.5 right-1.5 text-amber-400/70 hover:text-amber-200"
-                            title="Cerrar"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                          <p className="pr-5 leading-relaxed flex items-start gap-2">
-                            <Info className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
-                            <span>
-                              <strong className="text-amber-300">¡Así se comparte!</strong> Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.
-                            </span>
-                          </p>
-                          <div className="absolute -top-1.5 right-8 w-3 h-3 bg-amber-500/10 border-l border-t border-amber-500/30 rotate-45"></div>
-                        </div>
-                      )}
                     </div>
                   );
                 })}
