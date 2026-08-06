@@ -37,11 +37,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        // We do logical delete for safety, so we just set isActive to false
-        await prisma.liveItem.update({
-            where: { id },
-            data: { isActive: false }
-        });
+        // Borrado real: "isActive: false" ya lo usa el toggle de "Ocultar" para
+        // moderacion (item pendiente/oculto pero visible en el panel), asi que
+        // reutilizarlo para "Eliminar" hacia que el item siguiera apareciendo
+        // en la lista del admin (con el badge de "Pendiente / Oculto") y
+        // volviera a aparecer en cada refresco de polling.
+        await prisma.liveItem.delete({ where: { id } });
 
         return new NextResponse("Deleted", { status: 200 });
     } catch (error) {
