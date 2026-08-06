@@ -431,7 +431,7 @@ export function ElegantTemplateOrange({ invitation, guest, isPersonalized = fals
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-screen w-full bg-gradient-to-b from-[#0d1412] via-[#121c19] to-[#090e0d] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#0d1412] via-[#121c19] to-[#090e0d] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Decorative Background Overlay */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-25 bg-cover bg-center"

@@ -43,7 +43,7 @@ function InvitationStyleApplicator({ children }: { children: ReactNode }) {
   return (
     <div 
       style={styleVariables}
-      className={`min-h-screen w-full bg-background text-foreground font-sans ${fontConfig && fontConfig.id === 'playfair' ? 'font-serif' : ''}`}
+      className={`min-h-dvh w-full bg-background text-foreground font-sans ${fontConfig && fontConfig.id === 'playfair' ? 'font-serif' : ''}`}
     >
       {/* Inject Google Font Link */}
       {fontConfig && (

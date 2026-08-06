@@ -27,7 +27,7 @@ function WizardBootstrap() {
 
 export default function CrearInvitacionPage() {
     return (
-        <div className="py-8 px-4 md:px-8 max-w-4xl mx-auto min-h-screen">
+        <div className="py-8 px-4 md:px-8 max-w-4xl mx-auto min-h-dvh">
             <Suspense fallback={null}>
                 <WizardBootstrap />
             </Suspense>

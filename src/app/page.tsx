@@ -12,7 +12,7 @@ export default async function Home() {
   const registerUrl = session ? "/dashboard?new=true" : "/register";
   const premiumUrl = session ? "/dashboard?new=true&plan=premium" : "/register?plan=premium";
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black p-0 md:p-6">
+    <div className="flex min-h-dvh items-center justify-center bg-black p-0 md:p-6">
       <div className="landing w-full max-w-[1180px]">
         {/* NAV */}
         <LandingNav registerUrl={registerUrl} isLoggedIn={Boolean(session)} />

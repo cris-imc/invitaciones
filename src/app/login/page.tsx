@@ -47,7 +47,7 @@ export default function LoginPage() {
 
 
   return (
-      <div className="min-h-screen py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative">
+      <div className="min-h-dvh py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative">
         <Link href="/" className="absolute top-6 left-6 md:top-12 md:left-12 flex items-center gap-2 text-sm text-[var(--paper)] opacity-70 hover:opacity-100 transition-opacity">
           <ArrowLeft className="w-4 h-4" />
           Volver al inicio

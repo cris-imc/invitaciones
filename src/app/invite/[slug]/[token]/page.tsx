@@ -195,7 +195,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
     // Security check: Ensure token matches the invitation
     if (!guest || guest.invitationId !== String(validInvitation.id)) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+            <div className="min-h-dvh flex flex-col items-center justify-center p-6 text-center">
                 <h1 className="text-2xl font-bold mb-2">Enlace no válido</h1>
                 <p className="text-muted-foreground">
                     El enlace que utilizaste no parece ser correcto o ha expirado.

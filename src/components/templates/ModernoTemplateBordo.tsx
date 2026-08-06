@@ -463,7 +463,7 @@ export function ModernoTemplateBordo({ invitation, guest, isPersonalized = false
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-screen w-full bg-gradient-to-b bg-[#120406] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b bg-[#120406] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Decorative Background Overlay */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-25 bg-cover bg-center"

@@ -8,7 +8,7 @@ export default function DashboardLayout({
 }) {
     return (
         <AuthProvider>
-            <div className="flex min-h-screen justify-center md:py-6 md:px-6 bg-black">
+            <div className="flex min-h-dvh justify-center md:py-6 md:px-6 bg-black">
                 <div className="panel w-full max-w-[1180px]">
                     <Sidebar />
                     <main className="p-main relative">

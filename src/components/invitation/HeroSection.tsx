@@ -60,7 +60,7 @@ export function HeroSection({
         <div className="relative">
             {/* Hero Section */}
             <div
-                className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+                className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden"
                 style={{
                     backgroundColor: '#fafafa',
                 }}

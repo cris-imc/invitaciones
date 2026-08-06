@@ -47,18 +47,18 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
         return () => clearInterval(interval);
     }, [session, token]);
 
-    if (loading) return <div className="min-h-screen bg-[#050807] flex items-center justify-center text-white">Cargando...</div>;
+    if (loading) return <div className="min-h-dvh bg-[#050807] flex items-center justify-center text-white">Cargando...</div>;
     
     if (session === false || !session.isActive) {
         return (
-            <div className="min-h-screen bg-[#050807] flex items-center justify-center text-white/50 font-serif text-2xl">
+            <div className="min-h-dvh bg-[#050807] flex items-center justify-center text-white/50 font-serif text-2xl">
                 El LIVE está inactivo o finalizó.
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#050807] text-[#F6F3EC] p-8 flex flex-col font-sans">
+        <div className="min-h-dvh bg-[#050807] text-[#F6F3EC] p-8 flex flex-col font-sans">
             <header className="flex justify-between items-start border-b border-[#F6F3EC]/10 pb-8 mb-8">
                 <div>
                     <div className="flex items-center gap-2 mb-2 text-[#C79A4B] text-xs font-mono uppercase tracking-widest">

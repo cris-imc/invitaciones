@@ -177,12 +177,12 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
         }
     };
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center bg-black text-white"><Loader2 className="animate-spin" /></div>;
-    if (!session) return <div className="min-h-screen flex items-center justify-center bg-black text-white p-6 text-center">La sesión LIVE no existe o ha sido cerrada por el anfitrión.</div>;
+    if (loading) return <div className="min-h-dvh flex items-center justify-center bg-black text-white"><Loader2 className="animate-spin" /></div>;
+    if (!session) return <div className="min-h-dvh flex items-center justify-center bg-black text-white p-6 text-center">La sesión LIVE no existe o ha sido cerrada por el anfitrión.</div>;
 
     if (!hasName) {
         return (
-            <div className="min-h-screen bg-[#050807] flex flex-col items-center justify-center p-6 text-center text-white">
+            <div className="min-h-dvh bg-[#050807] flex flex-col items-center justify-center p-6 text-center text-white">
                 <div className="w-16 h-16 rounded-full bg-[#182420] border border-[#F6F3EC]/10 flex items-center justify-center mb-6">
                     <Camera className="w-8 h-8 text-[#C79A4B]" />
                 </div>
@@ -209,7 +209,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
     }
 
     return (
-        <div className="min-h-screen bg-[#050807] text-[#F6F3EC] pb-24 font-sans">
+        <div className="min-h-dvh bg-[#050807] text-[#F6F3EC] pb-24 font-sans">
             {errorModal && (
                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                     <div className="bg-[#182420] border border-white/10 rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl">

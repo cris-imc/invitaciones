@@ -463,7 +463,7 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-screen w-full bg-gradient-to-b from-[#12181A] via-[#161F22] to-[#0B1112] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#12181A] via-[#161F22] to-[#0B1112] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Decorative Background Overlay */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-25 bg-cover bg-center"
