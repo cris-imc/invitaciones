@@ -327,6 +327,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         setNewGuestChildCount(0);
         setNewGuestIsExempt(false);
         setNewIndividualCategory('adult');
+        setNewGuestType(null);
+        setAddGuestOpen(false);
         showToast("Invitado agregado exitosamente", "success");
       } else {
         showToast("Error al agregar invitado", "error");
