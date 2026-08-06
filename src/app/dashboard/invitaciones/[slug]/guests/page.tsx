@@ -41,27 +41,28 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         </Button>
       </Link>
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Gestión del Evento</h1>
-          <p className="text-muted-foreground text-sm">{invitation.nombreEvento}</p>
+      {/* Header — siempre en fila, título y cupos libres uno al lado del
+          otro, también en mobile (apilados se veía desprolijo) */}
+      <div className="flex flex-row items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg md:text-2xl font-bold tracking-tight truncate">Gestión del Evento</h1>
+          <p className="text-muted-foreground text-xs md:text-sm truncate">{invitation.nombreEvento}</p>
         </div>
 
         <div
-          className="flex items-center gap-4 px-5 py-3 rounded-2xl border self-start md:self-auto"
+          className="flex items-center gap-2.5 md:gap-4 px-3 py-2 md:px-5 md:py-3 rounded-2xl border shrink-0"
           style={{ backgroundColor: "var(--ink)", borderColor: "var(--ink-2)", color: "var(--on-ink)" }}
         >
           <div className="text-right">
-            <span className="block text-[10px] uppercase tracking-widest font-bold opacity-60 mb-1">Cupos Libres</span>
-            <strong className="text-2xl md:text-3xl leading-none" style={{ color: "var(--accent)", fontFamily: "var(--font-display)" }}>
+            <span className="block text-[8px] md:text-[10px] uppercase tracking-widest font-bold opacity-60 mb-0.5 md:mb-1 whitespace-nowrap">Cupos Libres</span>
+            <strong className="text-lg md:text-3xl leading-none" style={{ color: "var(--accent)", fontFamily: "var(--font-display)" }}>
               {remaining}
             </strong>
           </div>
           {maxGuests !== null && (
-            <div className="pl-4 border-l text-right" style={{ borderColor: "var(--ink-2)" }}>
-              <span className="block text-[10px] uppercase tracking-widest font-bold opacity-60 mb-1">Total</span>
-              <strong className="text-2xl md:text-3xl leading-none" style={{ fontFamily: "var(--font-display)" }}>
+            <div className="pl-2.5 md:pl-4 border-l text-right" style={{ borderColor: "var(--ink-2)" }}>
+              <span className="block text-[8px] md:text-[10px] uppercase tracking-widest font-bold opacity-60 mb-0.5 md:mb-1">Total</span>
+              <strong className="text-lg md:text-3xl leading-none" style={{ fontFamily: "var(--font-display)" }}>
                 {maxGuestsStr}
               </strong>
             </div>
