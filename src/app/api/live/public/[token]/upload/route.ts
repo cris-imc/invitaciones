@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import { prisma } from '@/lib/db';
+import { getUploadsDir } from '@/lib/uploads';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
     try {
@@ -65,14 +65,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         const ext = type === 'PHOTO' ? '.jpg' : '.webm'; // Assume converted/compressed forms if needed
         const filename = `live-${uniqueSuffix}${ext}`;
 
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'live');
+        const uploadDir = getUploadsDir('live');
         try {
             await mkdir(uploadDir, { recursive: true });
         } catch (e) {
             // Ignore error if it exists
         }
 
-        const filepath = path.join(uploadDir, filename);
+        const filepath = getUploadsDir('live', filename);
         await writeFile(filepath, buffer);
 
         const fileUrl = `/uploads/live/${filename}`;

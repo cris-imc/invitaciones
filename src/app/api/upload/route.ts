@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { getUploadsDir } from '@/lib/uploads';
 
 export async function POST(request: NextRequest) {
     try {
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
         const filename = uniqueSuffix + '-' + originalName;
 
         // Ensure uploads directory exists (in case it wasn't created yet or we are in a fresh env)
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+        const uploadDir = getUploadsDir();
         try {
             await mkdir(uploadDir, { recursive: true });
         } catch (e) {

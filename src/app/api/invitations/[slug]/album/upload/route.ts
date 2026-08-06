@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { writeFile, mkdir } from "fs/promises";
 import { checkPlanLimits, PlanTier } from "@/lib/plan-limits";
+import { getUploadsDir } from "@/lib/uploads";
 
 export async function POST(
     request: NextRequest,
@@ -82,7 +82,10 @@ export async function POST(
         const timestamp = Date.now();
         const originalName = file.name.replace(/\s+/g, "-");
         const filename = `${timestamp}-${originalName}`;
-        const filepath = path.join(process.cwd(), "public", "uploads", filename);
+
+        const uploadDir = getUploadsDir();
+        await mkdir(uploadDir, { recursive: true }).catch(() => {});
+        const filepath = getUploadsDir(filename);
 
         await writeFile(filepath, buffer);
 
