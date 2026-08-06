@@ -21,6 +21,7 @@ interface Props {
   precioNino: unknown;
   rsvpEnabled: boolean;
   planTier: string;
+  fechaEvento: string;
 }
 
 const TAB_DESCRIPTIONS: Record<Tab, string> = {
@@ -56,7 +57,7 @@ function AnimatedTabDescription({ text }: { text: string }) {
   );
 }
 
-export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier }: Props) {
+export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier, fechaEvento }: Props) {
   const [tab, setTab] = useState<Tab>("agregar");
 
   const tabs: { id: Tab; label: string; highlight?: "gold" | "live" | "default" }[] = [
@@ -189,7 +190,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
           {tab === "live" && (
             <div className="bg-card border rounded-lg p-4 md:p-6">
               <h2 className="text-xl font-semibold mb-6">LIVE 📸</h2>
-              <LiveAdminPanel invitationId={invitationId} />
+              <LiveAdminPanel invitationId={invitationId} fechaEvento={fechaEvento} />
             </div>
           )}
         </motion.div>

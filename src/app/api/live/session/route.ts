@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { nanoid } from "nanoid";
+import { getEventStatus } from "@/lib/expiration";
 
 export async function GET(req: Request) {
     try {
@@ -71,7 +72,15 @@ export async function POST(req: Request) {
             where: { invitationId },
         });
 
+        // El LIVE solo se puede ACTIVAR el día del evento, salvo para admins.
+        // Apagarlo nunca está restringido.
+        const isAdmin = session.user.role === "ADMIN";
+        const canActivate = isAdmin || getEventStatus(invitation.fechaEvento) === "EVENT_DAY";
+
         if (action === "create" && !liveSession) {
+            if (!canActivate) {
+                return new NextResponse("El LIVE solo se puede activar el día del evento.", { status: 403 });
+            }
             liveSession = await prisma.liveSession.create({
                 data: {
                     invitationId,
@@ -80,6 +89,10 @@ export async function POST(req: Request) {
                 },
             });
         } else if (action === "toggle" && liveSession) {
+            const activating = !liveSession.isActive;
+            if (activating && !canActivate) {
+                return new NextResponse("El LIVE solo se puede activar el día del evento.", { status: 403 });
+            }
             liveSession = await prisma.liveSession.update({
                 where: { invitationId },
                 data: {

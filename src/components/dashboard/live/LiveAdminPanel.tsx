@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Trash2, ExternalLink, RefreshCw, Power } from "lucide-react";
 import {
@@ -11,6 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { getEventStatus } from "@/lib/expiration";
 
 interface LiveItem {
     id: string;
@@ -29,12 +31,17 @@ interface LiveSession {
     items: LiveItem[];
 }
 
-export function LiveAdminPanel({ invitationId }: { invitationId: string }) {
+export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: string; fechaEvento: string }) {
     const [session, setSession] = useState<LiveSession | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+    const { data: authSession } = useSession();
+    const isAdmin = authSession?.user?.role === "ADMIN" || authSession?.user?.planTier === "ADMIN";
+    const isEventDay = getEventStatus(fechaEvento) === "EVENT_DAY";
+    const canActivate = isAdmin || isEventDay;
 
     const fetchSession = useCallback(async () => {
         try {
@@ -64,6 +71,11 @@ export function LiveAdminPanel({ invitationId }: { invitationId: string }) {
     }, [fetchSession, session?.isActive]);
 
     const toggleLive = async () => {
+        const activating = !session?.isActive;
+        if (activating && !canActivate) {
+            setErrorMsg("El LIVE solo se puede activar el día del evento.");
+            return;
+        }
         setLoading(true);
         try {
             const res = await fetch("/api/live/session", {
@@ -152,27 +164,37 @@ export function LiveAdminPanel({ invitationId }: { invitationId: string }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border flex-wrap gap-3">
                 <div>
                     <h3 className="font-semibold flex items-center gap-2">
                         Estado del LIVE
                         {isActive ? (
                             <span className="flex h-3 w-3 relative">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                             </span>
                         ) : (
-                            <span className="h-3 w-3 rounded-full bg-gray-400"></span>
+                            <span className="h-3 w-3 rounded-full bg-red-500"></span>
                         )}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
                         {isActive ? "Los invitados pueden subir contenido ahora." : "El LIVE está apagado."}
                     </p>
+                    {!isActive && !canActivate && (
+                        <p className="text-xs text-amber-500 mt-1">
+                            Se habilita el día del evento.
+                        </p>
+                    )}
+                    {!isActive && isAdmin && !isEventDay && (
+                        <p className="text-xs text-amber-400 mt-1">
+                            👑 Modo Administrador: podés activarlo aunque no sea el día del evento.
+                        </p>
+                    )}
                 </div>
-                <Button 
-                    onClick={toggleLive} 
+                <Button
+                    onClick={toggleLive}
                     variant={isActive ? "destructive" : "default"}
-                    disabled={loading}
+                    disabled={loading || (!isActive && !canActivate)}
                     className="gap-2"
                 >
                     <Power className="w-4 h-4" />
