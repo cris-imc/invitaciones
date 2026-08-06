@@ -503,21 +503,16 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           </CardHeader>
           <CardContent>
             {!addGuestOpen ? (
-              <div className="relative">
-                {!isLoading && guests.length === 0 && (
-                  <span className="absolute -inset-1.5 rounded-xl bg-amber-400/50 blur-md pointer-events-none animate-heartbeat-halo"></span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setAddGuestOpen(true)}
-                  className={`relative w-full flex flex-col items-center justify-center gap-2 py-10 rounded-xl border-2 border-dashed border-muted-foreground/30 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors ${!isLoading && guests.length === 0 ? "animate-heartbeat-ring" : ""}`}
-                >
-                  <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-                    <Plus className="w-5 h-5" />
-                  </span>
-                  <span className="font-medium">Agrega un invitado</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setAddGuestOpen(true)}
+                className="w-full flex flex-col items-center justify-center gap-2 py-10 rounded-xl border-2 border-dashed border-muted-foreground/30 text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors"
+              >
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                  <Plus className="w-5 h-5" />
+                </span>
+                <span className="font-medium">Agrega un invitado</span>
+              </button>
             ) : newGuestType === null ? (
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">¿Qué tipo de invitación querés crear?</p>
