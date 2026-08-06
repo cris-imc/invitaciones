@@ -51,6 +51,7 @@ import {
   Pencil,
   Lock,
   Plus,
+  Minus,
   X,
   Info,
 } from "lucide-react";
@@ -92,6 +93,46 @@ function parseGuestName(guest: Pick<Guest, "name" | "type">): { nombre: string; 
   const parts = guest.name.trim().split(/\s+/).filter(Boolean);
   if (parts.length <= 1) return { nombre: guest.name.trim(), apellido: "" };
   return { nombre: parts.slice(0, -1).join(" "), apellido: parts[parts.length - 1] };
+}
+
+// Selector +/- para las cantidades de adultos/adolescentes/niños: en mobile,
+// tipear en un input numérico es incómodo, así que se suma/resta con botones.
+function QuantityStepper({
+  value,
+  onChange,
+  min = 0,
+  max = 20,
+  ariaLabel,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  ariaLabel: string;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-4">
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(min, value - 1))}
+        disabled={value <= min}
+        aria-label={`Restar ${ariaLabel}`}
+        className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-muted-foreground/30 text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+      >
+        <Minus className="w-4 h-4" />
+      </button>
+      <span className="w-8 text-center text-base font-semibold tabular-nums">{value}</span>
+      <button
+        type="button"
+        onClick={() => onChange(Math.min(max, value + 1))}
+        disabled={value >= max}
+        aria-label={`Sumar ${ariaLabel}`}
+        className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-muted-foreground/30 text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+      >
+        <Plus className="w-4 h-4" />
+      </button>
+    </div>
+  );
 }
 
 interface GuestManagerProps {
@@ -661,8 +702,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       />
                     </div>
                     {newAdultsEnabled && (
-                      <Input id="adultCount" type="number" min="1" max="20" value={newGuestAdultCount}
-                        onChange={(e) => setNewGuestAdultCount(parseInt(e.target.value) || 1)} />
+                      <QuantityStepper value={newGuestAdultCount} onChange={setNewGuestAdultCount} min={1} max={20} ariaLabel="adultos" />
                     )}
                   </div>
 
@@ -680,8 +720,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       />
                     </div>
                     {newTeensEnabled && (
-                      <Input id="teenCount" type="number" min="0" max="20" value={newGuestTeenCount}
-                        onChange={(e) => setNewGuestTeenCount(parseInt(e.target.value) || 0)} />
+                      <QuantityStepper value={newGuestTeenCount} onChange={setNewGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" />
                     )}
                   </div>
 
@@ -699,8 +738,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       />
                     </div>
                     {newChildrenEnabled && (
-                      <Input id="childCount" type="number" min="0" max="20" value={newGuestChildCount}
-                        onChange={(e) => setNewGuestChildCount(parseInt(e.target.value) || 0)} />
+                      <QuantityStepper value={newGuestChildCount} onChange={setNewGuestChildCount} min={0} max={20} ariaLabel="niños" />
                     )}
                   </div>
                 </div>
@@ -1065,8 +1103,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     />
                   </div>
                   {editAdultsEnabled && (
-                    <Input id="editAdultCount" type="number" min="1" max="20" value={editGuestAdultCount}
-                      onChange={(e) => setEditGuestAdultCount(parseInt(e.target.value) || 1)} />
+                    <QuantityStepper value={editGuestAdultCount} onChange={setEditGuestAdultCount} min={1} max={20} ariaLabel="adultos" />
                   )}
                 </div>
 
@@ -1084,8 +1121,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     />
                   </div>
                   {editTeensEnabled && (
-                    <Input id="editTeenCount" type="number" min="0" max="20" value={editGuestTeenCount}
-                      onChange={(e) => setEditGuestTeenCount(parseInt(e.target.value) || 0)} />
+                    <QuantityStepper value={editGuestTeenCount} onChange={setEditGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" />
                   )}
                 </div>
 
@@ -1103,8 +1139,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     />
                   </div>
                   {editChildrenEnabled && (
-                    <Input id="editChildCount" type="number" min="0" max="20" value={editGuestChildCount}
-                      onChange={(e) => setEditGuestChildCount(parseInt(e.target.value) || 0)} />
+                    <QuantityStepper value={editGuestChildCount} onChange={setEditGuestChildCount} min={0} max={20} ariaLabel="niños" />
                   )}
                 </div>
               </div>
