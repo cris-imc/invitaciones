@@ -17,7 +17,7 @@ import Link from "next/link";
 
 const WHATSAPP_SUPPORT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent("Hola! Quiero comprar créditos premium para crear una invitación")}`;
 
-export function NewInvitationButton({ premiumCredits, totalInvitations, planTier, autoOpen = false }: { premiumCredits: number, totalInvitations: number, planTier?: string, autoOpen?: boolean }) {
+export function NewInvitationButton({ premiumCredits, totalInvitations, planTier, autoOpen = false, renderTrigger }: { premiumCredits: number, totalInvitations: number, planTier?: string, autoOpen?: boolean, renderTrigger?: (onClick: () => void) => React.ReactNode }) {
     const [open, setOpen] = useState(autoOpen);
     const [showError, setShowError] = useState(false);
     const router = useRouter();
@@ -48,10 +48,12 @@ export function NewInvitationButton({ premiumCredits, totalInvitations, planTier
 
     return (
         <>
-            <Button onClick={handleNewClick} className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
-                + Nueva invitación
-            </Button>
-            
+            {renderTrigger ? renderTrigger(handleNewClick) : (
+                <Button onClick={handleNewClick} className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
+                    + Nueva invitación
+                </Button>
+            )}
+
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent>
                     <DialogHeader>

@@ -161,7 +161,9 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
             )}
           </p>
         </div>
-        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} planTier={dbUser?.planTier} autoOpen={isAutoOpen} />
+        <div className="hidden md:block">
+          <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} planTier={dbUser?.planTier} autoOpen={isAutoOpen} />
+        </div>
       </div>
 
       {/* KPIs */}
