@@ -5,14 +5,14 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { BarChart, Heart, Home, LogOut, Menu, X, User } from "lucide-react";
+import { BarChart, Archive, Home, LogOut, Menu, X, User } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
-    { title: "Mis Invitaciones", href: "/dashboard/invitaciones", icon: Heart },
+    { title: "Inactivas", href: "/dashboard/invitaciones", icon: Archive },
     { title: "Mis Datos", href: "/dashboard/perfil", icon: User },
 ];
 

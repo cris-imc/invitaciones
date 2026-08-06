@@ -10,6 +10,7 @@ import { InvitationCard } from "@/components/dashboard/InvitationCard";
 import { DeleteInvitationButton } from "@/components/dashboard/DeleteInvitationButton";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
+import { getEventStatus } from "@/lib/expiration";
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -39,7 +40,14 @@ async function getInvitations() {
         }
     });
 
-    const invitations = invitationsData.map(inv => ({
+    // Solo invitaciones inactivas: no-ACTIVA (borrador/finalizada), o que ya
+    // pasaron los 3 meses de vigencia posteriores a la fecha del evento
+    // (aunque el estado siga diciendo ACTIVA en la base).
+    const inactiveInvitationsData = invitationsData.filter(
+        (inv) => inv.estado !== "ACTIVA" || getEventStatus(inv.fechaEvento) === "EXPIRED"
+    );
+
+    const invitations = inactiveInvitationsData.map(inv => ({
         ...inv,
         _count: {
             guests: inv.guests.reduce((sum, g) => sum + (g.attendingCount || 0), 0)
@@ -54,9 +62,9 @@ export default async function InvitacionesPage() {
         <>
             <div className="p-topbar">
                 <div>
-                    <h2>Mis Invitaciones</h2>
+                    <h2>Invitaciones Inactivas</h2>
                     <p>
-                        Gestiona tus eventos y monitorea las confirmaciones.
+                        Invitaciones en borrador, finalizadas, o que ya vencieron (3 meses después del evento).
                         {dbUser && (
                             <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
                                 {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE' ?
@@ -145,8 +153,7 @@ export default async function InvitacionesPage() {
                     })
                 ) : (
                     <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
-                        <p className="text-muted-foreground mb-4 font-ui">No tienes invitaciones. Comienza creando tu primera invitación para un evento.</p>
-                        <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} />
+                        <p className="text-muted-foreground font-ui">No tenés invitaciones inactivas. Las vas a encontrar acá cuando queden en borrador, finalicen, o venzan 3 meses después del evento.</p>
                     </div>
                 )}
             </div>

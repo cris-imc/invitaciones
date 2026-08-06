@@ -10,6 +10,7 @@ import { DeleteInvitationButton } from "@/components/dashboard/DeleteInvitationB
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { GreetingText } from "@/components/dashboard/GreetingText";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
+import { getEventStatus } from "@/lib/expiration";
 
 async function getDashboardStats(userId: string) {
   if (!userId) throw new Error("No user ID provided");
@@ -58,7 +59,10 @@ async function getDashboardStats(userId: string) {
     totalPending,
     totalSongsPending,
     totalPremiumUsadas,
-    recentInvitations: invitations.filter((i) => i.estado === "ACTIVA").slice(0, 3),
+    activeInvitationsList: invitations.filter((i) => i.estado === "ACTIVA"),
+    inactiveCount: invitations.filter(
+      (i) => i.estado !== "ACTIVA" || getEventStatus(i.fechaEvento) === "EXPIRED"
+    ).length,
   };
 }
 
@@ -171,14 +175,14 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
         ))}
       </div>
 
-      {/* Invitaciones recientes */}
+      {/* Invitaciones activas */}
       <div className="p-list-head">
-        <h3>Tus invitaciones recientes</h3>
+        <h3>Tus invitaciones activas</h3>
       </div>
 
       <div className="flex flex-col gap-4">
-        {stats.recentInvitations.length > 0 ? (
-          stats.recentInvitations.map((inv) => {
+        {stats.activeInvitationsList.length > 0 ? (
+          stats.activeInvitationsList.map((inv) => {
             const confirmed = inv.guests.filter((g) => g.status === "CONFIRMED");
             const people = confirmed.reduce((s, g) => s + g.attendingCount, 0);
             const mono = inv.nombreEvento.substring(0, 1).toUpperCase();
@@ -231,16 +235,16 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
           })
         ) : (
           <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
-            <p className="text-muted-foreground mb-4 font-ui">Todavía no tenés invitaciones.</p>
+            <p className="text-muted-foreground mb-4 font-ui">Todavía no tenés invitaciones activas.</p>
             <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} planTier={dbUser?.planTier} autoOpen={isAutoOpen} />
           </div>
         )}
       </div>
 
-      {stats.totalInvitations > 3 && (
+      {stats.inactiveCount > 0 && (
         <div className="mt-4 text-center">
           <Link href="/dashboard/invitaciones" className="text-accent font-ui font-semibold text-sm hover:underline">
-            Ver todas las invitaciones →
+            Ver invitaciones inactivas ({stats.inactiveCount}) →
           </Link>
         </div>
       )}

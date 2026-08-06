@@ -33,7 +33,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/dashboard/invitaciones">
+          <Link href="/dashboard">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="w-4 h-4" />
             </Button>
