@@ -161,6 +161,13 @@ export function Sidebar() {
                 </button>
             </header>
 
+            {/* ── MOBILE BOTTOM NAV (barra curva con botón de Inicio) ── */}
+            <div className="p-bottom-nav md:hidden">
+                <Link href="/dashboard" className="p-bottom-nav-home" aria-label="Ir a Inicio">
+                    <Home className="w-5 h-5" />
+                </Link>
+            </div>
+
             {/* ── MOBILE DRAWER OVERLAY ── */}
             {open && (
                 <div className="p-drawer-overlay" onClick={() => setOpen(false)} />

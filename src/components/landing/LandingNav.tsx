@@ -11,7 +11,7 @@ interface LandingNavProps {
   isLoggedIn: boolean;
 }
 
-const LINKS = [
+const BASE_LINKS = [
   { href: "#plantillas", label: "Plantillas" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#precios", label: "Precios" },
@@ -20,6 +20,13 @@ const LINKS = [
 export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Logueado: agrega "Inicio" (vuelve al dashboard) al ppio de los links,
+  // tanto en la barra de escritorio como en el drawer mobile. Deslogueado,
+  // no tiene sentido mostrarlo (no hay a dónde volver todavía).
+  const LINKS = isLoggedIn
+    ? [{ href: "/dashboard", label: "Inicio" }, ...BASE_LINKS]
+    : BASE_LINKS;
 
   // El drawer se porta a document.body: PageTransition envuelve toda la app
   // en un motion.div con filter (blur en la animación de entre-páginas), y

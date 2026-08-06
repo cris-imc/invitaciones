@@ -947,10 +947,14 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 
 @media (max-width: 767px) {
   .landing{ border-radius:0; border:none; }
-  .l-nav{ padding:16px 18px; gap:10px; }
+  .l-nav{
+    padding:16px 18px; gap:10px;
+    position:fixed; top:0; left:0; right:0; z-index:60;
+    background:var(--ink); border-bottom:1px solid var(--line);
+  }
   .l-nav-links{ display:none; }
   .l-hamburger{ display:flex; }
-  .l-hero{ grid-template-columns:1fr; padding:36px 20px 8px; gap:32px; }
+  .l-hero{ grid-template-columns:1fr; padding:96px 20px 8px; gap:32px; }
   .l-hero h1{ font-size:42px; }
   .l-hero p.sub{ max-width:none; font-size:14.5px; }
   .l-hero-ctas{ flex-wrap:wrap; }
@@ -1018,6 +1022,40 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 }
 .p-hamburger:hover{ background: rgba(246,243,236,.08); }
 
+/* Barra curva inferior (mobile) con el botón circular de Inicio */
+.p-bottom-nav{
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 55;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 999px;
+  background: rgba(15, 22, 19, 0.75);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.p-bottom-nav-home{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.p-bottom-nav-home:hover,
+.p-bottom-nav-home:active{
+  transform: scale(0.94);
+}
+
 /* Drawer overlay */
 .p-drawer-overlay{
   position: fixed;
@@ -1068,8 +1106,9 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
     min-height: calc(var(--vh, 1vh) * 100);
   }
   .p-side{ display: none; }
-  .p-main{ padding: 110px 20px 40px !important; }
+  .p-main{ padding: 110px 20px 104px !important; }
   .p-mobile-topbar{ display: flex; }
+  .p-bottom-nav{ display: flex; }
   .p-stats{ grid-template-columns: repeat(2, 1fr) !important; }
   .p-topbar { flex-direction: column; align-items: flex-start; gap: 16px; }
   .p-topbar p { white-space: normal; overflow: visible; }
