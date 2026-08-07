@@ -108,30 +108,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // interno en vez del dominio público, incluso con trustHost/AUTH_URL
     // seteados (ver https://github.com/nextauthjs/next-auth/issues/12117).
     //
-    // El fix anterior forzaba SIEMPRE la base a partir de AUTH_URL/
-    // NEXT_PUBLIC_APP_URL, ignorando baseUrl por completo -- eso rompió el
-    // login apenas se sumó un dominio propio (altainvitacion.com) además
-    // del dominio de Railway: cualquiera fuera el dominio real por el que
-    // entraba el usuario, el redirect lo mandaba siempre al dominio fijo
-    // de esas env vars. Ahora se usa baseUrl (que sí refleja el dominio
-    // real de la request gracias a trustHost) salvo que sea justo el
-    // localhost interno roto -- ahí, y solo ahí, cae al fallback fijo.
+    // Dos intentos previos de arreglar esto reconstruían la URL absoluta a
+    // mano (usando baseUrl, o forzando AUTH_URL/NEXT_PUBLIC_APP_URL) -- los
+    // dos rompían apenas había mas de un dominio publico valido (el de
+    // Railway y altainvitacion.com), porque baseUrl termina siendo SIEMPRE
+    // el valor de AUTH_URL en este hosting (no el dominio real de la
+    // request), asi que "confiar en baseUrl salvo que sea localhost" no
+    // alcanzaba: baseUrl nunca es localhost, pero tampoco es el dominio
+    // correcto.
+    //
+    // La forma correcta: cuando el destino ya es una ruta relativa, no
+    // tocarla -- devolverla tal cual. Un Location relativo (sin dominio) lo
+    // resuelve el propio browser contra el dominio real por el que llego
+    // la respuesta, sea cual sea (Railway o el dominio propio), sin
+    // depender de que este codigo adivine bien esa base.
     async redirect({ url, baseUrl }) {
-      const isBrokenInternalHost = /localhost|127\.0\.0\.1|0\.0\.0\.0/i.test(baseUrl);
-      const configuredBase = (
-        isBrokenInternalHost
-          ? (process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || baseUrl)
-          : baseUrl
-      ).replace(/\/$/, "");
-
-      if (url.startsWith("/")) return `${configuredBase}${url}`;
+      if (url.startsWith("/")) return url;
 
       try {
-        if (new URL(url).origin === new URL(configuredBase).origin) return url;
+        if (new URL(url).origin === new URL(baseUrl).origin) return url;
       } catch {
         // url inválida: cae al fallback de abajo
       }
-      return configuredBase;
+      return "/";
     },
   },
   pages: {
