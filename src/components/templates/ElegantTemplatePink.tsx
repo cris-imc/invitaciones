@@ -1379,7 +1379,7 @@ export function ElegantTemplatePink({ invitation, guest, isPersonalized = false 
             <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
           </small>
         </footer>
-        <LogoFooterCredit />
+        <LogoFooterCredit bgColor="#A87082" />
         </div>
       </div>
       

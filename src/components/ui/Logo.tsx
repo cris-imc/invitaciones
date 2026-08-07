@@ -87,16 +87,24 @@ export function Logo({
  * pensado para la version mobile de la tarjeta, que es la que ve casi todo
  * invitado real.
  */
-export function LogoFooterCredit({ className }: { className?: string }) {
+export function LogoFooterCredit({
+  className,
+  bgColor = "#0F1613",
+}: {
+  className?: string;
+  /** Ink/fondo oscuro propio de la plantilla+color elegidos (no del tipo de
+   * evento -- var(--t-ink) cambia por evento, no por plantilla, y por eso
+   * quedaba siempre igual sin importar el color de tarjeta seleccionado). */
+  bgColor?: string;
+}) {
   // Va despues del ultimo bloque de contenido de la invitacion, fuera del
   // footer de escritorio (que es hidden md:block y trae su propio fondo
   // oscuro). Sin fondo propio, este wrapper deja ver el crema/paper base
-  // de la "escena" (.desktop-stage) en vez del color de la plantilla --
-  // por eso usa var(--t-ink), que ya cambia solo segun tema/color elegido.
+  // de la "escena" (.desktop-stage) en vez del color de la plantilla.
   return (
     <div
       className={`md:hidden flex justify-center py-8 ${className ?? ""}`}
-      style={{ backgroundColor: "var(--t-ink, #0F1613)" }}
+      style={{ backgroundColor: bgColor }}
     >
       <div
         className="flex flex-col items-center gap-2 px-5 py-4 rounded-2xl"

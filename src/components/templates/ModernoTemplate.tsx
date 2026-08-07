@@ -1285,7 +1285,7 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
             <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
           </small>
         </footer>
-        <LogoFooterCredit />
+        <LogoFooterCredit bgColor="#0F0E13" />
         </div>
       </div>
       

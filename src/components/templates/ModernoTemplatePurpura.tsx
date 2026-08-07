@@ -1299,7 +1299,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
             <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
           </small>
         </footer>
-        <LogoFooterCredit />
+        <LogoFooterCredit bgColor="#0D0412" />
         </div>
       </div>
       

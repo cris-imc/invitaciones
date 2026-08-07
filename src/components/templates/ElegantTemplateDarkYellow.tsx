@@ -1379,7 +1379,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
             <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
           </small>
         </footer>
-        <LogoFooterCredit />
+        <LogoFooterCredit bgColor="#B8964C" />
         </div>
       </div>
       
