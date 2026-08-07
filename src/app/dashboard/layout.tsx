@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
-import { AuthProvider } from "@/components/providers/AuthProvider";
 
 export default function DashboardLayout({
     children,
@@ -7,16 +6,14 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <AuthProvider>
-            <div className="flex min-h-dvh justify-center md:py-6 md:px-6 bg-black">
-                <div className="panel w-full max-w-[1180px]">
-                    <Sidebar />
-                    <main className="p-main relative">
-                        {children}
-                    </main>
-                </div>
+        <div className="flex min-h-dvh justify-center md:py-6 md:px-6 bg-black">
+            <div className="panel w-full max-w-[1180px]">
+                <Sidebar />
+                <main className="p-main relative">
+                    {children}
+                </main>
             </div>
-        </AuthProvider>
+        </div>
     );
 }
 
