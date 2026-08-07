@@ -88,12 +88,16 @@ export function Logo({
  * invitado real.
  */
 export function LogoFooterCredit({ className }: { className?: string }) {
-  // Va en el pie de cada invitación, que cambia de sección/fondo segun la
-  // plantilla (a veces oscuro, a veces claro) -- por eso lleva su propio
-  // fondo tinta + texto papel, con contraste garantizado sin importar
-  // sobre que seccion caiga.
+  // Va despues del ultimo bloque de contenido de la invitacion, fuera del
+  // footer de escritorio (que es hidden md:block y trae su propio fondo
+  // oscuro). Sin fondo propio, este wrapper deja ver el crema/paper base
+  // de la "escena" (.desktop-stage) en vez del color de la plantilla --
+  // por eso usa var(--t-ink), que ya cambia solo segun tema/color elegido.
   return (
-    <div className={`md:hidden flex justify-center py-8 ${className ?? ""}`}>
+    <div
+      className={`md:hidden flex justify-center py-8 ${className ?? ""}`}
+      style={{ backgroundColor: "var(--t-ink, #0F1613)" }}
+    >
       <div
         className="flex flex-col items-center gap-2 px-5 py-4 rounded-2xl"
         style={{ backgroundColor: "#0F1613" }}
