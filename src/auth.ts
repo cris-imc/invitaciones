@@ -107,21 +107,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // Auth.js a veces resuelve mal y termina armando URLs con localhost
     // interno en vez del dominio público, incluso con trustHost/AUTH_URL
     // seteados (ver https://github.com/nextauthjs/next-auth/issues/12117).
-    // Se fuerza la base acá, tomando la primera variable de entorno
-    // disponible, para no depender de esa detección.
+    //
+    // Dos intentos previos de arreglar esto reconstruían la URL absoluta a
+    // mano (usando baseUrl, o forzando AUTH_URL/NEXT_PUBLIC_APP_URL) -- los
+    // dos rompían apenas había mas de un dominio publico valido (el de
+    // Railway y altainvitacion.com), porque baseUrl termina siendo SIEMPRE
+    // el valor de AUTH_URL en este hosting (no el dominio real de la
+    // request), asi que "confiar en baseUrl salvo que sea localhost" no
+    // alcanzaba: baseUrl nunca es localhost, pero tampoco es el dominio
+    // correcto.
+    //
+    // La forma correcta: cuando el destino ya es una ruta relativa, no
+    // tocarla -- devolverla tal cual. Un Location relativo (sin dominio) lo
+    // resuelve el propio browser contra el dominio real por el que llego
+    // la respuesta, sea cual sea (Railway o el dominio propio), sin
+    // depender de que este codigo adivine bien esa base.
     async redirect({ url, baseUrl }) {
-      const configuredBase = (
-        process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || baseUrl
-      ).replace(/\/$/, "");
-
-      if (url.startsWith("/")) return `${configuredBase}${url}`;
+      if (url.startsWith("/")) return url;
 
       try {
-        if (new URL(url).origin === new URL(configuredBase).origin) return url;
+        if (new URL(url).origin === new URL(baseUrl).origin) return url;
       } catch {
         // url inválida: cae al fallback de abajo
       }
-      return configuredBase;
+      return "/";
     },
   },
   pages: {
