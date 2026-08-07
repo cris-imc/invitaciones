@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 interface LandingNavProps {
   registerUrl: string;
@@ -43,14 +44,7 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
       <div className={`l-drawer ${open ? "open" : ""}`}>
         <div className="l-drawer-head">
           <div className="l-brand" style={{ margin: 0 }}>
-            <span className="flex flex-col leading-none">
-              <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
-                Invitaciones
-              </span>
-              <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
-                Digitales
-              </span>
-            </span>
+            <Logo href="/" />
           </div>
           <button type="button" className="l-hamburger" onClick={() => setOpen(false)} aria-label="Cerrar menú">
             <X className="w-5 h-5" />
@@ -101,14 +95,7 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
   return (
     <nav className="l-nav">
       <div className="l-brand">
-        <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
-          <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
-            Invitaciones
-          </span>
-          <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
-            Digitales
-          </span>
-        </Link>
+        <Logo href="/" />
       </div>
 
       <div className="l-nav-links">

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
+import { Logo } from "@/components/ui/Logo";
 
 const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
@@ -144,14 +145,7 @@ export function Sidebar() {
             {/* ── DESKTOP SIDEBAR ── */}
             <aside className="p-side">
                 <div className="p-brand">
-                    <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
-                        <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
-                            Invitaciones
-                        </span>
-                        <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
-                            Digitales
-                        </span>
-                    </Link>
+                    <Logo />
                 </div>
 
                 <nav className="p-nav flex-1">
@@ -165,14 +159,7 @@ export function Sidebar() {
                     {/* ── MOBILE TOP BAR ── */}
                     <header className="p-mobile-topbar md:hidden">
                         <div className="p-brand" style={{ margin: 0 }}>
-                            <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
-                                <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
-                                    Invitaciones
-                                </span>
-                                <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
-                                    Digitales
-                                </span>
-                            </Link>
+                            <Logo />
                         </div>
                     </header>
 
