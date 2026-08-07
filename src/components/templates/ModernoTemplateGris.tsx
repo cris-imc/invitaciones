@@ -29,6 +29,7 @@ import { TypewriterText } from "@/components/ui/TypewriterText";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
+import { LogoFooterCredit } from "@/components/ui/Logo";
 import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 
@@ -1291,13 +1292,14 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
 
         {musicaHabilitada && musicAudioElement}
 
-        <footer className="d-foot">
+        <footer className="d-foot hidden md:block">
           <div className="mono">{monogram}</div>
           <small>
             Con cariño, gracias por ser parte de este día ✦{" "}
             <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
           </small>
         </footer>
+        <LogoFooterCredit />
         </div>
       </div>
       

@@ -40,28 +40,31 @@ function Isotype({ color, className }: { color: LogoColor; className?: string })
 
 export function Logo({
   href = "/",
-  color = "paper",
+  wordmarkColor = "paper",
   mobileIconColor = "accent",
   className,
 }: {
   href?: string;
-  color?: LogoColor;
+  /** Color de "altainvitacion" (el ".com" y el isotipo siempre van dorados). */
+  wordmarkColor?: LogoColor;
   mobileIconColor?: LogoColor;
   className?: string;
 }) {
-  const wordmarkColor = COLOR_VALUES[color];
+  const textColor = COLOR_VALUES[wordmarkColor];
 
+  // Todo en una sola fila horizontal: isotipo (dorado) — altainvitacion
+  // (color a elección, blanco por default) — .com (dorado).
   const content = (
     <>
       {/* Mobile: solo isotipo, en el color de acento de la marca */}
       <Isotype color={mobileIconColor} className="w-6 h-6 md:hidden" />
 
-      {/* Desktop/tablet: isotipo + wordmark completo */}
-      <span className="hidden md:flex items-center gap-2.5">
-        <Isotype color={color} className="w-5 h-5 shrink-0" />
+      {/* Desktop/tablet: isotipo + wordmark completo, mas grande */}
+      <span className="hidden md:flex items-center gap-3">
+        <Isotype color="accent" className="w-7 h-7 shrink-0" />
         <span
           className="leading-none whitespace-nowrap"
-          style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 15, color: wordmarkColor }}
+          style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 19, color: textColor }}
         >
           <span style={{ fontWeight: 600 }}>alta</span>
           <span style={{ fontWeight: 300 }}>invitacion</span>
@@ -81,5 +84,44 @@ export function Logo({
     <Link href={href} className={`${wrapperClassName} hover:opacity-80 transition-opacity`}>
       {content}
     </Link>
+  );
+}
+
+/**
+ * Credito de marca al pie de cada invitación (solo mobile): "Hecho con amor
+ * por" + isologotipo completo horizontal. En desktop no se muestra --
+ * pensado para la version mobile de la tarjeta, que es la que ve casi todo
+ * invitado real.
+ */
+export function LogoFooterCredit({ className }: { className?: string }) {
+  // Va en el pie de cada invitación, que cambia de sección/fondo segun la
+  // plantilla (a veces oscuro, a veces claro) -- por eso lleva su propio
+  // fondo tinta + texto papel, con contraste garantizado sin importar
+  // sobre que seccion caiga.
+  return (
+    <div className={`md:hidden flex justify-center py-8 ${className ?? ""}`}>
+      <div
+        className="flex flex-col items-center gap-2 px-5 py-4 rounded-2xl"
+        style={{ backgroundColor: "#0F1613" }}
+      >
+        <span
+          className="text-[10px] uppercase tracking-[0.15em]"
+          style={{ fontFamily: "var(--font-inter), sans-serif", color: "#F6F3EC", opacity: 0.6 }}
+        >
+          Hecho con amor por
+        </span>
+        <span className="flex items-center gap-2">
+          <Isotype color="accent" className="w-5 h-5 shrink-0" />
+          <span
+            className="leading-none whitespace-nowrap"
+            style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 15, color: "#F6F3EC" }}
+          >
+            <span style={{ fontWeight: 600 }}>alta</span>
+            <span style={{ fontWeight: 300 }}>invitacion</span>
+            <span style={{ fontWeight: 300, color: "var(--accent, #C79A4B)" }}>.com</span>
+          </span>
+        </span>
+      </div>
+    </div>
   );
 }
