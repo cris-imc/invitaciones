@@ -6,9 +6,10 @@ import Link from "next/link";
  * unidas al punto central donde se pliega -- el mismo cruce de líneas, leído
  * de otra forma, es un moño de frac. Path SVG tomado tal cual del manual.
  *
- * En mobile se muestra solo el isotipo, en el dorado/acento de la marca
- * (--accent, que ya coincide con el "Oro #C79A4B" del manual) -- en desktop,
- * isotipo + wordmark completo.
+ * Isotipo + wordmark completo en todos los tamaños de pantalla (el icono
+ * siempre dorado, --accent, que ya coincide con el "Oro #C79A4B" del
+ * manual) -- mas chico en mobile, mas grande en desktop, via clases
+ * responsive, sin ocultar ninguna parte.
  */
 const ISOTYPE_PATH =
   "M15 20 Q5 50 15 80 L47 53 Q50 50 47 47 Z M85 20 Q95 50 85 80 L53 53 Q50 50 53 47 Z";
@@ -41,37 +42,30 @@ function Isotype({ color, className }: { color: LogoColor; className?: string })
 export function Logo({
   href = "/",
   wordmarkColor = "paper",
-  mobileIconColor = "accent",
   className,
 }: {
   href?: string;
   /** Color de "altainvitacion" (el ".com" y el isotipo siempre van dorados). */
   wordmarkColor?: LogoColor;
-  mobileIconColor?: LogoColor;
   className?: string;
 }) {
   const textColor = COLOR_VALUES[wordmarkColor];
 
-  // Todo en una sola fila horizontal: isotipo (dorado) — altainvitacion
-  // (color a elección, blanco por default) — .com (dorado).
+  // Todo en una sola fila horizontal, siempre completo: isotipo (dorado) —
+  // altainvitacion (color a elección, blanco por default) — .com (dorado).
+  // Mas chico en mobile, mas grande en desktop, via clases responsive.
   const content = (
-    <>
-      {/* Mobile: solo isotipo, en el color de acento de la marca */}
-      <Isotype color={mobileIconColor} className="w-6 h-6 md:hidden" />
-
-      {/* Desktop/tablet: isotipo + wordmark completo, mas grande */}
-      <span className="hidden md:flex items-center gap-3">
-        <Isotype color="accent" className="w-7 h-7 shrink-0" />
-        <span
-          className="leading-none whitespace-nowrap"
-          style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 19, color: textColor }}
-        >
-          <span style={{ fontWeight: 600 }}>alta</span>
-          <span style={{ fontWeight: 300 }}>invitacion</span>
-          <span style={{ fontWeight: 300, color: "var(--accent, #C79A4B)" }}>.com</span>
-        </span>
+    <span className="flex items-center gap-2 md:gap-2.5">
+      <Isotype color="accent" className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
+      <span
+        className="leading-none whitespace-nowrap text-[14px] md:text-[17px]"
+        style={{ fontFamily: "var(--font-fraunces), serif", color: textColor }}
+      >
+        <span style={{ fontWeight: 600 }}>alta</span>
+        <span style={{ fontWeight: 300 }}>invitacion</span>
+        <span style={{ fontWeight: 300, color: "var(--accent, #C79A4B)" }}>.com</span>
       </span>
-    </>
+    </span>
   );
 
   const wrapperClassName = className ? `flex items-center ${className}` : "flex items-center";

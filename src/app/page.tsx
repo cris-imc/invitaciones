@@ -20,12 +20,11 @@ export default async function Home() {
         {/* HERO */}
         <section className="l-hero">
           <div>
-            <p className="kicker">Invitaciones digitales</p>
             <AnimatedHeroText />
             <p className="sub">
               Elegí una plantilla pensada para tu tipo de evento, personalizá
-              cada detalle y compartí un link. Confirmaciones, mapa y mensajes
-              de tus invitados, todo en un mismo lugar.
+              cada detalle y compartí un link. Confirmaciones, mapas, fotos y
+              mensajes de tus invitados, todo en un mismo lugar y en vivo.
             </p>
             <div className="l-hero-ctas">
               <Link href={registerUrl}>
