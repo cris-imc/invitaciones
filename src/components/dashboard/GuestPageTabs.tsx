@@ -79,6 +79,21 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
     return () => { cancelled = true; clearInterval(interval); };
   }, [invitationId]);
 
+  // Misma red de seguridad que PageTransition.tsx: si el filter de esta
+  // transición queda trabado por quedar en background a mitad de animación,
+  // fuerza la limpieza al volver.
+  useEffect(() => {
+    const resetFilter = () => {
+      if (tabContentRef.current) tabContentRef.current.style.filter = "none";
+    };
+    document.addEventListener("visibilitychange", resetFilter);
+    window.addEventListener("pageshow", resetFilter);
+    return () => {
+      document.removeEventListener("visibilitychange", resetFilter);
+      window.removeEventListener("pageshow", resetFilter);
+    };
+  }, []);
+
   const tabs: { id: Tab; label: string; highlight?: "gold" | "live" | "default" }[] = [
     { id: "agregar", label: "Gestionar invitados", highlight: "gold" },
     { id: "invitados", label: pagoTarjetaHabilitado ? "Gestionar pagos" : "Lista de invitados", highlight: "default" },

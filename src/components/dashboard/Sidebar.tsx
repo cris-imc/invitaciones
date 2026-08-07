@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -27,6 +28,21 @@ export function Sidebar() {
     const [showWarning, setShowWarning] = useState(false);
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [premiumCredits, setPremiumCredits] = useState(0);
+    const [mounted, setMounted] = useState(false);
+
+    // El PageTransition global (template.tsx) anima "filter" en cada cambio
+    // de pagina, lo que crea un containing block nuevo para position:fixed
+    // (ver comentario igual en ImageCropper.tsx). Si esa animacion queda
+    // "trabada" -- típicamente al volver de background/lock screen, porque
+    // el callback que limpia el filter depende de un rAF que el navegador
+    // pausa en segundo plano -- la topbar y la botonera (fixed) dejan de
+    // anclarse a la pantalla real y se anclan al alto de toda la pagina,
+    // generando el espacio de scroll fantasma. Un portal a <body> las
+    // escapa de ese containing block por completo, sin depender de que
+    // ese cleanup llegue a tiempo.
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Créditos premium para el item "Nueva invitación" de la botonera mobile
     // (el admin no crea invitaciones para si mismo, no aplica).
@@ -144,94 +160,99 @@ export function Sidebar() {
 
             </aside>
 
-            {/* ── MOBILE TOP BAR ── */}
-            <header className="p-mobile-topbar md:hidden">
-                <div className="p-brand" style={{ margin: 0 }}>
-                    <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
-                        <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
-                            Invitaciones
-                        </span>
-                        <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
-                            Digitales
-                        </span>
-                    </Link>
-                </div>
-            </header>
+            {mounted && createPortal(
+                <>
+                    {/* ── MOBILE TOP BAR ── */}
+                    <header className="p-mobile-topbar md:hidden">
+                        <div className="p-brand" style={{ margin: 0 }}>
+                            <Link href="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
+                                <span className="text-[10px] font-sans font-bold tracking-widest uppercase opacity-70">
+                                    Invitaciones
+                                </span>
+                                <span className="text-sm font-sans font-bold tracking-[0.2em] uppercase -mt-1">
+                                    Digitales
+                                </span>
+                            </Link>
+                        </div>
+                    </header>
 
-            {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ── */}
-            <div className="p-bottom-nav md:hidden" data-debug-role={role}>
-                <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label="Cerrar sesión">
-                    <LogOut className="w-5 h-5" />
-                    <span>Salir</span>
-                </button>
+                    {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ── */}
+                    <div className="p-bottom-nav md:hidden">
+                        <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label="Cerrar sesión">
+                            <LogOut className="w-5 h-5" />
+                            <span>Salir</span>
+                        </button>
 
-                {role === "ADMIN" ? (
-                    <CreateUserButton
-                        renderTrigger={(onClick) => (
-                            <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nuevo Usuario">
-                                <UserPlus className="w-5 h-5" />
-                                <span>Alta</span>
-                            </button>
+                        {role === "ADMIN" ? (
+                            <CreateUserButton
+                                renderTrigger={(onClick) => (
+                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nuevo Usuario">
+                                        <UserPlus className="w-5 h-5" />
+                                        <span>Alta</span>
+                                    </button>
+                                )}
+                            />
+                        ) : (
+                            <Link
+                                href="/dashboard/invitaciones"
+                                className={`p-bottom-nav-item ${pathname === "/dashboard/invitaciones" ? "active" : ""}`}
+                                onClick={(e) => handleNavClick(e, "/dashboard/invitaciones")}
+                                aria-label="Inactivas"
+                            >
+                                <Archive className="w-5 h-5" />
+                                <span>Inactivas</span>
+                            </Link>
                         )}
-                    />
-                ) : (
-                    <Link
-                        href="/dashboard/invitaciones"
-                        className={`p-bottom-nav-item ${pathname === "/dashboard/invitaciones" ? "active" : ""}`}
-                        onClick={(e) => handleNavClick(e, "/dashboard/invitaciones")}
-                        aria-label="Inactivas"
-                    >
-                        <Archive className="w-5 h-5" />
-                        <span>Inactivas</span>
-                    </Link>
-                )}
 
-                <Link
-                    href="/dashboard"
-                    className={`p-bottom-nav-home-wrap ${pathname === "/dashboard" ? "active" : ""}`}
-                    onClick={(e) => handleNavClick(e, "/dashboard")}
-                    aria-label="Ir a Inicio"
-                >
-                    <span className="p-bottom-nav-home">
-                        <Home className="w-5 h-5" />
-                    </span>
-                    <span>Inicio</span>
-                </Link>
+                        <Link
+                            href="/dashboard"
+                            className={`p-bottom-nav-home-wrap ${pathname === "/dashboard" ? "active" : ""}`}
+                            onClick={(e) => handleNavClick(e, "/dashboard")}
+                            aria-label="Ir a Inicio"
+                        >
+                            <span className="p-bottom-nav-home">
+                                <Home className="w-5 h-5" />
+                            </span>
+                            <span>Inicio</span>
+                        </Link>
 
-                <Link
-                    href="/dashboard/perfil"
-                    className={`p-bottom-nav-item ${pathname === "/dashboard/perfil" ? "active" : ""}`}
-                    onClick={(e) => handleNavClick(e, "/dashboard/perfil")}
-                    aria-label="Mis Datos"
-                >
-                    <User className="w-5 h-5" />
-                    <span>Datos</span>
-                </Link>
+                        <Link
+                            href="/dashboard/perfil"
+                            className={`p-bottom-nav-item ${pathname === "/dashboard/perfil" ? "active" : ""}`}
+                            onClick={(e) => handleNavClick(e, "/dashboard/perfil")}
+                            aria-label="Mis Datos"
+                        >
+                            <User className="w-5 h-5" />
+                            <span>Datos</span>
+                        </Link>
 
-                {role === "ADMIN" ? (
-                    <Link
-                        href="/dashboard/registros"
-                        className={`p-bottom-nav-item ${pathname === "/dashboard/registros" ? "active" : ""}`}
-                        onClick={(e) => handleNavClick(e, "/dashboard/registros")}
-                        aria-label="Registros"
-                    >
-                        <BarChart3 className="w-5 h-5" />
-                        <span>Registros</span>
-                    </Link>
-                ) : (
-                    <NewInvitationButton
-                        premiumCredits={premiumCredits}
-                        totalInvitations={0}
-                        planTier={session?.user?.planTier}
-                        renderTrigger={(onClick) => (
-                            <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nueva invitación">
-                                <Plus className="w-5 h-5" />
-                                <span>Nueva</span>
-                            </button>
+                        {role === "ADMIN" ? (
+                            <Link
+                                href="/dashboard/registros"
+                                className={`p-bottom-nav-item ${pathname === "/dashboard/registros" ? "active" : ""}`}
+                                onClick={(e) => handleNavClick(e, "/dashboard/registros")}
+                                aria-label="Registros"
+                            >
+                                <BarChart3 className="w-5 h-5" />
+                                <span>Registros</span>
+                            </Link>
+                        ) : (
+                            <NewInvitationButton
+                                premiumCredits={premiumCredits}
+                                totalInvitations={0}
+                                planTier={session?.user?.planTier}
+                                renderTrigger={(onClick) => (
+                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nueva invitación">
+                                        <Plus className="w-5 h-5" />
+                                        <span>Nueva</span>
+                                    </button>
+                                )}
+                            />
                         )}
-                    />
-                )}
-            </div>
+                    </div>
+                </>,
+                document.body
+            )}
         </>
     );
 }

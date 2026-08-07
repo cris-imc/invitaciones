@@ -2,11 +2,30 @@
 
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
+
+  // Red de seguridad además de onAnimationComplete: si la pestaña queda en
+  // background justo cuando la transición está corriendo (bloquear pantalla,
+  // cambiar de app), el requestAnimationFrame del que depende Framer Motion
+  // se pausa y ese callback puede no llegar a ejecutarse nunca — el filter
+  // queda "trabado" en un valor distinto de "none" y rompe el anclaje de
+  // cualquier position:fixed que no esté portado fuera de este árbol. Al
+  // volver a foreground, forzamos la limpieza de una.
+  useEffect(() => {
+    const resetFilter = () => {
+      if (ref.current) ref.current.style.filter = "none";
+    };
+    document.addEventListener("visibilitychange", resetFilter);
+    window.addEventListener("pageshow", resetFilter);
+    return () => {
+      document.removeEventListener("visibilitychange", resetFilter);
+      window.removeEventListener("pageshow", resetFilter);
+    };
+  }, []);
 
   return (
     <motion.div
