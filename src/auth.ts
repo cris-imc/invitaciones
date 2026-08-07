@@ -107,11 +107,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // Auth.js a veces resuelve mal y termina armando URLs con localhost
     // interno en vez del dominio público, incluso con trustHost/AUTH_URL
     // seteados (ver https://github.com/nextauthjs/next-auth/issues/12117).
-    // Se fuerza la base acá, tomando la primera variable de entorno
-    // disponible, para no depender de esa detección.
+    //
+    // El fix anterior forzaba SIEMPRE la base a partir de AUTH_URL/
+    // NEXT_PUBLIC_APP_URL, ignorando baseUrl por completo -- eso rompió el
+    // login apenas se sumó un dominio propio (altainvitacion.com) además
+    // del dominio de Railway: cualquiera fuera el dominio real por el que
+    // entraba el usuario, el redirect lo mandaba siempre al dominio fijo
+    // de esas env vars. Ahora se usa baseUrl (que sí refleja el dominio
+    // real de la request gracias a trustHost) salvo que sea justo el
+    // localhost interno roto -- ahí, y solo ahí, cae al fallback fijo.
     async redirect({ url, baseUrl }) {
+      const isBrokenInternalHost = /localhost|127\.0\.0\.1|0\.0\.0\.0/i.test(baseUrl);
       const configuredBase = (
-        process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || baseUrl
+        isBrokenInternalHost
+          ? (process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || baseUrl)
+          : baseUrl
       ).replace(/\/$/, "");
 
       if (url.startsWith("/")) return `${configuredBase}${url}`;
