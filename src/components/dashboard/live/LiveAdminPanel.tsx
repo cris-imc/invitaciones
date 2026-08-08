@@ -245,7 +245,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                             {publicUrl}
                         </code>
                         <div className="flex gap-3">
-                            <Button asChild variant="outline" size="sm" className="gap-2">
+                            <Button asChild variant="outline" size="sm" className="gap-2 border-white/10">
                                 <a href={screenUrl} target="_blank" rel="noopener noreferrer">
                                     <ExternalLink className="w-4 h-4" />
                                     Abrir Pantalla (Proyector)
@@ -380,9 +380,9 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                                         type="button"
                                                         onClick={() => setDeleteItemId(item.id)}
                                                         aria-label="Eliminar ahora"
-                                                        className="absolute bottom-11 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 shadow"
+                                                        className="absolute top-2 left-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 shadow-lg"
                                                     >
-                                                        <Trash2 className="w-3 h-3" />
+                                                        <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </>
                                             )}

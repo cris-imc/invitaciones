@@ -230,7 +230,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
             />
           )}
           {tab === "live" && (
-            <div className="bg-card border rounded-lg p-4 md:p-6">
+            <div className="bg-card border border-white/10 rounded-lg p-4 md:p-6">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                 LIVE
                 <Camera className="w-5 h-5 text-muted-foreground" strokeWidth={1.75} />
