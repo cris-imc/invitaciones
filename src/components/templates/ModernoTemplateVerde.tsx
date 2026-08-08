@@ -1293,13 +1293,6 @@ export function ModernoTemplateVerde({ invitation, guest, isPersonalized = false
 
         {musicaHabilitada && musicAudioElement}
 
-        <footer className="d-foot hidden md:block">
-          <div className="mono">{monogram}</div>
-          <small>
-            Con cariño, gracias por ser parte de este día ✦{" "}
-            <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
-          </small>
-        </footer>
         <LogoFooterCredit bgColor="#05120B" />
         </div>
       </div>

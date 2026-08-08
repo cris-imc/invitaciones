@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { authenticate } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
@@ -90,9 +91,8 @@ export default function LoginPage() {
                 <Lock className="w-4 h-4" />
                 Contraseña
               </Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) =>

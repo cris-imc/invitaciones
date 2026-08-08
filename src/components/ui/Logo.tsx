@@ -82,10 +82,10 @@ export function Logo({
 }
 
 /**
- * Credito de marca al pie de cada invitación (solo mobile): "Hecho con amor
- * por" + isologotipo completo horizontal. En desktop no se muestra --
- * pensado para la version mobile de la tarjeta, que es la que ve casi todo
- * invitado real.
+ * Credito de marca al pie de cada invitación (mobile y desktop): "Hecho
+ * con amor por" + isologotipo completo horizontal. Reemplaza al viejo
+ * footer de texto ("Invitaciones digitales" con link a convite.ar), que
+ * ya no debe aparecer en ningún lado.
  */
 export function LogoFooterCredit({
   className,
@@ -97,13 +97,12 @@ export function LogoFooterCredit({
    * quedaba siempre igual sin importar el color de tarjeta seleccionado). */
   bgColor?: string;
 }) {
-  // Va despues del ultimo bloque de contenido de la invitacion, fuera del
-  // footer de escritorio (que es hidden md:block y trae su propio fondo
-  // oscuro). Sin fondo propio, este wrapper deja ver el crema/paper base
-  // de la "escena" (.desktop-stage) en vez del color de la plantilla.
+  // Va despues del ultimo bloque de contenido de la invitacion. Sin fondo
+  // propio, este wrapper deja ver el crema/paper base de la "escena"
+  // (.desktop-stage) en vez del color de la plantilla.
   return (
     <div
-      className={`md:hidden flex justify-center py-8 ${className ?? ""}`}
+      className={`flex justify-center py-8 ${className ?? ""}`}
       style={{ backgroundColor: bgColor }}
     >
       <div className="flex flex-col items-center gap-2 px-5 py-4">

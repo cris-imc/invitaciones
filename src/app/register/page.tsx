@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
@@ -318,9 +319,8 @@ function RegisterForm() {
                   <Lock className="w-4 h-4" />
                   Contraseña
                 </Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   placeholder="Mínimo 6 caracteres"
                   value={formData.password}
                   onChange={(e) =>
@@ -340,9 +340,8 @@ function RegisterForm() {
                   <Lock className="w-4 h-4" />
                   Confirmar contraseña
                 </Label>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
-                  type="password"
                   placeholder="Repite tu contraseña"
                   value={formData.confirmPassword}
                   onChange={(e) =>

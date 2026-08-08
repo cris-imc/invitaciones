@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
 import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { LandingNav } from "@/components/landing/LandingNav";
+import { Logo } from "@/components/ui/Logo";
 import { HeroParallaxPhoto } from "@/components/landing/HeroParallaxPhoto";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
@@ -200,7 +201,10 @@ export default async function Home() {
 
         {/* FOOTER */}
         <div className="l-foot">
-          <small>Invitaciones Digitales · Hecho con ❤️</small>
+          <div className="flex items-center gap-2">
+            <small style={{ whiteSpace: "nowrap" }}>Hecho con amor por</small>
+            <Logo href="" wordmarkColor="paper" />
+          </div>
           <small>
             Hecho para bodas, cumpleaños, eventos y todo lo que se celebra
           </small>

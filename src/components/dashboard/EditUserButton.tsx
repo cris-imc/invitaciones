@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Settings, Loader2, Mail, Lock, User } from "lucide-react";
 import { adminUpdateUser } from "@/app/actions/admin";
@@ -90,8 +91,7 @@ export function EditUserButton({ userId, initialName, initialEmail }: { userId: 
                             <label className="text-xs font-medium text-white/70 flex items-center gap-2">
                                 <Lock className="w-4 h-4" /> Nueva Contraseña
                             </label>
-                            <Input
-                                type="password"
+                            <PasswordInput
                                 name="admin-edit-password"
                                 autoComplete="new-password"
                                 data-lpignore="true"

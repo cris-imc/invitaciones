@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { UserPlus, Loader2, Mail, Lock, User } from "lucide-react";
 import { adminCreateUser } from "@/app/actions/admin";
@@ -105,8 +106,7 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                             <label className="text-xs font-medium text-white/70 flex items-center gap-2">
                                 <Lock className="w-4 h-4" /> Contraseña
                             </label>
-                            <Input
-                                type="password"
+                            <PasswordInput
                                 name="admin-create-password"
                                 autoComplete="new-password"
                                 data-lpignore="true"

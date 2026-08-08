@@ -15,6 +15,7 @@ import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
+import { LogoFooterCredit } from "@/components/ui/Logo";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
@@ -1440,13 +1441,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
 
         {musicaHabilitada && musicAudioElement}
 
-        <footer className="d-foot">
-          <div className="mono">{monogram}</div>
-          <small>
-            Con cariño, gracias por ser parte de este día ✦{" "}
-            <a href="https://convite.ar" style={{ color: "inherit", textDecoration: "none" }} target="_blank" rel="noopener noreferrer">Invitaciones digitales</a>
-          </small>
-        </footer>
+        <LogoFooterCredit bgColor="#0F1613" />
         </div>
       </div>
       
