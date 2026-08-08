@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { nanoid } from "nanoid";
 import { getEventStatus } from "@/lib/expiration";
 import { cleanupExpiredRejectedItems } from "@/lib/live-cleanup";
+import { canUseFeature, PlanTier } from "@/lib/plan-limits";
 
 const PAGE_SIZE = 4;
 const VALID_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
@@ -121,8 +122,12 @@ export async function POST(req: Request) {
         // Apagarlo nunca está restringido.
         const isAdmin = session.user.role === "ADMIN";
         const canActivate = isAdmin || getEventStatus(invitation.fechaEvento) === "EVENT_DAY";
+        const hasLiveFeature = isAdmin || canUseFeature(invitation.planTier as PlanTier, "live");
 
         if (action === "create" && !liveSession) {
+            if (!hasLiveFeature) {
+                return new NextResponse("Tu plan no incluye LIVE. Actualizá a Premium para habilitarlo.", { status: 403 });
+            }
             if (!canActivate) {
                 return new NextResponse("El LIVE solo se puede activar el día del evento.", { status: 403 });
             }
@@ -135,6 +140,9 @@ export async function POST(req: Request) {
             });
         } else if (action === "toggle" && liveSession) {
             const activating = !liveSession.isActive;
+            if (activating && !hasLiveFeature) {
+                return new NextResponse("Tu plan no incluye LIVE. Actualizá a Premium para habilitarlo.", { status: 403 });
+            }
             if (activating && !canActivate) {
                 return new NextResponse("El LIVE solo se puede activar el día del evento.", { status: 403 });
             }

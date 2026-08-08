@@ -7,6 +7,7 @@ import { Logo } from "@/components/ui/Logo";
 import { HeroParallaxPhoto } from "@/components/landing/HeroParallaxPhoto";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
+import { PLAN_LIMITS } from "@/lib/plan-limits";
 
 export default async function Home() {
   const session = await auth();
@@ -151,7 +152,7 @@ export default async function Home() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Álbum de fotos (hasta 10 fotos)</span>
+                  <span>Álbum de fotos (hasta {PLAN_LIMITS.FREE.maxPhotos} fotos)</span>
                 </li>
               </ul>
               <Link href={registerUrl} className="w-full mt-auto">
@@ -177,11 +178,11 @@ export default async function Home() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Interacción LIVE:</strong> proyección de fotos en vivo en tu fiesta</span>
+                  <span><strong className="text-white">Interacción LIVE:</strong> proyección de fotos en vivo en tu fiesta (hasta {PLAN_LIMITS.PREMIUM.maxLivePhotos} fotos)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Álbum de fotos premium</strong> (hasta 200 fotos)</span>
+                  <span><strong className="text-white">Álbum de fotos premium</strong> (hasta {PLAN_LIMITS.PREMIUM.maxPhotos} fotos)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>

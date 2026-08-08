@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { prisma } from '@/lib/db';
 import { getUploadsDir } from '@/lib/uploads';
+import { checkPlanLimits, PlanTier } from '@/lib/plan-limits';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
     try {
@@ -9,7 +10,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         if (!token) return new NextResponse("Missing token", { status: 400 });
 
         const liveSession = await prisma.liveSession.findUnique({
-            where: { publicToken: token }
+            where: { publicToken: token },
+            include: { invitation: true }
         });
 
         if (!liveSession || !liveSession.isActive) {
@@ -28,6 +30,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         // Basic validation
         if (type !== 'PHOTO' && type !== 'AUDIO' && type !== 'TEXT') {
             return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 });
+        }
+
+        // El cupo de LIVE solo se descuenta con fotos (video, a futuro, también descontará)
+        if (type === 'PHOTO') {
+            const photoCount = await prisma.liveItem.count({
+                where: { sessionId: liveSession.id, type: 'PHOTO' }
+            });
+            const limitError = await checkPlanLimits(
+                liveSession.invitation.userId,
+                liveSession.invitation.planTier as PlanTier,
+                "add-live-photo",
+                photoCount
+            );
+            if (limitError) {
+                return NextResponse.json({ error: limitError.message }, { status: 403 });
+            }
         }
 
         if (type === 'TEXT') {

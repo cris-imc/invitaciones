@@ -20,7 +20,8 @@ export interface PlanLimits {
   price: number; // in ARS
   maxInvitations: number | null; // null = unlimited
   maxGuests: number | null; // null = unlimited
-  maxPhotos: number | null;
+  maxPhotos: number | null; // fotos en el álbum de la invitación
+  maxLivePhotos: number | null; // fotos (y video, a futuro) guardadas/compartidas en LIVE
   allowedTemplates: string[] | "all"; // specific template IDs or "all"
   features: PlanFeatures;
 }
@@ -31,7 +32,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     price: 0,
     maxInvitations: null, // unlimited free invitations
     maxGuests: 20,
-    maxPhotos: 10,
+    maxPhotos: 5,
+    maxLivePhotos: 0, // sin LIVE en el plan Gratis
     allowedTemplates: [
       "modern-invitation",
       "botanical-garden",
@@ -58,7 +60,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     price: 50000,
     maxInvitations: null, // unlimited
     maxGuests: null, // unlimited
-    maxPhotos: 200,
+    maxPhotos: 15,
+    maxLivePhotos: 200,
     allowedTemplates: "all",
     features: {
       customMusic: true,
@@ -81,6 +84,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxInvitations: null, // unlimited
     maxGuests: null,
     maxPhotos: null,
+    maxLivePhotos: null,
     allowedTemplates: "all",
     features: {
       customMusic: true,
@@ -103,6 +107,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxInvitations: null,
     maxGuests: null,
     maxPhotos: null,
+    maxLivePhotos: null,
     allowedTemplates: "all",
     features: {
       customMusic: true,
@@ -131,7 +136,7 @@ export interface PlanValidationError {
 export async function checkPlanLimits(
   userId: string,
   planTier: PlanTier,
-  operation: "create-invitation" | "add-guest" | "add-photo",
+  operation: "create-invitation" | "add-guest" | "add-photo" | "add-live-photo",
   currentCount?: number
 ): Promise<PlanValidationError | null> {
   const limits = PLAN_LIMITS[planTier];
@@ -175,6 +180,19 @@ export async function checkPlanLimits(
             field: "photos",
             message: `Has alcanzado el límite de ${limits.maxPhotos} fotos de tu plan ${limits.name}. Actualiza tu plan para agregar más.`,
             limit: limits.maxPhotos,
+            current: currentCount,
+          };
+        }
+      }
+      break;
+
+    case "add-live-photo":
+      if (limits.maxLivePhotos !== null && currentCount !== undefined) {
+        if (currentCount >= limits.maxLivePhotos) {
+          return {
+            field: "livePhotos",
+            message: `Se alcanzó el límite de ${limits.maxLivePhotos} fotos guardadas en LIVE del plan ${limits.name}.`,
+            limit: limits.maxLivePhotos,
             current: currentCount,
           };
         }

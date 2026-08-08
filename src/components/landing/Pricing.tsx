@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { PLAN_LIMITS } from "@/lib/plan-limits";
 
 const plans = [
     {
@@ -11,7 +12,7 @@ const plans = [
             "Plantilla 100% personalizada",
             "Gestión de invitados y pagos",
             "Cuenta regresiva",
-            "Album de fotos",
+            `Hasta ${PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum`,
             "Sin musica de fondo",
             "Sin LIVE (fotos transmitidas en vivo)",
             "Sin Trivia",
@@ -29,9 +30,9 @@ const plans = [
             "Plantilla 100% personalizada",
             "Gestión de invitados y pagos",
             "Cuenta regresiva",
-            "Album de fotos",
+            `Hasta ${PLAN_LIMITS.PREMIUM.maxPhotos} fotos en el álbum`,
             "Con musica de fondo",
-            "Con LIVE (fotos transmitidas en vivo)",
+            `Con LIVE (hasta ${PLAN_LIMITS.PREMIUM.maxLivePhotos} fotos)`,
             "Con Trivia",
             "Con sugerencias de musica para el DJ",
         ],

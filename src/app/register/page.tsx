@@ -176,7 +176,7 @@ function RegisterForm() {
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Album de fotos</span>
+                  <span>Hasta {PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum</span>
                 </li>
                 <li className="flex items-center gap-1.5 opacity-50">
                   <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
@@ -245,7 +245,7 @@ function RegisterForm() {
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Album de fotos</span>
+                  <span>Hasta {PLAN_LIMITS.PREMIUM.maxPhotos} fotos en el álbum</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
@@ -253,7 +253,7 @@ function RegisterForm() {
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Con LIVE (fotos en vivo)</span>
+                  <span>Con LIVE (hasta {PLAN_LIMITS.PREMIUM.maxLivePhotos} fotos)</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
