@@ -5,6 +5,7 @@ import { checkPlanLimits } from '@/lib/plan-limits';
 import type { PlanTier } from '@/lib/plan-limits';
 import { checkAndCleanupIfExpired, isEventDateLocked } from '@/lib/expiration-server';
 import { slugify } from '@/lib/slugify';
+import { resolveGoogleMapsShortLink } from '@/lib/google-maps';
 
 // GET - Obtener invitaciones del usuario o invitación pública por slug
 export async function GET(request: NextRequest) {
@@ -117,6 +118,13 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json();
         console.log('DEBUG: POST /api/invitations body:', JSON.stringify(body, null, 2));
+
+        // Si pegaron el link corto de "Compartir" (maps.app.goo.gl), lo
+        // resolvemos una sola vez acá al link largo real -- así el iframe
+        // del mapa en la invitación no depende de convertirlo en cada visita.
+        if (body.mapUrl) {
+            body.mapUrl = await resolveGoogleMapsShortLink(body.mapUrl);
+        }
 
         let invitationPlanTier = 'FREE';
         const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
@@ -383,6 +391,10 @@ export async function PUT(request: NextRequest) {
         }
 
         const body = await request.json();
+
+        if (body.mapUrl) {
+            body.mapUrl = await resolveGoogleMapsShortLink(body.mapUrl);
+        }
 
         // NUNCA regenerar el slug en actualizaciones — los links enviados a invitados deben ser permanentes.
         // El slug solo se genera una vez al crear la invitación (POST).

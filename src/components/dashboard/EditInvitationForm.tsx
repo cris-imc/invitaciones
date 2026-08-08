@@ -444,8 +444,11 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                 value={formData.mapUrl}
                                 onChange={(e) => handleInputChange('mapUrl', e.target.value)}
                                 className="w-full p-2 border rounded-md"
-                                placeholder="https://maps.google.com/..."
+                                placeholder="Pegá el link que copiaste de Google Maps"
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Vale cualquier link de Google Maps (el de "Compartir" o el de la barra de direcciones).
+                            </p>
                         </div>
 
                         {/* Selección de Plantilla */}

@@ -17,6 +17,7 @@ import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/Music
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
+import { toEmbedMapUrl } from "@/lib/google-maps";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
@@ -1247,7 +1248,7 @@ export function ElegantTemplateBlue({ invitation, guest, isPersonalized = false 
         {mapUrl && (
           <section id="location" style={{ height: "220px", overflow: "hidden" }}>
             <iframe
-              src={mapUrl.replace("maps.google.com", "maps.google.com/maps?output=embed&")}
+              src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
               height="220"
               style={{ border: 0, display: "block" }}
