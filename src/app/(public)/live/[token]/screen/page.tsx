@@ -5,6 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { LiveItem } from "@prisma/client";
 import { motion, AnimatePresence } from "framer-motion";
 import Marquee from "react-fast-marquee";
+import { Logo } from "@/components/ui/Logo";
 
 export default function LiveScreenPage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = use(params);
@@ -71,11 +72,9 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                     <p className="text-[#F6F3EC]/60">Escaneá el código para compartir tus fotos y audios al instante.</p>
                 </div>
 
-                <div className="bg-[#F6F3EC] p-4 rounded-xl text-center shadow-2xl flex-shrink-0">
+                <div className="bg-[#F6F3EC] p-4 rounded-xl shadow-2xl shrink-0 flex flex-col items-center gap-3">
                     <QRCodeSVG value={publicUrl} size={150} level="H" />
-                    <p className="text-[#0F1613] font-mono text-[10px] font-bold mt-2 tracking-tight overflow-hidden text-ellipsis max-w-[150px]">
-                        Invitaciones Digitales
-                    </p>
+                    <Logo href="" wordmarkColor="ink" />
                 </div>
             </header>
 
