@@ -199,7 +199,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border flex-wrap gap-3">
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-white/10 flex-wrap gap-3">
                 <div>
                     <h3 className="font-semibold flex items-center gap-2">
                         Estado del LIVE
@@ -241,7 +241,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                     <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg flex flex-col gap-3">
                         <p className="text-sm font-medium">Link para Invitados (Código QR)</p>
-                        <code className="bg-background p-2 rounded border text-xs overflow-x-auto">
+                        <code className="bg-background p-2 rounded border border-white/10 text-xs overflow-x-auto">
                             {publicUrl}
                         </code>
                         <div className="flex gap-3">
@@ -251,16 +251,10 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                     Abrir Pantalla (Proyector)
                                 </a>
                             </Button>
-                            <Button asChild variant="outline" size="sm" className="gap-2">
-                                <a href={publicUrl} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="w-4 h-4" />
-                                    Abrir App Invitado (Test)
-                                </a>
-                            </Button>
                         </div>
                     </div>
 
-                    <div className="p-4 bg-muted/20 border rounded-lg flex items-center justify-between">
+                    <div className="p-4 bg-muted/20 border border-white/10 rounded-lg flex items-center justify-between">
                         <div>
                             <h4 className="font-semibold text-sm">Moderación de contenido</h4>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -290,7 +284,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                         </div>
 
                         {/* Pestañas Pendientes / Aceptadas / Rechazadas */}
-                        <div className="flex gap-2 mb-4 border-b">
+                        <div className="flex gap-2 mb-4 border-b border-white/10">
                             {TABS.map(tab => (
                                 <button
                                     key={tab.key}
@@ -311,7 +305,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                             <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {session.items.map(item => (
-                                        <div key={item.id} className="relative rounded-lg overflow-hidden border bg-muted/20">
+                                        <div key={item.id} className="relative rounded-lg overflow-hidden border border-white/10 bg-muted/20">
                                             {item.type === "PHOTO" ? (
                                                 <img src={item.fileUrl} alt="Live" className="w-full h-40 object-cover" />
                                             ) : item.type === "AUDIO" ? (
@@ -330,12 +324,12 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                             )}
 
                                             {activeTab === "REJECTED" && (
-                                                <div className="absolute top-2 left-2 bg-black/70 backdrop-blur text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded">
+                                                <div className="px-2 py-1 text-[10px] uppercase tracking-wider font-bold text-center bg-black/70 text-amber-400">
                                                     {timeLeftLabel(item.rejectedAt)}
                                                 </div>
                                             )}
 
-                                            <div className="p-2 border-t text-xs text-muted-foreground flex justify-between items-center bg-background/95 backdrop-blur-sm">
+                                            <div className="p-2 border-t border-white/10 text-xs text-muted-foreground flex justify-between items-center bg-background/95 backdrop-blur-sm">
                                                 <span className="truncate pr-2">{item.guestName || "Anónimo"}</span>
                                                 <span>{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                             </div>
@@ -429,7 +423,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                 )}
                             </>
                         ) : (
-                            <div className="text-center p-8 border rounded-lg border-dashed text-muted-foreground">
+                            <div className="text-center p-8 border border-white/10 rounded-lg border-dashed text-muted-foreground">
                                 {activeTab === "PENDING" && "Todavía no hay contenido pendiente de moderar."}
                                 {activeTab === "APPROVED" && "Todavía no hay contenido aceptado."}
                                 {activeTab === "REJECTED" && "No hay contenido rechazado."}
