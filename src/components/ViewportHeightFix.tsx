@@ -3,24 +3,22 @@
 import { useEffect } from "react";
 
 /**
- * Algunos navegadores mobile (ej: Chrome en iOS, que corre sobre WebKit pero
- * con su propio manejo de la barra de herramientas) no recalculan "dvh"
- * de forma confiable cuando la barra se muestra/oculta. Esto guarda el alto
- * real del viewport en la variable CSS --vh, para que
- * "calc(var(--vh, 1vh) * 100)" sea un reemplazo de 100dvh que funciona en
- * cualquier navegador.
+ * En Chrome para iOS especificamente (no en Safari, Firefox ni Edge para
+ * iOS, aunque los tres corren sobre el mismo WKWebView de Apple) "dvh"
+ * puede quedar pegado a un valor viejo después de volver de background o
+ * de bloquear la pantalla. Es un bug conocido y confirmado del lado de
+ * Chrome (https://issues.chromium.org/issues/40944174), no algo que
+ * dependa de esperar el tiempo justo.
  *
- * Usa window.visualViewport cuando está disponible: es más preciso que
- * window.innerHeight para esto (pensado justamente para reflejar el área
- * visible real, sin importar la barra del navegador) y tiene sus propios
- * eventos "resize"/"scroll" más confiables que el "resize" genérico de
- * window para este caso.
- *
- * Además de resize/orientationchange/pageshow/focus/visibilitychange (que
- * cubren volver de background luego de bloquear la pantalla o cambiar de
- * app), se vuelve a recalcular con un pequeño delay después de cada evento:
- * en algunos navegadores el valor todavía no está estable en el instante
- * exacto en que el evento se dispara (la barra sigue animando/asentándose).
+ * El problema es que no hay ninguna garantía de que ESCUCHAR el evento
+ * correcto alcance: si el bug es tan profundo que ni siquiera
+ * window.innerHeight/visualViewport.height se actualizan a tiempo con
+ * "resize"/"visibilitychange"/etc. en Chrome-iOS, ningún listener por sí
+ * solo lo va a agarrar de forma confiable. Por eso, además de reaccionar
+ * a los eventos de siempre (para que responda rápido en los navegadores
+ * donde sí funcionan), hay un sondeo de fondo que corre SIEMPRE, sin
+ * depender de ningún evento -- así, aunque Chrome-iOS no dispare nada
+ * útil, en el peor caso el layout se corrige solo en <=1.5s.
  */
 export function ViewportHeightFix() {
   useEffect(() => {
@@ -29,37 +27,42 @@ export function ViewportHeightFix() {
         ? window.visualViewport.height
         : window.innerHeight;
 
+    let lastApplied = -1;
     const setVh = () => {
-      document.documentElement.style.setProperty("--vh", `${getHeight() * 0.01}px`);
-    };
-
-    const setVhSettled = () => {
-      setVh();
-      setTimeout(setVh, 120);
-      setTimeout(setVh, 400);
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") setVhSettled();
+      const h = getHeight();
+      if (h !== lastApplied) {
+        document.documentElement.style.setProperty("--vh", `${h * 0.01}px`);
+        lastApplied = h;
+      }
+      return h;
     };
 
     setVh();
 
-    window.addEventListener("resize", setVhSettled);
-    window.addEventListener("orientationchange", setVhSettled);
-    window.addEventListener("pageshow", setVhSettled);
-    window.addEventListener("focus", setVhSettled);
+    // Sondeo de fondo, independiente de cualquier evento -- la red de
+    // seguridad real para navegadores que no avisan nada.
+    const backgroundPoll = setInterval(setVh, 1500);
+
+    // Listeners "normales", para reaccionar mas rapido donde sí funcionan.
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") setVh();
+    };
+    window.addEventListener("resize", setVh);
+    window.addEventListener("orientationchange", setVh);
+    window.addEventListener("pageshow", setVh);
+    window.addEventListener("focus", setVh);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.visualViewport?.addEventListener("resize", setVhSettled);
+    window.visualViewport?.addEventListener("resize", setVh);
     window.visualViewport?.addEventListener("scroll", setVh);
 
     return () => {
-      window.removeEventListener("resize", setVhSettled);
-      window.removeEventListener("orientationchange", setVhSettled);
-      window.removeEventListener("pageshow", setVhSettled);
-      window.removeEventListener("focus", setVhSettled);
+      clearInterval(backgroundPoll);
+      window.removeEventListener("resize", setVh);
+      window.removeEventListener("orientationchange", setVh);
+      window.removeEventListener("pageshow", setVh);
+      window.removeEventListener("focus", setVh);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.visualViewport?.removeEventListener("resize", setVhSettled);
+      window.visualViewport?.removeEventListener("resize", setVh);
       window.visualViewport?.removeEventListener("scroll", setVh);
     };
   }, []);
