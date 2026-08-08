@@ -106,10 +106,7 @@ export function LogoFooterCredit({
       className={`md:hidden flex justify-center py-8 ${className ?? ""}`}
       style={{ backgroundColor: bgColor }}
     >
-      <div
-        className="flex flex-col items-center gap-2 px-5 py-4 rounded-2xl"
-        style={{ backgroundColor: "#0F1613" }}
-      >
+      <div className="flex flex-col items-center gap-2 px-5 py-4">
         <span
           className="text-[10px] uppercase tracking-[0.15em]"
           style={{ fontFamily: "var(--font-inter), sans-serif", color: "#F6F3EC", opacity: 0.6 }}
