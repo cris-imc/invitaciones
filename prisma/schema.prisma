@@ -346,9 +346,12 @@ model LiveItem {
   fileUrl      String
   duration     Int?        // Solo para AUDIO, en segundos
   guestName    String?     // Opcional
-  isActive     Boolean     @default(true) // Para moderación (falso = no se muestra)
+  isActive     Boolean     @default(true) // true = aprobado, visible en pantalla/publico
+  status       String      @default("APPROVED") // "PENDING" | "APPROVED" | "REJECTED"
+  rejectedAt   DateTime?   // cuando se rechazo -- se borra 1h despues (limpieza en GET /api/live/session)
   createdAt    DateTime    @default(now())
   session      LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId, isActive, createdAt(sort: Desc)])
+  @@index([sessionId, status, createdAt(sort: Desc)])
 }

@@ -3,6 +3,11 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { nanoid } from "nanoid";
 import { getEventStatus } from "@/lib/expiration";
+import { cleanupExpiredRejectedItems } from "@/lib/live-cleanup";
+
+const PAGE_SIZE = 4;
+const VALID_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
+type ItemStatus = (typeof VALID_STATUSES)[number];
 
 export async function GET(req: Request) {
     try {
@@ -13,6 +18,11 @@ export async function GET(req: Request) {
 
         const url = new URL(req.url);
         const invitationId = url.searchParams.get("invitationId");
+        const statusParam = url.searchParams.get("status");
+        const status: ItemStatus = VALID_STATUSES.includes(statusParam as ItemStatus)
+            ? (statusParam as ItemStatus)
+            : "PENDING";
+        const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10) || 1);
 
         if (!invitationId) {
             return new NextResponse("Missing invitationId", { status: 400 });
@@ -28,16 +38,51 @@ export async function GET(req: Request) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const liveSession = await prisma.liveSession.findUnique({
+        const liveSessionBase = await prisma.liveSession.findUnique({
             where: { invitationId },
-            include: {
-                items: {
-                    orderBy: { createdAt: "desc" }
-                }
-            }
         });
 
-        return NextResponse.json(liveSession);
+        if (!liveSessionBase) {
+            return NextResponse.json(null);
+        }
+
+        // Limpieza perezosa: borra (archivo + registro) las rechazadas de hace
+        // más de 1 hora antes de contar/paginar, para que no se acumulen.
+        await cleanupExpiredRejectedItems(liveSessionBase.id);
+
+        const [items, total, counts] = await Promise.all([
+            prisma.liveItem.findMany({
+                where: { sessionId: liveSessionBase.id, status },
+                orderBy: { createdAt: "desc" },
+                skip: (page - 1) * PAGE_SIZE,
+                take: PAGE_SIZE,
+            }),
+            prisma.liveItem.count({ where: { sessionId: liveSessionBase.id, status } }),
+            prisma.liveItem.groupBy({
+                by: ["status"],
+                where: { sessionId: liveSessionBase.id },
+                _count: { _all: true },
+            }),
+        ]);
+
+        const countsByStatus = { PENDING: 0, APPROVED: 0, REJECTED: 0 } as Record<ItemStatus, number>;
+        for (const c of counts) {
+            if (VALID_STATUSES.includes(c.status as ItemStatus)) {
+                countsByStatus[c.status as ItemStatus] = c._count._all;
+            }
+        }
+
+        return NextResponse.json({
+            ...liveSessionBase,
+            items,
+            pagination: {
+                page,
+                pageSize: PAGE_SIZE,
+                total,
+                totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+            },
+            counts: countsByStatus,
+        });
     } catch (error) {
         console.error("[LIVE_SESSION_GET]", error);
         return new NextResponse("Internal Error", { status: 500 });
@@ -98,7 +143,6 @@ export async function POST(req: Request) {
                 data: {
                     isActive: !liveSession.isActive,
                 },
-                include: { items: { orderBy: { createdAt: "desc" } } }
             });
         } else if (action === "toggleModeration" && liveSession) {
             liveSession = await prisma.liveSession.update({
@@ -106,7 +150,6 @@ export async function POST(req: Request) {
                 data: {
                     isModerated: !liveSession.isModerated,
                 },
-                include: { items: { orderBy: { createdAt: "desc" } } }
             });
         }
 

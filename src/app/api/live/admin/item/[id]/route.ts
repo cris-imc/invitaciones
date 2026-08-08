@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { deleteLiveItemFile } from "@/lib/live-cleanup";
+
+const VALID_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
+type ItemStatus = (typeof VALID_STATUSES)[number];
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -37,11 +41,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        // Borrado real: "isActive: false" ya lo usa el toggle de "Ocultar" para
-        // moderacion (item pendiente/oculto pero visible en el panel), asi que
-        // reutilizarlo para "Eliminar" hacia que el item siguiera apareciendo
-        // en la lista del admin (con el badge de "Pendiente / Oculto") y
-        // volviera a aparecer en cada refresco de polling.
+        // Borrado real: archivo en disco + registro. Se usa para "Eliminar
+        // ahora" (saltea la espera de 1h de la pestaña de Rechazadas).
+        await deleteLiveItemFile(liveItem);
         await prisma.liveItem.delete({ where: { id } });
 
         return new NextResponse("Deleted", { status: 200 });
@@ -65,7 +67,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         }
 
         const body = await req.json();
-        const { isActive } = body;
+        const { status } = body as { status?: ItemStatus };
+
+        if (!VALID_STATUSES.includes(status as ItemStatus)) {
+            return new NextResponse("Invalid status", { status: 400 });
+        }
 
         const liveItem = await prisma.liveItem.findUnique({
             where: { id },
@@ -91,7 +97,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         const updatedItem = await prisma.liveItem.update({
             where: { id },
-            data: { isActive: !!isActive }
+            data: {
+                status,
+                isActive: status === "APPROVED",
+                rejectedAt: status === "REJECTED" ? new Date() : null,
+            }
         });
 
         return NextResponse.json(updatedItem);

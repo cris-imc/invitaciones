@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Trash2, ExternalLink, RefreshCw, Power } from "lucide-react";
+import { Trash2, ExternalLink, RefreshCw, Power, ChevronLeft, ChevronRight, Check, X, RotateCcw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { getEventStatus } from "@/lib/expiration";
 
+type ItemStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 interface LiveItem {
     id: string;
     type: string;
@@ -21,6 +23,8 @@ interface LiveItem {
     guestName: string | null;
     createdAt: string;
     isActive: boolean;
+    status: ItemStatus;
+    rejectedAt: string | null;
 }
 
 interface LiveSession {
@@ -29,23 +33,47 @@ interface LiveSession {
     isActive: boolean;
     isModerated: boolean;
     items: LiveItem[];
+    pagination: { page: number; pageSize: number; total: number; totalPages: number };
+    counts: Record<ItemStatus, number>;
+}
+
+const TABS: { key: ItemStatus; label: string }[] = [
+    { key: "PENDING", label: "Pendientes" },
+    { key: "APPROVED", label: "Aceptadas" },
+    { key: "REJECTED", label: "Rechazadas" },
+];
+
+const REJECTED_TTL_MS = 60 * 60 * 1000;
+
+function timeLeftLabel(rejectedAt: string | null): string {
+    if (!rejectedAt) return "";
+    const deadline = new Date(rejectedAt).getTime() + REJECTED_TTL_MS;
+    const msLeft = deadline - Date.now();
+    if (msLeft <= 0) return "se está eliminando...";
+    const minsLeft = Math.ceil(msLeft / 60000);
+    if (minsLeft < 60) return `se elimina en ${minsLeft} min`;
+    return "se elimina en menos de 1 h";
 }
 
 export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: string; fechaEvento: string }) {
     const [session, setSession] = useState<LiveSession | null>(null);
     const [loading, setLoading] = useState(true);
+    const [tabLoading, setTabLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<ItemStatus>("PENDING");
+    const [page, setPage] = useState(1);
 
     const { data: authSession } = useSession();
     const isAdmin = authSession?.user?.role === "ADMIN" || authSession?.user?.planTier === "ADMIN";
     const isEventDay = getEventStatus(fechaEvento) === "EVENT_DAY";
     const canActivate = isAdmin || isEventDay;
 
-    const fetchSession = useCallback(async () => {
+    const fetchSession = useCallback(async (opts?: { silent?: boolean }) => {
+        if (!opts?.silent) setTabLoading(true);
         try {
-            const res = await fetch(`/api/live/session?invitationId=${invitationId}`);
+            const res = await fetch(`/api/live/session?invitationId=${invitationId}&status=${activeTab}&page=${page}`);
             if (res.ok) {
                 const data = await res.json();
                 setSession(data);
@@ -56,19 +84,27 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
             setError(err.message);
         } finally {
             setLoading(false);
+            setTabLoading(false);
         }
-    }, [invitationId]);
+    }, [invitationId, activeTab, page]);
 
     useEffect(() => {
         fetchSession();
-        // Poll every 5 seconds if active
+        // Poll every 5 seconds si el LIVE está activo, sin mostrar el loader
+        // (para no interrumpir al que está moderando mientras entran fotos).
         const interval = setInterval(() => {
             if (session?.isActive) {
-                fetchSession();
+                fetchSession({ silent: true });
             }
         }, 5000);
         return () => clearInterval(interval);
     }, [fetchSession, session?.isActive]);
+
+    const changeTab = (tab: ItemStatus) => {
+        if (tab === activeTab) return;
+        setActiveTab(tab);
+        setPage(1);
+    };
 
     const toggleLive = async () => {
         const activating = !session?.isActive;
@@ -84,9 +120,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                 body: JSON.stringify({ invitationId, action: session ? "toggle" : "create" })
             });
             if (res.ok) {
-                const data = await res.json();
-                setSession(data);
-                fetchSession(); // Re-fetch to get items if needed
+                fetchSession();
             } else {
                 const errText = await res.text();
                 console.error("API error", errText);
@@ -109,10 +143,8 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                 body: JSON.stringify({ invitationId, action: "toggleModeration" })
             });
             if (res.ok) {
-                const data = await res.json();
-                setSession(data);
+                fetchSession();
             } else {
-                const errText = await res.text();
                 setErrorMsg("Error al cambiar moderación.\n\nProbá detener la terminal y volver a correr `npm run dev` para que tome los últimos cambios de la base de datos.");
             }
         } catch (err) {
@@ -123,21 +155,24 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
         }
     };
 
-    const toggleItemActive = async (id: string, currentActive: boolean) => {
+    const setItemStatus = async (id: string, status: ItemStatus) => {
+        // Optimista: lo sacamos de la lista actual ya mismo (va a aparecer en
+        // su nueva pestaña la próxima vez que el moderador la abra).
+        setSession(prev => prev ? {
+            ...prev,
+            items: prev.items.filter(i => i.id !== id),
+            counts: { ...prev.counts, [activeTab]: Math.max(0, prev.counts[activeTab] - 1), [status]: prev.counts[status] + 1 },
+        } : prev);
         try {
-            const res = await fetch(`/api/live/admin/item/${id}`, { 
+            const res = await fetch(`/api/live/admin/item/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ isActive: !currentActive })
+                body: JSON.stringify({ status })
             });
-            if (res.ok) {
-                setSession(prev => prev ? { 
-                    ...prev, 
-                    items: prev.items.map(i => i.id === id ? { ...i, isActive: !currentActive } : i) 
-                } : prev);
-            }
+            if (!res.ok) throw new Error("failed");
         } catch (err) {
-            console.error("Error toggling item", err);
+            console.error("Error updating item status", err);
+            fetchSession(); // revertir el optimismo si falló
         }
     };
 
@@ -248,64 +283,132 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <h4 className="font-semibold text-lg">Contenido en Pantalla</h4>
-                            <Button variant="ghost" size="sm" onClick={fetchSession} className="gap-2">
-                                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                            <Button variant="ghost" size="sm" onClick={() => fetchSession()} className="gap-2">
+                                <RefreshCw className={`w-4 h-4 ${tabLoading ? 'animate-spin' : ''}`} />
                                 Actualizar
                             </Button>
                         </div>
 
+                        {/* Pestañas Pendientes / Aceptadas / Rechazadas */}
+                        <div className="flex gap-2 mb-4 border-b">
+                            {TABS.map(tab => (
+                                <button
+                                    key={tab.key}
+                                    type="button"
+                                    onClick={() => changeTab(tab.key)}
+                                    className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
+                                        activeTab === tab.key
+                                            ? "border-primary text-primary"
+                                            : "border-transparent text-muted-foreground hover:text-foreground"
+                                    }`}
+                                >
+                                    {tab.label} ({session.counts[tab.key]})
+                                </button>
+                            ))}
+                        </div>
+
                         {session.items && session.items.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {session.items.map(item => (
-                                    <div key={item.id} className="relative group rounded-lg overflow-hidden border bg-muted/20">
-                                        {item.type === "PHOTO" ? (
-                                            <img src={item.fileUrl} alt="Live" className="w-full h-40 object-cover" />
-                                        ) : (
-                                            <div className="w-full h-40 flex flex-col items-center justify-center bg-indigo-500/10 text-indigo-500 p-4 text-center">
-                                                <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center mb-2">
-                                                    💬
+                            <>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {session.items.map(item => (
+                                        <div key={item.id} className="relative group rounded-lg overflow-hidden border bg-muted/20">
+                                            {item.type === "PHOTO" ? (
+                                                <img src={item.fileUrl} alt="Live" className="w-full h-40 object-cover" />
+                                            ) : item.type === "AUDIO" ? (
+                                                <div className="w-full h-40 flex flex-col items-center justify-center bg-purple-500/10 text-purple-500 p-4 text-center">
+                                                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-2">🎤</div>
+                                                    <span className="text-xs font-semibold">Audio</span>
                                                 </div>
-                                                <span className="text-xs font-semibold">Mensaje</span>
-                                                <span className="text-[10px] mt-1 opacity-70 line-clamp-2">"{item.fileUrl}"</span>
-                                            </div>
-                                        )}
-                                            {/* Etiqueta de estado (pendiente/oculto) */}
-                                            {!item.isActive && (
-                                                <div className="absolute top-2 left-2 bg-black/70 backdrop-blur text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded">
-                                                    Pendiente / Oculto
+                                            ) : (
+                                                <div className="w-full h-40 flex flex-col items-center justify-center bg-indigo-500/10 text-indigo-500 p-4 text-center">
+                                                    <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center mb-2">
+                                                        💬
+                                                    </div>
+                                                    <span className="text-xs font-semibold">Mensaje</span>
+                                                    <span className="text-[10px] mt-1 opacity-70 line-clamp-2">"{item.fileUrl}"</span>
                                                 </div>
                                             )}
-                                        <div className="p-2 border-t text-xs text-muted-foreground flex justify-between items-center bg-background/95 backdrop-blur-sm">
-                                            <span className="truncate pr-2">{item.guestName || "Anónimo"}</span>
-                                            <span>{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                                        </div>
 
-                                        {/* Overlay de moderación */}
-                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                                            <Button 
-                                                variant={item.isActive ? "secondary" : "default"} 
-                                                size="sm"
-                                                onClick={() => toggleItemActive(item.id, item.isActive)}
-                                                className="w-32 font-semibold"
-                                            >
-                                                {item.isActive ? "Ocultar" : "Aprobar"}
-                                            </Button>
-                                            <Button 
-                                                variant="destructive" 
-                                                size="sm"
-                                                onClick={() => setDeleteItemId(item.id)}
-                                                className="w-32 gap-2"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                                Eliminar
-                                            </Button>
+                                            {activeTab === "REJECTED" && (
+                                                <div className="absolute top-2 left-2 bg-black/70 backdrop-blur text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded">
+                                                    {timeLeftLabel(item.rejectedAt)}
+                                                </div>
+                                            )}
+
+                                            <div className="p-2 border-t text-xs text-muted-foreground flex justify-between items-center bg-background/95 backdrop-blur-sm">
+                                                <span className="truncate pr-2">{item.guestName || "Anónimo"}</span>
+                                                <span>{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                            </div>
+
+                                            {/* Overlay de moderación, según pestaña */}
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                                                {activeTab === "PENDING" && (
+                                                    <>
+                                                        <Button size="sm" onClick={() => setItemStatus(item.id, "APPROVED")} className="w-32 gap-2 font-semibold">
+                                                            <Check className="w-4 h-4" /> Aprobar
+                                                        </Button>
+                                                        <Button variant="destructive" size="sm" onClick={() => setItemStatus(item.id, "REJECTED")} className="w-32 gap-2">
+                                                            <X className="w-4 h-4" /> Rechazar
+                                                        </Button>
+                                                    </>
+                                                )}
+                                                {activeTab === "APPROVED" && (
+                                                    <Button variant="destructive" size="sm" onClick={() => setItemStatus(item.id, "REJECTED")} className="w-32 gap-2">
+                                                        <X className="w-4 h-4" /> Rechazar
+                                                    </Button>
+                                                )}
+                                                {activeTab === "REJECTED" && (
+                                                    <>
+                                                        <Button size="sm" onClick={() => setItemStatus(item.id, "APPROVED")} className="w-32 gap-2 font-semibold">
+                                                            <RotateCcw className="w-4 h-4" /> Restaurar
+                                                        </Button>
+                                                        <Button variant="destructive" size="sm" onClick={() => setDeleteItemId(item.id)} className="w-32 gap-2">
+                                                            <Trash2 className="w-4 h-4" /> Eliminar ya
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
+                                    ))}
+                                </div>
+
+                                {session.pagination.totalPages > 1 && (
+                                    <div className="flex items-center justify-center gap-2 mt-4">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={page <= 1}
+                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                        >
+                                            <ChevronLeft className="w-4 h-4" />
+                                        </Button>
+                                        {Array.from({ length: session.pagination.totalPages }, (_, i) => i + 1).map(p => (
+                                            <Button
+                                                key={p}
+                                                variant={p === page ? "default" : "outline"}
+                                                size="sm"
+                                                className="w-9"
+                                                onClick={() => setPage(p)}
+                                            >
+                                                {p}
+                                            </Button>
+                                        ))}
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={page >= session.pagination.totalPages}
+                                            onClick={() => setPage(p => Math.min(session.pagination.totalPages, p + 1))}
+                                        >
+                                            <ChevronRight className="w-4 h-4" />
+                                        </Button>
                                     </div>
-                                ))}
-                            </div>
+                                )}
+                            </>
                         ) : (
                             <div className="text-center p-8 border rounded-lg border-dashed text-muted-foreground">
-                                Todavía no hay contenido subido a esta sesión.
+                                {activeTab === "PENDING" && "Todavía no hay contenido pendiente de moderar."}
+                                {activeTab === "APPROVED" && "Todavía no hay contenido aceptado."}
+                                {activeTab === "REJECTED" && "No hay contenido rechazado."}
                             </div>
                         )}
                     </div>
@@ -318,7 +421,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                     <DialogHeader>
                         <DialogTitle>Eliminar contenido</DialogTitle>
                         <DialogDescription>
-                            ¿Estás seguro de que querés eliminar este contenido de la pantalla? No se podrá recuperar.
+                            ¿Estás seguro de que querés eliminar este contenido ahora mismo? No se podrá recuperar.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>

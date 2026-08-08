@@ -45,7 +45,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
                     type: 'TEXT',
                     fileUrl: message.trim(), // We store the text message here
                     guestName: guestName || null,
-                    isActive: !liveSession.isModerated
+                    isActive: !liveSession.isModerated,
+                    status: liveSession.isModerated ? 'PENDING' : 'APPROVED'
                 }
             });
             return NextResponse.json(item);
@@ -83,7 +84,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
                 type,
                 fileUrl,
                 guestName: guestName || null,
-                isActive: !liveSession.isModerated
+                isActive: !liveSession.isModerated,
+                status: liveSession.isModerated ? 'PENDING' : 'APPROVED'
             }
         });
 
