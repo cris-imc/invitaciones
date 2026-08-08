@@ -311,7 +311,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                             <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {session.items.map(item => (
-                                        <div key={item.id} className="relative group rounded-lg overflow-hidden border bg-muted/20">
+                                        <div key={item.id} className="relative rounded-lg overflow-hidden border bg-muted/20">
                                             {item.type === "PHOTO" ? (
                                                 <img src={item.fileUrl} alt="Live" className="w-full h-40 object-cover" />
                                             ) : item.type === "AUDIO" ? (
@@ -340,34 +340,58 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                                 <span>{new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                             </div>
 
-                                            {/* Overlay de moderación, según pestaña */}
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                                                {activeTab === "PENDING" && (
-                                                    <>
-                                                        <Button size="sm" onClick={() => setItemStatus(item.id, "APPROVED")} className="w-32 gap-2 font-semibold">
-                                                            <Check className="w-4 h-4" /> Aprobar
-                                                        </Button>
-                                                        <Button variant="destructive" size="sm" onClick={() => setItemStatus(item.id, "REJECTED")} className="w-32 gap-2">
-                                                            <X className="w-4 h-4" /> Rechazar
-                                                        </Button>
-                                                    </>
-                                                )}
-                                                {activeTab === "APPROVED" && (
-                                                    <Button variant="destructive" size="sm" onClick={() => setItemStatus(item.id, "REJECTED")} className="w-32 gap-2">
-                                                        <X className="w-4 h-4" /> Rechazar
-                                                    </Button>
-                                                )}
-                                                {activeTab === "REJECTED" && (
-                                                    <>
-                                                        <Button size="sm" onClick={() => setItemStatus(item.id, "APPROVED")} className="w-32 gap-2 font-semibold">
-                                                            <RotateCcw className="w-4 h-4" /> Restaurar
-                                                        </Button>
-                                                        <Button variant="destructive" size="sm" onClick={() => setDeleteItemId(item.id)} className="w-32 gap-2">
-                                                            <Trash2 className="w-4 h-4" /> Eliminar ya
-                                                        </Button>
-                                                    </>
-                                                )}
-                                            </div>
+                                            {/* Botones de moderación: siempre visibles (no por hover, que no
+                                                existe en mobile), mismo estilo que "eliminar foto" del wizard. */}
+                                            {activeTab === "PENDING" && (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setItemStatus(item.id, "APPROVED")}
+                                                        aria-label="Aprobar"
+                                                        className="absolute top-2 left-2 bg-green-600/90 hover:bg-green-600 text-white rounded-full p-1.5 shadow-lg"
+                                                    >
+                                                        <Check className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setItemStatus(item.id, "REJECTED")}
+                                                        aria-label="Rechazar"
+                                                        className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white rounded-full p-1.5 shadow-lg"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            )}
+                                            {activeTab === "APPROVED" && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setItemStatus(item.id, "REJECTED")}
+                                                    aria-label="Rechazar"
+                                                    className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white rounded-full p-1.5 shadow-lg"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                            {activeTab === "REJECTED" && (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setItemStatus(item.id, "APPROVED")}
+                                                        aria-label="Restaurar"
+                                                        className="absolute top-2 right-2 bg-yellow-500/90 hover:bg-yellow-500 text-white rounded-full p-1.5 shadow-lg"
+                                                    >
+                                                        <RotateCcw className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setDeleteItemId(item.id)}
+                                                        aria-label="Eliminar ahora"
+                                                        className="absolute bottom-11 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 shadow"
+                                                    >
+                                                        <Trash2 className="w-3 h-3" />
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
