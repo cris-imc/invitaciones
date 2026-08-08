@@ -27,25 +27,12 @@ export function ViewportHeightFix() {
         ? window.visualViewport.height
         : window.innerHeight;
 
-    // Fuerza un reflow/repintado real del layout y, en particular, hace que
-    // WebKit vuelva a validar los límites de scroll de la página -- en iOS
-    // el motor puede quedarse con el alto scrolleable "cacheado" de antes,
-    // sin recalcularlo solo aunque el CSS ya tenga el valor correcto. Un
-    // scrollTo() a la MISMA posición (no se mueve nada visible) es el
-    // truco clásico para forzar esa revalidación sin efectos secundarios.
-    const forceReflow = () => {
-      const panel = document.querySelector<HTMLElement>(".panel");
-      if (panel) void panel.offsetHeight; // fuerza recalculo de estilos/layout
-      window.scrollTo(window.scrollX, window.scrollY);
-    };
-
     let lastApplied = -1;
     const setVh = () => {
       const h = getHeight();
       if (h !== lastApplied) {
         document.documentElement.style.setProperty("--vh", `${h * 0.01}px`);
         lastApplied = h;
-        forceReflow();
       }
       return h;
     };
