@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { ViewportHeightFix } from "@/components/ViewportHeightFix";
 import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2, Sora } from 'next/font/google';
 
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
@@ -37,6 +38,7 @@ export default function RootLayout({
       <head>
       </head>
       <body className={`antialiased ${fraunces.variable} ${spaceGrotesk.variable} ${spaceMono.variable} ${inter.variable} ${cormorant.variable} ${bricolage.variable} ${fredoka.variable} ${baloo.variable} ${sora.variable}`}>
+        <ViewportHeightFix />
         <AuthProvider>
           <ToastProvider>
             {children}

@@ -135,14 +135,14 @@ export function StepDetails() {
                                     <FormControl>
                                         <Input placeholder="Pegá el link que copiaste de Google Maps" {...field} />
                                     </FormControl>
-                                    <p className="text-xs text-muted-foreground">
-                                        Vale cualquier link de Google Maps (el de "Compartir" o el de la barra de direcciones).
-                                    </p>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
                     </div>
+                    <p className="text-xs text-muted-foreground -mt-2">
+                        Vale cualquier link de Google Maps (el de "Compartir" o el de la barra de direcciones).
+                    </p>
 
                     <div className="pt-4 border-t border-border/50">
                         <div className="flex items-center gap-2 mb-4">
