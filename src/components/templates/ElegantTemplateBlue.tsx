@@ -379,8 +379,7 @@ export function ElegantTemplateBlue({ invitation, guest, isPersonalized = false 
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
   const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
-  const liveFotos = (invitation.liveSession as { items?: { fileUrl: string }[] } | null)?.items?.map((i) => i.fileUrl) ?? [];
-  const allPhotos = [...new Set([...galeria, ...albumFotos, ...liveFotos].filter(Boolean))];
+  const allPhotos = [...new Set([...galeria, ...albumFotos].filter(Boolean))];
 
   const cronograma: CronoItem[] = safeJson<CronoItem[]>(String(invitation.cronogramaEventos ?? ""), []);
 

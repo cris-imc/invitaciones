@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getUploadsDir } from "@/lib/uploads";
 
 const REJECTED_TTL_MS = 60 * 60 * 1000; // 1 hora
+const PENDING_GRACE_MS = 24 * 60 * 60 * 1000; // 24 horas post-evento
 
 /** Borra el archivo en disco de un LiveItem (no aplica a "TEXT", que no tiene archivo). */
 async function deleteLiveItemFile(item: { type: string; fileUrl: string }) {
@@ -38,6 +39,22 @@ export async function cleanupExpiredRejectedItems(sessionId: string) {
   await Promise.all(expired.map(deleteLiveItemFile));
   await prisma.liveItem.deleteMany({
     where: { id: { in: expired.map((i) => i.id) } },
+  });
+}
+
+/**
+ * Si ya pasaron 24hs desde el evento y quedan items PENDING sin moderar
+ * (el anfitrión nunca los aprobó ni rechazó), se pasan a REJECTED -- de ahí
+ * entran al mismo circuito de borrado a la hora que cualquier rechazo
+ * manual. Se llama de forma perezosa desde las páginas públicas de la
+ * invitación, que ya conocen la fecha del evento.
+ */
+export async function autoRejectStalePending(sessionId: string, fechaEvento: Date) {
+  if (Date.now() - fechaEvento.getTime() < PENDING_GRACE_MS) return;
+
+  await prisma.liveItem.updateMany({
+    where: { sessionId, status: "PENDING" },
+    data: { status: "REJECTED", rejectedAt: new Date() },
   });
 }
 

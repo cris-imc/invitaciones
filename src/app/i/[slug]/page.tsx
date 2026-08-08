@@ -20,6 +20,7 @@ import { ModernoTemplateVerde } from "@/components/templates/ModernoTemplateVerd
 import { ModernoTemplateRojo } from "@/components/templates/ModernoTemplateRojo";
 import { ModernoTemplateGris } from "@/components/templates/ModernoTemplateGris";
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
+import { autoRejectStalePending } from "@/lib/live-cleanup";
 
 // ── Helpers ──────────────────────────────────────────────────────
 async function getInvitation(slug: string) {
@@ -36,7 +37,9 @@ async function getInvitation(slug: string) {
       },
       liveSession: {
         include: {
-          items: true,
+          // Solo aprobadas -- pendientes/rechazadas no deben mostrarse
+          // nunca en la invitación pública.
+          items: { where: { status: "APPROVED" } },
         },
       },
     },
@@ -110,6 +113,10 @@ export default async function InvitationPage({
   const invitation = await checkAndCleanupIfExpired(rawInvitation);
 
   if (!invitation) notFound();
+
+  if (invitation.liveSession?.id && invitation.fechaEvento) {
+    await autoRejectStalePending(invitation.liveSession.id, new Date(invitation.fechaEvento));
+  }
 
   let temaColoresObj = { colorPrincipal: 'default' };
   try {

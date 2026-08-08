@@ -20,6 +20,7 @@ import { ModernoTemplateRojo } from "@/components/templates/ModernoTemplateRojo"
 import { ModernoTemplateGris } from "@/components/templates/ModernoTemplateGris";
 import { Metadata } from 'next';
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
+import { autoRejectStalePending } from "@/lib/live-cleanup";
 
 // Generate metadata for social sharing
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -159,7 +160,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 liveSession: {
                     select: {
                         id: true,
-                        items: true,
+                        // Solo aprobadas -- pendientes/rechazadas no deben
+                        // mostrarse nunca en la invitación pública.
+                        items: { where: { status: "APPROVED" } },
                     },
                 },
             } as any,
@@ -191,6 +194,11 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
 
     const validInvitation = await checkAndCleanupIfExpired(invitation as any);
     if (!validInvitation) return notFound();
+
+    const vInv = validInvitation as unknown as { liveSession?: { id?: string } | null; fechaEvento?: string | Date | null };
+    if (vInv.liveSession?.id && vInv.fechaEvento) {
+        await autoRejectStalePending(vInv.liveSession.id, new Date(vInv.fechaEvento));
+    }
 
     // Security check: Ensure token matches the invitation
     if (!guest || guest.invitationId !== String(validInvitation.id)) {
