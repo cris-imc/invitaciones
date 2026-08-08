@@ -1,6 +1,16 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Refuerza min-h-dvh (Tailwind) con el alto real medido por JS (--vh, ver
+   ViewportHeightFix.tsx). Algunos navegadores mobile (ej: Chrome en iOS) no
+   recalculan bien "100dvh" cuando su barra de herramientas se muestra u
+   oculta, dejando espacio vacío scrolleable de más. Al no estar dentro de
+   ningún @layer, esta regla gana por sobre el utility de Tailwind sin
+   depender del orden en el archivo. */
+.min-h-dvh {
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
 /* Brillo animado para el boton de Administrar */
 .btn-admin-glow {
   position: relative;
@@ -959,7 +969,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 }
 
 /* ---- PANEL (Dashboard) ---- */
-.panel{display:grid; grid-template-columns:220px minmax(0, 1fr); gap:0; border-radius:var(--r-l); overflow:hidden; border:1px solid var(--line); background:var(--ink); min-height:80vh; min-height:80dvh;}
+.panel{display:grid; grid-template-columns:220px minmax(0, 1fr); gap:0; border-radius:var(--r-l); overflow:hidden; border:1px solid var(--line); background:var(--ink); min-height:80vh; min-height:calc(var(--vh, 1vh) * 80);}
 .p-side{border-right:1px solid var(--line); padding:22px 16px; display:flex; flex-direction:column;}
 .p-brand{display:flex; align-items:center; gap:10px; font-family:var(--font-ui); font-weight:700; font-size:15px; margin-bottom:28px; padding:0 6px; color:var(--paper);}
 .p-nav{display:flex; flex-direction:column; gap:2px;}
@@ -996,23 +1006,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   justify-content: space-between;
 }
 
-/* Hamburger button */
-.p-hamburger{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--paper);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.p-hamburger:hover{ background: rgba(246,243,236,.08); }
-
-/* Barra curva inferior (mobile) con el botón circular de Inicio */
+/* Botonera inferior (mobile): Salir | Inactivas | Inicio (elevado) | Datos | Nueva */
 .p-bottom-nav{
   display: none;
   position: fixed;
@@ -1020,14 +1014,51 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   bottom: 16px;
   transform: translateX(-50%);
   z-index: 55;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2px;
+  width: calc(100vw - 24px);
+  max-width: 400px;
+  padding: 8px 10px;
+  border-radius: 28px;
+  background: rgba(15, 22, 19, 0.85);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.p-bottom-nav-item{
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  border-radius: 999px;
-  background: rgba(15, 22, 19, 0.75);
-  border: 1px solid var(--line);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  gap: 3px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 2px;
+  border: none;
+  background: transparent;
+  color: rgba(246,243,236,.5);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.p-bottom-nav-item span{ white-space: nowrap; }
+.p-bottom-nav-item:hover,
+.p-bottom-nav-item.active{ color: var(--paper); }
+
+.p-bottom-nav-home-wrap{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+  margin-top: -26px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--paper);
 }
 .p-bottom-nav-home{
   display: flex;
@@ -1041,50 +1072,9 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   box-shadow: 0 4px 14px rgba(0,0,0,.35);
   transition: transform 0.15s ease, background 0.15s ease;
 }
-.p-bottom-nav-home:hover,
-.p-bottom-nav-home:active{
+.p-bottom-nav-home-wrap:hover .p-bottom-nav-home,
+.p-bottom-nav-home-wrap:active .p-bottom-nav-home{
   transform: scale(0.94);
-}
-
-/* Drawer overlay */
-.p-drawer-overlay{
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(2px);
-}
-
-/* Drawer panel */
-.p-drawer{
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 100;
-  width: 280px;
-  background: var(--ink);
-  border-right: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  transform: translateX(-100%);
-  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-  padding: 0;
-}
-.p-drawer.open{ transform: translateX(0); }
-
-.p-drawer-head{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 16px;
-  border-bottom: 1px solid var(--line);
-}
-
-.p-drawer .p-nav{
-  padding: 12px 12px;
-  overflow-y: auto;
-  flex: 1;
 }
 
 @media (max-width: 767px) {
@@ -1093,6 +1083,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
     border-radius: 0;
     border: none;
     min-height: 100dvh;
+    min-height: calc(var(--vh, 1vh) * 100);
   }
   .p-side{ display: none; }
   .p-main{ padding: 110px 20px 104px !important; }
