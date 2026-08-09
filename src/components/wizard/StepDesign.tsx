@@ -40,21 +40,7 @@ export function StepDesign() {
         }
     };
 
-    const handleCreate = async () => {
-        setIsCreating(true);
-        try {
-            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit);
-            // Evita que el listener de beforeunload dispare el aviso nativo del
-            // navegador ("los cambios no se guardarán") durante esta redirección,
-            // ya que la invitación recién se guardó con éxito.
-            setDirty(false);
-            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
-        } catch (error) {
-            console.error('Error creating invitation:', error);
-            alert(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`);
-            setIsCreating(false);
-        }
-    };
+
 
     return (
         <div className="space-y-8">
@@ -132,7 +118,7 @@ export function StepDesign() {
                 </>
             )}
 
-            <SaveStepButtons isLastStep={true} onCreate={handleCreate} isCreating={isCreating} />
+            <SaveStepButtons />
         </div>
     );
 }
