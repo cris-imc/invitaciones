@@ -1263,7 +1263,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 
 /* ---- Ã¡lbum / carrusel de fotos ---- */
 #album .album-wrap, .d-sec > .album-wrap { position: relative; width: 100% !important; max-width: 1000px !important; margin: 0 auto; }
-.album-track{display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch;}
+.album-track{display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch; touch-action:pan-x;}
 .album-track::-webkit-scrollbar{display:none;}
 .album-item{flex:0 0 auto; width:190px; height:250px; border-radius:14px; background-size:cover; background-position:center; scroll-snap-align:start;}
 .album-nav{display:flex; gap:8px; margin-top:10px; justify-content:flex-end;}
