@@ -10,7 +10,6 @@ import { StepMusic } from "./StepMusic";
 import { StepTrivia } from "./StepTrivia";
 import { StepDesign } from "./StepDesign";
 import { StepCronograma } from "./StepCronograma";
-import { WizardPreviewPane } from "./WizardPreviewPane";
 import { BackLink } from "@/components/ui/BackLink";
 import { StepPreview } from "./StepPreview";
 import { StepPhrase } from "./StepPhrase";
