@@ -209,6 +209,9 @@ model Invitation {
   despedidaTexto               String?
   despedidaFoto                String?
   tipografiaDisplay            String?          @default("fraunces")
+  fontTitle                    String?          @default("fraunces")
+  fontBody                     String?          @default("space-grotesk")
+  countdownStyle               String?          @default("clasico")
   createdAt                    DateTime         @default(now())
   updatedAt                    DateTime         @updatedAt
   ciudad                       String?
