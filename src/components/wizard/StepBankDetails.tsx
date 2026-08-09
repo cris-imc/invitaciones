@@ -11,6 +11,7 @@ import { Info, ChevronDown, ChevronUp, Gift, CreditCard, ShieldAlert, Lock } fro
 import { SaveStepButtons } from "./SaveStepButtons";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
+import { saveInvitationFromWizard } from "@/lib/save-invitation";
 
 const PREDEFINED_TITULOS_REGALO = ["Regalo", "Mesa de Regalos", "Colaboración"];
 const PREDEFINED_TITULOS_TARJETA = ["Pago de Tarjetas", "Pago de Invitaciones", "Entrada al Evento"];
@@ -24,6 +25,8 @@ export function StepBankDetails() {
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
     const [attemptedNext, setAttemptedNext] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
+    const themeConfig = useWizardStore((state) => state.themeConfig);
 
     // Helper for CBU formatting (digits only, max 22 characters)
     const handleCbuChange = (field: "regaloCbu" | "pagoTarjetaCbu", rawValue: string) => {
@@ -69,6 +72,25 @@ export function StepBankDetails() {
         }
         setAttemptedNext(false);
         nextStep();
+    };
+
+    const handleCreate = async () => {
+        if (hasMissingRequired) {
+            setAttemptedNext(true);
+            showToast("Completá los datos bancarios obligatorios (titular y CBU/CVU o alias) antes de continuar.", "error");
+            return;
+        }
+        setAttemptedNext(false);
+        setIsCreating(true);
+        try {
+            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit);
+            useWizardStore.getState().setDirty(false);
+            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
+        } catch (error) {
+            console.error('Error creating invitation:', error);
+            showToast(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`, "error");
+            setIsCreating(false);
+        }
     };
 
     return (
@@ -522,7 +544,7 @@ export function StepBankDetails() {
                 )}
             </div>
 
-            <SaveStepButtons onNext={handleNext} />
+            <SaveStepButtons onNext={handleNext} isLastStep={true} onCreate={handleCreate} isCreating={isCreating} />
         </div>
     );
 }
