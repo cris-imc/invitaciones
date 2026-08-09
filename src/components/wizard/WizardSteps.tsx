@@ -21,9 +21,13 @@ export function WizardSteps() {
     const { currentStep, data } = useWizardStore();
 
     const isCasamiento = data.type === 'CASAMIENTO';
+    // Al editar una invitación ya creada no tiene sentido volver a elegir el
+    // tipo de evento (cambia plantillas/campos disponibles), así que ese
+    // paso solo existe en el flujo de creación.
+    const isEditing = Boolean(data.id);
 
     const steps = [
-        { component: StepEventType, label: "Tipo de Evento" },
+        ...(isEditing ? [] : [{ component: StepEventType, label: "Tipo de Evento" }]),
         { component: StepBasicInfo, label: "Información Básica" },
         { component: StepDetails, label: "Detalles del Salón" },
         ...(isCasamiento ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),

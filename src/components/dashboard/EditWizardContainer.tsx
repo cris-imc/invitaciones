@@ -122,7 +122,9 @@ function WizardContent({ invitation }: { invitation: any }) {
             setDirty(false); // Reset dirtiness after loading from DB
             
             if (initialStepParam === 'design') {
-                setStep(invitation.tipo === 'CASAMIENTO' ? 11 : 10);
+                // Sin el paso "Tipo de Evento" (solo existe al crear), todos
+                // los indices en modo edicion quedan corridos uno hacia atras.
+                setStep(invitation.tipo === 'CASAMIENTO' ? 10 : 9);
             } else {
                 setStep(0);
             }
