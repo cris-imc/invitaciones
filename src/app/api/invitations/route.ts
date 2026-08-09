@@ -248,6 +248,9 @@ export async function POST(request: NextRequest) {
                 templateId: 'default',
                 templateTipo: body.templateTipo || 'ORIGINAL',
                 tipografiaDisplay: body.tipografiaDisplay || 'fraunces',
+                fontTitle: body.fontTitle || 'fraunces',
+                fontBody: body.fontBody || 'space-grotesk',
+                countdownStyle: body.countdownStyle || 'clasico',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -458,6 +461,9 @@ export async function PUT(request: NextRequest) {
                 musicaUrl: body.musicaUrl || null,
                 templateTipo: body.templateTipo || 'ORIGINAL',
                 tipografiaDisplay: body.tipografiaDisplay || 'fraunces',
+                fontTitle: body.fontTitle || 'fraunces',
+                fontBody: body.fontBody || 'space-grotesk',
+                countdownStyle: body.countdownStyle || 'clasico',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',

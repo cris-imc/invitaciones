@@ -286,8 +286,8 @@
 
   --font-serif: var(--font-display);
   --font-sans:  var(--font-body);
-  --font-mono:  var(--font-mono);
-  --font-ui:    var(--font-ui);
+  --font-mono:  var(--font-space-mono);
+  --font-ui:    var(--font-space-grotesk);
 }
 
 /* --------------------------------------------------
@@ -1384,7 +1384,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .wiz-scroll::-webkit-scrollbar { width: 4px; }
 .wiz-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
 
-/* Right preview pane — hidden on mobile */
+/* Right preview pane — hidden on mobile (usa WizardMobilePreviewSheet ahí) */
 .wiz-preview-pane {
   display: none;
   width: 420px;
@@ -1394,6 +1394,8 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   overflow: hidden;
   position: relative;
   min-height: 520px;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 900px) {
@@ -1405,6 +1407,52 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 @media (max-width: 899px) {
   .wiz-panel { border-radius: var(--r-s); }
   .wiz-scroll { padding: 18px 16px 24px; }
+}
+
+/* Corrección 4 (docs/correcciones.md): bottom sheet arrastrable con la
+   preview en vivo, solo en mobile (el panel derecho fijo ya cubre desktop).
+   Portaleado a document.body (ver WizardMobilePreviewSheet.tsx), así que el
+   toggle de display va directo acá, sin wrapper intermedio. */
+.wiz-mobile-sheet {
+  display: block;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  background: var(--ink);
+  border-radius: var(--r-l) var(--r-l) 0 0;
+  box-shadow: 0 -12px 32px rgba(0,0,0,.45);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  touch-action: none;
+}
+.wiz-mobile-sheet-handle {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 6px;
+  cursor: grab;
+}
+.wiz-mobile-sheet-handle span {
+  width: 40px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(246,243,236,.25);
+}
+.wiz-mobile-sheet-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px 24px;
+}
+
+@media (min-width: 900px) {
+  .wiz-mobile-sheet { display: none; }
 }
 
 /* ──────────────────────────────────────────────────────────

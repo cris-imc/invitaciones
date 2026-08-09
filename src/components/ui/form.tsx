@@ -97,7 +97,20 @@ function FormLabel({
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      className={cn(
+        // Corrección 5 (docs/correcciones.md): labels del wizard siempre en
+        // Space Mono uppercase, consistente con el resto de los pasos
+        // rediseñados (Plantilla, Tipografía, Countdown). FormLabel solo se
+        // usa dentro del wizard (StepBasicInfo/StepDetails/StepCeremonia/
+        // StepEventType), así que este cambio no afecta otros formularios.
+        // Usa --font-space-mono (la variable real del font loader) en vez
+        // de la semántica --font-mono: esta última, pese a estar bien
+        // declarada en globals.css, no resuelve en runtime dentro de este
+        // árbol (ver nota en docs/PLAN_CORRECCIONES_WIZARD.md).
+        "[font-family:var(--font-space-mono)] text-[10px] uppercase tracking-[0.08em] text-white/50",
+        "data-[error=true]:text-destructive",
+        className
+      )}
       htmlFor={formItemId}
       {...props}
     />

@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useWizardStore } from "@/store/wizard-store";
 import { WizardSteps } from "@/components/wizard/WizardSteps";
+import { getWizardSteps } from "@/components/wizard/wizard-steps-config";
 import { useSearchParams } from "next/navigation";
 
 function WizardContent({ invitation }: { invitation: any }) {
@@ -122,9 +123,11 @@ function WizardContent({ invitation }: { invitation: any }) {
             setDirty(false); // Reset dirtiness after loading from DB
             
             if (initialStepParam === 'design') {
-                // Sin el paso "Tipo de Evento" (solo existe al crear), todos
-                // los indices en modo edicion quedan corridos uno hacia atras.
-                setStep(invitation.tipo === 'CASAMIENTO' ? 10 : 9);
+                // Calculado por búsqueda (no hardcodeado) para que nunca se
+                // desincronice si se vuelve a reordenar el wizard.
+                const editSteps = getWizardSteps({ isEditing: true, isCasamiento: invitation.tipo === 'CASAMIENTO' });
+                const designIndex = editSteps.findIndex((s) => s.label === 'Plantilla');
+                setStep(designIndex >= 0 ? designIndex : 0);
             } else {
                 setStep(0);
             }

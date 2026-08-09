@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   MODERNO_COMPONENTS,
@@ -27,6 +27,36 @@ function PreviewPlantillaContent() {
   const componentsMap = tipo === "MODERNO" ? MODERNO_COMPONENTS : ELEGANT_COMPONENTS;
   const Template = componentsMap[color] ?? componentsMap.default;
   const sample = getTemplatePreviewSample(evento, tipo, color);
+
+  // Corrección 1 (docs/correcciones.md): cuando este iframe se usa desde el
+  // wizard (WizardLivePreview.tsx), el padre empuja los datos reales que el
+  // usuario va cargando via postMessage. Mientras no llegó nada, se sigue
+  // mostrando la muestra fija (para no verse vacío antes del primer mensaje,
+  // ej. cuando se usa como TemplateShowcase/TemplatePreviewModal sin nunca
+  // mandar datos en vivo).
+  const [liveInvitation, setLiveInvitation] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.source !== window.parent) return;
+      if (event.data?.type !== "wizard-live-data") return;
+      setLiveInvitation(event.data.invitation ?? {});
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
+  // Solo pisa los campos que ya llegaron con un valor real -- así, por
+  // ejemplo, antes de llegar al paso "Información Básica" la fecha sigue
+  // siendo la de la muestra en vez de quedar vacía.
+  const displayInvitation = liveInvitation
+    ? {
+        ...sample,
+        ...Object.fromEntries(
+          Object.entries(liveInvitation).filter(([, v]) => v !== undefined && v !== null && v !== "")
+        ),
+      }
+    : sample;
 
   // Salta la portada de bienvenida ("Abrir invitación") y recién ahí avisa
   // al padre (el modal del wizard) que ya se puede mostrar. Sin esto se ve
@@ -75,7 +105,7 @@ function PreviewPlantillaContent() {
     };
   }, [evento, tipo, color, scrollable]);
 
-  return <Template invitation={sample} guest={null} isPersonalized={false} />;
+  return <Template invitation={displayInvitation} guest={null} isPersonalized={false} />;
 }
 
 export default function PreviewPlantillaPage() {

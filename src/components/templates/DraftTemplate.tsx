@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
-import { DraftCountdown as CountdownV2 } from "@/components/invitation/v2/DraftCountdown";
+import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -17,6 +17,7 @@ import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket 
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { toEmbedMapUrl } from "@/lib/google-maps";
+import { getTypographyCssVars } from "@/lib/typography-map";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
@@ -975,7 +976,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem' }}>
             
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#2C2C2C] leading-relaxed" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#2C2C2C] leading-relaxed" style={{ fontFamily: 'var(--font-title)', fontStyle: 'italic' }}>
               {guestNameDisplay}
             </h2>
 
@@ -1036,7 +1037,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         document.body
       )}
 
-      <div className="desktop-stage" data-theme={theme}>
+      <div className="desktop-stage" data-theme={theme} style={getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
           className="hero-photo"
@@ -1052,7 +1053,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
             <span style={{ color: "white", fontFamily: "var(--font-cormorant), serif", textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}>{monogram}</span>
           </div>
           <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-white mb-6 drop-shadow-sm">{eyebrow}</p>
-          <h1 className="text-5xl font-light text-white leading-tight mb-4 drop-shadow-md" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <h1 className="text-5xl font-light text-white leading-tight mb-4 drop-shadow-md" style={{ fontFamily: 'var(--font-title)' }}>
             {em ? (
               <>
                 <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
@@ -1086,7 +1087,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
             <p className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-[#C79A4B] mb-6">
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#2C2C2C] leading-[1.0] mb-8" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            <h1 className="text-[4rem] font-light text-[#2C2C2C] leading-[1.0] mb-8" style={{ fontFamily: 'var(--font-title)' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
@@ -1121,8 +1122,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         </div>
 
         {(invitation.contadorHabilitado ?? true) ? (
-          <CountdownV2
+          <Countdown
             targetDate={fechaEvento}
+            countdownStyle={invitation.countdownStyle as any}
             kicker="Cuenta regresiva"
             title={tipo === "CASAMIENTO" ? "Faltan poquitos días" : "La cuenta ya empezó"}
           />

@@ -53,6 +53,9 @@ export const designSchema = z.object({
     tema: z.string().optional(),
     templateTipo: z.string().optional().default("ORIGINAL"),
     tipografiaDisplay: z.string().optional().default("fraunces"),
+    fontTitle: z.string().optional().default("fraunces"),
+    fontBody: z.string().optional().default("space-grotesk"),
+    countdownStyle: z.string().optional().default("clasico"),
     imagenCelebremosJuntos: z.string().optional(),
 });
 

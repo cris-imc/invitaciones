@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
-import { CountdownV2 } from "@/components/invitation/v2/CountdownV2";
+import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -16,6 +16,7 @@ import { Clock, MapPin, Trophy, Star, ThumbsUp, Users } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { toEmbedMapUrl } from "@/lib/google-maps";
+import { getTypographyCssVars } from "@/lib/typography-map";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
@@ -459,7 +460,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             </p>
 
             {/* Guest Name or Event Title */}
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-12 text-[#F7F1E4] leading-tight">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-12 text-[#F7F1E4] leading-tight" style={{ fontFamily: 'var(--font-title)' }}>
               {guestNameDisplay}
             </h2>
 
@@ -492,7 +493,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         </div>
       )}
 
-      <div className="desktop-stage" data-theme={theme}>
+      <div className="desktop-stage" data-theme={theme} style={getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
           className="hero-photo"
@@ -508,7 +509,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             <span style={{ color: "var(--t-acc)", fontFamily: "var(--t-font-d)" }}>{monogram}</span>
           </div>
           <p className="t-kicker" style={{ color: "var(--t-acc)" }}>{eyebrow}</p>
-          <h1>
+          <h1 style={{ fontFamily: 'var(--font-title)' }}>
             {em ? (
               <>
                 {title.slice(0, title.indexOf(em))}
@@ -545,7 +546,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               <span style={{ color: "var(--t-acc)", fontFamily: "var(--t-font-d)" }}>{monogram}</span>
             </div>
             <p className="t-kicker" style={{ color: "var(--t-acc)" }}>{eyebrow}</p>
-            <h1>
+            <h1 style={{ fontFamily: 'var(--font-title)' }}>
               {em ? (
                 <>
                   {title.slice(0, title.indexOf(em))}
@@ -559,8 +560,9 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         </div>
 
         {(invitation.contadorHabilitado ?? true) ? (
-          <CountdownV2
+          <Countdown
             targetDate={fechaEvento}
+            countdownStyle={invitation.countdownStyle as any}
             kicker="Cuenta regresiva"
             title={tipo === "CASAMIENTO" ? "Faltan poquitos días" : "La cuenta ya empezó"}
           />
