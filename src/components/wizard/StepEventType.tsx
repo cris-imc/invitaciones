@@ -48,7 +48,13 @@ export function StepEventType() {
                             <FormItem className="space-y-3">
                                 <FormControl>
                                     <RadioGroup
-                                        onValueChange={field.onChange}
+                                        onValueChange={(value) => {
+                                            field.onChange(value);
+                                            // Sincroniza ya (no recien al "Siguiente Paso") para que el
+                                            // contador de pasos de arriba sepa desde el click si suma
+                                            // el paso extra de Ceremonia (solo Casamiento lo tiene).
+                                            setData({ type: value as any });
+                                        }}
                                         defaultValue={field.value}
                                         className="grid grid-cols-1 sm:grid-cols-3 gap-4"
                                     >
