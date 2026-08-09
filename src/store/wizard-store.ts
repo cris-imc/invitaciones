@@ -31,6 +31,7 @@ export const useWizardStore = create<WizardState>((set) => ({
     data: {
         colorPrincipal: "#000000", // Default color (legacy)
         templateTipo: "ORIGINAL", // Default template
+        tipografiaDisplay: "fraunces", // Default typography
 
         // Initial values for new fields
         sugerenciaMusicaHabilitada: true,
@@ -136,6 +137,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         data: {
             colorPrincipal: "#000000",
             templateTipo: "ORIGINAL",
+            tipografiaDisplay: "fraunces",
             cronogramaEventos: JSON.stringify([]),
             rsvpDaysBeforeEvent: 7,
             

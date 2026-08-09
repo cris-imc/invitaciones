@@ -247,6 +247,7 @@ export async function POST(request: NextRequest) {
 
                 templateId: 'default',
                 templateTipo: body.templateTipo || 'ORIGINAL',
+                tipografiaDisplay: body.tipografiaDisplay || 'fraunces',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -456,6 +457,7 @@ export async function PUT(request: NextRequest) {
                 mapUrl: body.mapUrl || null,
                 musicaUrl: body.musicaUrl || null,
                 templateTipo: body.templateTipo || 'ORIGINAL',
+                tipografiaDisplay: body.tipografiaDisplay || 'fraunces',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',

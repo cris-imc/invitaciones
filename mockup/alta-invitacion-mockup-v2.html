@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alta Invitación — Mockup v2 (tokens reales)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   TOKENS DEL SISTEMA REAL (globals.css)
+══════════════════════════════════════════ */
+:root {
+  --ink:        #0F1613;
+  --ink-2:      #182420;
+  --paper:      #F6F3EC;
+  --paper-2:    #EAE4D4;
+  --line:       rgba(246, 243, 236, .12);
+  --line-soft:  rgba(15, 22, 19, .1);
+  --accent:     #C79A4B;
+  --accent-2:   #5C8A7A;
+  --danger:     #C0604A;
+
+  --font-display: 'Fraunces', serif;
+  --font-ui:      'Space Grotesk', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+  --font-body:    'Inter', sans-serif;
+
+  --r-s:   8px;
+  --r-m:   14px;
+  --r-l:   22px;
+  --r-pill: 999px;
+
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.06);
+  --shadow-card:  0 2px 12px rgba(0,0,0,.1);
+  --shadow-float: 0 10px 30px rgba(0,0,0,.18);
+  --shadow-nav:   0 10px 30px rgba(0,0,0,.4);
+
+  /* Tema boda (default preview) */
+  --t-ink:    #122019; --t-ink2:   #1c2f26;
+  --t-paper:  #F7F1E4; --t-paper2: #EFE6D2;
+  --t-acc:    #B98B3E; --t-acc2:   #5C2333;
+  --t-onink:  #F7F1E4; --t-onpaper:#1B2A24;
+  --t-hair:   rgba(185,139,62,.35);
+  --t-font-d: 'Fraunces', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: #0A0E0C;
+  color: var(--paper);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ══ PAGE CHROME ══ */
+.page-header {
+  background: var(--ink-2);
+  border-bottom: 1px solid var(--line);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.page-logo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -.2px;
+}
+.page-logo span { color: var(--paper); font-weight: 400; font-style: italic; }
+.page-url {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(246,243,236,.35);
+}
+
+/* ══ TAB SWITCHER ══ */
+.tab-bar {
+  display: flex; gap: 3px;
+  background: rgba(246,243,236,.06);
+  border-radius: var(--r-pill);
+  padding: 3px;
+  border: 1px solid var(--line);
+}
+.tab-btn {
+  padding: 7px 18px;
+  border: none; border-radius: var(--r-pill);
+  font-family: var(--font-ui);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: all .18s;
+  background: transparent;
+  color: rgba(246,243,236,.45);
+  letter-spacing: .02em;
+}
+.tab-btn.active {
+  background: var(--ink-2);
+  color: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ══ LAYOUT ══ */
+.canvas { padding: 48px 32px; max-width: 1500px; margin: 0 auto; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+.screens-row {
+  display: flex; gap: 36px;
+  align-items: flex-start; flex-wrap: wrap;
+}
+.screen-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+}
+.screen-label {
+  font-family: var(--font-mono);
+  font-size: 11px; color: rgba(246,243,236,.4);
+  text-align: center; letter-spacing: .04em;
+}
+
+/* ══ MOBILE FRAME ══ */
+.mobile-frame {
+  width: 375px;
+  background: var(--ink);
+  border-radius: 44px;
+  overflow: hidden;
+  box-shadow: 0 0 0 10px #0D0D0D, 0 0 0 12px #1A1A1A, var(--shadow-float);
+  position: relative; flex-shrink: 0;
+}
+.mobile-notch {
+  width: 110px; height: 26px;
+  background: #0D0D0D;
+  border-radius: 0 0 16px 16px;
+  margin: 0 auto;
+  position: relative; z-index: 10;
+}
+
+/* ══ DESKTOP FRAME ══ */
+.desktop-frame {
+  width: 1100px;
+  background: var(--ink);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(246,243,236,.08), var(--shadow-float);
+  flex-shrink: 0;
+}
+.desktop-titlebar {
+  height: 34px;
+  background: #080C0A;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; padding: 0 14px; gap: 7px;
+}
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.dot.r { background: #FF5F57; } .dot.y { background: #FFBD2E; } .dot.g { background: #28C840; }
+.titlebar-url {
+  margin: 0 auto;
+  font-family: var(--font-mono);
+  font-size: 10px; color: rgba(246,243,236,.25);
+  background: rgba(246,243,236,.05);
+  padding: 2px 12px; border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+}
+
+/* ════════════════════════════════
+   M1 — DASHBOARD MOBILE
+════════════════════════════════ */
+.m-dash { height: 812px; background: var(--ink); display: flex; flex-direction: column; overflow: hidden; }
+
+.m-topbar {
+  background: var(--ink-2);
+  padding: 13px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+.m-logo {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  color: var(--accent);
+}
+.m-logo em { font-style: italic; font-weight: 400; color: var(--paper); }
+.m-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui); font-size: 12px; font-weight: 700; color: var(--ink);
+}
+
+.m-dash-body {
+  flex: 1; overflow-y: auto; scrollbar-width: none;
+  padding: 18px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.m-dash-body::-webkit-scrollbar { display: none; }
+
+/* "nueva invitación" button */
+.m-new-btn {
+  width: 100%;
+  background: var(--accent);
+  color: var(--ink);
+  border: none; border-radius: var(--r-m);
+  padding: 13px;
+  font-family: var(--font-ui);
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer;
+  letter-spacing: .02em;
+  box-shadow: 0 4px 16px rgba(199,154,75,.3);
+}
+
+/* Invitation card */
+.m-inv-card {
+  background: var(--ink-2);
+  border-radius: var(--r-m);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.m-card-strip {
+  height: 86px;
+  position: relative;
+  display: flex; align-items: flex-end; padding: 12px 16px;
+}
+.m-card-strip-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.25);
+}
+.m-card-type {
+  position: relative; z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.15);
+  padding: 3px 8px; border-radius: var(--r-pill);
+  backdrop-filter: blur(4px);
+}
+.m-card-emoji {
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  font-size: 26px; z-index: 1;
+}
+.m-card-body { padding: 14px 16px; }
+.m-card-title {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 700;
+  color: var(--paper); margin-bottom: 8px;
+  line-height: 1.1;
+}
+.m-card-title em { font-style: italic; font-weight: 400; color: var(--accent); }
+.m-card-meta { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.m-meta-row {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 10.5px;
+  color: rgba(246,243,236,.5);
+}
+.m-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.m-tag {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 3px 9px; border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+}
+.m-tag.active { color: var(--accent-2); border-color: var(--accent-2); }
+.m-tag.days   { color: rgba(246,243,236,.45); }
+.m-tag.free   { color: rgba(246,243,236,.3); }
+
+.m-card-actions { display: flex; gap: 8px; }
+.m-btn-ghost {
+  flex: 1; padding: 9px;
+  border: 1px solid var(--line);
+  background: transparent; border-radius: var(--r-s);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+  color: rgba(246,243,236,.55); cursor: pointer;
+}
+.m-btn-admin {
+  flex: 1.5; padding: 9px;
+  border: none; background: var(--accent); border-radius: var(--r-s);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 700;
+  color: var(--ink); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+
+/* second card dim */
+.m-inv-card.dim { opacity: .5; }
+
+/* bottom nav mobile dash */
+.m-bottom-nav {
+  background: rgba(10,14,12,.9);
+  border-top: 1px solid var(--line);
+  display: flex; padding: 8px 0 18px;
+}
+.m-nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; padding: 4px 0;
+}
+.m-nav-icon { font-size: 17px; }
+.m-nav-lbl {
+  font-family: var(--font-mono); font-size: 8.5px;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: rgba(246,243,236,.35);
+}
+.m-nav-item.active .m-nav-lbl { color: var(--accent); }
+
+/* ════════════════════════════════
+   M2 — WIZARD MOBILE
+════════════════════════════════ */
+.m-wizard { height: 812px; position: relative; overflow: hidden; background: var(--ink); }
+
+/* BG preview blur */
+.m-wiz-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(165deg, var(--t-ink2) 0%, var(--t-ink) 65%, rgba(185,139,62,.15) 100%);
+}
+.m-wiz-bg-preview {
+  position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
+  width: 180px;
+  background: rgba(246,243,236,.07);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(246,243,236,.12);
+  border-radius: var(--r-m); padding: 18px 14px;
+  text-align: center;
+}
+.m-wiz-seal {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--t-acc);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 10px;
+}
+.m-wiz-seal span {
+  font-family: var(--t-font-d); font-size: 13px;
+  color: var(--t-acc); font-weight: 700;
+}
+.m-wiz-preview-title {
+  font-family: var(--t-font-d); font-size: 16px;
+  font-weight: 700; color: var(--t-onink); line-height: 1.1;
+}
+.m-wiz-preview-title em { font-style: italic; color: var(--t-acc); }
+.m-wiz-preview-date {
+  font-family: var(--font-mono); font-size: 9.5px;
+  color: rgba(246,243,236,.55); margin-top: 6px;
+}
+
+/* Wizard header */
+.m-wiz-header {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+  padding: 12px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.m-wiz-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(246,243,236,.1); backdrop-filter: blur(8px);
+  border: 1px solid var(--line); color: var(--paper); font-size: 14px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.m-wiz-progress {
+  flex: 1; display: flex; flex-direction: column; gap: 4px;
+}
+.m-wiz-step-lbl {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .08em; color: rgba(246,243,236,.65);
+}
+.m-wiz-step-lbl span { color: var(--accent); font-weight: 700; }
+.m-progress-track {
+  height: 2px; background: rgba(246,243,236,.15); border-radius: var(--r-pill); overflow: hidden;
+}
+.m-progress-fill {
+  height: 100%; width: 16.6%;
+  background: var(--accent); border-radius: var(--r-pill);
+}
+.m-wiz-menu {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(246,243,236,.1); backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--paper);
+}
+
+/* Bottom sheet */
+.m-sheet {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--ink-2);
+  border-radius: 26px 26px 0 0;
+  height: 575px;
+  display: flex; flex-direction: column;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -12px 40px rgba(0,0,0,.4);
+  z-index: 15;
+}
+.m-sheet-handle {
+  width: 36px; height: 3px;
+  background: rgba(246,243,236,.2); border-radius: var(--r-pill);
+  margin: 10px auto 0; flex-shrink: 0;
+}
+.m-sheet-scroll {
+  flex: 1; overflow-y: auto; padding: 16px 20px 0;
+  scrollbar-width: none;
+}
+.m-sheet-scroll::-webkit-scrollbar { display: none; }
+
+.m-sheet-title {
+  font-family: var(--font-display); font-size: 22px; font-weight: 700;
+  color: var(--paper); margin-bottom: 4px;
+}
+.m-sheet-sub {
+  font-size: 12.5px; color: rgba(246,243,236,.5);
+  line-height: 1.5; margin-bottom: 20px;
+}
+.m-section-hd {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 10px;
+}
+
+/* Chips */
+.m-chips { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin-bottom: 20px; padding-bottom: 2px; }
+.m-chips::-webkit-scrollbar { display: none; }
+.m-chip {
+  flex-shrink: 0; padding: 7px 13px; border-radius: var(--r-pill);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+  background: rgba(246,243,236,.06); color: rgba(246,243,236,.55);
+  border: 1px solid var(--line); white-space: nowrap; cursor: pointer;
+}
+.m-chip.active {
+  background: rgba(199,154,75,.15); color: var(--accent);
+  border-color: rgba(199,154,75,.5); font-weight: 700;
+}
+
+/* Look grid */
+.m-look-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 20px; }
+.m-look-card {
+  border-radius: var(--r-s); overflow: hidden;
+  border: 1.5px solid var(--line); cursor: pointer;
+}
+.m-look-card.active { border-color: var(--accent); }
+.m-look-thumb {
+  height: 68px; display: flex;
+  align-items: center; justify-content: center;
+  position: relative;
+}
+.m-look-check {
+  position: absolute; top: 5px; right: 5px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); color: var(--ink);
+  font-size: 9px; display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+.m-look-name {
+  padding: 5px 8px; font-family: var(--font-ui);
+  font-size: 10.5px; font-weight: 600;
+  color: rgba(246,243,236,.7); background: var(--ink-2);
+  border-top: 1px solid var(--line);
+}
+
+/* Font grid */
+.m-font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 20px; }
+.m-font-card {
+  border-radius: var(--r-s); border: 1.5px solid var(--line);
+  padding: 12px 10px; cursor: pointer; text-align: center;
+  background: rgba(246,243,236,.03);
+}
+.m-font-card.active { border-color: var(--accent); background: rgba(199,154,75,.08); }
+.m-font-preview { font-size: 14px; color: var(--paper); margin-bottom: 4px; }
+.m-font-name { font-family: var(--font-mono); font-size: 9px; color: rgba(246,243,236,.35); }
+
+/* Sheet footer */
+.m-sheet-footer {
+  padding: 12px 20px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid var(--line); flex-shrink: 0;
+}
+.m-btn-back {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+  color: rgba(246,243,236,.4); background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+}
+.m-btn-next {
+  padding: 11px 26px;
+  background: var(--accent); color: var(--ink);
+  border: none; border-radius: var(--r-pill);
+  font-family: var(--font-ui); font-size: 13px; font-weight: 700;
+  cursor: pointer; letter-spacing: .02em;
+  box-shadow: 0 4px 14px rgba(199,154,75,.3);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ════════════════════════════════
+   M3 — ADMINISTRAR MOBILE
+════════════════════════════════ */
+.m-admin { height: 812px; background: var(--ink); display: flex; flex-direction: column; }
+
+.m-admin-topbar {
+  background: var(--ink-2); padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.m-breadcrumb {
+  font-family: var(--font-mono); font-size: 10.5px;
+  color: rgba(246,243,236,.4);
+  display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+}
+.m-breadcrumb-link { color: var(--accent); }
+.m-admin-title {
+  font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  color: var(--paper); line-height: 1.1;
+}
+.m-admin-title em { font-style: italic; font-weight: 400; color: var(--accent); }
+
+.m-admin-body {
+  flex: 1; overflow-y: auto; scrollbar-width: none;
+  padding: 16px; display: flex; flex-direction: column; gap: 14px;
+}
+.m-admin-body::-webkit-scrollbar { display: none; }
+
+/* Status card */
+.m-status-card {
+  border-radius: var(--r-m); padding: 14px 16px;
+  border: 1px solid rgba(199,154,75,.2);
+  background: rgba(199,154,75,.06);
+}
+.m-status-kicker {
+  font-family: var(--font-mono); font-size: 9.5px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--accent); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.m-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.m-metric {
+  background: rgba(246,243,236,.04);
+  border: 1px solid var(--line);
+  border-radius: var(--r-s); padding: 10px 12px;
+}
+.m-metric-val {
+  font-family: var(--font-mono); font-size: 28px; font-weight: 700;
+  color: var(--paper); line-height: 1;
+}
+.m-metric-val.accent { color: var(--accent); }
+.m-metric-lbl { font-family: var(--font-mono); font-size: 9.5px; color: rgba(246,243,236,.4); margin-top: 3px; }
+
+/* Phone preview */
+.m-phone-preview { display: flex; justify-content: center; }
+.m-mini-phone {
+  width: 150px; background: #060808; border-radius: 22px;
+  padding: 8px 6px; box-shadow: var(--shadow-card);
+}
+.m-mini-screen {
+  background: linear-gradient(165deg, var(--t-ink2), var(--t-ink) 70%);
+  border-radius: 15px; height: 240px; overflow: hidden;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 16px; position: relative;
+}
+.m-mini-screen::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(0,0,0,.2);
+}
+.m-mini-content { position: relative; z-index: 1; }
+.m-mini-seal {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--t-acc);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px;
+}
+.m-mini-seal-txt { font-family: var(--t-font-d); font-size: 10px; color: var(--t-acc); font-weight: 700; }
+.m-mini-event { font-family: var(--font-mono); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; color: rgba(247,241,228,.5); margin-bottom: 4px; }
+.m-mini-title { font-family: var(--t-font-d); font-size: 14px; font-weight: 700; color: var(--t-onink); line-height: 1.1; margin-bottom: 2px; }
+.m-mini-title em { font-style: italic; color: var(--t-acc); }
+.m-mini-date { font-family: var(--font-mono); font-size: 8px; color: rgba(247,241,228,.55); margin-bottom: 10px; }
+.m-mini-cta {
+  background: var(--t-acc); color: var(--t-ink);
+  border-radius: var(--r-pill); font-family: var(--font-ui);
+  font-size: 9px; font-weight: 700; padding: 4px 12px;
+  display: inline-block;
+}
+
+/* Quick stats row */
+.m-quick-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.m-quick-cell {
+  background: rgba(246,243,236,.04); border: 1px solid var(--line);
+  border-radius: var(--r-s); padding: 10px; text-align: center;
+}
+.m-quick-cell-icon { font-size: 15px; margin-bottom: 3px; }
+.m-quick-cell-val { font-family: var(--font-mono); font-size: 11px; color: var(--paper); }
+.m-quick-cell-lbl { font-family: var(--font-mono); font-size: 8.5px; color: rgba(246,243,236,.35); margin-top: 1px; }
+
+/* bottom nav admin */
+.m-admin-bottom-nav {
+  background: var(--ink-2);
+  border-top: 1px solid var(--line);
+  display: flex; padding: 8px 0 20px;
+}
+.m-admin-nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; padding: 4px 0; cursor: pointer;
+}
+.m-admin-nav-icon { font-size: 16px; }
+.m-admin-nav-lbl {
+  font-family: var(--font-mono); font-size: 8px;
+  text-transform: uppercase; letter-spacing: .05em;
+  color: rgba(246,243,236,.3);
+}
+.m-admin-nav-item.active .m-admin-nav-lbl { color: var(--accent); }
+
+/* ════════════════════════════════
+   D1 — DASHBOARD DESKTOP
+════════════════════════════════ */
+.d-layout { display: flex; height: 650px; }
+
+/* Sidebar */
+.d-side {
+  width: 220px; flex-shrink: 0;
+  background: var(--ink-2);
+  border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  padding: 22px 16px;
+}
+.d-brand {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  color: var(--accent); margin-bottom: 28px; padding: 0 6px;
+}
+.d-brand em { font-style: italic; font-weight: 400; color: var(--paper); }
+.d-nav { display: flex; flex-direction: column; gap: 2px; }
+.d-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+  padding: 9px 10px; border-radius: var(--r-s);
+  color: rgba(246,243,236,.5); cursor: pointer; text-decoration: none;
+  transition: all .15s;
+}
+.d-nav-item b { font-family: var(--font-mono); font-size: 12px; color: var(--accent); width: 16px; text-align: center; }
+.d-nav-item.active, .d-nav-item:hover { background: rgba(246,243,236,.06); color: var(--paper); }
+.d-side-foot {
+  margin-top: auto; padding: 12px 10px;
+  border-top: 1px solid var(--line);
+  display: flex; align-items: center; gap: 10px;
+}
+.d-side-seal {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--accent);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.d-side-seal span { font-family: var(--font-display); font-size: 10px; color: var(--accent); font-weight: 700; }
+.d-side-name { font-family: var(--font-ui); font-size: 12px; color: var(--paper); }
+.d-side-plan { font-family: var(--font-mono); font-size: 9.5px; color: rgba(246,243,236,.35); }
+
+/* Main area */
+.d-main { flex: 1; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; }
+.d-main::-webkit-scrollbar { display: none; }
+.d-topbar {
+  padding: 22px 28px 0;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.d-topbar-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--paper); }
+.d-topbar-sub { font-family: var(--font-mono); font-size: 10.5px; color: rgba(246,243,236,.4); margin-top: 3px; }
+.d-new-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 18px;
+  background: var(--accent); color: var(--ink);
+  border: none; border-radius: var(--r-m);
+  font-family: var(--font-ui); font-size: 13px; font-weight: 700;
+  cursor: pointer; letter-spacing: .02em;
+  box-shadow: 0 4px 14px rgba(199,154,75,.25);
+}
+
+/* Stats row */
+.d-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; padding: 0 28px; margin-bottom: 20px; }
+.d-stat {
+  border: 1px solid var(--line); border-radius: var(--r-m); padding: 14px 16px;
+  background: rgba(246,243,236,.02);
+}
+.d-stat-kicker { font-family: var(--font-mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin-bottom: 6px; }
+.d-stat-val { font-family: var(--font-mono); font-size: 22px; font-weight: 700; display: block; color: var(--paper); }
+.d-stat-lbl { font-size: 11px; color: rgba(246,243,236,.4); margin-top: 2px; }
+
+/* Card list */
+.d-list { padding: 0 28px 28px; display: flex; flex-direction: column; gap: 10px; }
+.d-list-head {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+}
+.d-list-head h3 { font-family: var(--font-ui); font-size: 13.5px; font-weight: 600; color: var(--paper); }
+
+.d-inv-row {
+  display: grid; grid-template-columns: 76px 1fr auto;
+  align-items: start; gap: 14px;
+  padding: 14px 16px; border: 1px solid var(--line);
+  border-radius: var(--r-m); background: var(--ink-2);
+}
+.d-inv-thumb {
+  width: 76px; height: 68px; border-radius: var(--r-s); overflow: hidden;
+  position: relative; flex-shrink: 0;
+}
+.d-inv-thumb-bg {
+  position: absolute; inset: 0; background-size: cover; background-position: center;
+}
+.d-inv-thumb-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.25); }
+.d-inv-thumb-emoji {
+  position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+  font-size: 22px; z-index: 1;
+}
+.d-inv-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--paper); margin-bottom: 5px; }
+.d-inv-title em { font-style: italic; color: var(--accent); }
+.d-inv-meta { font-family: var(--font-mono); font-size: 10.5px; color: rgba(246,243,236,.4); margin-bottom: 8px; }
+.d-inv-tags { display: flex; gap: 6px; }
+.d-inv-tag {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em;
+  padding: 3px 8px; border-radius: var(--r-pill); border: 1px solid var(--line);
+}
+.d-inv-tag.on { color: var(--accent-2); border-color: var(--accent-2); }
+.d-inv-tag.days { color: rgba(246,243,236,.4); }
+.d-inv-tag.free { color: rgba(246,243,236,.25); }
+.d-inv-actions { display: flex; flex-direction: column; gap: 7px; align-items: flex-end; }
+.d-btn-ghost-sm {
+  padding: 7px 14px; border: 1px solid var(--line);
+  background: transparent; border-radius: var(--r-s);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+  color: rgba(246,243,236,.45); cursor: pointer; white-space: nowrap;
+}
+.d-btn-admin-sm {
+  padding: 7px 14px; border: none;
+  background: var(--accent); border-radius: var(--r-s);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 700;
+  color: var(--ink); cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ════════════════════════════════
+   D2 — WIZARD DESKTOP
+════════════════════════════════ */
+.d-wizard-layout { display: flex; height: 650px; }
+
+.d-wizard-panel {
+  width: 460px; flex-shrink: 0;
+  background: var(--ink-2);
+  border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+}
+.d-wiz-header {
+  padding: 15px 22px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: 14px;
+}
+.d-wiz-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(246,243,236,.06); border: 1px solid var(--line);
+  color: rgba(246,243,236,.55); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.d-wiz-progress { flex: 1; }
+.d-wiz-step-lbl {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .08em; color: rgba(246,243,236,.5); margin-bottom: 6px;
+}
+.d-wiz-step-lbl span { color: var(--accent); font-weight: 700; }
+.d-progress-track { height: 3px; background: rgba(246,243,236,.1); border-radius: var(--r-pill); overflow: hidden; }
+.d-progress-fill { height: 100%; width: 16.6%; background: var(--accent); border-radius: var(--r-pill); }
+
+.d-wiz-scroll {
+  flex: 1; overflow-y: auto; padding: 22px; scrollbar-width: none;
+}
+.d-wiz-scroll::-webkit-scrollbar { display: none; }
+
+.d-wiz-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--paper); margin-bottom: 5px; }
+.d-wiz-sub { font-size: 12.5px; color: rgba(246,243,236,.45); line-height: 1.5; margin-bottom: 22px; }
+.d-section-hd {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--accent); margin-bottom: 10px;
+}
+
+.d-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
+.d-chip {
+  padding: 7px 13px; border-radius: var(--r-pill);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+  background: rgba(246,243,236,.05); color: rgba(246,243,236,.5);
+  border: 1px solid var(--line); cursor: pointer;
+}
+.d-chip.active {
+  background: rgba(199,154,75,.12); color: var(--accent);
+  border-color: rgba(199,154,75,.45); font-weight: 700;
+}
+
+.d-look-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 22px; }
+.d-look-card {
+  border-radius: var(--r-s); overflow: hidden;
+  border: 1.5px solid var(--line); cursor: pointer;
+}
+.d-look-card.active { border-color: var(--accent); }
+.d-look-thumb {
+  height: 76px; display: flex; align-items: center; justify-content: center; position: relative;
+}
+.d-look-check {
+  position: absolute; top: 5px; right: 5px;
+  width: 17px; height: 17px; border-radius: 50%;
+  background: var(--accent); color: var(--ink);
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.d-look-name {
+  padding: 6px 9px; font-family: var(--font-ui);
+  font-size: 11px; font-weight: 600;
+  color: rgba(246,243,236,.65); background: var(--ink);
+  border-top: 1px solid var(--line);
+}
+
+.d-font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 16px; }
+.d-font-card {
+  border-radius: var(--r-s); border: 1.5px solid var(--line);
+  padding: 13px 10px; cursor: pointer; text-align: center;
+  background: rgba(246,243,236,.02);
+}
+.d-font-card.active { border-color: var(--accent); background: rgba(199,154,75,.07); }
+.d-font-preview { font-size: 15px; color: var(--paper); margin-bottom: 4px; }
+.d-font-name { font-family: var(--font-mono); font-size: 9px; color: rgba(246,243,236,.3); }
+
+.d-wiz-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.d-btn-back {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+  color: rgba(246,243,236,.35); background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+}
+.d-btn-next {
+  padding: 10px 26px; background: var(--accent); color: var(--ink);
+  border: none; border-radius: var(--r-m);
+  font-family: var(--font-ui); font-size: 13px; font-weight: 700;
+  cursor: pointer; letter-spacing: .02em;
+  box-shadow: 0 4px 14px rgba(199,154,75,.25);
+  display: flex; align-items: center; gap: 5px;
+}
+
+/* Preview pane */
+.d-wiz-preview {
+  flex: 1; background: var(--ink);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  position: relative; overflow: hidden;
+}
+.d-wiz-preview::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 60% 40%, rgba(199,154,75,.08) 0%, transparent 65%);
+}
+.d-preview-lbl {
+  font-family: var(--font-mono); font-size: 9.5px;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: rgba(246,243,236,.25);
+  position: absolute; top: 20px;
+}
+.d-phone-frame {
+  width: 190px; background: #070909; border-radius: 34px;
+  padding: 12px 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(246,243,236,.06);
+  position: relative; z-index: 1;
+}
+.d-phone-notch {
+  width: 52px; height: 14px; background: #070909;
+  border-radius: 0 0 9px 9px; margin: 0 auto 6px;
+}
+.d-phone-screen {
+  background: linear-gradient(165deg, var(--t-ink2), var(--t-ink) 70%);
+  border-radius: 22px; height: 360px; overflow: hidden;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 20px; position: relative;
+}
+.d-phone-screen::after {
+  content: ''; position: absolute; inset: 0; background: rgba(0,0,0,.22);
+}
+.d-phone-content { position: relative; z-index: 1; }
+.d-phone-seal {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1.5px solid var(--t-acc);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 10px;
+}
+.d-phone-seal span { font-family: var(--t-font-d); font-size: 13px; color: var(--t-acc); font-weight: 700; }
+.d-phone-eyebrow { font-family: var(--font-mono); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; color: rgba(247,241,228,.45); margin-bottom: 5px; }
+.d-phone-title { font-family: var(--t-font-d); font-size: 20px; font-weight: 700; color: var(--t-onink); line-height: 1.06; margin-bottom: 4px; }
+.d-phone-title em { font-style: italic; color: var(--t-acc); }
+.d-phone-date { font-family: var(--font-mono); font-size: 9px; color: rgba(247,241,228,.55); margin-bottom: 14px; }
+.d-phone-cta {
+  background: var(--t-acc); color: var(--t-ink);
+  border-radius: var(--r-pill); font-family: var(--font-ui);
+  font-size: 10px; font-weight: 700; padding: 6px 18px; display: inline-block;
+}
+.d-preview-hint {
+  font-family: var(--font-mono); font-size: 9px;
+  color: rgba(246,243,236,.2); text-align: center;
+  position: absolute; bottom: 18px; letter-spacing: .04em;
+}
+
+/* ════════════════════════════════
+   D3 — ADMINISTRAR DESKTOP
+════════════════════════════════ */
+.d-admin-main { flex: 1; overflow-y: auto; scrollbar-width: none; background: var(--ink); }
+.d-admin-main::-webkit-scrollbar { display: none; }
+
+.d-admin-header { padding: 22px 28px 0; margin-bottom: 18px; }
+.d-breadcrumb {
+  font-family: var(--font-mono); font-size: 10.5px;
+  color: rgba(246,243,236,.35);
+  display: flex; align-items: center; gap: 7px; margin-bottom: 5px;
+}
+.d-breadcrumb-link { color: var(--accent); cursor: pointer; }
+.d-admin-title-main {
+  font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--paper);
+}
+.d-admin-title-main em { font-style: italic; color: var(--accent); }
+
+/* Tabs */
+.d-admin-tabs {
+  display: flex; border-bottom: 1px solid var(--line);
+  padding: 0 28px; margin-bottom: 22px;
+}
+.d-admin-tab {
+  padding: 9px 18px;
+  font-family: var(--font-ui); font-size: 12.5px; font-weight: 500;
+  color: rgba(246,243,236,.4); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  display: flex; align-items: center; gap: 6px;
+  transition: all .15s;
+}
+.d-admin-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+
+/* Content */
+.d-admin-content { padding: 0 28px 28px; }
+
+.d-status-bar {
+  border-radius: var(--r-m); padding: 14px 18px; margin-bottom: 22px;
+  border: 1px solid rgba(199,154,75,.2);
+  background: rgba(199,154,75,.05);
+  display: flex; align-items: center; gap: 18px;
+}
+.d-status-icon-wrap {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(199,154,75,.2); border: 1px solid rgba(199,154,75,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.d-status-info { flex: 1; }
+.d-status-kicker { font-family: var(--font-mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); margin-bottom: 3px; }
+.d-status-sub { font-family: var(--font-mono); font-size: 11px; color: rgba(246,243,236,.4); }
+.d-metrics-row { display: flex; gap: 12px; }
+.d-metric-box {
+  background: rgba(246,243,236,.04); border: 1px solid var(--line);
+  border-radius: var(--r-s); padding: 10px 18px; text-align: center; min-width: 90px;
+}
+.d-metric-num { font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--paper); line-height: 1; }
+.d-metric-num.gold { color: var(--accent); }
+.d-metric-num.sage { color: var(--accent-2); }
+.d-metric-lbl-d { font-family: var(--font-mono); font-size: 9px; color: rgba(246,243,236,.35); margin-top: 3px; }
+
+/* Two-col */
+.d-admin-cols { display: grid; grid-template-columns: 1fr 300px; gap: 22px; }
+
+.d-preview-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.d-admin-phone-frame {
+  width: 170px; background: #060808; border-radius: 30px;
+  padding: 10px 7px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.5), 0 0 0 1px rgba(246,243,236,.05);
+}
+.d-admin-phone-screen {
+  background: linear-gradient(165deg, var(--t-ink2), var(--t-ink) 70%);
+  border-radius: 20px; height: 300px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 16px; position: relative;
+}
+.d-admin-phone-screen::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,.22); }
+.d-admin-phone-content { position: relative; z-index: 1; }
+.d-preview-actions { display: flex; gap: 8px; }
+
+/* Quick actions */
+.d-actions-col {}
+.d-actions-title { font-family: var(--font-mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .1em; color: rgba(246,243,236,.3); margin-bottom: 10px; }
+.d-action-item {
+  background: var(--ink-2); border: 1px solid var(--line);
+  border-radius: var(--r-s); padding: 11px 13px;
+  display: flex; align-items: center; gap: 11px;
+  cursor: pointer; margin-bottom: 7px;
+  transition: border-color .15s;
+}
+.d-action-item:hover { border-color: rgba(199,154,75,.3); }
+.d-action-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(246,243,236,.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.d-action-icon.gold { background: rgba(199,154,75,.1); }
+.d-action-lbl { font-family: var(--font-ui); font-size: 12.5px; font-weight: 500; color: var(--paper); }
+.d-action-sub { font-family: var(--font-mono); font-size: 10px; color: rgba(246,243,236,.3); }
+.d-action-arrow { margin-left: auto; font-size: 14px; color: rgba(246,243,236,.25); }
+
+.d-action-item.premium {
+  border-color: rgba(199,154,75,.25);
+  background: rgba(199,154,75,.05);
+}
+.d-action-item.premium .d-action-lbl { color: var(--accent); }
+.d-action-item.premium .d-action-arrow { color: var(--accent); }
+
+/* ══ VISIBILITY ══ */
+.view { display: none; }
+.view.active { display: block; }
+.screens-desktop { display: flex; flex-direction: column; gap: 48px; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="page-logo">Alta <span>Invitación</span></div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchView('mobile',this)">📱 Mobile</button>
+    <button class="tab-btn" onclick="switchView('desktop',this)">🖥 Desktop</button>
+  </div>
+  <div class="page-url">altainvitacion.com</div>
+</header>
+
+<div class="canvas">
+
+  <!-- ════ MOBILE ════ -->
+  <div class="view active" id="view-mobile">
+    <div class="section-label">Pantallas Mobile — 375px</div>
+    <div class="screens-row">
+
+      <!-- M1: DASHBOARD -->
+      <div class="screen-wrap">
+        <div class="screen-label">01 · Dashboard</div>
+        <div class="mobile-frame">
+          <div class="mobile-notch"></div>
+          <div class="m-dash">
+            <div class="m-topbar">
+              <div class="m-logo">Alta <em>Invitación</em></div>
+              <div class="m-avatar">CM</div>
+            </div>
+            <div class="m-dash-body">
+              <button class="m-new-btn">✦ &nbsp;Nueva invitación</button>
+
+              <!-- Card 1 -->
+              <div class="m-inv-card">
+                <div class="m-card-strip" style="background:linear-gradient(135deg,#122019,#1c2f26 60%,#2a4035 100%)">
+                  <div class="m-card-strip-overlay"></div>
+                  <div class="m-card-type">Casamiento</div>
+                  <div class="m-card-emoji">💍</div>
+                </div>
+                <div class="m-card-body">
+                  <div class="m-card-title">Ana <em>&</em> Martín</div>
+                  <div class="m-card-meta">
+                    <div class="m-meta-row">📅&nbsp; Sáb. 14 de marzo, 2026</div>
+                    <div class="m-meta-row">📍&nbsp; Estancia La Catalana · Córdoba</div>
+                    <div class="m-meta-row">👁&nbsp; 87 vistas · 34 confirmados</div>
+                  </div>
+                  <div class="m-tags">
+                    <span class="m-tag active">Activa</span>
+                    <span class="m-tag days">218 días</span>
+                    <span class="m-tag free">Free</span>
+                  </div>
+                </div>
+                <div class="m-card-actions" style="padding:0 16px 16px">
+                  <button class="m-btn-ghost">Ver ↗</button>
+                  <button class="m-btn-admin">Administrar →</button>
+                </div>
+              </div>
+
+              <!-- Card 2 dim -->
+              <div class="m-inv-card dim">
+                <div class="m-card-strip" style="background:linear-gradient(135deg,#241221,#33162d 60%,#4a1f3f 100%);height:64px">
+                  <div class="m-card-strip-overlay"></div>
+                  <div class="m-card-type">15 Años</div>
+                  <div class="m-card-emoji">👑</div>
+                </div>
+                <div class="m-card-body" style="padding-bottom:10px">
+                  <div class="m-card-title" style="font-size:16px;margin-bottom:5px">Mis XV Años</div>
+                  <div class="m-card-meta">
+                    <div class="m-meta-row">📅&nbsp; 2 de abril, 2027 · 236 días</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="m-bottom-nav">
+              <div class="m-nav-item active">
+                <div class="m-nav-icon">⊞</div>
+                <div class="m-nav-lbl">Inicio</div>
+              </div>
+              <div class="m-nav-item">
+                <div class="m-nav-icon">📋</div>
+                <div class="m-nav-lbl">Inactivas</div>
+              </div>
+              <div class="m-nav-item" style="margin-top:-20px">
+                <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ink);box-shadow:0 4px 14px rgba(199,154,75,.35);">✦</div>
+                <div class="m-nav-lbl" style="color:var(--paper)">Nueva</div>
+              </div>
+              <div class="m-nav-item">
+                <div class="m-nav-icon">👤</div>
+                <div class="m-nav-lbl">Datos</div>
+              </div>
+              <div class="m-nav-item">
+                <div class="m-nav-icon">⬡</div>
+                <div class="m-nav-lbl">Salir</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M2: WIZARD -->
+      <div class="screen-wrap">
+        <div class="screen-label">02 · Wizard — Paso 1 · Estilo</div>
+        <div class="mobile-frame">
+          <div class="mobile-notch"></div>
+          <div class="m-wizard">
+            <div class="m-wiz-bg"></div>
+            <div class="m-wiz-bg-preview" style="top:74px">
+              <div class="m-wiz-seal"><span>A<em style="font-style:italic">&</em>M</span></div>
+              <div class="m-wiz-preview-title">Ana <em>&</em> Martín</div>
+              <div class="m-wiz-preview-date">SAB · 14 MAR · 2026</div>
+            </div>
+            <div class="m-wiz-header">
+              <button class="m-wiz-close">✕</button>
+              <div class="m-wiz-progress">
+                <div class="m-wiz-step-lbl">Paso 1 de 6 · <span>Estilo</span></div>
+                <div class="m-progress-track"><div class="m-progress-fill"></div></div>
+              </div>
+              <div class="m-wiz-menu">☰</div>
+            </div>
+            <div class="m-sheet">
+              <div class="m-sheet-handle"></div>
+              <div class="m-sheet-scroll">
+                <div class="m-sheet-title" style="margin-top:12px">Define el estilo</div>
+                <div class="m-sheet-sub">Elegí tipo de evento y look. Después ajustás los detalles.</div>
+
+                <div class="m-section-hd">Tipo de evento</div>
+                <div class="m-chips">
+                  <div class="m-chip active">💍 Casamiento</div>
+                  <div class="m-chip">👑 XV Años</div>
+                  <div class="m-chip">🎂 Cumpleaños</div>
+                  <div class="m-chip">🎓 Egreso</div>
+                  <div class="m-chip">💼 Ejecutivo</div>
+                  <div class="m-chip">🍼 Bautismo</div>
+                  <div class="m-chip">✦ Otro</div>
+                </div>
+
+                <div class="m-section-hd">Look prediseñado</div>
+                <div class="m-look-grid">
+                  <div class="m-look-card active">
+                    <div class="m-look-thumb" style="background:linear-gradient(135deg,#122019,#1c2f26);"><span style="font-family:'Fraunces',serif;color:#B98B3E;font-size:13px">Ana & Martín</span><div class="m-look-check">✓</div></div>
+                    <div class="m-look-name">Boda Clásica</div>
+                  </div>
+                  <div class="m-look-card">
+                    <div class="m-look-thumb" style="background:linear-gradient(135deg,#241221,#33162d);"><span style="font-family:'Fraunces',serif;color:#C98A4B;font-size:13px;font-style:italic">Mis XV</span></div>
+                    <div class="m-look-name">Quinceañera</div>
+                  </div>
+                  <div class="m-look-card">
+                    <div class="m-look-thumb" style="background:linear-gradient(135deg,#0F2E28,#173F37);"><span style="font-family:'Fraunces',serif;color:#E0A458;font-size:13px">Cumple</span></div>
+                    <div class="m-look-name">Celebración</div>
+                  </div>
+                  <div class="m-look-card">
+                    <div class="m-look-thumb" style="background:linear-gradient(135deg,#10151F,#1A2230);"><span style="font-family:'Space Grotesk',sans-serif;color:#3D6E64;font-size:12px;font-weight:700">EVENTO</span></div>
+                    <div class="m-look-name">Ejecutivo</div>
+                  </div>
+                </div>
+
+                <div class="m-section-hd">Tipografía</div>
+                <div class="m-font-grid">
+                  <div class="m-font-card active">
+                    <div class="m-font-preview" style="font-family:'Fraunces',serif">Ana & Martín</div>
+                    <div class="m-font-name">Fraunces</div>
+                  </div>
+                  <div class="m-font-card">
+                    <div class="m-font-preview" style="font-family:'Cormorant Garamond',serif">Ana & Martín</div>
+                    <div class="m-font-name">Cormorant</div>
+                  </div>
+                  <div class="m-font-card">
+                    <div class="m-font-preview" style="font-family:'Fraunces',serif;font-style:italic">Ana & Martín</div>
+                    <div class="m-font-name">Fraunces Italic</div>
+                  </div>
+                  <div class="m-font-card">
+                    <div class="m-font-preview" style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em">ANA & MARTÍN</div>
+                    <div class="m-font-name">Space Grotesk</div>
+                  </div>
+                </div>
+              </div>
+              <div class="m-sheet-footer">
+                <button class="m-btn-back">← Atrás</button>
+                <button class="m-btn-next">Siguiente →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M3: ADMINISTRAR -->
+      <div class="screen-wrap">
+        <div class="screen-label">03 · Administrar</div>
+        <div class="mobile-frame">
+          <div class="mobile-notch"></div>
+          <div class="m-admin">
+            <div class="m-admin-topbar">
+              <div class="m-breadcrumb"><span class="m-breadcrumb-link">← Invitaciones</span><span>›</span><span>Ana & Martín</span></div>
+              <div class="m-admin-title">Ana <em>&</em> Martín</div>
+            </div>
+            <div class="m-admin-body">
+              <!-- Status -->
+              <div class="m-status-card">
+                <div class="m-status-kicker">ⓘ Estado de tu invitación</div>
+                <div class="m-metrics">
+                  <div class="m-metric"><div class="m-metric-val">87</div><div class="m-metric-lbl">Vistas únicas</div></div>
+                  <div class="m-metric"><div class="m-metric-val accent">34</div><div class="m-metric-lbl">Confirmados</div></div>
+                </div>
+              </div>
+              <!-- Preview -->
+              <div class="m-phone-preview">
+                <div class="m-mini-phone">
+                  <div class="m-mini-screen">
+                    <div class="m-mini-content">
+                      <div class="m-mini-seal"><span class="m-mini-seal-txt">A&M</span></div>
+                      <div class="m-mini-event">Casamiento</div>
+                      <div class="m-mini-title">Ana <em>&</em> Martín</div>
+                      <div class="m-mini-date">SAB · 14 MAR · 2026</div>
+                      <div class="m-mini-cta">Entrar</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Quick stats -->
+              <div class="m-quick-row">
+                <div class="m-quick-cell"><div class="m-quick-cell-icon">📅</div><div class="m-quick-cell-val">218</div><div class="m-quick-cell-lbl">días</div></div>
+                <div class="m-quick-cell"><div class="m-quick-cell-icon">👥</div><div class="m-quick-cell-val">50</div><div class="m-quick-cell-lbl">invitados</div></div>
+                <div class="m-quick-cell"><div class="m-quick-cell-icon" style="color:var(--accent-2)">✓</div><div class="m-quick-cell-val" style="color:var(--accent-2)">68%</div><div class="m-quick-cell-lbl">confirmó</div></div>
+              </div>
+            </div>
+            <div class="m-admin-bottom-nav">
+              <div class="m-admin-nav-item active"><div class="m-admin-nav-icon">⊞</div><div class="m-admin-nav-lbl" style="color:var(--accent)">Resumen</div></div>
+              <div class="m-admin-nav-item"><div class="m-admin-nav-icon">✏️</div><div class="m-admin-nav-lbl">Editor</div></div>
+              <div class="m-admin-nav-item"><div class="m-admin-nav-icon">👥</div><div class="m-admin-nav-lbl">Invitados</div></div>
+              <div class="m-admin-nav-item"><div class="m-admin-nav-icon">↗</div><div class="m-admin-nav-lbl">Compartir</div></div>
+              <div class="m-admin-nav-item"><div class="m-admin-nav-icon">···</div><div class="m-admin-nav-lbl">Más</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════ DESKTOP ════ -->
+  <div class="view" id="view-desktop">
+    <div class="section-label">Pantallas Desktop — 1100px</div>
+    <div class="screens-desktop">
+
+      <!-- D1: DASHBOARD -->
+      <div class="screen-wrap" style="align-items:flex-start">
+        <div class="screen-label">04 · Dashboard</div>
+        <div class="desktop-frame">
+          <div class="desktop-titlebar">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+            <div class="titlebar-url">altainvitacion.com/dashboard</div>
+          </div>
+          <div class="d-layout">
+            <div class="d-side">
+              <div class="d-brand">Alta <em>Invitación</em></div>
+              <div class="d-nav">
+                <div class="d-nav-item active"><b>⊞</b> Mis invitaciones</div>
+                <div class="d-nav-item"><b>✦</b> Nueva</div>
+                <div class="d-nav-item" style="margin-top:10px"><b>⚙</b> Configuración</div>
+                <div class="d-nav-item"><b>?</b> Ayuda</div>
+              </div>
+              <div class="d-side-foot">
+                <div class="d-side-seal"><span>CM</span></div>
+                <div>
+                  <div class="d-side-name">Cristina M.</div>
+                  <div class="d-side-plan">Plan Free</div>
+                </div>
+              </div>
+            </div>
+            <div class="d-main">
+              <div class="d-topbar">
+                <div>
+                  <div class="d-topbar-title">Mis invitaciones</div>
+                  <div class="d-topbar-sub">2 activas · última actividad hace 2h</div>
+                </div>
+                <button class="d-new-btn">✦ &nbsp;Nueva invitación</button>
+              </div>
+              <div class="d-stats">
+                <div class="d-stat"><div class="d-stat-kicker">Vistas</div><b class="d-stat-val">87</b><div class="d-stat-lbl">total acumulado</div></div>
+                <div class="d-stat"><div class="d-stat-kicker">Confirmados</div><b class="d-stat-val">34</b><div class="d-stat-lbl">de 50 invitados</div></div>
+                <div class="d-stat"><div class="d-stat-kicker">Tasa RSVP</div><b class="d-stat-val">68%</b><div class="d-stat-lbl">respuesta invitados</div></div>
+                <div class="d-stat"><div class="d-stat-kicker">Eventos</div><b class="d-stat-val">2</b><div class="d-stat-lbl">en curso</div></div>
+              </div>
+              <div class="d-list">
+                <div class="d-list-head"><h3>Invitaciones activas</h3></div>
+                <!-- Row 1 -->
+                <div class="d-inv-row">
+                  <div class="d-inv-thumb">
+                    <div class="d-inv-thumb-bg" style="background:linear-gradient(135deg,#122019,#2a4035)"></div>
+                    <div class="d-inv-thumb-overlay"></div>
+                    <div class="d-inv-thumb-emoji">💍</div>
+                  </div>
+                  <div>
+                    <div class="d-inv-title">Ana <em>&</em> Martín</div>
+                    <div class="d-inv-meta">Casamiento · Sáb. 14 mar 2026 · Estancia La Catalana, Córdoba</div>
+                    <div class="d-inv-tags">
+                      <span class="d-inv-tag on">Activa</span>
+                      <span class="d-inv-tag days">218 días</span>
+                      <span class="d-inv-tag free">Free</span>
+                    </div>
+                  </div>
+                  <div class="d-inv-actions">
+                    <button class="d-btn-ghost-sm">Ver invitación ↗</button>
+                    <button class="d-btn-admin-sm">Administrar →</button>
+                  </div>
+                </div>
+                <!-- Row 2 -->
+                <div class="d-inv-row" style="opacity:.55">
+                  <div class="d-inv-thumb">
+                    <div class="d-inv-thumb-bg" style="background:linear-gradient(135deg,#241221,#4a1f3f)"></div>
+                    <div class="d-inv-thumb-overlay"></div>
+                    <div class="d-inv-thumb-emoji">👑</div>
+                  </div>
+                  <div>
+                    <div class="d-inv-title">Mis XV Años</div>
+                    <div class="d-inv-meta">15 Años · Viernes 2 abr 2027 · Salón Madrid, Córdoba</div>
+                    <div class="d-inv-tags">
+                      <span class="d-inv-tag on">Activa</span>
+                      <span class="d-inv-tag days">236 días</span>
+                      <span class="d-inv-tag free">Free</span>
+                    </div>
+                  </div>
+                  <div class="d-inv-actions">
+                    <button class="d-btn-ghost-sm">Ver invitación ↗</button>
+                    <button class="d-btn-admin-sm">Administrar →</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- D2: WIZARD -->
+      <div class="screen-wrap" style="align-items:flex-start">
+        <div class="screen-label">05 · Wizard desktop — Paso 1 · Estilo</div>
+        <div class="desktop-frame">
+          <div class="desktop-titlebar">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+            <div class="titlebar-url">altainvitacion.com/dashboard/invitaciones/crear</div>
+          </div>
+          <div class="d-wizard-layout">
+            <div class="d-wizard-panel">
+              <div class="d-wiz-header">
+                <button class="d-wiz-close">✕</button>
+                <div class="d-wiz-progress">
+                  <div class="d-wiz-step-lbl">Paso 1 de 6 · <span>Estilo</span></div>
+                  <div class="d-progress-track"><div class="d-progress-fill"></div></div>
+                </div>
+              </div>
+              <div class="d-wiz-scroll">
+                <div class="d-wiz-title">Define el estilo</div>
+                <div class="d-wiz-sub">Elegí tipo de evento y look. La preview se actualiza en tiempo real.</div>
+
+                <div class="d-section-hd">Tipo de evento</div>
+                <div class="d-chips" style="margin-bottom:22px">
+                  <div class="d-chip active">💍 Casamiento</div>
+                  <div class="d-chip">👑 XV Años</div>
+                  <div class="d-chip">🎂 Cumpleaños</div>
+                  <div class="d-chip">🎓 Egreso</div>
+                  <div class="d-chip">💼 Ejecutivo</div>
+                  <div class="d-chip">🍼 Bautismo</div>
+                  <div class="d-chip">✦ Otro</div>
+                </div>
+
+                <div class="d-section-hd">Look prediseñado</div>
+                <div class="d-look-grid">
+                  <div class="d-look-card active">
+                    <div class="d-look-thumb" style="background:linear-gradient(135deg,#122019,#1c2f26)"><span style="font-family:'Fraunces',serif;color:#B98B3E;font-size:13px">Ana & Martín</span><div class="d-look-check">✓</div></div>
+                    <div class="d-look-name">Boda Clásica</div>
+                  </div>
+                  <div class="d-look-card">
+                    <div class="d-look-thumb" style="background:linear-gradient(135deg,#241221,#33162d)"><span style="font-family:'Fraunces',serif;color:#C98A4B;font-size:13px;font-style:italic">Mis XV</span></div>
+                    <div class="d-look-name">Quinceañera</div>
+                  </div>
+                  <div class="d-look-card">
+                    <div class="d-look-thumb" style="background:linear-gradient(135deg,#0F2E28,#173F37)"><span style="font-family:'Fraunces',serif;color:#E0A458;font-size:13px">Celebración</span></div>
+                    <div class="d-look-name">Cumpleaños</div>
+                  </div>
+                  <div class="d-look-card">
+                    <div class="d-look-thumb" style="background:linear-gradient(135deg,#10151F,#1A2230)"><span style="font-family:'Space Grotesk',sans-serif;color:#3D6E64;font-size:12px;font-weight:700;letter-spacing:.05em">EJECUTIVO</span></div>
+                    <div class="d-look-name">Ejecutivo</div>
+                  </div>
+                </div>
+
+                <div class="d-section-hd">Tipografía</div>
+                <div class="d-font-grid">
+                  <div class="d-font-card active">
+                    <div class="d-font-preview" style="font-family:'Fraunces',serif">Ana & Martín</div>
+                    <div class="d-font-name">Fraunces</div>
+                  </div>
+                  <div class="d-font-card">
+                    <div class="d-font-preview" style="font-family:'Cormorant Garamond',serif">Ana & Martín</div>
+                    <div class="d-font-name">Cormorant Garamond</div>
+                  </div>
+                  <div class="d-font-card">
+                    <div class="d-font-preview" style="font-family:'Fraunces',serif;font-style:italic">Ana & Martín</div>
+                    <div class="d-font-name">Fraunces Italic</div>
+                  </div>
+                  <div class="d-font-card">
+                    <div class="d-font-preview" style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em">ANA & MARTÍN</div>
+                    <div class="d-font-name">Space Grotesk</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-wiz-footer">
+                <button class="d-btn-back">← Atrás</button>
+                <button class="d-btn-next">Siguiente →</button>
+              </div>
+            </div>
+            <!-- Preview pane -->
+            <div class="d-wiz-preview">
+              <div class="d-preview-lbl">Vista previa en tiempo real</div>
+              <div class="d-phone-frame">
+                <div class="d-phone-notch"></div>
+                <div class="d-phone-screen">
+                  <div class="d-phone-content">
+                    <div class="d-phone-seal"><span>A&M</span></div>
+                    <div class="d-phone-eyebrow">Casamiento</div>
+                    <div class="d-phone-title">Ana <em>&</em> Martín</div>
+                    <div class="d-phone-date">SAB · 14 MAR · 2026 · CÓRDOBA</div>
+                    <div class="d-phone-cta">Entrar</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-preview-hint">Los cambios se reflejan aquí al instante</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- D3: ADMINISTRAR -->
+      <div class="screen-wrap" style="align-items:flex-start">
+        <div class="screen-label">06 · Administrar desktop</div>
+        <div class="desktop-frame">
+          <div class="desktop-titlebar">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+            <div class="titlebar-url">altainvitacion.com/dashboard/invitaciones/ana-y-martin</div>
+          </div>
+          <div class="d-layout">
+            <!-- Same sidebar -->
+            <div class="d-side">
+              <div class="d-brand">Alta <em>Invitación</em></div>
+              <div class="d-nav">
+                <div class="d-nav-item active"><b>⊞</b> Mis invitaciones</div>
+                <div class="d-nav-item"><b>✦</b> Nueva</div>
+                <div class="d-nav-item" style="margin-top:10px"><b>⚙</b> Configuración</div>
+              </div>
+              <div class="d-side-foot">
+                <div class="d-side-seal"><span>CM</span></div>
+                <div>
+                  <div class="d-side-name">Cristina M.</div>
+                  <div class="d-side-plan">Plan Free</div>
+                </div>
+              </div>
+            </div>
+            <!-- Admin main -->
+            <div class="d-admin-main">
+              <div class="d-admin-header">
+                <div class="d-breadcrumb"><span class="d-breadcrumb-link">← Invitaciones</span><span>›</span><span>Ana & Martín</span></div>
+                <div class="d-admin-title-main">Ana <em>&</em> Martín</div>
+              </div>
+              <div class="d-admin-tabs">
+                <div class="d-admin-tab active">⊞ Resumen</div>
+                <div class="d-admin-tab">✏️ Editor</div>
+                <div class="d-admin-tab">👥 Invitados</div>
+                <div class="d-admin-tab">↗ Compartir</div>
+                <div class="d-admin-tab">⭐ Premium</div>
+                <div class="d-admin-tab">··· Más</div>
+              </div>
+              <div class="d-admin-content">
+                <!-- Status bar -->
+                <div class="d-status-bar">
+                  <div class="d-status-icon-wrap">ⓘ</div>
+                  <div class="d-status-info">
+                    <div class="d-status-kicker">Estado de tu invitación</div>
+                    <div class="d-status-sub">Activa · Free · Faltan 218 días · 10 vistas restantes</div>
+                  </div>
+                  <div class="d-metrics-row">
+                    <div class="d-metric-box"><div class="d-metric-num">87</div><div class="d-metric-lbl-d">Vistas únicas</div></div>
+                    <div class="d-metric-box"><div class="d-metric-num gold">34</div><div class="d-metric-lbl-d">Confirmados</div></div>
+                    <div class="d-metric-box"><div class="d-metric-num sage">68%</div><div class="d-metric-lbl-d">Tasa RSVP</div></div>
+                  </div>
+                </div>
+                <!-- Two col -->
+                <div class="d-admin-cols">
+                  <div class="d-preview-col">
+                    <div class="d-admin-phone-frame">
+                      <div class="d-admin-phone-screen">
+                        <div class="d-admin-phone-content">
+                          <div style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--t-acc);display:flex;align-items:center;justify-content:center;margin:0 auto 8px"><span style="font-family:'Fraunces',serif;font-size:10px;color:var(--t-acc);font-weight:700">A&M</span></div>
+                          <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(247,241,228,.4);margin-bottom:4px">Casamiento</div>
+                          <div style="font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--t-onink);line-height:1.05;margin-bottom:3px">Ana <em style="font-style:italic;color:var(--t-acc)">&</em> Martín</div>
+                          <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(247,241,228,.5);margin-bottom:12px">SAB · 14 MAR · 2026</div>
+                          <div style="background:var(--t-acc);color:var(--t-ink);border-radius:999px;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;padding:5px 14px;display:inline-block">Entrar</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-preview-actions">
+                      <button class="d-btn-ghost-sm">Ver ↗</button>
+                      <button class="d-btn-admin-sm">✏️ Editar</button>
+                    </div>
+                  </div>
+                  <div class="d-actions-col">
+                    <div class="d-actions-title">Acciones rápidas</div>
+                    <div class="d-action-item">
+                      <div class="d-action-icon gold">👥</div>
+                      <div><div class="d-action-lbl">Gestionar invitados</div><div class="d-action-sub">50 cargados · 34 confirmaron</div></div>
+                      <div class="d-action-arrow">›</div>
+                    </div>
+                    <div class="d-action-item">
+                      <div class="d-action-icon">↗</div>
+                      <div><div class="d-action-lbl">Compartir</div><div class="d-action-sub">Link · WhatsApp · QR</div></div>
+                      <div class="d-action-arrow">›</div>
+                    </div>
+                    <div class="d-action-item">
+                      <div class="d-action-icon">📊</div>
+                      <div><div class="d-action-lbl">Estadísticas</div><div class="d-action-sub">87 vistas únicas</div></div>
+                      <div class="d-action-arrow">›</div>
+                    </div>
+                    <div class="d-action-item">
+                      <div class="d-action-icon">⬛</div>
+                      <div><div class="d-action-lbl">Check-in QR</div><div class="d-action-sub">Escanear al llegar</div></div>
+                      <div class="d-action-arrow">›</div>
+                    </div>
+                    <div class="d-action-item premium">
+                      <div class="d-action-icon gold">⭐</div>
+                      <div><div class="d-action-lbl">Desbloquear Premium</div><div class="d-action-sub">Vistas ilimitadas · sin marca</div></div>
+                      <div class="d-action-arrow" style="color:var(--accent)">›</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchView(view, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

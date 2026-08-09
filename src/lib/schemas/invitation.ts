@@ -52,6 +52,7 @@ export const designSchema = z.object({
     colorPrincipal: z.string(),
     tema: z.string().optional(),
     templateTipo: z.string().optional().default("ORIGINAL"),
+    tipografiaDisplay: z.string().optional().default("fraunces"),
     imagenCelebremosJuntos: z.string().optional(),
 });
 

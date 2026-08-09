@@ -57,7 +57,18 @@ function AnimatedTabDescription({ text }: { text: string }) {
   );
 }
 
-export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjetaHabilitado = false, regaloMonto, precioAdolescente, precioNino, rsvpEnabled, planTier, fechaEvento }: Props) {
+export function GuestPageTabs({
+  invitationId,
+  slug,
+  regaloHabilitado,
+  pagoTarjetaHabilitado = false,
+  regaloMonto,
+  precioAdolescente,
+  precioNino,
+  rsvpEnabled,
+  planTier,
+  fechaEvento,
+}: Props) {
   const [tab, setTab] = useState<Tab>("agregar");
   const [liveActive, setLiveActive] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
@@ -79,9 +90,7 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
     return () => { cancelled = true; clearInterval(interval); };
   }, [invitationId]);
 
-  // Misma red de seguridad que PageTransition.tsx: si el filter de esta
-  // transición queda trabado por quedar en background a mitad de animación,
-  // fuerza la limpieza al volver.
+  // Safety net for stuck filter animations (e.g. when returning from background)
   useEffect(() => {
     const resetFilter = () => {
       if (tabContentRef.current) tabContentRef.current.style.filter = "none";
@@ -104,69 +113,69 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
 
   return (
     <div>
-      {/* Tab bar */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "8px",
-          marginBottom: "20px",
-          padding: "8px",
-          background: "var(--muted, rgba(255,255,255,0.05))",
-          borderRadius: "14px",
-          border: "1px solid var(--line)",
-        }}
-      >
+      {/* ── Desktop horizontal tab bar (adm-tabs mockup style) ── */}
+      <div className="adm-tabs">
         {tabs.map((t) => {
           const isLocked = planTier === "FREE" && (t.id === "canciones" || t.id === "live");
-          
+
+          // Live tab: pulsing dot
+          const tabLabel =
+            t.id === "live" ? (
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ position: "relative", width: 8, height: 8, display: "inline-block" }}>
+                  {!isLocked && liveActive && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        borderRadius: "50%",
+                        background: "#22c55e",
+                        opacity: 0.7,
+                        animation: "liveRecPulse 1.2s ease-in-out infinite",
+                      }}
+                    />
+                  )}
+                  <span
+                    style={{
+                      position: "relative",
+                      display: "inline-block",
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: liveActive ? "#22c55e" : "#ef4444",
+                    }}
+                  />
+                </span>
+                LIVE
+              </span>
+            ) : (
+              t.label
+            );
+
           return (
-            <div key={t.id} className="relative group flex-1 min-w-[120px]">
+            <div key={t.id} className="relative group">
               <button
                 type="button"
                 onClick={() => !isLocked && setTab(t.id)}
                 disabled={isLocked}
-                className={`
-                  w-full min-h-[42px] px-4 py-2 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap
-                  transition-all duration-300 cursor-pointer text-[13.5px] border relative overflow-hidden
-                  ${isLocked ? "opacity-50 cursor-not-allowed grayscale" : "hover:-translate-y-0.5"}
-                  ${t.highlight === "gold" ?
-                      tab === t.id
-                        ? "bg-amber-500 border-amber-400 text-black font-bold shadow-[0_0_12px_rgba(245,158,11,0.4)]"
-                        : "bg-amber-500/15 border-amber-500/30 text-amber-300 font-semibold hover:bg-amber-500/25"
-                    : t.highlight === "live" ?
-                      (liveActive
-                        ? tab === t.id
-                          ? "bg-green-500 border-green-400 text-white font-bold shadow-[0_0_15px_rgba(34,197,94,0.5)]"
-                          : "bg-green-500/10 border-green-500/30 text-green-400 font-semibold hover:bg-green-500/20 hover:border-green-400/50 shadow-[0_0_8px_rgba(34,197,94,0.1)]"
-                        : tab === t.id
-                          ? "bg-red-500 border-red-400 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-                          : "bg-red-500/10 border-red-500/30 text-red-400 font-semibold hover:bg-red-500/20 hover:border-red-400/50 shadow-[0_0_8px_rgba(239,68,68,0.1)]")
-                    : tab === t.id
-                      ? "bg-[var(--paper)] border-transparent text-[var(--ink)] font-bold shadow-sm"
-                      : "bg-transparent border-transparent text-white/60 font-medium hover:bg-white/5"
-                  }
-                `}
+                className={`adm-tab ${tab === t.id ? "active" : ""} ${isLocked ? "opacity-40" : ""}`}
+                style={
+                  t.highlight === "gold" && tab !== t.id
+                    ? { color: "var(--accent)" }
+                    : t.highlight === "live"
+                    ? { color: liveActive ? "#22c55e" : "#ef4444" }
+                    : {}
+                }
               >
-                {t.id === "live" ? (
-                  <span className="flex items-center gap-2 relative z-10">
-                    <div className="relative flex items-center justify-center w-2 h-2">
-                        {!isLocked && liveActive && <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping"></span>}
-                        <span className={`relative inline-flex rounded-full h-2 w-2 ${liveActive ? "bg-green-500" : "bg-red-500"}`}></span>
-                    </div>
-                    LIVE
-                  </span>
-                ) : (
-                  <span className="relative z-10">{t.label}</span>
-                )}
-                {isLocked && <Lock className="w-3.5 h-3.5 text-red-400 relative z-10" />}
+                {tabLabel}
+                {isLocked && <Lock className="w-3 h-3 ml-1" />}
               </button>
-              
+
               {/* Tooltip for locked tabs */}
               {isLocked && (
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
                   Disponible en Premium
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
                 </div>
               )}
             </div>
@@ -174,9 +183,10 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
         })}
       </div>
 
+      {/* ── Animated description ── */}
       <AnimatedTabDescription text={TAB_DESCRIPTIONS[tab]} />
 
-      {/* Content */}
+      {/* ── Tab content (AnimatePresence unchanged) ── */}
       <AnimatePresence mode="wait">
         <motion.div
           ref={tabContentRef}
@@ -240,6 +250,38 @@ export function GuestPageTabs({ invitationId, slug, regaloHabilitado, pagoTarjet
           )}
         </motion.div>
       </AnimatePresence>
+
+      {/* ── Mobile bottom nav ── */}
+      <nav className="adm-mobile-nav">
+        <div className="adm-mobile-nav-inner">
+          {tabs.map((t) => {
+            const isLocked = planTier === "FREE" && (t.id === "canciones" || t.id === "live");
+            return (
+              <button
+                key={t.id}
+                type="button"
+                className={`adm-nav-item ${tab === t.id ? "active" : ""} ${isLocked ? "opacity-40" : ""}`}
+                onClick={() => !isLocked && setTab(t.id)}
+                disabled={isLocked}
+              >
+                <span className="adm-nav-icon">
+                  {t.id === "agregar" && "👥"}
+                  {t.id === "invitados" && "✅"}
+                  {t.id === "precio" && "💰"}
+                  {t.id === "canciones" && "🎵"}
+                  {t.id === "live" && (liveActive ? "🟢" : "⭕")}
+                </span>
+                <span className="adm-nav-lbl">
+                  {t.id === "agregar" ? "Invitados" :
+                   t.id === "invitados" ? "Lista" :
+                   t.id === "precio" ? "Precio" :
+                   t.id === "canciones" ? "Música" : "LIVE"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

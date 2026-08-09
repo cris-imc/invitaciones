@@ -14,7 +14,7 @@ export default async function Home() {
   const registerUrl = session ? "/dashboard?new=true" : "/register";
   const premiumUrl = session ? "/dashboard?new=true&plan=premium" : "/register?plan=premium";
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-black p-0 md:p-6">
+    <div className="flex min-h-dvh items-center justify-center bg-[var(--ink)] p-0 md:p-6">
       <div className="landing w-full max-w-[1180px]">
         {/* NAV */}
         <LandingNav registerUrl={registerUrl} isLoggedIn={Boolean(session)} />
@@ -28,12 +28,12 @@ export default async function Home() {
               cada detalle y compartí un link. Confirmaciones, mapas, fotos y
               mensajes de tus invitados, todo en un mismo lugar y en vivo.
             </p>
-            <div className="l-hero-ctas">
+            <div className="l-hero-ctas font-ui">
               <Link href={registerUrl}>
-                <Button className="rounded-full bg-accent text-ink transition-all duration-200 hover:bg-accent/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent/20 px-6">Empezar gratis</Button>
+                <Button className="rounded-full bg-[var(--accent)] text-[var(--ink)] transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--accent)]/20 px-6 font-ui">Empezar gratis</Button>
               </Link>
               <Link href="/dashboard">
-                <Button variant="ghost" className="rounded-full border border-white/25 text-paper transition-all duration-200 hover:text-paper hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5 px-6">Ingresar</Button>
+                <Button variant="ghost" className="rounded-full border border-white/25 text-[var(--paper)] transition-all duration-200 hover:text-[var(--paper)] hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5 px-6 font-ui">Ingresar</Button>
               </Link>
             </div>
           </div>
@@ -47,17 +47,17 @@ export default async function Home() {
         <TemplateShowcase />
 
         {/* STRIP (FEATURES) */}
-        <section className="l-strip px-6 py-16 md:px-8 md:py-24" id="caracteristicas" style={{ background: "black" }}>
+        <section className="l-strip px-6 py-16 md:px-8 md:py-24" id="caracteristicas" style={{ background: "var(--ink-2)" }}>
           <div className="max-w-2xl mx-auto space-y-10">
             <div className="text-center">
-              <p className="text-accent uppercase tracking-widest text-sm font-semibold mb-2">Todo en uno</p>
-              <h2 className="text-4xl lg:text-5xl font-serif text-white leading-tight">Mucho más que una invitación</h2>
+              <p className="text-[var(--accent)] font-ui uppercase tracking-widest text-sm font-semibold mb-2">Todo en uno</p>
+              <h2 className="text-4xl lg:text-5xl font-display text-white leading-tight">Mucho más que una invitación</h2>
             </div>
 
             <div className="space-y-8">
               <div className="flex gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                  <Settings2 className="w-6 h-6 text-accent" />
+                  <Settings2 className="w-6 h-6 text-[var(--accent)]" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">Plantilla 100% Personalizable</h3>
@@ -67,7 +67,7 @@ export default async function Home() {
 
               <div className="flex gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                  <Users className="w-6 h-6 text-accent" />
+                  <Users className="w-6 h-6 text-[var(--accent)]" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">Gestión de Invitados y Pagos</h3>
@@ -77,7 +77,7 @@ export default async function Home() {
 
               <div className="flex gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                  <Radio className="w-6 h-6 text-accent" />
+                  <Radio className="w-6 h-6 text-[var(--accent)]" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">Interacción en Vivo (LIVE)</h3>
@@ -121,10 +121,10 @@ export default async function Home() {
         </section>
 
         {/* PRECIOS */}
-        <section id="precios" className="py-20 md:py-32 border-t border-zinc-900">
+        <section id="precios" className="py-20 md:py-32 border-t" style={{ borderColor: 'var(--line)' }}>
           <div className="text-center mb-16">
-            <p className="kicker mx-auto mb-4">Precios Transparentes</p>
-            <h2 className="text-3xl md:text-5xl font-semibold mb-6 tracking-tight text-white">Elegí el plan para tu evento</h2>
+            <p className="kicker font-ui mx-auto mb-4">Precios Transparentes</p>
+            <h2 className="text-3xl md:text-5xl font-display font-semibold mb-6 tracking-tight text-white">Elegí el plan para tu evento</h2>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto px-4">
               Empezá completamente gratis o desbloqueá todas las funcionalidades con un único pago. Sin suscripciones.
             </p>

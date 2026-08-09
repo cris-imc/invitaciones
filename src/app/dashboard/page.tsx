@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarCheck, Eye, Plus, Users, Music, TrendingUp, Pencil } from "lucide-react";
+import { CalendarCheck, Eye, Users, Music, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -12,6 +10,7 @@ import { GreetingText } from "@/components/dashboard/GreetingText";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
 import { getEventStatus } from "@/lib/expiration";
 
+// ── Data fetching ────────────────────────────────────────────────
 async function getDashboardStats(userId: string) {
   if (!userId) throw new Error("No user ID provided");
   const invitations = await prisma.invitation.findMany({
@@ -32,20 +31,19 @@ async function getDashboardStats(userId: string) {
     orderBy: { createdAt: "desc" },
   });
 
-  const totalInvitations    = invitations.length;
-  const activeInvitations   = invitations.filter((i) => i.estado === "ACTIVA").length;
+  const totalInvitations  = invitations.length;
+  const activeInvitations = invitations.filter((i) => i.estado === "ACTIVA").length;
 
-  // Agregar totales de guests
-  let totalConfirmed  = 0;
-  let totalPaid       = 0;
-  let totalPending    = 0;
+  let totalConfirmed    = 0;
+  let totalPaid         = 0;
+  let totalPending      = 0;
   let totalSongsPending = 0;
 
   for (const inv of invitations) {
     const confirmed = inv.guests.filter((g) => g.status === "CONFIRMED");
-    totalConfirmed  += confirmed.reduce((s, g) => s + g.attendingCount, 0);
-    totalPaid       += confirmed.filter((g) => g.paymentStatus === "PAID").length;
-    totalPending    += confirmed.filter((g) => g.paymentStatus === "PENDING").length;
+    totalConfirmed    += confirmed.reduce((s, g) => s + g.attendingCount, 0);
+    totalPaid         += confirmed.filter((g) => g.paymentStatus === "PAID").length;
+    totalPending      += confirmed.filter((g) => g.paymentStatus === "PENDING").length;
     totalSongsPending += inv.songSuggestions.length;
   }
 
@@ -66,45 +64,72 @@ async function getDashboardStats(userId: string) {
   };
 }
 
+// ── Helpers for card design ──────────────────────────────────────
+function getStripClass(tipo: string): string {
+  const t = (tipo || "").toUpperCase();
+  if (t === "CASAMIENTO") return "strip-casamiento";
+  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return "strip-quince";
+  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return "strip-cumple";
+  if (t === "CORPORATIVO" || t === "EJECUTIVO") return "strip-corporativo";
+  return "strip-default";
+}
+
+function getEventEmoji(tipo: string): string {
+  const t = (tipo || "").toUpperCase();
+  if (t === "CASAMIENTO") return "💍";
+  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return "👑";
+  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return "🎂";
+  if (t === "CORPORATIVO" || t === "EJECUTIVO") return "🏢";
+  return "🎉";
+}
+
+function getEventLabel(tipo: string): string {
+  const t = (tipo || "").toUpperCase();
+  if (t === "CASAMIENTO") return "Casamiento";
+  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return "15 Años";
+  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return "Cumpleaños";
+  if (t === "CORPORATIVO" || t === "EJECUTIVO") return "Corporativo";
+  return tipo || "Evento";
+}
+
+function getDaysUntil(fecha: Date): number {
+  const now = new Date();
+  return Math.ceil((fecha.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+// ── Page component ───────────────────────────────────────────────
 export default async function DashboardPage(props: { searchParams?: Promise<{ new?: string }> }) {
   const searchParams = props.searchParams ? await props.searchParams : {};
-  const isAutoOpen = searchParams?.new === "true";
+  const isAutoOpen   = searchParams?.new === "true";
 
   const session = await auth().catch(() => null);
   if (!session?.user || !session.user.id) redirect("/login");
 
-  const userId  = session.user.id as string;
-  const role = session.user.role as string;
+  const userId   = session.user.id as string;
+  const role     = session.user.role as string;
   const userName = (session.user.name ?? "").split(" ")[0] || "anfitrión";
 
   const dbUser = await prisma.user.findUnique({
     where: { id: userId },
-    select: { planTier: true, premiumCredits: true }
+    select: { planTier: true, premiumCredits: true },
   });
-  const currentPlan = dbUser?.planTier || "FREE";
-  const planName = PLAN_LIMITS[currentPlan as keyof typeof PLAN_LIMITS]?.name || "Gratis";
 
+  // ── ADMIN view ───────────────────────────────────────────────
   if (role === "ADMIN") {
     const clients = await prisma.user.findMany({
       where: { role: "CLIENT" },
-      include: {
-        invitations: {
-          orderBy: { createdAt: "desc" }
-        }
-      },
-      orderBy: { createdAt: "desc" }
+      include: { invitations: { orderBy: { createdAt: "desc" } } },
+      orderBy: { createdAt: "desc" },
     });
 
     return (
       <>
-        {/* Topbar */}
         <div className="p-topbar">
           <div>
             <GreetingText userName={userName} />
             <p>Gestiona los clientes activos y sus invitaciones.</p>
           </div>
         </div>
-
         <div className="mt-6">
           <AdminDashboardClient clients={clients} />
         </div>
@@ -112,61 +137,62 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
     );
   }
 
-  // Lógica original para CLIENT
-  const stats   = await getDashboardStats(userId);
+  // ── CLIENT view ──────────────────────────────────────────────
+  const stats = await getDashboardStats(userId);
 
   const kpis = [
     {
       label: "Invitaciones activas",
       value: stats.activeInvitations,
       sub: `${stats.totalInvitations} en total`,
-      icon: CalendarCheck,
     },
     {
       label: "Confirmaron",
       value: stats.totalConfirmed,
-      sub: `personas confirmadas`,
-      icon: Users,
+      sub: "personas confirmadas",
     },
     {
       label: "Pagaron",
       value: stats.totalPaid,
       sub: `${stats.totalPending} pendientes de pago`,
-      icon: TrendingUp,
     },
     {
       label: "Canciones pendientes",
       value: stats.totalSongsPending,
       sub: "requieren moderación",
-      icon: Music,
     },
   ];
 
   return (
     <>
       {/* Topbar */}
-      <div className="p-topbar flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 !items-start w-full text-left">
-        <div className="w-full text-left flex flex-col items-start">
-          <div className="flex items-center gap-3 mb-1">
-            <GreetingText userName={userName} />
-          </div>
+      <div className="p-topbar">
+        <div>
+          <GreetingText userName={userName} />
           <p>
             Acá tenés el resumen de tus eventos en tiempo real.
             {dbUser && (
-              <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
-                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE'
-                  ? 'Invitaciones Premium: ilimitadas por tu plan.'
+              <span className="text-yellow-500 font-semibold ml-2">
+                {dbUser.planTier === "PREMIUM" ||
+                dbUser.planTier === "ADMIN" ||
+                dbUser.planTier === "ENTERPRISE"
+                  ? "Invitaciones Premium: ilimitadas por tu plan."
                   : `Invitaciones Premium disponibles: ${dbUser.premiumCredits || 0}.`}
               </span>
             )}
           </p>
         </div>
         <div className="hidden md:block">
-          <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} planTier={dbUser?.planTier} autoOpen={isAutoOpen} />
+          <NewInvitationButton
+            premiumCredits={dbUser?.premiumCredits || 0}
+            totalInvitations={stats.totalInvitations}
+            planTier={dbUser?.planTier}
+            autoOpen={isAutoOpen}
+          />
         </div>
       </div>
 
-      {/* KPIs */}
+      {/* KPI stats */}
       <div className="p-stats">
         {kpis.map(({ label, value, sub }) => (
           <div className="stat" key={label}>
@@ -177,59 +203,103 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
         ))}
       </div>
 
-      {/* Invitaciones activas */}
+      {/* Invitaciones activas — list header */}
       <div className="p-list-head">
         <h3>Tus invitaciones activas</h3>
       </div>
 
-      <div className="flex flex-col gap-4">
+      {/* Cards */}
+      <div>
         {stats.activeInvitationsList.length > 0 ? (
           stats.activeInvitationsList.map((inv) => {
-            const confirmed = inv.guests.filter((g) => g.status === "CONFIRMED");
-            const people = confirmed.reduce((s, g) => s + g.attendingCount, 0);
-            const mono = inv.nombreEvento.substring(0, 1).toUpperCase();
-            
-            const planLimit = PLAN_LIMITS[inv.planTier as keyof typeof PLAN_LIMITS]?.maxGuests;
-            const maxGuests = inv.maxGuestsOverride !== null ? inv.maxGuestsOverride : planLimit;
+            const confirmed   = inv.guests.filter((g) => g.status === "CONFIRMED");
+            const people      = confirmed.reduce((s, g) => s + g.attendingCount, 0);
+            const planLimit   = PLAN_LIMITS[inv.planTier as keyof typeof PLAN_LIMITS]?.maxGuests;
+            const maxGuests   = inv.maxGuestsOverride !== null ? inv.maxGuestsOverride : planLimit;
             const maxGuestsStr = maxGuests === null ? "∞" : maxGuests.toString();
-            
+
+            const daysUntil = getDaysUntil(inv.fechaEvento);
+            const daysLabel =
+              daysUntil > 0
+                ? `Faltan ${daysUntil} días`
+                : daysUntil === 0
+                ? "¡Hoy!"
+                : "Finalizado";
+
             return (
-              <div className="inv-row" key={inv.id}>
-                <div className="seal" style={{ borderColor: 'var(--line)', width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span className="font-display text-accent font-bold">{mono}</span>
-                </div>
-                
-                <div className="inv-info">
-                  <div className="inv-title-row">
-                    <b>{inv.nombreEvento}</b>
-                    <div className={`tag ${inv.estado === "ACTIVA" ? "on" : "draft"}`}>
-                      {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
-                    </div>
-                    {inv.planTier === "FREE" ? (
-                      <span className="plan-badge plan-badge--free">Gratis</span>
-                    ) : (
-                      <span className="plan-badge plan-badge--premium">✦ Premium</span>
-                    )}
-                  </div>
-                  <span className="font-mono text-[11px] text-paper/50 mt-0.5">
-                    {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </span>
-                  <div className="rsvp-mini flex items-center gap-2 mt-1">
-                    <div className="dot" style={{ background: 'var(--accent)', width: 8, height: 8, borderRadius: '50%' }}></div>
-                    {people} <span className="opacity-60 text-xs">/ {maxGuestsStr} confirmadas</span>
-                  </div>
+              <div className="m-inv-card" key={inv.id}>
+                {/* ── Colored strip ── */}
+                <div className={`m-card-strip ${getStripClass(inv.tipo)}`}>
+                  <div className="m-card-strip-overlay" />
+                  <span className="m-card-type">{getEventLabel(inv.tipo)}</span>
+                  <span className="m-card-emoji">{getEventEmoji(inv.tipo)}</span>
                 </div>
 
-                <div className="inv-actions">
-                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go btn-admin-glow inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg text-black transition-colors">
+                {/* ── Card body ── */}
+                <div className="m-card-body">
+                  {/* Event name */}
+                  <p className="m-card-title">{inv.nombreEvento}</p>
+
+                  {/* Meta: date + place */}
+                  <div className="m-card-meta">
+                    <span className="m-meta-row">
+                      📅{" "}
+                      {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+                    {inv.lugarNombre && (
+                      <span className="m-meta-row">🏰 {inv.lugarNombre}</span>
+                    )}
+                    {inv.direccion && (
+                      <span className="m-meta-row">📍 {inv.direccion}</span>
+                    )}
+                  </div>
+
+                  {/* Confirmed count */}
+                  <div className="m-card-confirmed">
+                    <div className="m-card-confirmed-dot" />
+                    <span>
+                      {people} / {maxGuestsStr} confirmadas
+                    </span>
+                  </div>
+
+                  {/* Status tags */}
+                  <div className="m-tags">
+                    <span className={`m-tag ${inv.estado === "ACTIVA" ? "active" : "draft"}`}>
+                      {inv.estado === "ACTIVA"
+                        ? "Activa"
+                        : inv.estado === "BORRADOR"
+                        ? "Borrador"
+                        : "Finalizada"}
+                    </span>
+                    <span className={`m-tag ${inv.planTier === "FREE" ? "free" : "premium"}`}>
+                      {inv.planTier === "FREE" ? "Gratis" : "✦ Premium"}
+                    </span>
+                    <span className="m-tag days">{daysLabel}</span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="m-card-actions">
+                    <Link
+                      href={`/i/${inv.slug}`}
+                      target="_blank"
+                      className="m-btn-ghost"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Ver invitación
+                    </Link>
+                    <Link
+                      href={`/dashboard/invitaciones/${inv.slug}/guests`}
+                      className="btn-action go btn-admin-glow inline-flex items-center justify-center h-9 px-4 text-xs font-semibold rounded-lg text-black transition-colors flex-[1.5]"
+                    >
                       Administrar →
-                  </Link>
-                  <div className="btn-delete flex items-center justify-center">
+                    </Link>
+                    <div className="flex items-center justify-center">
                       <DeleteInvitationButton invitationId={inv.id} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -237,15 +307,26 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
           })
         ) : (
           <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
-            <p className="text-muted-foreground mb-4 font-ui">Todavía no tenés invitaciones activas.</p>
-            <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={stats.totalInvitations} planTier={dbUser?.planTier} autoOpen={isAutoOpen} />
+            <p className="text-muted-foreground mb-4 font-ui">
+              Todavía no tenés invitaciones activas.
+            </p>
+            <NewInvitationButton
+              premiumCredits={dbUser?.premiumCredits || 0}
+              totalInvitations={stats.totalInvitations}
+              planTier={dbUser?.planTier}
+              autoOpen={isAutoOpen}
+            />
           </div>
         )}
       </div>
 
+      {/* Link to inactive */}
       {stats.inactiveCount > 0 && (
         <div className="mt-4 text-center">
-          <Link href="/dashboard/invitaciones" className="text-accent font-ui font-semibold text-sm hover:underline">
+          <Link
+            href="/dashboard/invitaciones"
+            className="text-accent font-ui font-semibold text-sm hover:underline"
+          >
             Ver invitaciones inactivas ({stats.inactiveCount}) →
           </Link>
         </div>

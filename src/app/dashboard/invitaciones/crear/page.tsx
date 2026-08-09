@@ -1,10 +1,9 @@
 "use client";
 
 import { WizardSteps } from "@/components/wizard/WizardSteps";
-import { BackLink } from "@/components/ui/BackLink";
 import { useWizardStore } from "@/store/wizard-store";
 import { useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 // Sincroniza el store con la elección gratis/premium hecha en el modal de
 // NewInvitationButton, leída de la URL en vez de confiar en el estado que
@@ -25,24 +24,11 @@ function WizardBootstrap() {
 
 export default function CrearInvitacionPage() {
     return (
-        <div className="py-8 px-4 md:px-8 max-w-4xl mx-auto min-h-dvh">
+        <div className="wiz-page">
             <Suspense fallback={null}>
                 <WizardBootstrap />
             </Suspense>
-
-            <div className="mb-6 flex items-center">
-                <BackLink href="/dashboard" confirmIfDirty />
-            </div>
-
-            <div className="w-full">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Crear Nueva Invitación</h1>
-                    <p className="text-muted-foreground mt-2">
-                        Completa los pasos para generar tu invitación digital en minutos.
-                    </p>
-                </div>
-                <WizardSteps />
-            </div>
+            <WizardSteps />
         </div>
     );
 }
