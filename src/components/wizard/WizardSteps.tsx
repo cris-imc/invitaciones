@@ -44,16 +44,23 @@ export function WizardSteps() {
 
     const CurrentComponent = steps[currentStep].component;
     const progress = ((currentStep + 1) / steps.length) * 100;
+    // Al crear, el total de pasos depende del tipo elegido (Casamiento suma
+    // Ceremonia) y ese tipo recien se sabe en este mismo paso -- mostrar "de
+    // N" antes de elegir muestra un total que todavia puede cambiar. En
+    // edicion el tipo ya esta fijo de entrada, así que siempre se muestra.
+    const showProgress = isEditing || Boolean(data.type);
 
     return (
         <div className="max-w-2xl mx-auto w-full">
-            <div className="mb-8">
-                <div className="flex justify-between text-sm font-medium text-muted-foreground mb-2">
-                    <span>Paso {currentStep + 1} de {steps.length}</span>
-                    <span>{steps[currentStep].label}</span>
+            {showProgress && (
+                <div className="mb-8">
+                    <div className="flex justify-between text-sm font-medium text-muted-foreground mb-2">
+                        <span>Paso {currentStep + 1} de {steps.length}</span>
+                        <span>{steps[currentStep].label}</span>
+                    </div>
+                    <Progress value={progress} className="h-2" />
                 </div>
-                <Progress value={progress} className="h-2" />
-            </div>
+            )}
 
             <div className="bg-card rounded-xl shadow-lg p-6 md:p-8">
                 <CurrentComponent />
