@@ -25,17 +25,20 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
     const [errorModal, setErrorModal] = useState<string | null>(null);
 
     useEffect(() => {
-        const storedName = localStorage.getItem("live_guest_name");
+        // La clave incluye el token: sin esto, un mismo celular que escanea
+        // el QR de LIVE de dos eventos distintos arrastraba el nombre
+        // cargado en el primero al segundo.
+        const storedName = localStorage.getItem(`live_guest_name_${token}`);
         if (storedName) {
             setGuestName(storedName);
             setHasName(true);
         }
-    }, []);
+    }, [token]);
 
     const handleNameSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (guestName.trim()) {
-            localStorage.setItem("live_guest_name", guestName.trim());
+            localStorage.setItem(`live_guest_name_${token}`, guestName.trim());
             setHasName(true);
         }
     };
