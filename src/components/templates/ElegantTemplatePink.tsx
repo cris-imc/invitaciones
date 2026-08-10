@@ -531,7 +531,7 @@ export function ElegantTemplatePink({ invitation, guest, isPersonalized = false 
         }
         
         /* Remove ALL rounded corners for the sharp, formal aesthetic */
-        .desktop-stage .tpl div,
+        .desktop-stage .tpl div:not(#countdown div),
         .desktop-stage .tpl section,
         .desktop-stage .tpl button,
         .desktop-stage .tpl input,
