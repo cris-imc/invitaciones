@@ -107,7 +107,7 @@ export function Countdown({
                     fontSize: "1.5rem",
                     fontWeight: 600,
                     lineHeight: 1,
-                    color: "var(--t-ink)",
+                    color: "#ffffff",
                     fontFamily: "var(--font-cormorant), serif",
                   }}
                 >
@@ -122,7 +122,7 @@ export function Countdown({
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                     marginTop: "4px",
-                    color: "var(--t-ink)",
+                    color: "#ffffff",
                     opacity: 0.9,
                   }}
                 >

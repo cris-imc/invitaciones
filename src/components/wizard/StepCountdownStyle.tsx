@@ -37,7 +37,7 @@ function MiniPreview({ styleId, days }: { styleId: string; days: number }) {
             <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
                 {boxes.map((b) => (
                     <div key={b.label} style={{ borderRadius: "var(--radius-pill)", background: "var(--accent)", padding: "4px 8px", textAlign: "center" }}>
-                        <b style={{ fontFamily: "var(--font-cormorant), serif", fontSize: 12, color: "var(--ink)", display: "block" }}>{b.value}</b>
+                        <b style={{ fontFamily: "var(--font-cormorant), serif", fontSize: 12, color: "#ffffff", display: "block" }}>{b.value}</b>
                     </div>
                 ))}
             </div>
