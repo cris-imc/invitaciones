@@ -65,7 +65,7 @@ export function Countdown({
 
   if (countdownStyle === "minimalista") {
     return (
-      <section className={`w-full py-16 px-6 flex flex-col items-center justify-center text-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
+      <section data-style="minimalista" className={`w-full py-16 px-6 flex flex-col items-center justify-center text-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
         <p className="t-kicker mb-4">{kickerLabel}</p>
         <p
           className={`text-5xl sm:text-6xl font-light ${dark ? "text-[#EDE9F4]" : "text-[#2C2C2C]"}`}
@@ -82,7 +82,7 @@ export function Countdown({
 
   if (countdownStyle === "capsulas") {
     return (
-      <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
+      <section data-style="capsulas" className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
         <div className="w-full max-w-[340px] sm:max-w-xl text-center mx-auto">
           <p className="t-kicker mb-8" style={{ display: "flex", justifyContent: "center" }}>{kickerLabel}</p>
           <div style={{ display: "flex", flexWrap: "nowrap", alignItems: "center", justifyContent: "space-between", gap: "0.25rem", width: "100%" }}>
@@ -138,7 +138,7 @@ export function Countdown({
 
   if (countdownStyle === "flip") {
     return (
-      <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
+      <section data-style="flip" className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
         <div className="w-full max-w-[340px] sm:max-w-xl text-center mx-auto">
           <p className="t-kicker mb-8">{kickerLabel}</p>
           <div className="flex items-center justify-center gap-1 sm:gap-2 w-full">
@@ -177,7 +177,7 @@ export function Countdown({
 
   // "clasico" (default)
   return (
-    <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-black/20 dark" : "bg-white/40"}`} id="countdown">
+    <section data-style="clasico" className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-black/20 dark" : "bg-white/40"}`} id="countdown">
       <div className="w-full max-w-[340px] sm:max-w-xl text-left mx-auto">
         <p className="t-kicker mb-8" style={{ display: "flex", justifyContent: "flex-start" }}>{kickerLabel}</p>
         <div style={{ display: "flex", flexWrap: "nowrap", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", width: "100%" }}>

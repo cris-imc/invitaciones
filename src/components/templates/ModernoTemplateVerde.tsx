@@ -577,7 +577,7 @@ export function ModernoTemplateVerde({ invitation, guest, isPersonalized = false
         }
         
         /* Remove ALL rounded corners for the sharp, formal aesthetic */
-        .desktop-stage .tpl div,
+        .desktop-stage .tpl div:not(#countdown div),
         .desktop-stage .tpl section,
         .desktop-stage .tpl button,
         .desktop-stage .tpl input,
@@ -595,7 +595,7 @@ export function ModernoTemplateVerde({ invitation, guest, isPersonalized = false
           position: relative;
           z-index: 20;
         }
-        #countdown.dark > div > div > div {
+        #countdown[data-style="clasico"].dark > div > div > div {
           background-color: rgba(0, 0, 0, 0.2) !important;
           border-color: rgba(201, 168, 118, 0.2) !important;
         }
