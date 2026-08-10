@@ -85,7 +85,7 @@ export function Countdown({
       <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
         <div className="w-full max-w-[340px] sm:max-w-xl text-center mx-auto">
           <p className="t-kicker mb-8" style={{ display: "flex", justifyContent: "center" }}>{kickerLabel}</p>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "1rem", width: "100%" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "0.5rem", width: "100%" }}>
             {boxes.map(({ label, value }) => (
               <div
                 key={label}
@@ -94,7 +94,7 @@ export function Countdown({
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "12px 24px",
+                  padding: "8px 16px",
                   borderRadius: "9999px",
                   background: "var(--t-acc)",
                 }}
@@ -102,7 +102,7 @@ export function Countdown({
                 <b
                   aria-label={`${value} ${label}`}
                   style={{
-                    fontSize: "1.75rem",
+                    fontSize: "1.5rem",
                     fontWeight: 600,
                     lineHeight: 1,
                     color: "var(--t-ink)",
@@ -114,12 +114,12 @@ export function Countdown({
                 <span
                   aria-hidden="true"
                   style={{
-                    fontSize: "0.65rem",
+                    fontSize: "0.6rem",
                     fontFamily: "sans-serif",
                     fontWeight: 500,
                     textTransform: "uppercase",
                     letterSpacing: "0.1em",
-                    marginTop: "4px",
+                    marginTop: "2px",
                     color: "var(--t-ink)",
                     opacity: 0.9,
                   }}
@@ -178,7 +178,7 @@ export function Countdown({
     <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-black/20 dark" : "bg-white/40"}`} id="countdown">
       <div className="w-full max-w-[340px] sm:max-w-xl text-left mx-auto">
         <p className="t-kicker mb-8" style={{ display: "flex", justifyContent: "flex-start" }}>{kickerLabel}</p>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-start", gap: "1.5rem", width: "100%" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "0", width: "100%" }}>
           {boxes.map(({ label, value }) => (
             <div
               key={label}
@@ -187,8 +187,8 @@ export function Countdown({
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                width: "5rem",
-                height: "6rem",
+                width: "4.5rem",
+                height: "5.5rem",
                 borderRadius: "1rem",
                 background: "color-mix(in srgb, var(--t-ink) 4%, transparent)",
                 border: "1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)",
@@ -197,7 +197,7 @@ export function Countdown({
               <b
                 aria-label={`${value} ${label}`}
                 style={{
-                  fontSize: "2rem",
+                  fontSize: "1.75rem",
                   fontWeight: 300,
                   lineHeight: 1,
                   color: "var(--t-acc)",
@@ -209,7 +209,7 @@ export function Countdown({
               <span
                 aria-hidden="true"
                 style={{
-                  fontSize: "0.7rem",
+                  fontSize: "0.65rem",
                   fontFamily: "sans-serif",
                   fontWeight: 500,
                   textTransform: "uppercase",
