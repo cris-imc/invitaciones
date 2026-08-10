@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarCheck, Eye, Users, Music, TrendingUp } from "lucide-react";
+import { CalendarCheck, Eye, Users, Music, TrendingUp, PartyPopper, Gem, Crown, Cake, Building2 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -74,13 +74,13 @@ function getStripClass(tipo: string): string {
   return "strip-default";
 }
 
-function getEventEmoji(tipo: string): string {
+function getEventEmoji(tipo: string): React.ReactNode {
   const t = (tipo || "").toUpperCase();
-  if (t === "CASAMIENTO") return "💍";
-  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return "👑";
-  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return "🎂";
-  if (t === "CORPORATIVO" || t === "EJECUTIVO") return "🏢";
-  return "🎉";
+  if (t === "CASAMIENTO") return <Gem className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
+  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return <Crown className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
+  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return <Cake className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
+  if (t === "CORPORATIVO" || t === "EJECUTIVO") return <Building2 className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
+  return <PartyPopper className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
 }
 
 function getEventLabel(tipo: string): string {
