@@ -141,6 +141,8 @@ export function WizardLivePreview() {
                 boxShadow: "0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(246,243,236,.06)",
                 overflow: "hidden",
                 background: "#000",
+                isolation: "isolate",
+                WebkitMaskImage: "-webkit-radial-gradient(white, black)",
             }}
         >
             <div
