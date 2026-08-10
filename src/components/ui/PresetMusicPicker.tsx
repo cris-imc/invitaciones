@@ -14,13 +14,20 @@ export function PresetMusicPicker({ selectedUrl, onSelect }: PresetMusicPickerPr
     const [previewingId, setPreviewingId] = useState<string | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
+    const stopPreview = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.pause();
+        audio.currentTime = 0;
+        setPreviewingId(null);
+    };
+
     const togglePreview = (song: PresetSong) => {
         const audio = audioRef.current;
         if (!audio) return;
 
         if (previewingId === song.id) {
-            audio.pause();
-            setPreviewingId(null);
+            stopPreview();
             return;
         }
 
@@ -30,9 +37,16 @@ export function PresetMusicPicker({ selectedUrl, onSelect }: PresetMusicPickerPr
         setPreviewingId(song.id);
     };
 
+    const handleSelect = (song: PresetSong) => {
+        // Detener la preview antes de seleccionar para que no se pisen
+        // el audio del picker con el del live preview del wizard.
+        stopPreview();
+        onSelect(song);
+    };
+
     return (
         <div className="space-y-2">
-            <audio ref={audioRef} onEnded={() => setPreviewingId(null)} onPause={() => setPreviewingId(null)} />
+            <audio ref={audioRef} onEnded={() => setPreviewingId(null)} />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1">
                 {PRESET_SONGS.map((song) => {
@@ -43,8 +57,8 @@ export function PresetMusicPicker({ selectedUrl, onSelect }: PresetMusicPickerPr
                             key={song.id}
                             role="button"
                             tabIndex={0}
-                            onClick={() => onSelect(song)}
-                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(song); }}
+                            onClick={() => handleSelect(song)}
+                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleSelect(song); }}
                             className={cn(
                                 "group flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1.5 border cursor-pointer transition-colors",
                                 isSelected

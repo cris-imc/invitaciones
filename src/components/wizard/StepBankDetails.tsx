@@ -25,7 +25,6 @@ export function StepBankDetails() {
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
     const [attemptedNext, setAttemptedNext] = useState(false);
-    const [isCreating, setIsCreating] = useState(false);
     const themeConfig = useWizardStore((state) => state.themeConfig);
 
     // Helper for CBU formatting (digits only, max 22 characters)
@@ -72,25 +71,6 @@ export function StepBankDetails() {
         }
         setAttemptedNext(false);
         nextStep();
-    };
-
-    const handleCreate = async () => {
-        if (hasMissingRequired) {
-            setAttemptedNext(true);
-            showToast("Completá los datos bancarios obligatorios (titular y CBU/CVU o alias) antes de continuar.", "error");
-            return;
-        }
-        setAttemptedNext(false);
-        setIsCreating(true);
-        try {
-            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit);
-            useWizardStore.getState().setDirty(false);
-            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
-        } catch (error) {
-            console.error('Error creating invitation:', error);
-            showToast(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`, "error");
-            setIsCreating(false);
-        }
     };
 
     return (
@@ -263,7 +243,7 @@ export function StepBankDetails() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
                             <div className="space-y-1.5 md:col-span-1">
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center h-5">
                                     <Label htmlFor="cbu" className="text-xs font-medium">CBU / CVU (22 números)</Label>
                                     <span className="text-[10px] font-mono text-muted-foreground">
                                         {(d.regaloCbu || "").length}/22
@@ -280,7 +260,7 @@ export function StepBankDetails() {
                             </div>
 
                             <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="alias" className="text-xs font-medium">Alias</Label>
+                                <Label htmlFor="alias" className="text-xs font-medium h-5 flex items-center">Alias</Label>
                                 <Input
                                     id="alias"
                                     placeholder="Ej: novios.fiesta.mp"
@@ -294,7 +274,7 @@ export function StepBankDetails() {
                             </div>
 
                             <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="titular" className="text-xs font-medium">Titular de la Cuenta</Label>
+                                <Label htmlFor="titular" className="text-xs font-medium h-5 flex items-center">Titular de la Cuenta</Label>
                                 <Input
                                     id="titular"
                                     placeholder="Ej: María Pérez"
@@ -407,8 +387,8 @@ export function StepBankDetails() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
                             <div className="space-y-1.5 md:col-span-1">
-                                <div className="flex justify-between items-center">
-                                    <Label htmlFor="cardCbu" className="text-xs font-medium">CBU / CVU (22 números)</Label>
+                                <div className="flex justify-between items-center h-5">
+                                    <Label htmlFor="cbu-tarjeta" className="text-xs font-medium">CBU / CVU (22 números)</Label>
                                     <span className="text-[10px] font-mono text-muted-foreground">
                                         {(d.pagoTarjetaCbu || "").length}/22
                                     </span>
@@ -424,7 +404,7 @@ export function StepBankDetails() {
                             </div>
 
                             <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="cardAlias" className="text-xs font-medium">Alias</Label>
+                                <Label htmlFor="alias-tarjeta" className="text-xs font-medium h-5 flex items-center">Alias</Label>
                                 <Input
                                     id="cardAlias"
                                     placeholder="Ej: tarjetas.salon.mp"
@@ -438,7 +418,7 @@ export function StepBankDetails() {
                             </div>
 
                             <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="cardHolder" className="text-xs font-medium">Titular de la Cuenta</Label>
+                                <Label htmlFor="titular-tarjeta" className="text-xs font-medium h-5 flex items-center">Titular de la Cuenta</Label>
                                 <Input
                                     id="cardHolder"
                                     placeholder="Ej: Salón Los Olivos"
@@ -544,7 +524,7 @@ export function StepBankDetails() {
                 )}
             </div>
 
-            <SaveStepButtons onNext={handleNext} isLastStep={true} onCreate={handleCreate} isCreating={isCreating} />
+            <SaveStepButtons onNext={handleNext} />
         </div>
     );
 }

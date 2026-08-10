@@ -20,10 +20,18 @@ function isEmbedUrl(url: string): boolean {
 export function toEmbedMapUrl(rawUrl: string): string | null {
   const url = (rawUrl || "").trim();
   if (!url) return null;
-  if (isEmbedUrl(url)) return url;
+
+  // Si el usuario pego todo un <iframe> de Google Maps, extraemos solo el src
+  const iframeSrcMatch = url.match(/src="([^"]+)"/i);
+  let processUrl = url;
+  if (iframeSrcMatch) {
+    processUrl = iframeSrcMatch[1];
+  }
+
+  if (isEmbedUrl(processUrl)) return processUrl;
 
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(processUrl);
 
     // ?q=... o ?query=... ya presente
     const q = parsed.searchParams.get("q") || parsed.searchParams.get("query");

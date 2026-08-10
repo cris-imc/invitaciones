@@ -36,7 +36,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
       </div>
 
       {/* ── Title + status card row ── */}
-      <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-col xl:flex-row items-start justify-between gap-6 mb-2">
         {/* Title */}
         <div className="min-w-0 flex-1">
           <p className="adm-breadcrumb" style={{ marginBottom: 4 }}>
@@ -47,23 +47,23 @@ export default async function GuestManagementPage({ params }: { params: Promise<
           </h1>
         </div>
 
-        {/* Metrics card */}
-        <div className="adm-status-card" style={{ minWidth: 200, marginBottom: 0 }}>
-          <p className="adm-status-kicker">
+        {/* Metrics card (Horizontal) */}
+        <div className="adm-status-card w-full xl:w-auto" style={{ marginBottom: 0 }}>
+          <p className="adm-status-kicker mb-3">
             <span style={{ fontSize: 12 }}>●</span> Capacidad
           </p>
-          <div className="adm-metrics">
-            <div className="adm-metric">
-              <span className="adm-metric-val gold">{remaining}</span>
-              <span className="adm-metric-lbl">Cupos Libres</span>
+          <div className="flex flex-row items-center gap-3">
+            <div className="adm-metric flex-1 xl:flex-none px-4 py-2">
+              <span className="adm-metric-val gold text-2xl">{remaining}</span>
+              <span className="adm-metric-lbl text-[10px]">Cupos Libres</span>
             </div>
-            <div className="adm-metric">
-              <span className="adm-metric-val">{maxGuestsStr}</span>
-              <span className="adm-metric-lbl">Capacidad total</span>
+            <div className="adm-metric flex-1 xl:flex-none px-4 py-2">
+              <span className="adm-metric-val text-2xl">{maxGuestsStr}</span>
+              <span className="adm-metric-lbl text-[10px]">Total</span>
             </div>
-            <div className="adm-metric">
-              <span className="adm-metric-val sage">{totalConfirmed}</span>
-              <span className="adm-metric-lbl">Inscriptos</span>
+            <div className="adm-metric flex-1 xl:flex-none px-4 py-2">
+              <span className="adm-metric-val sage text-2xl">{totalConfirmed}</span>
+              <span className="adm-metric-lbl text-[10px]">Invitados</span>
             </div>
           </div>
         </div>

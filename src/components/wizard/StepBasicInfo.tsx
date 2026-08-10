@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,45 +25,32 @@ export function StepBasicInfo() {
     const { data: session } = useSession();
     const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
-    const predefinedCasamiento = ["Nuestra Boda", "Nos Casamos", "¡Nos Casamos!"];
-    const predefinedQuince = ["Mis 15 Años", "Mis Quince", "¡Mis 15!"];
-
-    const [isCustomTitle, setIsCustomTitle] = useState(() => {
-        if (data.type === 'CUMPLEANOS') return true;
-        if (!data.nombreEvento) return false;
-        if (data.type === 'CASAMIENTO' && !predefinedCasamiento.includes(data.nombreEvento)) return true;
-        if (data.type === 'QUINCE_ANOS' && !predefinedQuince.includes(data.nombreEvento)) return true;
-        return false;
-    });
-
+    const [isCustomTitle, setIsCustomTitle] = useState(false); // No longer needed but kept for TS if used
     const tipo = data.type;
 
     const basicInfoSchemaForType = basicInfoSchema.superRefine((values, ctx) => {
-        if (tipo === 'CASAMIENTO') {
-            if (!values.nombreNovia?.trim()) {
-                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nombreNovia'], message: 'El nombre de la novia es obligatorio' });
-            }
-            if (!values.nombreNovio?.trim()) {
-                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nombreNovio'], message: 'El nombre del novio es obligatorio' });
-            }
-        }
-        if (tipo === 'QUINCE_ANOS' && !values.nombreQuinceanera?.trim()) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nombreQuinceanera'], message: 'El nombre o apodo de la quinceañera es obligatorio' });
-        }
+        // Validation for name fields moved to StepEventType
     });
 
     const form = useForm<z.infer<typeof basicInfoSchema>>({
         resolver: zodResolver(basicInfoSchemaForType),
         defaultValues: {
-            nombreEvento: data.nombreEvento || "",
             fecha: data.fecha,
             ciudad: data.ciudad || "",
-            nombreNovio: data.nombreNovio || "",
-            nombreNovia: data.nombreNovia || "",
-            nombreQuinceanera: data.nombreQuinceanera || "",
             rsvpDaysBeforeEvent: data.rsvpDaysBeforeEvent || 7,
         },
     });
+
+    // Reactividad en vivo: sincronizar estado local con el store global
+    // para que la miniatura se actualice mientras el usuario escribe.
+    useEffect(() => {
+        const subscription = form.watch((value) => {
+            if (value) {
+                setData(value as any);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [form, setData]);
 
     function onSubmit(values: z.infer<typeof basicInfoSchema>) {
         setData(values);
@@ -102,90 +89,36 @@ export function StepBasicInfo() {
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <FormField
-                        control={form.control}
-                        name="nombreEvento"
-                        render={({ field }) => {
-                            const options = tipo === 'CASAMIENTO' ? predefinedCasamiento : (tipo === 'QUINCE_ANOS' ? predefinedQuince : []);
-                            return (
-                                <FormItem>
-                                    <FormLabel>Título de la Invitación</FormLabel>
-                                    <FormControl>
-                                        <div className="flex flex-col gap-3">
-                                            {options.length > 0 && (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {options.map(opt => (
-                                                        <button
-                                                            key={opt}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                field.onChange(opt);
-                                                                setIsCustomTitle(false);
-                                                            }}
-                                                            className={cn(
-                                                                "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
-                                                                field.value === opt && !isCustomTitle
-                                                                    ? "bg-amber-500 text-white border-amber-600"
-                                                                    : "bg-[var(--ink-2)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
-                                                            )}
-                                                        >
-                                                            {opt}
-                                                        </button>
-                                                    ))}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setIsCustomTitle(true);
-                                                            if (options.includes(field.value)) {
-                                                                field.onChange("");
-                                                            }
-                                                        }}
-                                                        className={cn(
-                                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
-                                                            isCustomTitle
-                                                                ? "bg-amber-500 text-white border-amber-600"
-                                                                : "bg-[var(--ink-2)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
-                                                        )}
-                                                    >
-                                                        Personalizado
-                                                    </button>
-                                                </div>
-                                            )}
-                                            {(isCustomTitle || options.length === 0) && (
-                                                <Input 
-                                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl mt-2"
-                                                    placeholder={
-                                                        tipo === 'CASAMIENTO' ? "Ej: Nuestra Boda" :
-                                                            tipo === 'QUINCE_ANOS' ? "Ej: Mis 15 Años" :
-                                                                "Ej: Mi Cumpleaños, Mi Bautismo, etc."
-                                                    } {...field} 
-                                                />
-                                            )}
-                                        </div>
-                                    </FormControl>
-                                    <p className="text-xs text-muted-foreground">
-                                        {tipo === 'QUINCE_ANOS'
-                                            ? "Este es el título general de la invitación. Tu nombre lo ingresarás en el siguiente campo."
-                                            : "Este es el título general que aparecerá en la invitación."}
-                                    </p>
-                                    <FormMessage />
-                                </FormItem>
-                            );
-                        }}
-                    />
+
 
                     <FormField
                         control={form.control}
                         name="fecha"
                         render={({ field }) => {
-                            const rawLocked = data.fecha ? isEventDateLocked(data.fecha) : false;
-                            const isDateLocked = !isAdmin && rawLocked;
+                            // Si no tiene data.id, es una invitación en borrador (no creada)
+                            const isEditing = Boolean(data.id);
+                            
+                            // Bloqueo base: la fecha está dentro de 30 días
+                            const baseLocked = data.fecha ? isEventDateLocked(data.fecha) : false;
+                            
+                            // No bloqueamos si la invitación se creó hace menos de 1 hora
+                            // Esto evita que un error de tipeo bloquee la fecha instantáneamente
+                            const createdAt = (data as any).createdAt;
+                            const isNew = createdAt ? (new Date().getTime() - new Date(createdAt).getTime() < 60 * 60 * 1000) : !isEditing;
+                            
+                            // El bloqueo real solo aplica si ya fue creada (isEditing) y no es "nueva" (dentro de la primera hora)
+                            const isDateLocked = !isAdmin && baseLocked && !isNew;
+                            
+                            // Si queremos mostrar el cartel de administrador de que él puede editar,
+                            // o el cartel rojo a un usuario de que está bloqueada.
+                            // Solo se debe mostrar si baseLocked es true, y NO es nueva.
+                            const showLockStatus = baseLocked && !isNew;
 
                             return (
                                 <FormItem className="flex flex-col">
                                     <FormLabel className="flex items-center justify-between">
                                         <span>Fecha del Evento</span>
-                                        {rawLocked && (
+                                        {showLockStatus && (
                                             <span className={`text-xs flex items-center gap-1 font-semibold ${isAdmin ? 'text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
                                                 <Lock className="w-3 h-3" /> {isAdmin ? "👑 Desbloqueado (Admin)" : "Bloqueada (30d)"}
                                             </span>
@@ -225,12 +158,12 @@ export function StepBasicInfo() {
                                             </PopoverContent>
                                         )}
                                     </Popover>
-                                    {rawLocked && !isAdmin && (
+                                    {showLockStatus && !isAdmin && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400">
                                             Fecha bloqueada por seguridad. Faltan 30 días o menos para la fecha del evento.
                                         </p>
                                     )}
-                                    {rawLocked && isAdmin && (
+                                    {showLockStatus && isAdmin && (
                                         <p className="text-xs text-green-400 font-medium">
                                             👑 Habilitado por rol Administrador: tenés permiso para editar la fecha aunque falten menos de 30 días.
                                         </p>
@@ -262,71 +195,7 @@ export function StepBasicInfo() {
                         )}
                     />
 
-                    {tipo === 'CASAMIENTO' && (
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="nombreNovia"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Nombre Novia</FormLabel>
-                                        <FormControl>
-                                             <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="nombreNovio"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Nombre Novio</FormLabel>
-                                        <FormControl>
-                                             <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    )}
 
-                    {tipo === 'QUINCE_ANOS' && (
-                        <FormField
-                            control={form.control}
-                            name="nombreQuinceanera"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Nombre o Apodo de la Quinceañera</FormLabel>
-                                    <FormControl>
-                                         <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Ej: Sofi, Valentina, Mafe..." {...field} />
-                                    </FormControl>
-                                    <p className="text-xs text-muted-foreground">
-                                        Ingresá el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.
-                                    </p>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
-
-                    {tipo !== 'CASAMIENTO' && tipo !== 'QUINCE_ANOS' && (
-                        <FormField
-                            control={form.control}
-                            name="nombreQuinceanera"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Nombre del Festejado/a (Opcional)</FormLabel>
-                                    <FormControl>
-                                         <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre de la persona o empresa" {...field} />
-                                    </FormControl>
-                                    <p className="text-xs text-muted-foreground">Si lo dejas vacío, se usará el nombre del evento.</p>
-                                </FormItem>
-                            )}
-                        />
-                    )}
 
                     
                         <SaveStepButtons form={form} />

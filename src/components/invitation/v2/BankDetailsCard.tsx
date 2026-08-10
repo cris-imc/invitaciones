@@ -28,6 +28,7 @@ interface BankDetailsCardProps {
   cardBorder?: string;
   InfoRow: ComponentType<RowProps>;
   CopyField: ComponentType<RowProps>;
+  defaultExpanded?: boolean;
 }
 
 // Card colapsable: por defecto solo se ve el icono + título (ahorra mucho
@@ -45,8 +46,9 @@ export function BankDetailsCard({
   cardBorder,
   InfoRow,
   CopyField,
+  defaultExpanded = false,
 }: BankDetailsCardProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const hasDetails = Boolean(data.banco || data.cbu || data.alias || data.titular);
 
   return (

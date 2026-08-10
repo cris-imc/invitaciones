@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
 
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada !== undefined ? body.galeriaPrincipalHabilitada : true,
-                galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : '[]',
+                galeriaPrincipalFotos: (() => { const g = body.galeriaPrincipalFotos; if (!g) return '[]'; if (typeof g === 'string') return g; return JSON.stringify(g); })(),
                 galeriaPrincipalAutoplay: body.galeriaPrincipalAutoplay !== undefined ? Boolean(body.galeriaPrincipalAutoplay) : false,
                 galeriaPrincipalEstilo: body.galeriaPrincipalEstilo || 'carrusel',
 
@@ -502,7 +502,7 @@ export async function PUT(request: NextRequest) {
 
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada,
-                galeriaPrincipalFotos: body.galeriaPrincipalFotos ? JSON.stringify(body.galeriaPrincipalFotos) : undefined,
+                galeriaPrincipalFotos: (() => { const g = body.galeriaPrincipalFotos; if (!g) return undefined; if (typeof g === 'string') return g; return JSON.stringify(g); })(),
 
                 sugerenciaMusicaHabilitada: body.sugerenciaMusicaHabilitada,
 

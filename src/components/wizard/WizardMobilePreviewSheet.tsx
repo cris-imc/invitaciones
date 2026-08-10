@@ -10,39 +10,27 @@ import { WizardLivePreview } from "./WizardLivePreview";
 // "peek" del borde superior (handle + una porción de la miniatura); un swipe
 // hacia arriba la revela completa, un swipe hacia abajo la vuelve a esconder.
 
-const SHEET_HEIGHT_VH = 62; // alto del sheet cuando está completamente revelado
-const PEEK_PX = 72; // cuánto asoma en reposo (handle + un poco de la miniatura)
+const SHEET_WIDTH_PX = 280; // ancho total del side sheet
+const PEEK_PX = 44; // cuánto asoma en reposo (handle + un poco de miniatura)
 
 export function WizardMobilePreviewSheet() {
-    // Portal a document.body: el dashboard tiene un ancestro con `filter`
-    // (blur de transición), que crea un containing block nuevo para
-    // position:fixed -- sin portal, el sheet quedaba anclado a ese ancestro
-    // en vez del viewport real. Mismo patrón que ya usan las plantillas
-    // (createPortal) para la burbuja de pase / botón de música.
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
     const [revealDistance, setRevealDistance] = useState(0);
-    // y=0 -> sheet completamente revelado. y=revealDistance -> solo el peek visible.
-    const y = useMotionValue(0);
+    // x=0 -> completamente revelado. x=revealDistance -> escondido a la derecha.
+    const x = useMotionValue(0);
     const wasRevealedRef = useRef(false);
     const observerRef = useRef<ResizeObserver | null>(null);
 
-    // Callback ref (no useEffect con deps []) porque el nodo real recién
-    // existe despues del segundo render (el gate de `mounted` hace que el
-    // primer render devuelva null) -- un effect con deps [] corre una sola
-    // vez, en ese primer render, cuando sheetRef.current todavia es null, y
-    // nunca vuelve a intentarlo.
     const attachRef = useCallback((el: HTMLDivElement | null) => {
         observerRef.current?.disconnect();
         if (!el) return;
         const update = () => {
-            const distance = Math.max(0, el.offsetHeight - PEEK_PX);
+            const distance = Math.max(0, el.offsetWidth - PEEK_PX);
             setRevealDistance(distance);
-            // Solo re-posiciona al valor de reposo si el usuario no lo tenía
-            // revelado a mano (evita "saltos" en cada resize/orientación).
             if (!wasRevealedRef.current) {
-                y.set(distance);
+                x.set(distance);
             }
         };
         update();
@@ -55,11 +43,12 @@ export function WizardMobilePreviewSheet() {
     useEffect(() => () => observerRef.current?.disconnect(), []);
 
     const handleDragEnd = (_: unknown, info: PanInfo) => {
-        const current = y.get();
-        const goingUp = info.velocity.y < -200 || (info.velocity.y <= 200 && current < revealDistance / 2);
-        const target = goingUp ? 0 : revealDistance;
+        const current = x.get();
+        // Si la velocidad a la izquierda es alta o cruzó la mitad hacia la izq
+        const goingLeft = info.velocity.x < -200 || (info.velocity.x <= 200 && current < revealDistance / 2);
+        const target = goingLeft ? 0 : revealDistance;
         wasRevealedRef.current = target === 0;
-        animate(y, target, { type: "spring", stiffness: 400, damping: 40 });
+        animate(x, target, { type: "spring", stiffness: 400, damping: 40 });
     };
 
     if (!mounted) return null;
@@ -68,9 +57,9 @@ export function WizardMobilePreviewSheet() {
         <motion.div
             ref={attachRef}
             className="wiz-mobile-sheet"
-            style={{ y, height: `calc(var(--vh, 1vh) * ${SHEET_HEIGHT_VH})` }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: revealDistance }}
+            style={{ x, width: SHEET_WIDTH_PX }}
+            drag="x"
+            dragConstraints={{ left: 0, right: revealDistance }}
             dragElastic={0.06}
             onDragEnd={handleDragEnd}
         >

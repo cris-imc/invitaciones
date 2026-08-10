@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
+import { getWizardSteps } from "./wizard-steps-config";
 
 // Corrección 1 (docs/correcciones.md): preview del wizard con fidelidad
 // real — reemplaza al mockup de teléfono inventado (WizardPreviewPane) por
@@ -21,10 +22,41 @@ const LIVE_DATA_DEBOUNCE_MS = 200;
 
 export function WizardLivePreview() {
     const { data, themeConfig } = useWizardStore();
+    if (typeof window !== "undefined") (window as any).__debugRenderPortada = data.portadaImagenFondo;
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const frameBoxRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
     const [loading, setLoading] = useState(true);
+    
+    // Función para enviar los datos actuales al iframe
+    const sendLiveData = () => {
+        const win = iframeRef.current?.contentWindow;
+        if (!win) return;
+
+        // galeriaPrincipalFotos puede ser un array JS (desde StepGallery) o
+        // ya un string JSON (desde EditWizardContainer). El template siempre
+        // espera un string JSON, así que normalizamos antes de postMessage.
+        const rawFotos = data.galeriaPrincipalFotos;
+        const galeriaPrincipalFotosStr = Array.isArray(rawFotos)
+            ? JSON.stringify(rawFotos)
+            : (typeof rawFotos === "string" ? rawFotos : "[]");
+
+        const invitation = {
+            ...data,
+            fechaEvento: data.fecha,
+            albumFotos: data.albumFotos || "[]",
+            galeriaPrincipalFotos: galeriaPrincipalFotosStr,
+            temaColores: JSON.stringify({
+                colorPrincipal: themeConfig?.colorPrincipal,
+                tema: themeConfig?.layout,
+            }),
+            isPreviewMode: true,
+            galeriaPrincipalHabilitada: data.galeriaPrincipalHabilitada ?? false,
+        };
+
+        (window as any).__debugLastPosted = invitation;
+        win.postMessage({ type: "wizard-live-data", invitation }, window.location.origin);
+    };
 
     useEffect(() => {
         const box = frameBoxRef.current;
@@ -39,16 +71,19 @@ export function WizardLivePreview() {
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
             if (event.source !== iframeRef.current?.contentWindow) return;
-            if (event.data?.type === "template-preview-ready") setLoading(false);
+            if (event.data?.type === "template-preview-ready") {
+                setLoading(false);
+                // El iframe acaba de cargar/recargar: enviar los datos actuales
+                // para que no quede con la muestra fija.
+                sendLiveData();
+            }
         };
         window.addEventListener("message", onMessage);
         return () => window.removeEventListener("message", onMessage);
-    }, []);
+    }, [data, themeConfig]); // Necesita dependencias porque sendLiveData lee de data y themeConfig
 
     // El src del iframe (fuerza recarga completa) solo depende de tipo de
-    // evento / plantilla / color -- son elecciones deliberadas y poco
-    // frecuentes, ya resueltas antes de llegar a los pasos donde importa la
-    // reactividad fina (Plantilla es el 2do paso del wizard).
+    // evento / plantilla / color
     const evento = data.type || "CASAMIENTO";
     const tipo = data.templateTipo === "MODERNO" ? "MODERNO" : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
@@ -58,42 +93,36 @@ export function WizardLivePreview() {
         setLoading(true);
     }, [previewSrc]);
 
-    // Todo lo demás (nombre, fecha, lugar, tipografía, countdown...) viaja
-    // por postMessage sin recargar el iframe, con un debounce corto para no
-    // saturarlo en cada tecla.
+    // Enviar datos debounced ante cambios
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            const win = iframeRef.current?.contentWindow;
-            if (!win) return;
-
-            const invitation = {
-                nombreEvento: data.nombreEvento,
-                fechaEvento: data.fecha,
-                lugarNombre: data.lugarNombre,
-                direccion: data.direccion,
-                ciudad: data.ciudad,
-                nombreNovio: data.nombreNovio,
-                nombreNovia: data.nombreNovia,
-                nombreQuinceanera: data.nombreQuinceanera,
-                portadaImagenFondo: data.portadaImagenFondo,
-                portadaImagenFondoDesktop: data.portadaImagenFondoDesktop,
-                templateTipo: data.templateTipo,
-                tipografiaDisplay: data.tipografiaDisplay,
-                fontTitle: data.fontTitle,
-                fontBody: data.fontBody,
-                countdownStyle: data.countdownStyle,
-                temaColores: JSON.stringify({
-                    colorPrincipal: themeConfig?.colorPrincipal,
-                    tema: themeConfig?.layout,
-                }),
-            };
-
-            win.postMessage({ type: "wizard-live-data", invitation }, window.location.origin);
-        }, LIVE_DATA_DEBOUNCE_MS);
-
+        const timeout = setTimeout(sendLiveData, LIVE_DATA_DEBOUNCE_MS);
         return () => clearTimeout(timeout);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data, themeConfig, previewSrc]);
+    }, [data, themeConfig]);
+    
+    const { currentStep } = useWizardStore();
+    // Sincronizar scroll cuando cambia de paso
+    useEffect(() => {
+        const win = iframeRef.current?.contentWindow;
+        if (!win || loading) return;
+        
+        const isEditing = Boolean(data.id);
+        const isCasamiento = data.type === "CASAMIENTO";
+        const steps = getWizardSteps({ isEditing, isCasamiento });
+        const stepLabel = steps[currentStep]?.label || "";
+
+        let section = "hero";
+        if (stepLabel === "Portada" || stepLabel === "Plantilla" || stepLabel === "Tipografía") section = "hero";
+        if (stepLabel === "Countdown" || stepLabel === "Información Básica") section = "countdown";
+        if (stepLabel === "Frase") section = "quote";
+        if (stepLabel === "Detalles del Salón" || stepLabel === "Ceremonia / Civil") section = "details";
+        if (stepLabel === "Cronograma") section = "schedule";
+        if (stepLabel === "Galería") section = "album";
+        if (stepLabel === "Música") section = "music";
+        if (stepLabel === "Regalo (CBU)") section = "banco";
+        if (stepLabel === "Trivia") section = "quiz";
+
+        win.postMessage({ type: "wizard-scroll-to", section }, window.location.origin);
+    }, [currentStep, loading, data.id, data.type]);
 
     return (
         <div

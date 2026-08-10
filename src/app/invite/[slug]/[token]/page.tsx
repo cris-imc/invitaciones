@@ -143,6 +143,11 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 despedidaFoto: true,
                 rsvpDaysBeforeEvent: true,
                 templateTipo: true,
+                fontTitle: true,
+                fontBody: true,
+                tipografiaDisplay: true,
+                countdownStyle: true,
+                portadaImagenDesktopEscala: true,
                 album: {
                     select: {
                         id: true,

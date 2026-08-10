@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +26,17 @@ export function StepDetails() {
             portadaDressCode: data.portadaDressCode || "",
         },
     });
+
+    // Reactividad en vivo: sincronizar estado local con el store global
+    // para que la miniatura se actualice mientras el usuario escribe.
+    useEffect(() => {
+        const subscription = form.watch((value) => {
+            if (value) {
+                setData(value as any);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [form, setData]);
 
     const currentDressCode = form.watch("portadaDressCode");
     const predefinedOptions = ["Elegante", "Elegante Sport", "Casual", "Formal", "De Gala"];

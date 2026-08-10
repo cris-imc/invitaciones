@@ -458,12 +458,12 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
                 <div className="h-[1px] w-12 bg-white/20" />
               </div>
 
-              <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide">
+              <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide" >
                 Gracias por acompañarnos en este día tan especial y compartir la alegría de crear recuerdos que perdurarán para siempre.
               </p>
 
               <div className="pt-6">
-                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-sans tracking-widest uppercase backdrop-blur-md">
+                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs  tracking-widest uppercase backdrop-blur-md" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
                   <span>Álbum disponible hasta el {expirationDateStr}</span>
                 </div>
@@ -482,7 +482,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
                     <h3 className="font-serif font-light text-xl text-slate-200 tracking-wide">
                       Álbum Fotográfico
                     </h3>
-                    <p className="text-sm text-slate-400 font-sans font-light tracking-wide">
+                    <p className="text-sm text-slate-400  font-light tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       No se registraron capturas durante la velada.
                     </p>
                   </div>
@@ -492,7 +492,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           </div>
         </main>
 
-        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 font-sans">
+        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 " style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
           Invitaciones Digitales · Recuerdos del Evento
         </footer>
       </div>
@@ -509,18 +509,21 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
         .desktop-stage .tpl .rsvp-container h3,
         .desktop-stage .tpl .quiz-container h2,
         .desktop-stage .tpl .quiz-container h3 {
-          font-family: var(--font-cormorant), serif !important;
+          font-family: var(--font-title, var(--font-cormorant)), serif !important;
           color: #1A2B33 !important;
         }
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           color: #5C8A7A !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
           letter-spacing: 0.2em !important;
           display: block;
+        }
+        .desktop-stage .tpl button {
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
         }
         .desktop-stage .tpl .t-kicker::before,
         .desktop-stage .tpl p.kicker::before {
@@ -570,7 +573,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           }
         }
         #rsvp.section.dark .t-kicker {
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           color: #ffffff !important;
           font-size: 11px !important;
           font-weight: 600 !important;
@@ -585,7 +588,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
         #rsvp.section.dark label {
           text-transform: uppercase !important;
           font-size: 10px !important;
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           letter-spacing: 0.15em !important;
           color: rgba(234, 229, 217, 0.4) !important;
           font-weight: 600 !important;
@@ -640,7 +643,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
         }
         #rsvp.section.dark .t-detail h4 {
           color: rgba(234, 229, 217, 0.5) !important;
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
           letter-spacing: 0.05em !important;
@@ -689,7 +692,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           }
         }
         #songs.d-sec.dark .t-kicker {
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           color: #5C8A7A !important; /* Gold/Orange */
           font-size: 11px !important;
           font-weight: 600 !important;
@@ -751,7 +754,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
         #rsvp.section.dark label {
           text-transform: uppercase !important;
           font-size: 10px !important;
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           letter-spacing: 0.15em !important;
           color: rgba(234, 229, 217, 0.4) !important;
           font-weight: 600 !important;
@@ -809,7 +812,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
         }
         #rsvp.section.dark .t-detail h4 {
           color: rgba(234, 229, 217, 0.5) !important;
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
           letter-spacing: 0.05em !important;
@@ -858,7 +861,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           }
         }
         #songs.d-sec.dark .t-kicker {
-          font-family: var(--font-inter), sans-serif !important;
+          font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           color: #5C8A7A !important; /* Gold/Orange */
           font-size: 11px !important;
           font-weight: 600 !important;
@@ -917,7 +920,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
         }
         .desktop-stage .d-foot .mono {
           color: #5C8A7A !important;
-          font-family: var(--font-cormorant), serif !important;
+          font-family: var(--font-title, var(--font-cormorant)), serif !important;
           font-size: 20px !important;
           margin-bottom: 8px !important;
         }
@@ -970,19 +973,19 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
       {/* PORTADA / WELCOME OVERLAY (Elegante y sencilla) */}
       {!isCoverOpen && (
         <div 
-          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F9F7F1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh' }}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F9F7F1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
           className="text-[#2C2C2C] transition-all duration-1000 animate-in fade-in"
         >
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem' }}>
             
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#2C2C2C] leading-relaxed" style={{ fontFamily: 'var(--font-title)', fontStyle: 'italic' }}>
+            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#2C2C2C] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className="font-sans text-sm font-medium text-[#7D786F] tracking-wide uppercase" style={{ letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className=" text-sm font-medium text-[#7D786F] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -991,7 +994,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
             <button
               type="button"
               onClick={() => setIsCoverOpen(true)}
-              className="inline-block font-sans font-medium text-xs tracking-[0.2em] px-10 py-3 border border-[#2C2C2C] text-[#2C2C2C] hover:bg-[#2C2C2C] hover:text-[#F9F7F1] transition-colors duration-500 cursor-pointer"
+              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 border border-[#2C2C2C] text-[#2C2C2C] hover:bg-[#2C2C2C] hover:text-[#F9F7F1] transition-colors duration-500 cursor-pointer"  style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}
             >
               ABRIR INVITACIÓN
             </button>
@@ -1009,7 +1012,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
-                <span className="font-sans text-[8px] font-semibold uppercase tracking-[0.2em] text-[#5C8A7A] leading-none mb-1">Pase Especial</span>
+                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#5C8A7A] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
                 <span className="text-[#1A2B33] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
               </div>
               <div className="flex flex-col items-end border-l border-[#5C8A7A]/20 pl-3">
@@ -1020,7 +1023,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#5C8A7A]" />
-              <span className="text-[#E5ECE9] font-sans text-[10px] font-semibold tracking-wider uppercase">Pase</span>
+              <span className="text-[#E5ECE9]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1052,8 +1055,8 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           <div className="seal" style={{ borderColor: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
             <span style={{ color: "white", fontFamily: "var(--font-cormorant), serif", textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}>{monogram}</span>
           </div>
-          <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-white mb-6 drop-shadow-sm">{eyebrow}</p>
-          <h1 className="text-5xl font-light text-white leading-tight mb-4 drop-shadow-md" style={{ fontFamily: 'var(--font-title)' }}>
+          <p className=" text-[11px] font-semibold uppercase tracking-[0.2em] text-white mb-6 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{eyebrow}</p>
+          <h1 className="text-5xl font-light text-white leading-tight mb-4 drop-shadow-md" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
             {em ? (
               <>
                 <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
@@ -1063,9 +1066,9 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
               <span className="block">{title}</span>
             )}
           </h1>
-          <p className="font-sans text-sm font-medium text-white/90 tracking-wide drop-shadow-sm">{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
+          <p className=" text-sm font-medium text-white/90 tracking-wide drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
           {Boolean(activeDressCode) && (
-            <p className="font-sans text-xs font-semibold text-white/80 tracking-widest uppercase mt-4 drop-shadow-sm">
+            <p className=" text-xs font-semibold text-white/80 tracking-widest uppercase mt-4 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               Dress code: {activeDressCode}
             </p>
           )}
@@ -1084,10 +1087,10 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
         <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#F9F7F1]">
           {/* Text Container */}
           <div className="px-8 pt-16 pb-12 text-left bg-[#F9F7F1] z-10 relative">
-            <p className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-[#5C8A7A] mb-6">
+            <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#5C8A7A] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#2C2C2C] leading-[1.0] mb-8" style={{ fontFamily: 'var(--font-title)' }}>
+            <h1 className="text-[4rem] font-light text-[#2C2C2C] leading-[1.0] mb-8" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
@@ -1097,11 +1100,11 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
                 <span className="block">{title}</span>
               )}
             </h1>
-            <p className="font-sans text-sm font-medium text-[#7D786F] tracking-wide">
+            <p className=" text-sm font-medium text-[#7D786F] tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {fechaStr}{lugarNombre ? ` · ${lugarNombre}` : ""}{ciudad ? ` — ${ciudad}` : ""}
             </p>
             {Boolean(activeDressCode) && (
-              <p className="font-sans text-xs font-semibold text-[#5C8A7A] tracking-widest uppercase mt-4">
+              <p className=" text-xs font-semibold text-[#5C8A7A] tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1152,7 +1155,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
             {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
               <div className="bg-[#FAF8F5] border border-[#5C8A7A]/20 rounded-xl p-5 sm:p-7 mb-6 shadow-sm transition-all hover:shadow-md">
                 <div>
-                  <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3E6152] block mb-3">
+                  <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3E6152] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
                   </span>
                   {Boolean(invitation.ceremoniaNombre) && (
@@ -1171,7 +1174,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
                     </p>
                   )}
                   {Boolean(invitation.ceremoniaMapUrl) && (
-                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#5C8A7A] hover:text-[#5C8A7A] transition-colors">
+                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2  text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#5C8A7A] hover:text-[#5C8A7A] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       Ver mapa ceremonia ↗
                     </a>
                   )}
@@ -1182,7 +1185,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
             {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
             {(lugarNombre || direccion) && (
               <div className="bg-[#FAF8F5] border border-[#5C8A7A]/20 rounded-xl p-5 sm:p-7 mb-10 shadow-sm transition-all hover:shadow-md">
-                <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3E6152] block mb-3">
+                <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3E6152] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   Fiesta / Salón
                 </span>
                 {lugarNombre && (
@@ -1201,7 +1204,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
                   </p>
                 )}
                 {mapUrl && (
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 font-sans text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#5C8A7A] hover:text-[#5C8A7A] transition-colors">
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2  text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#5C8A7A] hover:text-[#5C8A7A] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     Ver mapa fiesta ↗
                   </a>
                 )}
@@ -1218,11 +1221,11 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
                   {cronograma.map((item, i) => (
                     <div key={i} className="flex items-center py-5 border-b border-[#5C8A7A]/30 last:border-b-0">
                       {item.time && (
-                        <span className="font-sans text-lg sm:text-xl text-[#5C8A7A]/90 font-light tracking-widest w-28 sm:w-32 flex-shrink-0">
+                        <span className=" text-lg sm:text-xl text-[#5C8A7A]/90 font-light tracking-widest w-28 sm:w-32 flex-shrink-0" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                           {item.time}
                         </span>
                       )}
-                      <span className="font-sans text-[1.1rem] sm:text-xl text-[#1A2B33] font-normal">
+                      <span className=" text-[1.1rem] sm:text-xl text-[#1A2B33] font-normal" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                         {item.title}
                       </span>
                     </div>
@@ -1233,7 +1236,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           </div>
         </SectionWrapper>
 
-        {(invitation.galeriaPrincipalHabilitada ?? true) && allPhotos.length > 0 && (
+        {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full bg-[#E5ECE9] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-10">

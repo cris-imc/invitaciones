@@ -2,15 +2,15 @@ import { z } from "zod";
 
 export const eventTypeSchema = z.object({
     type: z.string().min(1, "Debes seleccionar un tipo de evento"),
-});
-
-export const basicInfoSchema = z.object({
-    nombreEvento: z.string().min(3, "El nombre del evento debe tener al menos 3 caracteres"),
-    fecha: z.date(),
-    ciudad: z.string().optional(),
+    nombreEvento: z.string().min(1, "El título de la invitación es obligatorio"),
     nombreNovio: z.string().optional(),
     nombreNovia: z.string().optional(),
     nombreQuinceanera: z.string().optional(),
+});
+
+export const basicInfoSchema = z.object({
+    fecha: z.date(),
+    ciudad: z.string().optional(),
     rsvpDaysBeforeEvent: z.number().min(1).max(90).optional(),
 });
 

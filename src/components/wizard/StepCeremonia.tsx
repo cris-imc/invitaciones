@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -41,6 +41,17 @@ export function StepCeremonia() {
             ceremoniaMapUrl: data.ceremoniaMapUrl || "",
         },
     });
+
+    // Reactividad en vivo: sincronizar estado local con el store global
+    // para que la miniatura se actualice mientras el usuario escribe.
+    useEffect(() => {
+        const subscription = form.watch((value) => {
+            if (value) {
+                setData(value as any);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [form, setData]);
 
     const ceremoniaHabilitada = form.watch("ceremoniaHabilitada");
 
@@ -192,23 +203,7 @@ export function StepCeremonia() {
                                 />
                             </div>
 
-                            <FormField
-                                control={form.control}
-                                name="ceremoniaMapUrl"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Link de Google Maps de la Ceremonia (Opcional)</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
-                                                placeholder="https://maps.google.com/?q=..."
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+
                         </div>
                     )}
 

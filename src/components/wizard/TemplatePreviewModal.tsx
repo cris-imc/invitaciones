@@ -31,6 +31,7 @@ interface TemplatePreviewModalProps {
   eventType: string | undefined;
   initialTemplateTipo: TemplateTipo;
   initialColor: string;
+  currentData?: Record<string, any>;
   onConfirm: (templateTipo: TemplateTipo, colorId: string) => void;
 }
 
@@ -40,6 +41,7 @@ export function TemplatePreviewModal({
   eventType,
   initialTemplateTipo,
   initialColor,
+  currentData,
   onConfirm,
 }: TemplatePreviewModalProps) {
   return (
@@ -55,6 +57,7 @@ export function TemplatePreviewModal({
             eventType={eventType}
             initialTemplateTipo={initialTemplateTipo}
             initialColor={initialColor}
+            currentData={currentData}
             onOpenChange={onOpenChange}
             onConfirm={onConfirm}
           />
@@ -68,6 +71,7 @@ interface TemplatePreviewModalBodyProps {
   eventType: string | undefined;
   initialTemplateTipo: TemplateTipo;
   initialColor: string;
+  currentData?: Record<string, any>;
   onOpenChange: (open: boolean) => void;
   onConfirm: (templateTipo: TemplateTipo, colorId: string) => void;
 }
@@ -76,6 +80,7 @@ function TemplatePreviewModalBody({
   eventType,
   initialTemplateTipo,
   initialColor,
+  currentData,
   onOpenChange,
   onConfirm,
 }: TemplatePreviewModalBodyProps) {
@@ -107,7 +112,23 @@ function TemplatePreviewModalBody({
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.source !== iframeRef.current?.contentWindow) return;
-      if (event.data?.type === "template-preview-ready") setPreviewLoading(false);
+      if (event.data?.type === "template-preview-ready") {
+          setPreviewLoading(false);
+          // Si tenemos datos del usuario editando la invitación, se los pasamos a la miniatura
+          if (currentData && iframeRef.current?.contentWindow) {
+              const invitation = {
+                  ...currentData,
+                  templateTipo: activeTab,
+                  temaColores: JSON.stringify({
+                      colorPrincipal: previewColor,
+                  }),
+              };
+              iframeRef.current.contentWindow.postMessage(
+                  { type: "wizard-live-data", invitation },
+                  window.location.origin
+              );
+          }
+      }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);

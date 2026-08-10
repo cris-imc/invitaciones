@@ -32,7 +32,7 @@ async function getDashboardStats(userId: string) {
   });
 
   const totalInvitations  = invitations.length;
-  const activeInvitations = invitations.filter((i) => i.estado === "ACTIVA").length;
+  const activeInvitations = invitations.filter((i) => i.estado === "ACTIVA" && getEventStatus(i.fechaEvento) !== "EXPIRED" && getEventStatus(i.fechaEvento) !== "POST_EVENT").length;
 
   let totalConfirmed    = 0;
   let totalPaid         = 0;
@@ -57,9 +57,9 @@ async function getDashboardStats(userId: string) {
     totalPending,
     totalSongsPending,
     totalPremiumUsadas,
-    activeInvitationsList: invitations.filter((i) => i.estado === "ACTIVA"),
+    activeInvitationsList: invitations.filter((i) => i.estado === "ACTIVA" && getEventStatus(i.fechaEvento) !== "EXPIRED" && getEventStatus(i.fechaEvento) !== "POST_EVENT"),
     inactiveCount: invitations.filter(
-      (i) => i.estado !== "ACTIVA" || getEventStatus(i.fechaEvento) === "EXPIRED"
+      (i) => i.estado !== "ACTIVA" || getEventStatus(i.fechaEvento) === "EXPIRED" || getEventStatus(i.fechaEvento) === "POST_EVENT"
     ).length,
   };
 }
@@ -209,7 +209,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
       </div>
 
       {/* Cards */}
-      <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {stats.activeInvitationsList.length > 0 ? (
           stats.activeInvitationsList.map((inv) => {
             const confirmed   = inv.guests.filter((g) => g.status === "CONFIRMED");
@@ -282,22 +282,24 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
                   </div>
 
                   {/* Actions */}
-                  <div className="m-card-actions">
-                    <Link
-                      href={`/i/${inv.slug}`}
-                      target="_blank"
-                      className="m-btn-ghost"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Ver invitación
-                    </Link>
-                    <Link
-                      href={`/dashboard/invitaciones/${inv.slug}/guests`}
-                      className="btn-action go btn-admin-glow inline-flex items-center justify-center h-9 px-4 text-xs font-semibold rounded-lg text-black transition-colors flex-[1.5]"
-                    >
-                      Administrar →
-                    </Link>
-                    <div className="flex items-center justify-center">
+                  <div className="m-card-actions flex-col">
+                    <div className="flex items-center gap-2 w-full">
+                      <Link
+                        href={`/i/${inv.slug}`}
+                        target="_blank"
+                        className="m-btn-ghost flex-1 h-9"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        Ver diseño
+                      </Link>
+                      <Link
+                        href={`/dashboard/invitaciones/${inv.slug}/guests`}
+                        className="btn-action go btn-admin-glow inline-flex items-center justify-center h-[40px] px-4 text-xs font-semibold rounded-lg text-black transition-colors flex-1"
+                      >
+                        Administrar →
+                      </Link>
+                    </div>
+                    <div className="flex items-center justify-center w-full mt-2">
                       <DeleteInvitationButton invitationId={inv.id} />
                     </div>
                   </div>

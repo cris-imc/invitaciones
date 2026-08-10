@@ -42,9 +42,9 @@ async function getInvitations() {
 
     // Solo invitaciones inactivas: no-ACTIVA (borrador/finalizada), o que ya
     // pasaron los 3 meses de vigencia posteriores a la fecha del evento
-    // (aunque el estado siga diciendo ACTIVA en la base).
+    // o cuyo evento ya ocurrió (POST_EVENT).
     const inactiveInvitationsData = invitationsData.filter(
-        (inv) => inv.estado !== "ACTIVA" || getEventStatus(inv.fechaEvento) === "EXPIRED"
+        (inv) => inv.estado !== "ACTIVA" || getEventStatus(inv.fechaEvento) === "EXPIRED" || getEventStatus(inv.fechaEvento) === "POST_EVENT"
     );
 
     const invitations = inactiveInvitationsData.map(inv => ({

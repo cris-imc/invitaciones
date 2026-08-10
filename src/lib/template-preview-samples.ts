@@ -148,7 +148,7 @@ function buildCasamientoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: str
   const fotos = getCasamientoFotos(templateTipo, colorId);
   return {
     tipo: "CASAMIENTO",
-    nombreEvento: "Valentina & Nicolás",
+    nombreEvento: "Nuestra Boda",
     nombreNovia: "Valentina",
     nombreNovio: "Nicolás",
     fechaEvento: fechaEjemplo,
@@ -174,7 +174,7 @@ function buildQuinceSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string)
   const fotos = getQuinceFotos(templateTipo, colorId);
   return {
     tipo: "QUINCE_ANOS",
-    nombreEvento: "Mis XV Años",
+    nombreEvento: "Mis 15 Años",
     nombreQuinceanera: "Sofía",
     fechaEvento: fechaEjemplo,
     ciudad: "Córdoba",
@@ -199,7 +199,7 @@ function buildEventoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string)
   const fotos = getEventoFotos(templateTipo, colorId);
   return {
     tipo: "CUMPLEANOS",
-    nombreEvento: "Fiesta de Fin de Año",
+    nombreEvento: "Mi Fiesta",
     fechaEvento: fechaEjemplo,
     ciudad: "Buenos Aires",
     lugarNombre: "Salón Terraza Norte",

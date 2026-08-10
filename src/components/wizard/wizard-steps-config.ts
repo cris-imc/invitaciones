@@ -38,15 +38,15 @@ export function getWizardSteps({
         { component: StepHeroImages, label: "Portada" },
         { component: StepDesign, label: "Plantilla" },
         { component: StepTypography, label: "Tipografía" },
-        { component: StepCountdownStyle, label: "Countdown" },
         { component: StepBasicInfo, label: "Información Básica" },
+        { component: StepCountdownStyle, label: "Countdown" },
+        { component: StepPhrase, label: "Frase" },
         { component: StepDetails, label: "Detalles del Salón" },
         ...(isCasamiento ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
         { component: StepCronograma, label: "Cronograma" },
         { component: StepGallery, label: "Galería" },
-        { component: StepPhrase, label: "Frase" },
         { component: StepMusic, label: "Música" },
-        { component: StepTrivia, label: "Trivia" },
         { component: StepBankDetails, label: "Regalo (CBU)" },
+        { component: StepTrivia, label: "Trivia" },
     ];
 }

@@ -35,28 +35,83 @@ function PreviewPlantillaContent() {
   // ej. cuando se usa como TemplateShowcase/TemplatePreviewModal sin nunca
   // mandar datos en vivo).
   const [liveInvitation, setLiveInvitation] = useState<Record<string, unknown> | null>(null);
+  const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window.parent) return;
-      if (event.data?.type !== "wizard-live-data") return;
-      setLiveInvitation(event.data.invitation ?? {});
+      if (event.data?.type === "wizard-live-data") {
+          (window as any).__debugLastReceived = event.data.invitation;
+          setLiveInvitation(event.data.invitation ?? {});
+      } else if (event.data?.type === "wizard-scroll-to") {
+          const sectionId = event.data.section;
+          if (!sectionId) return;
+          
+          if (sectionId === 'hero') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              setPendingScrollId(null);
+              return;
+          }
+          const element = document.getElementById(sectionId);
+          if (element) {
+              element.scrollIntoView({ behavior: "smooth", block: "center" });
+              setPendingScrollId(null);
+          } else {
+              setPendingScrollId(sectionId);
+          }
+      }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
+  // Si recibimos datos nuevos y hay un scroll pendiente (ej. usuario acaba de habilitar galería)
+  // intentamos hacer el scroll si el elemento ya existe en el DOM.
+  useEffect(() => {
+    if (pendingScrollId) {
+      const element = document.getElementById(pendingScrollId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        setPendingScrollId(null);
+      }
+    }
+  }, [liveInvitation, pendingScrollId]);
+
   // Solo pisa los campos que ya llegaron con un valor real -- así, por
   // ejemplo, antes de llegar al paso "Información Básica" la fecha sigue
   // siendo la de la muestra en vez de quedar vacía.
+  if (typeof window !== "undefined") (window as any).__debugLiveInvitationState = liveInvitation;
   const displayInvitation = liveInvitation
     ? {
         ...sample,
+        // En modo wizard nunca usar las fotos del sample — solo las reales
+        // que el usuario subió. Esto evita que el usuario vea fotos de ejemplo
+        // que no subió él. Si no hay fotos todavía, la sección no se muestra.
+        galeriaPrincipalFotos: "[]",
+        galeriaPrincipalHabilitada: false,
+        portadaImagenFondo: undefined,
+        portadaImagenFondoDesktop: undefined,
         ...Object.fromEntries(
-          Object.entries(liveInvitation).filter(([, v]) => v !== undefined && v !== null && v !== "")
+          Object.entries(liveInvitation).filter(([key, v]) => {
+            if (v === undefined || v === null || v === "") return false;
+            // Para el album: solo pisar si el user realmente subió fotos
+            if (key === "galeriaPrincipalFotos") {
+              if (v === "[]") return false;
+              if (Array.isArray(v) && v.length === 0) return false;
+              // Ignorar si son fotos de mockup
+              if (typeof v === 'string' && v.includes('/mockup-preview/')) return false;
+            }
+            // Para arrays genéricos vacíos (excepto galería ya manejada arriba)
+            if (Array.isArray(v) && v.length === 0) return false;
+            // Ignorar fotos de mockup en cualquier campo
+            if (typeof v === 'string' && v.includes('/mockup-preview/')) return false;
+            return true;
+          })
         ),
       }
     : sample;
+    
+  displayInvitation.isPreviewMode = true;
 
   // Salta la portada de bienvenida ("Abrir invitación") y recién ahí avisa
   // al padre (el modal del wizard) que ya se puede mostrar. Sin esto se ve

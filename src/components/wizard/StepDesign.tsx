@@ -84,6 +84,7 @@ export function StepDesign() {
                         eventType={data.type}
                         initialTemplateTipo={activeTemplateTipo}
                         initialColor={activeColorId}
+                        currentData={data}
                         onConfirm={(templateTipo, colorId) => {
                             setData({ templateTipo });
                             setThemeConfig({ colorPrincipal: colorId });

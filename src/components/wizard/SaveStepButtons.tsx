@@ -88,7 +88,7 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                 </DialogContent>
             </Dialog>
 
-            <div className="flex flex-col sm:flex-row sm:flex-nowrap justify-between pt-4 gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-between pt-4 gap-4">
                 <Button 
                     type="button" 
                     variant="outline" 
@@ -99,9 +99,9 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                     Atrás
                 </Button>
             
-            <div className="flex flex-col sm:flex-row sm:flex-nowrap justify-end gap-1.5 order-1 sm:order-2">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-end gap-1.5 order-1 sm:order-2">
                 {isEditing && (
-                    <div className="flex flex-wrap sm:flex-nowrap gap-1.5 w-full sm:w-auto">
+                    <div className="flex flex-wrap gap-1.5 w-full sm:w-auto">
                         {hasJustSaved && (
                             <>
                                 <Link href={`/dashboard/invitaciones/${useWizardStore.getState().data.slug}/guests`}>

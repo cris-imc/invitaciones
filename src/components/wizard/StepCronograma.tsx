@@ -149,7 +149,7 @@ export function StepCronograma() {
                             </Button>
                         </div>
 
-                        <div className="grid md:grid-cols-[1fr_2fr_1.5fr] gap-3">
+                        <div className="grid md:grid-cols-[1fr_3fr] gap-3">
                             <div className="space-y-1">
                                 <Label className="text-xs">Hora</Label>
                                 <div className="relative">
@@ -174,28 +174,6 @@ export function StepCronograma() {
                                     onChange={(e) => updateEvent(index, "title", e.target.value)}
                                     required
                                 />
-                            </div>
-
-                            <div className="space-y-1">
-                                <Label className="text-xs">Icono</Label>
-                                <div className="grid grid-cols-4 gap-1 p-1 border border-white/10 rounded-xl bg-[var(--ink)]">
-                                    {ICON_OPTIONS.map(({ value, Icon }) => (
-                                        <button
-                                            key={value}
-                                            type="button"
-                                            onClick={() => updateEvent(index, "icon", value)}
-                                            className={`
-                                                p-2 rounded-lg transition-all flex items-center justify-center
-                                                ${event.icon === value
-                                                    ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
-                                                    : 'hover:bg-white/5 text-muted-foreground'
-                                                }
-                                            `}
-                                        >
-                                            <Icon className="w-4 h-4" />
-                                        </button>
-                                    ))}
-                                </div>
                             </div>
                         </div>
                         {isIncomplete && (

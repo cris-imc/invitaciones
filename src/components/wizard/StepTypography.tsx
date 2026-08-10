@@ -1,8 +1,10 @@
 "use client";
+import React, { useState } from 'react';
 
 import { useWizardStore } from "@/store/wizard-store";
-import { SaveStepButtons } from "./SaveStepButtons";
 import { TITLE_FONT_OPTIONS, BODY_FONT_OPTIONS, type FontOption } from "@/lib/typography-map";
+import { SaveStepButtons } from "./SaveStepButtons";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 function FontGrid({
     options,
@@ -100,7 +102,24 @@ export function StepTypography() {
     const { data, setData } = useWizardStore();
     const selectedTitle = data.fontTitle || "fraunces";
     const selectedBody = data.fontBody || "space-grotesk";
-    const previewName = data.nombreEvento || "Nombre del Evento";
+    const getPreviewName = () => {
+        if (data.type === "CASAMIENTO") {
+            return data.nombreNovia || "María";
+        }
+        if (data.type === "QUINCE_ANOS") {
+            return data.nombreQuinceanera || "Mis 15 Años";
+        }
+        return data.nombreEvento || "Nombre del Evento";
+    };
+    
+    const previewName = getPreviewName();
+
+    const [modalTitleOpen, setModalTitleOpen] = useState(false);
+    const [modalBodyOpen, setModalBodyOpen] = useState(false);
+
+    // Muestra 4 opciones (2x2 grid) en la vista principal
+    const visibleTitleOptions = TITLE_FONT_OPTIONS.slice(0, 4);
+    const visibleBodyOptions = BODY_FONT_OPTIONS.slice(0, 4);
 
     return (
         <div className="space-y-8">
@@ -124,7 +143,7 @@ export function StepTypography() {
             </div>
 
             {/* Nivel 1: Títulos */}
-            <div className="space-y-2.5">
+            <div className="space-y-3">
                 <p
                     style={{
                         fontFamily: "var(--font-mono)",
@@ -137,15 +156,45 @@ export function StepTypography() {
                     Títulos
                 </p>
                 <FontGrid
-                    options={TITLE_FONT_OPTIONS}
+                    options={visibleTitleOptions}
                     selectedId={selectedTitle}
                     previewText={previewName}
                     onSelect={(id) => setData({ fontTitle: id })}
                 />
+                {TITLE_FONT_OPTIONS.length > 4 && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setModalTitleOpen(true)}
+                            className="text-xs font-medium opacity-70 hover:opacity-100 transition-opacity flex items-center justify-center w-full py-1"
+                        >
+                            Ver más tipografías
+                        </button>
+                        <Dialog open={modalTitleOpen} onOpenChange={setModalTitleOpen}>
+                            <DialogContent className="max-w-4xl w-[95vw] max-h-[85vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>Elegí la tipografía de los Títulos</DialogTitle>
+                                    <DialogDescription>Todas las tipografías disponibles para tus títulos.</DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                    <FontGrid
+                                        options={TITLE_FONT_OPTIONS}
+                                        selectedId={selectedTitle}
+                                        previewText={previewName}
+                                        onSelect={(id) => {
+                                            setData({ fontTitle: id });
+                                            setModalTitleOpen(false);
+                                        }}
+                                    />
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    </>
+                )}
             </div>
 
             {/* Nivel 2: Texto */}
-            <div className="space-y-2.5">
+            <div className="space-y-3">
                 <p
                     style={{
                         fontFamily: "var(--font-mono)",
@@ -158,11 +207,41 @@ export function StepTypography() {
                     Texto
                 </p>
                 <FontGrid
-                    options={BODY_FONT_OPTIONS}
+                    options={visibleBodyOptions}
                     selectedId={selectedBody}
                     previewText="Abrir invitación"
                     onSelect={(id) => setData({ fontBody: id })}
                 />
+                {BODY_FONT_OPTIONS.length > 4 && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setModalBodyOpen(true)}
+                            className="text-xs font-medium opacity-70 hover:opacity-100 transition-opacity flex items-center justify-center w-full py-1"
+                        >
+                            Ver más tipografías
+                        </button>
+                        <Dialog open={modalBodyOpen} onOpenChange={setModalBodyOpen}>
+                            <DialogContent className="max-w-4xl w-[95vw] max-h-[85vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>Elegí la tipografía del Texto</DialogTitle>
+                                    <DialogDescription>Todas las tipografías disponibles para tus textos.</DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                    <FontGrid
+                                        options={BODY_FONT_OPTIONS}
+                                        selectedId={selectedBody}
+                                        previewText="Abrir invitación"
+                                        onSelect={(id) => {
+                                            setData({ fontBody: id });
+                                            setModalBodyOpen(false);
+                                        }}
+                                    />
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    </>
+                )}
             </div>
 
             {/* Navigation */}

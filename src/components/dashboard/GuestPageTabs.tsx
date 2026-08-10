@@ -121,8 +121,8 @@ export function GuestPageTabs({
           // Live tab: pulsing dot
           const tabLabel =
             t.id === "live" ? (
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ position: "relative", width: 8, height: 8, display: "inline-block" }}>
+              <>
+                <span style={{ position: "relative", width: 8, height: 8, display: "block" }}>
                   {!isLocked && liveActive && (
                     <span
                       style={{
@@ -138,7 +138,7 @@ export function GuestPageTabs({
                   <span
                     style={{
                       position: "relative",
-                      display: "inline-block",
+                      display: "block",
                       width: 8,
                       height: 8,
                       borderRadius: "50%",
@@ -147,7 +147,7 @@ export function GuestPageTabs({
                   />
                 </span>
                 LIVE
-              </span>
+              </>
             ) : (
               t.label
             );

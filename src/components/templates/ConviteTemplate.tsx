@@ -393,12 +393,12 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 <div className="h-[1px] w-12 bg-white/20" />
               </div>
 
-              <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide">
+              <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide" >
                 Gracias por acompañarnos en este día tan especial y compartir la alegría de crear recuerdos que perdurarán para siempre.
               </p>
 
               <div className="pt-6">
-                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-sans tracking-widest uppercase backdrop-blur-md">
+                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs  tracking-widest uppercase backdrop-blur-md" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
                   <span>Álbum disponible hasta el {expirationDateStr}</span>
                 </div>
@@ -417,7 +417,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                     <h3 className="font-serif font-light text-xl text-slate-200 tracking-wide">
                       Álbum Fotográfico
                     </h3>
-                    <p className="text-sm text-slate-400 font-sans font-light tracking-wide">
+                    <p className="text-sm text-slate-400  font-light tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       No se registraron capturas durante la velada.
                     </p>
                   </div>
@@ -427,7 +427,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           </div>
         </main>
 
-        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 font-sans">
+        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 " style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
           Invitaciones Digitales · Recuerdos del Evento
         </footer>
       </div>
@@ -460,7 +460,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             </p>
 
             {/* Guest Name or Event Title */}
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-12 text-[#F7F1E4] leading-tight" style={{ fontFamily: 'var(--font-title)' }}>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-12 text-[#F7F1E4] leading-tight" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {guestNameDisplay}
             </h2>
 
@@ -471,7 +471,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 9.5l-4-4-3 3-2-2-2 2-3-3-4 4M21 9.5v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9" />
                 </svg>
-                <p className="text-sm font-bold tracking-widest uppercase font-sans">Dress Code: {portadaDressCode}</p>
+                <p className="text-sm font-bold tracking-widest uppercase " style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Dress Code: {portadaDressCode}</p>
               </div>
             )}
 
@@ -484,7 +484,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             <button
               type="button"
               onClick={() => setIsCoverOpen(true)}
-              className="inline-flex items-center gap-3 font-sans font-bold text-sm px-8 py-4 rounded-full bg-[var(--t-acc,#C79A4B)] text-[#0F1613] hover:scale-105 transition-all shadow-lg active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-3  font-bold text-sm px-8 py-4 rounded-full bg-[var(--t-acc,#C79A4B)] text-[#0F1613] hover:scale-105 transition-all shadow-lg active:scale-95 cursor-pointer" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}
             >
               <span className="text-base">✦</span> {portadaBoton}
             </button>
@@ -509,7 +509,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             <span style={{ color: "var(--t-acc)", fontFamily: "var(--t-font-d)" }}>{monogram}</span>
           </div>
           <p className="t-kicker" style={{ color: "var(--t-acc)" }}>{eyebrow}</p>
-          <h1 style={{ fontFamily: 'var(--font-title)' }}>
+          <h1 style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
             {em ? (
               <>
                 {title.slice(0, title.indexOf(em))}
@@ -546,7 +546,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               <span style={{ color: "var(--t-acc)", fontFamily: "var(--t-font-d)" }}>{monogram}</span>
             </div>
             <p className="t-kicker" style={{ color: "var(--t-acc)" }}>{eyebrow}</p>
-            <h1 style={{ fontFamily: 'var(--font-title)' }}>
+            <h1 style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
                 <>
                   {title.slice(0, title.indexOf(em))}
@@ -659,7 +659,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           )}
         </SectionWrapper>
 
-        {(invitation.galeriaPrincipalHabilitada ?? true) && allPhotos.length > 0 && (
+        {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <AlbumCarousel photos={allPhotos} dark />
         )}
 

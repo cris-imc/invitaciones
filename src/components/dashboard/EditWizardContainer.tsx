@@ -26,6 +26,7 @@ function WizardContent({ invitation }: { invitation: any }) {
 
             setData({
                 id: invitation.id,
+                createdAt: invitation.createdAt,
                 planTier: invitation.planTier || "FREE",
                 slug: invitation.slug,
                 type: invitation.tipo,

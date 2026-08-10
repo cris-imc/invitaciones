@@ -129,7 +129,7 @@ export function SongSuggestion({
         {!hideHeader && (
           <>
             {variant === "moderno" ? (
-              <p className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876] mb-6">
+              <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
                 {kicker}
               </p>
             ) : (
@@ -145,7 +145,7 @@ export function SongSuggestion({
         )}
         
         {hideHeader && (
-          <p className={variant === "moderno" ? "font-sans text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876] mb-6" : "t-kicker"}>
+          <p className={variant === "moderno" ? "text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876] mb-6" : "t-kicker"} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
             {kicker}
           </p>
         )}

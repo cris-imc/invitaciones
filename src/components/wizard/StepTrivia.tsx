@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { Trash2, Plus, Pencil, Lock, Info, ChevronDown, ChevronUp, Check, AlertTriangle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { cn } from "@/lib/utils";
+import { saveInvitationFromWizard } from "@/lib/save-invitation";
 
 const PREDEFINED_TITULOS_CASAMIENTO = ["¿Cuánto Nos Conocés?", "Trivia de los Novios", "¿Qué Tanto Sabés de Nosotros?"];
 const PREDEFINED_TITULOS_QUINCE = ["¿Cuánto Me Conocés?", "Trivia de mis 15", "¿Qué Tanto Sabés de Mí?"];
@@ -29,6 +30,8 @@ export function StepTrivia() {
     const [showTriviaInfo, setShowTriviaInfo] = useState(false);
     const { data: session } = useSession();
     const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+    const themeConfig = useWizardStore((state) => state.themeConfig);
+    const [isCreating, setIsCreating] = useState(false);
 
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
     const isEditing = Boolean(data.id);
@@ -74,6 +77,15 @@ export function StepTrivia() {
     );
     const isPendingPartial = hasPendingContent && !isPendingComplete;
 
+    // Sincronizar en tiempo real para el Live Preview
+    useEffect(() => {
+        let finalPreguntas = [...preguntas];
+        if (hasPendingContent) {
+            finalPreguntas.push(currentQuestion);
+        }
+        setData({ triviaPreguntas: JSON.stringify(finalPreguntas) });
+    }, [preguntas, currentQuestion, hasPendingContent, setData]);
+
     const handleAddQuestion = () => {
         if (isPendingComplete) {
             setPreguntas([...preguntas, currentQuestion]);
@@ -118,14 +130,31 @@ export function StepTrivia() {
         setShowAddForm(true);
     };
 
-    // Devuelve true si pudo avanzar (o no había nada pendiente que lo bloquee).
-    const handleNext = (): boolean => {
+    const handleFinishAdding = () => {
         if (isPendingPartial) {
             showToast(
                 "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
                 "error"
             );
-            return false;
+            return;
+        }
+
+        if (isPendingComplete) {
+            setPreguntas([...preguntas, currentQuestion]);
+            setCurrentQuestion({ pregunta: "", opciones: ["", "", "", ""], respuestaCorrecta: 0 });
+            showToast("Pregunta guardada.", "success");
+        }
+        
+        setShowAddForm(false);
+    };
+
+    const handleNext = () => {
+        if (isPendingPartial) {
+            showToast(
+                "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
+                "error"
+            );
+            return;
         }
 
         let finalPreguntas = [...preguntas];
@@ -135,9 +164,52 @@ export function StepTrivia() {
             showToast("Se agregó tu última pregunta antes de continuar.", "success");
         }
 
+        if (isTriviaActive && finalPreguntas.length === 0) {
+            showToast("Agregá al menos una pregunta a la Trivia, o deshabilitá la sección.", "error");
+            return;
+        }
+
         setData({ triviaPreguntas: JSON.stringify(finalPreguntas) });
         nextStep();
-        return true;
+    };
+
+    const handleCreate = async () => {
+        if (isPendingPartial) {
+            showToast(
+                "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
+                "error"
+            );
+            return;
+        }
+
+        let finalPreguntas = [...preguntas];
+        if (isPendingComplete) {
+            finalPreguntas.push(currentQuestion);
+            setCurrentQuestion({ pregunta: "", opciones: ["", "", "", ""], respuestaCorrecta: 0 });
+            showToast("Se agregó tu última pregunta antes de continuar.", "success");
+        }
+
+        if (data.triviaHabilitada && finalPreguntas.length === 0) {
+            showToast("Agregá al menos una pregunta a la Trivia, o deshabilitá la sección.", "error");
+            return;
+        }
+
+        const triviaPreguntas = JSON.stringify(finalPreguntas);
+        setData({ triviaPreguntas });
+        setIsCreating(true);
+        try {
+            const invitation = await saveInvitationFromWizard(
+                { ...data, triviaPreguntas },
+                themeConfig,
+                usePremiumCredit
+            );
+            useWizardStore.getState().setDirty(false);
+            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
+        } catch (error) {
+            console.error('Error creating invitation:', error);
+            showToast(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`, "error");
+            setIsCreating(false);
+        }
     };
 
     return (
@@ -387,11 +459,11 @@ export function StepTrivia() {
                                 </Button>
                                 <Button
                                     type="button"
-                                    onClick={handleNext}
+                                    onClick={handleFinishAdding}
                                     className="flex-1"
                                 >
                                     <Check className="w-4 h-4 mr-2" />
-                                    Listo, continuar
+                                    Listo, cerrar
                                 </Button>
                             </div>
                         </div>
@@ -400,7 +472,7 @@ export function StepTrivia() {
                 )}
             </div>
 
-            <SaveStepButtons onNext={handleNext} />
+            <SaveStepButtons onNext={handleNext} isLastStep={true} onCreate={handleCreate} isCreating={isCreating} />
         </div>
     );
 }
