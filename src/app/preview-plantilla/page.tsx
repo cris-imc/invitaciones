@@ -54,7 +54,8 @@ function PreviewPlantillaContent() {
           }
           const element = document.getElementById(sectionId);
           if (element) {
-              element.scrollIntoView({ behavior: "smooth", block: "center" });
+              const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
+              window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
               setPendingScrollId(null);
           } else {
               setPendingScrollId(sectionId);
@@ -71,7 +72,8 @@ function PreviewPlantillaContent() {
     if (pendingScrollId) {
       const element = document.getElementById(pendingScrollId);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
+        window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
         setPendingScrollId(null);
       }
     }
