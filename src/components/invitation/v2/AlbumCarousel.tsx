@@ -37,13 +37,14 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
     
     let isManualScrolling = false;
     let scrollTimeout: NodeJS.Timeout;
-    let isProgrammaticScroll = false;
 
     const handleScroll = () => {
-      if (isProgrammaticScroll) {
-        isProgrammaticScroll = false;
+      // Si el scroll coincide exactamente con nuestra posición animada (margen de 2px por redondeos del navegador),
+      // significa que fue el scroll programático y lo ignoramos.
+      if (Math.abs(track.scrollLeft - scrollPos) <= 2) {
         return;
       }
+      
       isManualScrolling = true;
       scrollPos = track.scrollLeft;
       clearTimeout(scrollTimeout);
@@ -56,14 +57,12 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
     
     const step = () => {
       if (!isHovered.current && !isManualScrolling) {
-        scrollPos += 0.5; // Velocidad smooth
+        scrollPos += 1; // 1px por frame (entero evita saltos y parpadeos de sub-píxel)
         
-        // Loop logic exacto sin saltos perceptibles usando módulo
         if (scrollPos >= setWidth) {
           scrollPos = scrollPos % setWidth; 
         }
         
-        isProgrammaticScroll = true;
         track.scrollLeft = scrollPos;
       }
       
