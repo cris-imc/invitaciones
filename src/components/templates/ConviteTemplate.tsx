@@ -795,7 +795,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         {Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl) && (
           <MusicPlayer
             musicaUrl={String(invitation.musicaUrl)}
-            autoplay={Boolean(invitation.musicaAutoplay ?? true) && !invitation.isPreviewMode}
+            autoplay={Boolean(invitation.musicaAutoplay ?? true)}
           />
         )}
 

@@ -306,7 +306,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
     musicaUrl: String(invitation.musicaUrl ?? ""),
-    autoplay: musicaHabilitada && Boolean(invitation.musicaAutoplay ?? true) && !invitation.isPreviewMode,
+    autoplay: musicaHabilitada && Boolean(invitation.musicaAutoplay ?? true),
   });
 
   const [mounted, setMounted] = useState(false);

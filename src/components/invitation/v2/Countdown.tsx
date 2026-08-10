@@ -89,8 +89,8 @@ export function Countdown({
             {boxes.map(({ label, value }) => (
               <div
                 key={label}
-                className="flex flex-col items-center justify-center px-4 py-3 sm:px-6 sm:py-4"
-                style={{ borderRadius: "9999px", background: "var(--t-acc)" }}
+                className="flex flex-col items-center justify-center px-4 py-3 sm:px-6 sm:py-4 countdown-capsula"
+                style={{ borderRadius: "999px", background: "var(--t-acc)" }}
               >
                 <b
                   aria-label={`${value} ${label}`}
@@ -159,7 +159,10 @@ export function Countdown({
             <div
               key={label}
               className="flex flex-col items-center justify-center w-[4.5rem] h-[5.5rem] sm:w-[5.5rem] sm:h-[6.5rem] rounded-2xl shadow-sm"
-              style={{ borderRadius: "1rem", background: "color-mix(in srgb, var(--t-ink) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)" }}
+              style={{ 
+                  background: "color-mix(in srgb, var(--t-ink) 4%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)" 
+              }}
             >
               <b aria-label={`${value} ${label}`} className="text-[1.8rem] sm:text-4xl font-light" style={{ color: "var(--t-acc)", fontFamily: "var(--font-cormorant), serif" }}>
                 {value}
