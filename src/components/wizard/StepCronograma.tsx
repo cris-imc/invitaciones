@@ -84,9 +84,26 @@ export function StepCronograma() {
         // formato de <input type="time">.
         const eventoHora = (data.hora || "").trim();
         const primeraEtapaHora = events[0]?.time?.trim();
-        if (primeraEtapaHora && eventoHora && primeraEtapaHora < eventoHora) {
-            setShowTimeError(true);
-            return;
+        
+        if (primeraEtapaHora && eventoHora) {
+            const parseTime = (t: string) => {
+                const [h, m] = t.split(':').map(Number);
+                return (h || 0) * 60 + (m || 0);
+            };
+            
+            const eventoMin = parseTime(eventoHora);
+            let primeraMin = parseTime(primeraEtapaHora);
+            
+            // Si el evento arranca al mediodía o más tarde (>= 12:00) y la primera etapa es de 
+            // madrugada (antes de las 09:00), asumimos que cruzó la medianoche hacia el día siguiente.
+            if (eventoMin >= 720 && primeraMin < 540) {
+                primeraMin += 1440;
+            }
+            
+            if (primeraMin < eventoMin) {
+                setShowTimeError(true);
+                return;
+            }
         }
 
         setAttemptedNext(false);
