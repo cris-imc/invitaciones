@@ -84,9 +84,26 @@ export function StepCronograma() {
         // formato de <input type="time">.
         const eventoHora = (data.hora || "").trim();
         const primeraEtapaHora = events[0]?.time?.trim();
-        if (primeraEtapaHora && eventoHora && primeraEtapaHora < eventoHora) {
-            setShowTimeError(true);
-            return;
+        
+        if (primeraEtapaHora && eventoHora) {
+            const parseTime = (timeStr: string) => {
+                const [h, m] = timeStr.split(':').map(Number);
+                return h * 60 + m;
+            };
+
+            let stageMins = parseTime(primeraEtapaHora);
+            let eventMins = parseTime(eventoHora);
+
+            // Si el evento arranca al mediodía o más tarde (>= 12:00),
+            // y la etapa es de madrugada (< 08:00), consideramos que es del día siguiente.
+            if (eventMins >= 720 && stageMins < 480) {
+                stageMins += 1440; // Sumar 24 horas
+            }
+
+            if (stageMins < eventMins) {
+                setShowTimeError(true);
+                return;
+            }
         }
 
         setAttemptedNext(false);

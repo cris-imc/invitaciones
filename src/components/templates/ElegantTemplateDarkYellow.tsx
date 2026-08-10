@@ -307,7 +307,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
     musicaUrl: String(invitation.musicaUrl ?? ""),
-    autoplay: musicaHabilitada && Boolean(invitation.musicaAutoplay ?? true),
+    autoplay: musicaHabilitada && Boolean(invitation.musicaAutoplay ?? true) && !invitation.isPreviewMode,
   });
 
   const [mounted, setMounted] = useState(false);
