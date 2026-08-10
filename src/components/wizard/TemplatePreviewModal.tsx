@@ -122,6 +122,8 @@ function TemplatePreviewModalBody({
                   temaColores: JSON.stringify({
                       colorPrincipal: previewColor,
                   }),
+                  musicaHabilitada: false,
+                  musicaUrl: "",
               };
               iframeRef.current.contentWindow.postMessage(
                   { type: "wizard-live-data", invitation },
