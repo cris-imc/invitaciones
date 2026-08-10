@@ -3,9 +3,7 @@
 import { motion } from "framer-motion";
 
 export function TypewriterText({ text, className, style }: { text: string, className?: string, style?: React.CSSProperties }) {
-  // Animamos por palabras en lugar de letras para evitar crear cientos de nodos DOM
-  // que pueden causar problemas de rendimiento o truncamiento visual en iframes móviles.
-  const words = text.split(/(\s+)/);
+  const letters = Array.from(text);
 
   return (
     <motion.h2 
@@ -19,12 +17,12 @@ export function TypewriterText({ text, className, style }: { text: string, class
         visible: {
           opacity: 1,
           transition: {
-            staggerChildren: 0.15
+            staggerChildren: 0.03
           }
         }
       }}
     >
-      {words.map((word, index) => (
+      {letters.map((char, index) => (
         <motion.span
           key={index}
           className="inline-block"
@@ -34,7 +32,7 @@ export function TypewriterText({ text, className, style }: { text: string, class
             visible: { opacity: 1, y: 0 }
           }}
         >
-          {word === '\n' ? <br /> : word}
+          {char === '\n' ? <br /> : char}
         </motion.span>
       ))}
     </motion.h2>
