@@ -88,96 +88,94 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                 </DialogContent>
             </Dialog>
 
-            <div className="flex flex-col sm:flex-row flex-wrap justify-between pt-4 gap-4">
-                <Button 
-                    type="button" 
-                    variant="outline" 
-                    size={isEditing ? "sm" : "default"}
-                    onClick={handleBackClick} 
-                    className="order-2 sm:order-1"
-                >
-                    Atrás
-                </Button>
-            
-            <div className="flex flex-col sm:flex-row flex-wrap justify-end gap-1.5 order-1 sm:order-2">
-                {isEditing && (
-                    <div className="flex flex-wrap gap-1.5 w-full sm:w-auto">
-                        {hasJustSaved && (
-                            <>
-                                <Link href={`/dashboard/invitaciones/${useWizardStore.getState().data.slug}/guests`}>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        className="border-orange-500 text-orange-500 hover:bg-orange-500/10 gap-1.5 font-bold px-2.5"
-                                    >
-                                        <LogOut className="w-3.5 h-3.5" />
-                                        Salir
-                                    </Button>
-                                </Link>
-                                <Link href={`/i/${useWizardStore.getState().data.slug}`} target="_blank">
-                                    <Button 
-                                        type="button" 
-                                        variant="outline"
-                                        size="sm"
-                                        className="border-amber-500 text-amber-500 hover:bg-amber-500/10 gap-1.5 font-bold px-2.5"
-                                    >
-                                        <Eye className="w-3.5 h-3.5" />
-                                        Ver cambios
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
-                        <Button 
-                            type="button" 
-                            variant={isDirty ? "default" : "secondary"}
-                            size="sm"
-                            className={isDirty ? "bg-amber-500 hover:bg-amber-600 text-black font-semibold w-full sm:w-auto px-3" : "w-full sm:w-auto px-3"}
-                            onClick={handleSaveClick}
-                            disabled={isSaving || !isDirty}
-                        >
-                        {isSaving ? (
-                            <>
-                                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                                Guardando...
-                            </>
-                        ) : (
-                            'Aplicar cambios'
-                        )}
-                        </Button>
+            <div className="flex flex-col gap-4 pt-6 mt-4 border-t border-border/40">
+                {/* Opciones extra que aparecen arriba al guardar */}
+                {isEditing && hasJustSaved && (
+                    <div className="flex justify-end gap-2 w-full">
+                        <Link href={`/dashboard/invitaciones/${useWizardStore.getState().data.slug}/guests`} className="flex-1 sm:flex-none">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full border-orange-500/50 text-orange-500 hover:bg-orange-500/10 gap-2 font-medium"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Salir
+                            </Button>
+                        </Link>
+                        <Link href={`/i/${useWizardStore.getState().data.slug}`} target="_blank" className="flex-1 sm:flex-none">
+                            <Button 
+                                type="button" 
+                                variant="outline"
+                                className="w-full border-amber-500/50 text-amber-500 hover:bg-amber-500/10 gap-2 font-medium"
+                            >
+                                <Eye className="w-4 h-4" />
+                                Ver cambios
+                            </Button>
+                        </Link>
                     </div>
                 )}
-                {isLastStep ? (
-                    !isEditing && (
-                        <Button 
-                            type="button" 
-                            size="lg"
-                            className="px-8 gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold"
-                            onClick={onCreate}
-                            disabled={isSaving || isCreating}
-                        >
-                            {isCreating ? (
+
+                {/* Fila inferior principal: Atrás (izq) | Aplicar + Siguiente (der) */}
+                <div className="flex justify-between items-center w-full gap-2 sm:gap-4">
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleBackClick} 
+                        className="shrink-0"
+                    >
+                        Atrás
+                    </Button>
+                
+                    <div className="flex justify-end gap-2 sm:gap-3 w-full">
+                        {isEditing && (
+                            <Button 
+                                type="button" 
+                                variant={isDirty ? "default" : "secondary"}
+                                className={isDirty ? "bg-amber-500 hover:bg-amber-600 text-black font-semibold flex-1 sm:flex-none" : "flex-1 sm:flex-none"}
+                                onClick={handleSaveClick}
+                                disabled={isSaving || !isDirty}
+                            >
+                            {isSaving ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Creando...
+                                    Guardando...
                                 </>
                             ) : (
-                                'Crear Invitación'
+                                'Aplicar cambios'
                             )}
-                        </Button>
-                    )
-                ) : (
-                    <Button 
-                        type={form ? "submit" : "button"} 
-                        size={isEditing ? "sm" : "default"}
-                        className={isEditing ? "px-3" : ""}
-                        onClick={onNext ? onNext : (!form ? nextStep : undefined)}
-                    >
-                        Siguiente Paso
-                    </Button>
-                )}
+                            </Button>
+                        )}
+                        {isLastStep ? (
+                            !isEditing && (
+                                <Button 
+                                    type="button" 
+                                    className="px-8 gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold flex-1 sm:flex-none"
+                                    onClick={onCreate}
+                                    disabled={isSaving || isCreating}
+                                >
+                                    {isCreating ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            Creando...
+                                        </>
+                                    ) : (
+                                        'Crear Invitación'
+                                    )}
+                                </Button>
+                            )
+                        ) : (
+                            <Button 
+                                type={form ? "submit" : "button"} 
+                                className="flex-1 sm:flex-none"
+                                onClick={onNext ? onNext : (!form ? nextStep : undefined)}
+                            >
+                                <span className="sm:hidden">Siguiente</span>
+                                <span className="hidden sm:inline">Siguiente Paso</span>
+                            </Button>
+                        )}
+                    </div>
+                </div>
             </div>
-        </div>
         </>
     );
 }
