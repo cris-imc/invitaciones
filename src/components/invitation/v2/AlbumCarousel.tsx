@@ -35,13 +35,22 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
     const itemWidth = 190 + 12; // 190px width + 12px gap
     const setWidth = itemWidth * photos.length; // Ancho exacto del set original
     
-    const step = () => {
-      if (!isHovered.current) {
-        // If user scrolled manually, sync accumulator
-        if (Math.abs(scrollPos - track.scrollLeft) > 2) {
-          scrollPos = track.scrollLeft;
-        }
+    let isManualScrolling = false;
+    let scrollTimeout: NodeJS.Timeout;
 
+    const handleScroll = () => {
+      isManualScrolling = true;
+      scrollPos = track.scrollLeft;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isManualScrolling = false;
+      }, 150);
+    };
+
+    track.addEventListener("scroll", handleScroll, { passive: true });
+    
+    const step = () => {
+      if (!isHovered.current && !isManualScrolling) {
         scrollPos += 0.5; // Velocidad smooth
         
         // Loop logic exacto sin saltos perceptibles usando módulo
@@ -51,16 +60,17 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
         } else {
           track.scrollLeft = scrollPos;
         }
-      } else {
-        // Sync accumulator while paused to avoid jump on resume
-        scrollPos = track.scrollLeft;
       }
       
       animationId = requestAnimationFrame(step);
     };
     
     animationId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      cancelAnimationFrame(animationId);
+      track.removeEventListener("scroll", handleScroll);
+      clearTimeout(scrollTimeout);
+    };
   }, [photos.length]);
 
   if (!photos.length) return null;
