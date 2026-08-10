@@ -84,22 +84,46 @@ export function Countdown({
     return (
       <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
         <div className="w-full max-w-[340px] sm:max-w-xl text-center mx-auto">
-          <p className="t-kicker mb-8">{kickerLabel}</p>
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 w-full">
+          <p className="t-kicker mb-8" style={{ display: "flex", justifyContent: "center" }}>{kickerLabel}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "1rem", width: "100%" }}>
             {boxes.map(({ label, value }) => (
               <div
                 key={label}
-                className="flex flex-col items-center justify-center px-4 py-3 sm:px-6 sm:py-4"
-                style={{ borderRadius: "9999px", background: "var(--t-acc)" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "12px 24px",
+                  borderRadius: "9999px",
+                  background: "var(--t-acc)",
+                }}
               >
                 <b
                   aria-label={`${value} ${label}`}
-                  className="text-xl sm:text-2xl font-semibold"
-                  style={{ color: "var(--t-bg)", fontFamily: "var(--font-cormorant), serif" }}
+                  style={{
+                    fontSize: "1.75rem",
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    color: "var(--t-ink)",
+                    fontFamily: "var(--font-cormorant), serif",
+                  }}
                 >
                   {value}
                 </b>
-                <span aria-hidden="true" className="text-[0.6rem] sm:text-[0.65rem] font-sans font-medium uppercase tracking-widest mt-0.5" style={{ color: "var(--t-bg)", opacity: 0.9 }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    fontSize: "0.65rem",
+                    fontFamily: "sans-serif",
+                    fontWeight: 500,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    marginTop: "4px",
+                    color: "var(--t-ink)",
+                    opacity: 0.9,
+                  }}
+                >
                   {label}
                 </span>
               </div>
@@ -153,18 +177,48 @@ export function Countdown({
   return (
     <section className={`w-full py-20 px-6 md:px-12 flex flex-col items-center justify-center ${dark ? "bg-black/20 dark" : "bg-white/40"}`} id="countdown">
       <div className="w-full max-w-[340px] sm:max-w-xl text-left mx-auto">
-        <p className="t-kicker mb-8">{kickerLabel}</p>
-        <div className="flex flex-wrap items-center justify-between sm:justify-start sm:gap-6 w-full">
+        <p className="t-kicker mb-8" style={{ display: "flex", justifyContent: "flex-start" }}>{kickerLabel}</p>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-start", gap: "1.5rem", width: "100%" }}>
           {boxes.map(({ label, value }) => (
             <div
               key={label}
-              className="flex flex-col items-center justify-center w-[4.5rem] h-[5.5rem] sm:w-[5.5rem] sm:h-[6.5rem] rounded-2xl shadow-sm"
-              style={{ borderRadius: "1rem", background: "color-mix(in srgb, var(--t-ink) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)" }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "5rem",
+                height: "6rem",
+                borderRadius: "1rem",
+                background: "color-mix(in srgb, var(--t-ink) 4%, transparent)",
+                border: "1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)",
+              }}
             >
-              <b aria-label={`${value} ${label}`} className="text-[1.8rem] sm:text-4xl font-light" style={{ color: "var(--t-acc)", fontFamily: "var(--font-cormorant), serif" }}>
+              <b
+                aria-label={`${value} ${label}`}
+                style={{
+                  fontSize: "2rem",
+                  fontWeight: 300,
+                  lineHeight: 1,
+                  color: "var(--t-acc)",
+                  fontFamily: "var(--font-cormorant), serif",
+                }}
+              >
                 {value}
               </b>
-              <span aria-hidden="true" className="text-[0.65rem] sm:text-xs font-sans font-medium uppercase tracking-widest mt-1 sm:mt-2" style={{ color: "var(--t-acc)", opacity: 0.8 }}>
+              <span
+                aria-hidden="true"
+                style={{
+                  fontSize: "0.7rem",
+                  fontFamily: "sans-serif",
+                  fontWeight: 500,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  marginTop: "8px",
+                  color: "var(--t-acc)",
+                  opacity: 0.8,
+                }}
+              >
                 {label}
               </span>
             </div>
