@@ -44,7 +44,7 @@ export function WizardLivePreview() {
         const invitation = {
             ...data,
             fechaEvento: data.fecha,
-            albumFotos: data.albumFotos || "[]",
+
             galeriaPrincipalFotos: galeriaPrincipalFotosStr,
             temaColores: JSON.stringify({
                 colorPrincipal: themeConfig?.colorPrincipal,
