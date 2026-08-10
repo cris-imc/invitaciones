@@ -898,7 +898,6 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
               onClick={() => setIsCoverOpen(true)}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
-                fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif',
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #C9A876', color: '#C9A876',
                 background: 'rgba(201,168,118,0.08)', backdropFilter: 'blur(6px)',
                 marginTop: '1rem',
