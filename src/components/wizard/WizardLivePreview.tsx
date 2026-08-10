@@ -52,6 +52,10 @@ export function WizardLivePreview() {
             }),
             isPreviewMode: true,
             galeriaPrincipalHabilitada: data.galeriaPrincipalHabilitada ?? false,
+            // Deshabilitamos la música completamente en el Live Preview
+            // para evitar que se superponga con el reproductor
+            musicaHabilitada: false,
+            musicaUrl: "",
         };
 
         (window as any).__debugLastPosted = invitation;

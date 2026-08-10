@@ -17,30 +17,18 @@ export function WizardMobilePreviewSheet() {
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
-    const [revealDistance, setRevealDistance] = useState(0);
     // x=0 -> completamente revelado. x=revealDistance -> escondido a la derecha.
-    const x = useMotionValue(0);
+    const revealDistance = SHEET_WIDTH_PX - PEEK_PX;
+    const x = useMotionValue(revealDistance);
     const wasRevealedRef = useRef(false);
-    const observerRef = useRef<ResizeObserver | null>(null);
 
-    const attachRef = useCallback((el: HTMLDivElement | null) => {
-        observerRef.current?.disconnect();
-        if (!el) return;
-        const update = () => {
-            const distance = Math.max(0, el.offsetWidth - PEEK_PX);
-            setRevealDistance(distance);
-            if (!wasRevealedRef.current) {
-                x.set(distance);
-            }
-        };
-        update();
-        const observer = new ResizeObserver(update);
-        observer.observe(el);
-        observerRef.current = observer;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => () => observerRef.current?.disconnect(), []);
+    // Eliminamos el ResizeObserver porque el ancho de la hoja es estático y 
+    // estaba causando un loop infinito que congelaba la app en móviles.
+    useEffect(() => {
+        if (!wasRevealedRef.current) {
+            x.set(revealDistance);
+        }
+    }, [revealDistance, x]);
 
     const handleDragEnd = (_: unknown, info: PanInfo) => {
         const current = x.get();
@@ -55,7 +43,6 @@ export function WizardMobilePreviewSheet() {
 
     return createPortal(
         <motion.div
-            ref={attachRef}
             className="wiz-mobile-sheet"
             style={{ x, width: SHEET_WIDTH_PX }}
             drag="x"
