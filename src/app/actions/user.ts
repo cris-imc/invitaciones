@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
@@ -26,5 +26,37 @@ export async function updateUserProfile(name: string) {
     } catch (error: any) {
         console.error("Error updating profile:", error);
         return { success: false, error: error.message || "Failed to update profile" };
+    }
+}
+
+import bcrypt from "bcryptjs";
+
+export async function forceChangePassword(password: string) {
+    try {
+        const session = await auth();
+        
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        if (!password || password.trim().length < 6) {
+            throw new Error("La contraseña debe tener al menos 6 caracteres.");
+        }
+
+        const hashedPassword = await bcrypt.hash(password.trim(), 10);
+
+        await prisma.user.update({
+            where: { id: session.user.id },
+            data: { 
+                password: hashedPassword,
+                mustChangePassword: false 
+            }
+        });
+
+        revalidatePath("/dashboard");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error force changing password:", error);
+        return { success: false, error: error.message || "Failed to update password" };
     }
 }

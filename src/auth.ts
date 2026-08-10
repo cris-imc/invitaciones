@@ -13,6 +13,7 @@ declare module "next-auth" {
       role: string;
       planTier: PlanTier;
       subscriptionStatus: string;
+      mustChangePassword: boolean;
     };
   }
 
@@ -23,6 +24,7 @@ declare module "next-auth" {
     role: string;
     planTier: string;
     subscriptionStatus: string;
+    mustChangePassword: boolean;
   }
 }
 
@@ -77,6 +79,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           role: user.role,
           planTier: user.planTier,
           subscriptionStatus: user.subscriptionStatus,
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),
@@ -85,12 +88,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update" && session !== undefined) {
+        if (session.mustChangePassword !== undefined) {
+          token.mustChangePassword = session.mustChangePassword;
+        }
+      }
+      
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.planTier = user.planTier;
         token.subscriptionStatus = user.subscriptionStatus;
+        token.mustChangePassword = user.mustChangePassword;
       }
       return token;
     },
@@ -100,6 +110,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.role = token.role as string;
         session.user.planTier = token.planTier as PlanTier;
         session.user.subscriptionStatus = token.subscriptionStatus as string;
+        session.user.mustChangePassword = token.mustChangePassword as boolean;
       }
       return session;
     },

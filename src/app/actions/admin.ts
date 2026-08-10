@@ -79,6 +79,7 @@ export async function adminUpdateUser(userId: string, data: { name?: string; ema
         
         if (data.password && data.password.trim().length > 0) {
             updateData.password = await bcrypt.hash(data.password.trim(), 10);
+            updateData.mustChangePassword = true;
         }
 
         await prisma.user.update({
@@ -129,6 +130,7 @@ export async function adminCreateUser(data: { name: string; email: string; passw
                 name,
                 email,
                 password: hashedPassword,
+                mustChangePassword: true,
                 planTier: "FREE",
                 premiumCredits: wantsPremium ? 1 : 0,
                 subscriptionStatus: wantsPremium ? "ACTIVE" : "TRIAL",
