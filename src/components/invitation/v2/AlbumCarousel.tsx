@@ -37,8 +37,13 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
     
     let isManualScrolling = false;
     let scrollTimeout: NodeJS.Timeout;
+    let isProgrammaticScroll = false;
 
     const handleScroll = () => {
+      if (isProgrammaticScroll) {
+        isProgrammaticScroll = false;
+        return;
+      }
       isManualScrolling = true;
       scrollPos = track.scrollLeft;
       clearTimeout(scrollTimeout);
@@ -56,10 +61,10 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
         // Loop logic exacto sin saltos perceptibles usando módulo
         if (scrollPos >= setWidth) {
           scrollPos = scrollPos % setWidth; 
-          track.scrollLeft = scrollPos; // Ajuste instantáneo invisible
-        } else {
-          track.scrollLeft = scrollPos;
         }
+        
+        isProgrammaticScroll = true;
+        track.scrollLeft = scrollPos;
       }
       
       animationId = requestAnimationFrame(step);
