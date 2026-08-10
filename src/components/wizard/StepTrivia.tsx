@@ -164,7 +164,7 @@ export function StepTrivia() {
             showToast("Se agregó tu última pregunta antes de continuar.", "success");
         }
 
-        if (isTriviaActive && finalPreguntas.length === 0) {
+        if (data.triviaHabilitada && finalPreguntas.length === 0) {
             showToast("Agregá al menos una pregunta a la Trivia, o deshabilitá la sección.", "error");
             return;
         }
