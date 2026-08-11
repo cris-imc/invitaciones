@@ -72,6 +72,24 @@ export function GuestPageTabs({
   const [tab, setTab] = useState<Tab>("agregar");
   const [liveActive, setLiveActive] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
+  
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,77 +131,93 @@ export function GuestPageTabs({
 
   return (
     <div>
-      {/* ── Desktop horizontal tab bar (adm-tabs mockup style) ── */}
-      <div className="adm-tabs">
-        {tabs.map((t) => {
-          const isLocked = planTier === "FREE" && (t.id === "canciones" || t.id === "live");
+      {/* 📱 Desktop horizontal tab bar (adm-tabs mockup style) 📱 */}
+      <div className="adm-tabs-container">
+        {canScrollLeft && (
+          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[var(--ink)] to-transparent pointer-events-none z-10 flex items-center justify-start pl-2">
+            <span className="text-white/40 font-ui text-lg tracking-[-2px] animate-pulse" style={{ animationDuration: '2.5s' }}>‹‹</span>
+          </div>
+        )}
+        {canScrollRight && (
+          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[var(--ink)] to-transparent pointer-events-none z-10 flex items-center justify-end pr-2">
+            <span className="text-white/40 font-ui text-lg tracking-[-2px] animate-pulse" style={{ animationDuration: '2.5s' }}>››</span>
+          </div>
+        )}
+        <div 
+          className="adm-tabs pl-4"
+          ref={scrollContainerRef}
+          onScroll={checkScroll}
+        >
+          {tabs.map((t) => {
+            const isLocked = planTier === "FREE" && (t.id === "canciones" || t.id === "live");
 
-          // Live tab: pulsing dot
-          const tabLabel =
-            t.id === "live" ? (
-              <>
-                <span style={{ position: "relative", width: 8, height: 8, display: "block" }}>
-                  {!isLocked && liveActive && (
+            // Live tab: pulsing dot
+            const tabLabel =
+              t.id === "live" ? (
+                <>
+                  <span style={{ position: "relative", width: 8, height: 8, display: "block" }}>
+                    {!isLocked && liveActive && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          borderRadius: "50%",
+                          background: "#22c55e",
+                          opacity: 0.7,
+                          animation: "liveRecPulse 1.2s ease-in-out infinite",
+                        }}
+                      />
+                    )}
                     <span
                       style={{
-                        position: "absolute",
-                        inset: 0,
+                        position: "relative",
+                        display: "block",
+                        width: 8,
+                        height: 8,
                         borderRadius: "50%",
-                        background: "#22c55e",
-                        opacity: 0.7,
-                        animation: "liveRecPulse 1.2s ease-in-out infinite",
+                        background: liveActive ? "#22c55e" : "#ef4444",
                       }}
                     />
-                  )}
-                  <span
-                    style={{
-                      position: "relative",
-                      display: "block",
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: liveActive ? "#22c55e" : "#ef4444",
-                    }}
-                  />
-                </span>
-                LIVE
-              </>
-            ) : (
-              t.label
+                  </span>
+                  LIVE
+                </>
+              ) : (
+                t.label
+              );
+
+            return (
+              <div key={t.id} className="relative group">
+                <button
+                  type="button"
+                  onClick={() => !isLocked && setTab(t.id)}
+                  disabled={isLocked}
+                  className={`adm-tab ${tab === t.id ? "active" : ""} ${isLocked ? "opacity-40" : ""}`}
+                  style={
+                    t.highlight === "gold" && tab !== t.id
+                      ? { color: "var(--accent)" }
+                      : t.highlight === "live"
+                      ? { color: liveActive ? "#22c55e" : "#ef4444" }
+                      : {}
+                  }
+                >
+                  {tabLabel}
+                  {isLocked && <Lock className="w-3 h-3 ml-1" />}
+                </button>
+
+                {/* Tooltip for locked tabs */}
+                {isLocked && (
+                  <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                    Disponible en Premium
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
+                  </div>
+                )}
+              </div>
             );
-
-          return (
-            <div key={t.id} className="relative group">
-              <button
-                type="button"
-                onClick={() => !isLocked && setTab(t.id)}
-                disabled={isLocked}
-                className={`adm-tab ${tab === t.id ? "active" : ""} ${isLocked ? "opacity-40" : ""}`}
-                style={
-                  t.highlight === "gold" && tab !== t.id
-                    ? { color: "var(--accent)" }
-                    : t.highlight === "live"
-                    ? { color: liveActive ? "#22c55e" : "#ef4444" }
-                    : {}
-                }
-              >
-                {tabLabel}
-                {isLocked && <Lock className="w-3 h-3 ml-1" />}
-              </button>
-
-              {/* Tooltip for locked tabs */}
-              {isLocked && (
-                <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  Disponible en Premium
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
-                </div>
-              )}
-            </div>
-          );
-        })}
+          })}
+        </div>
       </div>
 
-      {/* ── Animated description ── */}
+      {/* 📱 Animated description 📱 */}
       <AnimatedTabDescription text={TAB_DESCRIPTIONS[tab]} />
 
       {/* ── Tab content (AnimatePresence unchanged) ── */}
@@ -191,13 +225,10 @@ export function GuestPageTabs({
         <motion.div
           ref={tabContentRef}
           key={tab}
-          initial={{ opacity: 0, filter: "blur(4px)", y: 10 }}
-          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-          exit={{ opacity: 0, filter: "blur(4px)", y: -10 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          onAnimationComplete={() => {
-            if (tabContentRef.current) tabContentRef.current.style.filter = "none";
-          }}
         >
           {tab === "invitados" && (
             <div className="bg-card border rounded-lg p-4 md:p-6">

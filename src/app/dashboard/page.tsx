@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { CalendarCheck, Eye, Users, Music, TrendingUp, PartyPopper, Gem, Crown, Cake, Building2 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
@@ -290,7 +290,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
                         className="m-btn-ghost flex-1 h-9"
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        Ver diseño
+                        Ver ejemplo
                       </Link>
                       <Link
                         href={`/dashboard/invitaciones/${inv.slug}/guests`}

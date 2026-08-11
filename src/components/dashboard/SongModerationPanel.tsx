@@ -121,7 +121,18 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
       </div>
 
       {/* Filtros */}
-      <div style={{ display: "flex", gap: "6px", marginBottom: "16px", flexWrap: "wrap" }}>
+      <div 
+        style={{ 
+          display: "flex", 
+          gap: "6px", 
+          marginBottom: "16px", 
+          overflowX: "auto", 
+          scrollbarWidth: "none", 
+          paddingBottom: "4px",
+          WebkitOverflowScrolling: "touch"
+        }}
+        className="no-scrollbar"
+      >
         {(["all", "PENDING", "APPROVED", "HIDDEN"] as const).map((f) => (
           <button
             key={f}
@@ -137,6 +148,8 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
               cursor: "pointer",
               fontFamily: "var(--font-body)",
               minHeight: "44px",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
             }}
           >
             {f === "all" ? "Todas" : STATUS_LABEL[f]}
