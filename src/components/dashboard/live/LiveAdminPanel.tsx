@@ -220,9 +220,9 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                             Se habilita el día del evento.
                         </p>
                     )}
-                    {!isActive && isAdmin && !isEventDay && (
+                    {!isActive && isAdmin && status !== "EVENT_DAY" && status !== "POST_EVENT" && (
                         <p className="text-xs text-amber-400 mt-1">
-                            👑 Modo Administrador: podés activarlo aunque no sea el día del evento.
+                            👑 Modo Administrador: podés activarlo aunque falte para el evento.
                         </p>
                     )}
                 </div>
