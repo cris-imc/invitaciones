@@ -1916,6 +1916,8 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   display: flex;
   border-bottom: 1px solid var(--line);
   overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x;
   scrollbar-width: none;
   padding-right: 48px; /* Space for the right gradient */
 }

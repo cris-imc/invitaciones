@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 
@@ -129,7 +129,7 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
           overflowX: "auto", 
           scrollbarWidth: "none", 
           paddingBottom: "4px",
-          WebkitOverflowScrolling: "touch"
+          WebkitOverflowScrolling: "touch", touchAction: "pan-x"
         }}
         className="no-scrollbar"
       >
