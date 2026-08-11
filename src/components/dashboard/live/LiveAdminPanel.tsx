@@ -226,12 +226,12 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                         </p>
                     )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
                     {session && session.counts.APPROVED > 0 && (
                         <Button asChild variant="outline" className="gap-2">
                             <a href={`/api/live/download?invitationId=${invitationId}`} target="_blank" download>
                                 <Download className="w-4 h-4" />
-                                Descargar {session.counts.APPROVED} fotos (ZIP)
+                                <span className="hidden sm:inline">Descargar </span>{session.counts.APPROVED} fotos (ZIP)
                             </a>
                         </Button>
                     )}
