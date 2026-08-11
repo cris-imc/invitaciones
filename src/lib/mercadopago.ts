@@ -8,13 +8,6 @@ function getAccessToken(): string {
   return token;
 }
 
-// Los access tokens de prueba (sandbox) siempre arrancan con "TEST-", los
-// de producción con "APP_USR-" -- con eso alcanza para saber a qué
-// init_point redirigir sin pedir una variable de entorno aparte.
-function isSandboxToken(): boolean {
-  return getAccessToken().startsWith("TEST-");
-}
-
 function getClient(): MercadoPagoConfig {
   return new MercadoPagoConfig({ accessToken: getAccessToken() });
 }
@@ -46,18 +39,26 @@ export async function createCheckoutPreference(params: {
         pending: `${params.baseUrl}/register/pago-pendiente`,
         failure: `${params.baseUrl}/register/pago-fallido`,
       },
-      auto_return: "approved",
+      // auto_return exige que back_url.success sea https:// -- en local
+      // (http://localhost) Mercado Pago rechaza la preferencia si lo
+      // mandamos. Sin auto_return el flujo funciona igual, solo que el
+      // comprador tiene que tocar "Volver al sitio" en vez de que lo
+      // redirija solo.
+      auto_return: params.baseUrl.startsWith("https://") ? "approved" : undefined,
       notification_url: `${params.baseUrl}/api/mercadopago/webhook`,
     },
   });
 
-  const checkoutUrl = (isSandboxToken() ? result.sandbox_init_point : result.init_point) || result.init_point;
-
-  if (!result.id || !checkoutUrl) {
+  // No hace falta elegir entre init_point y sandbox_init_point a mano: Mercado
+  // Pago ya sabe si la preferencia se creó con credenciales de prueba o de
+  // producción (según el access token usado acá) y hace que init_point
+  // lleve al entorno correcto solo. El prefijo "TEST-" para credenciales de
+  // prueba está deprecado -- ahora ambos entornos usan "APP_USR-".
+  if (!result.id || !result.init_point) {
     throw new Error("Mercado Pago no devolvió una preferencia válida");
   }
 
-  return { preferenceId: result.id, checkoutUrl };
+  return { preferenceId: result.id, checkoutUrl: result.init_point };
 }
 
 export async function fetchMercadoPagoPayment(paymentId: string) {
