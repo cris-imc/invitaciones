@@ -23,6 +23,7 @@ interface Props {
   rsvpEnabled: boolean;
   planTier: string;
   fechaEvento: string;
+  tipo?: string;
 }
 
 const TAB_DESCRIPTIONS: Record<Tab, string> = {
@@ -69,6 +70,7 @@ export function GuestPageTabs({
   rsvpEnabled,
   planTier,
   fechaEvento,
+  tipo,
 }: Props) {
   const [tab, setTab] = useState<Tab>("agregar");
   const [liveActive, setLiveActive] = useState(false);
@@ -289,6 +291,7 @@ export function GuestPageTabs({
               pagoTarjetaMonto={Number(regaloMonto) || null}
               precioAdolescente={precioAdolescente != null ? Number(precioAdolescente) : null}
               precioNino={precioNino != null ? Number(precioNino) : null}
+              tipo={tipo}
             />
           )}
           {tab === "live" && (

@@ -6,6 +6,7 @@ import { LiveItem } from "@prisma/client";
 import { motion, AnimatePresence } from "framer-motion";
 import Marquee from "react-fast-marquee";
 import { Logo } from "@/components/ui/Logo";
+import { getHonoreeNames } from "@/lib/invitation-copy";
 
 export default function LiveScreenPage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = use(params);
@@ -66,10 +67,15 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                         <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                         En Vivo
                     </div>
-                    <h1 className="text-4xl font-serif font-bold mb-2">
+                    <h1 className="text-4xl font-serif font-bold mb-1">
                         {session.invitation?.nombreEvento || "Nuestra Fiesta"}
                     </h1>
-                    <p className="text-[#F6F3EC]/60">Escaneá el código para compartir tus fotos y audios al instante.</p>
+                    {session.invitation && getHonoreeNames(session.invitation) && (
+                        <p className="text-[#C79A4B] text-lg font-serif mb-2">
+                            {getHonoreeNames(session.invitation)}
+                        </p>
+                    )}
+                    <p className="text-[#F6F3EC]/60 mt-2">Escaneá el código para compartir tus fotos y audios al instante.</p>
                 </div>
 
                 <div className="bg-[#F6F3EC] p-4 rounded-xl shadow-2xl shrink-0 flex flex-col items-center gap-3">

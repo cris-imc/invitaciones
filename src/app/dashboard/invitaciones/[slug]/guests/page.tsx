@@ -84,6 +84,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         rsvpEnabled={invitation.rsvpEnabled ?? invitation.confirmacionHabilitada ?? true}
         planTier={invitation.planTier}
         fechaEvento={invitation.fechaEvento.toISOString()}
+        tipo={invitation.tipo}
       />
     </div>
   );

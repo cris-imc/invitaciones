@@ -21,6 +21,7 @@ import { ModernoTemplateGris } from "@/components/templates/ModernoTemplateGris"
 import { Metadata } from 'next';
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { autoRejectStalePending } from "@/lib/live-cleanup";
+import { getInvitePhrase } from "@/lib/invitation-copy";
 
 // Generate metadata for social sharing
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -29,9 +30,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     if (!invitation) return { title: 'Invitación no encontrada' };
 
+    const fecha = new Date(invitation.fechaEvento).toLocaleDateString('es-AR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+    const description = `Estás invitado a ${getInvitePhrase(invitation.tipo)} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ''}. Confirmá tu asistencia.`;
+    const ogImage = invitation.portadaImagenFondo
+        ? [{ url: invitation.portadaImagenFondo, width: 1200, height: 630, alt: invitation.nombreEvento }]
+        : undefined;
+
     return {
         title: invitation.nombreEvento,
-        description: `Estás invitado a ${invitation.nombreEvento}`,
+        description,
+        openGraph: {
+            title: invitation.nombreEvento,
+            description,
+            type: 'website',
+            locale: 'es_AR',
+            siteName: 'Invitaciones Digitales',
+            images: ogImage,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: invitation.nombreEvento,
+            description,
+            images: ogImage?.map((i) => i.url),
+        },
     };
 }
 

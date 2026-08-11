@@ -15,7 +15,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ token: s
                 invitation: {
                     select: {
                         nombreEvento: true,
-                        temaColores: true
+                        temaColores: true,
+                        tipo: true,
+                        nombreNovia: true,
+                        nombreNovio: true,
+                        nombreQuinceanera: true,
                     }
                 }
             }

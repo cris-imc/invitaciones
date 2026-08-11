@@ -56,6 +56,7 @@ import {
   Info,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
+import { getInvitePhrase } from "@/lib/invitation-copy";
 
 // Burbuja animada del primer invitado (y su halo en "Copiar Link"). Se
 // descartó como causa del bug de scroll extra en Chrome-iOS (persistía con
@@ -149,9 +150,10 @@ interface GuestManagerProps {
   pagoTarjetaMonto?: number | null;
   precioAdolescente?: number | null;
   precioNino?: number | null;
+  tipo?: string;
 }
 
-export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino }: GuestManagerProps) {
+export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino, tipo }: GuestManagerProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
@@ -819,7 +821,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 {paginatedGuests.map((guest) => {
                   const guestUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/invite/${slug}/${guest.uniqueToken}`;
                   const waMsg = encodeURIComponent(
-                    `¡Hola ${guest.name}! Te invitamos a nuestra celebración. Hacé clic en tu link personalizado para ver la invitación y confirmar tu asistencia: ${guestUrl}`,
+                    `¡Hola ${guest.name}! 🎉 Te invitamos a ${getInvitePhrase(tipo)}. Entrá a tu invitación personal para ver todos los detalles y confirmar tu asistencia:\n${guestUrl}`,
                   );
                   const waHref = `https://wa.me/?text=${waMsg}`;
 
