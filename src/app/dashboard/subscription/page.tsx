@@ -44,7 +44,7 @@ export default function SubscriptionPage() {
       .catch(console.error);
   }, []);
 
-  const plans: PlanTier[] = ["FREE", "PREMIUM", "ENTERPRISE"];
+  const plans: PlanTier[] = ["FREE", "PREMIUM", "DIAMOND"];
 
   return (
     <div className="min-h-dvh bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
@@ -73,6 +73,12 @@ export default function SubscriptionPage() {
                     Premium
                   </Badge>
                 )}
+                {userPlanTier === "DIAMOND" && (
+                  <Badge className="bg-gradient-to-r from-cyan-400 to-blue-600 text-white">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Diamond
+                  </Badge>
+                )}
                 {userPlanTier === "ENTERPRISE" && (
                   <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
                     <Star className="w-3 h-3 mr-1" />
@@ -86,8 +92,8 @@ export default function SubscriptionPage() {
               </p>
             </div>
 
-            {userPlanTier === "PREMIUM" && (
-              <Link href={`https://wa.me/5493517660000?text=${encodeURIComponent("Hola! Necesito soporte con mi plan Premium")}`} target="_blank">
+            {(userPlanTier === "PREMIUM" || userPlanTier === "DIAMOND") && (
+              <Link href={`https://wa.me/5493517660000?text=${encodeURIComponent(`Hola! Necesito soporte con mi plan ${currentPlan.name}`)}`} target="_blank">
                 <Button className="bg-green-500 hover:bg-green-600 text-white">
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Soporte WhatsApp
@@ -187,11 +193,11 @@ export default function SubscriptionPage() {
                         : isUpgrade
                         ? "hover:shadow-xl transition-shadow"
                         : "opacity-60"
-                    } ${planKey === "PREMIUM" ? "relative" : ""}`}
+                    } ${planKey === "DIAMOND" ? "relative" : ""}`}
                   >
-                    {planKey === "PREMIUM" && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-1 rounded-full text-sm font-semibold">
-                        Más Popular
+                    {planKey === "DIAMOND" && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-400 to-blue-600 text-white px-6 py-1 rounded-full text-sm font-semibold">
+                        Recomendado
                       </div>
                     )}
 
@@ -248,6 +254,14 @@ export default function SubscriptionPage() {
                         )}
                         <span>Sin marca de agua</span>
                       </li>
+                      <li className="flex items-center gap-2">
+                        {plan.features.live ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <X className="w-4 h-4 text-gray-300" />
+                        )}
+                        <span>Modo Live (fotos en vivo)</span>
+                      </li>
                     </ul>
 
                     {isCurrent ? (
@@ -262,7 +276,7 @@ export default function SubscriptionPage() {
                         >
                           Próximamente - Mercado Pago
                         </Button>
-                        {planKey === "PREMIUM" && (
+                        {planKey === "DIAMOND" && (
                           <p className="text-xs text-center text-gray-500">
                             Pago disponible pronto
                           </p>

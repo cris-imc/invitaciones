@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         }
 
         let invitationPlanTier = 'FREE';
-        const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
+        const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'DIAMOND' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
 
         if (body.usePremiumCredit) {
             if (!hasUnlimitedPremium) {
@@ -147,7 +147,10 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            invitationPlanTier = 'PREMIUM';
+            // Las cuentas con plan ilimitado (Diamond/Enterprise/Admin) deben
+            // heredar su propio tier en la invitación (no forzar 'PREMIUM'),
+            // para que features exclusivas como LIVE queden habilitadas.
+            invitationPlanTier = hasUnlimitedPremium ? planTier : 'PREMIUM';
         } else {
             // Check if user can create more invitations on their base plan
             const currentInvitationsCount = await prisma.invitation.count({

@@ -33,6 +33,7 @@ export function AdminPlanSelect({ invitationId, currentPlan }: { invitationId: s
             >
                 <option value="FREE">Gratis (20 inv)</option>
                 <option value="PREMIUM">Premium (Ilimitado)</option>
+                <option value="DIAMOND">Diamond (Ilimitado + LIVE)</option>
                 <option value="ENTERPRISE">Enterprise</option>
             </select>
             {isPending && <span className="text-xs text-blue-500">Guardando...</span>}

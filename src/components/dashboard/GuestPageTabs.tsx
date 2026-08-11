@@ -149,7 +149,9 @@ export function GuestPageTabs({
           onScroll={checkScroll}
         >
           {tabs.map((t) => {
-            const isLocked = planTier === "FREE" && (t.id === "canciones" || t.id === "live");
+            const hasLive = planTier === "DIAMOND" || planTier === "ENTERPRISE" || planTier === "ADMIN";
+            const isLocked =
+              t.id === "canciones" ? planTier === "FREE" : t.id === "live" ? !hasLive : false;
 
             // Live tab: pulsing dot
             const tabLabel =
@@ -207,7 +209,7 @@ export function GuestPageTabs({
                 {/* Tooltip for locked tabs */}
                 {isLocked && (
                   <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                    Disponible en Premium
+                    {t.id === "live" ? "Exclusivo del plan Diamond" : "Disponible en Premium"}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
                   </div>
                 )}
@@ -286,7 +288,9 @@ export function GuestPageTabs({
       <nav className="adm-mobile-nav">
         <div className="adm-mobile-nav-inner">
           {tabs.map((t) => {
-            const isLocked = planTier === "FREE" && (t.id === "canciones" || t.id === "live");
+            const hasLive = planTier === "DIAMOND" || planTier === "ENTERPRISE" || planTier === "ADMIN";
+            const isLocked =
+              t.id === "canciones" ? planTier === "FREE" : t.id === "live" ? !hasLive : false;
             return (
               <button
                 key={t.id}

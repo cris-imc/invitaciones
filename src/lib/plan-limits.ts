@@ -1,4 +1,4 @@
-export type PlanTier = "FREE" | "PREMIUM" | "ENTERPRISE" | "ADMIN";
+export type PlanTier = "FREE" | "PREMIUM" | "DIAMOND" | "ENTERPRISE" | "ADMIN";
 
 export interface PlanFeatures {
   customMusic: boolean;
@@ -58,6 +58,29 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   PREMIUM: {
     name: "Premium",
     price: 50000,
+    maxInvitations: null, // unlimited
+    maxGuests: null, // unlimited
+    maxPhotos: 15,
+    maxLivePhotos: 0, // LIVE es exclusivo del plan Diamond (y superiores)
+    allowedTemplates: "all",
+    features: {
+      customMusic: true,
+      trivia: true,
+      live: false,
+      djSuggestions: true,
+      sharedAlbum: true,
+      analytics: true,
+      noWatermark: true,
+      qrCodes: false,
+      whatsappReminders: false,
+      dedicatedSupport: true,
+      customDesign: false,
+      tableAssignment: false,
+    },
+  },
+  DIAMOND: {
+    name: "Diamond",
+    price: 90000,
     maxInvitations: null, // unlimited
     maxGuests: null, // unlimited
     maxPhotos: 15,

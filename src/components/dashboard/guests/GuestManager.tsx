@@ -598,17 +598,17 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   <div className="relative group">
                     <button
                       type="button"
-                      disabled={planTier !== 'PREMIUM'}
+                      disabled={planTier === 'FREE'}
                       onClick={() => setNewGuestType("FAMILY")}
-                      className={`w-full h-full flex flex-col items-center gap-2 py-6 px-3 rounded-xl border-2 text-sm font-medium transition-colors ${planTier !== 'PREMIUM' ? 'opacity-50 cursor-not-allowed border-muted-foreground/20' : 'border-muted-foreground/20 hover:border-primary hover:bg-primary/5'}`}
+                      className={`w-full h-full flex flex-col items-center gap-2 py-6 px-3 rounded-xl border-2 text-sm font-medium transition-colors ${planTier === 'FREE' ? 'opacity-50 cursor-not-allowed border-muted-foreground/20' : 'border-muted-foreground/20 hover:border-primary hover:bg-primary/5'}`}
                     >
                       <Users className="w-6 h-6" />
                       <span className="flex items-center gap-1.5">
                         Familia/Grupo
-                        {planTier !== 'PREMIUM' && <Lock className="w-3.5 h-3.5 text-red-400" />}
+                        {planTier === 'FREE' && <Lock className="w-3.5 h-3.5 text-red-400" />}
                       </span>
                     </button>
-                    {planTier !== 'PREMIUM' && (
+                    {planTier === 'FREE' && (
                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
                         Disponible en Premium
                         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
@@ -1010,22 +1010,22 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   />
                   <Label htmlFor="edit-individual">Individual</Label>
                 </div>
-                <div className={`flex items-center space-x-2 relative group${planTier !== 'PREMIUM' ? ' opacity-50' : ''}`}>
+                <div className={`flex items-center space-x-2 relative group${planTier === 'FREE' ? ' opacity-50' : ''}`}>
                   <input
                     type="radio"
                     id="edit-family"
                     name="edit-type"
                     checked={editGuestType === "FAMILY"}
                     onChange={() => setEditGuestType("FAMILY")}
-                    disabled={planTier !== 'PREMIUM'}
+                    disabled={planTier === 'FREE'}
                     className="accent-primary"
                   />
-                  <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier !== 'PREMIUM' ? ' cursor-not-allowed' : ''}`}>
+                  <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier === 'FREE' ? ' cursor-not-allowed' : ''}`}>
                       Familia/Grupo
-                      {planTier !== 'PREMIUM' && <Lock className="w-4 h-4 text-red-400" />}
+                      {planTier === 'FREE' && <Lock className="w-4 h-4 text-red-400" />}
                   </Label>
 
-                  {planTier !== 'PREMIUM' && (
+                  {planTier === 'FREE' && (
                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
                         Disponible en Premium
                         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>

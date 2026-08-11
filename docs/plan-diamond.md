@@ -4,7 +4,7 @@
 
 ### Checkpoints
 - [x] 1. Modelo de datos: membresías y créditos
-- [ ] 2. Actualizar lógica de membresías (Free / Premium / Diamond / Enterprise)
+- [x] 2. Actualizar lógica de membresías (Free / Premium / Diamond / Enterprise)
 - [ ] 3. Landing page: sección de precios actualizada
 - [ ] 4. Landing page: opción Contacto → WhatsApp
 - [ ] 5. Registro: rediseño de cards de membresía con UX mejorado
@@ -16,3 +16,8 @@
 
 ### Notas de avance
 - CP1: `planTier` en `User`/`Invitation`/`Payment` ya es `String` (no enum), así que DIAMOND y ENTERPRISE no requieren cambio de schema para el tipo de membresía — ya son valores válidos. Se agregó `diamondCredits Int @default(0)` a `User` (junto a `premiumCredits`). Migración additive: `20260811120000_add_diamond_membership_and_credits`.
+- CP2: `plan-limits.ts` — PREMIUM pierde `live`/`maxLivePhotos`, se agregó tier DIAMOND (mismos límites que Premium + LIVE), ENTERPRISE queda igual (ya tenía todo ilimitado/habilitado).
+  - `invitation.planTier` (no `user.planTier`) es lo que determina si una invitación puntual tiene LIVE habilitado (`canUseFeature` en `api/live/session/route.ts`). Antes, toda invitación creada con crédito o plan ilimitado quedaba en `'PREMIUM'` a nivel invitación; se corrigió `api/invitations/route.ts` para que las cuentas con plan ilimitado (Diamond/Enterprise/Admin) hereden su propio tier en la invitación — si no, ninguna invitación de un usuario Diamond hubiera tenido LIVE nunca.
+  - Bug encontrado y corregido de paso: `QuickEditPrice.tsx` (precio niño) y `GuestManager.tsx` (tipo de invitado Familia/Grupo) bloqueaban la feature con `planTier !== 'PREMIUM'` en vez de `=== 'FREE'` — con Diamond en juego eso hubiera bloqueado esas features justo a los usuarios Diamond. Corregido a `=== 'FREE'`.
+  - Nota pendiente (fuera de los 10 checkpoints, no implementado): no existe todavía un flujo de UI para "gastar 1 crédito diamond" al crear una invitación (equivalente a `usePremiumCredit`). Los créditos diamond se otorgan (registro/admin) y se muestran (CP7), pero consumirlos al crear una invitación puntual no está pedido en el plan — si se necesita, es checkpoint nuevo.
+  - Se actualizaron también los selectores de plan en `CreateUserButton.tsx` y `AdminPlanSelect.tsx` (agregado DIAMOND) para que sigan siendo consistentes, aunque el rediseño completo de gestión de membresías es CP6.

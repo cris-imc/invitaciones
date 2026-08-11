@@ -127,7 +127,7 @@ export function QuickEditPrice({
                     <div className="relative group">
                         <label className="text-sm font-medium mb-2 flex items-center gap-2 text-[var(--on-ink)]/80">
                             Valor Niño ($):
-                            {planTier !== 'PREMIUM' && <Lock className="w-3.5 h-3.5 text-red-400" />}
+                            {planTier === 'FREE' && <Lock className="w-3.5 h-3.5 text-red-400" />}
                         </label>
                         <Input 
                             type="number" 
@@ -135,10 +135,10 @@ export function QuickEditPrice({
                             placeholder="Opcional"
                             value={precioNino}
                             onChange={(e) => setPrecioNino(e.target.value)}
-                            disabled={planTier !== 'PREMIUM'}
+                            disabled={planTier === 'FREE'}
                             className="bg-[var(--ink)] border-none text-[var(--on-ink)] disabled:opacity-50"
                         />
-                        {planTier !== 'PREMIUM' && (
+                        {planTier === 'FREE' && (
                             <div className="absolute -top-10 left-16 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
                               Disponible en Premium
                               <div className="absolute -bottom-1 left-4 border-4 border-transparent border-t-black"></div>

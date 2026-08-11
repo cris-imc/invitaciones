@@ -67,7 +67,7 @@ export default async function InvitacionesPage() {
                         Invitaciones en borrador, finalizadas, o que ya vencieron (3 meses después del evento).
                         {dbUser && (
                             <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
-                                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE' ?
+                                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'DIAMOND' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE' ?
                                     `Invitaciones Premium: ilimitadas por tu plan.` :
                                     `Invitaciones Premium disponibles: ${dbUser.premiumCredits || 0}.`
                                 }

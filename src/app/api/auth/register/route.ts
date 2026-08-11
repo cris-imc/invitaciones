@@ -45,12 +45,13 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // "Premium" en el registro es una compra de UN crédito para hacer UNA
-    // invitación premium, nunca un plan de invitaciones ilimitadas. El
-    // planTier de la cuenta queda siempre FREE acá — un plan ilimitado
-    // (PREMIUM/ENTERPRISE/ADMIN) solo se asigna manualmente desde el admin.
+    // "Premium"/"Diamond" en el registro es una compra de UN crédito para
+    // hacer UNA invitación de ese tipo, nunca un plan de invitaciones
+    // ilimitadas. El planTier de la cuenta queda siempre FREE acá — un plan
+    // ilimitado (PREMIUM/DIAMOND/ENTERPRISE/ADMIN) solo se asigna
+    // manualmente desde el admin.
     const wantsPremium = planTier === "PREMIUM";
-    const creditsToAssign = wantsPremium ? 1 : 0;
+    const wantsDiamond = planTier === "DIAMOND";
 
     // Create user
     const user = await prisma.user.create({
@@ -59,8 +60,9 @@ export async function POST(request: NextRequest) {
         email: email.trim().toLowerCase(),
         password: hashedPassword,
         planTier: "FREE",
-        premiumCredits: creditsToAssign,
-        subscriptionStatus: wantsPremium ? "ACTIVE" : "TRIAL",
+        premiumCredits: wantsPremium ? 1 : 0,
+        diamondCredits: wantsDiamond ? 1 : 0,
+        subscriptionStatus: wantsPremium || wantsDiamond ? "ACTIVE" : "TRIAL",
         role: "CLIENT",
       },
       select: {

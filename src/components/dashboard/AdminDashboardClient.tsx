@@ -74,6 +74,7 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                 {paginatedClients.map(client => {
                     const isExpanded = expandedClients.includes(client.id);
                     const premiumEnUso = client.invitations.filter((inv: any) => inv.planTier === "PREMIUM").length;
+                    const diamondEnUso = client.invitations.filter((inv: any) => inv.planTier === "DIAMOND").length;
                     return (
                         <div key={client.id} className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-[var(--ink-2)] text-[var(--on-ink)] transition-all">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -96,6 +97,11 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                                     {premiumEnUso > 0 && (
                                         <div className="px-2 py-0.5 bg-green-500/15 text-green-500 rounded-full text-[10px] font-medium shrink-0">
                                             {premiumEnUso} premium en uso
+                                        </div>
+                                    )}
+                                    {diamondEnUso > 0 && (
+                                        <div className="px-2 py-0.5 bg-cyan-500/15 text-cyan-400 rounded-full text-[10px] font-medium shrink-0">
+                                            {diamondEnUso} diamond en uso
                                         </div>
                                     )}
                                 </div>

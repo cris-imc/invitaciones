@@ -22,7 +22,7 @@ export function NewInvitationButton({ premiumCredits, totalInvitations, planTier
     const [showError, setShowError] = useState(false);
     const router = useRouter();
     const setUsePremiumCredit = useWizardStore((state) => state.setUsePremiumCredit);
-    const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
+    const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'DIAMOND' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
 
     const handleNewClick = () => {
         // Siempre pregunta gratis/premium, incluida la primera invitación.

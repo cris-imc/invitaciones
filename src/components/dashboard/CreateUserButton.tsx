@@ -14,7 +14,7 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [planTier, setPlanTier] = useState<"FREE" | "PREMIUM">("FREE");
+    const [planTier, setPlanTier] = useState<"FREE" | "PREMIUM" | "DIAMOND">("FREE");
     const [isLoading, setIsLoading] = useState(false);
     const { showToast } = useToast();
 
@@ -133,6 +133,13 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                                     className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "PREMIUM" ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-400" : "bg-white/5 border-white/10 text-white/50"}`}
                                 >
                                     Premium (1 crédito)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setPlanTier("DIAMOND")}
+                                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "DIAMOND" ? "bg-cyan-500/20 border-cyan-400/40 text-cyan-300" : "bg-white/5 border-white/10 text-white/50"}`}
+                                >
+                                    Diamond (1 crédito)
                                 </button>
                             </div>
                         </div>

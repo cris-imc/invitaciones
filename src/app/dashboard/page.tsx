@@ -174,6 +174,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
             {dbUser && (
               <span className="text-yellow-500 font-semibold ml-2">
                 {dbUser.planTier === "PREMIUM" ||
+                dbUser.planTier === "DIAMOND" ||
                 dbUser.planTier === "ADMIN" ||
                 dbUser.planTier === "ENTERPRISE"
                   ? "Invitaciones Premium: ilimitadas por tu plan."

@@ -95,7 +95,7 @@ export async function adminUpdateUser(userId: string, data: { name?: string; ema
     }
 }
 
-export async function adminCreateUser(data: { name: string; email: string; password: string; planTier?: "FREE" | "PREMIUM" }) {
+export async function adminCreateUser(data: { name: string; email: string; password: string; planTier?: "FREE" | "PREMIUM" | "DIAMOND" }) {
     try {
         const session = await auth();
 
@@ -120,10 +120,11 @@ export async function adminCreateUser(data: { name: string; email: string; passw
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        // Igual que en el registro público: "Premium" acá es un credito para
-        // UNA invitacion premium, nunca un plan ilimitado (eso se asigna a
-        // mano despues, si corresponde).
+        // Igual que en el registro público: "Premium"/"Diamond" acá es un
+        // credito para UNA invitacion de ese tipo, nunca un plan ilimitado
+        // (eso se asigna a mano despues, si corresponde).
         const wantsPremium = data.planTier === "PREMIUM";
+        const wantsDiamond = data.planTier === "DIAMOND";
 
         await prisma.user.create({
             data: {
@@ -133,7 +134,8 @@ export async function adminCreateUser(data: { name: string; email: string; passw
                 mustChangePassword: true,
                 planTier: "FREE",
                 premiumCredits: wantsPremium ? 1 : 0,
-                subscriptionStatus: wantsPremium ? "ACTIVE" : "TRIAL",
+                diamondCredits: wantsDiamond ? 1 : 0,
+                subscriptionStatus: wantsPremium || wantsDiamond ? "ACTIVE" : "TRIAL",
                 role: "CLIENT",
             },
         });
