@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 function TypewriterText() {
-  const text = "Previsualizá el diseño o modificá los detalles en Editar Info...";
+  const text = "Previsualizá tu diseño o editá los detalles...";
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
@@ -20,7 +20,7 @@ function TypewriterText() {
   }, []);
 
   return (
-    <span className="font-medium text-sm text-slate-600 dark:text-slate-300">
+    <span className="font-medium text-xs sm:text-sm text-slate-600 dark:text-slate-300">
       {displayed}
       <span className="animate-pulse text-amber-500 font-bold ml-0.5">|</span>
     </span>
@@ -62,12 +62,12 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
         {/* Burbuja Principal */}
         <div className="relative w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-1.5 sm:pl-5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200/50 dark:border-slate-800/50 rounded-3xl sm:rounded-full shadow-sm gap-3 sm:gap-6 transition-all duration-300 hover:shadow-md overflow-hidden">
 
-          <div className="flex items-start sm:items-center gap-2.5 pt-2 sm:pt-0">
-            <span className="relative flex h-2.5 w-2.5 shrink-0 mt-1 sm:mt-0">
+          <div className="flex items-center gap-2.5 pt-2 sm:pt-0 min-w-0">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
             </span>
-            <div className="flex-1 text-balance">
+            <div className="flex-1 truncate min-w-0">
               <TypewriterText />
             </div>
           </div>
