@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.claude
+prisma/dev.db
+public/uploads
+docs
+img
+*.log
