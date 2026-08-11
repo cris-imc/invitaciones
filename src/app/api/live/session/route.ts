@@ -121,7 +121,8 @@ export async function POST(req: Request) {
         // El LIVE solo se puede ACTIVAR el día del evento, salvo para admins.
         // Apagarlo nunca está restringido.
         const isAdmin = session.user.role === "ADMIN";
-        const canActivate = isAdmin || getEventStatus(invitation.fechaEvento) === "EVENT_DAY";
+        const status = getEventStatus(invitation.fechaEvento);
+        const canActivate = isAdmin || status === "EVENT_DAY" || status === "POST_EVENT";
         const hasLiveFeature = isAdmin || canUseFeature(invitation.planTier as PlanTier, "live");
 
         if (action === "create" && !liveSession) {
@@ -129,7 +130,7 @@ export async function POST(req: Request) {
                 return new NextResponse("Tu plan no incluye LIVE. Actualizá a Premium para habilitarlo.", { status: 403 });
             }
             if (!canActivate) {
-                return new NextResponse("El LIVE solo se puede activar el día del evento.", { status: 403 });
+                return new NextResponse("El LIVE solo se puede activar a partir del día del evento.", { status: 403 });
             }
             liveSession = await prisma.liveSession.create({
                 data: {

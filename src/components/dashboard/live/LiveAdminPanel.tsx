@@ -67,8 +67,8 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
 
     const { data: authSession } = useSession();
     const isAdmin = authSession?.user?.role === "ADMIN" || authSession?.user?.planTier === "ADMIN";
-    const isEventDay = getEventStatus(fechaEvento) === "EVENT_DAY";
-    const canActivate = isAdmin || isEventDay;
+    const status = getEventStatus(fechaEvento);
+    const canActivate = isAdmin || status === "EVENT_DAY" || status === "POST_EVENT";
 
     const fetchSession = useCallback(async (opts?: { silent?: boolean }) => {
         if (!opts?.silent) setTabLoading(true);
@@ -109,7 +109,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
     const toggleLive = async () => {
         const activating = !session?.isActive;
         if (activating && !canActivate) {
-            setErrorMsg("El LIVE solo se puede activar el día del evento.");
+            setErrorMsg("El LIVE solo se puede activar a partir del día del evento.");
             return;
         }
         setLoading(true);
