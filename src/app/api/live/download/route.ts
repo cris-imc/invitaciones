@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 const archiver = require("archiver");
 import path from "path";
 import fs from "fs";
+import { Readable } from "stream";
+import { getUploadsDir } from "@/lib/uploads";
 
 export async function GET(req: Request) {
     try {
@@ -65,13 +67,13 @@ export async function GET(req: Request) {
 
         for (const item of items) {
             if (item.fileUrl) {
-                // Remove query strings if any, e.g. /uploads/file.jpg?v=1
+                // Extraemos el nombre del archivo de la URL (ej: /uploads/123.jpg -> 123.jpg)
                 const urlPath = item.fileUrl.split('?')[0];
-                const filePath = path.join(process.cwd(), "public", urlPath);
+                const fileName = urlPath.replace("/uploads/", "");
+                const filePath = getUploadsDir(fileName);
                 
                 if (fs.existsSync(filePath)) {
-                    const filename = path.basename(filePath);
-                    archive.file(filePath, { name: filename });
+                    archive.file(filePath, { name: fileName });
                 }
             }
         }
@@ -80,7 +82,9 @@ export async function GET(req: Request) {
 
         const filename = `fotos-live-${invitation.nombreEvento || "evento"}.zip`.replace(/[^a-zA-Z0-9.\-]/g, "_");
 
-        return new NextResponse(stream as any, {
+        const webStream = Readable.toWeb(stream as any);
+
+        return new NextResponse(webStream as any, {
             headers: {
                 "Content-Type": "application/zip",
                 "Content-Disposition": `attachment; filename="${filename}"`
