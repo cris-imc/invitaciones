@@ -5,13 +5,24 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUploader } from "@/components/ui/ImageUploader";
-import { X, Info, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { X, Info, ChevronDown, ChevronUp, AlertCircle, ImageOff } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { PLAN_LIMITS, type PlanTier } from "@/lib/plan-limits";
 
 export function StepGallery() {
-    const { data, setData } = useWizardStore();
+    const { data, setData, usePremiumCredit, useDiamondCredit } = useWizardStore();
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
+    const [showLimitModal, setShowLimitModal] = useState(false);
 
     const galeriaPrincipal = data.galeriaPrincipalFotos
         ? (typeof data.galeriaPrincipalFotos === 'string'
@@ -19,7 +30,20 @@ export function StepGallery() {
             : data.galeriaPrincipalFotos)
         : [];
 
+    // Si la invitación ya tiene un ID (edición) usamos su planTier real,
+    // sino el tier efectivo segun el credito elegido en el paso de creación.
+    const isEditing = Boolean(data.id);
+    const effectivePlanTier: PlanTier = isEditing
+        ? ((data.planTier as PlanTier) || "FREE")
+        : (usePremiumCredit || useDiamondCredit ? "PREMIUM" : "FREE");
+    const maxPhotos = PLAN_LIMITS[effectivePlanTier]?.maxPhotos ?? PLAN_LIMITS.FREE.maxPhotos;
+    const limitReached = maxPhotos !== null && galeriaPrincipal.length >= maxPhotos;
+
     const handleImageUploaded = (userId: string) => {
+        if (limitReached) {
+            setShowLimitModal(true);
+            return;
+        }
         const updatedPhotos = [...galeriaPrincipal, userId];
         setData({ galeriaPrincipalFotos: updatedPhotos as any });
     };
@@ -102,16 +126,27 @@ export function StepGallery() {
 
                         <div className="space-y-2 pt-1">
                             <Label className="text-sm font-medium">Agregar nueva foto (de a una)</Label>
-                            <ImageUploader
-                                onImageUploaded={handleImageUploaded}
-                                aspectRatio={1}
-                            />
+                            {limitReached ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLimitModal(true)}
+                                    className="w-full min-h-[140px] rounded-xl border-2 border-dashed border-amber-500/40 bg-amber-500/5 flex flex-col items-center justify-center gap-2 text-amber-300 text-sm p-6"
+                                >
+                                    <ImageOff className="w-6 h-6" />
+                                    <span className="font-medium">Llegaste al límite de fotos de tu plan</span>
+                                </button>
+                            ) : (
+                                <ImageUploader
+                                    onImageUploaded={handleImageUploaded}
+                                    aspectRatio={1}
+                                />
+                            )}
                         </div>
 
                         {galeriaPrincipal.length > 0 && (
                             <div className="space-y-2 pt-2">
                                 <Label className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-                                    Fotos agregadas ({galeriaPrincipal.length})
+                                    Fotos agregadas ({galeriaPrincipal.length}{maxPhotos !== null ? `/${maxPhotos}` : ''})
                                 </Label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     {galeriaPrincipal.map((url: string, index: number) => (
@@ -139,6 +174,24 @@ export function StepGallery() {
             </div>
 
             <SaveStepButtons />
+
+            <Dialog open={showLimitModal} onOpenChange={setShowLimitModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <ImageOff className="w-5 h-5 text-amber-500" />
+                            Llegaste al límite de fotos
+                        </DialogTitle>
+                        <DialogDescription className="pt-2">
+                            Tu plan {PLAN_LIMITS[effectivePlanTier].name} permite hasta{" "}
+                            <strong>{maxPhotos} fotos</strong> en el álbum. Actualizá tu plan para agregar más.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button onClick={() => setShowLimitModal(false)}>Entendido</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

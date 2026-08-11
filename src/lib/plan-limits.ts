@@ -30,7 +30,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   FREE: {
     name: "Gratis",
     price: 0,
-    maxInvitations: null, // unlimited free invitations
+    maxInvitations: 1, // un cliente no puede crear mas de una tarjeta gratis
     maxGuests: 20,
     maxPhotos: 5,
     maxLivePhotos: 0, // sin LIVE en el plan Gratis

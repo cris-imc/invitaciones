@@ -168,16 +168,18 @@ export async function POST(request: NextRequest) {
 
             invitationPlanTier = hasUnlimitedPremium ? planTier : 'DIAMOND';
         } else {
-            // Check if user can create more invitations on their base plan
-            const currentInvitationsCount = await prisma.invitation.count({
-                where: { userId, estado: 'ACTIVA' }
+            // Cuenta solo las invitaciones FREE (no las premium/diamond ya
+            // activas), para que el limite de "1 tarjeta gratis" no se
+            // dispare por invitaciones de otro tier que el cliente ya tiene.
+            const currentFreeInvitationsCount = await prisma.invitation.count({
+                where: { userId, estado: 'ACTIVA', planTier: 'FREE' }
             });
 
             const limitError = await checkPlanLimits(
                 userId,
                 planTier,
                 'create-invitation',
-                currentInvitationsCount
+                currentFreeInvitationsCount
             );
 
             if (limitError) {
