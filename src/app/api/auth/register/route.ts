@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { REGISTRATION_ENABLED } from "@/lib/features";
+import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 
 export async function POST(request: NextRequest) {
   if (!REGISTRATION_ENABLED) {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, email, password, planTier } = body;
+    const { name, email, password, planTier, phoneAreaCode, phoneNumber } = body;
 
     // Validate input
     if (!name || !email || !password) {
@@ -28,6 +29,16 @@ export async function POST(request: NextRequest) {
         { error: "La contraseña debe tener al menos 6 caracteres" },
         { status: 400 }
       );
+    }
+
+    const areaCodeError = validatePhoneAreaCode(phoneAreaCode || "");
+    if (areaCodeError) {
+      return NextResponse.json({ error: areaCodeError }, { status: 400 });
+    }
+
+    const phoneNumberError = validatePhoneNumber(phoneNumber || "");
+    if (phoneNumberError) {
+      return NextResponse.json({ error: phoneNumberError }, { status: 400 });
     }
 
     // Check if user already exists
@@ -59,6 +70,8 @@ export async function POST(request: NextRequest) {
         name,
         email: email.trim().toLowerCase(),
         password: hashedPassword,
+        phoneAreaCode,
+        phoneNumber,
         planTier: "FREE",
         premiumCredits: wantsPremium ? 1 : 0,
         diamondCredits: wantsDiamond ? 1 : 0,

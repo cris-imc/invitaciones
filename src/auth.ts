@@ -14,6 +14,8 @@ declare module "next-auth" {
       planTier: PlanTier;
       subscriptionStatus: string;
       mustChangePassword: boolean;
+      hasPhone: boolean;
+      phoneModalDismissed: boolean;
     };
   }
 
@@ -25,6 +27,7 @@ declare module "next-auth" {
     planTier: string;
     subscriptionStatus: string;
     mustChangePassword: boolean;
+    hasPhone: boolean;
   }
 }
 
@@ -80,6 +83,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           planTier: user.planTier,
           subscriptionStatus: user.subscriptionStatus,
           mustChangePassword: user.mustChangePassword,
+          hasPhone: Boolean(user.phoneAreaCode && user.phoneNumber),
         };
       },
     }),
@@ -93,14 +97,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (session.mustChangePassword !== undefined) {
           token.mustChangePassword = session.mustChangePassword;
         }
+        if (session.hasPhone !== undefined) {
+          token.hasPhone = session.hasPhone;
+        }
+        if (session.phoneModalDismissed !== undefined) {
+          token.phoneModalDismissed = session.phoneModalDismissed;
+        }
       }
-      
+
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.planTier = user.planTier;
         token.subscriptionStatus = user.subscriptionStatus;
         token.mustChangePassword = user.mustChangePassword;
+        token.hasPhone = user.hasPhone;
+        // Cada login nuevo resetea el "una vez por sesión" del recordatorio
+        // de teléfono -- si el usuario cerró el modal sin completar el dato,
+        // vuelve a aparecer recién en el próximo inicio de sesión.
+        token.phoneModalDismissed = false;
       }
       return token;
     },
@@ -111,6 +126,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.planTier = token.planTier as PlanTier;
         session.user.subscriptionStatus = token.subscriptionStatus as string;
         session.user.mustChangePassword = token.mustChangePassword as boolean;
+        session.user.hasPhone = token.hasPhone as boolean;
+        session.user.phoneModalDismissed = token.phoneModalDismissed as boolean;
       }
       return session;
     },

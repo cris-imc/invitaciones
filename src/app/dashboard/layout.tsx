@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { PhoneReminderModal } from "@/components/dashboard/PhoneReminderModal";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
                     {children}
                 </main>
             </div>
+            <PhoneReminderModal />
         </div>
     );
 }

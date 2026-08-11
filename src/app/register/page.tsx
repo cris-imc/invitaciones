@@ -8,9 +8,10 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
-import { Diamond, Mail, Lock, User, Check, ChevronLeft } from "lucide-react";
+import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft } from "lucide-react";
 import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
+import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
 
@@ -124,6 +125,8 @@ function RegisterForm() {
     email: "",
     password: "",
     confirmPassword: "",
+    phoneAreaCode: "",
+    phoneNumber: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,6 +142,18 @@ function RegisterForm() {
       return;
     }
 
+    const areaCodeError = validatePhoneAreaCode(formData.phoneAreaCode);
+    if (areaCodeError) {
+      showToast(areaCodeError, "error");
+      return;
+    }
+
+    const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
+    if (phoneNumberError) {
+      showToast(phoneNumberError, "error");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -150,6 +165,8 @@ function RegisterForm() {
           email: formData.email,
           password: formData.password,
           planTier: selectedPlan,
+          phoneAreaCode: normalizeDigits(formData.phoneAreaCode),
+          phoneNumber: normalizeDigits(formData.phoneNumber),
         }),
       });
 
@@ -322,6 +339,40 @@ function RegisterForm() {
                     required
                     className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                   />
+                </div>
+
+                <div>
+                  <Label className="flex items-center gap-2 mb-2 opacity-80">
+                    <Phone className="w-4 h-4" />
+                    Teléfono
+                  </Label>
+                  <div className="grid grid-cols-[100px_1fr] gap-2">
+                    <Input
+                      id="phoneAreaCode"
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="Cód. área"
+                      value={formData.phoneAreaCode}
+                      onChange={(e) => setFormData({ ...formData, phoneAreaCode: normalizeDigits(e.target.value) })}
+                      maxLength={4}
+                      required
+                      className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                    />
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="Número"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: normalizeDigits(e.target.value) })}
+                      maxLength={8}
+                      required
+                      className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                    />
+                  </div>
+                  <p className="text-xs opacity-50 mt-1.5">
+                    Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234)
+                  </p>
                 </div>
 
                 <div>
