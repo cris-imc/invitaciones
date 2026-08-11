@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Trash2, ExternalLink, RefreshCw, Power, ChevronLeft, ChevronRight, Check, X, RotateCcw } from "lucide-react";
+import { Trash2, ExternalLink, RefreshCw, Power, ChevronLeft, ChevronRight, Check, X, RotateCcw, Download } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -226,15 +226,25 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                         </p>
                     )}
                 </div>
-                <Button
-                    onClick={toggleLive}
-                    variant={isActive ? "destructive" : "default"}
-                    disabled={loading || (!isActive && !canActivate)}
-                    className="gap-2"
-                >
-                    <Power className="w-4 h-4" />
-                    {isActive ? "Apagar LIVE" : "Activar LIVE"}
-                </Button>
+                <div className="flex items-center gap-2">
+                    {session && session.counts.APPROVED > 0 && (
+                        <Button asChild variant="outline" className="gap-2">
+                            <a href={`/api/live/download?invitationId=${invitationId}`} target="_blank" download>
+                                <Download className="w-4 h-4" />
+                                Descargar {session.counts.APPROVED} fotos (ZIP)
+                            </a>
+                        </Button>
+                    )}
+                    <Button
+                        onClick={toggleLive}
+                        variant={isActive ? "destructive" : "default"}
+                        disabled={loading || (!isActive && !canActivate)}
+                        className="gap-2"
+                    >
+                        <Power className="w-4 h-4" />
+                        {isActive ? "Apagar LIVE" : "Activar LIVE"}
+                    </Button>
+                </div>
             </div>
 
             {isActive && session && (
