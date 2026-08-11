@@ -64,11 +64,12 @@ export async function updateInvitationMaxGuests(invitationId: string, maxGuestsO
 }
 
 import bcrypt from "bcryptjs";
+import { validatePassword } from "@/lib/password";
 
 export async function adminUpdateUser(userId: string, data: { name?: string; email?: string; password?: string }) {
     try {
         const session = await auth();
-        
+
         if (session?.user?.role !== "ADMIN") {
             throw new Error("Unauthorized");
         }
@@ -76,8 +77,12 @@ export async function adminUpdateUser(userId: string, data: { name?: string; ema
         const updateData: any = {};
         if (data.name && data.name.trim().length > 0) updateData.name = data.name.trim();
         if (data.email && data.email.trim().length > 0) updateData.email = data.email.trim().toLowerCase();
-        
+
         if (data.password && data.password.trim().length > 0) {
+            const passwordError = validatePassword(data.password.trim());
+            if (passwordError) {
+                return { success: false, error: passwordError };
+            }
             updateData.password = await bcrypt.hash(data.password.trim(), 10);
             updateData.mustChangePassword = true;
         }
@@ -110,8 +115,9 @@ export async function adminCreateUser(data: { name: string; email: string; passw
         if (!name || !email || !password) {
             return { success: false, error: "Nombre, email y contraseña son obligatorios" };
         }
-        if (password.length < 6) {
-            return { success: false, error: "La contraseña debe tener al menos 6 caracteres" };
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            return { success: false, error: passwordError };
         }
 
         const existing = await prisma.user.findUnique({ where: { email } });

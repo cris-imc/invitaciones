@@ -62,17 +62,19 @@ export async function updateUserProfile(name: string) {
 }
 
 import bcrypt from "bcryptjs";
+import { validatePassword } from "@/lib/password";
 
 export async function forceChangePassword(password: string) {
     try {
         const session = await auth();
-        
+
         if (!session?.user?.id) {
             throw new Error("Unauthorized");
         }
 
-        if (!password || password.trim().length < 6) {
-            throw new Error("La contraseña debe tener al menos 6 caracteres.");
+        const passwordError = validatePassword((password || "").trim());
+        if (passwordError) {
+            throw new Error(passwordError);
         }
 
         const hashedPassword = await bcrypt.hash(password.trim(), 10);

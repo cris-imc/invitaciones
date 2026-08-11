@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
+import { validatePassword } from "@/lib/password";
 
 export async function POST(request: NextRequest) {
   if (!REGISTRATION_ENABLED) {
@@ -24,11 +25,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "La contraseña debe tener al menos 6 caracteres" },
-        { status: 400 }
-      );
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
     const areaCodeError = validatePhoneAreaCode(phoneAreaCode || "");

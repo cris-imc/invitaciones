@@ -8,6 +8,7 @@ import { forceChangePassword } from "@/app/actions/user";
 import { useToast } from "@/components/ui/Toast";
 import { Lock, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 
 export default function ForzarCambioClavePage() {
   const router = useRouter();
@@ -23,8 +24,9 @@ export default function ForzarCambioClavePage() {
       showToast("Las contraseñas no coinciden", "error");
       return;
     }
-    if (password.length < 6) {
-      showToast("La contraseña debe tener al menos 6 caracteres", "error");
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      showToast(passwordError, "error");
       return;
     }
 
@@ -59,12 +61,14 @@ export default function ForzarCambioClavePage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-zinc-300">Nueva Contraseña</label>
-              <PasswordInput 
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={PASSWORD_MIN_LENGTH}
                 className="bg-black border-white/10"
               />
+              <p className="text-xs text-zinc-500">Mínimo 8 caracteres, con al menos una mayúscula</p>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-zinc-300">Confirmar Nueva Contraseña</label>

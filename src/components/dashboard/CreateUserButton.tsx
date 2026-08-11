@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { UserPlus, Loader2, Mail, Lock, User } from "lucide-react";
 import { adminCreateUser } from "@/app/actions/admin";
 import { useToast } from "@/components/ui/Toast";
+import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 
 export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: () => void) => React.ReactNode } = {}) {
     const [open, setOpen] = useState(false);
@@ -30,8 +31,9 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
             showToast("Nombre, email y contraseña son obligatorios", "error");
             return;
         }
-        if (password.length < 6) {
-            showToast("La contraseña debe tener al menos 6 caracteres", "error");
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            showToast(passwordError, "error");
             return;
         }
 
@@ -113,7 +115,8 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
-                                placeholder="Mínimo 6 caracteres"
+                                placeholder="Mínimo 8 caracteres, con una mayúscula"
+                                minLength={PASSWORD_MIN_LENGTH}
                             />
                         </div>
 

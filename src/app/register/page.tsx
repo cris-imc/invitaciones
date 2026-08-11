@@ -12,6 +12,7 @@ import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft } from "lucide-rea
 import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
+import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
 
@@ -137,8 +138,9 @@ function RegisterForm() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      showToast("La contraseña debe tener al menos 6 caracteres", "error");
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      showToast(passwordError, "error");
       return;
     }
 
@@ -382,11 +384,11 @@ function RegisterForm() {
                   </Label>
                   <PasswordInput
                     id="password"
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder="Mínimo 8 caracteres, con una mayúscula"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
-                    minLength={6}
+                    minLength={PASSWORD_MIN_LENGTH}
                     className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                   />
                 </div>
@@ -402,7 +404,7 @@ function RegisterForm() {
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
-                    minLength={6}
+                    minLength={PASSWORD_MIN_LENGTH}
                     className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
                   />
                 </div>

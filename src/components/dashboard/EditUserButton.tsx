@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Settings, Loader2, Mail, Lock, User } from "lucide-react";
 import { adminUpdateUser } from "@/app/actions/admin";
 import { useToast } from "@/components/ui/Toast";
+import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 
 export function EditUserButton({ userId, initialName, initialEmail }: { userId: string, initialName: string, initialEmail: string }) {
     const [open, setOpen] = useState(false);
@@ -21,6 +22,14 @@ export function EditUserButton({ userId, initialName, initialEmail }: { userId: 
         if (!name.trim() || !email.trim()) {
             showToast("Nombre y email son obligatorios", "error");
             return;
+        }
+
+        if (password.trim().length > 0) {
+            const passwordError = validatePassword(password.trim());
+            if (passwordError) {
+                showToast(passwordError, "error");
+                return;
+            }
         }
 
         setIsLoading(true);
@@ -99,8 +108,9 @@ export function EditUserButton({ userId, initialName, initialEmail }: { userId: 
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
                                 placeholder="Dejar en blanco para no cambiar"
+                                minLength={PASSWORD_MIN_LENGTH}
                             />
-                            <p className="text-[10px] text-white/40">Si ingresás una contraseña, se sobreescribirá la actual.</p>
+                            <p className="text-[10px] text-white/40">Si ingresás una contraseña (mínimo 8 caracteres, con una mayúscula), se sobreescribirá la actual y se le pedirá cambiarla al iniciar sesión.</p>
                         </div>
                     </div>
 
