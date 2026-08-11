@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { CalendarCheck, Eye, Users, Music, TrendingUp, PartyPopper, Gem, Crown, Cake, Building2 } from "lucide-react";
+import { CalendarCheck, Eye, Users, Music, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -9,6 +9,7 @@ import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton"
 import { GreetingText } from "@/components/dashboard/GreetingText";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
 import { getEventStatus } from "@/lib/expiration";
+import { getStripClass, getEventEmoji, getEventLabel, getDaysUntil } from "@/lib/invitation-card-helpers";
 
 // ── Data fetching ────────────────────────────────────────────────
 async function getDashboardStats(userId: string) {
@@ -62,39 +63,6 @@ async function getDashboardStats(userId: string) {
       (i) => i.estado !== "ACTIVA" || getEventStatus(i.fechaEvento) === "EXPIRED" || getEventStatus(i.fechaEvento) === "POST_EVENT"
     ).length,
   };
-}
-
-// ── Helpers for card design ──────────────────────────────────────
-function getStripClass(tipo: string): string {
-  const t = (tipo || "").toUpperCase();
-  if (t === "CASAMIENTO") return "strip-casamiento";
-  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return "strip-quince";
-  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return "strip-cumple";
-  if (t === "CORPORATIVO" || t === "EJECUTIVO") return "strip-corporativo";
-  return "strip-default";
-}
-
-function getEventEmoji(tipo: string): React.ReactNode {
-  const t = (tipo || "").toUpperCase();
-  if (t === "CASAMIENTO") return <Gem className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
-  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return <Crown className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
-  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return <Cake className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
-  if (t === "CORPORATIVO" || t === "EJECUTIVO") return <Building2 className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
-  return <PartyPopper className="w-[18px] h-[18px] text-[rgba(255,255,255,0.7)]" />;
-}
-
-function getEventLabel(tipo: string): string {
-  const t = (tipo || "").toUpperCase();
-  if (t === "CASAMIENTO") return "Casamiento";
-  if (t === "QUINCE_ANOS" || t === "QUINCEANOS") return "15 Años";
-  if (t === "CUMPLEANOS" || t === "CUMPLEAÑOS") return "Cumpleaños";
-  if (t === "CORPORATIVO" || t === "EJECUTIVO") return "Corporativo";
-  return tipo || "Evento";
-}
-
-function getDaysUntil(fecha: Date): number {
-  const now = new Date();
-  return Math.ceil((fecha.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 // ── Page component ───────────────────────────────────────────────

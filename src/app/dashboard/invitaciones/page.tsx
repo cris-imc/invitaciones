@@ -1,16 +1,11 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-} from "@/components/ui/card";
-import { Plus, Calendar, Eye, Pencil } from "lucide-react";
+import { Eye, Pencil } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { InvitationCard } from "@/components/dashboard/InvitationCard";
 import { DeleteInvitationButton } from "@/components/dashboard/DeleteInvitationButton";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
 import { getEventStatus } from "@/lib/expiration";
+import { getStripClass, getEventEmoji, getEventLabel } from "@/lib/invitation-card-helpers";
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -19,12 +14,12 @@ async function getInvitations() {
     const session = await auth().catch(() => null);
     if (!session?.user || !session.user.id) redirect("/login");
     const userId = session.user.id;
-    
+
     const dbUser = await prisma.user.findUnique({
         where: { id: userId },
         select: { premiumCredits: true, diamondCredits: true, planTier: true }
     });
-    
+
     const invitationsData = await prisma.invitation.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
@@ -58,6 +53,9 @@ async function getInvitations() {
 
 export default async function InvitacionesPage() {
     const { invitations, dbUser } = await getInvitations();
+    const hasUnlimitedPremium =
+        dbUser?.planTier === 'PREMIUM' || dbUser?.planTier === 'DIAMOND' || dbUser?.planTier === 'ADMIN' || dbUser?.planTier === 'ENTERPRISE';
+
     return (
         <>
             <div className="p-topbar">
@@ -65,12 +63,9 @@ export default async function InvitacionesPage() {
                     <h2>Invitaciones Inactivas</h2>
                     <p>
                         Invitaciones en borrador, finalizadas, o que ya vencieron (3 meses después del evento).
-                        {dbUser && (
+                        {dbUser && hasUnlimitedPremium && (
                             <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
-                                {dbUser.planTier === 'PREMIUM' || dbUser.planTier === 'DIAMOND' || dbUser.planTier === 'ADMIN' || dbUser.planTier === 'ENTERPRISE' ?
-                                    `Invitaciones Premium: ilimitadas por tu plan.` :
-                                    `Invitaciones Premium disponibles: ${dbUser.premiumCredits || 0}.`
-                                }
+                                Invitaciones Premium: ilimitadas por tu plan.
                             </span>
                         )}
                     </p>
@@ -78,85 +73,129 @@ export default async function InvitacionesPage() {
                 <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} diamondCredits={dbUser?.diamondCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} />
             </div>
 
-            <div className="flex flex-col">
+            {/* Créditos remanentes */}
+            {dbUser && ((dbUser.premiumCredits || 0) > 0 || (dbUser.diamondCredits || 0) > 0) && (
+                <div className="flex flex-wrap gap-2 mb-4" style={{ fontFamily: "var(--font-mono)" }}>
+                    {(dbUser.premiumCredits || 0) > 0 && (
+                        <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                            {dbUser.premiumCredits} crédito{dbUser.premiumCredits === 1 ? "" : "s"} Premium disponible{dbUser.premiumCredits === 1 ? "" : "s"}
+                        </span>
+                    )}
+                    {(dbUser.diamondCredits || 0) > 0 && (
+                        <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20">
+                            {dbUser.diamondCredits} crédito{dbUser.diamondCredits === 1 ? "" : "s"} Diamond disponible{dbUser.diamondCredits === 1 ? "" : "s"}
+                        </span>
+                    )}
+                </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {invitations.length > 0 ? (
                     invitations.map((inv) => {
-                        const mono = inv.nombreEvento.substring(0, 1).toUpperCase();
                         const planLimit = PLAN_LIMITS[inv.planTier as keyof typeof PLAN_LIMITS]?.maxGuests;
                         const maxGuests = inv.maxGuestsOverride !== null ? inv.maxGuestsOverride : planLimit;
                         const maxGuestsStr = maxGuests === null ? "∞" : maxGuests.toString();
 
+                        // Dentro de esta página, estado === "ACTIVA" solo aparece
+                        // cuando el evento ya venció por fecha (ver filtro arriba) --
+                        // nunca debe mostrar "Activa" acá, sino "Finalizada".
+                        const statusLabel =
+                            inv.estado === "BORRADOR" ? "Borrador" : "Finalizada";
+
                         return (
-                            <div className="inv-row" key={inv.id}>
-                                <div className="seal" style={{ borderColor: 'var(--line)', width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span className="font-display text-accent font-bold">{mono}</span>
+                            <div className="m-inv-card" key={inv.id}>
+                                {/* ── Colored strip ── */}
+                                <div className={`m-card-strip ${getStripClass(inv.tipo)}`}>
+                                    <div className="m-card-strip-overlay" />
+                                    <span className="m-card-type">{getEventLabel(inv.tipo)}</span>
+                                    <span className="m-card-emoji">{getEventEmoji(inv.tipo)}</span>
                                 </div>
 
-                                <div className="inv-info">
-                                    <div className="inv-title-row">
-                                        <b>{inv.nombreEvento}</b>
-                                        <div className={`tag ${inv.estado === "ACTIVA" ? "on" : "draft"}`}>
-                                            {inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}
-                                        </div>
-                                        {inv.planTier === "FREE" ? (
-                                            <span className="plan-badge plan-badge--free">Gratis</span>
-                                        ) : inv.planTier === "DIAMOND" ? (
-                                            <span className="plan-badge plan-badge--diamond">◆ Diamond</span>
-                                        ) : inv.planTier === "ENTERPRISE" ? (
-                                            <span className="plan-badge plan-badge--diamond">◆ Enterprise</span>
-                                        ) : (
-                                            <span className="plan-badge plan-badge--premium">✦ Premium</span>
-                                        )}
-                                    </div>
-                                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs opacity-60 mt-1">
-                                        <span>
-                                            📅 {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
+                                {/* ── Card body ── */}
+                                <div className="m-card-body">
+                                    <p className="m-card-title">{inv.nombreEvento}</p>
+
+                                    <div className="m-card-meta">
+                                        <span className="m-meta-row">
+                                            📅{" "}
+                                            {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
                                                 day: "2-digit",
                                                 month: "long",
                                                 year: "numeric",
                                             })}
                                         </span>
                                         {inv.lugarNombre && (
-                                            <span>🏰 {inv.lugarNombre}</span>
+                                            <span className="m-meta-row">🏰 {inv.lugarNombre}</span>
                                         )}
                                         {inv.direccion && (
-                                            <span>📍 {inv.direccion}</span>
+                                            <span className="m-meta-row">📍 {inv.direccion}</span>
                                         )}
-                                    </span>
-                                    <div className="rsvp-mini flex items-center gap-2 mt-1">
-                                        <div className="dot" style={{ background: 'var(--accent)', width: 8, height: 8, borderRadius: '50%' }}></div>
-                                        {inv._count.guests} <span className="opacity-60 text-xs">/ {maxGuestsStr} confirmadas</span>
                                     </div>
-                                </div>
 
-                                <div className="inv-actions">
-                                  <Link
-                                      href={`/i/${inv.slug}`}
-                                      target="_blank"
-                                      className="btn-action go inline-flex items-center gap-1.5 justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/40 transition-colors"
-                                  >
-                                      <Eye className="w-3.5 h-3.5" />
-                                      <span>Ver</span>
-                                  </Link>
-                                  <Link
-                                      href={`/dashboard/invitaciones/editar/${inv.id}`}
-                                      className="btn-action inline-flex items-center gap-1.5 justify-center h-8 px-3 text-xs font-semibold rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40 transition-colors"
-                                  >
-                                      <Pencil className="w-3.5 h-3.5" />
-                                      <span>Editar</span>
-                                  </Link>
-                                  <Link href={`/dashboard/invitaciones/${inv.slug}/guests`} className="btn-action go btn-admin-glow inline-flex items-center justify-center h-8 px-3 text-xs font-semibold rounded-lg text-black transition-colors">
-                                      Administrar →
-                                  </Link>
-                                  <div className="btn-delete flex items-center justify-center">
-                                      <DeleteInvitationButton invitationId={inv.id} />
-                                  </div>
+                                    <div className="m-card-confirmed">
+                                        <div className="m-card-confirmed-dot" />
+                                        <span>
+                                            {inv._count.guests} / {maxGuestsStr} confirmadas
+                                        </span>
+                                    </div>
+
+                                    <div className="m-tags">
+                                        <span className="m-tag draft">
+                                            {statusLabel}
+                                        </span>
+                                        <span
+                                            className={`m-tag ${
+                                                inv.planTier === "FREE"
+                                                    ? "free"
+                                                    : inv.planTier === "DIAMOND" || inv.planTier === "ENTERPRISE"
+                                                    ? "diamond"
+                                                    : "premium"
+                                            }`}
+                                        >
+                                            {inv.planTier === "FREE"
+                                                ? "Gratis"
+                                                : inv.planTier === "DIAMOND"
+                                                ? "◆ Diamond"
+                                                : inv.planTier === "ENTERPRISE"
+                                                ? "◆ Enterprise"
+                                                : "✦ Premium"}
+                                        </span>
+                                    </div>
+
+                                    <div className="m-card-actions flex-col">
+                                        <div className="flex items-center gap-2 w-full">
+                                            <Link
+                                                href={`/i/${inv.slug}`}
+                                                target="_blank"
+                                                className="m-btn-ghost flex-1 h-9"
+                                            >
+                                                <Eye className="w-3.5 h-3.5" />
+                                                Ver
+                                            </Link>
+                                            <Link
+                                                href={`/dashboard/invitaciones/editar/${inv.id}`}
+                                                className="m-btn-ghost flex-1 h-9"
+                                            >
+                                                <Pencil className="w-3.5 h-3.5" />
+                                                Editar
+                                            </Link>
+                                        </div>
+                                        <Link
+                                            href={`/dashboard/invitaciones/${inv.slug}/guests`}
+                                            className="btn-action go btn-admin-glow inline-flex items-center justify-center h-[40px] px-4 text-xs font-semibold rounded-lg text-black transition-colors w-full mt-2"
+                                        >
+                                            Administrar →
+                                        </Link>
+                                        <div className="flex items-center justify-center w-full mt-2">
+                                            <DeleteInvitationButton invitationId={inv.id} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         );
                     })
                 ) : (
-                    <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
+                    <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed col-span-full">
                         <p className="text-muted-foreground font-ui">No tenés invitaciones inactivas. Las vas a encontrar acá cuando queden en borrador, finalicen, o venzan 3 meses después del evento.</p>
                     </div>
                 )}
