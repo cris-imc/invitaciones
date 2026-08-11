@@ -3,7 +3,7 @@
 ## Rama: DIAMOND
 
 ### Checkpoints
-- [ ] 1. Modelo de datos: membresías y créditos
+- [x] 1. Modelo de datos: membresías y créditos
 - [ ] 2. Actualizar lógica de membresías (Free / Premium / Diamond / Enterprise)
 - [ ] 3. Landing page: sección de precios actualizada
 - [ ] 4. Landing page: opción Contacto → WhatsApp
@@ -15,4 +15,4 @@
 - [ ] 10. Revisión y checklist final
 
 ### Notas de avance
-(vacío por ahora — cada checkpoint agrega aquí decisiones relevantes tomadas durante la implementación)
+- CP1: `planTier` en `User`/`Invitation`/`Payment` ya es `String` (no enum), así que DIAMOND y ENTERPRISE no requieren cambio de schema para el tipo de membresía — ya son valores válidos. Se agregó `diamondCredits Int @default(0)` a `User` (junto a `premiumCredits`). Migración additive: `20260811120000_add_diamond_membership_and_credits`.

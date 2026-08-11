@@ -21,6 +21,7 @@ model User {
   subscriptionStartDate DateTime?
   subscriptionEndDate   DateTime?
   premiumCredits        Int          @default(0)
+  diamondCredits        Int          @default(0)
   mercadoPagoCustomerId String?      @unique
   createdAt             DateTime     @default(now())
   updatedAt             DateTime     @updatedAt
