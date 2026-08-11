@@ -12,6 +12,22 @@ function getClient(): MercadoPagoConfig {
   return new MercadoPagoConfig({ accessToken: getAccessToken() });
 }
 
+// request.nextUrl.origin no es confiable detrás del proxy de Railway --
+// resuelve a "http://localhost:8080" (el bind interno del contenedor) en vez
+// del dominio público, lo que rompe silenciosamente el webhook (Mercado
+// Pago nunca puede pegarle a localhost) y el auto_return. Se prioriza:
+// 1) NEXT_PUBLIC_APP_URL, si está seteada explícitamente (dominio propio en
+//    producción, ej. altainvitacion.com).
+// 2) RAILWAY_PUBLIC_DOMAIN, provista automáticamente por Railway y siempre
+//    correcta para el ambiente actual (ej. invitaciones-diamond.up.railway.app).
+// 3) request.nextUrl.origin como último recurso (desarrollo local, fuera de
+//    Railway).
+export function getPublicBaseUrl(requestOrigin: string): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) return `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+  return requestOrigin;
+}
+
 export async function createCheckoutPreference(params: {
   paymentId: string;
   title: string;

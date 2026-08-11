@@ -5,7 +5,7 @@ import { REGISTRATION_ENABLED } from "@/lib/features";
 import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword } from "@/lib/password";
 import { PLAN_LIMITS, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
-import { createCheckoutPreference } from "@/lib/mercadopago";
+import { createCheckoutPreference, getPublicBaseUrl } from "@/lib/mercadopago";
 
 export async function POST(request: NextRequest) {
   if (!REGISTRATION_ENABLED) {
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+      const baseUrl = getPublicBaseUrl(request.nextUrl.origin);
 
       const { preferenceId, checkoutUrl } = await createCheckoutPreference({
         paymentId: payment.id,
