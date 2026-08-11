@@ -31,10 +31,10 @@ export function useMusicPlayer({ musicaUrl, autoplay = true }: UseMusicPlayerOpt
             };
         }
 
-        // Intento inmediato. La mayoría de los navegadores bloquean el
-        // autoplay con sonido si todavía no hubo ninguna interacción del
-        // usuario en la página, así que esto suele fallar en silencio.
-        audio.play().catch(() => setIsPlaying(false));
+        // Eliminamos el intento inmediato de audio.play() para que NUNCA 
+        // arranque la música sola en la portada, incluso si el navegador 
+        // lo permite (ej. admin viendo su propia invitación).
+        // Siempre esperará al primer gesto del usuario (ej. click en "Abrir invitación").
 
         // Reintenta en la primera interacción real del usuario en cualquier
         // parte de la página -por ejemplo, al tocar "Abrir invitación"-, que
