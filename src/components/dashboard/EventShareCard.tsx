@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Check, Eye, Pencil } from "lucide-react";
@@ -62,12 +62,12 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
         {/* Burbuja Principal */}
         <div className="relative w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-1.5 sm:pl-5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200/50 dark:border-slate-800/50 rounded-3xl sm:rounded-full shadow-sm gap-3 sm:gap-6 transition-all duration-300 hover:shadow-md overflow-hidden">
 
-          <div className="flex items-center gap-2.5 min-w-0 pt-2 sm:pt-0">
-            <span className="relative flex h-2.5 w-2.5 shrink-0">
+          <div className="flex items-start sm:items-center gap-2.5 pt-2 sm:pt-0">
+            <span className="relative flex h-2.5 w-2.5 shrink-0 mt-1 sm:mt-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
             </span>
-            <div className="min-w-0 flex-1 truncate">
+            <div className="flex-1 text-balance">
               <TypewriterText />
             </div>
           </div>
