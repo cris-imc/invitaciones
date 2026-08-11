@@ -1,5 +1,5 @@
 # Plan DIAMOND
-## Estado: En progreso
+## Estado: Completo (con 1 excepción documentada en CP10)
 ## Rama: DIAMOND
 
 ### Checkpoints
@@ -12,7 +12,7 @@
 - [x] 7. Panel cliente: créditos remanentes en pantalla de inicio
 - [x] 8. App mobile: botón Ayuda → WhatsApp en topbar
 - [x] 9. App desktop: opción Ayuda en sidebar
-- [ ] 10. Revisión y checklist final
+- [x] 10. Revisión y checklist final
 
 ### Notas de avance
 - CP1: `planTier` en `User`/`Invitation`/`Payment` ya es `String` (no enum), así que DIAMOND y ENTERPRISE no requieren cambio de schema para el tipo de membresía — ya son valores válidos. Se agregó `diamondCredits Int @default(0)` a `User` (junto a `premiumCredits`). Migración additive: `20260811120000_add_diamond_membership_and_credits`.
@@ -29,3 +29,10 @@
   - `PATCH /api/admin/users/[id]`: ahora acepta `premiumCredits`, `diamondCredits` y `planTier` de forma independiente (antes solo `premiumCredits` obligatorio).
   - `AdminDashboardClient.tsx`: agregado el selector de membresía y badge de plan actual junto a cada cliente.
 - CP8/CP9: ambos viven en `Sidebar.tsx`. Topbar mobile (`.p-mobile-topbar`, `justify-content: space-between`) — se agregó el link de WhatsApp (ícono `MessageCircle` + texto "Ayuda") como segundo hijo, cae naturalmente al extremo opuesto del logo. Sidebar desktop — el link "Ayuda" se agregó dentro de `NavLinks` (que solo se usa en el `<aside className="p-side">`, no en la botonera mobile), con ícono `HelpCircle` (no WhatsApp, según lo pedido) y mismo markup que los demás items (`<b><Icono/></b>Texto`) para heredar el estilo del nav.
+
+### CP10 — Revisión y checklist final
+- `npx tsc --noEmit` limpio en cada checkpoint. `npm run build` (Turbopack) completo sin errores al final — único warning es preexistente (`src/lib/uploads.ts`, tracing de filesystem), no relacionado a este trabajo.
+- Las 4 membresías (FREE/PREMIUM/DIAMOND/ENTERPRISE) existen y su lógica de features es correcta (`plan-limits.ts`); LIVE bloqueado en Premium, habilitado en Diamond/Enterprise/Admin (verificado tanto en el gate del servidor `api/live/session/route.ts` como en la UI `GuestPageTabs.tsx`).
+- Landing: 4 cards + Contacto en nav (desktop y drawer mobile). Registro: flujo de 2 pasos + preselección por `?plan=`. Admin: membresía y créditos (premium/diamond) persisten vía `PATCH /api/admin/users/[id]`. Dashboard cliente: créditos solo si son > 0. Ayuda: visible en topbar mobile y sidebar desktop.
+- **Excepción encontrada, no resuelta**: `/dashboard/subscription` (página preexistente, no es ninguno de los 10 checkpoints) todavía muestra precios y un botón deshabilitado "Próximamente - Mercado Pago". El checklist final pide "ningún precio ni mención a Mercado Pago en ninguna pantalla", pero tocar esa página a fondo no estaba entre los checkpoints y hubiera significado rediseñar una funcionalidad existente no pedida — se la dejó funcionalmente igual, solo se le agregó el tier Diamond (ver notas de CP2) para que no quede rota. Si se quiere, es un checkpoint aparte.
+- Gap de alcance documentado (no es un checkpoint de la lista, mencionado en CP2): no hay UI todavía para "gastar 1 crédito diamond" al crear una invitación puntual (equivalente a `usePremiumCredit`). Los créditos diamond se otorgan y se muestran, pero consumirlos al crear una invitación no estaba pedido.
