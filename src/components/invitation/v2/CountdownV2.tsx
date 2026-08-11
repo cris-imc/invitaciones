@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Heart } from "lucide-react";
 
 interface CountdownV2Props {
   targetDate: Date;
@@ -82,12 +83,12 @@ export function CountdownV2({
       <section className={sectionClass} id="countdown">
         <p className="t-kicker">{kicker}</p>
         <div className="cd-past p-8 rounded-2xl bg-[color-mix(in_srgb,var(--t-acc)_15%,transparent)] border border-[var(--t-acc)] text-center shadow-lg">
-          <span className="cd-past-emoji text-5xl mb-3 block">🎉</span>
+          <Heart className="w-12 h-12 mx-auto mb-3 text-[var(--t-acc)] opacity-90" strokeWidth={1.5} />
           <h3 className="text-2xl sm:text-3xl font-bold font-serif mb-2 text-[var(--t-acc)]">
             ¡Llegó el día!
           </h3>
           <p className="cd-past-text text-base sm:text-lg font-medium opacity-90 leading-relaxed">
-            ¡Hoy es el gran día! Prepárate para festejar, reír y disfrutar cada instante inolvidable. ✨🥳
+            ¡Hoy es el gran día! Prepárate para festejar, reír y disfrutar cada instante inolvidable.
           </p>
         </div>
       </section>
@@ -98,8 +99,8 @@ export function CountdownV2({
     return (
       <section className={sectionClass} id="countdown">
         <p className="t-kicker">{kicker}</p>
-        <div className="cd-past">
-          <span className="cd-past-emoji">🎉</span>
+        <div className="cd-past text-center">
+          <Heart className="w-10 h-10 mx-auto mb-2 text-[var(--t-acc)] opacity-90" strokeWidth={1.5} />
           <p className="cd-past-text">¡Ya fue una noche increíble!</p>
         </div>
       </section>
