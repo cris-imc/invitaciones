@@ -78,12 +78,12 @@ export async function GET(req: Request) {
 
         archive.finalize();
 
-        const filename = \`fotos-live-\${invitation.nombreEvento || "evento"}.zip\`.replace(/[^a-zA-Z0-9.\-]/g, "_");
+        const filename = `fotos-live-${invitation.nombreEvento || "evento"}.zip`.replace(/[^a-zA-Z0-9.\-]/g, "_");
 
         return new NextResponse(stream as any, {
             headers: {
                 "Content-Type": "application/zip",
-                "Content-Disposition": \`attachment; filename="\${filename}"\`
+                "Content-Disposition": `attachment; filename="${filename}"`
             }
         });
     } catch (error) {
