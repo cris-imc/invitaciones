@@ -12,10 +12,14 @@ interface LandingNavProps {
   isLoggedIn: boolean;
 }
 
+const WHATSAPP_CONTACT_URL =
+  "https://wa.me/5493517660000?text=Hola%2C%20me%20comunico%20desde%20Alta%20Invitaci%C3%B3n";
+
 const BASE_LINKS = [
   { href: "#plantillas", label: "Plantillas" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#precios", label: "Precios" },
+  { href: WHATSAPP_CONTACT_URL, label: "Contacto", external: true },
 ];
 
 export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
@@ -53,7 +57,13 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
 
         <div className="l-drawer-links">
           {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              target={"external" in l && l.external ? "_blank" : undefined}
+              rel={"external" in l && l.external ? "noopener noreferrer" : undefined}
+            >
               {l.label}
             </Link>
           ))}
@@ -100,7 +110,12 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
 
       <div className="l-nav-links">
         {LINKS.map((l) => (
-          <Link key={l.href} href={l.href}>
+          <Link
+            key={l.href}
+            href={l.href}
+            target={"external" in l && l.external ? "_blank" : undefined}
+            rel={"external" in l && l.external ? "noopener noreferrer" : undefined}
+          >
             {l.label}
           </Link>
         ))}

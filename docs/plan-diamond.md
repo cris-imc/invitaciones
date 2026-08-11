@@ -5,8 +5,8 @@
 ### Checkpoints
 - [x] 1. Modelo de datos: membresías y créditos
 - [x] 2. Actualizar lógica de membresías (Free / Premium / Diamond / Enterprise)
-- [ ] 3. Landing page: sección de precios actualizada
-- [ ] 4. Landing page: opción Contacto → WhatsApp
+- [x] 3. Landing page: sección de precios actualizada
+- [x] 4. Landing page: opción Contacto → WhatsApp
 - [ ] 5. Registro: rediseño de cards de membresía con UX mejorado
 - [ ] 6. Panel admin: gestión de membresías y créditos por cliente
 - [ ] 7. Panel cliente: créditos remanentes en pantalla de inicio
@@ -21,3 +21,4 @@
   - Bug encontrado y corregido de paso: `QuickEditPrice.tsx` (precio niño) y `GuestManager.tsx` (tipo de invitado Familia/Grupo) bloqueaban la feature con `planTier !== 'PREMIUM'` en vez de `=== 'FREE'` — con Diamond en juego eso hubiera bloqueado esas features justo a los usuarios Diamond. Corregido a `=== 'FREE'`.
   - Nota pendiente (fuera de los 10 checkpoints, no implementado): no existe todavía un flujo de UI para "gastar 1 crédito diamond" al crear una invitación (equivalente a `usePremiumCredit`). Los créditos diamond se otorgan (registro/admin) y se muestran (CP7), pero consumirlos al crear una invitación puntual no está pedido en el plan — si se necesita, es checkpoint nuevo.
   - Se actualizaron también los selectores de plan en `CreateUserButton.tsx` y `AdminPlanSelect.tsx` (agregado DIAMOND) para que sigan siendo consistentes, aunque el rediseño completo de gestión de membresías es CP6.
+- CP3/CP4: `Pricing.tsx` reescrito con 4 cards (Gratis/Premium/Diamond/Enterprise) usando `PLAN_LIMITS` como fuente de verdad; precio Diamond calculado como 20% off del precio real (`PLAN_LIMITS.DIAMOND.price`). Enterprise sin precio fijo, CTA "Consultar" a WhatsApp, sin link a /register. `LandingNav.tsx`: agregado "Contacto" → WhatsApp (`target=_blank`) al array `BASE_LINKS`, se refleja automáticamente en desktop nav y drawer mobile porque ambos renderizan del mismo array.
