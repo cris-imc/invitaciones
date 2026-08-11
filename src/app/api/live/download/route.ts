@@ -56,7 +56,7 @@ export async function GET(req: Request) {
             zlib: { level: 5 } // Sets the compression level.
         });
 
-        archive.on("error", (err) => {
+        archive.on("error", (err: any) => {
             console.error("Archiver error:", err);
             stream.destroy(err);
         });
