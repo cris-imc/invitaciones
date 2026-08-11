@@ -12,7 +12,67 @@ import { Sparkles, Mail, Lock, User, Check, ChevronLeft } from "lucide-react";
 import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 
-type PlanType = "FREE" | "PREMIUM";
+type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
+
+const DIAMOND_DISCOUNT_PRICE = Math.round(PLAN_LIMITS.DIAMOND.price * 0.8);
+
+const PLAN_CARDS: {
+  key: PlanType;
+  name: string;
+  features: string[];
+  negativeFeatures?: string[];
+  recommended?: boolean;
+}[] = [
+  {
+    key: "FREE",
+    name: PLAN_LIMITS.FREE.name,
+    features: [
+      `Hasta ${PLAN_LIMITS.FREE.maxGuests} invitados`,
+      "Plantilla 100% personalizada",
+      "Gestión de invitados y pagos",
+      "Cuenta regresiva",
+      `Hasta ${PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum`,
+    ],
+    negativeFeatures: ["Sin musica de fondo", "Sin LIVE (fotos en vivo)", "Sin Trivia", "Sin sugerencias DJ"],
+  },
+  {
+    key: "PREMIUM",
+    name: "Premium",
+    features: [
+      "Invitados ilimitados",
+      "Plantilla 100% personalizada",
+      "Gestión de invitados y pagos",
+      "Cuenta regresiva",
+      `Hasta ${PLAN_LIMITS.PREMIUM.maxPhotos} fotos en el álbum`,
+      "Con musica de fondo",
+      "Con Trivia",
+      "Con sugerencias DJ",
+    ],
+    negativeFeatures: ["Sin función Live"],
+  },
+  {
+    key: "DIAMOND",
+    name: "Diamond",
+    features: [
+      "Invitados ilimitados",
+      "Plantilla 100% personalizada",
+      "Gestión de invitados y pagos",
+      "Cuenta regresiva",
+      `Hasta ${PLAN_LIMITS.DIAMOND.maxPhotos} fotos en el álbum`,
+      "Con musica de fondo",
+      `Con LIVE (hasta ${PLAN_LIMITS.DIAMOND.maxLivePhotos} fotos)`,
+      "Con Trivia",
+      "Con sugerencias DJ",
+    ],
+    recommended: true,
+  },
+];
+
+function planPriceLabel(plan: PlanType): string {
+  if (plan === "FREE") return formatPrice(PLAN_LIMITS.FREE.price);
+  if (plan === "DIAMOND") return formatPrice(DIAMOND_DISCOUNT_PRICE);
+  return formatPrice(PLAN_LIMITS[plan].price);
+}
 
 export default function RegisterPage() {
   if (!REGISTRATION_ENABLED) {
@@ -49,13 +109,16 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>("FREE");
+  const [step, setStep] = useState<1 | 2>(1);
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>("DIAMOND");
 
   useEffect(() => {
-    if (searchParams?.get("plan") === "premium") {
-      setSelectedPlan("PREMIUM");
-    }
+    const plan = searchParams?.get("plan");
+    if (plan === "premium") setSelectedPlan("PREMIUM");
+    else if (plan === "diamond") setSelectedPlan("DIAMOND");
+    else if (plan === "free") setSelectedPlan("FREE");
   }, [searchParams]);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -112,275 +175,207 @@ function RegisterForm() {
         <ChevronLeft className="w-4 h-4" />
         Volver al inicio
       </Link>
-      <div className="max-w-6xl mx-auto w-full relative z-10 text-[var(--on-ink)]">
-        {/* Header */}
-        <div className="text-center mb-12">
 
-          <h1 className="text-4xl font-display mb-2">
-            Crea tu cuenta
-          </h1>
+      <div className="max-w-5xl mx-auto w-full relative z-10 text-[var(--on-ink)] font-body">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-display mb-2">Crea tu cuenta</h1>
           <p className="opacity-70 text-lg font-body">
-            Comienza a crear invitaciones digitales increíbles
+            {step === 1
+              ? "Elegí el plan que mejor se adapta a tu evento"
+              : "Ya casi terminamos, completá tus datos"}
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 font-body max-w-6xl mx-auto w-full items-stretch">
-          {/* Plan Selection */}
+        {step === 1 ? (
           <div className="w-full flex flex-col">
-            <h2 className="text-2xl font-display mb-6">
-              Elige tu plan
-            </h2>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 flex-1">
+            <div className="grid sm:grid-cols-3 gap-4 sm:gap-5">
+              {PLAN_CARDS.map((plan) => {
+                const isSelected = selectedPlan === plan.key;
+                return (
+                  <button
+                    key={plan.key}
+                    type="button"
+                    onClick={() => setSelectedPlan(plan.key)}
+                    className={`relative w-full text-left p-5 sm:p-6 rounded-2xl border transition-all duration-300 flex flex-col ${
+                      isSelected
+                        ? "border-[var(--accent)] ring-2 ring-[var(--accent)] bg-[var(--ink-2)] shadow-[0_15px_40px_rgba(199,154,75,0.25)] sm:scale-[1.03] -translate-y-1 z-20"
+                        : "border-[var(--ink-2)] hover:border-[var(--accent)]/50 bg-[var(--ink)]/50 backdrop-blur-md opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    {plan.recommended && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-[var(--ink)] px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-bold font-mono tracking-wide uppercase flex items-center gap-1 whitespace-nowrap">
+                        <Sparkles className="w-3 h-3" />
+                        Recomendado
+                      </div>
+                    )}
 
-            {/* Free Plan */}
-            <button
-              type="button"
-              onClick={() => setSelectedPlan("FREE")}
-              className={`w-full h-full flex flex-col text-left p-3 sm:p-4 rounded-2xl border transition-all duration-300 ${
-                selectedPlan === "FREE"
-                  ? "border-[var(--paper)] ring-2 ring-[var(--paper)] bg-[var(--ink-2)] shadow-[0_15px_40px_rgba(246,243,236,0.2)] scale-[1.04] -translate-y-1.5 z-20"
-                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md opacity-70 hover:opacity-100"
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2 w-full">
-                <div>
-                  <h3 className="text-base sm:text-lg font-display leading-tight">
-                    {PLAN_LIMITS.FREE.name}
-                  </h3>
-                  <p className="text-lg sm:text-xl font-display text-[var(--paper)] mt-1">
-                    {formatPrice(PLAN_LIMITS.FREE.price)}
-                  </p>
-                </div>
-                {selectedPlan === "FREE" && (
-                  <div className="w-6 h-6 bg-[var(--paper)] rounded-full flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-[var(--ink)]" />
-                  </div>
-                )}
-              </div>
-              <ul className="space-y-1.5 opacity-80 text-[11px] sm:text-xs flex-1">
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Hasta {PLAN_LIMITS.FREE.maxGuests} invitados</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Plantilla 100% personalizada</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Gestión de invitados y pagos</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Cuenta regresiva</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Hasta {PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum</span>
-                </li>
-                <li className="flex items-center gap-1.5 opacity-50">
-                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
-                  <span>Sin musica de fondo</span>
-                </li>
-                <li className="flex items-center gap-1.5 opacity-50">
-                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
-                  <span>Sin LIVE (fotos en vivo)</span>
-                </li>
-                <li className="flex items-center gap-1.5 opacity-50">
-                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
-                  <span>Sin Trivia</span>
-                </li>
-                <li className="flex items-center gap-1.5 opacity-50">
-                  <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
-                  <span>Sin sugerencias DJ</span>
-                </li>
-              </ul>
-            </button>
+                    <div className="flex items-start justify-between mb-4 gap-2">
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-display leading-tight">{plan.name}</h3>
+                        <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+                          {plan.key === "DIAMOND" && (
+                            <span className="text-sm font-normal text-[var(--on-ink)]/40 line-through">
+                              {formatPrice(PLAN_LIMITS.DIAMOND.price)}
+                            </span>
+                          )}
+                          <span className="text-xl sm:text-2xl font-display text-[var(--accent)]">
+                            {planPriceLabel(plan.key)}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-2 ${
+                          isSelected ? "bg-[var(--accent)] border-[var(--accent)]" : "border-[var(--on-ink)]/20"
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3.5 h-3.5 text-[var(--ink)]" />}
+                      </div>
+                    </div>
 
-            {/* Premium Plan */}
-            <button
+                    <ul className="space-y-2 opacity-90 text-xs sm:text-sm flex-1">
+                      {plan.features.map((f) => (
+                        <li key={f} className="flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                      {plan.negativeFeatures?.map((f) => (
+                        <li key={f} className="flex items-center gap-1.5 opacity-50">
+                          <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </button>
+                );
+              })}
+            </div>
+
+            <Button
               type="button"
-              onClick={() => setSelectedPlan("PREMIUM")}
-              className={`w-full h-full flex flex-col text-left p-3 sm:p-4 rounded-2xl border transition-all duration-300 relative ${
-                selectedPlan === "PREMIUM"
-                  ? "border-[var(--paper)] ring-2 ring-[var(--paper)] bg-[var(--ink-2)] shadow-[0_15px_40px_rgba(246,243,236,0.2)] scale-[1.04] -translate-y-1.5 z-20"
-                  : "border-[var(--ink-2)] hover:border-[var(--paper)]/50 bg-[var(--ink)]/50 backdrop-blur-md opacity-70 hover:opacity-100"
-              }`}
+              onClick={() => setStep(2)}
+              className="w-full sm:w-auto sm:self-center l-cta h-14 text-lg px-12 bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 border-none mt-10"
             >
-              <div className="absolute -top-2.5 right-3 bg-[var(--paper)] text-[var(--ink)] px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold font-mono tracking-wide uppercase">
-                Más Popular
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2 w-full">
-                <div>
-                  <h3 className="text-base sm:text-lg font-display leading-tight">
-                    Premium
-                  </h3>
-                  <p className="text-lg sm:text-xl font-display text-[var(--paper)] mt-1">
-                    {formatPrice(PLAN_LIMITS.PREMIUM.price)}
-                  </p>
-                </div>
-                {selectedPlan === "PREMIUM" && (
-                  <div className="w-6 h-6 bg-[var(--paper)] rounded-full flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-[var(--ink)]" />
-                  </div>
-                )}
-              </div>
-              
-              <ul className="space-y-1.5 opacity-80 text-[11px] sm:text-xs flex-1">
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Invitados ilimitados</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Plantilla 100% personalizada</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Gestión de invitados y pagos</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Cuenta regresiva</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Hasta {PLAN_LIMITS.PREMIUM.maxPhotos} fotos en el álbum</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Con musica de fondo</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Con LIVE (hasta {PLAN_LIMITS.PREMIUM.maxLivePhotos} fotos)</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Con Trivia</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                  <span>Con sugerencias DJ</span>
-                </li>
-              </ul>
-              <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-md text-[10px] sm:text-[11px] text-yellow-500 leading-tight w-full mt-auto">
-                ⚠️ El pago se habilitará próximamente con Mercado Pago
-              </div>
-            </button>
+              Continuar
+            </Button>
+
+            <div className="text-center pt-6">
+              <p className="opacity-70">
+                ¿Ya tienes cuenta?{" "}
+                <Link href="/login" className="text-[var(--accent)] hover:underline font-semibold opacity-100">
+                  Inicia sesión
+                </Link>
+              </p>
             </div>
           </div>
-
-          {/* Registration Form */}
-          <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-6 sm:p-8 shadow-2xl w-full">
-            <h2 className="text-2xl font-display mb-6">
-              Datos de tu cuenta
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <Label htmlFor="name" className="flex items-center gap-2 mb-2 opacity-80">
-                  <User className="w-4 h-4" />
-                  Nombre completo
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Juan Pérez"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="email" className="flex items-center gap-2 mb-2 opacity-80">
-                  <Mail className="w-4 h-4" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="tu@email.com"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="password" className="flex items-center gap-2 mb-2 opacity-80">
-                  <Lock className="w-4 h-4" />
-                  Contraseña
-                </Label>
-                <PasswordInput
-                  id="password"
-                  placeholder="Mínimo 6 caracteres"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  required
-                  minLength={6}
-                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
-                />
-              </div>
-
-              <div>
-                <Label
-                  htmlFor="confirmPassword"
-                  className="flex items-center gap-2 mb-2 opacity-80"
-                >
-                  <Lock className="w-4 h-4" />
-                  Confirmar contraseña
-                </Label>
-                <PasswordInput
-                  id="confirmPassword"
-                  placeholder="Repite tu contraseña"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData({ ...formData, confirmPassword: e.target.value })
-                  }
-                  required
-                  minLength={6}
-                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full l-cta h-14 text-lg bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--paper)]/90 border-none mt-8"
-                disabled={isLoading}
+        ) : (
+          <div className="max-w-md mx-auto w-full">
+            <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-6 sm:p-8 shadow-2xl w-full">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="flex items-center gap-1.5 text-sm opacity-60 hover:opacity-100 transition-opacity mb-4"
               >
-                {isLoading ? (
-                  "Creando cuenta..."
-                ) : selectedPlan === "PREMIUM" ? (
-                  `Pagar ${formatPrice(PLAN_LIMITS.PREMIUM.price)} y Registrarme`
-                ) : (
-                  "Crear Cuenta Gratis"
-                )}
-              </Button>
+                <ChevronLeft className="w-4 h-4" />
+                Cambiar plan
+              </button>
 
-              <div className="text-center pt-4">
-                <p className="opacity-70">
-                  ¿Ya tienes cuenta?{" "}
-                  <Link
-                    href="/login"
-                    className="text-[var(--paper)] hover:underline font-semibold opacity-100"
-                  >
-                    Inicia sesión
-                  </Link>
-                </p>
+              <div className="flex items-center justify-between mb-6 p-4 rounded-xl bg-[var(--ink-2)] border border-[var(--accent)]/30">
+                <div>
+                  <p className="text-xs uppercase tracking-wide opacity-60">Plan elegido</p>
+                  <p className="text-lg font-display">{PLAN_CARDS.find((p) => p.key === selectedPlan)?.name}</p>
+                </div>
+                <p className="text-xl font-display text-[var(--accent)]">{planPriceLabel(selectedPlan)}</p>
               </div>
-            </form>
+
+              <h2 className="text-2xl font-display mb-6">Datos de tu cuenta</h2>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <Label htmlFor="name" className="flex items-center gap-2 mb-2 opacity-80">
+                    <User className="w-4 h-4" />
+                    Nombre completo
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Juan Pérez"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="email" className="flex items-center gap-2 mb-2 opacity-80">
+                    <Mail className="w-4 h-4" />
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="password" className="flex items-center gap-2 mb-2 opacity-80">
+                    <Lock className="w-4 h-4" />
+                    Contraseña
+                  </Label>
+                  <PasswordInput
+                    id="password"
+                    placeholder="Mínimo 6 caracteres"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    minLength={6}
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="confirmPassword" className="flex items-center gap-2 mb-2 opacity-80">
+                    <Lock className="w-4 h-4" />
+                    Confirmar contraseña
+                  </Label>
+                  <PasswordInput
+                    id="confirmPassword"
+                    placeholder="Repite tu contraseña"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    required
+                    minLength={6}
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full l-cta h-14 text-lg bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 border-none mt-8"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+                </Button>
+
+                <div className="text-center pt-4">
+                  <p className="opacity-70">
+                    ¿Ya tienes cuenta?{" "}
+                    <Link href="/login" className="text-[var(--accent)] hover:underline font-semibold opacity-100">
+                      Inicia sesión
+                    </Link>
+                  </p>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

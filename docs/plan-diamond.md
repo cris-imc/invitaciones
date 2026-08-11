@@ -7,7 +7,7 @@
 - [x] 2. Actualizar lógica de membresías (Free / Premium / Diamond / Enterprise)
 - [x] 3. Landing page: sección de precios actualizada
 - [x] 4. Landing page: opción Contacto → WhatsApp
-- [ ] 5. Registro: rediseño de cards de membresía con UX mejorado
+- [x] 5. Registro: rediseño de cards de membresía con UX mejorado
 - [ ] 6. Panel admin: gestión de membresías y créditos por cliente
 - [ ] 7. Panel cliente: créditos remanentes en pantalla de inicio
 - [ ] 8. App mobile: botón Ayuda → WhatsApp en topbar
@@ -22,3 +22,4 @@
   - Nota pendiente (fuera de los 10 checkpoints, no implementado): no existe todavía un flujo de UI para "gastar 1 crédito diamond" al crear una invitación (equivalente a `usePremiumCredit`). Los créditos diamond se otorgan (registro/admin) y se muestran (CP7), pero consumirlos al crear una invitación puntual no está pedido en el plan — si se necesita, es checkpoint nuevo.
   - Se actualizaron también los selectores de plan en `CreateUserButton.tsx` y `AdminPlanSelect.tsx` (agregado DIAMOND) para que sigan siendo consistentes, aunque el rediseño completo de gestión de membresías es CP6.
 - CP3/CP4: `Pricing.tsx` reescrito con 4 cards (Gratis/Premium/Diamond/Enterprise) usando `PLAN_LIMITS` como fuente de verdad; precio Diamond calculado como 20% off del precio real (`PLAN_LIMITS.DIAMOND.price`). Enterprise sin precio fijo, CTA "Consultar" a WhatsApp, sin link a /register. `LandingNav.tsx`: agregado "Contacto" → WhatsApp (`target=_blank`) al array `BASE_LINKS`, se refleja automáticamente en desktop nav y drawer mobile porque ambos renderizan del mismo array.
+- CP5: `register/page.tsx` reescrito como flujo de 2 pasos (antes era grid 2 columnas fijo: cards + form juntos). Paso 1: 3 cards (Free/Premium/Diamond) con selección por click, borde+ring dorado (`--accent`) en la seleccionada, Diamond con badge "Recomendado" y preseleccionada por default salvo que `?plan=free|premium|diamond` diga lo contrario. Paso 2: resumen del plan elegido arriba del form, botón "Crear cuenta" (se sacó la mención a pago/Mercado Pago que tenía antes: "Pagar $X y Registrarme"). El campo `planTier` que se manda a `/api/auth/register` ahora acepta "DIAMOND" (ya soportado desde CP2).
