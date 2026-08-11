@@ -206,7 +206,7 @@ export function StepEventType() {
                                                             } 
                                                             {...field} 
                                                             value={field.value || ""}
-                                                            onChange={(e) => field.onChange(formatName(e.target.value))}
+                                                            // Removed custom onChange to use the global input formatter
                                                         />
                                                     )}
                                                 </div>
@@ -231,7 +231,7 @@ export function StepEventType() {
                                             <FormItem>
                                                 <FormLabel>Nombre Novia</FormLabel>
                                                 <FormControl>
-                                                     <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} value={field.value || ""} onChange={(e) => field.onChange(formatName(e.target.value))} />
+                                                     <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} value={field.value || ""} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -244,7 +244,7 @@ export function StepEventType() {
                                             <FormItem>
                                                 <FormLabel>Nombre Novio</FormLabel>
                                                 <FormControl>
-                                                     <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} value={field.value || ""} onChange={(e) => field.onChange(formatName(e.target.value))} />
+                                                     <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre" {...field} value={field.value || ""} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -261,7 +261,7 @@ export function StepEventType() {
                                         <FormItem>
                                             <FormLabel>Nombre o Apodo de la Quinceañera</FormLabel>
                                             <FormControl>
-                                                 <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Ej: Sofi, Valentina, Mafe..." {...field} value={field.value || ""} onChange={(e) => field.onChange(formatName(e.target.value))} />
+                                                 <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Ej: Sofi, Valentina, Mafe..." {...field} value={field.value || ""} />
                                             </FormControl>
                                             <p className="text-xs text-muted-foreground">
                                                 Ingresá el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.
@@ -280,7 +280,7 @@ export function StepEventType() {
                                         <FormItem>
                                             <FormLabel>Nombre del Festejado/a (Opcional)</FormLabel>
                                             <FormControl>
-                                                 <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre de la persona o empresa" {...field} value={field.value || ""} onChange={(e) => field.onChange(formatName(e.target.value))} />
+                                                 <Input className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl" placeholder="Nombre de la persona o empresa" {...field} value={field.value || ""} />
                                             </FormControl>
                                             <p className="text-xs text-muted-foreground">Si lo dejas vacío, se usará el nombre del evento.</p>
                                         </FormItem>

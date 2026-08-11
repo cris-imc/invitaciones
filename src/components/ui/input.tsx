@@ -1,8 +1,49 @@
-import * as React from "react"
-
+﻿import * as React from "react"
 import { cn } from "@/lib/utils"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+export function formatInputText(val: string): string {
+  if (!val || typeof val !== 'string') return val;
+  
+  let isFirstLetterFound = false;
+
+  return val.split(/(\s+)/).map((word) => {
+    if (!word.trim()) return word;
+    
+    let firstChar = word.charAt(0);
+    const rest = word.slice(1).toLowerCase();
+    
+    if (!isFirstLetterFound) {
+      firstChar = firstChar.toUpperCase();
+      isFirstLetterFound = true;
+    }
+    
+    return firstChar + rest;
+  }).join('');
+}
+
+export function handleAutoFormatChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, type?: string) {
+  if (type !== "email" && type !== "password" && type !== "url" && type !== "number" && type !== "tel") {
+    const originalStart = e.target.selectionStart;
+    const originalEnd = e.target.selectionEnd;
+    
+    const formatted = formatInputText(e.target.value);
+    if (formatted !== e.target.value) {
+      e.target.value = formatted;
+      if (originalStart !== null && originalEnd !== null) {
+        e.target.setSelectionRange(originalStart, originalEnd);
+      }
+    }
+  }
+}
+
+function Input({ className, type, onChange, ...props }: React.ComponentProps<"input">) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleAutoFormatChange(e, type);
+    if (onChange) {
+      onChange(e);
+    }
+  };
+
   return (
     <input
       type={type}
@@ -13,6 +54,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
+      onChange={handleChange}
       {...props}
     />
   )
