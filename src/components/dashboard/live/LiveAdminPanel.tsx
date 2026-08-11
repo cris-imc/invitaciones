@@ -264,8 +264,8 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                         </div>
                     </div>
 
-                    <div className="p-4 bg-muted/20 border border-white/10 rounded-lg flex items-center justify-between">
-                        <div>
+                    <div className="p-4 bg-muted/20 border border-white/10 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex-1 pr-0 sm:pr-4">
                             <h4 className="font-semibold text-sm">Moderación de contenido</h4>
                             <p className="text-xs text-muted-foreground mt-1">
                                 Si está activado, las fotos y mensajes no aparecerán en pantalla hasta que los apruebes.
