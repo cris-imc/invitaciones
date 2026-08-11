@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import archiver from "archiver";
+const archiver = require("archiver");
 import path from "path";
 import fs from "fs";
 
