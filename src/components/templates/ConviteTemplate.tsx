@@ -427,8 +427,8 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           </div>
         </main>
 
-        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 " style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-          Invitaciones Digitales · Recuerdos del Evento
+        <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">
+          <LogoFooterCredit bgColor="transparent" />
         </footer>
       </div>
     );
