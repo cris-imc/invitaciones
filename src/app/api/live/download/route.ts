@@ -82,7 +82,21 @@ export async function GET(req: Request) {
 
         const filename = `fotos-live-${invitation.nombreEvento || "evento"}.zip`.replace(/[^a-zA-Z0-9.\-]/g, "_");
 
-        const webStream = Readable.toWeb(stream as any);
+        function iteratorToStream(iterator: AsyncIterable<any>) {
+            const it = iterator[Symbol.asyncIterator]();
+            return new ReadableStream({
+                async pull(controller) {
+                    const { value, done } = await it.next();
+                    if (done) {
+                        controller.close();
+                    } else {
+                        controller.enqueue(new Uint8Array(value));
+                    }
+                },
+            });
+        }
+
+        const webStream = iteratorToStream(stream);
 
         return new NextResponse(webStream as any, {
             headers: {
@@ -92,6 +106,6 @@ export async function GET(req: Request) {
         });
     } catch (error: any) {
         console.error("Live download zip error:", error);
-        return new NextResponse(`Error interno: ${error?.message}\n${error?.stack}`, { status: 500 });
+        return new NextResponse(`Error interno:\n${error?.message}\n${error?.stack}`, { status: 200, headers: { "Content-Disposition": "attachment; filename=\"error-log.txt\"", "Content-Type": "text/plain" } });
     }
 }
