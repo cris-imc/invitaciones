@@ -28,9 +28,9 @@ export function getEventStatus(fechaEvento: Date | string, now: Date = new Date(
     return "EXPIRED";
   }
 
-  // Inicio y fin del día del evento (00:00:00.000 a 23:59:59.999 en horario local)
+  // Inicio y fin del día del evento (extendido hasta 2 días después para abarcar trasnoche y post-fiesta)
   const startOfEventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate(), 0, 0, 0, 0);
-  const endOfEventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate(), 23, 59, 59, 999);
+  const endOfEventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate() + 2, 23, 59, 59, 999);
 
   if (now > endOfEventDay) {
     return "POST_EVENT";
