@@ -209,7 +209,7 @@ export function GuestPageTabs({
                 {/* Tooltip for locked tabs */}
                 {isLocked && (
                   <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                    {t.id === "live" ? "Exclusivo del plan Diamond" : "Disponible en Premium"}
+                    {t.id === "live" ? "Disponible en Diamond" : "Disponible en Premium"}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
                   </div>
                 )}
@@ -233,13 +233,13 @@ export function GuestPageTabs({
           transition={{ duration: 0.2, ease: "easeInOut" }}
         >
           {tab === "invitados" && (
-            <div className="bg-card border rounded-lg p-4 md:p-6">
+            <div>
               <h2 className="text-xl font-semibold mb-6">Lista de Invitados</h2>
               <GuestListWithPayment invitationId={invitationId} pagoTarjetaHabilitado={pagoTarjetaHabilitado} />
             </div>
           )}
           {tab === "canciones" && (
-            <div className="bg-card border rounded-lg p-4 md:p-6">
+            <div>
               <h2 className="text-xl font-semibold mb-6">Moderación de Canciones</h2>
               <SongModerationPanel invitationId={invitationId} />
             </div>
