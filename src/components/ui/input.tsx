@@ -36,9 +36,17 @@ export function handleAutoFormatChange(e: React.ChangeEvent<HTMLInputElement | H
   }
 }
 
-function Input({ className, type, onChange, ...props }: React.ComponentProps<"input">) {
+function Input({
+  className,
+  type,
+  onChange,
+  disableAutoFormat,
+  ...props
+}: React.ComponentProps<"input"> & { disableAutoFormat?: boolean }) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleAutoFormatChange(e, type);
+    if (!disableAutoFormat) {
+      handleAutoFormatChange(e, type);
+    }
     if (onChange) {
       onChange(e);
     }
