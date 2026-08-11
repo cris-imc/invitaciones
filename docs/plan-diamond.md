@@ -10,8 +10,8 @@
 - [x] 5. Registro: rediseño de cards de membresía con UX mejorado
 - [x] 6. Panel admin: gestión de membresías y créditos por cliente
 - [x] 7. Panel cliente: créditos remanentes en pantalla de inicio
-- [ ] 8. App mobile: botón Ayuda → WhatsApp en topbar
-- [ ] 9. App desktop: opción Ayuda en sidebar
+- [x] 8. App mobile: botón Ayuda → WhatsApp en topbar
+- [x] 9. App desktop: opción Ayuda en sidebar
 - [ ] 10. Revisión y checklist final
 
 ### Notas de avance
@@ -28,3 +28,4 @@
   - `EditCreditsButton.tsx` extendido: ahora edita `premiumCredits` **y** `diamondCredits` en el mismo diálogo (antes solo premium).
   - `PATCH /api/admin/users/[id]`: ahora acepta `premiumCredits`, `diamondCredits` y `planTier` de forma independiente (antes solo `premiumCredits` obligatorio).
   - `AdminDashboardClient.tsx`: agregado el selector de membresía y badge de plan actual junto a cada cliente.
+- CP8/CP9: ambos viven en `Sidebar.tsx`. Topbar mobile (`.p-mobile-topbar`, `justify-content: space-between`) — se agregó el link de WhatsApp (ícono `MessageCircle` + texto "Ayuda") como segundo hijo, cae naturalmente al extremo opuesto del logo. Sidebar desktop — el link "Ayuda" se agregó dentro de `NavLinks` (que solo se usa en el `<aside className="p-side">`, no en la botonera mobile), con ícono `HelpCircle` (no WhatsApp, según lo pedido) y mismo markup que los demás items (`<b><Icono/></b>Texto`) para heredar el estilo del nav.

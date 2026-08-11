@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Archive, BarChart3, Home, LogOut, User, UserPlus, Plus } from "lucide-react";
+import { Archive, BarChart3, Home, LogOut, User, UserPlus, Plus, MessageCircle, HelpCircle } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -111,7 +111,16 @@ export function Sidebar() {
                     </Link>
                 );
             })}
-            
+
+            <a
+                href="https://wa.me/5493517660000?text=Hola%2C%20necesito%20ayuda%20con%20Alta%20Invitaci%C3%B3n"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <b><HelpCircle className="w-4 h-4" /></b>
+                Ayuda
+            </a>
+
             <div className="mt-4 px-2">
                 <button onClick={handleSignOut} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 py-2 rounded-lg text-sm font-semibold transition-colors">
                     <LogOut className="w-4 h-4" />
@@ -161,6 +170,17 @@ export function Sidebar() {
                         <div className="p-brand" style={{ margin: 0 }}>
                             <Logo />
                         </div>
+                        <a
+                            href="https://wa.me/5493517660000?text=Hola%2C%20necesito%20ayuda%20con%20Alta%20Invitaci%C3%B3n"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Ayuda"
+                            style={{ color: "var(--accent)" }}
+                            className="flex items-center gap-1.5 text-xs font-semibold font-ui"
+                        >
+                            <MessageCircle className="w-5 h-5" />
+                            <span>Ayuda</span>
+                        </a>
                     </header>
 
                     {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ── */}
