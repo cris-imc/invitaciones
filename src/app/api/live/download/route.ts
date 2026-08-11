@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-const archiver = require("archiver");
+const { ZipArchive } = require("archiver");
 import path from "path";
 import fs from "fs";
 import { Readable } from "stream";
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
         const { PassThrough } = require("stream");
         const stream = new PassThrough();
 
-        const archive = archiver("zip", {
+        const archive = new ZipArchive({
             zlib: { level: 5 } // Sets the compression level.
         });
 
@@ -106,6 +106,6 @@ export async function GET(req: Request) {
         });
     } catch (error: any) {
         console.error("Live download zip error:", error);
-        return new NextResponse(`Error interno:\n${error?.message}\n${error?.stack}`, { status: 200, headers: { "Content-Disposition": "attachment; filename=\"error-log.txt\"", "Content-Type": "text/plain" } });
+        return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
