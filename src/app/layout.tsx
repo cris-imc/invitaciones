@@ -3,7 +3,8 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ViewportHeightFix } from "@/components/ViewportHeightFix";
-import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2, Sora, Dancing_Script, Playfair_Display, Great_Vibes, Merriweather, Lora, DM_Sans, Cinzel, Parisienne, Sacramento, Abril_Fatface, Prata, Montserrat, Roboto, Open_Sans, Nunito, Lato } from 'next/font/google';
+import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2, Sora, Dancing_Script, Playfair_Display, Great_Vibes, Merriweather, Lora, DM_Sans, Cinzel, Parisienne, Sacramento, Abril_Fatface, Prata, Montserrat, Open_Sans, Nunito, Lato } from 'next/font/google';
+import localFont from 'next/font/local';
 
 const fraunces = Fraunces({ style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
@@ -32,7 +33,19 @@ const merriweather = Merriweather({ weight: ['400', '700'], subsets: ['latin'], 
 const lora = Lora({ subsets: ['latin'], variable: '--font-lora', display: 'swap' });
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' });
 const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-montserrat', display: 'swap' });
-const roboto = Roboto({ weight: ['400', '500', '700'], subsets: ['latin'], variable: '--font-roboto', display: 'swap' });
+// Auto-hospedada (next/font/local) en vez de next/font/google -- las URLs de
+// Roboto que trae fijadas el paquete de Next.js para este build empezaron a
+// devolver 404 de fonts.gstatic.com, rompiendo el build en Railway. Con el
+// archivo local el build ya no depende de esa descarga.
+const roboto = localFont({
+  src: [
+    { path: './fonts/roboto-400.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/roboto-500.woff2', weight: '500', style: 'normal' },
+    { path: './fonts/roboto-700.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-roboto',
+  display: 'swap',
+});
 const openSans = Open_Sans({ subsets: ['latin'], variable: '--font-open-sans', display: 'swap' });
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito', display: 'swap' });
 const lato = Lato({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-lato', display: 'swap' });
