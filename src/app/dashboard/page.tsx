@@ -111,7 +111,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
 
   const dbUser = await prisma.user.findUnique({
     where: { id: userId },
-    select: { planTier: true, premiumCredits: true },
+    select: { planTier: true, premiumCredits: true, diamondCredits: true },
   });
 
   // ── ADMIN view ───────────────────────────────────────────────
@@ -192,6 +192,22 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
           />
         </div>
       </div>
+
+      {/* Créditos remanentes */}
+      {dbUser && ((dbUser.premiumCredits || 0) > 0 || (dbUser.diamondCredits || 0) > 0) && (
+        <div className="flex flex-wrap gap-2 mb-4" style={{ fontFamily: "var(--font-mono)" }}>
+          {(dbUser.premiumCredits || 0) > 0 && (
+            <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+              {dbUser.premiumCredits} crédito{dbUser.premiumCredits === 1 ? "" : "s"} Premium disponible{dbUser.premiumCredits === 1 ? "" : "s"}
+            </span>
+          )}
+          {(dbUser.diamondCredits || 0) > 0 && (
+            <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20">
+              {dbUser.diamondCredits} crédito{dbUser.diamondCredits === 1 ? "" : "s"} Diamond disponible{dbUser.diamondCredits === 1 ? "" : "s"}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* KPI stats */}
       <div className="p-stats">

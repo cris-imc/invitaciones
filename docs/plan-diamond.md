@@ -9,7 +9,7 @@
 - [x] 4. Landing page: opción Contacto → WhatsApp
 - [x] 5. Registro: rediseño de cards de membresía con UX mejorado
 - [x] 6. Panel admin: gestión de membresías y créditos por cliente
-- [ ] 7. Panel cliente: créditos remanentes en pantalla de inicio
+- [x] 7. Panel cliente: créditos remanentes en pantalla de inicio
 - [ ] 8. App mobile: botón Ayuda → WhatsApp en topbar
 - [ ] 9. App desktop: opción Ayuda en sidebar
 - [ ] 10. Revisión y checklist final
