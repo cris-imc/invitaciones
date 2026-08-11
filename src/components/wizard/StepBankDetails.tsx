@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useWizardStore } from "@/store/wizard-store";
@@ -184,7 +184,7 @@ export function StepBankDetails() {
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                         <div className="space-y-2">
                             <Label className="text-xs font-medium">Título de la Sección</Label>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}>
                                 {PREDEFINED_TITULOS_REGALO.map((opt) => (
                                     <button
                                         key={opt}
@@ -194,7 +194,7 @@ export function StepBankDetails() {
                                             setIsCustomRegaloTitulo(false);
                                         }}
                                         className={cn(
-                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
                                             (d.regaloTitulo || "Regalo") === opt && !isCustomRegaloTitulo
                                                 ? "bg-amber-500 text-white border-amber-600"
                                                 : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
@@ -212,7 +212,7 @@ export function StepBankDetails() {
                                         }
                                     }}
                                     className={cn(
-                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
                                         isCustomRegaloTitulo
                                             ? "bg-amber-500 text-white border-amber-600"
                                             : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
@@ -328,7 +328,7 @@ export function StepBankDetails() {
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                         <div className="space-y-2">
                             <Label className="text-xs font-medium">Título de la Sección</Label>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}>
                                 {PREDEFINED_TITULOS_TARJETA.map((opt) => (
                                     <button
                                         key={opt}
@@ -338,7 +338,7 @@ export function StepBankDetails() {
                                             setIsCustomTarjetaTitulo(false);
                                         }}
                                         className={cn(
-                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
                                             (d.pagoTarjetaTitulo || "Pago de Tarjetas") === opt && !isCustomTarjetaTitulo
                                                 ? "bg-amber-500 text-white border-amber-600"
                                                 : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
@@ -356,7 +356,7 @@ export function StepBankDetails() {
                                         }
                                     }}
                                     className={cn(
-                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
                                         isCustomTarjetaTitulo
                                             ? "bg-amber-500 text-white border-amber-600"
                                             : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"

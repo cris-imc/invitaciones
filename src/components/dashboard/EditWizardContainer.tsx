@@ -108,6 +108,10 @@ function WizardContent({ invitation }: { invitation: any }) {
                 templateTipo: invitation.templateTipo || "ORIGINAL",
                 colorPrincipal: temaColores?.colorPrincipal || temaColores?.primaryColor || "#000000",
                 imagenCelebremosJuntos: invitation.imagenCelebremosJuntos || "",
+                tipografiaDisplay: invitation.tipografiaDisplay || "fraunces",
+                fontTitle: invitation.fontTitle || "fraunces",
+                fontBody: invitation.fontBody || "space-grotesk",
+                countdownStyle: invitation.countdownStyle || "clasico",
             });
 
             // themeConfig es un slice separado de data (legacy). StepDesign lee
