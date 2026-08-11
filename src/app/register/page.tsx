@@ -8,7 +8,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
-import { Sparkles, Mail, Lock, User, Check, ChevronLeft } from "lucide-react";
+import { Diamond, Mail, Lock, User, Check, ChevronLeft } from "lucide-react";
 import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 
@@ -205,7 +205,7 @@ function RegisterForm() {
                   >
                     {plan.recommended && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--accent)] text-[var(--ink)] px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-bold font-mono tracking-wide uppercase flex items-center gap-1 whitespace-nowrap">
-                        <Sparkles className="w-3 h-3" />
+                        <Diamond className="w-3 h-3" />
                         Recomendado
                       </div>
                     )}

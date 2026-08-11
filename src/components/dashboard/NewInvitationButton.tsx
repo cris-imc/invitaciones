@@ -12,7 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Diamond } from "lucide-react";
 import Link from "next/link";
 
 const WHATSAPP_SUPPORT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent("Hola! Quiero comprar créditos premium para crear una invitación")}`;
@@ -91,7 +91,7 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                             )}
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-2">
+                    <DialogFooter className="mt-6 flex flex-col sm:flex-row sm:flex-wrap sm:justify-end gap-2">
                         <Button variant="outline" onClick={handleCreateFree} className="w-full sm:w-auto">
                             Crear Gratis
                         </Button>
@@ -101,7 +101,7 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                         </Button>
                         {hasDiamondCredits && (
                             <Button onClick={handleCreateDiamond} className="w-full sm:w-auto bg-[var(--accent,#C79A4B)] hover:opacity-90 text-[var(--ink,#0F1613)] flex items-center justify-center gap-2">
-                                <Sparkles className="w-4 h-4" />
+                                <Diamond className="w-4 h-4" />
                                 Usar Crédito Diamond
                             </Button>
                         )}

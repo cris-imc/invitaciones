@@ -7,10 +7,10 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLAN_LIMITS, formatPrice, type PlanTier } from "@/lib/plan-limits";
 import { 
-  Sparkles, 
-  Check, 
-  X, 
-  Crown, 
+  Check,
+  X,
+  Crown,
+  Diamond,
   Star,
   TrendingUp,
   Users,
@@ -75,7 +75,7 @@ export default function SubscriptionPage() {
                 )}
                 {userPlanTier === "DIAMOND" && (
                   <Badge className="bg-gradient-to-r from-cyan-400 to-blue-600 text-white">
-                    <Sparkles className="w-3 h-3 mr-1" />
+                    <Diamond className="w-3 h-3 mr-1" />
                     Diamond
                   </Badge>
                 )}
