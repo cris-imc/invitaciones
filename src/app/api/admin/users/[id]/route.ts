@@ -61,18 +61,41 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        
-        if (typeof body.premiumCredits !== 'number' || body.premiumCredits < 0) {
-            return NextResponse.json({ error: 'Cantidad de créditos inválida' }, { status: 400 });
+        const data: { premiumCredits?: number; diamondCredits?: number; planTier?: string } = {};
+
+        if (body.premiumCredits !== undefined) {
+            if (typeof body.premiumCredits !== 'number' || body.premiumCredits < 0) {
+                return NextResponse.json({ error: 'Cantidad de créditos premium inválida' }, { status: 400 });
+            }
+            data.premiumCredits = body.premiumCredits;
+        }
+
+        if (body.diamondCredits !== undefined) {
+            if (typeof body.diamondCredits !== 'number' || body.diamondCredits < 0) {
+                return NextResponse.json({ error: 'Cantidad de créditos diamond inválida' }, { status: 400 });
+            }
+            data.diamondCredits = body.diamondCredits;
+        }
+
+        if (body.planTier !== undefined) {
+            const validPlans = ['FREE', 'PREMIUM', 'DIAMOND', 'ENTERPRISE', 'ADMIN'];
+            if (!validPlans.includes(body.planTier)) {
+                return NextResponse.json({ error: 'Membresía inválida' }, { status: 400 });
+            }
+            data.planTier = body.planTier;
+        }
+
+        if (Object.keys(data).length === 0) {
+            return NextResponse.json({ error: 'Nada para actualizar' }, { status: 400 });
         }
 
         const updatedUser = await prisma.user.update({
             where: { id: userId },
-            data: { premiumCredits: body.premiumCredits },
-            select: { id: true, premiumCredits: true }
+            data,
+            select: { id: true, premiumCredits: true, diamondCredits: true, planTier: true }
         });
 
-        return NextResponse.json({ success: true, premiumCredits: updatedUser.premiumCredits });
+        return NextResponse.json({ success: true, ...updatedUser });
     } catch (error) {
         console.error('Error actualizando créditos de usuario:', error);
         return NextResponse.json(

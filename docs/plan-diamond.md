@@ -8,7 +8,7 @@
 - [x] 3. Landing page: sección de precios actualizada
 - [x] 4. Landing page: opción Contacto → WhatsApp
 - [x] 5. Registro: rediseño de cards de membresía con UX mejorado
-- [ ] 6. Panel admin: gestión de membresías y créditos por cliente
+- [x] 6. Panel admin: gestión de membresías y créditos por cliente
 - [ ] 7. Panel cliente: créditos remanentes en pantalla de inicio
 - [ ] 8. App mobile: botón Ayuda → WhatsApp en topbar
 - [ ] 9. App desktop: opción Ayuda en sidebar
@@ -23,3 +23,8 @@
   - Se actualizaron también los selectores de plan en `CreateUserButton.tsx` y `AdminPlanSelect.tsx` (agregado DIAMOND) para que sigan siendo consistentes, aunque el rediseño completo de gestión de membresías es CP6.
 - CP3/CP4: `Pricing.tsx` reescrito con 4 cards (Gratis/Premium/Diamond/Enterprise) usando `PLAN_LIMITS` como fuente de verdad; precio Diamond calculado como 20% off del precio real (`PLAN_LIMITS.DIAMOND.price`). Enterprise sin precio fijo, CTA "Consultar" a WhatsApp, sin link a /register. `LandingNav.tsx`: agregado "Contacto" → WhatsApp (`target=_blank`) al array `BASE_LINKS`, se refleja automáticamente en desktop nav y drawer mobile porque ambos renderizan del mismo array.
 - CP5: `register/page.tsx` reescrito como flujo de 2 pasos (antes era grid 2 columnas fijo: cards + form juntos). Paso 1: 3 cards (Free/Premium/Diamond) con selección por click, borde+ring dorado (`--accent`) en la seleccionada, Diamond con badge "Recomendado" y preseleccionada por default salvo que `?plan=free|premium|diamond` diga lo contrario. Paso 2: resumen del plan elegido arriba del form, botón "Crear cuenta" (se sacó la mención a pago/Mercado Pago que tenía antes: "Pagar $X y Registrarme"). El campo `planTier` que se manda a `/api/auth/register` ahora acepta "DIAMOND" (ya soportado desde CP2).
+- CP6: Encontré dos sistemas de "plan" distintos en el panel admin ya existentes: `AdminPlanSelect` (por invitación, dentro de cada cliente expandido) y ninguno a nivel cliente/usuario. Lo que pide el checkpoint es a nivel cliente, así que:
+  - Nuevo componente `AdminUserPlanSelect.tsx`: dropdown de membresía del **usuario** (`user.planTier`), persiste al cambiar (sin botón Guardar aparte, igual que `AdminPlanSelect`).
+  - `EditCreditsButton.tsx` extendido: ahora edita `premiumCredits` **y** `diamondCredits` en el mismo diálogo (antes solo premium).
+  - `PATCH /api/admin/users/[id]`: ahora acepta `premiumCredits`, `diamondCredits` y `planTier` de forma independiente (antes solo `premiumCredits` obligatorio).
+  - `AdminDashboardClient.tsx`: agregado el selector de membresía y badge de plan actual junto a cada cliente.

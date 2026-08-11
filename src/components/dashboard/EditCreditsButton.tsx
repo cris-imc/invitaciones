@@ -15,16 +15,26 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 
-export function EditCreditsButton({ userId, currentCredits }: { userId: string, currentCredits: number }) {
+export function EditCreditsButton({
+    userId,
+    currentCredits,
+    currentDiamondCredits = 0,
+}: {
+    userId: string;
+    currentCredits: number;
+    currentDiamondCredits?: number;
+}) {
     const [open, setOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [credits, setCredits] = useState(currentCredits.toString());
+    const [diamondCredits, setDiamondCredits] = useState(currentDiamondCredits.toString());
     const router = useRouter();
 
     const handleSave = async () => {
         const numCredits = parseInt(credits, 10);
-        if (isNaN(numCredits) || numCredits < 0) {
-            alert("Por favor ingresa un número válido de créditos (0 o más).");
+        const numDiamondCredits = parseInt(diamondCredits, 10);
+        if (isNaN(numCredits) || numCredits < 0 || isNaN(numDiamondCredits) || numDiamondCredits < 0) {
+            alert("Por favor ingresa números válidos de créditos (0 o más).");
             return;
         }
 
@@ -33,7 +43,7 @@ export function EditCreditsButton({ userId, currentCredits }: { userId: string, 
             const response = await fetch(`/api/admin/users/${userId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ premiumCredits: numCredits }),
+                body: JSON.stringify({ premiumCredits: numCredits, diamondCredits: numDiamondCredits }),
             });
 
             if (!response.ok) {
@@ -56,29 +66,41 @@ export function EditCreditsButton({ userId, currentCredits }: { userId: string, 
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2 border-[var(--ink-2)] text-[var(--on-ink)] hover:bg-[var(--ink-2)]">
                     <Coins className="w-4 h-4 text-yellow-500" />
-                    Disponible: {currentCredits}
+                    P: {currentCredits} / D: {currentDiamondCredits}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md bg-[var(--ink-2)] text-[var(--on-ink)] border-none">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Coins className="w-5 h-5 text-yellow-500" />
-                        Editar Créditos Premium
+                        Editar Créditos
                     </DialogTitle>
                     <DialogDescription className="text-[var(--on-ink)]/70 pt-2">
-                        Ajusta la cantidad de créditos premium disponibles para este usuario.
+                        Ajusta la cantidad de créditos disponibles para este usuario.
                     </DialogDescription>
                 </DialogHeader>
-                
-                <div className="my-4">
-                    <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Cantidad de créditos:</label>
-                    <Input 
-                        type="number" 
-                        min="0"
-                        value={credits}
-                        onChange={(e) => setCredits(e.target.value)}
-                        className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
-                    />
+
+                <div className="my-4 space-y-4">
+                    <div>
+                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Créditos premium:</label>
+                        <Input
+                            type="number"
+                            min="0"
+                            value={credits}
+                            onChange={(e) => setCredits(e.target.value)}
+                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Créditos diamond:</label>
+                        <Input
+                            type="number"
+                            min="0"
+                            value={diamondCredits}
+                            onChange={(e) => setDiamondCredits(e.target.value)}
+                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                        />
+                    </div>
                 </div>
 
                 <DialogFooter className="flex gap-2 sm:justify-end mt-2">
