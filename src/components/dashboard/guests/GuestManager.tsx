@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -224,6 +224,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     form: 'new' | 'edit'
   ) => {
     if (currentEnabled) { setEnabled(false); return; }
+
+    // Si la tarjeta no está habilitada, permitir agregar directamente
+    if (!pagoTarjetaHabilitado) {
+      setEnabled(true);
+      return;
+    }
+
     const price = category === 'adult' ? currentAdultPrice : category === 'teen' ? currentPrecioAdolescente : currentPrecioNino;
     if (!price || price <= 0) {
       // No price configured — open modal
@@ -699,7 +706,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
                         Adultos
-                        {currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                        {pagoTarjetaHabilitado && (currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
                       </Label>
                       <Switch
                         checked={newAdultsEnabled}
@@ -717,7 +724,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
                         Adolescentes
-                        {currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                        {pagoTarjetaHabilitado && (currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
                       </Label>
                       <Switch
                         checked={newTeensEnabled}
@@ -735,7 +742,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
                         Niños
-                        {currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                        {pagoTarjetaHabilitado && (currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
                       </Label>
                       <Switch
                         checked={newChildrenEnabled}
@@ -1100,7 +1107,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       Adultos
-                      {currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                      {pagoTarjetaHabilitado && (currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
                     </Label>
                     <Switch
                       checked={editAdultsEnabled}
@@ -1118,7 +1125,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       Adolescentes
-                      {currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                      {pagoTarjetaHabilitado && (currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
                     </Label>
                     <Switch
                       checked={editTeensEnabled}
@@ -1136,7 +1143,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       Niños
-                      {currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>}
+                      {pagoTarjetaHabilitado && (currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
                     </Label>
                     <Switch
                       checked={editChildrenEnabled}
