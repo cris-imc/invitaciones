@@ -6,7 +6,6 @@ import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
 import { DeleteUserButton } from "@/components/dashboard/DeleteUserButton";
 import { EditCreditsButton } from "@/components/dashboard/EditCreditsButton";
 import { EditUserButton } from "@/components/dashboard/EditUserButton";
-import { AdminUserPlanSelect } from "@/components/dashboard/AdminUserPlanSelect";
 import { Input } from "@/components/ui/input";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -95,11 +94,6 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                                     <div className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-[10px] font-medium opacity-70 shrink-0">
                                         {client.invitations.length} invitaciones
                                     </div>
-                                    {client.planTier && client.planTier !== "FREE" && (
-                                        <div className="px-2 py-0.5 bg-[var(--accent,#C79A4B)]/15 text-[var(--accent,#C79A4B)] rounded-full text-[10px] font-semibold shrink-0">
-                                            {client.planTier}
-                                        </div>
-                                    )}
                                     {premiumEnUso > 0 && (
                                         <div className="px-2 py-0.5 bg-green-500/15 text-green-500 rounded-full text-[10px] font-medium shrink-0">
                                             {premiumEnUso} premium en uso
@@ -113,7 +107,6 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                                 </div>
                                 
                                 <div className="flex gap-2 items-center flex-wrap">
-                                    <AdminUserPlanSelect userId={client.id} currentPlan={client.planTier || "FREE"} />
                                     <EditUserButton userId={client.id} initialName={client.name || ""} initialEmail={client.email || ""} />
                                     <EditCreditsButton
                                         userId={client.id}

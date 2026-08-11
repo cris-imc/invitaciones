@@ -12,7 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Sparkles, Diamond } from "lucide-react";
+import { Gift, Sparkles, Diamond, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 const WHATSAPP_SUPPORT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent("Hola! Quiero comprar créditos premium para crear una invitación")}`;
@@ -80,32 +80,65 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Elegí tu tipo de invitación</DialogTitle>
-                        <DialogDescription className="pt-2 space-y-1">
-                            {hasUnlimitedPremium ? (
-                                <span>Tu plan te permite crear <strong>invitaciones {planTier === 'DIAMOND' || planTier === 'ENTERPRISE' || planTier === 'ADMIN' ? 'diamond' : 'premium'} ilimitadas</strong>. ¿Qué tipo de invitación querés crear?</span>
-                            ) : (
-                                <>
-                                    <span className="block">Tenés <strong>{premiumCredits} {premiumCredits === 1 ? 'crédito premium' : 'créditos premium'}</strong> disponible{premiumCredits === 1 ? '' : 's'}{hasDiamondCredits && <> y <strong>{diamondCredits} {diamondCredits === 1 ? 'crédito diamond' : 'créditos diamond'}</strong></>}.</span>
-                                    <span className="block">¿Qué tipo de invitación querés crear?</span>
-                                </>
-                            )}
+                        <DialogDescription className="pt-1">
+                            ¿Qué tipo de invitación querés crear?
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter className="mt-6 flex flex-col sm:flex-row sm:flex-wrap sm:justify-end gap-2">
-                        <Button variant="outline" onClick={handleCreateFree} className="w-full sm:w-auto">
-                            Crear Gratis
-                        </Button>
-                        <Button onClick={handleCreatePremium} className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white flex items-center justify-center gap-2">
-                            <Sparkles className="w-4 h-4" />
-                            Usar Crédito Premium
-                        </Button>
+
+                    <div className="flex flex-col gap-2.5 mt-2">
+                        <button
+                            type="button"
+                            onClick={handleCreateFree}
+                            className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-foreground/25 hover:bg-muted/50 transition-colors text-left"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                <Gift className="w-5 h-5 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm">Crear Gratis</p>
+                                <p className="text-xs text-muted-foreground">Sin costo, funciones básicas</p>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleCreatePremium}
+                            className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-yellow-500/30 hover:border-yellow-500/60 hover:bg-yellow-500/5 transition-colors text-left"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-yellow-500/15 flex items-center justify-center shrink-0">
+                                <Sparkles className="w-5 h-5 text-yellow-500" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm text-yellow-500">Usar Crédito Premium</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {hasUnlimitedPremium
+                                        ? "Invitaciones premium ilimitadas por tu plan"
+                                        : `${premiumCredits} ${premiumCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}`}
+                                </p>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-yellow-500/60 shrink-0" />
+                        </button>
+
                         {hasDiamondCredits && (
-                            <Button onClick={handleCreateDiamond} className="w-full sm:w-auto bg-[var(--accent,#C79A4B)] hover:opacity-90 text-[var(--ink,#0F1613)] flex items-center justify-center gap-2">
-                                <Diamond className="w-4 h-4" />
-                                Usar Crédito Diamond
-                            </Button>
+                            <button
+                                type="button"
+                                onClick={handleCreateDiamond}
+                                className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-[var(--accent,#C79A4B)]/40 hover:border-[var(--accent,#C79A4B)] hover:bg-[var(--accent,#C79A4B)]/5 transition-colors text-left"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-[var(--accent,#C79A4B)]/15 flex items-center justify-center shrink-0">
+                                    <Diamond className="w-5 h-5 text-[var(--accent,#C79A4B)]" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-sm text-[var(--accent,#C79A4B)]">Usar Crédito Diamond</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {diamondCredits} {diamondCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}
+                                    </p>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-[var(--accent,#C79A4B)]/60 shrink-0" />
+                            </button>
                         )}
-                    </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
 

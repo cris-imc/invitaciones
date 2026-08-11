@@ -292,8 +292,22 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
                         ? "Borrador"
                         : "Finalizada"}
                     </span>
-                    <span className={`m-tag ${inv.planTier === "FREE" ? "free" : "premium"}`}>
-                      {inv.planTier === "FREE" ? "Gratis" : "✦ Premium"}
+                    <span
+                      className={`m-tag ${
+                        inv.planTier === "FREE"
+                          ? "free"
+                          : inv.planTier === "DIAMOND" || inv.planTier === "ENTERPRISE"
+                          ? "diamond"
+                          : "premium"
+                      }`}
+                    >
+                      {inv.planTier === "FREE"
+                        ? "Gratis"
+                        : inv.planTier === "DIAMOND"
+                        ? "◆ Diamond"
+                        : inv.planTier === "ENTERPRISE"
+                        ? "◆ Enterprise"
+                        : "✦ Premium"}
                     </span>
                     <span className="m-tag days">{daysLabel}</span>
                   </div>

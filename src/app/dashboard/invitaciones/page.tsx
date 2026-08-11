@@ -100,6 +100,10 @@ export default async function InvitacionesPage() {
                                         </div>
                                         {inv.planTier === "FREE" ? (
                                             <span className="plan-badge plan-badge--free">Gratis</span>
+                                        ) : inv.planTier === "DIAMOND" ? (
+                                            <span className="plan-badge plan-badge--diamond">◆ Diamond</span>
+                                        ) : inv.planTier === "ENTERPRISE" ? (
+                                            <span className="plan-badge plan-badge--diamond">◆ Enterprise</span>
                                         ) : (
                                             <span className="plan-badge plan-badge--premium">✦ Premium</span>
                                         )}

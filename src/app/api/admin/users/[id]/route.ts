@@ -61,7 +61,7 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        const data: { premiumCredits?: number; diamondCredits?: number; planTier?: string } = {};
+        const data: { premiumCredits?: number; diamondCredits?: number } = {};
 
         if (body.premiumCredits !== undefined) {
             if (typeof body.premiumCredits !== 'number' || body.premiumCredits < 0) {
@@ -77,14 +77,6 @@ export async function PATCH(
             data.diamondCredits = body.diamondCredits;
         }
 
-        if (body.planTier !== undefined) {
-            const validPlans = ['FREE', 'PREMIUM', 'DIAMOND', 'ENTERPRISE', 'ADMIN'];
-            if (!validPlans.includes(body.planTier)) {
-                return NextResponse.json({ error: 'Membresía inválida' }, { status: 400 });
-            }
-            data.planTier = body.planTier;
-        }
-
         if (Object.keys(data).length === 0) {
             return NextResponse.json({ error: 'Nada para actualizar' }, { status: 400 });
         }
@@ -92,7 +84,7 @@ export async function PATCH(
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data,
-            select: { id: true, premiumCredits: true, diamondCredits: true, planTier: true }
+            select: { id: true, premiumCredits: true, diamondCredits: true }
         });
 
         return NextResponse.json({ success: true, ...updatedUser });

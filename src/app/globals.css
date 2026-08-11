@@ -1132,6 +1132,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .plan-badge { font-family: var(--font-mono); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 999px; }
 .plan-badge--free { background: rgba(246,243,236,0.06); color: rgba(246,243,236,0.4); border: 1px solid rgba(246,243,236,0.12); }
 .plan-badge--premium { background: rgba(234,179,8,0.12); color: #ca8a04; border: 1px solid rgba(234,179,8,0.25); }
+.plan-badge--diamond { background: rgba(34,211,238,0.12); color: #0891b2; border: 1px solid rgba(34,211,238,0.3); }
 .inv-row .meta b{display:block; font-family:var(--font-ui); font-weight:600; font-size:14.5px; color:var(--paper);}
 .inv-row .meta span{font-family:var(--font-mono); font-size:11px; color:rgba(246,243,236,.5);}
 .inv-row .tag { align-self: start; margin-top: 2px; white-space:nowrap; }
@@ -1573,6 +1574,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .m-tag.days    { color: rgba(246,243,236,.4); }
 .m-tag.free    { color: rgba(246,243,236,.28); }
 .m-tag.premium { color: var(--accent); border-color: rgba(199,154,75,.45); }
+.m-tag.diamond { color: #67e8f9; border-color: rgba(103,232,249,.45); }
 .m-tag.draft   { color: rgba(246,243,236,.35); }
 
 /* Card actions */
