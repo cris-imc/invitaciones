@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -498,9 +498,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
           </div>
         </main>
 
-        <footer className="relative z-10 py-6 text-center text-xs text-slate-400 border-t border-white/10 " style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-          Invitaciones Digitales · Recuerdos del Evento
-        </footer>
+        <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">`n          <LogoFooterCredit bgColor="transparent" />`n        </footer>
       </div>
     );
   }
@@ -1450,3 +1448,4 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
       </>
   );
 }
+
