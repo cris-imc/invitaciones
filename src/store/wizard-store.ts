@@ -15,9 +15,11 @@ interface WizardState {
     data: Partial<InvitationFormData>;
     themeConfig: ThemeConfig;
     usePremiumCredit: boolean;
+    useDiamondCredit: boolean;
     setData: (data: Partial<InvitationFormData>) => void;
     setThemeConfig: (config: Partial<ThemeConfig>) => void;
     setUsePremiumCredit: (usePremiumCredit: boolean) => void;
+    setUseDiamondCredit: (useDiamondCredit: boolean) => void;
     nextStep: () => void;
     prevStep: () => void;
     setStep: (step: number) => void;
@@ -80,6 +82,7 @@ export const useWizardStore = create<WizardState>((set) => ({
     },
     themeConfig: DEFAULT_THEME_CONFIG,
     usePremiumCredit: false,
+    useDiamondCredit: false,
     isDirty: false,
     setDirty: (val) => set({ isDirty: val }),
     setData: (newData) => set((state) => {
@@ -128,6 +131,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         };
     }),
     setUsePremiumCredit: (usePremiumCredit) => set({ usePremiumCredit }),
+    setUseDiamondCredit: (useDiamondCredit) => set({ useDiamondCredit }),
     nextStep: () => set((state) => ({
         currentStep: state.currentStep + 1
     })),
@@ -161,7 +165,8 @@ export const useWizardStore = create<WizardState>((set) => ({
             sugerenciaMusicaHabilitada: true,
         },
         themeConfig: DEFAULT_THEME_CONFIG,
-        usePremiumCredit: state.usePremiumCredit
+        usePremiumCredit: state.usePremiumCredit,
+        useDiamondCredit: state.useDiamondCredit
     })),
 }));
 

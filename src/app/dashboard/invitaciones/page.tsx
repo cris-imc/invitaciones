@@ -22,7 +22,7 @@ async function getInvitations() {
     
     const dbUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { premiumCredits: true, planTier: true }
+        select: { premiumCredits: true, diamondCredits: true, planTier: true }
     });
     
     const invitationsData = await prisma.invitation.findMany({
@@ -75,7 +75,7 @@ export default async function InvitacionesPage() {
                         )}
                     </p>
                 </div>
-                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} />
+                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} diamondCredits={dbUser?.diamondCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} />
             </div>
 
             <div className="flex flex-col">

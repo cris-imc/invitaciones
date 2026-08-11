@@ -13,13 +13,13 @@ import { saveInvitationFromWizard } from "@/lib/save-invitation";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 
 export function StepPreview() {
-    const { data, themeConfig, prevStep, usePremiumCredit } = useWizardStore();
+    const { data, themeConfig, prevStep, usePremiumCredit, useDiamondCredit } = useWizardStore();
     const [isCreating, setIsCreating] = useState(false);
 
     const handleCreate = async () => {
         setIsCreating(true);
         try {
-            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit);
+            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit, useDiamondCredit);
 
             // Redirigir a la invitación creada
             window.location.href = `/invitation/${invitation.slug}`;

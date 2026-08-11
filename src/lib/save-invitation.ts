@@ -1,4 +1,4 @@
-export async function saveInvitationFromWizard(data: any, themeConfig: any, usePremiumCredit: boolean = false) {
+export async function saveInvitationFromWizard(data: any, themeConfig: any, usePremiumCredit: boolean = false, useDiamondCredit: boolean = false) {
     const payload = {
         ...data,
         ...themeConfig,
@@ -12,6 +12,7 @@ export async function saveInvitationFromWizard(data: any, themeConfig: any, useP
         triviaHabilitada: data.triviaHabilitada,
         triviaPreguntas: data.triviaPreguntas,
         usePremiumCredit: usePremiumCredit,
+        useDiamondCredit: useDiamondCredit,
     };
 
     if (payload.fecha instanceof Date) {

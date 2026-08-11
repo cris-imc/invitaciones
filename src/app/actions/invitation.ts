@@ -14,7 +14,7 @@ export async function deleteInvitation(invitationId: string) {
 
         const invitation = await prisma.invitation.findUnique({
             where: { id: invitationId },
-            select: { userId: true, planTier: true, premiumCreditSpent: true }
+            select: { userId: true, planTier: true, premiumCreditSpent: true, diamondCreditSpent: true }
         });
 
         if (!invitation) {
@@ -27,11 +27,18 @@ export async function deleteInvitation(invitationId: string) {
 
         // Solo reembolsa si esta invitación puntual efectivamente consumió un
         // crédito al crearse (no para cuentas con plan ilimitado, ni para
-        // invitaciones que un admin pasó a PREMIUM manualmente sin gastar uno).
+        // invitaciones que un admin pasó a PREMIUM/DIAMOND manualmente sin
+        // gastar uno).
         if (invitation.premiumCreditSpent) {
             await prisma.user.update({
                 where: { id: invitation.userId },
                 data: { premiumCredits: { increment: 1 } }
+            });
+        }
+        if (invitation.diamondCreditSpent) {
+            await prisma.user.update({
+                where: { id: invitation.userId },
+                data: { diamondCredits: { increment: 1 } }
             });
         }
 

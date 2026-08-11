@@ -13,13 +13,14 @@ import { useSession } from "next-auth/react";
 export function StepMusic() {
     const { data, setData } = useWizardStore();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
+    const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
     const [showMusicInfo, setShowMusicInfo] = useState(false);
     const { data: session } = useSession();
     const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
-    
-    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
+
+    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit/useDiamondCredit (creación)
     const isEditing = Boolean(data.id);
-    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit && !useDiamondCredit;
     const isLocked = !isAdmin && rawLocked;
 
     return (

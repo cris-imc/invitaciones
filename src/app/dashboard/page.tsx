@@ -186,6 +186,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
         <div className="hidden md:block">
           <NewInvitationButton
             premiumCredits={dbUser?.premiumCredits || 0}
+            diamondCredits={dbUser?.diamondCredits || 0}
             totalInvitations={stats.totalInvitations}
             planTier={dbUser?.planTier}
             autoOpen={isAutoOpen}

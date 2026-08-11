@@ -12,8 +12,8 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { premiumCredits: true },
+        select: { premiumCredits: true, diamondCredits: true },
     });
 
-    return NextResponse.json({ premiumCredits: user?.premiumCredits || 0 });
+    return NextResponse.json({ premiumCredits: user?.premiumCredits || 0, diamondCredits: user?.diamondCredits || 0 });
 }

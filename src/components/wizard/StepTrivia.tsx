@@ -27,15 +27,16 @@ export function StepTrivia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
     const { showToast } = useToast();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
+    const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
     const [showTriviaInfo, setShowTriviaInfo] = useState(false);
     const { data: session } = useSession();
     const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
     const themeConfig = useWizardStore((state) => state.themeConfig);
     const [isCreating, setIsCreating] = useState(false);
 
-    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
+    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit/useDiamondCredit (creación)
     const isEditing = Boolean(data.id);
-    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit && !useDiamondCredit;
     const isLocked = !isAdmin && rawLocked;
 
     // Parse existing questions or initialize empty array
@@ -201,7 +202,8 @@ export function StepTrivia() {
             const invitation = await saveInvitationFromWizard(
                 { ...data, triviaPreguntas },
                 themeConfig,
-                usePremiumCredit
+                usePremiumCredit,
+                useDiamondCredit
             );
             useWizardStore.getState().setDirty(false);
             window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;

@@ -151,6 +151,22 @@ export async function POST(request: NextRequest) {
             // heredar su propio tier en la invitación (no forzar 'PREMIUM'),
             // para que features exclusivas como LIVE queden habilitadas.
             invitationPlanTier = hasUnlimitedPremium ? planTier : 'PREMIUM';
+        } else if (body.useDiamondCredit) {
+            if (!hasUnlimitedPremium) {
+                const user = await prisma.user.findUnique({
+                    where: { id: userId },
+                    select: { diamondCredits: true }
+                });
+
+                if (!user || user.diamondCredits <= 0) {
+                    return NextResponse.json(
+                        { error: 'No tienes créditos diamond disponibles' },
+                        { status: 403 }
+                    );
+                }
+            }
+
+            invitationPlanTier = hasUnlimitedPremium ? planTier : 'DIAMOND';
         } else {
             // Check if user can create more invitations on their base plan
             const currentInvitationsCount = await prisma.invitation.count({
@@ -201,10 +217,12 @@ export async function POST(request: NextRequest) {
             fechaEvento = new Date();
         }
 
-        // Solo marca premiumCreditSpent cuando realmente se descontó un
-        // crédito (no para cuentas con plan ilimitado) — así el refund al
-        // borrar la invitación (deleteInvitation) sabe si corresponde o no.
+        // Solo marca premiumCreditSpent/diamondCreditSpent cuando realmente se
+        // descontó un crédito (no para cuentas con plan ilimitado) — así el
+        // refund al borrar la invitación (deleteInvitation) sabe si
+        // corresponde o no.
         const willSpendCredit = Boolean(body.usePremiumCredit) && !hasUnlimitedPremium;
+        const willSpendDiamondCredit = Boolean(body.useDiamondCredit) && !hasUnlimitedPremium;
 
         let invitation;
         try {
@@ -221,12 +239,22 @@ export async function POST(request: NextRequest) {
                         throw new Error('INSUFFICIENT_CREDITS');
                     }
                 }
+                if (willSpendDiamondCredit) {
+                    const result = await tx.user.updateMany({
+                        where: { id: userId, diamondCredits: { gt: 0 } },
+                        data: { diamondCredits: { decrement: 1 } },
+                    });
+                    if (result.count === 0) {
+                        throw new Error('INSUFFICIENT_CREDITS');
+                    }
+                }
 
                 return tx.invitation.create({
             data: {
                 userId,
                 planTier: invitationPlanTier, // Asignar el plan correspondiente
                 premiumCreditSpent: willSpendCredit,
+                diamondCreditSpent: willSpendDiamondCredit,
                 tipo: body.type || 'CASAMIENTO',
                 estado: 'ACTIVA',
                 slug,
@@ -363,7 +391,7 @@ export async function POST(request: NextRequest) {
         } catch (txError) {
             if (txError instanceof Error && txError.message === 'INSUFFICIENT_CREDITS') {
                 return NextResponse.json(
-                    { error: 'No tienes créditos premium disponibles' },
+                    { error: willSpendDiamondCredit ? 'No tienes créditos diamond disponibles' : 'No tienes créditos premium disponibles' },
                     { status: 403 }
                 );
             }

@@ -269,19 +269,15 @@ export default function SubscriptionPage() {
                         Plan Actual
                       </Button>
                     ) : isUpgrade ? (
-                      <div className="space-y-3">
-                        <Button
-                          disabled
-                          className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
-                        >
-                          Próximamente - Mercado Pago
+                      <Link
+                        href={`https://wa.me/5493517660000?text=${encodeURIComponent(`Hola! Quiero actualizar mi cuenta al plan ${plan.name}`)}`}
+                        target="_blank"
+                      >
+                        <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center gap-2">
+                          <MessageCircle className="w-4 h-4" />
+                          Quiero el plan {plan.name}
                         </Button>
-                        {planKey === "DIAMOND" && (
-                          <p className="text-xs text-center text-gray-500">
-                            Pago disponible pronto
-                          </p>
-                        )}
-                      </div>
+                      </Link>
                     ) : (
                       <Button disabled variant="outline" className="w-full">
                         Plan Anterior

@@ -19,6 +19,7 @@ const PREDEFINED_TITULOS_TARJETA = ["Pago de Tarjetas", "Pago de Invitaciones", 
 export function StepBankDetails() {
     const { data, setData, nextStep } = useWizardStore();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
+    const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
     const { showToast } = useToast();
     const { data: session } = useSession();
     const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
@@ -36,8 +37,8 @@ export function StepBankDetails() {
     const d = data as any;
     const isEditing = Boolean(d.id);
 
-    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit (creación)
-    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit;
+    // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit/useDiamondCredit (creación)
+    const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit && !useDiamondCredit;
     const isLocked = !isAdmin && rawLocked;
 
     const [isCustomRegaloTitulo, setIsCustomRegaloTitulo] = useState(() => {

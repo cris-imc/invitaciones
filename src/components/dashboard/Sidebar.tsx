@@ -29,6 +29,7 @@ export function Sidebar() {
     const [showWarning, setShowWarning] = useState(false);
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [premiumCredits, setPremiumCredits] = useState(0);
+    const [diamondCredits, setDiamondCredits] = useState(0);
     const [mounted, setMounted] = useState(false);
 
     // El PageTransition global (template.tsx) anima "filter" en cada cambio
@@ -51,7 +52,12 @@ export function Sidebar() {
         if (role !== "CLIENT") return;
         fetch("/api/user/credits")
             .then((r) => (r.ok ? r.json() : null))
-            .then((data) => { if (data) setPremiumCredits(data.premiumCredits || 0); })
+            .then((data) => {
+                if (data) {
+                    setPremiumCredits(data.premiumCredits || 0);
+                    setDiamondCredits(data.diamondCredits || 0);
+                }
+            })
             .catch(() => {});
     }, [role]);
 
@@ -246,6 +252,7 @@ export function Sidebar() {
                         ) : (
                             <NewInvitationButton
                                 premiumCredits={premiumCredits}
+                                diamondCredits={diamondCredits}
                                 totalInvitations={0}
                                 planTier={session?.user?.planTier}
                                 renderTrigger={(onClick) => (
