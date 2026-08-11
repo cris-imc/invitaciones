@@ -9,14 +9,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
 import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft } from "lucide-react";
-import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
+import { PLAN_LIMITS, formatPrice, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
-
-const DIAMOND_DISCOUNT_PRICE = Math.round(PLAN_LIMITS.DIAMOND.price * 0.8);
 
 const PLAN_CARDS: {
   key: PlanType;
@@ -176,6 +174,19 @@ function RegisterForm() {
 
       if (!response.ok) {
         showToast(data.error || "Error al registrarse", "error");
+        return;
+      }
+
+      if (data.checkoutUrl) {
+        showToast("¡Cuenta creada! Redirigiendo a Mercado Pago...", "success");
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+
+      if (data.error) {
+        // Cuenta creada, pero el cobro no se pudo generar (ver mensaje del servidor).
+        showToast(data.error, "error");
+        router.push("/login");
         return;
       }
 
@@ -414,7 +425,11 @@ function RegisterForm() {
                   className="w-full l-cta h-14 text-lg bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 border-none mt-8"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+                  {isLoading
+                    ? "Creando cuenta..."
+                    : selectedPlan === "FREE"
+                    ? "Crear cuenta"
+                    : "Continuar a Mercado Pago"}
                 </Button>
 
                 <div className="text-center pt-4">

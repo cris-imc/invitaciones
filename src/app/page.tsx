@@ -7,14 +7,14 @@ import { Logo } from "@/components/ui/Logo";
 import { HeroParallaxPhoto } from "@/components/landing/HeroParallaxPhoto";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
-import { PLAN_LIMITS, formatPrice } from "@/lib/plan-limits";
+import { PLAN_LIMITS, formatPrice, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
 
 export default async function Home() {
   const session = await auth();
   const registerUrl = session ? "/dashboard?new=true" : "/register";
   const premiumUrl = session ? "/dashboard?new=true&plan=premium" : "/register?plan=premium";
   const diamondUrl = session ? "/dashboard?new=true&plan=diamond" : "/register?plan=diamond";
-  const diamondDiscountPrice = Math.round(PLAN_LIMITS.DIAMOND.price * 0.8);
+  const diamondDiscountPrice = DIAMOND_DISCOUNT_PRICE;
   const whatsappEnterpriseUrl = `https://wa.me/5493517660000?text=${encodeURIComponent(
     "Hola, me interesa el plan Enterprise de Alta Invitación"
   )}`;

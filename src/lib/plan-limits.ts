@@ -149,6 +149,11 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   },
 };
 
+// Precio real de Diamond con 20% OFF aplicado -- es lo que efectivamente se
+// cobra. Centralizado acá para que landing, registro y el cobro de
+// Mercado Pago nunca se desincronicen entre sí.
+export const DIAMOND_DISCOUNT_PRICE = Math.round(PLAN_LIMITS.DIAMOND.price * 0.8);
+
 export interface PlanValidationError {
   field: string;
   message: string;

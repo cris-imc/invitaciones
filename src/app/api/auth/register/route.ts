@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword } from "@/lib/password";
+import { PLAN_LIMITS, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
+import { createCheckoutPreference } from "@/lib/mercadopago";
 
 export async function POST(request: NextRequest) {
   if (!REGISTRATION_ENABLED) {
@@ -60,6 +62,10 @@ export async function POST(request: NextRequest) {
     // ilimitadas. El planTier de la cuenta queda siempre FREE acá — un plan
     // ilimitado (PREMIUM/DIAMOND/ENTERPRISE/ADMIN) solo se asigna
     // manualmente desde el admin.
+    //
+    // El crédito NO se otorga acá -- la cuenta se crea siempre (aunque no se
+    // complete el pago, para no perder el alta), y el crédito recién se
+    // acredita cuando el webhook de Mercado Pago confirma el pago aprobado.
     const wantsPremium = planTier === "PREMIUM";
     const wantsDiamond = planTier === "DIAMOND";
 
@@ -72,9 +78,9 @@ export async function POST(request: NextRequest) {
         phoneAreaCode,
         phoneNumber,
         planTier: "FREE",
-        premiumCredits: wantsPremium ? 1 : 0,
-        diamondCredits: wantsDiamond ? 1 : 0,
-        subscriptionStatus: wantsPremium || wantsDiamond ? "ACTIVE" : "TRIAL",
+        premiumCredits: 0,
+        diamondCredits: 0,
+        subscriptionStatus: "TRIAL",
         role: "CLIENT",
       },
       select: {
@@ -86,13 +92,59 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      {
-        message: "Usuario creado exitosamente",
-        user,
-      },
-      { status: 201 }
-    );
+    if (!wantsPremium && !wantsDiamond) {
+      return NextResponse.json(
+        { message: "Usuario creado exitosamente", user },
+        { status: 201 }
+      );
+    }
+
+    const amount = wantsDiamond ? DIAMOND_DISCOUNT_PRICE : PLAN_LIMITS.PREMIUM.price;
+    const paidPlanTier = wantsDiamond ? "DIAMOND" : "PREMIUM";
+
+    try {
+      const payment = await prisma.payment.create({
+        data: {
+          userId: user.id,
+          amount,
+          currency: "ARS",
+          status: "PENDING",
+          planTier: paidPlanTier,
+        },
+      });
+
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+
+      const { preferenceId, checkoutUrl } = await createCheckoutPreference({
+        paymentId: payment.id,
+        title: `Membresía ${paidPlanTier === "DIAMOND" ? "Diamond" : "Premium"} - Alta Invitación`,
+        amount,
+        payerEmail: user.email,
+        baseUrl,
+      });
+
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: { mercadoPagoId: preferenceId },
+      });
+
+      return NextResponse.json(
+        { message: "Usuario creado exitosamente", user, checkoutUrl },
+        { status: 201 }
+      );
+    } catch (paymentError) {
+      console.error("Error creando la preferencia de Mercado Pago:", paymentError);
+      // La cuenta ya existe (como Gratis, sin credito) -- no la perdemos por
+      // un problema al armar el cobro. El usuario puede iniciar sesion igual.
+      return NextResponse.json(
+        {
+          message: "Usuario creado exitosamente",
+          user,
+          error: "Tu cuenta se creó, pero hubo un problema al generar el pago. Escribinos por WhatsApp para completarlo.",
+        },
+        { status: 201 }
+      );
+    }
   } catch (error) {
     console.error("Error creating user:", error);
     return NextResponse.json(
