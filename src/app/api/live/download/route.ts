@@ -90,8 +90,8 @@ export async function GET(req: Request) {
                 "Content-Disposition": `attachment; filename="${filename}"`
             }
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Live download zip error:", error);
-        return new NextResponse("Internal Server Error", { status: 500 });
+        return new NextResponse(`Error interno: ${error?.message}\n${error?.stack}`, { status: 500 });
     }
 }
