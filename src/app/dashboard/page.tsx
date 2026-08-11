@@ -171,16 +171,15 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
           <GreetingText userName={userName} />
           <p>
             Acá tenés el resumen de tus eventos en tiempo real.
-            {dbUser && (
-              <span className="text-yellow-500 font-semibold ml-2">
-                {dbUser.planTier === "PREMIUM" ||
+            {dbUser &&
+              (dbUser.planTier === "PREMIUM" ||
                 dbUser.planTier === "DIAMOND" ||
                 dbUser.planTier === "ADMIN" ||
-                dbUser.planTier === "ENTERPRISE"
-                  ? "Invitaciones Premium: ilimitadas por tu plan."
-                  : `Invitaciones Premium disponibles: ${dbUser.premiumCredits || 0}.`}
-              </span>
-            )}
+                dbUser.planTier === "ENTERPRISE") && (
+                <span className="text-yellow-500 font-semibold ml-2">
+                  Invitaciones Premium: ilimitadas por tu plan.
+                </span>
+              )}
           </p>
         </div>
         <div className="hidden md:block">
