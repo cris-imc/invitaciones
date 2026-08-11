@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { GuestManager } from "@/components/dashboard/guests/GuestManager";
 import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPayment";
@@ -71,6 +72,7 @@ export function GuestPageTabs({
 }: Props) {
   const [tab, setTab] = useState<Tab>("agregar");
   const [liveActive, setLiveActive] = useState(false);
+  const [lockedTooltip, setLockedTooltip] = useState<{ id: Tab; top: number; left: number } | null>(null);
   const tabContentRef = useRef<HTMLDivElement>(null);
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -188,7 +190,16 @@ export function GuestPageTabs({
               );
 
             return (
-              <div key={t.id} className="relative group">
+              <div
+                key={t.id}
+                className="relative"
+                onMouseEnter={(e) => {
+                  if (!isLocked) return;
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setLockedTooltip({ id: t.id, top: rect.top, left: rect.left + rect.width / 2 });
+                }}
+                onMouseLeave={() => setLockedTooltip(null)}
+              >
                 <button
                   type="button"
                   onClick={() => !isLocked && setTab(t.id)}
@@ -205,19 +216,27 @@ export function GuestPageTabs({
                   {tabLabel}
                   {isLocked && <Lock className="w-3 h-3 ml-1" />}
                 </button>
-
-                {/* Tooltip for locked tabs */}
-                {isLocked && (
-                  <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                    {t.id === "live" ? "Disponible en Diamond" : "Disponible en Premium"}
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
-                  </div>
-                )}
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Tooltip de tabs bloqueados, portado a <body>: el contenedor de tabs
+          tiene overflow-x:auto para el scroll horizontal, lo que fuerza
+          overflow-y:hidden implícito y recorta cualquier tooltip absoluto
+          que intente sobresalir por arriba de la fila. */}
+      {lockedTooltip &&
+        createPortal(
+          <div
+            className="fixed px-3 py-1.5 bg-black text-white text-xs rounded whitespace-nowrap z-[200] pointer-events-none"
+            style={{ top: lockedTooltip.top - 8, left: lockedTooltip.left, transform: "translate(-50%, -100%)" }}
+          >
+            {lockedTooltip.id === "live" ? "Disponible en Diamond" : "Disponible en Premium"}
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
+          </div>,
+          document.body
+        )}
 
       {/* 📱 Animated description 📱 */}
       <AnimatedTabDescription text={TAB_DESCRIPTIONS[tab]} />
