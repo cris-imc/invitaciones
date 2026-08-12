@@ -29,7 +29,7 @@ const PLAN_CARDS: {
     features: [
       `Hasta ${PLAN_LIMITS.FREE.maxGuests} invitados`,
       "Plantilla 100% personalizada",
-      "Gestión de invitados y pagos",
+      "Gestión de invitados",
       "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum`,
     ],
