@@ -65,8 +65,9 @@ export async function updateInvitationMaxGuests(invitationId: string, maxGuestsO
 
 import bcrypt from "bcryptjs";
 import { validatePassword } from "@/lib/password";
+import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 
-export async function adminUpdateUser(userId: string, data: { name?: string; email?: string; password?: string }) {
+export async function adminUpdateUser(userId: string, data: { name?: string; email?: string; password?: string; phoneAreaCode?: string; phoneNumber?: string }) {
     try {
         const session = await auth();
 
@@ -77,6 +78,23 @@ export async function adminUpdateUser(userId: string, data: { name?: string; ema
         const updateData: any = {};
         if (data.name && data.name.trim().length > 0) updateData.name = data.name.trim();
         if (data.email && data.email.trim().length > 0) updateData.email = data.email.trim().toLowerCase();
+
+        if (data.phoneAreaCode !== undefined && data.phoneNumber !== undefined) {
+            const areaCode = data.phoneAreaCode.trim();
+            const number = data.phoneNumber.trim();
+            // Ambos vacíos = borrar el teléfono. Si sólo uno está cargado, validar.
+            if (!areaCode && !number) {
+                updateData.phoneAreaCode = null;
+                updateData.phoneNumber = null;
+            } else {
+                const areaCodeError = validatePhoneAreaCode(areaCode);
+                if (areaCodeError) return { success: false, error: areaCodeError };
+                const numberError = validatePhoneNumber(number);
+                if (numberError) return { success: false, error: numberError };
+                updateData.phoneAreaCode = areaCode;
+                updateData.phoneNumber = number;
+            }
+        }
 
         if (data.password && data.password.trim().length > 0) {
             const passwordError = validatePassword(data.password.trim());

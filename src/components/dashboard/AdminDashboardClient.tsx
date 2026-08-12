@@ -107,7 +107,7 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                                 </div>
                                 
                                 <div className="flex gap-2 items-center flex-wrap">
-                                    <EditUserButton userId={client.id} initialName={client.name || ""} initialEmail={client.email || ""} />
+                                    <EditUserButton userId={client.id} initialName={client.name || ""} initialEmail={client.email || ""} initialPhoneAreaCode={client.phoneAreaCode || ""} initialPhoneNumber={client.phoneNumber || ""} />
                                     <EditCreditsButton
                                         userId={client.id}
                                         currentCredits={client.premiumCredits || 0}
