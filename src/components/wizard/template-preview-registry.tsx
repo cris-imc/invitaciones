@@ -10,13 +10,17 @@ export interface ColorOption {
   color: string;
 }
 
+// Colores de los circulitos selectores (no son el color real de la
+// plantilla, solo la muestra en el picker) -- se eligen versiones más
+// claras/saturadas que el tono casi negro de cada plantilla para que se
+// puedan distinguir entre sí de un vistazo.
 export const MODERNO_COLORS: ColorOption[] = [
-  { id: "default", name: "Gris y Dorado", color: "#1E1F22" },
-  { id: "Bordo", name: "Bordó y Dorado", color: "#2A0811" },
-  { id: "Azul", name: "Azul y Dorado", color: "#050B14" },
-  { id: "Verde", name: "Verde y Dorado", color: "#05120B" },
-  { id: "Purpura", name: "Violeta y Dorado", color: "#0D0412" },
-  { id: "Rojo", name: "Rojo y Dorado", color: "#8A2E3B" },
+  { id: "default", name: "Gris y Dorado", color: "#4B4B52" },
+  { id: "Bordo", name: "Bordó y Dorado", color: "#7A1128" },
+  { id: "Azul", name: "Azul y Dorado", color: "#1B4B8F" },
+  { id: "Verde", name: "Verde y Dorado", color: "#146C3E" },
+  { id: "Purpura", name: "Violeta y Dorado", color: "#5B2A86" },
+  { id: "Rojo", name: "Rojo y Dorado", color: "#D62828" },
 ];
 
 export const ELEGANT_COLORS: ColorOption[] = [
