@@ -11,6 +11,7 @@ import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray"
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
+import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
 
 async function getInvitation(slug: string) {
     const invitation = await prisma.invitation.findUnique({
@@ -20,6 +21,7 @@ async function getInvitation(slug: string) {
             slug: true,
             tipo: true,
             estado: true,
+            planTier: true,
             nombreEvento: true,
             nombreNovia: true,
             nombreNovio: true,
@@ -129,22 +131,34 @@ export default async function InvitationPage({ params }: { params: Promise<{ slu
         // Fallback
     }
 
-    if (invitation.tipo === 'CASAMIENTO' || invitation.tipo === 'QUINCE_ANOS' || invitation.tipo === 'CUMPLEANOS') {
-        const color = temaColoresObj.colorPrincipal || 'default';
-        const invRecord = invitation as Record<string, unknown>;
-        
-        switch (color) {
-            case 'Green': return <ElegantTemplateGreen invitation={invRecord} />;
-            case 'Red': return <ElegantTemplateRed invitation={invRecord} />;
-            case 'Blue': return <ElegantTemplateBlue invitation={invRecord} />;
-            case 'Orange': return <ElegantTemplateOrange invitation={invRecord} />;
-            case 'Violet': return <ElegantTemplateViolet invitation={invRecord} />;
-            case 'Gray': return <ElegantTemplateGray invitation={invRecord} />;
-            case 'DarkYellow': return <ElegantTemplateDarkYellow invitation={invRecord} />;
-            case 'Pink': return <ElegantTemplatePink invitation={invRecord} />;
-            default: return <ElegantTemplate invitation={invRecord} />;
+    function renderTemplate() {
+        if (invitation!.tipo === 'CASAMIENTO' || invitation!.tipo === 'QUINCE_ANOS' || invitation!.tipo === 'CUMPLEANOS') {
+            const color = temaColoresObj.colorPrincipal || 'default';
+            const invRecord = invitation as Record<string, unknown>;
+
+            switch (color) {
+                case 'Green': return <ElegantTemplateGreen invitation={invRecord} />;
+                case 'Red': return <ElegantTemplateRed invitation={invRecord} />;
+                case 'Blue': return <ElegantTemplateBlue invitation={invRecord} />;
+                case 'Orange': return <ElegantTemplateOrange invitation={invRecord} />;
+                case 'Violet': return <ElegantTemplateViolet invitation={invRecord} />;
+                case 'Gray': return <ElegantTemplateGray invitation={invRecord} />;
+                case 'DarkYellow': return <ElegantTemplateDarkYellow invitation={invRecord} />;
+                case 'Pink': return <ElegantTemplatePink invitation={invRecord} />;
+                default: return <ElegantTemplate invitation={invRecord} />;
+            }
         }
+
+        return <ConviteTemplate invitation={invitation as Record<string, unknown>} />;
     }
 
-    return <ConviteTemplate invitation={invitation as Record<string, unknown>} />;
+    const isFree = invitation.planTier === 'FREE';
+
+    return (
+        <>
+            {isFree && <FreePlanBanner />}
+            {isFree && <FreePlanBannerSpacer />}
+            {renderTemplate()}
+        </>
+    );
 }

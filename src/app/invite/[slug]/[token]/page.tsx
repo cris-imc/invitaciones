@@ -22,6 +22,7 @@ import { Metadata } from 'next';
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { autoRejectStalePending } from "@/lib/live-cleanup";
 import { getInvitePhrase } from "@/lib/invitation-copy";
+import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
 
 // Generate metadata for social sharing
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -72,6 +73,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 slug: true,
                 tipo: true,
                 estado: true,
+                planTier: true,
                 nombreEvento: true,
                 nombreNovia: true,
                 nombreNovio: true,
@@ -254,44 +256,56 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         // Fallback
     }
 
-    if (validInvitation.tipo === 'CASAMIENTO' || validInvitation.tipo === 'QUINCE_ANOS' || validInvitation.tipo === 'CUMPLEANOS') {
-        const color = temaColoresObj.colorPrincipal || 'default';
-        const invRecord = validInvitation as Record<string, unknown>;
-        const guestRecord = guest as any;
+    function renderTemplate() {
+        if (validInvitation.tipo === 'CASAMIENTO' || validInvitation.tipo === 'QUINCE_ANOS' || validInvitation.tipo === 'CUMPLEANOS') {
+            const color = temaColoresObj.colorPrincipal || 'default';
+            const invRecord = validInvitation as Record<string, unknown>;
+            const guestRecord = guest as any;
 
-        if (validInvitation.templateTipo === 'MODERNO') {
-            switch (color) {
-                case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Bordo': return <ModernoTemplateBordo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Negro': return <ModernoTemplateNegro invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Purpura': return <ModernoTemplatePurpura invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Verde': return <ModernoTemplateVerde invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Rojo': return <ModernoTemplateRojo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'default':
-                case 'Gris': return <ModernoTemplateGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                default: return <ModernoTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-            }
-        } else {
-            // Default to ELEGANT
-            switch (color) {
-                case 'Green': return <ElegantTemplateGreen invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Red': return <ElegantTemplateRed invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Blue': return <ElegantTemplateBlue invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Orange': return <ElegantTemplateOrange invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Violet': return <ElegantTemplateViolet invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Gray': return <ElegantTemplateGray invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'DarkYellow': return <ElegantTemplateDarkYellow invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                case 'Pink': return <ElegantTemplatePink invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
-                default: return <ElegantTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            if (validInvitation.templateTipo === 'MODERNO') {
+                switch (color) {
+                    case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Bordo': return <ModernoTemplateBordo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Negro': return <ModernoTemplateNegro invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Purpura': return <ModernoTemplatePurpura invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Verde': return <ModernoTemplateVerde invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Rojo': return <ModernoTemplateRojo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'default':
+                    case 'Gris': return <ModernoTemplateGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ModernoTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else {
+                // Default to ELEGANT
+                switch (color) {
+                    case 'Green': return <ElegantTemplateGreen invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Red': return <ElegantTemplateRed invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Blue': return <ElegantTemplateBlue invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Orange': return <ElegantTemplateOrange invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Violet': return <ElegantTemplateViolet invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Gray': return <ElegantTemplateGray invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'DarkYellow': return <ElegantTemplateDarkYellow invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Pink': return <ElegantTemplatePink invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ElegantTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
             }
         }
+
+        return (
+            <ConviteTemplate
+                invitation={invitation as Record<string, unknown>}
+                guest={guest as any}
+                isPersonalized={true}
+            />
+        );
     }
 
+    const isFree = validInvitation.planTier === 'FREE';
+
     return (
-        <ConviteTemplate
-            invitation={invitation as Record<string, unknown>}
-            guest={guest as any}
-            isPersonalized={true}
-        />
+        <>
+            {isFree && <FreePlanBanner />}
+            {isFree && <FreePlanBannerSpacer />}
+            {renderTemplate()}
+        </>
     );
 }
