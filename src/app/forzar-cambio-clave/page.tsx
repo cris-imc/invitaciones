@@ -68,7 +68,7 @@ export default function ForzarCambioClavePage() {
                 minLength={PASSWORD_MIN_LENGTH}
                 className="bg-black border-white/10"
               />
-              <p className="text-xs text-zinc-500">Mínimo 8 caracteres, con al menos una mayúscula</p>
+              <p className="text-xs text-zinc-500">Mínimo 8 caracteres, con al menos una mayúscula y un número</p>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-zinc-300">Confirmar Nueva Contraseña</label>

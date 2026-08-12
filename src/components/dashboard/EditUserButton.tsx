@@ -140,7 +140,7 @@ export function EditUserButton({ userId, initialName, initialEmail, initialPhone
                                 placeholder="Dejar en blanco para no cambiar"
                                 minLength={PASSWORD_MIN_LENGTH}
                             />
-                            <p className="text-[10px] text-white/40">Si ingresás una contraseña (mínimo 8 caracteres, con una mayúscula), se sobreescribirá la actual y se le pedirá cambiarla al iniciar sesión.</p>
+                            <p className="text-[10px] text-white/40">Si ingresás una contraseña (mínimo 8 caracteres, con una mayúscula y un número), se sobreescribirá la actual y se le pedirá cambiarla al iniciar sesión.</p>
                         </div>
                     </div>
 

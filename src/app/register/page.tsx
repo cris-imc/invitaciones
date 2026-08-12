@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
 import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PLAN_LIMITS, formatPrice, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
@@ -127,9 +128,15 @@ function RegisterForm() {
     phoneAreaCode: "",
     phoneNumber: "",
   });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!acceptedTerms) {
+      showToast("Debés aceptar los Términos y Condiciones para registrarte", "error");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       showToast("Las contraseñas no coinciden", "error");
@@ -167,6 +174,7 @@ function RegisterForm() {
           planTier: selectedPlan,
           phoneAreaCode: normalizeDigits(formData.phoneAreaCode),
           phoneNumber: normalizeDigits(formData.phoneNumber),
+          acceptedTerms,
         }),
       });
 
@@ -395,7 +403,7 @@ function RegisterForm() {
                   </Label>
                   <PasswordInput
                     id="password"
-                    placeholder="Mínimo 8 caracteres, con una mayúscula"
+                    placeholder="Mínimo 8 caracteres, con una mayúscula y un número"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
@@ -420,10 +428,32 @@ function RegisterForm() {
                   />
                 </div>
 
+                <div className="flex items-start gap-2.5 pt-1">
+                  <Checkbox
+                    id="acceptedTerms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => setAcceptedTerms(Boolean(checked))}
+                    className="mt-0.5 border-[var(--on-ink)]/30 data-[state=checked]:bg-[var(--accent)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:text-[var(--ink)]"
+                  />
+                  <Label htmlFor="acceptedTerms" className="text-sm opacity-80 font-normal leading-snug cursor-pointer">
+                    Acepto los{" "}
+                    <Link
+                      href="/terminos-registro"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--accent)] hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Términos y Condiciones
+                    </Link>{" "}
+                    de Alta Invitación
+                  </Label>
+                </div>
+
                 <Button
                   type="submit"
-                  className="w-full l-cta h-14 text-lg bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 border-none mt-8"
-                  disabled={isLoading}
+                  className="w-full l-cta h-14 text-lg bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 border-none mt-2"
+                  disabled={isLoading || !acceptedTerms}
                 >
                   {isLoading
                     ? "Creando cuenta..."

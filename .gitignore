@@ -45,3 +45,4 @@ next-env.d.ts
 # archivos sueltos de trabajo/referencia (no tocan el contenido ya commiteado en img/)
 docs/ANALISIS.md
 img/*
+/svg/

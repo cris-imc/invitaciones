@@ -6,6 +6,7 @@ import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword } from "@/lib/password";
 import { PLAN_LIMITS, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
 import { createCheckoutPreference, getPublicBaseUrl } from "@/lib/mercadopago";
+import { getRequestIp } from "@/lib/request-ip";
 
 export async function POST(request: NextRequest) {
   if (!REGISTRATION_ENABLED) {
@@ -17,12 +18,22 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, email, password, planTier, phoneAreaCode, phoneNumber } = body;
+    const { name, email, password, planTier, phoneAreaCode, phoneNumber, acceptedTerms } = body;
 
     // Validate input
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: "Todos los campos son requeridos" },
+        { status: 400 }
+      );
+    }
+
+    // El checkbox del cliente es solo UX -- la aceptación real que vale
+    // como evidencia es esta validación server-side + el timestamp/IP que
+    // se graba abajo en el registro del usuario.
+    if (acceptedTerms !== true) {
+      return NextResponse.json(
+        { error: "Debés aceptar los Términos y Condiciones para registrarte" },
         { status: 400 }
       );
     }
@@ -82,6 +93,8 @@ export async function POST(request: NextRequest) {
         diamondCredits: 0,
         subscriptionStatus: "TRIAL",
         role: "CLIENT",
+        termsAcceptedAt: new Date(),
+        termsAcceptedIp: getRequestIp(request),
       },
       select: {
         id: true,

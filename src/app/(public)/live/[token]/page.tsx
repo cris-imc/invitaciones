@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef, use } from "react";
+import Link from "next/link";
 import { Camera, MessageSquare, Loader2, Smile } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { LiveItem } from "@prisma/client";
 
@@ -23,23 +25,50 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
     const [guestName, setGuestName] = useState("");
     const [hasName, setHasName] = useState(false);
     const [errorModal, setErrorModal] = useState<string | null>(null);
+    const [acceptedLiveTerms, setAcceptedLiveTerms] = useState(false);
+    const [acceptingTerms, setAcceptingTerms] = useState(false);
+    const [acceptanceId, setAcceptanceId] = useState<string | null>(null);
 
     useEffect(() => {
         // La clave incluye el token: sin esto, un mismo celular que escanea
         // el QR de LIVE de dos eventos distintos arrastraba el nombre
-        // cargado en el primero al segundo.
+        // cargado en el primero al segundo. Solo se restaura la sesión si
+        // también hay un acceptanceId guardado (aceptación ya registrada en
+        // el servidor) -- si no, vuelve a pedir el check (ej. invitados que
+        // ya tenían el nombre guardado de antes de que existiera este check).
         const storedName = localStorage.getItem(`live_guest_name_${token}`);
-        if (storedName) {
-            setGuestName(storedName);
+        const storedAcceptanceId = localStorage.getItem(`live_terms_acceptance_${token}`);
+        if (storedName) setGuestName(storedName);
+        if (storedName && storedAcceptanceId) {
+            setAcceptanceId(storedAcceptanceId);
             setHasName(true);
         }
     }, [token]);
 
-    const handleNameSubmit = (e: React.FormEvent) => {
+    const handleNameSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (guestName.trim()) {
+        if (!guestName.trim() || !acceptedLiveTerms || acceptingTerms) return;
+
+        setAcceptingTerms(true);
+        try {
+            const res = await fetch(`/api/live/public/${token}/accept-terms`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ guestName: guestName.trim() }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.acceptanceId) {
+                setErrorModal(data.error || "No pudimos registrar la aceptación de los Términos. Probá de nuevo.");
+                return;
+            }
             localStorage.setItem(`live_guest_name_${token}`, guestName.trim());
+            localStorage.setItem(`live_terms_acceptance_${token}`, data.acceptanceId);
+            setAcceptanceId(data.acceptanceId);
             setHasName(true);
+        } catch {
+            setErrorModal("No pudimos registrar la aceptación de los Términos. Probá de nuevo.");
+        } finally {
+            setAcceptingTerms(false);
         }
     };
 
@@ -122,6 +151,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             formData.append("file", compressedBlob, "photo.jpg");
             formData.append("type", "PHOTO");
             if (guestName) formData.append("guestName", guestName);
+            if (acceptanceId) formData.append("acceptanceId", acceptanceId);
 
             const res = await fetch(`/api/live/public/${token}/upload`, {
                 method: "POST",
@@ -154,6 +184,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
         formData.append("type", "TEXT");
         formData.append("message", message);
         if (guestName) formData.append("guestName", guestName);
+        if (acceptanceId) formData.append("acceptanceId", acceptanceId);
         
         try {
             const res = await fetch(`/api/live/public/${token}/upload`, {
@@ -200,11 +231,35 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                         onChange={(e) => setGuestName(e.target.value)}
                         required
                     />
+                    <label className="flex items-start gap-2.5 text-left cursor-pointer">
+                        <Checkbox
+                            checked={acceptedLiveTerms}
+                            onCheckedChange={(checked) => setAcceptedLiveTerms(Boolean(checked))}
+                            className="mt-0.5 border-[#F6F3EC]/30 data-[state=checked]:bg-[#C79A4B] data-[state=checked]:border-[#C79A4B] data-[state=checked]:text-[#050807]"
+                        />
+                        <span className="text-xs opacity-70 leading-snug">
+                            Acepto los{" "}
+                            <Link
+                                href="/terminos-live"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#C79A4B] hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                Términos y Condiciones
+                            </Link>{" "}
+                            del servicio LIVE
+                        </span>
+                    </label>
+                    {errorModal && (
+                        <p className="text-red-400 text-xs -mt-1">{errorModal}</p>
+                    )}
                     <button
                         type="submit"
-                        className="w-full bg-[#C79A4B] text-[#050807] font-semibold py-3 rounded-xl hover:bg-[#b08540] transition-colors"
+                        disabled={!acceptedLiveTerms || acceptingTerms}
+                        className="w-full bg-[#C79A4B] text-[#050807] font-semibold py-3 rounded-xl hover:bg-[#b08540] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#C79A4B]"
                     >
-                        Comenzar a Subir
+                        {acceptingTerms ? "Verificando..." : "Comenzar a Subir"}
                     </button>
                 </form>
             </div>

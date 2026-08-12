@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -25,6 +25,8 @@ model User {
   phoneAreaCode         String?
   phoneNumber           String?
   mercadoPagoCustomerId String?      @unique
+  termsAcceptedAt       DateTime?
+  termsAcceptedIp       String?
   createdAt             DateTime     @default(now())
   updatedAt             DateTime     @updatedAt
   accounts              Account[]
@@ -337,29 +339,50 @@ model SongSuggestion {
 }
 
 model LiveSession {
-  id           String      @id @default(cuid())
-  invitationId String      @unique
-  publicToken  String      @unique
-  isActive     Boolean     @default(true)
-  isModerated  Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  invitation   Invitation  @relation(fields: [invitationId], references: [id], onDelete: Cascade)
-  items        LiveItem[]
+  id              String                 @id @default(cuid())
+  invitationId    String                 @unique
+  publicToken     String                 @unique
+  isActive        Boolean                @default(true)
+  isModerated     Boolean                @default(false)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  invitation      Invitation             @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  items           LiveItem[]
+  termsAcceptances LiveTermsAcceptance[]
+}
+
+// Prueba server-side de que un invitado aceptó los Términos y Condiciones
+// del servicio LIVE antes de poder subir contenido -- el checkbox del
+// cliente por sí solo no alcanza como evidencia, así que cada aceptación
+// exitosa queda registrada acá (con IP y user-agent) y el endpoint de
+// upload exige un acceptanceId válido para procesar cualquier archivo.
+model LiveTermsAcceptance {
+  id         String      @id @default(cuid())
+  sessionId  String
+  guestName  String
+  ipAddress  String?
+  userAgent  String?
+  acceptedAt DateTime    @default(now())
+  session    LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  items      LiveItem[]
+
+  @@index([sessionId])
 }
 
 model LiveItem {
-  id           String      @id @default(cuid())
+  id           String                @id @default(cuid())
   sessionId    String
-  type         String      // "PHOTO" | "AUDIO"
+  type         String                // "PHOTO" | "AUDIO"
   fileUrl      String
-  duration     Int?        // Solo para AUDIO, en segundos
-  guestName    String?     // Opcional
-  isActive     Boolean     @default(true) // true = aprobado, visible en pantalla/publico
-  status       String      @default("APPROVED") // "PENDING" | "APPROVED" | "REJECTED"
-  rejectedAt   DateTime?   // cuando se rechazo -- se borra 1h despues (limpieza en GET /api/live/session)
-  createdAt    DateTime    @default(now())
-  session      LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  duration     Int?                  // Solo para AUDIO, en segundos
+  guestName    String?               // Opcional
+  isActive     Boolean               @default(true) // true = aprobado, visible en pantalla/publico
+  status       String                @default("APPROVED") // "PENDING" | "APPROVED" | "REJECTED"
+  rejectedAt   DateTime?             // cuando se rechazo -- se borra 1h despues (limpieza en GET /api/live/session)
+  createdAt    DateTime              @default(now())
+  session      LiveSession           @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  acceptanceId String?               // Trazabilidad: qué aceptación de T&C autorizó este item puntual
+  acceptance   LiveTermsAcceptance?  @relation(fields: [acceptanceId], references: [id])
 
   @@index([sessionId, isActive, createdAt(sort: Desc)])
   @@index([sessionId, status, createdAt(sort: Desc)])

@@ -22,9 +22,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         const type = formData.get('type') as string; // 'PHOTO' | 'AUDIO' | 'TEXT'
         const file = type !== 'TEXT' ? (formData.get('file') as File | null) : null;
         const guestName = formData.get('guestName') as string | null;
+        const acceptanceId = formData.get('acceptanceId') as string | null;
 
         if (!type || (type !== 'TEXT' && !file)) {
             return NextResponse.json({ error: 'Falta archivo o tipo' }, { status: 400 });
+        }
+
+        // Sin una aceptación de Términos y Condiciones válida y registrada
+        // para esta sesión, no se procesa ningún archivo -- el checkbox del
+        // cliente no es suficiente evidencia por sí solo.
+        if (!acceptanceId) {
+            return NextResponse.json({ error: 'Debés aceptar los Términos y Condiciones para subir contenido' }, { status: 403 });
+        }
+        const acceptance = await prisma.liveTermsAcceptance.findUnique({ where: { id: acceptanceId } });
+        if (!acceptance || acceptance.sessionId !== liveSession.id) {
+            return NextResponse.json({ error: 'Debés aceptar los Términos y Condiciones para subir contenido' }, { status: 403 });
         }
 
         // Basic validation
@@ -64,7 +76,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
                     fileUrl: message.trim(), // We store the text message here
                     guestName: guestName || null,
                     isActive: !liveSession.isModerated,
-                    status: liveSession.isModerated ? 'PENDING' : 'APPROVED'
+                    status: liveSession.isModerated ? 'PENDING' : 'APPROVED',
+                    acceptanceId: acceptance.id
                 }
             });
             return NextResponse.json(item);
@@ -103,7 +116,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
                 fileUrl,
                 guestName: guestName || null,
                 isActive: !liveSession.isModerated,
-                status: liveSession.isModerated ? 'PENDING' : 'APPROVED'
+                status: liveSession.isModerated ? 'PENDING' : 'APPROVED',
+                acceptanceId: acceptance.id
             }
         });
 
