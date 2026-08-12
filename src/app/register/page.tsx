@@ -428,14 +428,14 @@ function RegisterForm() {
                   />
                 </div>
 
-                <div className="flex items-start gap-2.5 pt-1">
+                <label htmlFor="acceptedTerms" className="flex items-start gap-2.5 pt-1 cursor-pointer">
                   <Checkbox
                     id="acceptedTerms"
                     checked={acceptedTerms}
                     onCheckedChange={(checked) => setAcceptedTerms(Boolean(checked))}
                     className="mt-0.5 border-[var(--on-ink)]/30 data-[state=checked]:bg-[var(--accent)] data-[state=checked]:border-[var(--accent)] data-[state=checked]:text-[var(--ink)]"
                   />
-                  <Label htmlFor="acceptedTerms" className="text-sm opacity-80 font-normal leading-snug cursor-pointer">
+                  <span className="text-sm opacity-80 leading-snug">
                     Acepto los{" "}
                     <Link
                       href="/terminos-registro"
@@ -447,8 +447,8 @@ function RegisterForm() {
                       Términos y Condiciones
                     </Link>{" "}
                     de Alta Invitación
-                  </Label>
-                </div>
+                  </span>
+                </label>
 
                 <Button
                   type="submit"
