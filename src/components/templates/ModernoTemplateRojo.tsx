@@ -2,7 +2,7 @@
  * ModernoTemplateRojo.tsx
  * Derivado de DraftTemplate.tsx: misma estructura, props, secciones y componentes
  * reutilizados (CountdownV2, AlbumCarousel, RSVPWizardV2, SongSuggestion, etc).
- * Cambia solo la capa visual: paleta grafito (#150406) + dorado champagne (#C9A876)
+ * Cambia solo la capa visual: paleta grafito (#3D0808 -- rojo real, distinto de Bordo) + dorado champagne (#C9A876)
  * + acento esmeralda, bordes rectos (look "glass" moderno).
  *
  * Para el look tipográfico completo (Fraunces itálica + Sora), alias en tu layout
@@ -469,7 +469,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b bg-[#150406] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b bg-[#3D0808] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -557,7 +557,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         }
         /* Tarjetas claras (Ceremonia/Fiesta) necesitan texto oscuro, no blanco */
         .desktop-stage .tpl .moderno-light-card h4 {
-          color: #150406 !important;
+          color: #3D0808 !important;
         }
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
@@ -591,7 +591,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
 
         /* Override Countdown Hardcoded Colors */
         #countdown.dark {
-          background-color: #150406 !important;
+          background-color: #3D0808 !important;
           margin-top: -2px !important;
           position: relative;
           z-index: 20;
@@ -603,8 +603,8 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
 
         /* RSVP Custom Aesthetics for DraftTemplate */
         #rsvp.section.dark {
-          background-color: #150406 !important; /* Dark brown/black */
-          color: #1A070A !important;
+          background-color: #3D0808 !important; /* Dark brown/black */
+          color: #521010 !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -647,7 +647,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
-          background-color: #1A070A !important;
+          background-color: #521010 !important;
           color: #FFFFFF !important;
           border-radius: 0 !important;
           border: none !important;
@@ -714,7 +714,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #1A070A !important;
+          color: #521010 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
@@ -724,7 +724,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         
         /* SongSuggestion Custom Aesthetics */
         #songs.d-sec.dark {
-          background-color: #1A070A !important;
+          background-color: #521010 !important;
           padding: 80px 24px !important;
           display: flex;
           flex-direction: column;
@@ -782,7 +782,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         }
         #songs.d-sec.dark button[type="submit"] {
           background-color: #C9A876 !important;
-          color: #150406 !important;
+          color: #3D0808 !important;
           border-radius: 0 !important;
           border: none !important;
           padding: 14px 24px !important;
@@ -796,7 +796,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         
         /* Footer Aesthetics */
         .desktop-stage .d-foot {
-          background-color: #150406 !important; /* Matches light sections */
+          background-color: #3D0808 !important; /* Matches light sections */
           color: #FFFFFF !important;
           padding: 24px 24px 38px 24px !important;
           text-align: center;
@@ -814,7 +814,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         }
         #banco .copy-btn {
           background-color: #C9A876 !important;
-          color: #150406 !important;
+          color: #3D0808 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;
@@ -823,7 +823,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         }
         #banco .copy-btn.copied {
           background-color: #FFFFFF !important;
-          color: #150406 !important;
+          color: #3D0808 !important;
         }
 
         /* Bottom Nav Pill - Liquid Glass Sticky */
@@ -856,7 +856,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
       {/* PORTADA / WELCOME OVERLAY (mesh dorado + esmeralda animado, glow pulsante) */}
       {!isCoverOpen && (
         <div 
-          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#150406', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#3D0808', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
           className="text-[#EDE9F4] transition-all duration-1000 animate-in fade-in"
         >
           <div style={{
@@ -903,7 +903,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
                 background: 'rgba(201,168,118,0.08)', backdropFilter: 'blur(6px)',
                 marginTop: '1rem',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A876'; e.currentTarget.style.color = '#150406'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A876'; e.currentTarget.style.color = '#3D0808'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(201,168,118,0.08)'; e.currentTarget.style.color = '#C9A876'; }}
             >
               ABRIR INVITACIÓN
@@ -923,7 +923,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
         <div 
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#C9A876]/40 shadow-md ${isTicketMaximized ? 'bg-[#150406]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#FFFFFF]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
+          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#C9A876]/40 shadow-md ${isTicketMaximized ? 'bg-[#3D0808]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#FFFFFF]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
         >
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
@@ -939,7 +939,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#C9A876]" />
-              <span className="text-[#1A070A]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#521010]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1001,9 +1001,9 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
       </aside>
 
       <div className="d-right tpl">
-        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#150406]">
+        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#3D0808]">
           {/* Text Container */}
-          <div className="px-8 pt-16 pb-12 text-left bg-[#150406] z-10 relative">
+          <div className="px-8 pt-16 pb-12 text-left bg-[#3D0808] z-10 relative">
             <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#C9A876] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
@@ -1030,7 +1030,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
           
           {/* Image Container */}
           <div className="flex-1 w-full relative">
-            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #150406 100%)' }} />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #3D0808 100%)' }} />
             <div
               className="absolute inset-0 w-full h-full"
               style={heroBgMobile ? {
@@ -1038,7 +1038,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
                 backgroundSize: "cover",
                 backgroundPosition: `${Number(invitation.portadaImagenPosX ?? 50)}% ${Number(invitation.portadaImagenPosY ?? 50)}%`,
                 backgroundRepeat: "no-repeat"
-              } : { backgroundColor: '#1A070A' }}
+              } : { backgroundColor: '#521010' }}
             />
           </div>
         </div>
@@ -1054,7 +1054,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #C9A87614, transparent 70%), #1A070A" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #C9A87614, transparent 70%), #521010" }}>
             <div className="max-w-2xl mx-auto text-center">
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
@@ -1065,7 +1065,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
           </SectionWrapper>
         ) : null}
 
-        <SectionWrapper id="details" delay={150} className="w-full bg-[#150406] py-20 px-6 md:px-12">
+        <SectionWrapper id="details" delay={150} className="w-full bg-[#3D0808] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
             <p className="t-kicker mb-8  text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               CUÁNDO Y DÓNDE
@@ -1157,7 +1157,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#1A070A] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#521010] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-10">
                 ÁLBUM
@@ -1215,7 +1215,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
 
 
         {showGiftSection && (
-          <SectionWrapper id="banco" delay={200} className="w-full bg-[#1A070A] py-20 px-6 md:px-12 overflow-hidden">
+          <SectionWrapper id="banco" delay={200} className="w-full bg-[#521010] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
                 <p className="t-kicker mb-10 text-[#C9A876]">
                   DATOS BANCARIOS DEL EVENTO
@@ -1267,7 +1267,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
         )}
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
-          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #C9A87618, transparent 70%), #1A070A" }}>
+          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #C9A87618, transparent 70%), #521010" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-8">
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
@@ -1298,7 +1298,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
 
         {musicaHabilitada && musicAudioElement}
 
-        <LogoFooterCredit bgColor="#150406" />
+        <LogoFooterCredit bgColor="#3D0808" />
         </div>
       </div>
       
