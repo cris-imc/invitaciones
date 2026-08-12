@@ -820,8 +820,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
               <div className="space-y-4">
                 {paginatedGuests.map((guest) => {
                   const guestUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/invite/${slug}/${guest.uniqueToken}`;
+                  const waGreeting = guest.type === "FAMILY" ? `familia ${guest.name}` : guest.name;
+                  const waEstas = guest.type === "FAMILY" ? "Están invitados" : "Estás invitado/a";
                   const waMsg = encodeURIComponent(
-                    `¡Hola ${guest.name}! 🎉 Te invitamos a ${getInvitePhrase(tipo)}. Entrá a tu invitación personal para ver todos los detalles y confirmar tu asistencia:\n${guestUrl}`,
+                    `¡Hola ${waGreeting}! 🎉 ${waEstas} a ${getInvitePhrase(tipo)}. Entrá a tu invitación personal para ver todos los detalles y confirmar tu asistencia:\n${guestUrl}`,
                   );
                   const waHref = `https://wa.me/?text=${waMsg}`;
 
