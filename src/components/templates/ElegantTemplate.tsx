@@ -325,13 +325,17 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
   const theme  = getThemeFromTipo(tipo);
 
   useEffect(() => {
-    if (!isCoverOpen) {
+    // No bloquear el scroll del body si no hay portada que tapar (ej. la
+    // vista post-evento) -- si no, overflow queda en "hidden" para siempre
+    // porque isCoverOpen nunca pasa a true en esas vistas.
+    const isPostEventNow = getEventStatus(invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date()) === "POST_EVENT";
+    if (!isCoverOpen && !isPostEventNow) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
-  }, [isCoverOpen]);
+  }, [isCoverOpen, invitation.fechaEvento]);
 
   // Cover / Welcome Overlay data
   const portadaHabilitada = Boolean(invitation.portadaHabilitada ?? true);
@@ -434,12 +438,9 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
   if (eventStatus === "POST_EVENT") {
     return (
       <div className="min-h-dvh w-full bg-gradient-to-b from-[#0d1412] via-[#121c19] to-[#090e0d] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
-        {/* Decorative Background Overlay */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-25 bg-cover bg-center"
-          style={heroBgDesktop ? { backgroundImage: `url(${heroBgDesktop})` } : undefined}
-        />
-        <div className="absolute inset-0 pointer-events-none bg-black/50 backdrop-blur-[2px]" />
+        {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
+        <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
 
         <main className="relative z-10 max-w-5xl mx-auto w-full px-4 md:px-6 py-12 lg:py-20">
           <div className="rounded-[2rem] bg-black/40 border border-white/10 shadow-2xl backdrop-blur-3xl text-center max-w-4xl mx-auto relative overflow-hidden flex flex-col">
@@ -492,7 +493,9 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
           </div>
         </main>
 
-        <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">`n          <LogoFooterCredit bgColor="transparent" />`n        </footer>
+        <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">
+          <LogoFooterCredit bgColor="transparent" />
+        </footer>
       </div>
     );
   }

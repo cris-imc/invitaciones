@@ -102,19 +102,20 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
           <h2>Un poco de nuestra historia</h2>
         </>
       )}
-      <div 
+      <div
         className="album-wrap w-full !max-w-[1000px] mx-auto"
         onMouseEnter={() => (isHovered.current = true)}
         onMouseLeave={() => (isHovered.current = false)}
         onTouchStart={() => (isHovered.current = true)}
         onTouchEnd={() => (isHovered.current = false)}
+        onContextMenu={(e) => e.preventDefault()}
       >
         <div className="album-track" ref={trackRef}>
           {duplicatedPhotos.map((url, i) => (
             <div
               key={i}
-              className="album-item cursor-pointer hover:opacity-90 transition-opacity"
-              style={{ backgroundImage: `url(${url})` }}
+              className="album-item cursor-pointer hover:opacity-90 transition-opacity select-none"
+              style={{ backgroundImage: `url(${url})`, WebkitTouchCallout: "none" }}
               role="img"
               aria-label={`Foto ${(i % photos.length) + 1}`}
               onClick={() => setExpandedPhoto(url)}
@@ -143,11 +144,12 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
 
       {/* Lightbox Overlay */}
       {expandedPhoto && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm cursor-zoom-out"
           onClick={() => setExpandedPhoto(null)}
+          onContextMenu={(e) => e.preventDefault()}
         >
-          <button 
+          <button
             className="absolute top-4 right-4 md:top-8 md:right-8 text-white/70 hover:text-white p-2 rounded-full bg-black/50 hover:bg-black/80 transition-all"
             onClick={(e) => {
               e.stopPropagation();
@@ -156,11 +158,13 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
           >
             <X className="w-8 h-8" />
           </button>
-          
-          <img 
-            src={expandedPhoto} 
-            alt="Foto ampliada" 
-            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default"
+
+          <img
+            src={expandedPhoto}
+            alt="Foto ampliada"
+            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default select-none"
+            draggable={false}
+            style={{ WebkitTouchCallout: "none" }}
             onClick={(e) => e.stopPropagation()}
           />
         </div>
