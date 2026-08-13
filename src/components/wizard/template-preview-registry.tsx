@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC";
 
 export interface ColorOption {
   id: string;
@@ -22,6 +22,30 @@ export const MODERNO_COLORS: ColorOption[] = [
   { id: "Verde", name: "Verde y Dorado", color: "#3D6B54" },
   { id: "Purpura", name: "Violeta y Dorado", color: "#5C4472" },
   { id: "Rojo", name: "Rojo y Dorado", color: "#B84A3E" },
+];
+
+// Neon ("Doodle Disco 15") solo se ofrece para QUINCE_ANOS/CUMPLEANOS -- el
+// gating vive en TemplatePreviewModal.tsx, no acá.
+export const NEON_COLORS: ColorOption[] = [
+  { id: "default", name: "Cian y Magenta", color: "#39FFD0" },
+  { id: "Violeta", name: "Violeta y Cian", color: "#B24BFF" },
+  { id: "Dorado", name: "Dorado y Magenta", color: "#FFC94B" },
+  { id: "Verde", name: "Verde Lima y Magenta", color: "#B6FF3C" },
+  { id: "Azul", name: "Azul Eléctrico y Magenta", color: "#3C8CFF" },
+  { id: "Rojo", name: "Rojo y Cian", color: "#FF3C5C" },
+];
+
+// Chic ("Doodle Wedding") solo se ofrece para CASAMIENTO -- el gating vive
+// en TemplatePreviewModal.tsx, no acá. Dorado queda fijo en todas (como en
+// Moderno), varía el acento "oliva".
+export const CHIC_COLORS: ColorOption[] = [
+  { id: "default", name: "Oliva y Dorado", color: "#6B7A4F" },
+  { id: "Rosa", name: "Rosa Antiguo y Dorado", color: "#B08590" },
+  { id: "Azul", name: "Azul Grisáceo y Dorado", color: "#6E8299" },
+  { id: "Terracota", name: "Terracota y Dorado", color: "#B9713F" },
+  { id: "Violeta", name: "Violeta Apagado y Dorado", color: "#8779A0" },
+  { id: "VerdeBotella", name: "Verde Botella y Dorado", color: "#3F5F4A" },
+  { id: "Gris", name: "Gris Cálido y Dorado", color: "#8C8275" },
 ];
 
 export const ELEGANT_COLORS: ColorOption[] = [
@@ -59,6 +83,25 @@ export const MODERNO_COMPONENTS: Record<string, PreviewComponent> = {
   Verde: dynamic(() => import("@/components/templates/ModernoTemplateVerde").then((m) => m.ModernoTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Purpura: dynamic(() => import("@/components/templates/ModernoTemplatePurpura").then((m) => m.ModernoTemplatePurpura), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Rojo: dynamic(() => import("@/components/templates/ModernoTemplateRojo").then((m) => m.ModernoTemplateRojo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const NEON_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/NeonTemplate").then((m) => m.NeonTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violeta: dynamic(() => import("@/components/templates/NeonTemplateVioleta").then((m) => m.NeonTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/NeonTemplateDorado").then((m) => m.NeonTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Verde: dynamic(() => import("@/components/templates/NeonTemplateVerde").then((m) => m.NeonTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/NeonTemplateAzul").then((m) => m.NeonTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rojo: dynamic(() => import("@/components/templates/NeonTemplateRojo").then((m) => m.NeonTemplateRojo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CHIC_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/ChicTemplate").then((m) => m.ChicTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rosa: dynamic(() => import("@/components/templates/ChicTemplateRosa").then((m) => m.ChicTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/ChicTemplateAzul").then((m) => m.ChicTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/ChicTemplateTerracota").then((m) => m.ChicTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violeta: dynamic(() => import("@/components/templates/ChicTemplateVioleta").then((m) => m.ChicTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  VerdeBotella: dynamic(() => import("@/components/templates/ChicTemplateVerdeBotella").then((m) => m.ChicTemplateVerdeBotella), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Gris: dynamic(() => import("@/components/templates/ChicTemplateGris").then((m) => m.ChicTemplateGris), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {

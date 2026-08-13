@@ -12,6 +12,19 @@ import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray"
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
+import { NeonTemplate } from "@/components/templates/NeonTemplate";
+import { NeonTemplateVioleta } from "@/components/templates/NeonTemplateVioleta";
+import { NeonTemplateDorado } from "@/components/templates/NeonTemplateDorado";
+import { NeonTemplateVerde } from "@/components/templates/NeonTemplateVerde";
+import { NeonTemplateAzul } from "@/components/templates/NeonTemplateAzul";
+import { NeonTemplateRojo } from "@/components/templates/NeonTemplateRojo";
+import { ChicTemplate } from "@/components/templates/ChicTemplate";
+import { ChicTemplateRosa } from "@/components/templates/ChicTemplateRosa";
+import { ChicTemplateAzul } from "@/components/templates/ChicTemplateAzul";
+import { ChicTemplateTerracota } from "@/components/templates/ChicTemplateTerracota";
+import { ChicTemplateVioleta } from "@/components/templates/ChicTemplateVioleta";
+import { ChicTemplateVerdeBotella } from "@/components/templates/ChicTemplateVerdeBotella";
+import { ChicTemplateGris } from "@/components/templates/ChicTemplateGris";
 import { ModernoTemplateAzul } from "@/components/templates/ModernoTemplateAzul";
 import { ModernoTemplateBordo } from "@/components/templates/ModernoTemplateBordo";
 import { ModernoTemplateNegro } from "@/components/templates/ModernoTemplateNegro";
@@ -135,7 +148,26 @@ export default async function InvitationPage({
         const color = temaColoresObj.colorPrincipal || 'default';
         const invRecord = invitation as Record<string, unknown>;
 
-        if (invitation!.templateTipo === 'MODERNO') {
+        if (invitation!.templateTipo === 'NEON') {
+            switch (color) {
+                case 'Violeta': return <NeonTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Dorado': return <NeonTemplateDorado invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Verde': return <NeonTemplateVerde invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <NeonTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rojo': return <NeonTemplateRojo invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <NeonTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
+        } else if (invitation!.templateTipo === 'CHIC') {
+            switch (color) {
+                case 'Rosa': return <ChicTemplateRosa invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <ChicTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Terracota': return <ChicTemplateTerracota invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <ChicTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'VerdeBotella': return <ChicTemplateVerdeBotella invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Gris': return <ChicTemplateGris invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <ChicTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
+        } else if (invitation!.templateTipo === 'MODERNO') {
             switch (color) {
                 case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
                 case 'Bordo': return <ModernoTemplateBordo invitation={invRecord} guest={null} isPersonalized={false} />;

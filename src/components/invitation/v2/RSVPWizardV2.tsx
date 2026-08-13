@@ -133,7 +133,7 @@ export function RSVPWizardV2({
           <button
             className="t-btn"
             onClick={() => handleDecline()}
-            style={{ width: "100%", justifyContent: "center", background: "transparent", fontWeight: 600, color: dark ? "#FFFFFF" : "inherit", borderColor: "currentColor" }}
+            style={{ width: "100%", justifyContent: "center", background: "transparent", fontWeight: 600, color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit", borderColor: "currentColor" }}
             aria-label="Declinar invitación"
           >
             Rechazar
@@ -143,7 +143,7 @@ export function RSVPWizardV2({
     }
 
     if (step === "details") {
-      const textColor = dark ? "#FFFFFF" : "inherit";
+      const textColor = dark ? "var(--chic-ink, #FFFFFF)" : "inherit";
       return (
         <div style={{ color: textColor }}>
           {!guestToken && (
@@ -276,7 +276,7 @@ export function RSVPWizardV2({
             lineHeight: "1.2",
             fontFamily: "var(--font-cormorant), serif",
             textAlign: "center",
-            color: dark ? "#FFFFFF" : "inherit"
+            color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit"
           }}>
             {maxGuests > 1 && (adultCount > 0 || teenCount > 0 || childCount > 0) ? (
               `Confirmaste ${adultCount} ${adultCount === 1 ? "adulto" : "adultos"}` +
@@ -290,7 +290,7 @@ export function RSVPWizardV2({
             <button
               className="t-btn"
               onClick={() => setStep("decision")}
-              style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", border: "1px solid currentColor", color: dark ? "#FFFFFF" : "inherit" }}
+              style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", border: "1px solid currentColor", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}
             >
               Modificar asistencia
             </button>
@@ -302,16 +302,16 @@ export function RSVPWizardV2({
     if (step === "declined") {
       return (
         <div role="status">
-          <h3 style={{ marginBottom: "16px", fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", color: dark ? "#FFFFFF" : "inherit", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+          <h3 style={{ marginBottom: "16px", fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
             Qué pena <Heart className="w-6 h-6" strokeWidth={1.5} />
           </h3>
-          <p style={{ fontSize: "16px", opacity: 0.9, lineHeight: 1.5, color: dark ? "#FFFFFF" : "inherit" }}>
+          <p style={{ fontSize: "16px", opacity: 0.9, lineHeight: 1.5, color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}>
             Gracias por avisarnos. Si cambiás de idea, el link sigue activo.
           </p>
           <button
             className="t-btn"
             onClick={() => setStep("decision")}
-            style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", color: dark ? "#FFFFFF" : "inherit", border: "1px solid currentColor" }}
+            style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit", border: "1px solid currentColor" }}
           >
             Cambié de idea, ¡voy!
           </button>

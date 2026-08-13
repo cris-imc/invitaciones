@@ -12,9 +12,30 @@ import {
     TemplatePreviewModal,
     MODERNO_COLORS,
     ELEGANT_COLORS,
+    NEON_COLORS,
+    CHIC_COLORS,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
 import { Wand2 } from "lucide-react";
+
+const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
+    ELEGANT: "Elegant",
+    MODERNO: "Moderno",
+    NEON: "Neon",
+    CHIC: "Chic",
+};
+const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
+    ELEGANT: ELEGANT_COLORS,
+    MODERNO: MODERNO_COLORS,
+    NEON: NEON_COLORS,
+    CHIC: CHIC_COLORS,
+};
+const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = {
+    ELEGANT: "1px solid rgba(0,0,0,.15)",
+    MODERNO: "2px solid #C9A876",
+    NEON: "2px solid #39FFD0",
+    CHIC: "2px solid #C9A876",
+};
 
 
 
@@ -25,9 +46,9 @@ export function StepDesign() {
     const selectedTemplate = data.templateTipo || "ORIGINAL";
 
     const isDesignEvent = ['CASAMIENTO', 'QUINCE_ANOS', 'CUMPLEANOS'].includes(data.type ?? '');
-    const activeTemplateTipo: TemplateTipo = data.templateTipo === 'MODERNO' ? 'MODERNO' : 'ELEGANT';
+    const activeTemplateTipo: TemplateTipo = (data.templateTipo === 'MODERNO' || data.templateTipo === 'NEON' || data.templateTipo === 'CHIC') ? data.templateTipo : 'ELEGANT';
     const activeColorId = themeConfig?.colorPrincipal || 'default';
-    const activeColorList = activeTemplateTipo === 'MODERNO' ? MODERNO_COLORS : ELEGANT_COLORS;
+    const activeColorList = TEMPLATE_TIPO_COLORS[activeTemplateTipo];
     const activeColorOption = activeColorList.find(c => c.id === activeColorId) ?? activeColorList[0];
 
     const handleTemplateSelect = (templateId: string) => {
@@ -61,11 +82,11 @@ export function StepDesign() {
                                 className="h-10 w-10 rounded-full shadow-sm shrink-0"
                                 style={{
                                     backgroundColor: activeColorOption?.color,
-                                    border: activeTemplateTipo === 'MODERNO' ? '2px solid #C9A876' : '1px solid rgba(0,0,0,.15)',
+                                    border: TEMPLATE_TIPO_BORDER[activeTemplateTipo],
                                 }}
                             />
                             <div className="text-left">
-                                <p className="font-semibold">{activeTemplateTipo === 'MODERNO' ? 'Moderno' : 'Elegant'}</p>
+                                <p className="font-semibold">{TEMPLATE_TIPO_LABEL[activeTemplateTipo]}</p>
                                 <p className="text-sm text-muted-foreground">{activeColorOption?.name}</p>
                             </div>
                         </div>

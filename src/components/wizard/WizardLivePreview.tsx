@@ -89,7 +89,7 @@ export function WizardLivePreview() {
     // El src del iframe (fuerza recarga completa) solo depende de tipo de
     // evento / plantilla / color
     const evento = data.type || "CASAMIENTO";
-    const tipo = data.templateTipo === "MODERNO" ? "MODERNO" : "ELEGANT";
+    const tipo = (data.templateTipo === "MODERNO" || data.templateTipo === "NEON" || data.templateTipo === "CHIC") ? data.templateTipo : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
     const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(evento)}&tipo=${tipo}&color=${encodeURIComponent(color)}`;
 

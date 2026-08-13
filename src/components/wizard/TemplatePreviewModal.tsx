@@ -13,10 +13,37 @@ import { cn } from "@/lib/utils";
 import {
   MODERNO_COLORS,
   ELEGANT_COLORS,
+  NEON_COLORS,
+  CHIC_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
-export { MODERNO_COLORS, ELEGANT_COLORS, type TemplateTipo };
+export { MODERNO_COLORS, ELEGANT_COLORS, NEON_COLORS, CHIC_COLORS, type TemplateTipo };
+
+const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
+  { tipo: "ELEGANT", label: "Elegant" },
+  { tipo: "MODERNO", label: "Moderno" },
+  { tipo: "NEON", label: "Neon" },
+  { tipo: "CHIC", label: "Chic" },
+];
+
+// Neon ("Doodle Disco 15") solo se ofrece para 15 años y Evento (CUMPLEANOS),
+// Chic ("Doodle Wedding") solo para Casamiento -- ver
+// docs/PLAN_TEMPLATES_NEON_CHIC.md.
+function getAvailableTabs(eventType: string | undefined): { tipo: TemplateTipo; label: string }[] {
+  return TEMPLATE_TABS.filter(({ tipo }) => {
+    if (tipo === "NEON") return eventType === "QUINCE_ANOS" || eventType === "CUMPLEANOS";
+    if (tipo === "CHIC") return eventType === "CASAMIENTO";
+    return true;
+  });
+}
+
+function getColorsForTipo(tipo: TemplateTipo) {
+  if (tipo === "MODERNO") return MODERNO_COLORS;
+  if (tipo === "NEON") return NEON_COLORS;
+  if (tipo === "CHIC") return CHIC_COLORS;
+  return ELEGANT_COLORS;
+}
 
 // Ancho de un celular real: el iframe siempre se layoutea a este ancho para
 // que las tipografías/paddings de la plantilla queden proporcionados como en
@@ -136,13 +163,14 @@ function TemplatePreviewModalBody({
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
-  const colors = activeTab === "MODERNO" ? MODERNO_COLORS : ELEGANT_COLORS;
+  const colors = getColorsForTipo(activeTab);
   const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(eventType ?? "CASAMIENTO")}&tipo=${activeTab}&color=${encodeURIComponent(previewColor)}`;
+  const availableTabs = getAvailableTabs(eventType);
 
   return (
     <>
         <div className="flex gap-2 px-6 pt-4 shrink-0">
-          {(["ELEGANT", "MODERNO"] as TemplateTipo[]).map((tipo) => (
+          {availableTabs.map(({ tipo, label }) => (
             <button
               key={tipo}
               type="button"
@@ -158,7 +186,7 @@ function TemplatePreviewModalBody({
                   : "bg-muted text-muted-foreground hover:bg-muted/70"
               )}
             >
-              {tipo === "ELEGANT" ? "Elegant" : "Moderno"}
+              {label}
             </button>
           ))}
         </div>
@@ -192,7 +220,7 @@ function TemplatePreviewModalBody({
                     )}
                     style={{
                       backgroundColor: c.color,
-                      border: activeTab === "MODERNO" ? "2px solid #C9A876" : "1px solid rgba(0,0,0,.1)",
+                      border: activeTab === "MODERNO" ? "2px solid #C9A876" : activeTab === "NEON" ? "2px solid #39FFD0" : activeTab === "CHIC" ? "2px solid #C9A876" : "1px solid rgba(0,0,0,.1)",
                     }}
                   />
                   <span className="hidden md:inline text-sm font-medium flex-1">{c.name}</span>

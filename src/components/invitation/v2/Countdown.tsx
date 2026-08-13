@@ -69,8 +69,8 @@ export function Countdown({
       <section data-style="minimalista" className={`w-full py-16 px-6 flex flex-col items-center justify-center text-center ${dark ? "bg-transparent dark" : "bg-transparent"}`} id="countdown">
         <p className="t-kicker mb-4">{kickerLabel}</p>
         <p
-          className={`text-5xl sm:text-6xl font-light ${dark ? "text-[#EDE9F4]" : "text-[#2C2C2C]"}`}
-          style={{ fontFamily: "var(--font-cormorant), serif" }}
+          className="text-5xl sm:text-6xl font-light"
+          style={{ fontFamily: "var(--font-cormorant), serif", color: dark ? "var(--chic-ink, #EDE9F4)" : "#2C2C2C" }}
         >
           {time.dias}
         </p>

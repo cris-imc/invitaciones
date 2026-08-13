@@ -11,6 +11,19 @@ import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray"
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
+import { NeonTemplate } from "@/components/templates/NeonTemplate";
+import { NeonTemplateVioleta } from "@/components/templates/NeonTemplateVioleta";
+import { NeonTemplateDorado } from "@/components/templates/NeonTemplateDorado";
+import { NeonTemplateVerde } from "@/components/templates/NeonTemplateVerde";
+import { NeonTemplateAzul } from "@/components/templates/NeonTemplateAzul";
+import { NeonTemplateRojo } from "@/components/templates/NeonTemplateRojo";
+import { ChicTemplate } from "@/components/templates/ChicTemplate";
+import { ChicTemplateRosa } from "@/components/templates/ChicTemplateRosa";
+import { ChicTemplateAzul } from "@/components/templates/ChicTemplateAzul";
+import { ChicTemplateTerracota } from "@/components/templates/ChicTemplateTerracota";
+import { ChicTemplateVioleta } from "@/components/templates/ChicTemplateVioleta";
+import { ChicTemplateVerdeBotella } from "@/components/templates/ChicTemplateVerdeBotella";
+import { ChicTemplateGris } from "@/components/templates/ChicTemplateGris";
 import { ModernoTemplateAzul } from "@/components/templates/ModernoTemplateAzul";
 import { ModernoTemplateBordo } from "@/components/templates/ModernoTemplateBordo";
 import { ModernoTemplateNegro } from "@/components/templates/ModernoTemplateNegro";
@@ -262,7 +275,26 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
             const invRecord = validInvitation as Record<string, unknown>;
             const guestRecord = guest as any;
 
-            if (validInvitation.templateTipo === 'MODERNO') {
+            if (validInvitation.templateTipo === 'NEON') {
+                switch (color) {
+                    case 'Violeta': return <NeonTemplateVioleta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Dorado': return <NeonTemplateDorado invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Verde': return <NeonTemplateVerde invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Azul': return <NeonTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Rojo': return <NeonTemplateRojo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <NeonTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'CHIC') {
+                switch (color) {
+                    case 'Rosa': return <ChicTemplateRosa invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Azul': return <ChicTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Terracota': return <ChicTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Violeta': return <ChicTemplateVioleta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'VerdeBotella': return <ChicTemplateVerdeBotella invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Gris': return <ChicTemplateGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ChicTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'MODERNO') {
                 switch (color) {
                     case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Bordo': return <ModernoTemplateBordo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;

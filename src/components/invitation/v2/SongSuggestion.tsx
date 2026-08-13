@@ -124,12 +124,12 @@ export function SongSuggestion({
   };
 
   return (
-    <SectionWrapper dark={dark} id="songs" className={variant === "moderno" ? "bg-[#0F0E13] py-20 px-6 md:px-12 w-full" : ""}>
+    <SectionWrapper dark={dark} id="songs" className={variant === "moderno" ? "bg-[var(--t-bg)] py-20 px-6 md:px-12 w-full" : ""}>
       <div className={variant === "moderno" ? "w-full max-w-[340px] sm:max-w-xl mx-auto text-left" : ""}>
         {!hideHeader && (
           <>
             {variant === "moderno" ? (
-              <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
+              <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
                 {kicker}
               </p>
             ) : (
@@ -145,7 +145,7 @@ export function SongSuggestion({
         )}
         
         {hideHeader && (
-          <p className={variant === "moderno" ? "text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876] mb-6" : "t-kicker"} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
+          <p className={variant === "moderno" ? "text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" : "t-kicker"} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
             {kicker}
           </p>
         )}
@@ -162,7 +162,7 @@ export function SongSuggestion({
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   maxLength={100}
-                  className="w-full h-[46px] !m-0 bg-[#151219] border border-[#C9A876]/40 rounded-none px-4 text-sm text-[#FFFFFF] placeholder-[#9B92AF] focus:outline-none focus:border-[#C9A876]/70 transition-colors"
+                  className="w-full h-[46px] !m-0 bg-[var(--t-surface)] border border-[var(--t-acc)]/40 rounded-none px-4 text-sm text-[#FFFFFF] placeholder-[var(--t-muted)] focus:outline-none focus:border-[var(--t-acc)]/70 transition-colors"
                 />
                 <input
                   type="text"
@@ -170,12 +170,12 @@ export function SongSuggestion({
                   value={artistValue}
                   onChange={(e) => setArtistValue(e.target.value)}
                   maxLength={80}
-                  className="w-full h-[46px] !m-0 bg-[#151219] border border-[#C9A876]/40 rounded-none px-4 text-sm text-[#FFFFFF] placeholder-[#9B92AF] focus:outline-none focus:border-[#C9A876]/70 transition-colors"
+                  className="w-full h-[46px] !m-0 bg-[var(--t-surface)] border border-[var(--t-acc)]/40 rounded-none px-4 text-sm text-[#FFFFFF] placeholder-[var(--t-muted)] focus:outline-none focus:border-[var(--t-acc)]/70 transition-colors"
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-[46px] !m-0 flex items-center justify-center bg-[#C9A876] text-[#0F0E13] font-semibold font-sans text-[11px] uppercase tracking-[0.1em] px-6 rounded-none hover:bg-[#D5B78A] transition-colors whitespace-nowrap"
+                  className="h-[46px] !m-0 flex items-center justify-center bg-[var(--t-acc)] text-[var(--t-bg)] font-semibold font-sans text-[11px] uppercase tracking-[0.1em] px-6 rounded-none hover:bg-[var(--t-acc)]/90 transition-colors whitespace-nowrap"
                 >
                   {isSubmitting ? "..." : "ENVIAR"}
                 </button>
@@ -222,7 +222,7 @@ export function SongSuggestion({
           </form>
         ) : (
           <div
-            className={variant === "moderno" ? "bg-[#151219] border border-[#C9A876]/20 text-[#C9A876] p-4 rounded-md mb-6 text-sm flex justify-between items-center" : ""}
+            className={variant === "moderno" ? "bg-[var(--t-surface)] border border-[var(--t-acc)]/20 text-[var(--t-acc)] p-4 rounded-md mb-6 text-sm flex justify-between items-center" : ""}
             style={variant === "moderno" ? {} : {
               padding: "var(--sp-4)",
               background: "rgba(255,255,255,.07)",
@@ -252,19 +252,19 @@ export function SongSuggestion({
               .map((song) => {
                 const alreadyVoted = votedIds.has(song.id);
                 return variant === "moderno" ? (
-                  <div key={song.id} className="bg-[#151219] border border-[#C9A876]/10 rounded-md p-4 flex items-center justify-between">
+                  <div key={song.id} className="bg-[var(--t-surface)] border border-[var(--t-acc)]/10 rounded-md p-4 flex items-center justify-between">
                     <div className="flex flex-col flex-1 min-w-0 pr-4">
                       <b className="text-white font-sans text-base font-bold truncate">
                         {song.title}
                       </b>
-                      <span className="text-[#9B92AF] font-sans text-sm truncate">
+                      <span className="text-[var(--t-muted)] font-sans text-sm truncate">
                         {song.artist}
                       </span>
                     </div>
                     <button 
                       onClick={() => handleVote(song.id)}
                       disabled={alreadyVoted}
-                      className={`flex items-center gap-2 border px-3 py-1.5 rounded-md font-sans text-sm transition-colors ${alreadyVoted ? "border-[#C9A876]/40 text-[#C9A876]/60 cursor-default" : "border-[#C9A876] text-[#C9A876] hover:bg-[#C9A876]/10"}`}
+                      className={`flex items-center gap-2 border px-3 py-1.5 rounded-md font-sans text-sm transition-colors ${alreadyVoted ? "border-[var(--t-acc)]/40 text-[var(--t-acc)]/60 cursor-default" : "border-[var(--t-acc)] text-[var(--t-acc)] hover:bg-[var(--t-acc)]/10"}`}
                     >
                       <span>♥</span>
                       <span className="font-semibold">{song.votes}</span>

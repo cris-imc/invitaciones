@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import {
   MODERNO_COMPONENTS,
   ELEGANT_COMPONENTS,
+  NEON_COMPONENTS,
+  CHIC_COMPONENTS,
   PreviewLoading,
   type TemplateTipo,
 } from "@/components/wizard/template-preview-registry";
@@ -17,14 +19,15 @@ import { getTemplatePreviewSample } from "@/lib/template-preview-samples";
 function PreviewPlantillaContent() {
   const params = useSearchParams();
   const evento = params.get("evento") ?? "CASAMIENTO";
-  const tipo: TemplateTipo = params.get("tipo") === "MODERNO" ? "MODERNO" : "ELEGANT";
+  const tipoParam = params.get("tipo");
+  const tipo: TemplateTipo = (tipoParam === "MODERNO" || tipoParam === "NEON" || tipoParam === "CHIC") ? tipoParam : "ELEGANT";
   const color = params.get("color") ?? "default";
   // El showcase de la landing (a diferencia del preview del wizard) quiere
   // poder hacer scroll para mostrar más contenido de la plantilla en vez de
   // quedarse fijo en la portada.
   const scrollable = params.get("scroll") === "1";
 
-  const componentsMap = tipo === "MODERNO" ? MODERNO_COMPONENTS : ELEGANT_COMPONENTS;
+  const componentsMap = tipo === "MODERNO" ? MODERNO_COMPONENTS : tipo === "NEON" ? NEON_COMPONENTS : tipo === "CHIC" ? CHIC_COMPONENTS : ELEGANT_COMPONENTS;
   const Template = componentsMap[color] ?? componentsMap.default;
   const sample = getTemplatePreviewSample(evento, tipo, color);
 

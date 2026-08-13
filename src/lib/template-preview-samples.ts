@@ -3,6 +3,8 @@
 // wizard de creación. No se guardan en la base de datos ni se usan en
 // invitaciones reales.
 
+import type { TemplateTipo } from "@/components/wizard/template-preview-registry";
+
 const CASAMIENTO_FOTOS = [
   "/mockup-preview/casamiento/watermarked_img_1346976295218286240.jpg",
   "/mockup-preview/casamiento/watermarked_img_13217750163076780480.jpg",
@@ -102,8 +104,21 @@ const ELEGANT_COLOR_TO_VESTIDO: Record<string, keyof typeof QUINCE_FOTOS_POR_COL
   Pink: "rosa",
 };
 
-function getQuinceFotos(templateTipo: "ELEGANT" | "MODERNO", colorId: string): string[] {
-  const map = templateTipo === "MODERNO" ? MODERNO_COLOR_TO_VESTIDO : ELEGANT_COLOR_TO_VESTIDO;
+// Neon ("Doodle Disco 15") no tiene vestido propio todavía -- cae a "rojo"
+// como neutro más cercano al duotono cian/magenta del mockup.
+const NEON_COLOR_TO_VESTIDO: Record<string, keyof typeof QUINCE_FOTOS_POR_COLOR> = {
+  default: "rojo",
+  Violeta: "violeta",
+  Dorado: "amarillo",
+  Verde: "verde",
+  Azul: "azul",
+  Rojo: "rojo",
+};
+
+function getQuinceFotos(templateTipo: TemplateTipo, colorId: string): string[] {
+  const map = templateTipo === "MODERNO" ? MODERNO_COLOR_TO_VESTIDO
+    : templateTipo === "NEON" ? NEON_COLOR_TO_VESTIDO
+    : ELEGANT_COLOR_TO_VESTIDO;
   const vestido = map[colorId] ?? "amarillo";
   return QUINCE_FOTOS_POR_COLOR[vestido];
 }
@@ -126,14 +141,14 @@ function hashString(str: string): number {
   return Math.abs(hash);
 }
 
-function getCasamientoFotos(templateTipo: "ELEGANT" | "MODERNO", colorId: string): string[] {
+function getCasamientoFotos(templateTipo: TemplateTipo, colorId: string): string[] {
   const offset = hashString(`${templateTipo}:${colorId}`);
   return rotate(CASAMIENTO_FOTOS, offset);
 }
 
 // Tampoco hay fotos de evento genérico por color (no hay un "vestido" que
 // varíe), misma rotación por plantilla/color que casamiento.
-function getEventoFotos(templateTipo: "ELEGANT" | "MODERNO", colorId: string): string[] {
+function getEventoFotos(templateTipo: TemplateTipo, colorId: string): string[] {
   const offset = hashString(`${templateTipo}:${colorId}`);
   return rotate(EVENTO_FOTOS, offset);
 }
@@ -144,7 +159,7 @@ const fechaEjemplo = (() => {
   return d.toISOString();
 })();
 
-function buildCasamientoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string): Record<string, unknown> {
+function buildCasamientoSample(templateTipo: TemplateTipo, colorId: string): Record<string, unknown> {
   const fotos = getCasamientoFotos(templateTipo, colorId);
   return {
     tipo: "CASAMIENTO",
@@ -170,7 +185,7 @@ function buildCasamientoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: str
   };
 }
 
-function buildQuinceSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string): Record<string, unknown> {
+function buildQuinceSample(templateTipo: TemplateTipo, colorId: string): Record<string, unknown> {
   const fotos = getQuinceFotos(templateTipo, colorId);
   return {
     tipo: "QUINCE_ANOS",
@@ -195,7 +210,7 @@ function buildQuinceSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string)
   };
 }
 
-function buildEventoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string): Record<string, unknown> {
+function buildEventoSample(templateTipo: TemplateTipo, colorId: string): Record<string, unknown> {
   const fotos = getEventoFotos(templateTipo, colorId);
   return {
     tipo: "CUMPLEANOS",
@@ -221,7 +236,7 @@ function buildEventoSample(templateTipo: "ELEGANT" | "MODERNO", colorId: string)
 
 export function getTemplatePreviewSample(
   eventType: string | undefined,
-  templateTipo: "ELEGANT" | "MODERNO",
+  templateTipo: TemplateTipo,
   colorId: string
 ): Record<string, unknown> {
   if (eventType === "QUINCE_ANOS") return buildQuinceSample(templateTipo, colorId);

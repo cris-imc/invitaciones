@@ -90,12 +90,18 @@ export function Logo({
 export function LogoFooterCredit({
   className,
   bgColor = "#0F1613",
+  textColor = "#F6F3EC",
 }: {
   className?: string;
   /** Ink/fondo oscuro propio de la plantilla+color elegidos (no del tipo de
    * evento -- var(--t-ink) cambia por evento, no por plantilla, y por eso
    * quedaba siempre igual sin importar el color de tarjeta seleccionado). */
   bgColor?: string;
+  /** Color del texto "Hecho con amor por" y "altainvitacion" (el ".com" y el
+   * isotipo siguen siempre dorados). Default pensado para fondos oscuros
+   * (Moderno/Neon); las plantillas de tema claro (Chic) deben pasar un tono
+   * oscuro acá, porque este texto viene hardcodeado claro por defecto. */
+  textColor?: string;
 }) {
   // Va despues del ultimo bloque de contenido de la invitacion. Sin fondo
   // propio, este wrapper deja ver el crema/paper base de la "escena"
@@ -108,7 +114,7 @@ export function LogoFooterCredit({
       <div className="flex flex-col items-center gap-2 px-5 py-4">
         <span
           className="text-[10px] uppercase tracking-[0.15em]"
-          style={{ fontFamily: "var(--font-inter), sans-serif", color: "#F6F3EC", opacity: 0.6 }}
+          style={{ fontFamily: "var(--font-inter), sans-serif", color: textColor, opacity: 0.6 }}
         >
           Hecho con amor por
         </span>
@@ -116,7 +122,7 @@ export function LogoFooterCredit({
           <Isotype color="accent" className="w-5 h-5 shrink-0" />
           <span
             className="leading-none whitespace-nowrap"
-            style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 15, color: "#F6F3EC" }}
+            style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 15, color: textColor }}
           >
             <span style={{ fontWeight: 600 }}>alta</span>
             <span style={{ fontWeight: 300 }}>invitacion</span>
