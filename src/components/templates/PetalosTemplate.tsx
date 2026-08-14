@@ -76,9 +76,9 @@ const IconBlossom = ({ className, style }: { className?: string; style?: React.C
 // Pétalo suelto -- forma de almendra con una línea de vena central, usado
 // suelto como acento chico y como base del efecto "pétalos a la deriva".
 const IconPetal = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 16 24" fill="none" stroke="currentColor" strokeWidth={1} className={className} style={style} aria-hidden="true">
+  <svg viewBox="0 0 16 24" fill="currentColor" stroke="none" className={className} style={style} aria-hidden="true">
     <path d="M8 1c5 5 6 12 0 22C2 13 3 6 8 1Z" />
-    <path d="M8 4v16" strokeWidth={0.6} opacity={0.6} />
+    <path d="M8 4v16" stroke="currentColor" strokeWidth={0.8} strokeLinecap="round" opacity={0.35} />
   </svg>
 );
 // Enredadera -- tallo curvo con 3 hojitas alternadas, separador de secciones
@@ -1185,15 +1185,17 @@ export function PetalosTemplate({ invitation, guest, isPersonalized = false }: P
               <IconBlossom style={{ position: "absolute", bottom: -12, right: -10, width: 22, height: 22, color: "var(--t-acc2)" }} />
               <IconVine style={{ position: "absolute", bottom: -2, right: 14, width: 20, height: 12, color: "var(--t-acc)", transform: "scaleX(-1)" }} />
             </div>
-            {/* Pétalos a la deriva */}
-            <div ref={petal1Ref} className="pointer-events-none z-20" style={{ position: 'absolute', width: 12, height: 18, opacity: 0 }}>
-              <IconPetal style={{ width: '100%', height: '100%', color: 'color-mix(in srgb, var(--t-acc2) 70%, white)' }} />
+            {/* Pétalos a la deriva -- agrandados y con menos dilución de
+                blanco (antes 9-14px y 60-70% color: casi invisibles en
+                movimiento, a pedido del usuario). */}
+            <div ref={petal1Ref} className="pointer-events-none z-20" style={{ position: 'absolute', width: 18, height: 27, opacity: 0 }}>
+              <IconPetal style={{ width: '100%', height: '100%', color: 'color-mix(in srgb, var(--t-acc2) 85%, white)' }} />
             </div>
-            <div ref={petal2Ref} className="pointer-events-none z-20" style={{ position: 'absolute', width: 9, height: 14, opacity: 0 }}>
-              <IconPetal style={{ width: '100%', height: '100%', color: 'color-mix(in srgb, var(--t-acc) 70%, white)' }} />
+            <div ref={petal2Ref} className="pointer-events-none z-20" style={{ position: 'absolute', width: 14, height: 21, opacity: 0 }}>
+              <IconPetal style={{ width: '100%', height: '100%', color: 'color-mix(in srgb, var(--t-acc) 85%, white)' }} />
             </div>
-            <div ref={petal3Ref} className="pointer-events-none z-20" style={{ position: 'absolute', width: 14, height: 20, opacity: 0 }}>
-              <IconPetal style={{ width: '100%', height: '100%', color: 'color-mix(in srgb, var(--t-acc2) 60%, white)' }} />
+            <div ref={petal3Ref} className="pointer-events-none z-20" style={{ position: 'absolute', width: 20, height: 29, opacity: 0 }}>
+              <IconPetal style={{ width: '100%', height: '100%', color: 'color-mix(in srgb, var(--t-acc2) 78%, white)' }} />
             </div>
           </div>
         </div>
