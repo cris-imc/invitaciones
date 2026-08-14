@@ -1239,7 +1239,7 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #8FA07A14, transparent 70%), #FFFFFF" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #8FA07A14, transparent 70%), var(--t-surface)" }}>
             <div className="max-w-2xl mx-auto text-center">
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
@@ -1341,7 +1341,7 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#FFFFFF] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: "var(--t-surface)" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-10 flex items-center gap-2">
                 <IconRanunculus className="golden-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#8FA07A' }} />
