@@ -5,7 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { LiveItem } from "@prisma/client";
 import { motion, AnimatePresence } from "framer-motion";
 import Marquee from "react-fast-marquee";
-import { Logo } from "@/components/ui/Logo";
+import { LandingLogo } from "@/components/ui/Logo";
 import { getHonoreeNames } from "@/lib/invitation-copy";
 
 export default function LiveScreenPage({ params }: { params: Promise<{ token: string }> }) {
@@ -80,7 +80,7 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
 
                 <div className="bg-[#F6F3EC] p-4 rounded-xl shadow-2xl shrink-0 flex flex-col items-center gap-3">
                     <QRCodeSVG value={publicUrl} size={150} level="H" />
-                    <Logo href="" wordmarkColor="ink" />
+                    <LandingLogo href="" src="/landing/logo-negro-v2.png" className="h-4 w-auto" />
                 </div>
             </header>
 
