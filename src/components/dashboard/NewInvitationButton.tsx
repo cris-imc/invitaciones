@@ -25,10 +25,6 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
     const setUsePremiumCredit = useWizardStore((state) => state.setUsePremiumCredit);
     const setUseDiamondCredit = useWizardStore((state) => state.setUseDiamondCredit);
     const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'DIAMOND' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
-    // Los planes ilimitados ya se cubren con el botón "Premium" (hereda su
-    // propio tier al crear); este botón de crédito diamond es solo para
-    // cuentas que compraron créditos diamond sueltos sin tener el plan.
-    const hasDiamondCredits = !hasUnlimitedPremium && diamondCredits > 0;
 
     const handleNewClick = () => {
         // Siempre pregunta gratis/premium, incluida la primera invitación.
@@ -120,24 +116,24 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                             <ChevronRight className="w-4 h-4 text-yellow-500/60 shrink-0" />
                         </button>
 
-                        {hasDiamondCredits && (
-                            <button
-                                type="button"
-                                onClick={handleCreateDiamond}
-                                className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-[var(--accent,#C79A4B)]/40 hover:border-[var(--accent,#C79A4B)] hover:bg-[var(--accent,#C79A4B)]/5 transition-colors text-left"
-                            >
-                                <div className="w-10 h-10 rounded-full bg-[var(--accent,#C79A4B)]/15 flex items-center justify-center shrink-0">
-                                    <Diamond className="w-5 h-5 text-[var(--accent,#C79A4B)]" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-sm text-[var(--accent,#C79A4B)]">Usar Crédito Diamond</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {diamondCredits} {diamondCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}
-                                    </p>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-[var(--accent,#C79A4B)]/60 shrink-0" />
-                            </button>
-                        )}
+                        <button
+                            type="button"
+                            onClick={handleCreateDiamond}
+                            className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-[var(--accent,#C79A4B)]/40 hover:border-[var(--accent,#C79A4B)] hover:bg-[var(--accent,#C79A4B)]/5 transition-colors text-left"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-[var(--accent,#C79A4B)]/15 flex items-center justify-center shrink-0">
+                                <Diamond className="w-5 h-5 text-[var(--accent,#C79A4B)]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm text-[var(--accent,#C79A4B)]">Usar Crédito Diamond</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {hasUnlimitedPremium
+                                        ? "Invitaciones premium ilimitadas por tu plan"
+                                        : `${diamondCredits} ${diamondCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}`}
+                                </p>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-[var(--accent,#C79A4B)]/60 shrink-0" />
+                        </button>
                     </div>
                 </DialogContent>
             </Dialog>

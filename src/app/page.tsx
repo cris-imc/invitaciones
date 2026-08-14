@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
 import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { LandingNav } from "@/components/landing/LandingNav";
-import { Logo } from "@/components/ui/Logo";
+import { LandingLogo } from "@/components/ui/Logo";
 import { HeroParallaxPhoto } from "@/components/landing/HeroParallaxPhoto";
 import { Settings2, Users, Radio } from "lucide-react";
 import { auth } from "@/auth";
@@ -267,7 +267,7 @@ export default async function Home() {
         <div className="l-foot">
           <div className="flex items-center gap-2">
             <small style={{ whiteSpace: "nowrap" }}>Hecho con amor por</small>
-            <Logo href="" wordmarkColor="paper" />
+            <LandingLogo href="" src="/landing/logo-blanco-v2.png" className="h-4 w-auto" />
           </div>
           <small>
             Hecho para bodas, cumpleaños, eventos y todo lo que se celebra

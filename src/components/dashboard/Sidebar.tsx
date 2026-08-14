@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
-import { Logo } from "@/components/ui/Logo";
+import { LandingLogo } from "@/components/ui/Logo";
 
 const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
@@ -160,7 +160,7 @@ export function Sidebar() {
             {/* ── DESKTOP SIDEBAR ── */}
             <aside className="p-side">
                 <div className="p-brand">
-                    <Logo />
+                    <LandingLogo fullWidth className="w-3/4 h-auto block" />
                 </div>
 
                 <nav className="p-nav flex-1">
@@ -174,7 +174,7 @@ export function Sidebar() {
                     {/* ── MOBILE TOP BAR ── */}
                     <header className="p-mobile-topbar md:hidden">
                         <div className="p-brand" style={{ margin: 0 }}>
-                            <Logo />
+                            <LandingLogo className="h-[50px] w-auto" />
                         </div>
                         <a
                             href="https://wa.me/5493517660000?text=Hola%2C%20necesito%20ayuda%20con%20Alta%20Invitaci%C3%B3n"

@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
-import { Logo } from "@/components/ui/Logo";
+import { LandingLogo } from "@/components/ui/Logo";
 
 interface LandingNavProps {
   registerUrl: string;
@@ -48,7 +48,7 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
       <div className={`l-drawer ${open ? "open" : ""}`}>
         <div className="l-drawer-head">
           <div className="l-brand" style={{ margin: 0 }}>
-            <Logo href="/" />
+            <LandingLogo href="/" />
           </div>
           <button type="button" className="l-hamburger" onClick={() => setOpen(false)} aria-label="Cerrar menú">
             <X className="w-5 h-5" />
@@ -105,7 +105,7 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
   return (
     <nav className="l-nav">
       <div className="l-brand">
-        <Logo href="/" />
+        <LandingLogo href="/" />
       </div>
 
       <div className="l-nav-links">

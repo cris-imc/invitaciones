@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Gem } from "lucide-react";
 
 // Alto del banner por breakpoint -- en mobile el texto y el botón se
 // apilan en dos líneas (no entran juntos en una fila angosta), en
@@ -19,9 +20,12 @@ export function FreePlanBanner() {
         borderBottom: "1px solid rgba(246,243,236,0.12)",
       }}
     >
-      <span className="text-[11px] sm:text-sm text-center" style={{ color: "#F6F3EC" }}>
-        <span className="sm:hidden">Creada gratis en <strong>AltaInvitacion.com</strong></span>
-        <span className="hidden sm:inline">🎉 Invitación gratuita creada en <strong>AltaInvitacion.com</strong></span>
+      <span className="text-[11px] sm:text-sm text-center inline-flex items-center gap-1.5" style={{ color: "#F6F3EC" }}>
+        <span className="sm:hidden">Creada gratis en <strong>altainvitacion.com</strong></span>
+        <span className="hidden sm:inline-flex items-center gap-1.5">
+          <Gem className="w-4 h-4 shrink-0" style={{ color: "#C79A4B" }} aria-hidden="true" />
+          Invitación gratuita creada en <strong>altainvitacion.com</strong>
+        </span>
       </span>
       <Link
         href="/register?plan=premium"

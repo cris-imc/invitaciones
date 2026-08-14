@@ -82,10 +82,73 @@ export function Logo({
 }
 
 /**
+ * Isologotipo en PNG (fondo recortado a transparente) para probar el
+ * lockup nuevo solo en la landing -- no toca `Logo` (dashboard/pantalla en
+ * vivo) ni `LogoFooterCredit` (pie de cada invitación).
+ */
+export function LandingLogo({
+  href = "/",
+  src = "/landing/logo-blanco.png",
+  className,
+  fullWidth = false,
+}: {
+  href?: string;
+  src?: string;
+  className?: string;
+  /** Llena el ancho del contenedor (alto automático, sin deformar) en vez
+   * de fijar una altura -- para cajas angostas como el brand del sidebar. */
+  fullWidth?: boolean;
+}) {
+  const content = (
+    <img
+      src={src}
+      alt="altainvitacion.com"
+      className={className ?? (fullWidth ? "w-full h-auto block" : "h-10 md:h-12 w-auto")}
+    />
+  );
+
+  const wrapperClassName = fullWidth ? "flex items-center w-full" : "flex items-center";
+
+  if (!href) {
+    return <span className={wrapperClassName}>{content}</span>;
+  }
+
+  return (
+    <Link href={href} className={`${wrapperClassName} hover:opacity-80 transition-opacity`}>
+      {content}
+    </Link>
+  );
+}
+
+/**
+ * Detecta si un color (hex directo, o `var(--x, #hex)` con fallback hex) es
+ * claro u oscuro, para elegir el isologotipo PNG negro o blanco que mejor
+ * contrasta. Cae a "claro" (blanco) si no puede extraer un hex, que es el
+ * comportamiento previo por default.
+ */
+function isLightColor(color: string): boolean {
+  const match = color.match(/#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/);
+  if (!match) return true;
+  let hex = match[1];
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5;
+}
+
+/**
  * Credito de marca al pie de cada invitación (mobile y desktop): "Hecho
- * con amor por" + isologotipo completo horizontal. Reemplaza al viejo
- * footer de texto ("Invitaciones digitales" con link a convite.ar), que
- * ya no debe aparecer en ningún lado.
+ * con amor por" + isologotipo PNG completo horizontal (negro o blanco
+ * segun contraste con `textColor`). Reemplaza al viejo footer de texto
+ * ("Invitaciones digitales" con link a convite.ar), que ya no debe
+ * aparecer en ningún lado.
  */
 export function LogoFooterCredit({
   className,
@@ -97,12 +160,17 @@ export function LogoFooterCredit({
    * evento -- var(--t-ink) cambia por evento, no por plantilla, y por eso
    * quedaba siempre igual sin importar el color de tarjeta seleccionado). */
   bgColor?: string;
-  /** Color del texto "Hecho con amor por" y "altainvitacion" (el ".com" y el
-   * isotipo siguen siempre dorados). Default pensado para fondos oscuros
-   * (Moderno/Neon); las plantillas de tema claro (Chic) deben pasar un tono
-   * oscuro acá, porque este texto viene hardcodeado claro por defecto. */
+  /** Color del texto "Hecho con amor por" (el isologotipo se resuelve solo,
+   * en blanco o negro, segun este mismo color). Default pensado para fondos
+   * oscuros (Moderno/Neon); las plantillas de tema claro (Chic) deben pasar
+   * un tono oscuro acá, porque este texto viene hardcodeado claro por
+   * defecto. */
   textColor?: string;
 }) {
+  const logoSrc = isLightColor(textColor)
+    ? "/landing/logo-blanco-v2.png"
+    : "/landing/logo-negro-v2.png";
+
   // Va despues del ultimo bloque de contenido de la invitacion. Sin fondo
   // propio, este wrapper deja ver el crema/paper base de la "escena"
   // (.desktop-stage) en vez del color de la plantilla.
@@ -118,17 +186,7 @@ export function LogoFooterCredit({
         >
           Hecho con amor por
         </span>
-        <span className="flex items-center gap-2">
-          <Isotype color="accent" className="w-5 h-5 shrink-0" />
-          <span
-            className="leading-none whitespace-nowrap"
-            style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 15, color: textColor }}
-          >
-            <span style={{ fontWeight: 600 }}>alta</span>
-            <span style={{ fontWeight: 300 }}>invitacion</span>
-            <span style={{ fontWeight: 300, color: "var(--accent, #C79A4B)" }}>.com</span>
-          </span>
-        </span>
+        <img src={logoSrc} alt="altainvitacion.com" className="h-4 w-auto" />
       </div>
     </div>
   );
