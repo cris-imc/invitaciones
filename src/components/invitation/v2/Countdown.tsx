@@ -36,7 +36,7 @@ export function Countdown({
           <h3 className="text-2xl sm:text-3xl font-bold font-serif mb-2 text-[var(--t-acc)]">
             ¡Llegó el día!
           </h3>
-          <p className="cd-past-text text-base sm:text-lg font-medium opacity-90 leading-relaxed">
+          <p className="cd-past-text text-base sm:text-lg font-medium opacity-90 leading-relaxed" style={{ color: "var(--t-muted, #8F8F98)" }}>
             ¡Hoy es el gran día! Prepárate para festejar, reír y disfrutar cada instante inolvidable.
           </p>
         </div>
@@ -50,7 +50,7 @@ export function Countdown({
         <p className="t-kicker">{kicker}</p>
         <div className="cd-past text-center">
           <Heart className="w-10 h-10 mx-auto mb-2 text-[var(--t-acc)] opacity-90" strokeWidth={1.5} />
-          <p className="cd-past-text">¡Ya fue una noche increíble!</p>
+          <p className="cd-past-text" style={{ color: "var(--t-muted, #8F8F98)" }}>¡Ya fue una noche increíble!</p>
         </div>
       </section>
     );
