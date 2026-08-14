@@ -1,6 +1,6 @@
 "use client";
 
-import { toggleInvitationStatus, updateInvitationMaxGuests } from "@/app/actions/admin";
+import { toggleInvitationStatus, updateInvitationMaxLivePhotos } from "@/app/actions/admin";
 import { useState, useTransition } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [status, setStatus] = useState(invitation.estado);
-    const [maxGuests, setMaxGuests] = useState(invitation.maxGuestsOverride || "");
+    const [maxLivePhotos, setMaxLivePhotos] = useState(invitation.maxLivePhotosOverride || "");
     const { showToast } = useToast();
 
     const handleToggle = () => {
@@ -30,12 +30,12 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
         });
     };
 
-    const handleUpdateMaxGuests = () => {
+    const handleUpdateMaxLivePhotos = () => {
         startTransition(async () => {
-            const val = maxGuests ? parseInt(maxGuests, 10) : null;
-            const res = await updateInvitationMaxGuests(invitation.id, val);
+            const val = maxLivePhotos ? parseInt(maxLivePhotos, 10) : null;
+            const res = await updateInvitationMaxLivePhotos(invitation.id, val);
             if (res.success) {
-                showToast("Límite de invitados actualizado", "success");
+                showToast("Límite de fotos LIVE actualizado", "success");
             } else {
                 showToast(res.error || "Error", "error");
             }
@@ -87,12 +87,12 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                     <AdminPlanSelect invitationId={invitation.id} currentPlan={invitation.planTier} />
                     
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold opacity-70">Invitados Max:</span>
-                        <Input 
-                            type="number" 
-                            value={maxGuests}
-                            onChange={(e) => setMaxGuests(e.target.value)}
-                            placeholder="Ilimitado"
+                        <span className="text-xs font-semibold opacity-70">Fotos LIVE Máx:</span>
+                        <Input
+                            type="number"
+                            value={maxLivePhotos}
+                            onChange={(e) => setMaxLivePhotos(e.target.value)}
+                            placeholder="Según plan"
                             className="w-24 h-8 text-sm bg-[var(--ink)] border-none text-[var(--on-ink)] placeholder:text-white/30"
                         />
                     </div>
@@ -107,9 +107,9 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                     <DeleteInvitationButton invitationId={invitation.id} />
                 </div>
                 
-                <button 
-                    disabled={isPending || String(maxGuests) === String(invitation.maxGuestsOverride || "")}
-                    onClick={handleUpdateMaxGuests}
+                <button
+                    disabled={isPending || String(maxLivePhotos) === String(invitation.maxLivePhotosOverride || "")}
+                    onClick={handleUpdateMaxLivePhotos}
                     className="text-sm font-semibold bg-accent text-ink px-4 py-1.5 rounded-full hover:bg-accent/90 transition-colors disabled:opacity-30 whitespace-nowrap ml-auto"
                 >
                     Guardar

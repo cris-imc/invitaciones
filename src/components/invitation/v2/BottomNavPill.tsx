@@ -23,9 +23,14 @@ interface BottomNavPillProps {
   // accent a baja opacidad no contrasta lo suficiente; ahí conviene pisarlo
   // con el ink oscuro de la plantilla.
   inactiveColor?: string;
+  // Si true, fondo solido (sin blur ni transparencia) en variant="moderno" --
+  // el efecto "liquid glass" default no contrastaba lo suficiente en
+  // plantillas como Petalos. Sigue siendo el color de la variante
+  // (surfaceColor), simplemente al 100% de opacidad y sin backdrop-blur.
+  solid?: boolean;
 }
 
-export function BottomNavPill({ sections, variant = "default", accentColor = "#C9A876", surfaceColor = "#151219", inactiveColor }: BottomNavPillProps) {
+export function BottomNavPill({ sections, variant = "default", accentColor = "#C9A876", surfaceColor = "#151219", inactiveColor, solid = false }: BottomNavPillProps) {
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "");
 
   // Observa qué sección está visible y marca el nav activo
@@ -65,8 +70,8 @@ export function BottomNavPill({ sections, variant = "default", accentColor = "#C
 
   return createPortal(
     <nav
-      className={variant === "moderno" 
-        ? "fixed bottom-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-nowrap overflow-x-auto items-center justify-start sm:justify-center gap-x-3 sm:gap-x-4 px-4 sm:px-6 py-3.5 rounded-[2rem] bg-[var(--t-surface)]/95 border border-[var(--t-acc)]/20 shadow-xl backdrop-blur-md w-[95%] max-w-max hide-desktop" 
+      className={variant === "moderno"
+        ? `fixed bottom-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-nowrap overflow-x-auto items-center justify-start sm:justify-center gap-x-3 sm:gap-x-4 px-4 sm:px-6 py-3.5 rounded-[2rem] border border-[var(--t-acc)]/20 shadow-xl w-[95%] max-w-max hide-desktop ${solid ? "bg-[var(--t-surface)]" : "bg-[var(--t-surface)]/95 backdrop-blur-md"}`
         : "bottom-nav hide-desktop"}
       style={variant === "moderno" ? { scrollbarWidth: 'none', msOverflowStyle: 'none', "--t-acc": accentColor, "--t-surface": surfaceColor, "--t-nav-inactive": inactiveColor ?? accentColor } as React.CSSProperties : undefined}
       aria-label="Navegación de la invitación"

@@ -45,21 +45,21 @@ export async function updateInvitationPlan(invitationId: string, planTier: strin
     }
 }
 
-export async function updateInvitationMaxGuests(invitationId: string, maxGuestsOverride: number | null) {
+export async function updateInvitationMaxLivePhotos(invitationId: string, maxLivePhotosOverride: number | null) {
     try {
         const session = await auth();
         if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized");
 
         await prisma.invitation.update({
             where: { id: invitationId },
-            data: { maxGuestsOverride }
+            data: { maxLivePhotosOverride }
         });
 
         revalidatePath("/dashboard");
         return { success: true };
     } catch (error) {
-        console.error("Error updating max guests:", error);
-        return { success: false, error: "Failed to update max guests" };
+        console.error("Error updating max live photos:", error);
+        return { success: false, error: "Failed to update max live photos" };
     }
 }
 

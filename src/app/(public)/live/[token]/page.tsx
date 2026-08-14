@@ -164,7 +164,8 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             } else if (res.status === 404) {
                 setErrorModal("El LIVE ha sido desactivado por el anfitrión.");
             } else {
-                setErrorModal("Error al subir la foto.");
+                const data = await res.json().catch(() => ({}));
+                setErrorModal(data.error || "Error al subir la foto.");
             }
         } catch (error) {
             console.error(error);

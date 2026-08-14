@@ -101,6 +101,11 @@ model Invitation {
   premiumCreditSpent           Boolean          @default(false)
   diamondCreditSpent           Boolean          @default(false)
   maxGuestsOverride            Int?
+  // Superpoder de admin: sube (o baja) el tope de fotos guardadas en LIVE de
+  // ESTA tarjeta puntual, sin tocar el limite del plan (200 en Diamond) que
+  // siguen teniendo el resto de las tarjetas/clientes. null = usa el limite
+  // del plan tal cual.
+  maxLivePhotosOverride        Int?
   tipo                         String
   estado                       String           @default("BORRADOR")
   slug                         String           @unique

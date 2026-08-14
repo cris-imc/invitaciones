@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { prisma } from '@/lib/db';
 import { getUploadsDir } from '@/lib/uploads';
-import { checkPlanLimits, PlanTier } from '@/lib/plan-limits';
+import { PLAN_LIMITS, PlanTier } from '@/lib/plan-limits';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
     try {
@@ -44,19 +44,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
             return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 });
         }
 
-        // El cupo de LIVE solo se descuenta con fotos (video, a futuro, también descontará)
+        // El cupo de LIVE solo se descuenta con fotos (video, a futuro, también descontará).
+        // maxLivePhotosOverride es un superpoder de admin sobre ESTA tarjeta puntual --
+        // si está seteado pisa el límite del plan, sin afectar a otras tarjetas/clientes.
         if (type === 'PHOTO') {
             const photoCount = await prisma.liveItem.count({
                 where: { sessionId: liveSession.id, type: 'PHOTO' }
             });
-            const limitError = await checkPlanLimits(
-                liveSession.invitation.userId,
-                liveSession.invitation.planTier as PlanTier,
-                "add-live-photo",
-                photoCount
-            );
-            if (limitError) {
-                return NextResponse.json({ error: limitError.message }, { status: 403 });
+            const planLimit = PLAN_LIMITS[liveSession.invitation.planTier as PlanTier]?.maxLivePhotos ?? null;
+            const maxLivePhotos = liveSession.invitation.maxLivePhotosOverride ?? planLimit;
+            if (maxLivePhotos !== null && photoCount >= maxLivePhotos) {
+                return NextResponse.json(
+                    { error: `Se alcanzó el límite de ${maxLivePhotos} fotos guardadas en esta fiesta.` },
+                    { status: 403 }
+                );
             }
         }
 
