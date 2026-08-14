@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Jost:wght@300;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#FDF6F0;font-family:'Jost',sans-serif;color:#3B2A2A;}
+a{color:#C8956C;text-decoration:none;}
+a:hover{color:#D4845A;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+@keyframes floatDoodle{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-7px) rotate(1.4deg);}}
+@keyframes floatDoodle2{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(6px) rotate(-2deg);}}
+@keyframes twinkleDoodle{0%,100%{opacity:.3;transform:scale(.94);}50%{opacity:.85;transform:scale(1.06);}}
+@keyframes inkFade{0%{opacity:0;transform:translateY(14px);}100%{opacity:1;transform:translateY(0);}}
+@keyframes sunRise{0%,100%{opacity:.7;}50%{opacity:1;}}
+</style>
+</helmet>
+
+<div style="max-width:1360px;margin:0 auto;padding:28px 20px 80px;">
+
+  <div style="max-width:820px;margin:0 0 28px;">
+    <p style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#9C7C6E;margin:0 0 10px;">Golden Dusk &middot; boda al atardecer</p>
+    <h1 style="font:600 30px/1.2 'Cormorant Garamond',serif;font-style:italic;margin:0 0 12px;color:#3B2A2A;">Golden Dusk Wedding</h1>
+    <p style="font:300 14.5px/1.7 'Jost',sans-serif;color:#5c4640;margin:0;">Marfil c&aacute;lido, lino blush, terracota dorada y champagne. Doodles bot&aacute;nicos de trazo fino: ramo de rosas y pampa, p&eacute;talos de ranunculus, enredadera en el marco, rosa abierta y eucalipto saliendo del marco, sol/horizonte como divisor. Misma arquitectura del pack Doodle: toggle celular/escritorio, parallax, orden de secciones fijo.</p>
+  </div>
+
+  <div style="display:flex;gap:6px;background:#3B2A2A;border-radius:999px;padding:4px;width:fit-content;margin-bottom:20px;">
+    <button onClick="{{ setMobile }}" style="{{ mobileBtnStyle }}">&#128241; Celular</button>
+    <button onClick="{{ setDesktop }}" style="{{ desktopBtnStyle }}">&#128421; Escritorio</button>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:10px 0;">
+    <div style="{{ outerFrameStyle }}">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <div style="height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:110px;height:16px;background:#000;border-radius:12px;"></div>
+        </div>
+      </sc-if>
+      <div style="{{ screenStyle }}" onScroll="{{ handleScroll }}">
+
+        <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ styles.splash }}">
+            <div style="{{ styles.watermark }}"></div>
+
+            <svg viewBox="0 0 120 90" style="{{ styles.splashOrnTop }}" fill="none" stroke="#C8956C" stroke-width="1.1" stroke-linecap="round">
+              <path d="M20 70 C 24 58, 30 50, 40 46"></path>
+              <ellipse cx="44" cy="42" rx="10" ry="7" transform="rotate(-20 44 42)"></ellipse>
+              <ellipse cx="54" cy="36" rx="9" ry="6" transform="rotate(-40 54 36)"></ellipse>
+              <circle cx="49" cy="39" r="2.2"></circle>
+              <path d="M30 62 L20 40 M34 58 L44 34 M40 54 L54 30"></path>
+              <path d="M58 44 C 62 40, 68 40, 70 44 C 68 48, 62 48, 58 44 Z"></path>
+            </svg>
+
+            <svg viewBox="0 0 120 90" style="{{ styles.splashOrnBottom }}" fill="none" stroke="#E8C4A0" stroke-width="1.1" stroke-linecap="round">
+              <path d="M100 18 L92 34 M84 20 L78 38 M108 24 L104 42"></path>
+              <ellipse cx="90" cy="42" rx="6" ry="4" transform="rotate(30 90 42)"></ellipse>
+              <ellipse cx="76" cy="46" rx="5" ry="3.4" transform="rotate(50 76 46)"></ellipse>
+              <ellipse cx="102" cy="48" rx="5.5" ry="3.6" transform="rotate(10 102 48)"></ellipse>
+            </svg>
+
+            <div style="{{ styles.splashInner }}">
+              <svg viewBox="0 0 60 40" style="{{ styles.splashRings }}" fill="none" stroke="#C8956C" stroke-width="1.2">
+                <path d="M6 34 C 20 34, 20 14, 30 14 C 40 14, 40 34, 54 34"></path>
+                <circle cx="30" cy="20" r="3"></circle>
+              </svg>
+              <p style="{{ styles.splashKicker }}">Con amor y alegría, los invitamos a celebrar</p>
+              <h2 style="{{ styles.splashName }}">{{ guestName }}</h2>
+              <div style="{{ styles.splashRule }}"></div>
+              <p style="{{ styles.splashDress }}">Elegante formal — paleta pastel o neutros cálidos</p>
+              <button onClick="{{ openCard }}" style="{{ styles.splashBtn }}">Abrir invitación</button>
+            </div>
+
+            <svg viewBox="0 0 22 26" style="{{ styles.star1 }}" fill="none" stroke="#C8956C" stroke-width="1.1" stroke-linecap="round">
+              <path d="M11 24 C 4 18, 2 12, 6 8 C 9 5, 11 8, 11 11 C 11 8, 13 5, 16 8 C 20 12, 18 18, 11 24 Z"></path>
+            </svg>
+            <svg viewBox="0 0 30 20" style="{{ styles.heart1 }}" fill="none" stroke="#E8C4A0" stroke-width="1.1" stroke-linecap="round">
+              <path d="M4 10 C 8 10, 10 4, 15 10 C 20 4, 22 10, 26 10"></path>
+              <ellipse cx="15" cy="15" rx="4" ry="2.6"></ellipse>
+            </svg>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contentVisible }}" hint-placeholder-val="{{ true }}">
+        <div style="{{ styles.stage }}">
+
+          <div style="{{ styles.heroAside }}">
+            <div style="{{ styles.heroPhotoWrap }}">
+              <img src="img/casamiento/istockphoto-1093617712-1024x1024.jpg" style="{{ styles.heroPhoto }}" alt="Portada">
+              <div style="{{ styles.heroCream }}"></div>
+              <div style="{{ styles.heroFrame }}"></div>
+
+              <svg viewBox="0 0 70 70" style="{{ styles.frameCornerTL }}" fill="none" stroke="#FDF6F0" stroke-width="1.2" stroke-linecap="round">
+                <path d="M4 40 C 4 20, 20 4, 40 4"></path>
+                <path d="M10 34 C 16 26, 22 22, 30 20"></path>
+                <ellipse cx="14" cy="30" rx="4" ry="2.6" transform="rotate(50 14 30)"></ellipse>
+                <ellipse cx="24" cy="16" rx="4" ry="2.6" transform="rotate(-30 24 16)"></ellipse>
+                <ellipse cx="34" cy="10" rx="3.6" ry="2.4" transform="rotate(-10 34 10)"></ellipse>
+              </svg>
+              <svg viewBox="0 0 70 70" style="{{ styles.frameCornerBR }}" fill="none" stroke="#FDF6F0" stroke-width="1.2" stroke-linecap="round">
+                <path d="M66 30 C 66 50, 50 66, 30 66"></path>
+                <path d="M60 36 C 54 44, 48 48, 40 50"></path>
+                <ellipse cx="56" cy="40" rx="4" ry="2.6" transform="rotate(50 56 40)"></ellipse>
+                <ellipse cx="46" cy="54" rx="4" ry="2.6" transform="rotate(-30 46 54)"></ellipse>
+                <ellipse cx="36" cy="60" rx="3.6" ry="2.4" transform="rotate(-10 36 60)"></ellipse>
+              </svg>
+
+              <svg viewBox="0 0 90 90" style="{{ styles.dressOut }}" fill="none" stroke="#D4845A" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="46" cy="46" r="16"></circle>
+                <circle cx="46" cy="46" r="8"></circle>
+                <path d="M46 22 C 40 16, 34 18, 34 24 C 34 30, 42 30, 46 22 Z"></path>
+                <path d="M60 32 C 62 26, 68 24, 70 30 C 72 36, 64 38, 60 32 Z"></path>
+                <path d="M60 60 C 66 62, 68 68, 62 70 C 56 72, 54 64, 60 60 Z"></path>
+                <path d="M30 34 L20 24 M30 58 L20 68"></path>
+              </svg>
+              <svg viewBox="0 0 90 90" style="{{ styles.glassesOut }}" fill="none" stroke="#9C7C6E" stroke-width="1.2" stroke-linecap="round">
+                <path d="M20 10 C 20 34, 30 50, 30 78"></path>
+                <path d="M30 24 C 40 20, 46 24, 44 30 C 42 36, 32 32, 30 24 Z"></path>
+                <path d="M30 42 C 42 40, 48 46, 44 52 C 40 58, 28 52, 30 42 Z"></path>
+                <path d="M30 60 C 40 58, 46 64, 42 70 C 38 76, 28 70, 30 60 Z"></path>
+              </svg>
+            </div>
+
+            <div style="{{ styles.heroTextBlock }}">
+              <svg viewBox="0 0 40 20" style="{{ styles.seal }}" fill="none" stroke="#C8956C" stroke-width="1.3" stroke-linecap="round">
+                <path d="M2 16 C 10 4, 16 4, 20 12 C 24 4, 30 4, 38 16"></path>
+              </svg>
+              <p style="{{ styles.eyebrow }}">Nos casamos al atardecer</p>
+              <h1 style="{{ styles.title }}">Mili <span style="{{ styles.titleAmp }}">&amp;</span> Gastón</h1>
+              <div style="{{ styles.underline }}"></div>
+              <p style="{{ styles.dateLine }}">12 · 09 · 2026 · Viñedo Los Robles</p>
+            </div>
+
+            <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+              <nav style="{{ styles.nav }}">
+                <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
+                  <a href="#" style="{{ styles.navItem }}"><b style="{{ styles.navNum }}">{{ n.num }}</b> {{ n.label }}</a>
+                </sc-for>
+              </nav>
+            </sc-if>
+          </div>
+
+          <div style="{{ styles.mainCol }}">
+
+            <div style="{{ styles.countdownSection }}">
+              <div style="{{ styles.watermarkSoft }}"></div>
+              <svg viewBox="0 0 200 24" style="{{ styles.divider }}" fill="none" stroke="#C8956C" stroke-width="1" stroke-linecap="round">
+                <path d="M6 16 L82 16"></path>
+                <path d="M118 16 L194 16"></path>
+                <path d="M85 16 A 15 15 0 0 1 115 16"></path>
+                <path d="M82 16 L118 16"></path>
+              </svg>
+              <p style="{{ styles.kicker }}">Cuenta regresiva</p>
+              <div style="{{ styles.countdownWrap }}">
+                <sc-for list="{{ countdownBoxes }}" as="cd" hint-placeholder-count="4">
+                  <div style="{{ styles.cdBox }}">
+                    <span style="{{ styles.cdNum }}">{{ cd.n }}</span>
+                    <span style="{{ styles.cdLabel }}">{{ cd.l }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="{{ styles.quoteSection }}">
+              <svg viewBox="0 0 40 26" style="{{ styles.quoteDoodle }}" fill="none" stroke="#C8956C" stroke-width="1.2" stroke-linecap="round">
+                <path d="M4 4 C 4 14, 4 20, 12 22"></path>
+                <path d="M18 4 C 18 14, 18 20, 26 22"></path>
+              </svg>
+              <p style="{{ styles.quoteText }}">"Dos almas, un mismo cielo al atardecer."</p>
+            </div>
+
+            <div style="{{ styles.section }}">
+              <svg viewBox="0 0 48 40" style="{{ styles.sectionIcon }}" fill="none" stroke="#3B2A2A" stroke-width="1.2" stroke-linecap="round">
+                <path d="M14 30 L14 14 L20 8 L28 14 L28 30"></path>
+                <path d="M20 8 L20 4"></path>
+                <path d="M14 30 L28 30"></path>
+                <circle cx="34" cy="20" r="1.6"></circle>
+              </svg>
+              <p style="{{ styles.kicker }}">Cuándo y dónde</p>
+              <div style="{{ styles.addrCard }}">
+                <span style="{{ styles.addrKicker }}">Ceremonia</span>
+                <h4 style="{{ styles.addrTitle }}">Capilla del Viñedo</h4>
+                <p style="{{ styles.addrRow }}">17:30 hs</p>
+                <p style="{{ styles.addrRow }}">Camino del Sol s/n</p>
+                <a href="#" style="{{ styles.mapBtn }}">Ver mapa ceremonia ↗</a>
+              </div>
+              <div style="{{ styles.addrCard }}">
+                <span style="{{ styles.addrKicker }}">Fiesta</span>
+                <h4 style="{{ styles.addrTitle }}">Viñedo Los Robles</h4>
+                <p style="{{ styles.addrRow }}">19:30 hs</p>
+                <p style="{{ styles.addrRow }}">Ruta del Vino km 12</p>
+                <a href="#" style="{{ styles.mapBtn }}">Ver mapa fiesta ↗</a>
+              </div>
+
+              <p style="{{ styles.kickerSpaced }}">Cronograma</p>
+              <sc-for list="{{ scheduleItems }}" as="sc" hint-placeholder-count="4">
+                <div style="{{ styles.schedRow }}">
+                  <span style="{{ styles.schedTime }}">{{ sc.time }}</span>
+                  <span style="{{ styles.schedLabel }}">{{ sc.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="{{ styles.albumSection }}">
+              <svg viewBox="0 0 48 40" style="{{ styles.sectionIcon }}" fill="none" stroke="#3B2A2A" stroke-width="1.2" stroke-linecap="round">
+                <path d="M4 12 L14 12 L18 6 L30 6 L34 12 L44 12 L44 34 L4 34 Z"></path>
+                <circle cx="24" cy="22" r="8"></circle>
+                <circle cx="24" cy="22" r="4"></circle>
+              </svg>
+              <p style="{{ styles.kicker }}">Álbum</p>
+              <div style="{{ styles.galleryWrap }}">
+                <sc-for list="{{ galleryImages }}" as="g" hint-placeholder-count="4">
+                  <div style="{{ g.wrapStyle }}"><img src="{{ g.src }}" alt="Momento" style="{{ styles.galleryImg }}"></div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="{{ styles.mapPlaceholder }}">
+              <svg viewBox="0 0 32 40" style="{{ styles.mapPin }}" fill="none" stroke="#3B2A2A" stroke-width="1.2" stroke-linecap="round">
+                <path d="M16 38 C 16 38, 28 24, 28 15 C 28 8, 22 3, 16 3 C 10 3, 4 8, 4 15 C 4 24, 16 38, 16 38 Z"></path>
+                <circle cx="16" cy="15" r="5"></circle>
+              </svg>
+              <span style="{{ styles.mapText }}">Mapa embebido</span>
+            </div>
+
+            <div style="{{ styles.rsvpSection }}">
+              <svg viewBox="0 0 70 40" style="{{ styles.rsvpRings }}" fill="none" stroke="#C8956C" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="29" cy="20" r="12"></circle>
+                <circle cx="41" cy="20" r="12"></circle>
+                <ellipse cx="35" cy="8" rx="4" ry="2.6"></ellipse>
+              </svg>
+              <p style="{{ styles.kickerOnDark }}">Confirmación</p>
+              <h3 style="{{ styles.rsvpTitle }}">¿Nos acompañás?</h3>
+              <div style="margin:18px 0 22px;max-width:420px;">
+                <label style="{{ styles.fieldLabel }}">Nombre y apellido</label>
+                <input value="Fam. Duarte" style="{{ styles.fieldInput }}" readonly>
+              </div>
+              <div style="display:flex;gap:10px;">
+                <button style="{{ styles.rsvpBtnSolid }}">Confirmar asistencia</button>
+                <button style="{{ styles.rsvpBtnGhost }}">No podré</button>
+              </div>
+            </div>
+
+            <div style="{{ styles.section }}">
+              <svg viewBox="0 0 44 44" style="{{ styles.sectionIcon }}" fill="none" stroke="#3B2A2A" stroke-width="1.2" stroke-linecap="round">
+                <path d="M10 16 L34 16 L30 38 L14 38 Z"></path>
+                <path d="M10 16 C 6 12, 6 6, 12 6 C 16 6, 18 10, 18 16"></path>
+                <path d="M34 16 C 38 12, 38 6, 32 6 C 28 6, 26 10, 26 16"></path>
+                <path d="M14 24 L30 24"></path>
+              </svg>
+              <p style="{{ styles.kicker }}">Datos bancarios del evento</p>
+              <div style="{{ styles.giftGrid }}">
+                <div style="{{ styles.giftCard }}">
+                  <span style="{{ styles.giftCardTitle }}">Pago de tarjetas</span>
+                  <div style="{{ styles.copyRow }}"><span style="{{ styles.copyLabel }}">Alias</span><span style="{{ styles.copyValue }}">miliygaston.tarjeta</span></div>
+                </div>
+                <div style="{{ styles.giftCard }}">
+                  <span style="{{ styles.giftCardTitle }}">Regalos</span>
+                  <div style="{{ styles.copyRow }}"><span style="{{ styles.copyLabel }}">Alias</span><span style="{{ styles.copyValue }}">miliygaston.regalo</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="{{ styles.section }}">
+              <svg viewBox="0 0 44 44" style="{{ styles.sectionIcon }}" fill="none" stroke="#3B2A2A" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="22" cy="22" r="18"></circle>
+                <circle cx="22" cy="22" r="4"></circle>
+                <path d="M22 8 C 30 10, 34 14, 36 22"></path>
+              </svg>
+              <p style="{{ styles.kicker }}">Sugerí una canción</p>
+              <div style="display:flex;gap:8px;margin:16px 0;">
+                <input placeholder="Canción — artista" style="{{ styles.musicInput }}" readonly>
+                <button style="{{ styles.musicSendBtn }}">Enviar</button>
+              </div>
+              <sc-for list="{{ musicItems }}" as="mi" hint-placeholder-count="2">
+                <div style="{{ styles.musicRow }}">
+                  <div><b style="{{ styles.musicRowTitle }}">{{ mi.t }}</b><span style="{{ styles.musicRowSub }}">{{ mi.s }}</span></div>
+                  <button onClick="{{ mi.vote }}" style="{{ styles.musicBadge }}">{{ mi.badge }}</button>
+                </div>
+              </sc-for>
+            </div>
+
+            <footer style="{{ styles.footer }}">
+              <svg viewBox="0 0 130 34" style="{{ styles.footerGarland }}" fill="none" stroke="#C8956C" stroke-width="1" stroke-linecap="round">
+                <text x="10" y="22" font-family="'Cormorant Garamond',serif" font-style="italic" font-size="20" fill="#C8956C" stroke="none">&amp; forever</text>
+                <path d="M96 24 C 104 20, 112 24, 108 30 C 104 34, 96 30, 96 24 Z"></path>
+                <path d="M112 20 C 118 16, 124 20, 120 26 C 116 30, 110 26, 112 20 Z"></path>
+              </svg>
+              <small style="{{ styles.footerText }}">Gracias por ser parte de este momento · altainvitacion.com</small>
+            </footer>
+
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ isMobileNavVisible }}" hint-placeholder-val="{{ false }}">
+          <nav style="{{ styles.bottomPill }}">
+            <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
+              <a href="#" style="{{ styles.bottomPillItem }}">{{ n.short }}</a>
+            </sc-for>
+          </nav>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font:300 12px 'Jost',sans-serif;color:#9C7C6E;margin:10px 0 0;">{{ frameHint }}</p>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { device:'mobile', opened:false, votes:{}, scrollY:0 };
+
+  colors = {bg:'#FDF6F0', bgAlt:'#F5EBE0', ink:'#3B2A2A', inkSoft:'#9C7C6E', gold:'#C8956C', champagne:'#E8C4A0'};
+
+  setMobile(){ this.setState({device:'mobile'}); }
+  setDesktop(){ this.setState({device:'desktop'}); }
+  openCard(){ this.setState({opened:true}); }
+  vote(key){ this.setState(s=>({votes:{...s.votes,[key]:(s.votes[key]||0)+1}})); }
+  handleScroll(e){ this.setState({scrollY: e.target.scrollTop||0}); }
+
+  buildStyles(isDesktop, scrollY){
+    const c = this.colors;
+    const parallax = Math.min(scrollY||0, 260);
+    const wm = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23C8956C' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M30 100 C 34 88, 40 80, 50 76'/%3E%3Cellipse cx='54' cy='72' rx='8' ry='5.5' transform='rotate(-20 54 72)'/%3E%3Cpath d='M100 30 L92 46 M84 32 L78 50'/%3E%3Cellipse cx='90' cy='54' rx='6' ry='4' transform='rotate(30 90 54)'/%3E%3C/g%3E%3C/svg%3E")`;
+
+    return {
+      splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'40px 30px',textAlign:'center',position:'relative',overflow:'hidden',background:c.bg},
+      watermark:{position:'absolute',inset:0,backgroundImage:wm,backgroundSize:'200px 200px',opacity:.07,pointerEvents:'none'},
+      splashOrnTop:{position:'absolute',top:'6%',left:'-4%',width:'190px',opacity:.85,animation:'floatDoodle 9s ease-in-out infinite',pointerEvents:'none'},
+      splashOrnBottom:{position:'absolute',bottom:'6%',right:'-4%',width:'190px',opacity:.75,animation:'floatDoodle2 11s ease-in-out infinite',pointerEvents:'none'},
+      splashInner:{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'14px',animation:'inkFade 1s ease-out'},
+      splashRings:{width:'70px',marginBottom:'4px'},
+      splashKicker:{fontFamily:"'Jost',sans-serif",fontWeight:300,fontSize:'11.5px',letterSpacing:'.2em',textTransform:'uppercase',color:c.inkSoft,margin:0,maxWidth:'260px'},
+      splashName:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'clamp(2.4rem,9vw,3.4rem)',color:c.ink,margin:0,lineHeight:1.1},
+      splashRule:{width:'54px',height:'1px',background:c.gold},
+      splashDress:{fontFamily:"'Jost',sans-serif",fontWeight:300,fontSize:'12px',color:c.inkSoft,textTransform:'uppercase',letterSpacing:'.14em',margin:0,maxWidth:'260px'},
+      splashBtn:{fontFamily:"'Jost',sans-serif",fontWeight:500,fontSize:'11.5px',letterSpacing:'.2em',textTransform:'uppercase',padding:'14px 34px',border:`1px solid ${c.ink}`,background:'transparent',color:c.ink,cursor:'pointer',marginTop:'10px'},
+      star1:{position:'absolute',top:'26%',right:'16%',width:'20px',animation:'twinkleDoodle 4s ease-in-out infinite',pointerEvents:'none'},
+      heart1:{position:'absolute',bottom:'30%',left:'14%',width:'26px',opacity:.6,animation:'twinkleDoodle 5.5s ease-in-out infinite',pointerEvents:'none'},
+
+      stage: isDesktop ? {display:'grid',gridTemplateColumns:'440px 1fr',minHeight:'800px',background:c.bg} : {background:c.bg},
+      heroAside: isDesktop
+        ? {position:'relative',background:c.bgAlt,display:'flex',flexDirection:'column',padding:'34px 30px',borderRight:`1px solid ${c.gold}33`}
+        : {position:'relative'},
+      heroPhotoWrap: isDesktop
+        ? {position:'relative',height:'300px',overflow:'visible',marginBottom:'26px'}
+        : {position:'relative',height:'430px',overflow:'visible'},
+      heroPhoto:{width:'100%',height:'112%',objectFit:'cover',display:'block',transform:`translateY(${-parallax*0.16}px)`,filter:'saturate(1.02) contrast(1.02) brightness(1.05) sepia(.08)'},
+      heroCream:{position:'absolute',inset:0,background:'rgba(253,246,240,0.18)',pointerEvents:'none'},
+      heroFrame:{position:'absolute',inset:'12px',border:`1px solid rgba(253,246,240,.8)`,pointerEvents:'none'},
+      frameCornerTL:{position:'absolute',top:'4px',left:'4px',width:'74px',pointerEvents:'none'},
+      frameCornerBR:{position:'absolute',bottom:'4px',right:'4px',width:'74px',pointerEvents:'none'},
+      dressOut:{position:'absolute',bottom:'-30px',left:'-24px',width:'88px',animation:'floatDoodle 10s ease-in-out infinite',pointerEvents:'none'},
+      glassesOut:{position:'absolute',top:'-24px',right:'-18px',width:'82px',animation:'floatDoodle2 12s ease-in-out infinite',pointerEvents:'none'},
+
+      heroTextBlock: isDesktop
+        ? {position:'relative',marginTop:'auto',textAlign:'left'}
+        : {position:'relative',background:c.bg,padding:'34px 26px 6px',textAlign:'center'},
+      seal:{width:'40px',display:'block',margin: isDesktop?'0 0 14px':'0 auto 14px',opacity:.9},
+      eyebrow:{fontFamily:"'Jost',sans-serif",fontWeight:500,fontSize:'10.5px',letterSpacing:'.22em',textTransform:'uppercase',color:c.gold,margin:'0 0 10px'},
+      title:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize: isDesktop?'clamp(3rem,4vw,3.6rem)':'clamp(2.8rem,11vw,3.6rem)',lineHeight:1.05,margin:'0 0 6px',color:c.ink},
+      titleAmp:{color:c.gold,fontWeight:600},
+      underline:{width:'40px',height:'1px',background:c.gold,margin: isDesktop?'6px 0 12px':'6px auto 12px'},
+      dateLine:{fontFamily:"'Jost',sans-serif",fontWeight:300,fontSize:'12.5px',color:c.inkSoft,margin:0,letterSpacing:'.06em'},
+      nav:{marginTop:'26px',display:'flex',flexDirection:'column',gap:'2px'},
+      navItem:{display:'flex',alignItems:'center',gap:'10px',padding:'9px 0',color:c.inkSoft,fontFamily:"'Jost',sans-serif",fontSize:'13px',fontWeight:300,borderBottom:`1px solid ${c.gold}22`},
+      navNum:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',color:c.gold},
+
+      mainCol:{},
+      kicker:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'16px',letterSpacing:'.02em',color:c.gold,margin:'0 0 18px',textAlign:'center'},
+      kickerSpaced:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'16px',letterSpacing:'.02em',color:c.gold,margin:'38px 0 18px',textAlign:'center'},
+      kickerOnDark:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'16px',color:c.gold,margin:'0 0 10px',textAlign:'center'},
+      sectionIcon:{width:'40px',display:'block',margin:'0 auto 12px'},
+      divider:{width:'210px',display:'block',margin:'0 auto 20px'},
+
+      countdownSection:{padding: isDesktop?'46px 52px':'38px 24px',background:c.bg,position:'relative',overflow:'hidden'},
+      watermarkSoft:{position:'absolute',inset:0,backgroundImage:wm,backgroundSize:'210px 210px',opacity:.05,pointerEvents:'none'},
+      countdownWrap:{display:'flex',gap:'10px',position:'relative'},
+      cdBox:{flex:1,textAlign:'center',padding:'16px 6px',background:c.bgAlt,border:`1px solid ${c.gold}44`},
+      cdNum:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'28px',display:'block',color:c.ink},
+      cdLabel:{fontSize:'9.5px',textTransform:'uppercase',letterSpacing:'.14em',fontWeight:500,color:c.inkSoft,fontFamily:"'Jost',sans-serif"},
+
+      quoteSection:{padding: isDesktop?'56px 64px':'44px 26px',background:c.bgAlt,textAlign:'center',borderTop:`1px solid ${c.gold}22`,borderBottom:`1px solid ${c.gold}22`},
+      quoteDoodle:{width:'34px',display:'block',margin:'0 auto 16px',animation:'twinkleDoodle 6s ease-in-out infinite'},
+      quoteText:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize: isDesktop?'clamp(1.5rem,2vw,1.9rem)':'clamp(1.25rem,5vw,1.55rem)',lineHeight:1.6,margin:0,color:c.ink,maxWidth:'620px',marginLeft:'auto',marginRight:'auto'},
+
+      section:{padding: isDesktop?'50px 52px':'40px 24px',background:c.bg},
+      addrCard:{background:c.bgAlt,padding:'22px 24px',marginBottom:'16px',border:`1px solid ${c.gold}33`,textAlign:'center'},
+      addrKicker:{fontFamily:"'Jost',sans-serif",fontWeight:500,fontSize:'10px',textTransform:'uppercase',letterSpacing:'.2em',color:c.gold,display:'block',marginBottom:'10px'},
+      addrTitle:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'22px',margin:'0 0 10px',color:c.ink},
+      addrRow:{margin:'0 0 5px',fontSize:'13px',color:c.inkSoft,fontFamily:"'Jost',sans-serif",fontWeight:300,letterSpacing:'.04em'},
+      mapBtn:{fontSize:'11px',fontWeight:500,color:c.gold,fontFamily:"'Jost',sans-serif",display:'inline-block',marginTop:'10px',letterSpacing:'.12em',textTransform:'uppercase',borderBottom:`1px solid ${c.gold}`,paddingBottom:'3px'},
+      schedRow:{display:'flex',gap:'18px',padding:'13px 0',borderBottom:`1px solid ${c.gold}2A`,alignItems:'center',justifyContent:'center'},
+      schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.gold,minWidth:'54px',fontWeight:700},
+      schedLabel:{fontFamily:"'Jost',sans-serif",fontSize:'13.5px',color:c.ink,fontWeight:300,letterSpacing:'.08em'},
+
+      albumSection:{padding: isDesktop?'50px 52px':'40px 24px',background:c.bgAlt},
+      galleryWrap: isDesktop ? {display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'12px'} : {display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'},
+      galleryImg:{width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'saturate(1.02) contrast(1.02) sepia(.06)'},
+
+      mapPlaceholder:{height:'170px',background:c.bg,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'10px',borderTop:`1px solid ${c.gold}22`,borderBottom:`1px solid ${c.gold}22`},
+      mapPin:{width:'30px'},
+      mapText:{fontFamily:"'Jost',sans-serif",fontWeight:300,color:c.inkSoft,fontSize:'12px',letterSpacing:'.14em',textTransform:'uppercase'},
+
+      rsvpSection:{padding: isDesktop?'54px 52px':'44px 24px',background:c.ink,color:c.bg,textAlign:'center'},
+      rsvpRings:{width:'100px',display:'block',margin:'0 auto 18px'},
+      rsvpTitle:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'clamp(1.7rem,5vw,2.1rem)',margin:'0 0 4px',color:c.bg},
+      fieldLabel:{display:'block',fontSize:'10px',textTransform:'uppercase',fontWeight:500,letterSpacing:'.2em',opacity:.7,marginBottom:'8px',fontFamily:"'Jost',sans-serif",color:c.bg,textAlign:'left'},
+      fieldInput:{width:'100%',padding:'14px 16px',border:`1px solid rgba(253,246,240,.35)`,background:'rgba(253,246,240,.06)',color:c.bg,fontSize:'14px',fontFamily:"'Jost',sans-serif",fontWeight:300},
+      rsvpBtnSolid:{flex:1,padding:'15px',border:'none',background:c.gold,color:c.ink,fontWeight:500,fontSize:'11px',letterSpacing:'.18em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Jost',sans-serif"},
+      rsvpBtnGhost:{padding:'15px 18px',border:`1px solid rgba(253,246,240,.5)`,background:'transparent',color:c.bg,fontWeight:400,fontSize:'11px',cursor:'pointer',fontFamily:"'Jost',sans-serif",letterSpacing:'.14em',textTransform:'uppercase'},
+
+      giftGrid: isDesktop ? {display:'grid',gridTemplateColumns:'1fr',gap:'16px'} : {display:'flex',flexDirection:'column',gap:'14px'},
+      giftCard:{background:c.bgAlt,padding:'22px',border:`1px solid ${c.gold}33`,textAlign:'center'},
+      giftCardTitle:{fontFamily:"'Cormorant Garamond',serif",fontStyle:'italic',fontWeight:600,fontSize:'19px',color:c.ink,display:'block',marginBottom:'14px'},
+      copyRow:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 0',borderTop:`1px solid ${c.gold}2A`,minWidth:0},
+      copyLabel:{fontSize:'10.5px',fontWeight:500,textTransform:'uppercase',letterSpacing:'.06em',color:c.inkSoft,fontFamily:"'Jost',sans-serif"},
+      copyValue:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.gold,fontWeight:700,overflowWrap:'anywhere'},
+
+      musicInput:{flex:1,minWidth:0,padding:'14px 16px',border:`1px solid ${c.gold}44`,background:c.bgAlt,fontSize:'13px',fontFamily:"'Jost',sans-serif",fontWeight:300,color:c.ink},
+      musicSendBtn:{padding:'14px 24px',border:'none',background:c.ink,color:c.bg,fontWeight:500,fontSize:'12px',cursor:'pointer',fontFamily:"'Jost',sans-serif",letterSpacing:'.04em'},
+      musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px',background:c.bgAlt,borderRadius:'2px',marginBottom:'8px',border:`1px solid ${c.gold}26`},
+      musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:"'Jost',sans-serif",fontWeight:500,color:c.ink},
+      musicRowSub:{opacity:.7,fontSize:'11.5px',fontFamily:"'Jost',sans-serif",color:c.inkSoft,fontWeight:300},
+      musicBadge:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'12px',background:'none',border:`1px solid ${c.gold}`,color:c.gold,padding:'6px 12px',cursor:'pointer'},
+
+      footer:{padding:'36px 24px 90px',textAlign:'center',background:c.bgAlt,borderTop:`1px solid ${c.gold}22`},
+      footerGarland:{width:'150px',display:'block',margin:'0 auto 14px'},
+      footerText:{fontSize:'10.5px',color:c.inkSoft,fontFamily:"'Jost',sans-serif",fontWeight:300,letterSpacing:'.1em'},
+
+      bottomPill:{position:'sticky',bottom:'16px',left:0,right:0,margin:'0 16px',display:'flex',justifyContent:'space-around',background:'rgba(59,42,42,.94)',borderRadius:'999px',padding:'14px 10px',boxShadow:'0 12px 30px rgba(59,42,42,.3)',border:`1px solid ${c.gold}33`},
+      bottomPillItem:{color:c.champagne,fontSize:'10px',fontWeight:500,fontFamily:"'Jost',sans-serif",letterSpacing:'.1em',textTransform:'uppercase'},
+    };
+  }
+
+  renderVals(){
+    const isDesktop = this.state.device==='desktop';
+    const isMobile = !isDesktop;
+    const styles = this.buildStyles(isDesktop, this.state.scrollY);
+    const showSplash = isMobile && !this.state.opened;
+    const contentVisible = !showSplash;
+
+    return {
+      styles, isDesktop, isMobile, showSplash, contentVisible,
+      isMobileNavVisible: isMobile && this.state.opened,
+      guestName: 'Familia Duarte',
+      handleScroll: (e)=>this.handleScroll(e),
+      mobileBtnStyle:{fontFamily:"'Jost',sans-serif",fontSize:'12px',fontWeight:500,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isMobile?'#FDF6F0':'transparent',color: isMobile?'#3B2A2A':'#c9b8ac'},
+      desktopBtnStyle:{fontFamily:"'Jost',sans-serif",fontSize:'12px',fontWeight:500,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isDesktop?'#FDF6F0':'transparent',color: isDesktop?'#3B2A2A':'#c9b8ac'},
+      setMobile: ()=>this.setMobile(),
+      setDesktop: ()=>this.setDesktop(),
+      openCard: ()=>this.openCard(),
+      frameHint: isMobile ? 'Modo celular: portada con ramo y pétalos doodle, luego scroll con parallax suave en la foto.' : 'Modo escritorio: aside con foto enmarcada por enredadera, rosa y eucalipto saliendo del marco.',
+      outerFrameStyle: isMobile
+        ? {width:'390px',maxWidth:'100%',background:'#000',borderRadius:'44px',padding:'14px',boxShadow:'0 30px 60px rgba(59,42,42,.35)',display:'flex',flexDirection:'column'}
+        : {width:'1180px',maxWidth:'100%'},
+      screenStyle: isMobile
+        ? {height:'800px',overflowY:'auto',borderRadius:'30px',background:'#FDF6F0',position:'relative',scrollbarWidth:'none'}
+        : {borderRadius:'4px',background:'#FDF6F0',position:'relative',boxShadow:'0 30px 70px rgba(59,42,42,.14)',overflow:'hidden'},
+
+      navItems: [
+        {num:'01',label:'Detalles',short:'Info'},{num:'02',label:'Mapa',short:'Mapa'},{num:'03',label:'Confirmar',short:'RSVP'},
+        {num:'04',label:'Banco',short:'Banco'},{num:'05',label:'Música',short:'Música'},{num:'06',label:'Álbum',short:'Álbum'}
+      ],
+      countdownBoxes:[{n:'63',l:'días'},{n:'08',l:'hs'},{n:'40',l:'min'},{n:'12',l:'seg'}],
+      scheduleItems:[{time:'17:30',label:'Ceremonia'},{time:'19:30',label:'Recepción'},{time:'20:30',label:'Cena'},{time:'22:30',label:'Fiesta'}],
+      galleryImages:['img/casamiento/istockphoto-1078252368-1024x1024.jpg','img/casamiento/istockphoto-1135139821-1024x1024.jpg','img/casamiento/istockphoto-1173516409-1024x1024.jpg','img/casamiento/istockphoto-1093617712-1024x1024.jpg'].map(src=>({src,wrapStyle:{aspectRatio:'1',overflow:'hidden'}})),
+      musicItems: [{t:'La Vie en Rose',s:'Édith Piaf',badge:'♥ 12'},{t:'Perfect',s:'Ed Sheeran',badge:'♥ 9'}].map((m,i)=>{
+        const key='m'+i; const votes=this.state.votes[key]||0; const base=parseInt(m.badge.match(/\d+/)[0],10);
+        return {t:m.t,s:m.s,badge:m.badge.replace(/\d+/, base+votes),vote:()=>this.vote(key)};
+      }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

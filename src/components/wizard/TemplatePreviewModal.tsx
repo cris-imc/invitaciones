@@ -15,34 +15,137 @@ import {
   ELEGANT_COLORS,
   NEON_COLORS,
   CHIC_COLORS,
+  EDITORIAL_COLORS,
+  ONIX_COLORS,
+  JARDINSEDA_COLORS,
+  HOLOGRAMA_COLORS,
+  CIRCUITO_COLORS,
+  CRISTAL3D_COLORS,
+  CINE_COLORS,
+  NORDICO_COLORS,
+  RIVIERA_COLORS,
+  GOLDENDUSK_COLORS,
+  SEDA_COLORS,
+  PETALOS_COLORS,
+  LUZLUNA_COLORS,
+  BONVOYAGE_COLORS,
+  CORPORATE_COLORS,
+  GARDENPARTY_COLORS,
+  LOFTINDUSTRIAL_COLORS,
+  INFANTIL_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
-export { MODERNO_COLORS, ELEGANT_COLORS, NEON_COLORS, CHIC_COLORS, type TemplateTipo };
+export {
+  MODERNO_COLORS, ELEGANT_COLORS, NEON_COLORS, CHIC_COLORS,
+  EDITORIAL_COLORS, ONIX_COLORS, JARDINSEDA_COLORS, HOLOGRAMA_COLORS, CIRCUITO_COLORS, CRISTAL3D_COLORS,
+  CINE_COLORS, NORDICO_COLORS, RIVIERA_COLORS, GOLDENDUSK_COLORS,
+  SEDA_COLORS, PETALOS_COLORS, LUZLUNA_COLORS, BONVOYAGE_COLORS,
+  CORPORATE_COLORS, GARDENPARTY_COLORS, LOFTINDUSTRIAL_COLORS, INFANTIL_COLORS,
+  type TemplateTipo,
+};
+
+// Acento principal (variante "default") de cada TemplateTipo -- se usa para
+// el borde de los swatches de color y para TEMPLATE_TIPO_BORDER en
+// StepDesign.tsx. Ver docs/GUIA_TECNICA_PLANTILLAS.md.
+export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
+  ELEGANT: "rgba(0,0,0,.15)",
+  MODERNO: "#C9A876",
+  NEON: "#39FFD0",
+  CHIC: "#C9A876",
+  EDITORIAL: "#A3123B",
+  ONIX: "#D89AA0",
+  JARDINSEDA: "#B79FC4",
+  HOLOGRAMA: "#A78BFA",
+  CIRCUITO: "#39FFD0",
+  CRISTAL3D: "#8FD3FF",
+  CINE: "#C08A3E",
+  NORDICO: "#5B5850",
+  RIVIERA: "#C1734A",
+  GOLDENDUSK: "#C8956C",
+  SEDA: "#C9A0A6",
+  PETALOS: "#E23B4E",
+  LUZLUNA: "#B9A6D9",
+  BONVOYAGE: "#2E7EA6",
+  CORPORATE: "#5C8DFF",
+  GARDENPARTY: "#D97757",
+  LOFTINDUSTRIAL: "#E0B84B",
+  INFANTIL: "#FF5C8A",
+};
 
 const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
   { tipo: "ELEGANT", label: "Elegant" },
   { tipo: "MODERNO", label: "Moderno" },
   { tipo: "NEON", label: "Neon" },
   { tipo: "CHIC", label: "Chic" },
+  { tipo: "EDITORIAL", label: "Editorial" },
+  { tipo: "ONIX", label: "Ónix" },
+  { tipo: "JARDINSEDA", label: "Jardín de Seda" },
+  { tipo: "HOLOGRAMA", label: "Holograma" },
+  { tipo: "CIRCUITO", label: "Circuito" },
+  { tipo: "CRISTAL3D", label: "Cristal 3D" },
+  { tipo: "CINE", label: "Cine" },
+  { tipo: "NORDICO", label: "Atelier Nórdico" },
+  { tipo: "RIVIERA", label: "Riviera" },
+  { tipo: "GOLDENDUSK", label: "Golden Dusk" },
+  { tipo: "SEDA", label: "Seda" },
+  { tipo: "PETALOS", label: "Pétalos" },
+  { tipo: "LUZLUNA", label: "Luz de Luna" },
+  { tipo: "BONVOYAGE", label: "Bon Voyage" },
+  { tipo: "CORPORATE", label: "Corporate" },
+  { tipo: "GARDENPARTY", label: "Garden Party" },
+  { tipo: "LOFTINDUSTRIAL", label: "Loft Industrial" },
+  { tipo: "INFANTIL", label: "Infantil" },
 ];
 
 // Neon ("Doodle Disco 15") solo se ofrece para 15 años y Evento (CUMPLEANOS),
 // Chic ("Doodle Wedding") solo para Casamiento -- ver
-// docs/PLAN_TEMPLATES_NEON_CHIC.md.
+// docs/PLAN_TEMPLATES_NEON_CHIC.md. El pack de 18 plantillas nuevas de
+// docs/INVENTARIO_IMPLE_MASIVA.md sigue el mismo patrón de gating por tipo
+// de evento -- ver esa tabla para el detalle de cada una.
 function getAvailableTabs(eventType: string | undefined): { tipo: TemplateTipo; label: string }[] {
+  const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D"]);
+  const soloCasamiento = new Set(["CINE", "NORDICO", "RIVIERA", "GOLDENDUSK"]);
+  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE"]);
+  const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
     if (tipo === "NEON") return eventType === "QUINCE_ANOS" || eventType === "CUMPLEANOS";
     if (tipo === "CHIC") return eventType === "CASAMIENTO";
+    if (soloQuince.has(tipo)) return eventType === "QUINCE_ANOS";
+    if (soloCasamiento.has(tipo)) return eventType === "CASAMIENTO";
+    if (quinceYCasamiento.has(tipo)) return eventType === "QUINCE_ANOS" || eventType === "CASAMIENTO";
+    if (soloCumpleanos.has(tipo)) return eventType === "CUMPLEANOS";
     return true;
   });
 }
 
+const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
+  ELEGANT: ELEGANT_COLORS,
+  MODERNO: MODERNO_COLORS,
+  NEON: NEON_COLORS,
+  CHIC: CHIC_COLORS,
+  EDITORIAL: EDITORIAL_COLORS,
+  ONIX: ONIX_COLORS,
+  JARDINSEDA: JARDINSEDA_COLORS,
+  HOLOGRAMA: HOLOGRAMA_COLORS,
+  CIRCUITO: CIRCUITO_COLORS,
+  CRISTAL3D: CRISTAL3D_COLORS,
+  CINE: CINE_COLORS,
+  NORDICO: NORDICO_COLORS,
+  RIVIERA: RIVIERA_COLORS,
+  GOLDENDUSK: GOLDENDUSK_COLORS,
+  SEDA: SEDA_COLORS,
+  PETALOS: PETALOS_COLORS,
+  LUZLUNA: LUZLUNA_COLORS,
+  BONVOYAGE: BONVOYAGE_COLORS,
+  CORPORATE: CORPORATE_COLORS,
+  GARDENPARTY: GARDENPARTY_COLORS,
+  LOFTINDUSTRIAL: LOFTINDUSTRIAL_COLORS,
+  INFANTIL: INFANTIL_COLORS,
+};
+
 function getColorsForTipo(tipo: TemplateTipo) {
-  if (tipo === "MODERNO") return MODERNO_COLORS;
-  if (tipo === "NEON") return NEON_COLORS;
-  if (tipo === "CHIC") return CHIC_COLORS;
-  return ELEGANT_COLORS;
+  return COLORS_BY_TIPO[tipo];
 }
 
 // Ancho de un celular real: el iframe siempre se layoutea a este ancho para
@@ -220,7 +323,7 @@ function TemplatePreviewModalBody({
                     )}
                     style={{
                       backgroundColor: c.color,
-                      border: activeTab === "MODERNO" ? "2px solid #C9A876" : activeTab === "NEON" ? "2px solid #39FFD0" : activeTab === "CHIC" ? "2px solid #C9A876" : "1px solid rgba(0,0,0,.1)",
+                      border: activeTab === "ELEGANT" ? "1px solid rgba(0,0,0,.1)" : `2px solid ${TEMPLATE_TIPO_ACCENT[activeTab]}`,
                     }}
                   />
                   <span className="hidden md:inline text-sm font-medium flex-1">{c.name}</span>

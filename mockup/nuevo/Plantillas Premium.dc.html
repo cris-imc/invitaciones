@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,500&family=Archivo:wght@400;500;600;700&family=Bebas+Neue&family=Italiana&family=Jost:wght@400;500;600&family=Gloock&family=Work+Sans:wght@400;500;600&family=Playfair+Display:ital@1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#EDEBE5;font-family:'Archivo',sans-serif;color:#1a1a1a;}
+a{color:inherit;text-decoration:none;}
+a:hover{opacity:.75;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(14px);}100%{opacity:1;transform:translateY(0);}}
+@keyframes shimmerGold{0%{background-position:-400px 0;}100%{background-position:400px 0;}}
+@keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(10px,-14px) scale(1.05);}}
+@keyframes pulseRing{0%,100%{box-shadow:0 0 0 0 rgba(201,162,39,.35);}50%{box-shadow:0 0 0 8px rgba(201,162,39,0);}}
+</style>
+</helmet>
+
+<div style="max-width:1400px;margin:0 auto;padding:28px 20px 80px;">
+
+  <div style="max-width:820px;margin:0 0 28px;">
+    <p style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8a8578;margin:0 0 10px;">Convite &middot; Propuesta de dise&ntilde;o</p>
+    <h1 style="font:600 30px/1.25 'Archivo',sans-serif;margin:0 0 12px;">6 plantillas nuevas, nivel &ldquo;template premium&rdquo;</h1>
+    <p style="font:400 14.5px/1.65 'Archivo',sans-serif;color:#4a473e;margin:0 0 10px;">Contexto: el wizard actual ya define las secciones fijas (portada &rarr; fecha/foto &rarr; countdown &rarr; frase &rarr; &aacute;lbum &rarr; direcciones &rarr; cronograma &rarr; RSVP &rarr; quiz &rarr; CBU/regalo &rarr; sugerencia de m&uacute;sica &rarr; cierre) y hoy solo cambia color/tipograf&iacute;a sobre un mismo layout. Ac&aacute; propongo <strong>3 sistemas de layout</strong> realmente distintos &mdash; no solo repintados &mdash; cada uno aplicado a Boda y a 15 a&ntilde;os, usando fotos reales del repo como referencia de contenido.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;">
+      <div style="flex:1;min-width:220px;background:#fff;border:1px solid #e2ded2;border-radius:4px;padding:14px 16px;">
+        <p style="margin:0 0 4px;font:600 13px 'Archivo',sans-serif;">A &middot; Editorial Blanc</p>
+        <p style="margin:0;font:400 12.5px/1.5 'Archivo',sans-serif;color:#6b6759;">Minimalismo de lujo: tipograf&iacute;a Bodoni enorme, blanco roto, reglas finas, cero cajas.</p>
+      </div>
+      <div style="flex:1;min-width:220px;background:#fff;border:1px solid #e2ded2;border-radius:4px;padding:14px 16px;">
+        <p style="margin:0 0 4px;font:600 13px 'Archivo',sans-serif;">B &middot; Noir &amp; Oro</p>
+        <p style="margin:0;font:400 12.5px/1.5 'Archivo',sans-serif;color:#6b6759;">Lujo oscuro: negro/m&aacute;rmol, marcos dorados, insignias circulares, glass panels.</p>
+      </div>
+      <div style="flex:1;min-width:220px;background:#fff;border:1px solid #e2ded2;border-radius:4px;padding:14px 16px;">
+        <p style="margin:0 0 4px;font:600 13px 'Archivo',sans-serif;">C &middot; Bot&aacute;nico</p>
+        <p style="margin:0;font:400 12.5px/1.5 'Archivo',sans-serif;color:#6b6759;">Org&aacute;nico y suave: blobs acuarela, polaroids con leve rotaci&oacute;n, todo redondeado.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px;padding:14px 16px;background:#1a1a1a;border-radius:14px;">
+    <span style="font:700 10.5px 'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8578;margin-right:4px;">Eleg&iacute; una plantilla</span>
+    <sc-for list="{{ themesList }}" as="th" hint-placeholder-count="6">
+      <button onClick="{{ th.select }}" style="{{ th.chipStyle }}">{{ th.label }}</button>
+    </sc-for>
+    <div style="flex:1;"></div>
+    <button onClick="{{ toggleFrame }}" style="{{ frameToggleStyle }}">{{ frameToggleLabel }}</button>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:26px 0 10px;">
+    <div style="{{ outerFrameStyle }}">
+      <sc-if value="{{ frameOn }}" hint-placeholder-val="{{ true }}">
+        <div style="height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:110px;height:16px;background:#000;border-radius:12px;"></div>
+        </div>
+      </sc-if>
+      <div style="{{ screenStyle }}">
+
+        <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ styles.splash }}">
+            <div style="{{ styles.monogram }}">{{ active.monogram }}</div>
+            <p style="{{ styles.splashGreet }}">{{ active.splashGreeting }}</p>
+            <button onClick="{{ openCard }}" style="{{ styles.splashBtn }}">{{ active.splashCta }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contentVisible }}" hint-placeholder-val="{{ true }}">
+        <div>
+
+          <section style="{{ styles.hero }}">
+            <img src="{{ active.heroImg }}" alt="Portada" style="{{ styles.heroImg }}">
+            <div style="{{ styles.heroOverlay }}"></div>
+            <div style="{{ styles.heroContent }}">
+              <p style="{{ styles.eyebrow }}">{{ active.eyebrow }}</p>
+              <h2 style="{{ styles.title }}">{{ active.titleHtmlA }}<br>{{ active.titleHtmlB }}</h2>
+              <p style="{{ styles.dateLine }}">{{ active.dateLine }}</p>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cuenta regresiva</p>
+            <div style="{{ styles.countdownWrap }}">
+              <sc-for list="{{ countdownBoxes }}" as="cd" hint-placeholder-count="3">
+                <div style="{{ cd.boxStyle }}">
+                  <span style="{{ styles.cdNum }}">{{ cd.n }}</span>
+                  <span style="{{ styles.cdLabel }}">{{ cd.l }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.quoteSection }}">
+            <p style="{{ styles.quoteText }}">{{ active.quote }}</p>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">&Aacute;lbum</p>
+            <div style="{{ styles.galleryWrap }}">
+              <sc-for list="{{ galleryImages }}" as="g" hint-placeholder-count="3">
+                <div style="{{ g.wrapStyle }}"><img src="{{ g.src }}" alt="Momento" style="{{ styles.galleryImg }}"></div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">D&oacute;nde</p>
+            <sc-for list="{{ addrCards }}" as="ad" hint-placeholder-count="2">
+              <div style="{{ styles.addrCard }}">
+                <h3 style="{{ styles.addrTitle }}">{{ ad.t }}</h3>
+                <p style="{{ styles.addrSub }}">{{ ad.s }}</p>
+                <a href="#" style="{{ styles.mapBtn }}">Ver mapa &#8599;</a>
+              </div>
+            </sc-for>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cronograma</p>
+            <sc-for list="{{ scheduleItems }}" as="sc" hint-placeholder-count="3">
+              <div style="{{ styles.schedRow }}">
+                <span style="{{ styles.schedTime }}">{{ sc.time }}</span>
+                <span style="{{ styles.schedLabel }}">{{ sc.label }}</span>
+              </div>
+            </sc-for>
+          </section>
+
+          <section style="{{ styles.rsvpSection }}">
+            <p style="{{ styles.kickerOnRsvp }}">Confirmaci&oacute;n</p>
+            <h3 style="{{ styles.rsvpTitle }}">{{ active.rsvpTitle }}</h3>
+            <div style="margin:14px 0;">
+              <label style="{{ styles.fieldLabel }}">Nombre y apellido</label>
+              <input value="{{ active.rsvpName }}" style="{{ styles.fieldInput }}" readonly>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button style="{{ styles.rsvpBtnSolid }}">{{ active.rsvpBtn }}</button>
+              <button style="{{ styles.rsvpBtnGhost }}">No podr&eacute;</button>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Quiz</p>
+            <div style="{{ styles.quizCard }}">
+              <p style="{{ styles.quizQ }}">{{ active.quizQ }}</p>
+              <sc-for list="{{ quizOptions }}" as="qo" hint-placeholder-count="3">
+                <div style="{{ qo.style }}">{{ qo.text }}</div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Regalo</p>
+            <div style="{{ styles.giftCard }}">
+              <h3 style="{{ styles.giftTitle }}">{{ active.giftTitle }}</h3>
+              <p style="{{ styles.giftBody }}">{{ active.giftBody }}</p>
+              <div style="{{ styles.giftAliasBox }}">{{ active.giftAlias }}</div>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">M&uacute;sica</p>
+            <h3 style="{{ styles.musicTitle }}">{{ active.musicTitle }}</h3>
+            <p style="{{ styles.musicSub }}">{{ active.musicSub }}</p>
+            <div style="display:flex;gap:8px;margin:14px 0;">
+              <input placeholder="{{ active.musicPlaceholder }}" style="{{ styles.musicInput }}" readonly>
+              <button style="{{ styles.musicSendBtn }}">Enviar</button>
+            </div>
+            <sc-for list="{{ musicItems }}" as="mi" hint-placeholder-count="2">
+              <div style="{{ styles.musicRow }}">
+                <div><b style="{{ styles.musicRowTitle }}">{{ mi.t }}</b><span style="{{ styles.musicRowSub }}">{{ mi.s }}</span></div>
+                <button onClick="{{ mi.vote }}" style="{{ styles.musicBadge }}">{{ mi.badge }}</button>
+              </div>
+            </sc-for>
+          </section>
+
+          <footer style="{{ styles.footer }}">
+            <div style="{{ styles.footerMono }}">{{ active.monogram }}</div>
+            <small style="{{ styles.footerText }}">{{ active.footerText }}</small>
+          </footer>
+
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font:400 12px 'Archivo',sans-serif;color:#8a8578;margin:6px 0 0;">{{ frameHint }}</p>
+
+  <div style="max-width:980px;margin:56px auto 0;">
+    <button onClick="{{ toggleNotes }}" style="display:flex;align-items:center;gap:8px;background:#1a1a1a;color:#fff;border:none;border-radius:999px;padding:10px 18px;font:600 12.5px 'Archivo',sans-serif;cursor:pointer;">
+      {{ notesToggleLabel }}
+    </button>
+    <sc-if value="{{ notesOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
+        <sc-for list="{{ techNotes }}" as="tn" hint-placeholder-count="6">
+          <div style="background:#fff;border:1px solid #e2ded2;border-radius:10px;padding:18px 20px;">
+            <p style="margin:0 0 2px;font:700 10px 'Space Mono',monospace;letter-spacing:.08em;color:#8a8578;text-transform:uppercase;">{{ tn.layout }} &middot; {{ tn.eventLabel }}</p>
+            <h4 style="margin:2px 0 10px;font:600 16px 'Archivo',sans-serif;">{{ tn.name }}</h4>
+            <p style="margin:0 0 6px;font:400 12.5px/1.5 'Archivo',sans-serif;color:#4a473e;"><b>Archivo:</b> src/components/templates/{{ tn.filename }}.tsx &middot; layoutId <code>{{ tn.layoutId }}</code></p>
+            <p style="margin:0 0 6px;font:400 12.5px/1.5 'Archivo',sans-serif;color:#4a473e;"><b>Fuentes:</b> {{ tn.fonts }}</p>
+            <p style="margin:0 0 6px;font:400 12.5px/1.5 'Archivo',sans-serif;color:#4a473e;"><b>Paleta:</b> {{ tn.palette }}</p>
+            <p style="margin:0;font:400 12.5px/1.5 'Archivo',sans-serif;color:#4a473e;"><b>Reusa:</b> {{ tn.reuse }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:18px;background:#1a1a1a;color:#e8e4d8;border-radius:10px;padding:18px 22px;">
+        <p style="margin:0 0 8px;font:600 13px 'Archivo',sans-serif;">Integraci&oacute;n com&uacute;n (igual al patr&oacute;n de VintageElegance/AuroraDreamy)</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Archivo',sans-serif;color:#c9c5b8;">1. Agregar entrada en <code>theme-config.ts</code> (id, name, description) y en <code>templatesConfig.ts</code> (TEMPLATE_ID, categor&iacute;a).</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Archivo',sans-serif;color:#c9c5b8;">2. Import + condicional en <code>StepPreview.tsx</code> e <code>InvitationContent.tsx</code>.</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Archivo',sans-serif;color:#c9c5b8;">3. Reusar los componentes existentes tal cual (mismas props/flags): <code>Countdown</code>/<code>CountdownV2</code>, <code>SharedAlbum</code>/<code>AlbumCarousel</code>, <code>CronogramaOriginal</code>, <code>QuizTrivia</code>, <code>BankDetails</code>, <code>SongSuggestion</code>, <code>PersonalizedRsvpForm</code>/<code>RSVPWizardV2</code>, <code>SplashScreen</code> &mdash; el layout nuevo solo cambia el wrapper visual (JSX/CSS), no la l&oacute;gica ni los flags (<code>galeriaPrincipalHabilitada</code>, <code>triviaHabilitada</code>, <code>regaloHabilitado</code>, <code>cancionSugeridaHabilitado</code>, etc.) que siguen viniendo del wizard sin cambios.</p>
+        <p style="margin:0;font:400 12.5px/1.6 'Archivo',sans-serif;color:#c9c5b8;">4. Los 3 layouts (Editorial/Noir/Bot&aacute;nico) son sistemas reutilizables: agregar m&aacute;s tipos de evento a futuro es swap de paleta+copy+fotos sobre el mismo layout, como ya hac&iacute;a la plantilla &uacute;nica actual.</p>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  THEMES = [
+  { id:'editorial-boda', eventType:'Boda', layout:'A', name:'Editorial Blanc',
+    displayFont:"'Bodoni Moda',serif", bodyFont:"'Archivo',sans-serif",
+    colors:{bg:'#FAF9F5',bg2:'#F1EEE5',ink:'#17140F',inkSoft:'#6b6759',accent:'#B08D57',accent2:'#17140F',onDark:'#FAF9F5',line:'#D8D2C4'},
+    heroImg:'img/casamiento/istockphoto-1072442264-1024x1024.jpg',
+    galleryImgs:['img/casamiento/istockphoto-1078252368-1024x1024.jpg','img/casamiento/istockphoto-1093617712-1024x1024.jpg','img/casamiento/istockphoto-1072442264-1024x1024.jpg'],
+    monogram:'V·I', eyebrow:'Nos casamos', titleHtmlA:'Valentina', titleHtmlB:'& Ignacio', dateLine:'21 de noviembre de 2026 — Buenos Aires',
+    cdBoxes:[{n:'87',l:'días'},{n:'14',l:'hs'},{n:'22',l:'min'}],
+    splashGreeting:'Con todo nuestro cariño', splashCta:'Abrir invitación',
+    quote:'“Elegimos empezar así: rodeados de las personas que más queremos.”',
+    addr:[{t:'Ceremonia',s:'18:00 hs · Basílica del Pilar, Recoleta'},{t:'Recepción',s:'20:00 hs · Casona Los Nogales, San Isidro'}],
+    schedule:[{time:'18:00',label:'Ceremonia'},{time:'20:00',label:'Recepción y brindis'},{time:'21:30',label:'Cena'},{time:'23:00',label:'Fiesta'}],
+    rsvpTitle:'Confirmá tu presencia', rsvpName:'Familia Duarte', rsvpBtn:'Confirmar',
+    quizQ:'¿En qué ciudad nos conocimos?', quizOpts:['Córdoba','Buenos Aires','Rosario'],
+    giftTitle:'Tu presencia es el regalo', giftBody:'Si querés sumar algo más, dejamos disponible un alias.', giftAlias:'valeignacio.boda',
+    musicTitle:'Sugerí una canción', musicSub:'¿Qué no puede faltar en la pista?', musicPlaceholder:'Canción — artista',
+    musicItems:[{t:'La Bilirrubina',s:'Juan Luis Guerra',badge:'♥ 14'},{t:'September',s:'Earth, Wind & Fire',badge:'♥ 9'}],
+    footerText:'Gracias por ser parte de este día' },
+
+  { id:'debutante-xv', eventType:'15 años', layout:'A', name:'Débutante',
+    displayFont:"'Bodoni Moda',serif", bodyFont:"'Archivo',sans-serif",
+    colors:{bg:'#F5F3EE',bg2:'#ECE7DC',ink:'#17140F',inkSoft:'#6b6046',accent:'#A3123B',accent2:'#17140F',onDark:'#F5F3EE',line:'#DDD4C4'},
+    heroImg:'img/15/istockphoto-2277379197-1024x1024.jpg',
+    galleryImgs:['img/15/istockphoto-2277379219-1024x1024.jpg','img/15/istockphoto-2277379309-1024x1024.jpg','img/15/istockphoto-2277379197-1024x1024.jpg'],
+    monogram:'15', eyebrow:'Mis quince años', titleHtmlA:'Martina', titleHtmlB:'cumple 15', dateLine:'12 de septiembre de 2026 — Córdoba',
+    cdBoxes:[{n:'41',l:'días'},{n:'06',l:'hs'},{n:'50',l:'min'}],
+    splashGreeting:'Un antes y un después', splashCta:'Abrir invitación',
+    quote:'“Gracias por acompañarme a cerrar esta etapa y abrir la que viene.”',
+    addr:[{t:'Ceremonia',s:'19:00 hs · Parroquia San José'},{t:'Fiesta',s:'21:00 hs · Salón Le Blanc'}],
+    schedule:[{time:'19:00',label:'Ceremonia'},{time:'21:00',label:'Recepción'},{time:'22:00',label:'Vals'},{time:'23:30',label:'Fiesta'}],
+    rsvpTitle:'¿Venís a mi fiesta?', rsvpName:'Fam. Ríos', rsvpBtn:'Confirmar',
+    quizQ:'¿Cuál es mi color favorito?', quizOpts:['Rojo','Negro','Dorado'],
+    giftTitle:'Valor de tarjeta: $15.000 por persona', giftBody:'Por transferencia o efectivo el día de la fiesta.', giftAlias:'martina.xv',
+    musicTitle:'Armemos el playlist', musicSub:'Dejá el tema que no puede faltar.', musicPlaceholder:'Canción — artista',
+    musicItems:[{t:'Cairo',s:'Feid',badge:'♥ 21'},{t:'La Old Skul',s:'Duki',badge:'♥ 17'}],
+    footerText:'Gracias por ser parte de mi noche' },
+
+  { id:'marmol-boda', eventType:'Boda', layout:'B', name:'Mármol & Oro',
+    displayFont:"'Italiana',serif", bodyFont:"'Jost',sans-serif",
+    colors:{bg:'#0B0A08',bg2:'#17140F',ink:'#EFE7D8',inkSoft:'#B7AE9A',accent:'#C9A227',accent2:'#8A6E2E',onDark:'#EFE7D8',line:'rgba(201,162,39,.35)'},
+    heroImg:'img/casamiento/istockphoto-1135139821-1024x1024.jpg',
+    galleryImgs:['img/casamiento/istockphoto-1135822056-1024x1024.jpg','img/casamiento/istockphoto-1172642415-1024x1024.jpg','img/casamiento/istockphoto-1135139821-1024x1024.jpg'],
+    monogram:'M·G', eyebrow:'Nos casamos', titleHtmlA:'Milagros', titleHtmlB:'& Gastón', dateLine:'6 de marzo de 2027 — Mendoza',
+    cdBoxes:[{n:'56',l:'días'},{n:'09',l:'hs'},{n:'12',l:'min'}],
+    splashGreeting:'Los esperamos', splashCta:'Abrir invitación',
+    quote:'“Todo lo lindo, mejor si es compartido.”',
+    addr:[{t:'Ceremonia',s:'19:30 hs · Bodega Chandon'},{t:'Fiesta',s:'21:00 hs · Salón Los Álamos'}],
+    schedule:[{time:'19:30',label:'Ceremonia'},{time:'21:00',label:'Brindis'},{time:'22:00',label:'Cena'},{time:'00:00',label:'Fiesta'}],
+    rsvpTitle:'¿Nos acompañás?', rsvpName:'Familia Suárez', rsvpBtn:'Confirmar asistencia',
+    quizQ:'¿Dónde fue la primera cita?', quizOpts:['Un bar','El cine','Una boda ajena'],
+    giftTitle:'Valor de tarjeta: $22.000 por persona', giftBody:'Alias o efectivo el día del evento.', giftAlias:'milygaston.boda',
+    musicTitle:'Que no falte en la pista', musicSub:'Dejanos tu sugerencia.', musicPlaceholder:'Canción — artista',
+    musicItems:[{t:'Get Lucky',s:'Daft Punk',badge:'♥ 11'},{t:'Bamboleo',s:'Gipsy Kings',badge:'♥ 8'}],
+    footerText:'Con todo nuestro cariño, gracias por venir' },
+
+  { id:'onix-xv', eventType:'15 años', layout:'B', name:'Ónix',
+    displayFont:"'Italiana',serif", bodyFont:"'Jost',sans-serif",
+    colors:{bg:'#140B14',bg2:'#20111F',ink:'#F1E4E6',inkSoft:'#B79CA6',accent:'#D89AA0',accent2:'#6B2740',onDark:'#F1E4E6',line:'rgba(216,154,160,.35)'},
+    heroImg:'img/15/istockphoto-2277380082-1024x1024.jpg',
+    galleryImgs:['img/15/istockphoto-2277380114-1024x1024.jpg','img/15/istockphoto-2277380274-1024x1024.jpg','img/15/istockphoto-2277380082-1024x1024.jpg'],
+    monogram:'15', eyebrow:'Mis quince', titleHtmlA:'Sofía', titleHtmlB:'Noche de gala', dateLine:'24 de octubre de 2026 — Rosario',
+    cdBoxes:[{n:'33',l:'días'},{n:'19',l:'hs'},{n:'05',l:'min'}],
+    splashGreeting:'Se viene la noche', splashCta:'Abrir invitación',
+    quote:'“Una noche para brillar junto a los que quiero.”',
+    addr:[{t:'Ceremonia',s:'19:00 hs · Catedral de Rosario'},{t:'Fiesta',s:'21:30 hs · Salón Imperial'}],
+    schedule:[{time:'19:00',label:'Ceremonia'},{time:'21:30',label:'Entrada'},{time:'22:30',label:'Vals'},{time:'00:00',label:'Fiesta'}],
+    rsvpTitle:'¿Venís a mi noche?', rsvpName:'Fam. Alonso', rsvpBtn:'Confirmar',
+    quizQ:'¿Cuál es mi película favorita?', quizOpts:['Romance','Drama','Comedia'],
+    giftTitle:'Valor de tarjeta: $16.000 por persona', giftBody:'Alias o efectivo esa noche.', giftAlias:'sofia.xv',
+    musicTitle:'DJ, tomá nota', musicSub:'Sugerí el tema que no puede faltar.', musicPlaceholder:'Canción — artista',
+    musicItems:[{t:'Tusa',s:'Karol G',badge:'♥ 19'},{t:'Ojos Marrones',s:'Emilia',badge:'♥ 12'}],
+    footerText:'Gracias por brillar conmigo esta noche' },
+
+  { id:'herbario-boda', eventType:'Boda', layout:'C', name:'Herbario',
+    displayFont:"'Gloock',serif", bodyFont:"'Work Sans',sans-serif",
+    colors:{bg:'#F6F3EA',bg2:'#EFE9D8',ink:'#2E2A20',inkSoft:'#7C8B6F',accent:'#8B9B72',accent2:'#C68E76',onDark:'#F6F3EA',line:'rgba(139,155,114,.35)'},
+    heroImg:'img/casamiento/istockphoto-1173516409-1024x1024.jpg',
+    galleryImgs:['img/casamiento/istockphoto-1331310748-1024x1024.jpg','img/casamiento/istockphoto-1072442264-1024x1024.jpg','img/casamiento/istockphoto-1173516409-1024x1024.jpg'],
+    monogram:'C·L', eyebrow:'Nos casamos', titleHtmlA:'Camila', titleHtmlB:'& Lucas', dateLine:'14 de noviembre de 2026 — Jardín Botánico, Córdoba',
+    cdBoxes:[{n:'72',l:'días'},{n:'11',l:'hs'},{n:'30',l:'min'}],
+    splashGreeting:'Con cariño los invitamos', splashCta:'Abrir invitación',
+    quote:'“Como las plantas: creciendo despacio, juntos, hacia la luz.”',
+    addr:[{t:'Ceremonia',s:'17:30 hs · Capilla del Bosque'},{t:'Fiesta',s:'19:30 hs · Jardín Botánico'}],
+    schedule:[{time:'17:30',label:'Ceremonia'},{time:'19:30',label:'Recepción al aire libre'},{time:'21:00',label:'Cena'},{time:'22:30',label:'Fiesta'}],
+    rsvpTitle:'¿Nos acompañás?', rsvpName:'Familia Ortiz', rsvpBtn:'Confirmar asistencia',
+    quizQ:'¿Qué flor eligió la novia?', quizOpts:['Peonía','Rosa','Lavanda'],
+    giftTitle:'Tu presencia es lo que más nos importa', giftBody:'Si querés colaborar con la luna de miel, dejamos un alias.', giftAlias:'camilucas.boda',
+    musicTitle:'Sugerí una canción', musicSub:'Para bailar bajo los árboles.', musicPlaceholder:'Canción — artista',
+    musicItems:[{t:'La Vie en Rose',s:'Édith Piaf',badge:'♥ 10'},{t:'Budapest',s:'George Ezra',badge:'♥ 7'}],
+    footerText:'Gracias por acompañarnos a florecer' },
+
+  { id:'silk-xv', eventType:'15 años', layout:'C', name:'Jardín de Seda',
+    displayFont:"'Gloock',serif", bodyFont:"'Work Sans',sans-serif",
+    colors:{bg:'#FBF1F3',bg2:'#F3E4E8',ink:'#3A2E33',inkSoft:'#9C7C9E',accent:'#B79FC4',accent2:'#D98A93',onDark:'#FBF1F3',line:'rgba(183,159,196,.35)'},
+    heroImg:'img/15/istockphoto-2277379540-1024x1024.jpg',
+    galleryImgs:['img/15/istockphoto-2277380413-1024x1024.jpg','img/15/istockphoto-2277379197-1024x1024.jpg','img/15/istockphoto-2277379540-1024x1024.jpg'],
+    monogram:'15', eyebrow:'Mis quince años', titleHtmlA:'Delfina', titleHtmlB:'florece hoy', dateLine:'3 de mayo de 2027 — Córdoba',
+    cdBoxes:[{n:'29',l:'días'},{n:'08',l:'hs'},{n:'40',l:'min'}],
+    splashGreeting:'Con todo mi cariño', splashCta:'Abrir invitación',
+    quote:'“Gracias por acompañarme en este jardín que recién empieza.”',
+    addr:[{t:'Ceremonia',s:'18:30 hs · Parroquia Santa Teresita'},{t:'Fiesta',s:'20:30 hs · Quinta Los Jazmines'}],
+    schedule:[{time:'18:30',label:'Ceremonia'},{time:'20:30',label:'Recepción'},{time:'21:30',label:'Vals'},{time:'23:00',label:'Fiesta'}],
+    rsvpTitle:'¿Venís a mi fiesta?', rsvpName:'Fam. Molina', rsvpBtn:'Confirmar',
+    quizQ:'¿Cuál es mi flor favorita?', quizOpts:['Jazmín','Rosa','Lavanda'],
+    giftTitle:'Valor de tarjeta: $14.000 por persona', giftBody:'Alias o efectivo el día de la fiesta.', giftAlias:'delfina.xv',
+    musicTitle:'Sugerí una canción', musicSub:'Para que no falte en la pista.', musicPlaceholder:'Canción — artista',
+    musicItems:[{t:'Peaches',s:'Justin Bieber',badge:'♥ 13'},{t:'Envolver',s:'Anitta',badge:'♥ 9'}],
+    footerText:'Gracias por ser parte de mi jardín' }
+  ];
+
+  state = { activeId: this.THEMES[0].id, frame: true, opened: false, notesOpen: false, votes: {} };
+
+  find(id){ return this.THEMES.find(t=>t.id===id) || this.THEMES[0]; }
+
+  buildStyles(t){
+    const c = t.colors, disp = t.displayFont, body = t.bodyFont;
+    const base = {
+      section:{padding:'34px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg,color:c.ink,fontFamily:body},
+      kicker:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.accent,margin:'0 0 10px'},
+      kickerOnRsvp:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.onDark,opacity:.75,margin:'0 0 10px'},
+      heroImg:{width:'100%',height:'100%',objectFit:'cover',position:'absolute',inset:0},
+      galleryImg:{width:'100%',height:'100%',objectFit:'cover',display:'block'},
+      fieldLabel:{display:'block',fontSize:'10.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.6,marginBottom:'6px',fontFamily:body,color:c.ink},
+      fieldInput:{width:'100%',padding:'12px 14px',borderRadius:'6px',border:`1px solid ${c.line}`,background:c.bg2,fontSize:'14px',color:c.ink,fontFamily:body},
+    };
+    if(t.layout==='A'){
+      return {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:c.bg,padding:'40px',textAlign:'center'},
+        monogram:{fontFamily:disp,fontSize:'15px',letterSpacing:'.3em',color:c.accent},
+        splashGreet:{fontFamily:disp,fontStyle:'italic',fontSize:'22px',color:c.ink,margin:0},
+        splashBtn:{fontFamily:body,fontSize:'11px',letterSpacing:'.1em',textTransform:'uppercase',padding:'14px 30px',border:`1px solid ${c.ink}`,background:'transparent',color:c.ink,cursor:'pointer'},
+        hero:{position:'relative',height:'340px'},
+        heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.55) 100%)'},
+        heroContent:{position:'relative',padding:'26px 24px',background:c.bg},
+        eyebrow:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.14em',textTransform:'uppercase',color:c.accent,margin:'0 0 8px'},
+        title:{fontFamily:disp,fontWeight:500,fontSize:'42px',lineHeight:1.05,margin:'0 0 12px',color:c.ink},
+        dateLine:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex',gap:'0'},
+        cdNum:{fontFamily:disp,fontWeight:500,fontSize:'26px',display:'block',color:c.ink},
+        cdLabel:{fontSize:'9.5px',textTransform:'uppercase',letterSpacing:'.08em',opacity:.55,fontFamily:body,color:c.ink},
+        quoteSection:{padding:'38px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2},
+        quoteText:{fontFamily:disp,fontStyle:'italic',fontSize:'19px',lineHeight:1.5,margin:0,color:c.ink},
+        galleryWrap:{display:'grid',gridTemplateColumns:'1.3fr 1fr',gap:'8px',gridAutoRows:'110px'},
+        addrCard:{borderBottom:`1px solid ${c.line}`,padding:'16px 0',marginBottom:'12px'},
+        addrTitle:{fontFamily:disp,fontWeight:500,fontSize:'18px',margin:'0 0 4px',color:c.ink},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11.5px',fontWeight:600,letterSpacing:'.04em',color:c.accent,fontFamily:body},
+        schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'13px',color:c.accent,minWidth:'50px'},
+        schedLabel:{fontFamily:body,fontSize:'14px',color:c.ink},
+        rsvpSection:{padding:'38px 24px',background:c.ink,color:c.onDark},
+        rsvpTitle:{fontFamily:disp,fontWeight:500,fontSize:'24px',margin:'0 0 4px',color:c.onDark},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:c.accent,color:c.ink,fontWeight:600,fontSize:'12.5px',letterSpacing:'.04em',textTransform:'uppercase',cursor:'pointer',fontFamily:body},
+        rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.onDark}`,background:'transparent',color:c.onDark,fontWeight:600,fontSize:'12.5px',cursor:'pointer',fontFamily:body},
+        quizCard:{border:`1px solid ${c.line}`,padding:'18px'},
+        quizQ:{fontFamily:disp,fontSize:'17px',margin:'0 0 12px',color:c.ink},
+        giftCard:{border:`1px solid ${c.ink}`,padding:'20px'},
+        giftTitle:{fontFamily:disp,fontWeight:500,fontSize:'18px',margin:'0 0 6px',color:c.ink},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',border:`1px dashed ${c.accent}`,padding:'10px 12px',color:c.ink},
+        musicTitle:{fontFamily:disp,fontWeight:500,fontSize:'20px',margin:'0 0 6px',color:c.ink},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,padding:'12px 14px',border:`1px solid ${c.line}`,background:c.bg2,fontSize:'13px',fontFamily:body,color:c.ink},
+        musicSendBtn:{padding:'12px 18px',border:'none',background:c.ink,color:c.bg,fontWeight:600,fontSize:'12px',cursor:'pointer',fontFamily:body},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+        musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:"'Space Mono',monospace",fontSize:'12px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'5px 10px',cursor:'pointer'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:c.ink,color:c.onDark},
+        footerMono:{fontFamily:disp,fontSize:'20px',letterSpacing:'.15em',color:c.accent,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.55,fontFamily:body,color:c.onDark},
+      };
+    }
+    if(t.layout==='B'){
+      return {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:`radial-gradient(120% 90% at 50% 20%, ${c.bg2}, ${c.bg} 75%)`,padding:'40px',textAlign:'center'},
+        monogram:{width:'64px',height:'64px',borderRadius:'50%',border:`1.5px solid ${c.accent}`,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:disp,fontSize:'20px',color:c.accent,animation:'pulseRing 2.6s ease-in-out infinite'},
+        splashGreet:{fontFamily:disp,fontSize:'20px',letterSpacing:'.04em',color:c.ink,margin:0},
+        splashBtn:{fontFamily:body,fontSize:'11px',letterSpacing:'.12em',textTransform:'uppercase',padding:'14px 30px',border:`1px solid ${c.accent}`,background:'transparent',color:c.accent,cursor:'pointer',borderRadius:'999px'},
+        hero:{position:'relative',height:'380px',padding:'20px'},
+        heroOverlay:{position:'absolute',inset:'20px',border:`1.5px solid ${c.accent}`,pointerEvents:'none',boxShadow:'inset 0 0 40px rgba(0,0,0,.4)'},
+        heroContent:{position:'relative',marginTop:'-70px',background:`linear-gradient(180deg, transparent, ${c.bg} 55%)`,padding:'80px 24px 26px',textAlign:'center'},
+        eyebrow:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.2em',textTransform:'uppercase',color:c.accent,margin:'0 0 10px'},
+        title:{fontFamily:disp,fontWeight:400,fontSize:'34px',lineHeight:1.15,margin:'0 0 10px',color:c.ink,letterSpacing:'.02em'},
+        dateLine:{fontFamily:"'Space Mono',monospace",fontSize:'11.5px',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex',gap:'12px',justifyContent:'center'},
+        cdNum:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'20px',display:'block',color:c.accent},
+        cdLabel:{fontSize:'9px',textTransform:'uppercase',letterSpacing:'.08em',opacity:.6,fontFamily:body,color:c.ink},
+        quoteSection:{padding:'40px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2,textAlign:'center'},
+        quoteText:{fontFamily:disp,fontSize:'19px',lineHeight:1.6,margin:0,color:c.ink},
+        galleryWrap:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'6px'},
+        addrCard:{background:'rgba(255,255,255,.04)',borderLeft:`3px solid ${c.accent}`,padding:'16px 18px',marginBottom:'12px',borderRadius:'2px'},
+        addrTitle:{fontFamily:disp,fontWeight:400,fontSize:'17px',margin:'0 0 4px',color:c.ink,letterSpacing:'.02em'},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11.5px',fontWeight:600,color:c.accent,fontFamily:body,letterSpacing:'.04em'},
+        schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px dotted ${c.line}`,alignItems:'center'},
+        schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'13px',color:c.accent,minWidth:'50px'},
+        schedLabel:{fontFamily:body,fontSize:'14px',color:c.ink,letterSpacing:'.02em'},
+        rsvpSection:{padding:'40px 24px',background:c.bg2,color:c.onDark},
+        rsvpTitle:{fontFamily:disp,fontWeight:400,fontSize:'23px',margin:'0 0 4px',color:c.onDark,letterSpacing:'.02em'},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:c.accent,color:'#1a1408',fontWeight:600,fontSize:'12.5px',letterSpacing:'.04em',textTransform:'uppercase',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.accent}`,background:'transparent',color:c.accent,fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        quizCard:{background:'rgba(255,255,255,.04)',border:`1px solid ${c.line}`,padding:'20px',borderRadius:'6px'},
+        quizQ:{fontFamily:disp,fontSize:'17px',margin:'0 0 12px',color:c.ink,letterSpacing:'.02em'},
+        giftCard:{border:`1px solid ${c.accent}`,padding:'22px',textAlign:'center',borderRadius:'6px'},
+        giftTitle:{fontFamily:disp,fontWeight:400,fontSize:'18px',margin:'0 0 6px',color:c.accent,letterSpacing:'.02em'},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',border:`1px solid ${c.line}`,padding:'10px 12px',color:c.ink,display:'inline-block'},
+        musicTitle:{fontFamily:disp,fontWeight:400,fontSize:'20px',margin:'0 0 6px',color:c.ink,letterSpacing:'.02em'},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,padding:'12px 14px',border:`1px solid ${c.line}`,background:'rgba(255,255,255,.04)',fontSize:'13px',fontFamily:body,color:c.ink,borderRadius:'999px'},
+        musicSendBtn:{padding:'12px 18px',border:'none',background:c.accent,color:'#1a1408',fontWeight:600,fontSize:'12px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',background:'rgba(255,255,255,.04)',borderRadius:'6px',marginBottom:'8px'},
+        musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+        musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:"'Space Mono',monospace",fontSize:'12px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'5px 10px',cursor:'pointer',borderRadius:'999px'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:c.bg},
+        footerMono:{fontFamily:disp,fontSize:'20px',letterSpacing:'.1em',color:c.accent,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.55,fontFamily:body,color:c.ink},
+      };
+    }
+    // layout C - botanical
+    return {...base,
+      splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:`radial-gradient(60% 50% at 20% 20%, ${c.accent2}33, transparent), radial-gradient(50% 45% at 85% 75%, ${c.accent}33, transparent), ${c.bg}`,padding:'40px',textAlign:'center'},
+      monogram:{fontFamily:disp,fontSize:'26px',color:c.ink,border:`2px solid ${c.accent}`,borderRadius:'46% 54% 58% 42%/52% 44% 56% 48%',width:'76px',height:'76px',display:'flex',alignItems:'center',justifyContent:'center'},
+      splashGreet:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontSize:'21px',color:c.ink,margin:0},
+      splashBtn:{fontFamily:body,fontSize:'11.5px',letterSpacing:'.06em',padding:'14px 30px',border:'none',background:c.accent,color:'#fff',cursor:'pointer',borderRadius:'999px'},
+      hero:{position:'relative',height:'360px',borderRadius:'0 0 42% 8%/0 0 6% 6%',overflow:'hidden'},
+      heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.5) 100%)'},
+      heroContent:{position:'relative',padding:'26px 24px 30px',background:c.bg,borderRadius:'26px 26px 0 0',marginTop:'-26px'},
+      eyebrow:{fontFamily:body,fontSize:'11px',letterSpacing:'.1em',textTransform:'uppercase',color:c.accent2,margin:'0 0 8px'},
+      title:{fontFamily:disp,fontWeight:400,fontSize:'36px',lineHeight:1.1,margin:'0 0 12px',color:c.ink},
+      dateLine:{fontFamily:body,fontSize:'12.5px',color:c.inkSoft,margin:0},
+      countdownWrap:{display:'flex',gap:'10px'},
+      cdNum:{fontFamily:disp,fontWeight:400,fontSize:'22px',display:'block',color:c.ink},
+      cdLabel:{fontSize:'9.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.65,fontFamily:body,color:c.inkSoft},
+      quoteSection:{padding:'38px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2,borderRadius:'0'},
+      quoteText:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontSize:'18.5px',lineHeight:1.55,margin:0,color:c.ink,textAlign:'center'},
+      galleryWrap:{display:'flex',flexWrap:'wrap',gap:'14px',padding:'6px 4px 10px',justifyContent:'center'},
+      addrCard:{background:c.bg2,borderRadius:'24px',padding:'18px 20px',marginBottom:'12px',boxShadow:`0 8px 24px ${c.line}`},
+      addrTitle:{fontFamily:disp,fontWeight:400,fontSize:'17px',margin:'0 0 4px',color:c.ink},
+      addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+      mapBtn:{fontSize:'11.5px',fontWeight:600,color:'#fff',background:c.accent,padding:'7px 14px',borderRadius:'999px',display:'inline-block'},
+      schedRow:{display:'flex',gap:'14px',alignItems:'center',padding:'8px 14px',background:c.bg2,borderRadius:'999px',marginBottom:'8px'},
+      schedTime:{fontFamily:body,fontWeight:600,fontSize:'12.5px',color:'#fff',background:c.accent2,padding:'4px 10px',borderRadius:'999px'},
+      schedLabel:{fontFamily:body,fontSize:'13.5px',color:c.ink},
+      rsvpSection:{padding:'38px 24px',background:c.bg2,color:c.ink},
+      rsvpTitle:{fontFamily:disp,fontWeight:400,fontSize:'23px',margin:'0 0 4px',color:c.ink},
+      rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:c.accent,color:'#fff',fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+      rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.accent}`,background:'transparent',color:c.accent2,fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+      quizCard:{background:c.bg2,padding:'20px',borderRadius:'24px'},
+      quizQ:{fontFamily:disp,fontSize:'17px',margin:'0 0 12px',color:c.ink},
+      giftCard:{background:c.bg2,padding:'22px',borderRadius:'26px',textAlign:'center'},
+      giftTitle:{fontFamily:disp,fontWeight:400,fontSize:'18px',margin:'0 0 6px',color:c.ink},
+      giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+      giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',background:'#fff',borderRadius:'999px',padding:'10px 16px',color:c.ink,display:'inline-block'},
+      musicTitle:{fontFamily:disp,fontWeight:400,fontSize:'20px',margin:'0 0 6px',color:c.ink},
+      musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+      musicInput:{flex:1,padding:'12px 16px',border:'none',background:c.bg2,fontSize:'13px',fontFamily:body,color:c.ink,borderRadius:'999px'},
+      musicSendBtn:{padding:'12px 18px',border:'none',background:c.accent,color:'#fff',fontWeight:600,fontSize:'12px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+      musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:c.bg2,borderRadius:'18px',marginBottom:'8px'},
+      musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+      musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+      musicBadge:{fontFamily:body,fontWeight:600,fontSize:'12px',background:c.accent,border:'none',color:'#fff',padding:'6px 12px',cursor:'pointer',borderRadius:'999px'},
+      footer:{padding:'34px 24px 42px',textAlign:'center',background:c.bg},
+      footerMono:{fontFamily:disp,fontSize:'20px',color:c.accent2,marginBottom:'6px'},
+      footerText:{fontSize:'11px',opacity:.6,fontFamily:body,color:c.ink},
+    };
+  }
+
+  select(id){ this.setState({activeId:id, opened:false}); }
+  openCard(){ this.setState({opened:true}); }
+  toggleFrame(){ this.setState(s=>({frame:!s.frame})); }
+  toggleNotes(){ this.setState(s=>({notesOpen:!s.notesOpen})); }
+  vote(key){ this.setState(s=>({votes:{...s.votes,[key]:(s.votes[key]||0)+1}})); }
+
+  renderVals(){
+    const t = this.find(this.state.activeId);
+    const styles = this.buildStyles(t);
+    const frameOn = this.state.frame;
+    const showSplash = frameOn && !this.state.opened;
+    const contentVisible = !showSplash;
+
+    const galleryWraps = t.layout==='C'
+      ? [{rot:-4},{rot:3},{rot:-2}]
+      : [{},{},{}];
+
+    return {
+      themesList: this.THEMES.map(th=>({
+        id: th.id, label: `${th.name}`,
+        select: ()=>this.select(th.id),
+        chipStyle:{fontFamily:'Archivo,sans-serif',fontSize:'12.5px',fontWeight:600,padding:'8px 14px',borderRadius:'999px',border:'1px solid #333',
+          background: th.id===this.state.activeId ? '#fff' : 'transparent',
+          color: th.id===this.state.activeId ? '#000' : '#aaa',
+          borderColor: th.id===this.state.activeId ? '#fff' : '#333',
+          cursor:'pointer'}
+      })),
+      active: t,
+      styles,
+      frameOn, showSplash, contentVisible,
+      frameToggleLabel: frameOn ? 'Ver pantalla completa (sin marco)' : 'Ver con marco de celular',
+      frameToggleStyle:{fontFamily:'Archivo,sans-serif',fontSize:'12px',fontWeight:600,padding:'8px 14px',borderRadius:'999px',border:'1px solid #555',background:'transparent',color:'#ddd',cursor:'pointer'},
+      frameHint: frameOn ? 'Modo celular: toca "Abrir invitación" para ver el flujo completo.' : 'Modo pantalla completa: scroll continuo, sin gesto de apertura.',
+      outerFrameStyle: frameOn
+        ? {width:'390px',maxWidth:'100%',background:'#000',borderRadius:'44px',padding:'14px',boxShadow:'0 30px 60px rgba(0,0,0,.5)',display:'flex',flexDirection:'column'}
+        : {width:'420px',maxWidth:'100%'},
+      screenStyle: frameOn
+        ? {height:'800px',overflowY:'auto',borderRadius:'30px',background:t.colors.bg,position:'relative',scrollbarWidth:'none'}
+        : {borderRadius:'12px',background:t.colors.bg,position:'relative',boxShadow:'0 20px 50px rgba(0,0,0,.12)',overflow:'hidden'},
+
+      openCard: ()=>this.openCard(),
+      toggleFrame: ()=>this.toggleFrame(),
+      toggleNotes: ()=>this.toggleNotes(),
+      notesOpen: this.state.notesOpen,
+      notesToggleLabel: this.state.notesOpen ? 'Ocultar notas técnicas ▲' : 'Ver notas técnicas para el equipo dev ▼',
+
+      countdownBoxes: t.cdBoxes.map(b=>({n:b.n,l:b.l,boxStyle: t.layout==='A'
+        ? {flex:1,textAlign:'center',padding:'0 14px',borderRight:`1px solid ${t.colors.line}`}
+        : t.layout==='B'
+        ? {flex:1,textAlign:'center',background:'rgba(255,255,255,.04)',border:`1px solid ${t.colors.line}`,borderRadius:'50%',aspectRatio:'1',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}
+        : {flex:1,textAlign:'center',background:t.colors.bg2,borderRadius:'999px',padding:'14px 4px'}
+      })),
+
+      galleryImages: t.galleryImgs.map((src,i)=>({src, wrapStyle: t.layout==='C'
+        ? {width:'100px',height:'128px',background:'#fff',padding:'6px 6px 16px',boxShadow:'0 6px 14px rgba(0,0,0,.15)',transform:`rotate(${galleryWraps[i].rot}deg)`,borderRadius:'2px'}
+        : {aspectRatio: i===0 && t.layout==='A' ? '1' : '1', overflow:'hidden', borderRadius: t.layout==='B'?'4px':'0'}
+      })),
+
+      addrCards: t.addr,
+      scheduleItems: t.schedule,
+
+      quizOptions: t.quizOpts.map((o,i)=>({text:o, style:{
+        padding:'11px 14px', marginBottom:'8px', fontSize:'13.5px', fontFamily:t.bodyFont, color:t.colors.ink,
+        border: t.layout==='C' ? 'none' : `1px solid ${t.colors.line}`,
+        background: t.layout==='C' ? t.colors.bg : (t.layout==='B' ? 'rgba(255,255,255,.03)' : 'transparent'),
+        borderRadius: t.layout==='A' ? '0' : (t.layout==='C' ? '999px' : '4px')
+      }})),
+
+      musicItems: t.musicItems.map((m,i)=>{
+        const key = t.id+'-'+i;
+        const votes = this.state.votes[key]||0;
+        const baseNum = parseInt(m.badge.match(/\d+/)[0],10);
+        return {t:m.t, s:m.s, badge: m.badge.replace(/\d+/, baseNum+votes), vote:()=>this.vote(key)};
+      }),
+
+      techNotes: this.THEMES.map(th=>({
+        layout: 'Layout '+th.layout, eventLabel: th.eventType, name: th.name,
+        filename: th.name.replace(/[^a-zA-Z0-9]/g,''),
+        layoutId: th.id,
+        fonts: th.displayFont.replace(/'/g,'') + ' + ' + th.bodyFont.replace(/'/g,''),
+        palette: `${th.colors.bg} · ${th.colors.ink} · ${th.colors.accent}`,
+        reuse: th.layout==='A' ? 'Grid split editorial (Débutante comparte el mismo sistema)' : th.layout==='B' ? 'Glass panels + marco dorado (Ónix comparte el mismo sistema)' : 'Blobs + polaroids redondeados (Jardín de Seda comparte el mismo sistema)'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

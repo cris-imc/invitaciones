@@ -7,10 +7,55 @@ import {
   ELEGANT_COMPONENTS,
   NEON_COMPONENTS,
   CHIC_COMPONENTS,
+  EDITORIAL_COMPONENTS,
+  ONIX_COMPONENTS,
+  JARDINSEDA_COMPONENTS,
+  HOLOGRAMA_COMPONENTS,
+  CIRCUITO_COMPONENTS,
+  CRISTAL3D_COMPONENTS,
+  CINE_COMPONENTS,
+  NORDICO_COMPONENTS,
+  RIVIERA_COMPONENTS,
+  GOLDENDUSK_COMPONENTS,
+  SEDA_COMPONENTS,
+  PETALOS_COMPONENTS,
+  LUZLUNA_COMPONENTS,
+  BONVOYAGE_COMPONENTS,
+  CORPORATE_COMPONENTS,
+  GARDENPARTY_COMPONENTS,
+  LOFTINDUSTRIAL_COMPONENTS,
+  INFANTIL_COMPONENTS,
   PreviewLoading,
   type TemplateTipo,
 } from "@/components/wizard/template-preview-registry";
 import { getTemplatePreviewSample } from "@/lib/template-preview-samples";
+
+const COMPONENTS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COMPONENTS> = {
+  ELEGANT: ELEGANT_COMPONENTS,
+  MODERNO: MODERNO_COMPONENTS,
+  NEON: NEON_COMPONENTS,
+  CHIC: CHIC_COMPONENTS,
+  EDITORIAL: EDITORIAL_COMPONENTS,
+  ONIX: ONIX_COMPONENTS,
+  JARDINSEDA: JARDINSEDA_COMPONENTS,
+  HOLOGRAMA: HOLOGRAMA_COMPONENTS,
+  CIRCUITO: CIRCUITO_COMPONENTS,
+  CRISTAL3D: CRISTAL3D_COMPONENTS,
+  CINE: CINE_COMPONENTS,
+  NORDICO: NORDICO_COMPONENTS,
+  RIVIERA: RIVIERA_COMPONENTS,
+  GOLDENDUSK: GOLDENDUSK_COMPONENTS,
+  SEDA: SEDA_COMPONENTS,
+  PETALOS: PETALOS_COMPONENTS,
+  LUZLUNA: LUZLUNA_COMPONENTS,
+  BONVOYAGE: BONVOYAGE_COMPONENTS,
+  CORPORATE: CORPORATE_COMPONENTS,
+  GARDENPARTY: GARDENPARTY_COMPONENTS,
+  LOFTINDUSTRIAL: LOFTINDUSTRIAL_COMPONENTS,
+  INFANTIL: INFANTIL_COMPONENTS,
+};
+
+const DESIGN_TEMPLATE_TIPOS = new Set<string>(Object.keys(COMPONENTS_BY_TIPO));
 
 // Página standalone, sin layout de dashboard/auth: se carga dentro de un
 // <iframe> desde el wizard para que las media queries de la plantilla
@@ -20,14 +65,14 @@ function PreviewPlantillaContent() {
   const params = useSearchParams();
   const evento = params.get("evento") ?? "CASAMIENTO";
   const tipoParam = params.get("tipo");
-  const tipo: TemplateTipo = (tipoParam === "MODERNO" || tipoParam === "NEON" || tipoParam === "CHIC") ? tipoParam : "ELEGANT";
+  const tipo: TemplateTipo = (tipoParam && DESIGN_TEMPLATE_TIPOS.has(tipoParam)) ? (tipoParam as TemplateTipo) : "ELEGANT";
   const color = params.get("color") ?? "default";
   // El showcase de la landing (a diferencia del preview del wizard) quiere
   // poder hacer scroll para mostrar más contenido de la plantilla en vez de
   // quedarse fijo en la portada.
   const scrollable = params.get("scroll") === "1";
 
-  const componentsMap = tipo === "MODERNO" ? MODERNO_COMPONENTS : tipo === "NEON" ? NEON_COMPONENTS : tipo === "CHIC" ? CHIC_COMPONENTS : ELEGANT_COMPONENTS;
+  const componentsMap = COMPONENTS_BY_TIPO[tipo];
   const Template = componentsMap[color] ?? componentsMap.default;
   const sample = getTemplatePreviewSample(evento, tipo, color);
 

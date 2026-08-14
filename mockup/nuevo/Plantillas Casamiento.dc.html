@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,500&family=Space+Mono:wght@400;700&family=Jost:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Marcellus&family=Caveat:wght@600&family=Mulish:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#EDEBE5;font-family:'Jost',sans-serif;color:#1a1a1a;}
+a{color:inherit;text-decoration:none;}
+a:hover{opacity:.75;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+</style>
+</helmet>
+
+<div style="max-width:1400px;margin:0 auto;padding:28px 20px 80px;">
+
+  <div style="max-width:860px;margin:0 0 28px;">
+    <p style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8a8578;margin:0 0 10px;">Convite &middot; Pack exclusivo Casamiento</p>
+    <h1 style="font:600 30px/1.25 'Jost',sans-serif;margin:0 0 12px;">6 plantillas premium, solo para bodas</h1>
+    <p style="font:400 14.5px/1.65 'Jost',sans-serif;color:#4a473e;margin:0 0 10px;">3 sistemas de layout nuevos, distintos a los del pack de 15 (nada de Editorial Bodoni / Noir dorado / Bot&aacute;nico org&aacute;nico): <strong>Cine</strong> (documental, s&eacute;pia, filmina), <strong>Atelier N&oacute;rdico</strong> (minimalismo geom&eacute;trico, blanco y negro, grid duro) y <strong>Riviera</strong> (lino c&aacute;lido, terracota, arcos mediterr&aacute;neos). Dos parejas por sistema, con vista celular y vista escritorio.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;">
+      <div style="flex:1;min-width:220px;background:#fff;border:1px solid #e2ded2;border-radius:4px;padding:14px 16px;">
+        <p style="margin:0 0 4px;font:600 13px 'Jost',sans-serif;">D &middot; Cine</p>
+        <p style="margin:0;font:400 12.5px/1.5 'Jost',sans-serif;color:#6b6759;">Documental/film: fotos en s&eacute;pia, filmina con perforaciones, countdown tipo timestamp.</p>
+      </div>
+      <div style="flex:1;min-width:220px;background:#fff;border:1px solid #e2ded2;border-radius:4px;padding:14px 16px;">
+        <p style="margin:0 0 4px;font:600 13px 'Jost',sans-serif;">E &middot; Atelier N&oacute;rdico</p>
+        <p style="margin:0;font:400 12.5px/1.5 'Jost',sans-serif;color:#6b6759;">Minimalismo geom&eacute;trico: blanco/negro, hairlines, cero radios, grid tipo p&oacute;ster.</p>
+      </div>
+      <div style="flex:1;min-width:220px;background:#fff;border:1px solid #e2ded2;border-radius:4px;padding:14px 16px;">
+        <p style="margin:0 0 4px;font:600 13px 'Jost',sans-serif;">F &middot; Riviera</p>
+        <p style="margin:0;font:400 12.5px/1.5 'Jost',sans-serif;color:#6b6759;">Mediterr&aacute;neo c&aacute;lido: lino, terracota, arcos y c&iacute;rculos tipo sol.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px;padding:14px 16px;background:#1a1a1a;border-radius:14px;">
+    <span style="font:700 10.5px 'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8578;margin-right:4px;">Eleg&iacute; una plantilla</span>
+    <sc-for list="{{ themesList }}" as="th" hint-placeholder-count="6">
+      <button onClick="{{ th.select }}" style="{{ th.chipStyle }}">{{ th.label }}</button>
+    </sc-for>
+    <div style="flex:1;"></div>
+    <div style="display:flex;gap:6px;background:#000;border-radius:999px;padding:4px;">
+      <button onClick="{{ setMobile }}" style="{{ mobileBtnStyle }}">&#128241; Celular</button>
+      <button onClick="{{ setDesktop }}" style="{{ desktopBtnStyle }}">&#128421; Escritorio</button>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:26px 0 10px;">
+    <div style="{{ outerFrameStyle }}">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <div style="height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:110px;height:16px;background:#000;border-radius:12px;"></div>
+        </div>
+      </sc-if>
+      <div style="{{ screenStyle }}">
+
+        <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ styles.splash }}">
+            <div style="{{ styles.monogram }}">{{ active.monogram }}</div>
+            <p style="{{ styles.splashGreet }}">{{ active.splashGreeting }}</p>
+            <button onClick="{{ openCard }}" style="{{ styles.splashBtn }}">{{ active.splashCta }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contentVisible }}" hint-placeholder-val="{{ true }}">
+        <div>
+
+          <section style="{{ styles.hero }}">
+            <div style="{{ styles.heroMedia }}">
+              <img src="{{ active.heroImg }}" alt="Portada" style="{{ styles.heroImg }}">
+              <div style="{{ styles.heroOverlay }}"></div>
+              <sc-if value="{{ active.showFilmstrip }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ styles.filmstrip }}"></div>
+              </sc-if>
+            </div>
+            <div style="{{ styles.heroContent }}">
+              <p style="{{ styles.eyebrow }}">{{ active.eyebrow }}</p>
+              <h2 style="{{ styles.title }}">{{ active.titleHtmlA }}<br>{{ active.titleHtmlB }}</h2>
+              <p style="{{ styles.dateLine }}">{{ active.dateLine }}</p>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cuenta regresiva</p>
+            <div style="{{ styles.countdownWrap }}">
+              <sc-for list="{{ countdownBoxes }}" as="cd" hint-placeholder-count="3">
+                <div style="{{ cd.boxStyle }}">
+                  <span style="{{ styles.cdNum }}">{{ cd.n }}</span>
+                  <span style="{{ styles.cdLabel }}">{{ cd.l }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.quoteSection }}">
+            <p style="{{ styles.quoteText }}">{{ active.quote }}</p>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">&Aacute;lbum</p>
+            <div style="{{ styles.galleryWrap }}">
+              <sc-for list="{{ galleryImages }}" as="g" hint-placeholder-count="3">
+                <div style="{{ g.wrapStyle }}"><img src="{{ g.src }}" alt="Momento" style="{{ styles.galleryImg }}"></div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">D&oacute;nde</p>
+            <div style="{{ styles.addrWrap }}">
+              <sc-for list="{{ addrCards }}" as="ad" hint-placeholder-count="2">
+                <div style="{{ styles.addrCard }}">
+                  <h3 style="{{ styles.addrTitle }}">{{ ad.t }}</h3>
+                  <p style="{{ styles.addrSub }}">{{ ad.s }}</p>
+                  <a href="#" style="{{ styles.mapBtn }}">Ver mapa &#8599;</a>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cronograma</p>
+            <div style="{{ styles.scheduleWrap }}">
+              <sc-for list="{{ scheduleItems }}" as="sc" hint-placeholder-count="3">
+                <div style="{{ styles.schedRow }}">
+                  <span style="{{ styles.schedTime }}">{{ sc.time }}</span>
+                  <span style="{{ styles.schedLabel }}">{{ sc.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.rsvpSection }}">
+            <p style="{{ styles.kickerOnRsvp }}">Confirmaci&oacute;n</p>
+            <h3 style="{{ styles.rsvpTitle }}">{{ active.rsvpTitle }}</h3>
+            <div style="margin:14px 0;max-width:420px;">
+              <label style="{{ styles.fieldLabel }}">Nombre y apellido</label>
+              <input value="{{ active.rsvpName }}" style="{{ styles.fieldInput }}" readonly>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button style="{{ styles.rsvpBtnSolid }}">{{ active.rsvpBtn }}</button>
+              <button style="{{ styles.rsvpBtnGhost }}">No podr&eacute;</button>
+            </div>
+          </section>
+
+          <div style="{{ styles.bottomGrid }}">
+            <section style="{{ styles.sectionInGrid }}">
+              <p style="{{ styles.kicker }}">Quiz</p>
+              <div style="{{ styles.quizCard }}">
+                <p style="{{ styles.quizQ }}">{{ active.quizQ }}</p>
+                <sc-for list="{{ quizOptions }}" as="qo" hint-placeholder-count="3">
+                  <div style="{{ qo.style }}">{{ qo.text }}</div>
+                </sc-for>
+              </div>
+            </section>
+
+            <section style="{{ styles.sectionInGrid }}">
+              <p style="{{ styles.kicker }}">Regalo</p>
+              <div style="{{ styles.giftCard }}">
+                <h3 style="{{ styles.giftTitle }}">{{ active.giftTitle }}</h3>
+                <p style="{{ styles.giftBody }}">{{ active.giftBody }}</p>
+                <div style="{{ styles.giftAliasBox }}">{{ active.giftAlias }}</div>
+              </div>
+            </section>
+
+            <section style="{{ styles.sectionInGrid }}">
+              <p style="{{ styles.kicker }}">M&uacute;sica</p>
+              <h3 style="{{ styles.musicTitle }}">{{ active.musicTitle }}</h3>
+              <p style="{{ styles.musicSub }}">{{ active.musicSub }}</p>
+              <div style="display:flex;gap:8px;margin:14px 0;">
+                <input placeholder="{{ active.musicPlaceholder }}" style="{{ styles.musicInput }}" readonly>
+                <button style="{{ styles.musicSendBtn }}">Enviar</button>
+              </div>
+              <sc-for list="{{ musicItems }}" as="mi" hint-placeholder-count="2">
+                <div style="{{ styles.musicRow }}">
+                  <div><b style="{{ styles.musicRowTitle }}">{{ mi.t }}</b><span style="{{ styles.musicRowSub }}">{{ mi.s }}</span></div>
+                  <button onClick="{{ mi.vote }}" style="{{ styles.musicBadge }}">{{ mi.badge }}</button>
+                </div>
+              </sc-for>
+            </section>
+          </div>
+
+          <footer style="{{ styles.footer }}">
+            <div style="{{ styles.footerMono }}">{{ active.monogram }}</div>
+            <small style="{{ styles.footerText }}">{{ active.footerText }}</small>
+          </footer>
+
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font:400 12px 'Jost',sans-serif;color:#8a8578;margin:6px 0 0;">{{ frameHint }}</p>
+
+  <div style="max-width:980px;margin:56px auto 0;">
+    <button onClick="{{ toggleNotes }}" style="display:flex;align-items:center;gap:8px;background:#1a1a1a;color:#fff;border:none;border-radius:999px;padding:10px 18px;font:600 12.5px 'Jost',sans-serif;cursor:pointer;">
+      {{ notesToggleLabel }}
+    </button>
+    <sc-if value="{{ notesOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
+        <sc-for list="{{ techNotes }}" as="tn" hint-placeholder-count="6">
+          <div style="background:#fff;border:1px solid #e2ded2;border-radius:10px;padding:18px 20px;">
+            <p style="margin:0 0 2px;font:700 10px 'Space Mono',monospace;letter-spacing:.08em;color:#8a8578;text-transform:uppercase;">{{ tn.layout }}</p>
+            <h4 style="margin:2px 0 10px;font:600 16px 'Jost',sans-serif;">{{ tn.name }}</h4>
+            <p style="margin:0 0 6px;font:400 12.5px/1.5 'Jost',sans-serif;color:#4a473e;"><b>Archivo:</b> src/components/templates/{{ tn.filename }}.tsx &middot; layoutId <code>{{ tn.layoutId }}</code></p>
+            <p style="margin:0;font:400 12.5px/1.5 'Jost',sans-serif;color:#4a473e;"><b>Fuentes:</b> {{ tn.fonts }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:18px;background:#1a1a1a;color:#e8e4d8;border-radius:10px;padding:18px 22px;">
+        <p style="margin:0 0 8px;font:600 13px 'Jost',sans-serif;">Notas de integraci&oacute;n</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Jost',sans-serif;color:#c9c5b8;">1. Mismo patr&oacute;n que los packs anteriores: entrada en <code>theme-config.ts</code>/<code>templatesConfig.ts</code>, import + condicional en <code>StepPreview.tsx</code>/<code>InvitationContent.tsx</code>, mismos flags y componentes reusados sin cambios.</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Jost',sans-serif;color:#c9c5b8;">2. <b>Vista escritorio</b>: agregar un breakpoint <code>md:</code>/<code>lg:</code> real en Tailwind sobre el mismo componente &mdash; el toggle de esta demo simula ambos anchos; en producci&oacute;n es responsive nativo, no dos plantillas separadas.</p>
+        <p style="margin:0;font:400 12.5px/1.6 'Jost',sans-serif;color:#c9c5b8;">3. Los 3 sistemas (Cine/N&oacute;rdico/Riviera) son reutilizables para futuros tipos de evento, igual que los packs anteriores.</p>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  THEMES = [
+    { id:'cine-1', layout:'D', name:'Elena & Tomás (Cine)',
+      displayFont:"'EB Garamond',serif", bodyFont:"'Jost',sans-serif",
+      colors:{bg:'#F2EFE9',bg2:'#E9E3D6',ink:'#241F1A',inkSoft:'#6b6151',accent:'#8A7A5C',accent2:'#4A4038',onDark:'#F2EFE9',line:'#D9D1BF'},
+      heroImg:'img/casamiento/istockphoto-1093617712-1024x1024.jpg', showFilmstrip:true,
+      galleryImgs:['img/casamiento/istockphoto-1078252368-1024x1024.jpg','img/casamiento/istockphoto-1135139821-1024x1024.jpg','img/casamiento/istockphoto-1093617712-1024x1024.jpg'],
+      monogram:'E·T', eyebrow:'Nos casamos', titleHtmlA:'Elena', titleHtmlB:'& Tomás', dateLine:'9 de mayo de 2027 — Estancia La Candelaria',
+      cdBoxes:[{n:'63',l:'días'},{n:'08',l:'hs'},{n:'40',l:'min'}],
+      splashGreeting:'Con todo nuestro cariño', splashCta:'Abrir invitación',
+      quote:'“Una historia contada de a poco, fotograma a fotograma, hasta hoy.”',
+      addr:[{t:'Ceremonia',s:'18:00 hs · Capilla de campo'},{t:'Recepción',s:'20:00 hs · Estancia La Candelaria'}],
+      schedule:[{time:'18:00',label:'Ceremonia'},{time:'20:00',label:'Recepción'},{time:'21:30',label:'Cena'},{time:'23:00',label:'Fiesta'}],
+      rsvpTitle:'Confirmá tu presencia', rsvpName:'Familia Duarte', rsvpBtn:'Confirmar',
+      quizQ:'¿En qué ciudad nos conocimos?', quizOpts:['Córdoba','Buenos Aires','Rosario'],
+      giftTitle:'Tu presencia es el regalo', giftBody:'Si querés sumar algo más, dejamos disponible un alias.', giftAlias:'elenaytomas.boda',
+      musicTitle:'Sugerí una canción', musicSub:'¿Qué no puede faltar en la pista?', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'La Vie en Rose',s:'Édith Piaf',badge:'♥ 12'},{t:'September',s:'Earth, Wind & Fire',badge:'♥ 9'}],
+      footerText:'Gracias por ser parte de esta película' },
+
+    { id:'cine-2', layout:'D', name:'Carla & Franco (Cine)',
+      displayFont:"'EB Garamond',serif", bodyFont:"'Jost',sans-serif",
+      colors:{bg:'#F2EFE9',bg2:'#E9E3D6',ink:'#241F1A',inkSoft:'#6b6151',accent:'#8A7A5C',accent2:'#4A4038',onDark:'#F2EFE9',line:'#D9D1BF'},
+      heroImg:'img/casamiento/istockphoto-1173516409-1024x1024.jpg', showFilmstrip:true,
+      galleryImgs:['img/casamiento/istockphoto-1331310748-1024x1024.jpg','img/casamiento/istockphoto-1072442264-1024x1024.jpg','img/casamiento/istockphoto-1173516409-1024x1024.jpg'],
+      monogram:'C·F', eyebrow:'Nos casamos', titleHtmlA:'Carla', titleHtmlB:'& Franco', dateLine:'3 de abril de 2027 — Bodega Los Robles',
+      cdBoxes:[{n:'27',l:'días'},{n:'15',l:'hs'},{n:'10',l:'min'}],
+      splashGreeting:'Los esperamos', splashCta:'Abrir invitación',
+      quote:'“Como el buen vino: mejor con el tiempo, mejor acompañados.”',
+      addr:[{t:'Ceremonia',s:'17:30 hs · Viñedo Los Robles'},{t:'Fiesta',s:'19:30 hs · Bodega Los Robles'}],
+      schedule:[{time:'17:30',label:'Ceremonia'},{time:'19:30',label:'Brindis'},{time:'20:30',label:'Cena'},{time:'22:30',label:'Fiesta'}],
+      rsvpTitle:'¿Nos acompañás?', rsvpName:'Familia Suárez', rsvpBtn:'Confirmar asistencia',
+      quizQ:'¿Dónde fue la primera cita?', quizOpts:['Un bar','El cine','Una boda ajena'],
+      giftTitle:'Valor de tarjeta: $20.000 por persona', giftBody:'Alias o efectivo el día del evento.', giftAlias:'carlayfranco.boda',
+      musicTitle:'Que no falte en la pista', musicSub:'Dejanos tu sugerencia.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Get Lucky',s:'Daft Punk',badge:'♥ 10'},{t:'Bamboleo',s:'Gipsy Kings',badge:'♥ 7'}],
+      footerText:'Gracias por brindar con nosotros' },
+
+    { id:'nordico-1', layout:'E', name:'Sol & Bruno (Nórdico)',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Inter',sans-serif",
+      colors:{bg:'#FFFFFF',bg2:'#F1F1EF',ink:'#111111',inkSoft:'#666666',accent:'#111111',accent2:'#5B7B8C',onDark:'#FFFFFF',line:'#111111'},
+      heroImg:'img/evento/istockphoto-1143164411-2048x2048.jpg', showFilmstrip:false,
+      galleryImgs:['img/evento/istockphoto-1151176846-2048x2048.jpg','img/evento/istockphoto-1158555109-2048x2048.jpg','img/evento/istockphoto-1143164411-2048x2048.jpg'],
+      monogram:'S+B', eyebrow:'NOS CASAMOS', titleHtmlA:'Sol', titleHtmlB:'& Bruno', dateLine:'11.09.2026 — ROOFTOP CENTRO, CÓRDOBA',
+      cdBoxes:[{n:'40',l:'DÍAS'},{n:'06',l:'HS'},{n:'20',l:'MIN'}],
+      splashGreeting:'Los esperamos', splashCta:'ABRIR INVITACIÓN',
+      quote:'“Simple, honesto, nuestro.”',
+      addr:[{t:'Ceremonia',s:'18:00 · Registro Civil'},{t:'Fiesta',s:'20:00 · Rooftop Centro'}],
+      schedule:[{time:'18:00',label:'CEREMONIA'},{time:'20:00',label:'RECEPCIÓN'},{time:'21:00',label:'CENA'},{time:'23:00',label:'FIESTA'}],
+      rsvpTitle:'CONFIRMÁ TU LUGAR', rsvpName:'Familia Rivas', rsvpBtn:'CONFIRMAR',
+      quizQ:'¿En qué año nos conocimos?', quizOpts:['2019','2020','2021'],
+      giftTitle:'TU PRESENCIA ES EL REGALO', giftBody:'Si querés sumar algo más, alias disponible.', giftAlias:'solybruno.boda',
+      musicTitle:'SUGERÍ UNA CANCIÓN', musicSub:'Para la pista.', musicPlaceholder:'CANCIÓN — ARTISTA',
+      musicItems:[{t:'Chandelier',s:'Sia',badge:'♥ 8'},{t:'Blinding Lights',s:'The Weeknd',badge:'♥ 6'}],
+      footerText:'GRACIAS POR ACOMPAÑARNOS' },
+
+    { id:'nordico-2', layout:'E', name:'Ana & Nico (Nórdico)',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Inter',sans-serif",
+      colors:{bg:'#FFFFFF',bg2:'#F1F1EF',ink:'#111111',inkSoft:'#666666',accent:'#111111',accent2:'#5B7B8C',onDark:'#FFFFFF',line:'#111111'},
+      heroImg:'img/evento/istockphoto-1158593205-2048x2048.jpg', showFilmstrip:false,
+      galleryImgs:['img/evento/istockphoto-1321464782-2048x2048.jpg','img/evento/istockphoto-872162536-2048x2048.jpg','img/evento/istockphoto-1158593205-2048x2048.jpg'],
+      monogram:'A+N', eyebrow:'NOS CASAMOS', titleHtmlA:'Ana', titleHtmlB:'& Nico', dateLine:'23.05.2027 — GALERÍA DE ARTE, CÓRDOBA',
+      cdBoxes:[{n:'75',l:'DÍAS'},{n:'11',l:'HS'},{n:'05',l:'MIN'}],
+      splashGreeting:'Los esperamos', splashCta:'ABRIR INVITACIÓN',
+      quote:'“Menos ruido, más nosotros.”',
+      addr:[{t:'Ceremonia',s:'17:00 · Registro Civil'},{t:'Fiesta',s:'19:00 · Galería de Arte'}],
+      schedule:[{time:'17:00',label:'CEREMONIA'},{time:'19:00',label:'RECEPCIÓN'},{time:'20:00',label:'CENA'},{time:'22:00',label:'FIESTA'}],
+      rsvpTitle:'CONFIRMÁ TU LUGAR', rsvpName:'Familia Peralta', rsvpBtn:'CONFIRMAR',
+      quizQ:'¿Cuál fue nuestro primer viaje juntos?', quizOpts:['Bariloche','Mendoza','Salta'],
+      giftTitle:'VALOR DE TARJETA: $19.000 POR PERSONA', giftBody:'Alias o efectivo el día del evento.', giftAlias:'anaynico.boda',
+      musicTitle:'SUGERÍ UNA CANCIÓN', musicSub:'Para la pista.', musicPlaceholder:'CANCIÓN — ARTISTA',
+      musicItems:[{t:'Instant Crush',s:'Daft Punk',badge:'♥ 9'},{t:'Somebody Else',s:'The 1975',badge:'♥ 5'}],
+      footerText:'GRACIAS POR ACOMPAÑARNOS' },
+
+    { id:'riviera-1', layout:'F', name:'Marina & Diego (Riviera)',
+      displayFont:"'Marcellus',serif", bodyFont:"'Mulish',sans-serif",
+      colors:{bg:'#FBF3E7',bg2:'#F3E6D2',ink:'#3B2A1E',inkSoft:'#8A7159',accent:'#C1613C',accent2:'#D9A441',onDark:'#FBF3E7',line:'rgba(193,97,60,.3)'},
+      heroImg:'img/casamiento/istockphoto-1135822056-1024x1024.jpg', showFilmstrip:false,
+      galleryImgs:['img/casamiento/istockphoto-1172642415-1024x1024.jpg','img/casamiento/istockphoto-1135139821-1024x1024.jpg','img/casamiento/istockphoto-1135822056-1024x1024.jpg'],
+      monogram:'M·D', eyebrow:'Nos casamos', titleHtmlA:'Marina', titleHtmlB:'& Diego', dateLine:'17 de enero de 2027 — Costa Atlántica',
+      cdBoxes:[{n:'168',l:'días'},{n:'04',l:'hs'},{n:'30',l:'min'}],
+      splashGreeting:'Con el sol y el mar de testigos', splashCta:'Abrir invitación',
+      quote:'“Sal, sol y la gente que más queremos: la fórmula perfecta.”',
+      addr:[{t:'Ceremonia',s:'18:30 hs · Capilla frente al mar'},{t:'Fiesta',s:'20:30 hs · Terraza Costanera'}],
+      schedule:[{time:'18:30',label:'Ceremonia'},{time:'20:30',label:'Recepción'},{time:'21:30',label:'Cena'},{time:'23:00',label:'Fiesta'}],
+      rsvpTitle:'¿Nos acompañás?', rsvpName:'Familia Fontana', rsvpBtn:'Confirmar asistencia',
+      quizQ:'¿Cuál fue nuestro primer destino de viaje juntos?', quizOpts:['Uruguay','Brasil','España'],
+      giftTitle:'Tu presencia es el regalo', giftBody:'Si querés colaborar con la luna de miel, dejamos un alias.', giftAlias:'marinaydiego.boda',
+      musicTitle:'Sugerí una canción', musicSub:'Para bailar con los pies en la arena.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'La Vie en Rose',s:'Édith Piaf',badge:'♥ 11'},{t:'Corcovado',s:'João Gilberto',badge:'♥ 6'}],
+      footerText:'Gracias por venir a celebrar con nosotros' },
+
+    { id:'riviera-2', layout:'F', name:'Bianca & Lautaro (Riviera)',
+      displayFont:"'Marcellus',serif", bodyFont:"'Mulish',sans-serif",
+      colors:{bg:'#FBF3E7',bg2:'#F3E6D2',ink:'#3B2A1E',inkSoft:'#8A7159',accent:'#C1613C',accent2:'#D9A441',onDark:'#FBF3E7',line:'rgba(193,97,60,.3)'},
+      heroImg:'img/casamiento/istockphoto-1072442264-1024x1024.jpg', showFilmstrip:false,
+      galleryImgs:['img/casamiento/istockphoto-1078252368-1024x1024.jpg','img/casamiento/istockphoto-1173516409-1024x1024.jpg','img/casamiento/istockphoto-1072442264-1024x1024.jpg'],
+      monogram:'B·L', eyebrow:'Nos casamos', titleHtmlA:'Bianca', titleHtmlB:'& Lautaro', dateLine:'12 de diciembre de 2026 — Quinta Los Limoneros',
+      cdBoxes:[{n:'132',l:'días'},{n:'13',l:'hs'},{n:'45',l:'min'}],
+      splashGreeting:'Entre limoneros los esperamos', splashCta:'Abrir invitación',
+      quote:'“Que el aroma a azahar acompañe este nuevo comienzo.”',
+      addr:[{t:'Ceremonia',s:'18:00 hs · Jardín de los Limoneros'},{t:'Fiesta',s:'20:00 hs · Quinta Los Limoneros'}],
+      schedule:[{time:'18:00',label:'Ceremonia'},{time:'20:00',label:'Recepción'},{time:'21:00',label:'Cena'},{time:'22:30',label:'Fiesta'}],
+      rsvpTitle:'¿Nos acompañás?', rsvpName:'Familia Vera', rsvpBtn:'Confirmar asistencia',
+      quizQ:'¿Qué fruta no puede faltar en nuestra mesa?', quizOpts:['Limón','Naranja','Durazno'],
+      giftTitle:'Valor de tarjeta: $21.000 por persona', giftBody:'Alias o efectivo el día del evento.', giftAlias:'biancaylautaro.boda',
+      musicTitle:'Sugerí una canción', musicSub:'Para bailar bajo los limoneros.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Cheek to Cheek',s:'Ella Fitzgerald',badge:'♥ 7'},{t:'Bamboleo',s:'Gipsy Kings',badge:'♥ 9'}],
+      footerText:'Gracias por acompañarnos en este comienzo' }
+  ];
+
+  state = { activeId: this.THEMES[0].id, device:'mobile', opened:false, notesOpen:false, votes:{} };
+
+  find(id){ return this.THEMES.find(t=>t.id===id) || this.THEMES[0]; }
+
+  buildStyles(t, device){
+    const c = t.colors, disp = t.displayFont, body = t.bodyFont;
+    const isDesktop = device==='desktop';
+    const base = {
+      section:{padding: isDesktop ? '48px 64px' : '34px 24px', borderBottom:`1px solid ${c.line}`,background:c.bg,color:c.ink,fontFamily:body},
+      kicker:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.accent,margin:'0 0 10px'},
+      kickerOnRsvp:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.onDark,opacity:.75,margin:'0 0 10px'},
+      heroImg:{width:'100%',height:'100%',objectFit:'cover',position:'absolute',inset:0},
+      galleryImg:{width:'100%',height:'100%',objectFit:'cover',display:'block'},
+      fieldLabel:{display:'block',fontSize:'10.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.6,marginBottom:'6px',fontFamily:body,color:c.ink},
+      fieldInput:{width:'100%',padding:'12px 14px',borderRadius: t.layout==='E'?'0':'6px',border:`1px solid ${c.line}`,background:c.bg2,fontSize:'14px',color:c.ink,fontFamily:body},
+      heroMedia: isDesktop ? {position:'relative',height:'100%',overflow:'hidden'} : {position:'absolute',inset:0},
+      addrWrap: isDesktop ? {display:'flex',gap:'20px'} : {display:'block'},
+      scheduleWrap: isDesktop ? {maxWidth:'640px',margin:'0 auto'} : {},
+      bottomGrid: isDesktop ? {display:'grid',gridTemplateColumns:'1fr 1fr 1fr',alignItems:'stretch',minWidth:0} : {display:'block'},
+      sectionInGrid:{padding: isDesktop ? '30px 26px' : '34px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg,color:c.ink,fontFamily:body,minWidth:0,overflow:'hidden'},
+      galleryWrap: {}, // set per layout below
+    };
+    if(t.layout==='D'){
+      const s = {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:c.bg,padding:'40px',textAlign:'center'},
+        monogram:{fontFamily:disp,fontStyle:'italic',fontSize:'22px',color:c.accent},
+        splashGreet:{fontFamily:disp,fontStyle:'italic',fontSize:'21px',color:c.ink,margin:0},
+        splashBtn:{fontFamily:body,fontSize:'11px',letterSpacing:'.1em',textTransform:'uppercase',padding:'14px 30px',border:`1px solid ${c.ink}`,background:'transparent',color:c.ink,cursor:'pointer'},
+        hero:{position:'relative', height: isDesktop?'480px':'360px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1.1fr 1fr':undefined},
+        heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(40,30,20,.05) 40%,rgba(40,30,20,.65) 100%)',filter:'sepia(.35) contrast(1.02)'},
+        filmstrip:{position:'absolute',left:0,right:0,bottom:0,height:'14px',background:'repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 16px)',opacity:.55},
+        heroContent: isDesktop
+          ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:c.bg}
+          : {position:'relative',padding:'22px 24px',background:c.bg},
+        eyebrow:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.14em',textTransform:'uppercase',color:c.accent,margin:'0 0 8px'},
+        title:{fontFamily:disp,fontStyle:'italic',fontWeight:500,fontSize: isDesktop?'52px':'36px',lineHeight:1.1,margin:'0 0 12px',color:c.ink},
+        dateLine:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex',gap:'2px',justifyContent: isDesktop?'flex-start':'center',fontFamily:"'Space Mono',monospace",background:c.ink,color:c.onDark,padding:'14px 18px',width:'fit-content'},
+        cdNum:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'20px',display:'inline',color:c.onDark},
+        cdLabel:{fontSize:'11px',fontFamily:"'Space Mono',monospace",opacity:.7,color:c.onDark,marginLeft:'4px',marginRight:'10px'},
+        quoteSection:{padding: isDesktop?'50px 64px':'38px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2,textAlign:'center'},
+        quoteText:{fontFamily:disp,fontStyle:'italic',fontSize: isDesktop?'26px':'19px',lineHeight:1.5,margin:0,color:c.ink,maxWidth:'640px',marginLeft:'auto',marginRight:'auto'},
+        addrCard:{flex:1,borderBottom: isDesktop?'none':`1px solid ${c.line}`,borderLeft: isDesktop?`2px solid ${c.accent}`:'none',padding: isDesktop?'4px 0 4px 18px':'16px 0',marginBottom: isDesktop?0:'12px'},
+        addrTitle:{fontFamily:disp,fontStyle:'italic',fontWeight:500,fontSize:'18px',margin:'0 0 4px',color:c.ink},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11.5px',fontWeight:600,letterSpacing:'.04em',color:c.accent,fontFamily:body},
+        schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'13px',color:c.accent,minWidth:'50px'},
+        schedLabel:{fontFamily:body,fontSize:'14px',color:c.ink},
+        rsvpSection:{padding: isDesktop?'48px 64px':'38px 24px',background:c.ink,color:c.onDark},
+        rsvpTitle:{fontFamily:disp,fontStyle:'italic',fontWeight:500,fontSize:'24px',margin:'0 0 4px',color:c.onDark},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:c.accent,color:c.ink,fontWeight:600,fontSize:'12.5px',letterSpacing:'.04em',textTransform:'uppercase',cursor:'pointer',fontFamily:body},
+        rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.onDark}`,background:'transparent',color:c.onDark,fontWeight:600,fontSize:'12.5px',cursor:'pointer',fontFamily:body},
+        quizCard:{border:`1px solid ${c.line}`,padding:'18px'},
+        quizQ:{fontFamily:disp,fontStyle:'italic',fontSize:'17px',margin:'0 0 12px',color:c.ink},
+        giftCard:{border:`1px solid ${c.ink}`,padding:'20px'},
+        giftTitle:{fontFamily:disp,fontStyle:'italic',fontWeight:500,fontSize:'18px',margin:'0 0 6px',color:c.ink},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',border:`1px dashed ${c.accent}`,padding:'10px 12px',color:c.ink,overflowWrap:'anywhere'},
+        musicTitle:{fontFamily:disp,fontStyle:'italic',fontWeight:500,fontSize:'20px',margin:'0 0 6px',color:c.ink},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,padding:'12px 14px',border:`1px solid ${c.line}`,background:c.bg2,fontSize:'13px',fontFamily:body,color:c.ink},
+        musicSendBtn:{padding:'12px 18px',border:'none',background:c.ink,color:c.bg,fontWeight:600,fontSize:'12px',cursor:'pointer',fontFamily:body},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+        musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:"'Space Mono',monospace",fontSize:'12px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'5px 10px',cursor:'pointer'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:c.ink,color:c.onDark},
+        footerMono:{fontFamily:disp,fontStyle:'italic',fontSize:'20px',letterSpacing:'.05em',color:c.accent,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.55,fontFamily:body,color:c.onDark},
+      };
+      s.galleryWrap = isDesktop ? {display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px'} : {display:'grid',gridTemplateColumns:'1.3fr 1fr',gap:'8px',gridAutoRows:'110px'};
+      return s;
+    }
+    if(t.layout==='E'){
+      const s = {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:c.bg,padding:'40px',textAlign:'center',border:`1px solid ${c.line}`},
+        monogram:{fontFamily:disp,fontWeight:700,fontSize:'22px',letterSpacing:'.05em',color:c.ink},
+        splashGreet:{fontFamily:body,fontSize:'14px',textTransform:'uppercase',letterSpacing:'.08em',color:c.ink,margin:0},
+        splashBtn:{fontFamily:disp,fontWeight:600,fontSize:'12px',letterSpacing:'.1em',textTransform:'uppercase',padding:'14px 30px',border:`1px solid ${c.ink}`,background:c.ink,color:'#fff',cursor:'pointer'},
+        hero:{position:'relative', height: isDesktop?'480px':'380px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1fr 1fr':undefined, borderBottom:`2px solid ${c.ink}`},
+        heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(0deg,rgba(0,0,0,.35),transparent 55%)'},
+        filmstrip:{display:'none'},
+        heroContent: isDesktop
+          ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:'#fff',borderLeft:`2px solid ${c.ink}`}
+          : {position:'relative',padding:'22px 24px',background:'#fff',borderTop:`2px solid ${c.ink}`},
+        eyebrow:{fontFamily:disp,fontWeight:600,fontSize:'11px',letterSpacing:'.2em',textTransform:'uppercase',color:c.ink,margin:'0 0 10px'},
+        title:{fontFamily:disp,fontWeight:700,fontSize: isDesktop?'56px':'38px',lineHeight:1,margin:'0 0 14px',color:c.ink,textTransform:'uppercase'},
+        dateLine:{fontFamily:body,fontSize:'12px',letterSpacing:'.05em',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex'},
+        cdNum:{fontFamily:disp,fontWeight:700,fontSize:'30px',display:'block',color:c.ink},
+        cdLabel:{fontSize:'10px',letterSpacing:'.1em',fontFamily:body,color:c.inkSoft},
+        quoteSection:{padding: isDesktop?'50px 64px':'40px 24px',borderBottom:`2px solid ${c.ink}`,background:'#fff',textAlign:'left'},
+        quoteText:{fontFamily:disp,fontWeight:600,fontSize: isDesktop?'32px':'22px',lineHeight:1.25,margin:0,color:c.ink,textTransform:'uppercase'},
+        addrCard:{flex:1,border:`1px solid ${c.ink}`,padding:'18px',marginBottom: isDesktop?0:'12px'},
+        addrTitle:{fontFamily:disp,fontWeight:700,fontSize:'16px',margin:'0 0 4px',color:c.ink,textTransform:'uppercase'},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11px',fontWeight:700,letterSpacing:'.05em',color:c.ink,fontFamily:body,textDecoration:'underline'},
+        schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.ink}`},
+        schedTime:{fontFamily:disp,fontWeight:700,fontSize:'13px',color:c.ink,minWidth:'50px'},
+        schedLabel:{fontFamily:body,fontSize:'14px',color:c.ink,textTransform:'uppercase',letterSpacing:'.03em'},
+        rsvpSection:{padding: isDesktop?'48px 64px':'38px 24px',background:c.ink,color:'#fff'},
+        rsvpTitle:{fontFamily:disp,fontWeight:700,fontSize:'22px',margin:'0 0 4px',color:'#fff',textTransform:'uppercase'},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:'#fff',color:c.ink,fontWeight:700,fontSize:'12.5px',letterSpacing:'.05em',textTransform:'uppercase',cursor:'pointer',fontFamily:disp},
+        rsvpBtnGhost:{padding:'13px 16px',border:'1px solid #fff',background:'transparent',color:'#fff',fontWeight:700,fontSize:'12.5px',cursor:'pointer',fontFamily:disp,textTransform:'uppercase'},
+        quizCard:{border:`1px solid ${c.ink}`,padding:'18px'},
+        quizQ:{fontFamily:disp,fontWeight:700,fontSize:'16px',margin:'0 0 12px',color:c.ink,textTransform:'uppercase'},
+        giftCard:{border:`1px solid ${c.ink}`,padding:'20px'},
+        giftTitle:{fontFamily:disp,fontWeight:700,fontSize:'16px',margin:'0 0 6px',color:c.ink,textTransform:'uppercase'},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',border:`1px solid ${c.ink}`,padding:'10px 12px',color:c.ink,overflowWrap:'anywhere'},
+        musicTitle:{fontFamily:disp,fontWeight:700,fontSize:'18px',margin:'0 0 6px',color:c.ink,textTransform:'uppercase'},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,padding:'12px 14px',border:`1px solid ${c.ink}`,background:'#fff',fontSize:'13px',fontFamily:body,color:c.ink},
+        musicSendBtn:{padding:'12px 18px',border:'none',background:c.ink,color:'#fff',fontWeight:700,fontSize:'12px',cursor:'pointer',fontFamily:disp,textTransform:'uppercase'},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${c.ink}`},
+        musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+        musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:disp,fontWeight:700,fontSize:'11px',background:'none',border:`1px solid ${c.ink}`,color:c.ink,padding:'5px 10px',cursor:'pointer',textTransform:'uppercase'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:'#fff',borderTop:`2px solid ${c.ink}`},
+        footerMono:{fontFamily:disp,fontWeight:700,fontSize:'18px',letterSpacing:'.1em',color:c.ink,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.6,fontFamily:body,color:c.ink,textTransform:'uppercase',letterSpacing:'.03em'},
+      };
+      s.galleryWrap = isDesktop ? {display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'2px'} : {display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'2px'};
+      return s;
+    }
+    // layout F - riviera
+    const s = {...base,
+      splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:`radial-gradient(70% 55% at 50% 0%, ${c.accent2}22, transparent), ${c.bg}`,padding:'40px',textAlign:'center'},
+      monogram:{fontFamily:disp,fontSize:'24px',color:c.accent,border:`2px solid ${c.accent2}`,borderRadius:'50%',width:'72px',height:'72px',display:'flex',alignItems:'center',justifyContent:'center',animation:'sunSpin 40s linear infinite'},
+      splashGreet:{fontFamily:"'Caveat',cursive",fontSize:'26px',color:c.ink,margin:0},
+      splashBtn:{fontFamily:body,fontSize:'11.5px',letterSpacing:'.06em',padding:'14px 30px',border:'none',background:c.accent,color:'#fff',cursor:'pointer',borderRadius:'999px'},
+      hero:{position:'relative', height: isDesktop?'480px':'380px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1fr 1fr':undefined, borderRadius: isDesktop?'0':'0 0 50% 50%/0 0 60px 60px', overflow:'hidden'},
+      heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(59,42,30,0) 45%,rgba(59,42,30,.55) 100%)'},
+      filmstrip:{display:'none'},
+      heroContent: isDesktop
+        ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:c.bg}
+        : {position:'relative',padding:'26px 24px 30px',background:c.bg},
+      eyebrow:{fontFamily:body,fontSize:'11px',letterSpacing:'.1em',textTransform:'uppercase',color:c.accent2,margin:'0 0 8px'},
+      title:{fontFamily:disp,fontWeight:400,fontSize: isDesktop?'50px':'36px',lineHeight:1.1,margin:'0 0 12px',color:c.ink},
+      dateLine:{fontFamily:body,fontSize:'12.5px',color:c.inkSoft,margin:0},
+      countdownWrap:{display:'flex',gap:'10px'},
+      cdNum:{fontFamily:disp,fontWeight:400,fontSize:'22px',display:'block',color:c.ink},
+      cdLabel:{fontSize:'9.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.65,fontFamily:body,color:c.inkSoft},
+      quoteSection:{padding: isDesktop?'50px 64px':'38px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2},
+      quoteText:{fontFamily:"'Caveat',cursive",fontSize: isDesktop?'34px':'24px',lineHeight:1.4,margin:0,color:c.ink,textAlign:'center'},
+      addrCard:{flex:1,background:c.bg2,borderRadius:'0 0 40px 40px',padding:'18px 20px',marginBottom: isDesktop?0:'12px'},
+      addrTitle:{fontFamily:disp,fontWeight:400,fontSize:'17px',margin:'0 0 4px',color:c.ink},
+      addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+      mapBtn:{fontSize:'11.5px',fontWeight:600,color:'#fff',background:c.accent,padding:'7px 14px',borderRadius:'999px',display:'inline-block'},
+      schedRow:{display:'flex',gap:'14px',alignItems:'center',padding:'8px 14px',background:c.bg2,borderRadius:'999px',marginBottom:'8px'},
+      schedTime:{fontFamily:body,fontWeight:600,fontSize:'12.5px',color:'#fff',background:c.accent2,padding:'4px 10px',borderRadius:'999px'},
+      schedLabel:{fontFamily:body,fontSize:'13.5px',color:c.ink},
+      rsvpSection:{padding: isDesktop?'48px 64px':'38px 24px',background:c.bg2,color:c.ink},
+      rsvpTitle:{fontFamily:disp,fontWeight:400,fontSize:'23px',margin:'0 0 4px',color:c.ink},
+      rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:c.accent,color:'#fff',fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+      rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.accent}`,background:'transparent',color:c.accent2,fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+      quizCard:{background:c.bg2,padding:'20px',borderRadius:'24px'},
+      quizQ:{fontFamily:disp,fontSize:'17px',margin:'0 0 12px',color:c.ink},
+      giftCard:{background:c.bg2,padding:'22px',borderRadius:'26px',textAlign:'center'},
+      giftTitle:{fontFamily:disp,fontWeight:400,fontSize:'18px',margin:'0 0 6px',color:c.ink},
+      giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+      giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',background:'#fff',borderRadius:'999px',padding:'10px 16px',color:c.ink,display:'inline-block',overflowWrap:'anywhere',maxWidth:'100%'},
+      musicTitle:{fontFamily:disp,fontWeight:400,fontSize:'20px',margin:'0 0 6px',color:c.ink},
+      musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+      musicInput:{flex:1,padding:'12px 16px',border:'none',background:c.bg2,fontSize:'13px',fontFamily:body,color:c.ink,borderRadius:'999px'},
+      musicSendBtn:{padding:'12px 18px',border:'none',background:c.accent,color:'#fff',fontWeight:600,fontSize:'12px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+      musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:c.bg2,borderRadius:'18px',marginBottom:'8px'},
+      musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+      musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+      musicBadge:{fontFamily:body,fontWeight:600,fontSize:'12px',background:c.accent,border:'none',color:'#fff',padding:'6px 12px',cursor:'pointer',borderRadius:'999px'},
+      footer:{padding:'34px 24px 42px',textAlign:'center',background:c.bg},
+      footerMono:{fontFamily:disp,fontSize:'20px',color:c.accent2,marginBottom:'6px'},
+      footerText:{fontSize:'11px',opacity:.6,fontFamily:body,color:c.ink},
+    };
+    s.galleryWrap = isDesktop ? {display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'14px'} : {display:'flex',flexWrap:'wrap',gap:'14px',padding:'6px 4px 10px',justifyContent:'center'};
+    return s;
+  }
+
+  select(id){ this.setState({activeId:id, opened:false}); }
+  openCard(){ this.setState({opened:true}); }
+  setMobile(){ this.setState({device:'mobile'}); }
+  setDesktop(){ this.setState({device:'desktop'}); }
+  toggleNotes(){ this.setState(s=>({notesOpen:!s.notesOpen})); }
+  vote(key){ this.setState(s=>({votes:{...s.votes,[key]:(s.votes[key]||0)+1}})); }
+
+  renderVals(){
+    const t = this.find(this.state.activeId);
+    const device = this.state.device;
+    const isDesktop = device==='desktop';
+    const styles = this.buildStyles(t, device);
+    const isMobile = !isDesktop;
+    const showSplash = isMobile && !this.state.opened;
+    const contentVisible = !showSplash;
+
+    const galleryWraps = t.layout==='F' && !isDesktop ? [{rot:-4},{rot:3},{rot:-2}] : [{},{},{}];
+
+    return {
+      themesList: this.THEMES.map(th=>({
+        id: th.id, label: th.name,
+        select: ()=>this.select(th.id),
+        chipStyle:{fontFamily:'Jost,sans-serif',fontSize:'12.5px',fontWeight:600,padding:'8px 14px',borderRadius:'999px',border:'1px solid #333',
+          background: th.id===this.state.activeId ? '#fff' : 'transparent',
+          color: th.id===this.state.activeId ? '#000' : '#aaa',
+          borderColor: th.id===this.state.activeId ? '#fff' : '#333',
+          cursor:'pointer'}
+      })),
+      active: t, styles, isMobile, showSplash, contentVisible,
+      mobileBtnStyle:{fontFamily:'Jost,sans-serif',fontSize:'12px',fontWeight:600,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isMobile?'#fff':'transparent',color: isMobile?'#000':'#aaa'},
+      desktopBtnStyle:{fontFamily:'Jost,sans-serif',fontSize:'12px',fontWeight:600,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isDesktop?'#fff':'transparent',color: isDesktop?'#000':'#aaa'},
+      setMobile: ()=>this.setMobile(),
+      setDesktop: ()=>this.setDesktop(),
+      frameHint: isMobile ? 'Modo celular: tocá "Abrir invitación" para ver el flujo completo.' : 'Modo escritorio: layout ancho de 2 y 3 columnas, sin gesto de apertura.',
+      outerFrameStyle: isMobile
+        ? {width:'390px',maxWidth:'100%',background:'#000',borderRadius:'44px',padding:'14px',boxShadow:'0 30px 60px rgba(0,0,0,.5)',display:'flex',flexDirection:'column'}
+        : {width:'1180px',maxWidth:'100%'},
+      screenStyle: isMobile
+        ? {height:'800px',overflowY:'auto',borderRadius:'30px',background:t.colors.bg,position:'relative',scrollbarWidth:'none'}
+        : {borderRadius:'8px',background:t.colors.bg,position:'relative',boxShadow:'0 30px 70px rgba(0,0,0,.16)',overflow:'hidden'},
+
+      openCard: ()=>this.openCard(),
+      toggleNotes: ()=>this.toggleNotes(),
+      notesOpen: this.state.notesOpen,
+      notesToggleLabel: this.state.notesOpen ? 'Ocultar notas técnicas ▲' : 'Ver notas técnicas para el equipo dev ▼',
+
+      countdownBoxes: t.layout==='D'
+        ? t.cdBoxes.map(b=>({n:b.n,l:b.l,boxStyle:{display:'inline-flex',alignItems:'baseline'}}))
+        : t.layout==='E'
+        ? t.cdBoxes.map(b=>({n:b.n,l:b.l,boxStyle:{flex:1,textAlign: isDesktop?'left':'center',padding: isDesktop?'0 24px 0 0':'0 10px',borderRight: !isDesktop?`1px solid ${t.colors.ink}`:'none'}}))
+        : t.cdBoxes.map(b=>({n:b.n,l:b.l,boxStyle:{flex:1,textAlign:'center',background:t.colors.bg2,borderRadius:'999px',padding:'14px 4px'}})),
+
+      galleryImages: t.galleryImgs.map((src,i)=>({src, wrapStyle: t.layout==='F' && !isDesktop
+        ? {width:'100px',height:'128px',background:'#fff',padding:'6px 6px 16px',boxShadow:'0 6px 14px rgba(0,0,0,.15)',transform:`rotate(${galleryWraps[i].rot}deg)`,borderRadius:'2px'}
+        : t.layout==='F'
+        ? {aspectRatio:'1',overflow:'hidden',borderRadius:'0 0 30px 30px'}
+        : {aspectRatio:'1', overflow:'hidden', borderRadius:'0'}
+      })),
+
+      addrCards: t.addr,
+      scheduleItems: t.schedule,
+
+      quizOptions: t.quizOpts.map((o,i)=>({text:o, style:{
+        padding:'11px 14px', marginBottom:'8px', fontSize:'13.5px', fontFamily:t.bodyFont, color:t.colors.ink,
+        border: t.layout==='F' ? 'none' : `1px solid ${t.colors.line}`,
+        background: t.layout==='F' ? t.colors.bg : 'transparent',
+        borderRadius: t.layout==='F' ? '999px' : '0'
+      }})),
+
+      musicItems: t.musicItems.map((m,i)=>{
+        const key = t.id+'-'+i;
+        const votes = this.state.votes[key]||0;
+        const baseNum = parseInt(m.badge.match(/\d+/)[0],10);
+        return {t:m.t, s:m.s, badge: m.badge.replace(/\d+/, baseNum+votes), vote:()=>this.vote(key)};
+      }),
+
+      techNotes: this.THEMES.map(th=>({
+        layout:'Layout '+th.layout, name: th.name,
+        filename: th.name.replace(/[^a-zA-Z0-9]/g,''),
+        layoutId: th.id,
+        fonts: th.displayFont.replace(/'/g,'') + ' + ' + th.bodyFont.replace(/'/g,'')
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

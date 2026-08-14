@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&amp;family=DM+Sans:wght@300;500&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#F4F9FB;font-family:'DM Sans',sans-serif;color:#1B3A5C;}
+a{color:#C9A96E;text-decoration:none;}
+a:hover{color:#a8895a;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+@keyframes floatDoodle{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-7px) rotate(1.4deg);}}
+@keyframes floatDoodle2{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(6px) rotate(-2deg);}}
+@keyframes twinkleDoodle{0%,100%{opacity:.3;transform:scale(.94);}50%{opacity:.85;transform:scale(1.06);}}
+@keyframes inkFade{0%{opacity:0;transform:translateY(14px);}100%{opacity:1;transform:translateY(0);}}
+@keyframes bobBoat{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-4px) rotate(2deg);}}
+@keyframes letterWrite{0%{clip-path:inset(0 100% 0 0);opacity:.2;}60%{opacity:1;}100%{clip-path:inset(0 0% 0 0);opacity:1;}}
+</style>
+</helmet>
+
+<div style="max-width:1360px;margin:0 auto;padding:28px 20px 80px;">
+
+  <div style="max-width:820px;margin:0 0 28px;">
+    <p style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#4A90B8;margin:0 0 10px;">Bon Voyage · boda / 15 de aventura</p>
+    <h1 style="font:600 30px/1.2 'Playfair Display',serif;font-style:italic;margin:0 0 12px;color:#1B3A5C;">Bon Voyage Travel</h1>
+    <p style="font:300 14.5px/1.7 'DM Sans',sans-serif;color:#3d5a75;margin:0;">Espuma de mar, arena y océano profundo. Doodles de viaje: avioneta vintage con ruta punteada, olas con estrella de mar, brújula en el marco, valija con estampillas, cámara polaroid y sol asomándose. Misma arquitectura: toggle celular/escritorio, parallax, orden de secciones fijo.</p>
+  </div>
+
+  <div style="display:flex;gap:6px;background:#1B3A5C;border-radius:999px;padding:4px;width:fit-content;margin-bottom:20px;">
+    <button onClick="{{ setMobile }}" style="{{ mobileBtnStyle }}">📱 Celular</button>
+    <button onClick="{{ setDesktop }}" style="{{ desktopBtnStyle }}">🖥 Escritorio</button>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:10px 0;">
+    <div style="{{ outerFrameStyle }}">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <div style="height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:110px;height:16px;background:#000;border-radius:12px;"></div>
+        </div>
+      </sc-if>
+      <div style="{{ screenStyle }}" onScroll="{{ handleScroll }}">
+
+        <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ styles.splash }}">
+            <div style="{{ styles.watermark }}"></div>
+
+            <svg viewBox="0 0 120 90" style="{{ styles.splashOrnTop }}" fill="none" stroke="#1B3A5C" stroke-width="1.1" stroke-linecap="round">
+              <path d="M14 46 L58 32 L74 26 L70 36 L52 42 L40 52 L30 50 L34 42 Z"></path>
+              <path d="M58 32 L64 18 M52 42 L58 54"></path>
+              <circle cx="70" cy="30" r="2.4"></circle>
+              <path d="M78 24 C 84 20, 92 22, 96 18" stroke-dasharray="2 4"></path>
+              <path d="M96 18 C 100 14, 106 16, 110 12" stroke-dasharray="2 4"></path>
+            </svg>
+
+            <svg viewBox="0 0 120 90" style="{{ styles.splashOrnBottom }}" fill="none" stroke="#4A90B8" stroke-width="1.1" stroke-linecap="round">
+              <path d="M8 62 C 20 54, 30 54, 38 62 C 46 70, 56 70, 64 62"></path>
+              <path d="M64 62 C 72 54, 82 54, 90 62 C 98 70, 106 70, 114 62"></path>
+              <path d="M30 40 L34 30 L38 40 L42 32 L46 40 L36 46 Z"></path>
+              <path d="M78 44 C 82 40, 88 40, 90 45 C 88 49, 82 49, 78 44 Z"></path>
+            </svg>
+
+            <div style="{{ styles.splashInner }}">
+              <svg viewBox="0 0 60 40" style="{{ styles.splashRings }}" fill="none" stroke="#C9A96E" stroke-width="1.2">
+                <circle cx="30" cy="20" r="16"></circle>
+                <path d="M30 8 L34 20 L30 32 L26 20 Z"></path>
+                <path d="M18 20 L42 20"></path>
+              </svg>
+              <p style="{{ styles.splashKicker }}">Empezamos el viaje más importante de nuestras vidas</p>
+              <h2 style="{{ styles.splashName }}">{{ guestName }}</h2>
+              <div style="{{ styles.splashRule }}"></div>
+              <p style="{{ styles.splashDress }}">Elegante veraniego — blancos, azules y arena</p>
+              <button onClick="{{ openCard }}" style="{{ styles.splashBtn }}">Abrir invitación</button>
+            </div>
+
+            <svg viewBox="0 0 22 22" style="{{ styles.star1 }}" fill="none" stroke="#C9A96E" stroke-width="1.1" stroke-linecap="round">
+              <path d="M11 2 L13 9 L20 9 L14 13 L16 20 L11 16 L6 20 L8 13 L2 9 L9 9 Z"></path>
+            </svg>
+            <svg viewBox="0 0 30 20" style="{{ styles.heart1 }}" fill="none" stroke="#A8D8E8" stroke-width="1.1" stroke-linecap="round">
+              <path d="M4 12 C 10 8, 14 8, 15 12 C 16 8, 20 8, 26 12"></path>
+              <path d="M8 14 C 12 11, 18 11, 22 14" stroke-dasharray="1 3"></path>
+            </svg>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contentVisible }}" hint-placeholder-val="{{ true }}">
+        <div style="{{ styles.stage }}">
+
+          <div style="{{ styles.heroAside }}">
+            <div style="{{ styles.heroPhotoWrap }}">
+              <img src="img/casamiento/istockphoto-1093617712-1024x1024.jpg" style="{{ styles.heroPhoto }}" alt="Portada">
+              <div style="{{ styles.heroCream }}"></div>
+              <div style="{{ styles.heroFrame }}"></div>
+
+              <svg viewBox="0 0 70 70" style="{{ styles.frameCornerTL }}" fill="none" stroke="#F4F9FB" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="24" cy="24" r="16"></circle>
+                <path d="M24 8 L24 40 M8 24 L40 24"></path>
+                <path d="M24 12 L27 24 L24 36 L21 24 Z"></path>
+              </svg>
+              <svg viewBox="0 0 70 70" style="{{ styles.frameCornerBR }}" fill="none" stroke="#F4F9FB" stroke-width="1.2" stroke-linecap="round">
+                <path d="M14 56 L14 40 L36 40 L36 56 Z"></path>
+                <path d="M20 40 L20 34 L30 34 L30 40"></path>
+                <path d="M36 44 C 44 42, 50 46, 54 42" stroke-dasharray="2 4"></path>
+              </svg>
+
+              <svg viewBox="0 0 90 90" style="{{ styles.dressOut }}" fill="none" stroke="#1B3A5C" stroke-width="1.2" stroke-linecap="round">
+                <rect x="18" y="30" width="44" height="34" rx="4" transform="rotate(-6 40 47)"></rect>
+                <circle cx="34" cy="44" r="9" transform="rotate(-6 40 47)"></circle>
+                <rect x="46" y="24" width="10" height="6" transform="rotate(-6 40 47)"></rect>
+              </svg>
+              <svg viewBox="0 0 90 90" style="{{ styles.glassesOut }}" fill="none" stroke="#C9A96E" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="45" cy="30" r="16"></circle>
+                <path d="M45 6 L45 14 M45 46 L45 54 M21 30 L29 30 M61 30 L69 30"></path>
+                <path d="M45 40 C 40 50, 30 56, 30 66"></path>
+              </svg>
+            </div>
+
+            <div style="{{ styles.heroTextBlock }}">
+              <svg viewBox="0 0 40 20" style="{{ styles.seal }}" fill="none" stroke="#C9A96E" stroke-width="1.3" stroke-linecap="round">
+                <path d="M4 14 C 4 14, 12 4, 20 4 C 28 4, 36 14, 36 14" stroke-dasharray="2 3"></path>
+              </svg>
+              <p style="{{ styles.eyebrow }}">Nos casamos frente al mar</p>
+              <h1 style="{{ styles.title }}">
+                <sc-for list="{{ titleLetters }}" as="lt" hint-placeholder-count="12">
+                  <span style="{{ lt.style }}">{{ lt.ch }}</span>
+                </sc-for>
+              </h1>
+              <div style="{{ styles.underline }}"></div>
+              <p style="{{ styles.dateLine }}">12 · 09 · 2026 · Costa Atlántica</p>
+            </div>
+
+            <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+              <nav style="{{ styles.nav }}">
+                <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
+                  <a href="#" style="{{ styles.navItem }}"><b style="{{ styles.navNum }}">{{ n.num }}</b> {{ n.label }}</a>
+                </sc-for>
+              </nav>
+            </sc-if>
+          </div>
+
+          <div style="{{ styles.mainCol }}">
+
+            <div style="{{ styles.countdownSection }}">
+              <div style="left: -110px; top: 2px; position: absolute"></div>
+              <svg viewBox="0 0 200 24" style="{{ styles.divider }}" fill="none" stroke="#4A90B8" stroke-width="1" stroke-linecap="round">
+                <path d="M6 16 C 30 8, 40 24, 64 16 C 88 8, 98 24, 122 16"></path>
+                <path d="M122 16 C 138 8, 150 24, 174 16 C 182 12, 188 14, 194 16"></path>
+                <circle cx="100" cy="8" r="5"></circle>
+                <path d="M100 2 L100 4 M94 8 L96 8 M106 8 L104 8"></path>
+              </svg>
+              <p style="{{ styles.kicker }}">Cuenta regresiva</p>
+              <div style="{{ styles.countdownWrap }}">
+                <sc-for list="{{ countdownBoxes }}" as="cd" hint-placeholder-count="4">
+                  <div style="{{ styles.cdBox }}">
+                    <span style="{{ styles.cdNum }}">{{ cd.n }}</span>
+                    <span style="{{ styles.cdLabel }}">{{ cd.l }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="{{ styles.quoteSection }}">
+              <svg viewBox="0 0 40 26" style="{{ styles.quoteDoodle }}" fill="none" stroke="#4A90B8" stroke-width="1.2" stroke-linecap="round">
+                <path d="M4 4 C 4 14, 4 20, 12 22"></path>
+                <path d="M18 4 C 18 14, 18 20, 26 22"></path>
+                <path d="M2 24 C 10 26, 30 26, 38 24" stroke-dasharray="1.5 3"></path>
+              </svg>
+              <p style="{{ styles.quoteText }}">"El mundo es grande, pero este momento es nuestro."</p>
+            </div>
+
+            <div style="{{ styles.section }}">
+              <svg viewBox="0 0 48 40" style="{{ styles.sectionIcon }}" fill="none" stroke="#1B3A5C" stroke-width="1.2" stroke-linecap="round">
+                <path d="M24 8 L24 28"></path>
+                <path d="M12 28 C 12 18, 36 18, 36 28 Z"></path>
+                <path d="M4 34 L44 34"></path>
+                <path d="M28 6 L34 12 M30 4 L36 10"></path>
+              </svg>
+              <p style="{{ styles.kicker }}">Cuándo y dónde</p>
+              <div style="{{ styles.addrCard }}">
+                <span style="{{ styles.addrKicker }}">Ceremonia</span>
+                <h4 style="{{ styles.addrTitle }}">Capilla de la Costa</h4>
+                <p style="{{ styles.addrRow }}">18:30 hs</p>
+                <p style="{{ styles.addrRow }}">Av. Costanera 500</p>
+                <a href="#" style="{{ styles.mapBtn }}">Ver mapa ceremonia ↗</a>
+              </div>
+              <div style="{{ styles.addrCard }}">
+                <span style="{{ styles.addrKicker }}">Fiesta</span>
+                <h4 style="{{ styles.addrTitle }}">Terraza Faro Sur</h4>
+                <p style="{{ styles.addrRow }}">20:30 hs</p>
+                <p style="{{ styles.addrRow }}">Muelle Nuevo</p>
+                <a href="#" style="{{ styles.mapBtn }}">Ver mapa fiesta ↗</a>
+              </div>
+
+              <p style="{{ styles.kickerSpaced }}">Cronograma</p>
+              <sc-for list="{{ scheduleItems }}" as="sc" hint-placeholder-count="4">
+                <div style="{{ styles.schedRow }}">
+                  <span style="{{ styles.schedTime }}">{{ sc.time }}</span>
+                  <span style="{{ styles.schedLabel }}">{{ sc.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="{{ styles.albumSection }}">
+              <svg viewBox="0 0 48 40" style="{{ styles.sectionIcon }}" fill="none" stroke="#1B3A5C" stroke-width="1.2" stroke-linecap="round">
+                <rect x="8" y="6" width="24" height="28" rx="2" transform="rotate(-6 20 20)"></rect>
+                <rect x="16" y="10" width="24" height="28" rx="2" transform="rotate(6 28 24)"></rect>
+              </svg>
+              <p style="{{ styles.kicker }}">Álbum</p>
+              <div style="{{ styles.galleryWrap }}">
+                <sc-for list="{{ galleryImages }}" as="g" hint-placeholder-count="4">
+                  <div style="{{ g.wrapStyle }}"><img src="{{ g.src }}" alt="Momento" style="{{ styles.galleryImg }}"></div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="{{ styles.mapPlaceholder }}">
+              <svg viewBox="0 0 40 40" style="{{ styles.mapPin }}" fill="none" stroke="#1B3A5C" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="20" cy="20" r="16"></circle>
+                <path d="M20 8 L23 18 L20 32 L17 18 Z"></path>
+                <circle cx="20" cy="20" r="1.6"></circle>
+              </svg>
+              <span style="{{ styles.mapText }}">Mapa embebido</span>
+            </div>
+
+            <div style="{{ styles.rsvpSection }}">
+              <svg viewBox="0 0 70 40" style="{{ styles.rsvpRings }}" fill="none" stroke="#A8D8E8" stroke-width="1.2" stroke-linecap="round">
+                <rect x="10" y="10" width="20" height="20" rx="10"></rect>
+                <rect x="40" y="10" width="20" height="20" rx="10"></rect>
+                <path d="M35 32 L35 24 M31 28 L39 28"></path>
+              </svg>
+              <p style="{{ styles.kickerOnDark }}">Confirmación</p>
+              <h3 style="{{ styles.rsvpTitle }}">¿Embarcás con nosotros?</h3>
+              <div style="margin:18px 0 22px;max-width:420px;">
+                <label style="{{ styles.fieldLabel }}">Nombre y apellido</label>
+                <input value="Fam. Duarte" style="{{ styles.fieldInput }}" readonly="">
+              </div>
+              <div style="display:flex;gap:10px;">
+                <button style="{{ styles.rsvpBtnSolid }}">Confirmar asistencia</button>
+                <button style="{{ styles.rsvpBtnGhost }}">No podré</button>
+              </div>
+            </div>
+
+            <div style="{{ styles.section }}">
+              <svg viewBox="0 0 44 44" style="{{ styles.sectionIcon }}" fill="none" stroke="#1B3A5C" stroke-width="1.2" stroke-linecap="round">
+                <rect x="8" y="14" width="28" height="24"></rect>
+                <path d="M8 22 L36 22 M22 14 L22 38"></path>
+                <path d="M14 14 C 14 8, 30 8, 30 14"></path>
+                <path d="M32 6 L38 8 L36 4 Z"></path>
+              </svg>
+              <p style="{{ styles.kicker }}">Datos bancarios del evento</p>
+              <div style="{{ styles.giftGrid }}">
+                <div style="{{ styles.giftCard }}">
+                  <span style="{{ styles.giftCardTitle }}">Pago de tarjetas</span>
+                  <div style="{{ styles.copyRow }}"><span style="{{ styles.copyLabel }}">Alias</span><span style="{{ styles.copyValue }}">miliygaston.tarjeta</span></div>
+                </div>
+                <div style="{{ styles.giftCard }}">
+                  <span style="{{ styles.giftCardTitle }}">Regalos</span>
+                  <div style="{{ styles.copyRow }}"><span style="{{ styles.copyLabel }}">Alias</span><span style="{{ styles.copyValue }}">miliygaston.regalo</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="{{ styles.section }}">
+              <svg viewBox="0 0 44 44" style="{{ styles.sectionIcon }}" fill="none" stroke="#1B3A5C" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="22" cy="22" r="18"></circle>
+                <circle cx="22" cy="22" r="4"></circle>
+                <path d="M22 8 C 30 10, 34 14, 36 22"></path>
+                <path d="M6 30 C 10 27, 16 27, 20 30" stroke-dasharray="1.5 3"></path>
+              </svg>
+              <p style="{{ styles.kicker }}">Sugerí una canción</p>
+              <div style="display:flex;gap:8px;margin:16px 0;">
+                <input placeholder="Canción — artista" style="{{ styles.musicInput }}" readonly="">
+                <button style="{{ styles.musicSendBtn }}">Enviar</button>
+              </div>
+              <sc-for list="{{ musicItems }}" as="mi" hint-placeholder-count="2">
+                <div style="{{ styles.musicRow }}">
+                  <div><b style="{{ styles.musicRowTitle }}">{{ mi.t }}</b><span style="{{ styles.musicRowSub }}">{{ mi.s }}</span></div>
+                  <button onClick="{{ mi.vote }}" style="{{ styles.musicBadge }}">{{ mi.badge }}</button>
+                </div>
+              </sc-for>
+            </div>
+
+            <footer style="{{ styles.footer }}">
+              <svg viewBox="0 0 150 34" style="{{ styles.footerGarland }}" fill="none" stroke="#4A90B8" stroke-width="1" stroke-linecap="round">
+                <text x="4" y="20" font-family="'Playfair Display',serif" font-style="italic" font-size="17" fill="#1B3A5C" stroke="none">hasta siempre ✈</text>
+                <path d="M110 22 C 120 18, 130 22, 140 16" stroke-dasharray="2 4"></path>
+                <path d="M144 12 L150 14 L146 10 Z"></path>
+              </svg>
+              <small style="{{ styles.footerText }}">Gracias por ser parte de esta aventura · altainvitacion.com</small>
+            </footer>
+
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ isMobileNavVisible }}" hint-placeholder-val="{{ false }}">
+          <nav style="{{ styles.bottomPill }}">
+            <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
+              <a href="#" style="{{ styles.bottomPillItem }}">{{ n.short }}</a>
+            </sc-for>
+          </nav>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font:300 12px 'DM Sans',sans-serif;color:#4A90B8;margin:10px 0 0;">{{ frameHint }}</p>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { device:'mobile', opened:false, votes:{}, scrollY:0 };
+
+  colors = {bg:'#F4F9FB', bgAlt:'#E8D5B0', ink:'#1B3A5C', inkSoft:'#4A90B8', sand:'#C9A96E', aqua:'#A8D8E8'};
+
+  setMobile(){ this.setState({device:'mobile'}); }
+  setDesktop(){ this.setState({device:'desktop'}); }
+  openCard(){ this.setState({opened:true}); }
+  vote(key){ this.setState(s=>({votes:{...s.votes,[key]:(s.votes[key]||0)+1}})); }
+  handleScroll(e){ this.setState({scrollY: e.target.scrollTop||0}); }
+
+  buildStyles(isDesktop, scrollY){
+    const c = this.colors;
+    const parallax = Math.min(scrollY||0, 260);
+    const wm = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cg fill='none' stroke='%234A90B8' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M20 110 C 30 102, 40 102, 50 110'/%3E%3Cpath d='M100 30 C 106 24, 114 24, 118 30 C 114 36, 106 36, 100 30 Z'/%3E%3Cpath d='M60 40 L64 30 L68 40 L72 32 L76 40 L66 46 Z'/%3E%3C/g%3E%3C/svg%3E")`;
+
+    return {
+      splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'40px 30px',textAlign:'center',position:'relative',overflow:'hidden',background:c.bg},
+      watermark:{position:'absolute',inset:0,backgroundImage:wm,backgroundSize:'210px 210px',opacity:.07,pointerEvents:'none'},
+      splashOrnTop:{position:'absolute',top:'6%',left:'-4%',width:'190px',opacity:.85,animation:'floatDoodle 9s ease-in-out infinite',pointerEvents:'none'},
+      splashOrnBottom:{position:'absolute',bottom:'6%',right:'-4%',width:'190px',opacity:.75,animation:'floatDoodle2 11s ease-in-out infinite',pointerEvents:'none'},
+      splashInner:{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'14px',animation:'inkFade 1s ease-out'},
+      splashRings:{width:'70px',marginBottom:'4px'},
+      splashKicker:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:'11.5px',letterSpacing:'.16em',textTransform:'uppercase',color:c.inkSoft,margin:0,maxWidth:'270px'},
+      splashName:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'clamp(2.4rem,9vw,3.4rem)',color:c.ink,margin:0,lineHeight:1.1},
+      splashRule:{width:'54px',height:'1px',background:c.sand},
+      splashDress:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:'12px',color:c.inkSoft,textTransform:'uppercase',letterSpacing:'.12em',margin:0,maxWidth:'260px'},
+      splashBtn:{fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:'11.5px',letterSpacing:'.2em',textTransform:'uppercase',padding:'14px 34px',border:`1px solid ${c.ink}`,background:'transparent',color:c.ink,cursor:'pointer',marginTop:'10px'},
+      star1:{position:'absolute',top:'26%',right:'16%',width:'20px',animation:'twinkleDoodle 4s ease-in-out infinite',pointerEvents:'none'},
+      heart1:{position:'absolute',bottom:'30%',left:'14%',width:'26px',opacity:.6,animation:'bobBoat 5.5s ease-in-out infinite',pointerEvents:'none'},
+
+      stage: isDesktop ? {display:'grid',gridTemplateColumns:'440px 1fr',minHeight:'800px',background:c.bg} : {background:c.bg},
+      heroAside: isDesktop
+        ? {position:'relative',background:c.bgAlt+'44',display:'flex',flexDirection:'column',padding:'34px 30px',borderRight:`1px solid ${c.sand}33`}
+        : {position:'relative'},
+      heroPhotoWrap: isDesktop
+        ? {position:'relative',height:'300px',overflow:'visible',marginBottom:'26px'}
+        : {position:'relative',height:'430px',overflow:'visible'},
+      heroPhoto:{width:'100%',height:'112%',objectFit:'cover',display:'block',transform:`translateY(${-parallax*0.16}px)`,filter:'saturate(1.05) contrast(1.02) brightness(1.04)'},
+      heroCream:{position:'absolute',inset:0,background:'rgba(244,249,251,0.16)',pointerEvents:'none'},
+      heroFrame:{position:'absolute',inset:'12px',border:`1px solid rgba(244,249,251,.8)`,pointerEvents:'none'},
+      frameCornerTL:{position:'absolute',top:'4px',left:'4px',width:'70px',pointerEvents:'none'},
+      frameCornerBR:{position:'absolute',bottom:'4px',right:'4px',width:'70px',pointerEvents:'none'},
+      dressOut:{position:'absolute',bottom:'-28px',left:'-22px',width:'80px',animation:'floatDoodle 10s ease-in-out infinite',pointerEvents:'none'},
+      glassesOut:{position:'absolute',top:'-24px',right:'-18px',width:'82px',animation:'floatDoodle2 12s ease-in-out infinite',pointerEvents:'none'},
+
+      heroTextBlock: isDesktop
+        ? {position:'relative',marginTop:'auto',textAlign:'left'}
+        : {position:'relative',background:c.bg,padding:'34px 26px 6px',textAlign:'center'},
+      seal:{width:'40px',display:'block',margin: isDesktop?'0 0 14px':'0 auto 14px',opacity:.9},
+      eyebrow:{fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:'10.5px',letterSpacing:'.2em',textTransform:'uppercase',color:c.sand,margin:'0 0 10px'},
+      title:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize: isDesktop?'clamp(3rem,4vw,3.6rem)':'clamp(2.8rem,11vw,3.6rem)',lineHeight:1.05,margin:'0 0 6px',color:c.ink},
+      titleAmp:{color:c.sand,fontWeight:600},
+      underline:{width:'40px',height:'1px',background:c.sand,margin: isDesktop?'6px 0 12px':'6px auto 12px'},
+      dateLine:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:'12.5px',color:c.inkSoft,margin:0,letterSpacing:'.06em'},
+      nav:{marginTop:'26px',display:'flex',flexDirection:'column',gap:'2px'},
+      navItem:{display:'flex',alignItems:'center',gap:'10px',padding:'9px 0',color:c.inkSoft,fontFamily:"'DM Sans',sans-serif",fontSize:'13px',fontWeight:300,borderBottom:`1px solid ${c.sand}22`},
+      navNum:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',color:c.sand},
+
+      mainCol:{},
+      kicker:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'16px',color:c.inkSoft,margin:'0 0 18px',textAlign:'center'},
+      kickerSpaced:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'16px',color:c.inkSoft,margin:'38px 0 18px',textAlign:'center'},
+      kickerOnDark:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'16px',color:c.aqua,margin:'0 0 10px',textAlign:'center'},
+      sectionIcon:{width:'40px',display:'block',margin:'0 auto 12px'},
+      divider:{width:'210px',display:'block',margin:'0 auto 20px'},
+
+      countdownSection:{padding: isDesktop?'46px 52px':'38px 24px',background:c.bg,position:'relative',overflow:'hidden'},
+      watermarkSoft:{position:'absolute',inset:0,backgroundImage:wm,backgroundSize:'220px 220px',opacity:.05,pointerEvents:'none'},
+      countdownWrap:{display:'flex',gap:'10px',position:'relative'},
+      cdBox:{flex:1,textAlign:'center',padding:'16px 6px',background:c.bgAlt+'33',border:`1px solid ${c.inkSoft}44`},
+      cdNum:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'28px',display:'block',color:c.ink},
+      cdLabel:{fontSize:'9.5px',textTransform:'uppercase',letterSpacing:'.14em',fontWeight:500,color:c.inkSoft,fontFamily:"'DM Sans',sans-serif"},
+
+      quoteSection:{padding: isDesktop?'56px 64px':'44px 26px',background:c.bgAlt+'33',textAlign:'center',borderTop:`1px solid ${c.sand}22`,borderBottom:`1px solid ${c.sand}22`},
+      quoteDoodle:{width:'34px',display:'block',margin:'0 auto 16px',animation:'twinkleDoodle 6s ease-in-out infinite'},
+      quoteText:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize: isDesktop?'clamp(1.5rem,2vw,1.9rem)':'clamp(1.25rem,5vw,1.55rem)',lineHeight:1.6,margin:0,color:c.ink,maxWidth:'620px',marginLeft:'auto',marginRight:'auto'},
+
+      section:{padding: isDesktop?'50px 52px':'40px 24px',background:c.bg},
+      addrCard:{background:c.bgAlt+'2A',padding:'22px 24px',marginBottom:'16px',border:`1px solid ${c.sand}33`,textAlign:'center'},
+      addrKicker:{fontFamily:"'DM Sans',sans-serif",fontWeight:500,fontSize:'10px',textTransform:'uppercase',letterSpacing:'.2em',color:c.sand,display:'block',marginBottom:'10px'},
+      addrTitle:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'22px',margin:'0 0 10px',color:c.ink},
+      addrRow:{margin:'0 0 5px',fontSize:'13px',color:c.inkSoft,fontFamily:"'DM Sans',sans-serif",fontWeight:300,letterSpacing:'.04em'},
+      mapBtn:{fontSize:'11px',fontWeight:500,color:c.sand,fontFamily:"'DM Sans',sans-serif",display:'inline-block',marginTop:'10px',letterSpacing:'.12em',textTransform:'uppercase',borderBottom:`1px solid ${c.sand}`,paddingBottom:'3px'},
+      schedRow:{display:'flex',gap:'18px',padding:'13px 0',borderBottom:`1px solid ${c.sand}2A`,alignItems:'center',justifyContent:'center'},
+      schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.inkSoft,minWidth:'54px',fontWeight:700},
+      schedLabel:{fontFamily:"'DM Sans',sans-serif",fontSize:'13.5px',color:c.ink,fontWeight:300,letterSpacing:'.08em'},
+
+      albumSection:{padding: isDesktop?'50px 52px':'40px 24px',background:c.bgAlt+'26'},
+      galleryWrap: {display:'flex',justifyContent:'center',alignItems:'center',height: isDesktop?'240px':'200px',position:'relative'},
+      galleryImg:{width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'saturate(1.05) contrast(1.02)',border:'6px solid #fff',boxShadow:'0 10px 22px rgba(27,58,92,.22)'},
+
+      mapPlaceholder:{height:'170px',background:c.bg,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'10px',borderTop:`1px solid ${c.sand}22`,borderBottom:`1px solid ${c.sand}22`},
+      mapPin:{width:'30px'},
+      mapText:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,color:c.inkSoft,fontSize:'12px',letterSpacing:'.14em',textTransform:'uppercase'},
+
+      rsvpSection:{padding: isDesktop?'54px 52px':'44px 24px',background:c.ink,color:c.bg,textAlign:'center'},
+      rsvpRings:{width:'100px',display:'block',margin:'0 auto 18px'},
+      rsvpTitle:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'clamp(1.7rem,5vw,2.1rem)',margin:'0 0 4px',color:c.bg},
+      fieldLabel:{display:'block',fontSize:'10px',textTransform:'uppercase',fontWeight:500,letterSpacing:'.2em',opacity:.7,marginBottom:'8px',fontFamily:"'DM Sans',sans-serif",color:c.bg,textAlign:'left'},
+      fieldInput:{width:'100%',padding:'14px 16px',border:`1px solid rgba(244,249,251,.35)`,background:'rgba(244,249,251,.06)',color:c.bg,fontSize:'14px',fontFamily:"'DM Sans',sans-serif",fontWeight:300},
+      rsvpBtnSolid:{flex:1,padding:'15px',border:'none',background:c.aqua,color:c.ink,fontWeight:500,fontSize:'11px',letterSpacing:'.18em',textTransform:'uppercase',cursor:'pointer',fontFamily:"'DM Sans',sans-serif"},
+      rsvpBtnGhost:{padding:'15px 18px',border:`1px solid rgba(244,249,251,.5)`,background:'transparent',color:c.bg,fontWeight:400,fontSize:'11px',cursor:'pointer',fontFamily:"'DM Sans',sans-serif",letterSpacing:'.14em',textTransform:'uppercase'},
+
+      giftGrid: isDesktop ? {display:'grid',gridTemplateColumns:'1fr',gap:'16px'} : {display:'flex',flexDirection:'column',gap:'14px'},
+      giftCard:{background:c.bgAlt+'26',padding:'22px',border:`1px solid ${c.sand}33`,textAlign:'center'},
+      giftCardTitle:{fontFamily:"'Playfair Display',serif",fontStyle:'italic',fontWeight:600,fontSize:'19px',color:c.ink,display:'block',marginBottom:'14px'},
+      copyRow:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 0',borderTop:`1px solid ${c.sand}2A`,minWidth:0},
+      copyLabel:{fontSize:'10.5px',fontWeight:500,textTransform:'uppercase',letterSpacing:'.06em',color:c.inkSoft,fontFamily:"'DM Sans',sans-serif"},
+      copyValue:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.inkSoft,fontWeight:700,overflowWrap:'anywhere'},
+
+      musicInput:{flex:1,minWidth:0,padding:'14px 16px',border:`1px solid ${c.sand}44`,background:c.bgAlt+'26',fontSize:'13px',fontFamily:"'DM Sans',sans-serif",fontWeight:300,color:c.ink},
+      musicSendBtn:{padding:'14px 24px',border:'none',background:c.ink,color:c.bg,fontWeight:500,fontSize:'12px',cursor:'pointer',fontFamily:"'DM Sans',sans-serif",letterSpacing:'.04em'},
+      musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px',background:c.bgAlt+'26',borderRadius:'2px',marginBottom:'8px',border:`1px solid ${c.sand}26`},
+      musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:"'DM Sans',sans-serif",fontWeight:500,color:c.ink},
+      musicRowSub:{opacity:.7,fontSize:'11.5px',fontFamily:"'DM Sans',sans-serif",color:c.inkSoft,fontWeight:300},
+      musicBadge:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'12px',background:'none',border:`1px solid ${c.inkSoft}`,color:c.inkSoft,padding:'6px 12px',cursor:'pointer'},
+
+      footer:{padding:'36px 24px 90px',textAlign:'center',background:c.bgAlt+'26',borderTop:`1px solid ${c.sand}22`},
+      footerGarland:{width:'170px',display:'block',margin:'0 auto 14px'},
+      footerText:{fontSize:'10.5px',color:c.inkSoft,fontFamily:"'DM Sans',sans-serif",fontWeight:300,letterSpacing:'.1em'},
+
+      bottomPill:{position:'sticky',bottom:'16px',left:0,right:0,margin:'0 16px',display:'flex',justifyContent:'space-around',background:'rgba(27,58,92,.94)',borderRadius:'999px',padding:'14px 10px',boxShadow:'0 12px 30px rgba(27,58,92,.3)',border:`1px solid ${c.sand}33`},
+      bottomPillItem:{color:c.aqua,fontSize:'10px',fontWeight:500,fontFamily:"'DM Sans',sans-serif",letterSpacing:'.1em',textTransform:'uppercase'},
+    };
+  }
+
+  renderVals(){
+    const isDesktop = this.state.device==='desktop';
+    const isMobile = !isDesktop;
+    const styles = this.buildStyles(isDesktop, this.state.scrollY);
+    const showSplash = isMobile && !this.state.opened;
+    const contentVisible = !showSplash;
+
+    return {
+      styles, isDesktop, isMobile, showSplash, contentVisible,
+      isMobileNavVisible: isMobile && this.state.opened,
+      guestName: 'Familia Duarte',
+      titleLetters: (()=>{
+        const text = 'Mili & Gastón';
+        let delay = 0;
+        return text.split('').map((ch)=>{
+          const isSpace = ch===' ';
+          const isAmp = ch==='&';
+          if(!isSpace) delay += 70;
+          return { ch: isSpace?'\u00A0':ch, style:{
+            display:'inline-block',
+            color: isAmp ? '#C9A96E' : undefined,
+            animation: isSpace?undefined:`letterWrite .5s ease-out ${delay}ms both`,
+          }};
+        });
+      })(),
+      handleScroll: (e)=>this.handleScroll(e),
+      mobileBtnStyle:{fontFamily:"'DM Sans',sans-serif",fontSize:'12px',fontWeight:500,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isMobile?'#F4F9FB':'transparent',color: isMobile?'#1B3A5C':'#a8c4d8'},
+      desktopBtnStyle:{fontFamily:"'DM Sans',sans-serif",fontSize:'12px',fontWeight:500,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isDesktop?'#F4F9FB':'transparent',color: isDesktop?'#1B3A5C':'#a8c4d8'},
+      setMobile: ()=>this.setMobile(),
+      setDesktop: ()=>this.setDesktop(),
+      openCard: ()=>this.openCard(),
+      frameHint: isMobile ? 'Modo celular: portada con avioneta y olas doodle, luego scroll con parallax suave en la foto.' : 'Modo escritorio: aside con foto enmarcada por brújula y valija, polaroid y sol saliendo del marco.',
+      outerFrameStyle: isMobile
+        ? {width:'390px',maxWidth:'100%',background:'#000',borderRadius:'44px',padding:'14px',boxShadow:'0 30px 60px rgba(27,58,92,.35)',display:'flex',flexDirection:'column'}
+        : {width:'1180px',maxWidth:'100%'},
+      screenStyle: isMobile
+        ? {height:'800px',overflowY:'auto',borderRadius:'30px',background:'#F4F9FB',position:'relative',scrollbarWidth:'none'}
+        : {borderRadius:'4px',background:'#F4F9FB',position:'relative',boxShadow:'0 30px 70px rgba(27,58,92,.14)',overflow:'hidden'},
+
+      navItems: [
+        {num:'01',label:'Detalles',short:'Info'},{num:'02',label:'Mapa',short:'Mapa'},{num:'03',label:'Confirmar',short:'RSVP'},
+        {num:'04',label:'Banco',short:'Banco'},{num:'05',label:'Música',short:'Música'},{num:'06',label:'Álbum',short:'Álbum'}
+      ],
+      countdownBoxes:[{n:'63',l:'días'},{n:'08',l:'hs'},{n:'40',l:'min'},{n:'12',l:'seg'}],
+      scheduleItems:[{time:'18:30',label:'Ceremonia'},{time:'20:30',label:'Recepción'},{time:'21:30',label:'Cena'},{time:'23:30',label:'Fiesta'}],
+      galleryImages:['img/casamiento/istockphoto-1078252368-1024x1024.jpg','img/casamiento/istockphoto-1135139821-1024x1024.jpg','img/casamiento/istockphoto-1173516409-1024x1024.jpg','img/casamiento/istockphoto-1093617712-1024x1024.jpg'].map((src,i)=>{
+        const isD = this.state.device==='desktop';
+        const w = isD?190:150, h = isD?190:150;
+        const rots=[-6,3,-3,5], offs=[-24,-8,8,24];
+        return {src, wrapStyle:{position:'absolute',width:w+'px',height:h+'px',left:'50%',top:'50%',
+          transform:`translate(-50%,-50%) translateX(${offs[i]*(isD?1.3:1)}px) rotate(${rots[i]}deg)`,
+          zIndex:i, overflow:'hidden', borderRadius:'2px'}};
+      }),
+      musicItems: [{t:'Bésame Mucho',s:'Cesária Évora',badge:'♥ 10'},{t:'Corcovado',s:'João Gilberto',badge:'♥ 7'}].map((m,i)=>{
+        const key='m'+i; const votes=this.state.votes[key]||0; const base=parseInt(m.badge.match(/\d+/)[0],10);
+        return {t:m.t,s:m.s,badge:m.badge.replace(/\d+/, base+votes),vote:()=>this.vote(key)};
+      }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

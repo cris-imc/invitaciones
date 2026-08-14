@@ -14,6 +14,25 @@ import {
     ELEGANT_COLORS,
     NEON_COLORS,
     CHIC_COLORS,
+    EDITORIAL_COLORS,
+    ONIX_COLORS,
+    JARDINSEDA_COLORS,
+    HOLOGRAMA_COLORS,
+    CIRCUITO_COLORS,
+    CRISTAL3D_COLORS,
+    CINE_COLORS,
+    NORDICO_COLORS,
+    RIVIERA_COLORS,
+    GOLDENDUSK_COLORS,
+    SEDA_COLORS,
+    PETALOS_COLORS,
+    LUZLUNA_COLORS,
+    BONVOYAGE_COLORS,
+    CORPORATE_COLORS,
+    GARDENPARTY_COLORS,
+    LOFTINDUSTRIAL_COLORS,
+    INFANTIL_COLORS,
+    TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
 import { Wand2 } from "lucide-react";
@@ -23,19 +42,55 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     MODERNO: "Moderno",
     NEON: "Neon",
     CHIC: "Chic",
+    EDITORIAL: "Editorial",
+    ONIX: "Ónix",
+    JARDINSEDA: "Jardín de Seda",
+    HOLOGRAMA: "Holograma",
+    CIRCUITO: "Circuito",
+    CRISTAL3D: "Cristal 3D",
+    CINE: "Cine",
+    NORDICO: "Atelier Nórdico",
+    RIVIERA: "Riviera",
+    GOLDENDUSK: "Golden Dusk",
+    SEDA: "Seda",
+    PETALOS: "Pétalos",
+    LUZLUNA: "Luz de Luna",
+    BONVOYAGE: "Bon Voyage",
+    CORPORATE: "Corporate",
+    GARDENPARTY: "Garden Party",
+    LOFTINDUSTRIAL: "Loft Industrial",
+    INFANTIL: "Infantil",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
     MODERNO: MODERNO_COLORS,
     NEON: NEON_COLORS,
     CHIC: CHIC_COLORS,
+    EDITORIAL: EDITORIAL_COLORS,
+    ONIX: ONIX_COLORS,
+    JARDINSEDA: JARDINSEDA_COLORS,
+    HOLOGRAMA: HOLOGRAMA_COLORS,
+    CIRCUITO: CIRCUITO_COLORS,
+    CRISTAL3D: CRISTAL3D_COLORS,
+    CINE: CINE_COLORS,
+    NORDICO: NORDICO_COLORS,
+    RIVIERA: RIVIERA_COLORS,
+    GOLDENDUSK: GOLDENDUSK_COLORS,
+    SEDA: SEDA_COLORS,
+    PETALOS: PETALOS_COLORS,
+    LUZLUNA: LUZLUNA_COLORS,
+    BONVOYAGE: BONVOYAGE_COLORS,
+    CORPORATE: CORPORATE_COLORS,
+    GARDENPARTY: GARDENPARTY_COLORS,
+    LOFTINDUSTRIAL: LOFTINDUSTRIAL_COLORS,
+    INFANTIL: INFANTIL_COLORS,
 };
-const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = {
-    ELEGANT: "1px solid rgba(0,0,0,.15)",
-    MODERNO: "2px solid #C9A876",
-    NEON: "2px solid #39FFD0",
-    CHIC: "2px solid #C9A876",
-};
+const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
+    (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [
+        tipo,
+        tipo === "ELEGANT" ? "1px solid rgba(0,0,0,.15)" : `2px solid ${TEMPLATE_TIPO_ACCENT[tipo]}`,
+    ])
+) as Record<TemplateTipo, string>;
 
 
 
@@ -46,7 +101,9 @@ export function StepDesign() {
     const selectedTemplate = data.templateTipo || "ORIGINAL";
 
     const isDesignEvent = ['CASAMIENTO', 'QUINCE_ANOS', 'CUMPLEANOS'].includes(data.type ?? '');
-    const activeTemplateTipo: TemplateTipo = (data.templateTipo === 'MODERNO' || data.templateTipo === 'NEON' || data.templateTipo === 'CHIC') ? data.templateTipo : 'ELEGANT';
+    const activeTemplateTipo: TemplateTipo = (data.templateTipo && (data.templateTipo as string) in TEMPLATE_TIPO_LABEL)
+        ? (data.templateTipo as TemplateTipo)
+        : 'ELEGANT';
     const activeColorId = themeConfig?.colorPrincipal || 'default';
     const activeColorList = TEMPLATE_TIPO_COLORS[activeTemplateTipo];
     const activeColorOption = activeColorList.find(c => c.id === activeColorId) ?? activeColorList[0];

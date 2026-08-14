@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Fraunces:ital,wght@0,500;1,500&family=Space+Grotesk:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#EDEBE5;font-family:'Sora',sans-serif;color:#1a1a1a;}
+a{color:inherit;text-decoration:none;}
+a:hover{opacity:.75;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+@keyframes confettiFall{0%{transform:translateY(-10%) rotate(0deg);opacity:0;}10%{opacity:.9;}100%{transform:translateY(420%) rotate(200deg);opacity:0;}}
+</style>
+</helmet>
+
+<div style="max-width:1400px;margin:0 auto;padding:28px 20px 80px;">
+
+  <div style="max-width:860px;margin:0 0 28px;">
+    <p style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8a8578;margin:0 0 10px;">Convite &middot; Pack Eventos Gen&eacute;ricos</p>
+    <h1 style="font:600 30px/1.25 'Sora',sans-serif;margin:0 0 12px;">6 plantillas premium para cumplea&ntilde;os y eventos empresariales</h1>
+    <p style="font:400 14.5px/1.65 'Sora',sans-serif;color:#4a473e;margin:0 0 10px;">3 sistemas nuevos, cada uno en versi&oacute;n clara y oscura/vibrante: <strong>Minimal Corporate</strong> (gris grafito + azul, sobrio para eventos de empresa), <strong>Garden Party</strong> (pastel c&aacute;lido, para cumplea&ntilde;os de adultos) y <strong>Loft Industrial</strong> (concreto + negro, para after-office o aniversarios de marca). Mismo orden de secciones y toggle celular/escritorio que el resto de los packs.</p>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px;padding:14px 16px;background:#1a1a1a;border-radius:14px;">
+    <span style="font:700 10.5px 'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8578;margin-right:4px;">Eleg&iacute; una plantilla</span>
+    <sc-for list="{{ themesList }}" as="th" hint-placeholder-count="6">
+      <button onClick="{{ th.select }}" style="{{ th.chipStyle }}">{{ th.label }}</button>
+    </sc-for>
+    <div style="flex:1;"></div>
+    <div style="display:flex;gap:6px;background:#000;border-radius:999px;padding:4px;">
+      <button onClick="{{ setMobile }}" style="{{ mobileBtnStyle }}">&#128241; Celular</button>
+      <button onClick="{{ setDesktop }}" style="{{ desktopBtnStyle }}">&#128421; Escritorio</button>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:26px 0 10px;">
+    <div style="{{ outerFrameStyle }}">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <div style="height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:110px;height:16px;background:#000;border-radius:12px;"></div>
+        </div>
+      </sc-if>
+      <div style="{{ screenStyle }}">
+
+        <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ styles.splash }}">
+            <div style="{{ styles.monogram }}">{{ active.monogram }}</div>
+            <p style="{{ styles.splashGreet }}">{{ active.splashGreeting }}</p>
+            <button onClick="{{ openCard }}" style="{{ styles.splashBtn }}">{{ active.splashCta }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contentVisible }}" hint-placeholder-val="{{ true }}">
+        <div>
+
+          <section style="{{ styles.hero }}">
+            <div style="{{ styles.heroMedia }}">
+              <img src="{{ active.heroImg }}" alt="Portada" style="{{ styles.heroImg }}">
+              <div style="{{ styles.heroOverlay }}"></div>
+              <sc-if value="{{ active.showConfetti }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ styles.confetti1 }}"></div>
+                <div style="{{ styles.confetti2 }}"></div>
+              </sc-if>
+            </div>
+            <div style="{{ styles.heroContent }}">
+              <p style="{{ styles.eyebrow }}">{{ active.eyebrow }}</p>
+              <h2 style="{{ styles.title }}">{{ active.titleHtmlA }}<br>{{ active.titleHtmlB }}</h2>
+              <p style="{{ styles.dateLine }}">{{ active.dateLine }}</p>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cuenta regresiva</p>
+            <div style="{{ styles.countdownWrap }}">
+              <sc-for list="{{ countdownBoxes }}" as="cd" hint-placeholder-count="3">
+                <div style="{{ cd.boxStyle }}">
+                  <span style="{{ styles.cdNum }}">{{ cd.n }}</span>
+                  <span style="{{ styles.cdLabel }}">{{ cd.l }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.quoteSection }}">
+            <p style="{{ styles.quoteText }}">{{ active.quote }}</p>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">&Aacute;lbum</p>
+            <div style="{{ styles.galleryWrap }}">
+              <sc-for list="{{ galleryImages }}" as="g" hint-placeholder-count="3">
+                <div style="{{ g.wrapStyle }}"><img src="{{ g.src }}" alt="Momento" style="{{ styles.galleryImg }}"></div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">D&oacute;nde</p>
+            <div style="{{ styles.addrWrap }}">
+              <sc-for list="{{ addrCards }}" as="ad" hint-placeholder-count="2">
+                <div style="{{ styles.addrCard }}">
+                  <h3 style="{{ styles.addrTitle }}">{{ ad.t }}</h3>
+                  <p style="{{ styles.addrSub }}">{{ ad.s }}</p>
+                  <a href="#" style="{{ styles.mapBtn }}">Ver mapa &#8599;</a>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cronograma</p>
+            <div style="{{ styles.scheduleWrap }}">
+              <sc-for list="{{ scheduleItems }}" as="sc" hint-placeholder-count="3">
+                <div style="{{ styles.schedRow }}">
+                  <span style="{{ styles.schedTime }}">{{ sc.time }}</span>
+                  <span style="{{ styles.schedLabel }}">{{ sc.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.rsvpSection }}">
+            <p style="{{ styles.kickerOnRsvp }}">Confirmaci&oacute;n</p>
+            <h3 style="{{ styles.rsvpTitle }}">{{ active.rsvpTitle }}</h3>
+            <div style="margin:14px 0;max-width:420px;">
+              <label style="{{ styles.fieldLabel }}">Nombre y apellido</label>
+              <input value="{{ active.rsvpName }}" style="{{ styles.fieldInput }}" readonly>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button style="{{ styles.rsvpBtnSolid }}">{{ active.rsvpBtn }}</button>
+              <button style="{{ styles.rsvpBtnGhost }}">No podr&eacute;</button>
+            </div>
+          </section>
+
+          <div style="{{ styles.bottomGrid }}">
+            <section style="{{ styles.sectionInGrid }}">
+              <p style="{{ styles.kicker }}">Quiz</p>
+              <div style="{{ styles.quizCard }}">
+                <p style="{{ styles.quizQ }}">{{ active.quizQ }}</p>
+                <sc-for list="{{ quizOptions }}" as="qo" hint-placeholder-count="3">
+                  <div style="{{ qo.style }}">{{ qo.text }}</div>
+                </sc-for>
+              </div>
+            </section>
+
+            <section style="{{ styles.sectionInGrid }}">
+              <p style="{{ styles.kicker }}">{{ active.giftKicker }}</p>
+              <div style="{{ styles.giftCard }}">
+                <h3 style="{{ styles.giftTitle }}">{{ active.giftTitle }}</h3>
+                <p style="{{ styles.giftBody }}">{{ active.giftIntro }}</p>
+                <div style="{{ styles.giftAliasBox }}">{{ active.giftAlias }}</div>
+              </div>
+            </section>
+
+            <section style="{{ styles.sectionInGrid }}">
+              <p style="{{ styles.kicker }}">{{ active.musicKicker }}</p>
+              <h3 style="{{ styles.musicTitle }}">{{ active.musicTitle }}</h3>
+              <p style="{{ styles.musicSub }}">{{ active.musicSub }}</p>
+              <div style="display:flex;gap:8px;margin:14px 0;">
+                <input placeholder="{{ active.musicPlaceholder }}" style="{{ styles.musicInput }}" readonly>
+                <button style="{{ styles.musicSendBtn }}">Enviar</button>
+              </div>
+              <sc-for list="{{ musicItems }}" as="mi" hint-placeholder-count="2">
+                <div style="{{ styles.musicRow }}">
+                  <div><b style="{{ styles.musicRowTitle }}">{{ mi.t }}</b><span style="{{ styles.musicRowSub }}">{{ mi.s }}</span></div>
+                  <button onClick="{{ mi.vote }}" style="{{ styles.musicBadge }}">{{ mi.badge }}</button>
+                </div>
+              </sc-for>
+            </section>
+          </div>
+
+          <footer style="{{ styles.footer }}">
+            <div style="{{ styles.footerMono }}">{{ active.monogram }}</div>
+            <small style="{{ styles.footerText }}">{{ active.footerText }}</small>
+          </footer>
+
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font:400 12px 'Sora',sans-serif;color:#8a8578;margin:6px 0 0;">{{ frameHint }}</p>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  THEMES = [
+    { id:'corp-light', layout:'P', name:'Encuentro Anual (Corp. Claro)',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#F5F6F8',bg2:'#EBEDF2',ink:'#141A2E',inkSoft:'#5C6478',accent:'#2952E3',accent2:'#141A2E',onDark:'#F5F6F8',line:'#DCE0EA'},
+      heroImg:'img/evento/istockphoto-1143164411-2048x2048.jpg', showConfetti:false,
+      galleryImgs:['img/evento/istockphoto-1151176846-2048x2048.jpg','img/evento/istockphoto-1158555109-2048x2048.jpg','img/evento/istockphoto-1143164411-2048x2048.jpg'],
+      monogram:'AE', eyebrow:'Encuentro anual de equipo', titleHtmlA:'Encuentro', titleHtmlB:'Anual 2026', dateLine:'18 de noviembre de 2026 — Centro de Convenciones',
+      cdBoxes:[{n:'22',l:'días'},{n:'05',l:'hs'},{n:'30',l:'min'}],
+      splashGreeting:'Te esperamos', splashCta:'Ver invitación',
+      quote:'“Un año de logros compartidos merece festejarse juntos.”',
+      addr:[{t:'Acreditación',s:'18:00 hs · Hall principal'},{t:'Cena y after',s:'20:00 hs · Salón Roble'}],
+      schedule:[{time:'18:00',label:'Acreditación'},{time:'18:30',label:'Palabras de apertura'},{time:'20:00',label:'Cena'},{time:'22:00',label:'DJ set'}],
+      rsvpTitle:'Confirmá tu asistencia', rsvpName:'María Fernández', rsvpBtn:'Confirmar',
+      quizQ:'¿En qué año se fundó la empresa?', quizOpts:['2014','2016','2018'],
+      giftKicker:'Aporte', giftTitle:'Bono para el brindis común', giftIntro:'Si querés colaborar con el brindis de cierre, dejamos un alias.', giftAlias:'equipo.brindis2026',
+      musicKicker:'Playlist', musicTitle:'Sugerí una canción', musicSub:'Para el after de la noche.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Blinding Lights',s:'The Weeknd',badge:'♥ 9'},{t:'Levitating',s:'Dua Lipa',badge:'♥ 6'}],
+      footerText:'Gracias por ser parte de este equipo' },
+
+    { id:'corp-dark', layout:'P', name:'Encuentro Anual (Corp. Oscuro)',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#10131C',bg2:'#171B27',ink:'#EDEFF5',inkSoft:'#8990A6',accent:'#5C8DFF',accent2:'#EDEFF5',onDark:'#EDEFF5',line:'rgba(92,141,255,.25)'},
+      heroImg:'img/evento/istockphoto-1158593205-2048x2048.jpg', showConfetti:false,
+      galleryImgs:['img/evento/istockphoto-1321464782-2048x2048.jpg','img/evento/istockphoto-872162536-2048x2048.jpg','img/evento/istockphoto-1158593205-2048x2048.jpg'],
+      monogram:'GS', eyebrow:'Gala de fin de año', titleHtmlA:'Gala', titleHtmlB:'Fin de Año', dateLine:'12 de diciembre de 2026 — Torre Norte, piso 30',
+      cdBoxes:[{n:'56',l:'días'},{n:'11',l:'hs'},{n:'05',l:'min'}],
+      splashGreeting:'Te esperamos', splashCta:'Ver invitación',
+      quote:'“Cerramos el año como lo hacemos todo: juntos.”',
+      addr:[{t:'Recepción',s:'19:30 hs · Lobby Torre Norte'},{t:'Cena y show',s:'21:00 hs · Salón Panorámico'}],
+      schedule:[{time:'19:30',label:'Recepción'},{time:'21:00',label:'Cena'},{time:'22:30',label:'Reconocimientos'},{time:'23:30',label:'Fiesta'}],
+      rsvpTitle:'Confirmá tu asistencia', rsvpName:'Diego Almada', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál fue el proyecto destacado del año?', quizOpts:['Proyecto Aurora','Proyecto Nexo','Proyecto Vega'],
+      giftKicker:'Aporte', giftTitle:'Bono para el brindis común', giftIntro:'Si querés colaborar con el cierre de año, dejamos un alias.', giftAlias:'equipo.gala2026',
+      musicKicker:'Playlist', musicTitle:'Sugerí una canción', musicSub:'Para el after de la noche.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Instant Crush',s:'Daft Punk',badge:'♥ 8'},{t:'Somebody Else',s:'The 1975',badge:'♥ 5'}],
+      footerText:'Gracias por un gran año juntos' },
+
+    { id:'garden-light', layout:'Q', name:'Cumple de Valeria (Garden Claro)',
+      displayFont:"'Fraunces',serif", bodyFont:"'Poppins',sans-serif",
+      colors:{bg:'#FBF4EC',bg2:'#F5E6D6',ink:'#3A2A22',inkSoft:'#8a7462',accent:'#D97757',accent2:'#7C9473',onDark:'#FBF4EC',line:'rgba(217,119,87,.3)'},
+      heroImg:'img/evento/istockphoto-1151176846-2048x2048.jpg', showConfetti:true,
+      galleryImgs:['img/evento/istockphoto-1143164411-2048x2048.jpg','img/evento/istockphoto-1158555109-2048x2048.jpg','img/evento/istockphoto-1151176846-2048x2048.jpg'],
+      monogram:'V', eyebrow:'Cumpleaños', titleHtmlA:'Valeria', titleHtmlB:'cumple 40', dateLine:'25 de octubre de 2026 — Quinta Los Aromos',
+      cdBoxes:[{n:'40',l:'días'},{n:'09',l:'hs'},{n:'15',l:'min'}],
+      splashGreeting:'¡Vení a festejar!', splashCta:'Abrir invitación',
+      quote:'“40 y con más ganas de celebrar que nunca.”',
+      addr:[{t:'Recepción',s:'20:00 hs · Jardín principal'},{t:'Fiesta',s:'21:30 hs · Quinta Los Aromos'}],
+      schedule:[{time:'20:00',label:'Recepción'},{time:'21:30',label:'Cena'},{time:'23:00',label:'Torta'},{time:'23:30',label:'Fiesta'}],
+      rsvpTitle:'¿Venís a mi cumple?', rsvpName:'Fam. Correa', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál es mi comida favorita?', quizOpts:['Asado','Sushi','Pastas'],
+      giftKicker:'Regalo', giftTitle:'Si querés hacerme un regalo', giftIntro:'Alias o efectivo el día de la fiesta.', giftAlias:'valeria.cumple',
+      musicKicker:'Música', musicTitle:'Sugerí una canción', musicSub:'Para que no falte en la pista.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Color Esperanza',s:'Diego Torres',badge:'♥ 11'},{t:'La Bilirrubina',s:'Juan Luis Guerra',badge:'♥ 8'}],
+      footerText:'Gracias por venir a festejar conmigo' },
+
+    { id:'garden-vibrant', layout:'Q', name:'Cumple de Nico (Garden Vibrante)',
+      displayFont:"'Fraunces',serif", bodyFont:"'Poppins',sans-serif",
+      colors:{bg:'#FFF4F0',bg2:'#FFE1D6',ink:'#411D14',inkSoft:'#9c5a45',accent:'#FF5A36',accent2:'#2FA88A',onDark:'#FFF4F0',line:'rgba(255,90,54,.3)'},
+      heroImg:'img/evento/istockphoto-1158555109-2048x2048.jpg', showConfetti:true,
+      galleryImgs:['img/evento/istockphoto-1321464782-2048x2048.jpg','img/evento/istockphoto-872162536-2048x2048.jpg','img/evento/istockphoto-1158555109-2048x2048.jpg'],
+      monogram:'N', eyebrow:'Cumpleaños', titleHtmlA:'Nico', titleHtmlB:'cumple 30', dateLine:'7 de marzo de 2027 — Rooftop Centro',
+      cdBoxes:[{n:'207',l:'días'},{n:'14',l:'hs'},{n:'40',l:'min'}],
+      splashGreeting:'¡Se viene la fiesta!', splashCta:'Abrir invitación',
+      quote:'“30 se festejan una sola vez, ¡y a lo grande!”',
+      addr:[{t:'Recepción',s:'21:00 hs · Rooftop Centro'},{t:'Fiesta',s:'22:00 hs · Terraza principal'}],
+      schedule:[{time:'21:00',label:'Recepción'},{time:'22:00',label:'Brindis'},{time:'23:00',label:'Torta'},{time:'00:00',label:'Fiesta'}],
+      rsvpTitle:'¿Venís a mi cumple?', rsvpName:'Fam. Iturbe', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál es mi serie favorita?', quizOpts:['Stranger Things','The Boys','Wednesday'],
+      giftKicker:'Regalo', giftTitle:'Si querés hacerme un regalo', giftIntro:'Alias o efectivo esa noche.', giftAlias:'nico.cumple30',
+      musicKicker:'Música', musicTitle:'Sugerí una canción', musicSub:'Para que no falte en la pista.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Titanium',s:'David Guetta',badge:'♥ 14'},{t:'Tusa',s:'Karol G',badge:'♥ 10'}],
+      footerText:'Gracias por venir a festejar conmigo' },
+
+    { id:'loft-light', layout:'R', name:'Aniversario Estudio (Loft Claro)',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#F2F1EE',bg2:'#E6E4DE',ink:'#161513',inkSoft:'#6b6862',accent:'#C0392B',accent2:'#161513',onDark:'#F2F1EE',line:'#D6D3CB'},
+      heroImg:'img/evento/istockphoto-872162536-2048x2048.jpg', showConfetti:false,
+      galleryImgs:['img/evento/istockphoto-1143164411-2048x2048.jpg','img/evento/istockphoto-1321464782-2048x2048.jpg','img/evento/istockphoto-872162536-2048x2048.jpg'],
+      monogram:'10', eyebrow:'10 años de estudio', titleHtmlA:'10 años', titleHtmlB:'de historia', dateLine:'5 de septiembre de 2026 — Galpón Fábrica',
+      cdBoxes:[{n:'23',l:'días'},{n:'07',l:'hs'},{n:'50',l:'min'}],
+      splashGreeting:'Te esperamos para celebrar', splashCta:'Ver invitación',
+      quote:'“Diez años construyendo algo que nos enorgullece.”',
+      addr:[{t:'Recepción',s:'19:00 hs · Patio Galpón Fábrica'},{t:'Fiesta',s:'20:30 hs · Nave principal'}],
+      schedule:[{time:'19:00',label:'Recepción'},{time:'20:30',label:'Palabras'},{time:'21:00',label:'Cena'},{time:'23:00',label:'DJ set'}],
+      rsvpTitle:'Confirmá tu asistencia', rsvpName:'Equipo Estudio Norte', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál fue nuestro primer proyecto?', quizOpts:['Edificio Aurora','Casa Roble','Local Nexo'],
+      giftKicker:'Aporte', giftTitle:'Bono para el brindis común', giftIntro:'Si querés colaborar con el festejo, dejamos un alias.', giftAlias:'estudio.10anios',
+      musicKicker:'Playlist', musicTitle:'Sugerí una canción', musicSub:'Para la pista de esta noche.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Get Lucky',s:'Daft Punk',badge:'♥ 7'},{t:'One More Time',s:'Daft Punk',badge:'♥ 6'}],
+      footerText:'Gracias por diez años de historia compartida' },
+
+    { id:'loft-dark', layout:'R', name:'Aniversario Estudio (Loft Oscuro)',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#121212',bg2:'#1C1C1C',ink:'#F0EFEC',inkSoft:'#9C9992',accent:'#E0B84B',accent2:'#F0EFEC',onDark:'#F0EFEC',line:'rgba(224,184,75,.25)'},
+      heroImg:'img/evento/istockphoto-1321464782-2048x2048.jpg', showConfetti:false,
+      galleryImgs:['img/evento/istockphoto-1158593205-2048x2048.jpg','img/evento/istockphoto-1158555109-2048x2048.jpg','img/evento/istockphoto-1321464782-2048x2048.jpg'],
+      monogram:'15', eyebrow:'15 años de marca', titleHtmlA:'15 años', titleHtmlB:'de marca', dateLine:'20 de noviembre de 2026 — Depósito Central',
+      cdBoxes:[{n:'99',l:'días'},{n:'02',l:'hs'},{n:'10',l:'min'}],
+      splashGreeting:'Te esperamos para celebrar', splashCta:'Ver invitación',
+      quote:'“Quince años después, seguimos eligiendo crecer juntos.”',
+      addr:[{t:'Recepción',s:'20:00 hs · Entrada Depósito Central'},{t:'Fiesta',s:'21:30 hs · Nave principal'}],
+      schedule:[{time:'20:00',label:'Recepción'},{time:'21:30',label:'Palabras'},{time:'22:00',label:'Cena'},{time:'00:00',label:'DJ set'}],
+      rsvpTitle:'Confirmá tu asistencia', rsvpName:'Equipo Comercial', rsvpBtn:'Confirmar',
+      quizQ:'¿En qué ciudad abrimos la primera sucursal?', quizOpts:['Córdoba','Rosario','Mendoza'],
+      giftKicker:'Aporte', giftTitle:'Bono para el brindis común', giftIntro:'Si querés colaborar con el festejo, dejamos un alias.', giftAlias:'marca.15anios',
+      musicKicker:'Playlist', musicTitle:'Sugerí una canción', musicSub:'Para la pista de esta noche.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Genesis',s:'Grimes',badge:'♥ 5'},{t:'Physical',s:'Dua Lipa',badge:'♥ 9'}],
+      footerText:'Gracias por quince años de camino compartido' }
+  ];
+
+  state = { activeId: this.THEMES[0].id, device:'mobile', opened:false, votes:{} };
+
+  find(id){ return this.THEMES.find(t=>t.id===id) || this.THEMES[0]; }
+
+  buildStyles(t, device){
+    const c = t.colors, disp = t.displayFont, body = t.bodyFont;
+    const isDesktop = device==='desktop';
+    const base = {
+      section:{padding: isDesktop ? '48px 64px' : '34px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg,color:c.ink,fontFamily:body},
+      kicker:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.accent,margin:'0 0 10px'},
+      kickerOnRsvp:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.onDark,opacity:.75,margin:'0 0 10px'},
+      heroImg:{width:'100%',height:'100%',objectFit:'cover',position:'absolute',inset:0},
+      galleryImg:{width:'100%',height:'100%',objectFit:'cover',display:'block'},
+      fieldLabel:{display:'block',fontSize:'10.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.6,marginBottom:'6px',fontFamily:body,color:c.ink},
+      fieldInput:{width:'100%',padding:'12px 14px',borderRadius:'6px',border:`1px solid ${c.line}`,background:c.bg2,fontSize:'14px',color:c.ink,fontFamily:body},
+      heroMedia: isDesktop ? {position:'relative',height:'100%',overflow:'hidden'} : {position:'absolute',inset:0},
+      addrWrap: isDesktop ? {display:'flex',gap:'20px'} : {display:'block'},
+      scheduleWrap: isDesktop ? {maxWidth:'640px',margin:'0 auto'} : {},
+      bottomGrid: isDesktop ? {display:'grid',gridTemplateColumns:'1fr 1fr 1fr',minWidth:0} : {display:'block'},
+      sectionInGrid:{padding: isDesktop ? '30px 26px' : '34px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg,color:c.ink,fontFamily:body,minWidth:0,overflow:'hidden'},
+      confetti1:{position:'absolute',width:'12px',height:'16px',left:'20%',top:'-6%',background:c.accent,opacity:.8,animation:'confettiFall 8s linear infinite',borderRadius:'2px'},
+      confetti2:{position:'absolute',width:'10px',height:'14px',left:'65%',top:'-8%',background:c.accent2,opacity:.7,animation:'confettiFall 10s linear infinite 3s',borderRadius:'2px'},
+      giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',color:c.ink,overflowWrap:'anywhere'},
+    };
+    if(t.layout==='P'){
+      return {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:c.bg,padding:'40px',textAlign:'center'},
+        monogram:{fontFamily:disp,fontWeight:700,fontSize:'22px',letterSpacing:'.05em',color:c.ink,border:`1px solid ${c.accent}`,borderRadius:'50%',width:'60px',height:'60px',display:'flex',alignItems:'center',justifyContent:'center'},
+        splashGreet:{fontFamily:body,fontSize:'14px',textTransform:'uppercase',letterSpacing:'.08em',color:c.ink,margin:0},
+        splashBtn:{fontFamily:disp,fontWeight:600,fontSize:'12px',letterSpacing:'.06em',textTransform:'uppercase',padding:'14px 30px',border:`1px solid ${c.ink}`,background:c.ink,color:c.bg,cursor:'pointer'},
+        hero:{position:'relative', height: isDesktop?'480px':'340px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1.1fr 1fr':undefined},
+        heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.55) 100%)'},
+        heroContent: isDesktop
+          ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:c.bg}
+          : {position:'relative',padding:'22px 24px',background:c.bg},
+        eyebrow:{fontFamily:body,fontWeight:600,fontSize:'10.5px',letterSpacing:'.16em',textTransform:'uppercase',color:c.accent,margin:'0 0 10px'},
+        title:{fontFamily:disp,fontWeight:700,fontSize: isDesktop?'48px':'34px',lineHeight:1.05,margin:'0 0 12px',color:c.ink},
+        dateLine:{fontFamily:body,fontSize:'12px',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex'},
+        cdNum:{fontFamily:disp,fontWeight:700,fontSize:'28px',display:'block',color:c.ink},
+        cdLabel:{fontSize:'9px',textTransform:'uppercase',letterSpacing:'.1em',opacity:.6,fontFamily:body,color:c.inkSoft},
+        quoteSection:{padding:'40px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2,textAlign:'center'},
+        quoteText:{fontFamily:disp,fontWeight:500,fontSize:'20px',lineHeight:1.5,margin:0,color:c.ink},
+        galleryWrap: isDesktop ? {display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px'} : {display:'grid',gridTemplateColumns:'1.3fr 1fr',gap:'8px',gridAutoRows:'110px'},
+        addrCard:{flex: isDesktop?1:undefined,background:c.bg2,borderRadius:'4px',padding:'18px 20px',marginBottom: isDesktop?0:'12px'},
+        addrTitle:{fontFamily:disp,fontWeight:600,fontSize:'17px',margin:'0 0 4px',color:c.ink},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11.5px',fontWeight:600,color:c.accent,fontFamily:body},
+        schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'13px',color:c.accent,minWidth:'50px'},
+        schedLabel:{fontFamily:body,fontSize:'14px',color:c.ink},
+        rsvpSection:{padding:'38px 24px',background:c.ink,color:c.onDark},
+        rsvpTitle:{fontFamily:disp,fontWeight:700,fontSize:'22px',margin:'0 0 4px',color:c.onDark},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:c.accent,color:'#fff',fontWeight:600,fontSize:'12.5px',letterSpacing:'.04em',textTransform:'uppercase',cursor:'pointer',fontFamily:body,borderRadius:'4px'},
+        rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.onDark}`,background:'transparent',color:c.onDark,fontWeight:600,fontSize:'12.5px',cursor:'pointer',fontFamily:body,borderRadius:'4px'},
+        quizCard:{border:`1px solid ${c.line}`,padding:'18px',borderRadius:'6px'},
+        quizQ:{fontFamily:disp,fontWeight:600,fontSize:'16px',margin:'0 0 12px',color:c.ink},
+        giftCard:{border:`1px solid ${c.line}`,padding:'20px',borderRadius:'6px'},
+        giftTitle:{fontFamily:disp,fontWeight:600,fontSize:'17px',margin:'0 0 6px',color:c.ink},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        musicTitle:{fontFamily:disp,fontWeight:600,fontSize:'19px',margin:'0 0 6px',color:c.ink},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,minWidth:0,padding:'12px 14px',border:`1px solid ${c.line}`,background:c.bg2,fontSize:'13px',fontFamily:body,color:c.ink,borderRadius:'4px'},
+        musicSendBtn:{padding:'12px 18px',border:'none',background:c.ink,color:c.bg,fontWeight:600,fontSize:'12px',cursor:'pointer',fontFamily:body,borderRadius:'4px'},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+        musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:"'Space Mono',monospace",fontSize:'12px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'5px 10px',cursor:'pointer',borderRadius:'4px'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:c.ink,color:c.onDark},
+        footerMono:{fontFamily:disp,fontWeight:700,fontSize:'18px',color:c.accent,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.55,fontFamily:body,color:c.onDark},
+      };
+    }
+    if(t.layout==='Q'){
+      return {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:`radial-gradient(70% 55% at 30% 15%,${c.accent}22,transparent),radial-gradient(50% 50% at 80% 70%,${c.accent2}22,transparent),${c.bg}`,padding:'40px',textAlign:'center',position:'relative',overflow:'hidden'},
+        monogram:{fontFamily:disp,fontWeight:500,fontSize:'24px',color:c.ink,border:`2px solid ${c.accent}`,borderRadius:'50%',width:'70px',height:'70px',display:'flex',alignItems:'center',justifyContent:'center'},
+        splashGreet:{fontFamily:disp,fontStyle:'italic',fontSize:'21px',color:c.ink,margin:0},
+        splashBtn:{fontFamily:body,fontWeight:600,fontSize:'11.5px',letterSpacing:'.06em',padding:'14px 32px',border:'none',background:c.accent,color:'#fff',cursor:'pointer',borderRadius:'999px'},
+        hero:{position:'relative', height: isDesktop?'480px':'360px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1fr 1fr':undefined, borderRadius: isDesktop?'0':'0 0 40px 40px', overflow:'hidden'},
+        heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.5) 100%)'},
+        heroContent: isDesktop
+          ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:c.bg}
+          : {position:'relative',padding:'26px 24px 30px',background:c.bg,borderRadius:'26px 26px 0 0',marginTop:'-26px'},
+        eyebrow:{fontFamily:body,fontSize:'11px',letterSpacing:'.1em',textTransform:'uppercase',color:c.accent2,margin:'0 0 8px'},
+        title:{fontFamily:disp,fontWeight:500,fontSize: isDesktop?'46px':'36px',lineHeight:1.1,margin:'0 0 12px',color:c.ink},
+        dateLine:{fontFamily:body,fontSize:'12.5px',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex',gap:'10px'},
+        cdNum:{fontFamily:disp,fontWeight:500,fontSize:'22px',display:'block',color:c.ink},
+        cdLabel:{fontSize:'9.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.65,fontFamily:body,color:c.inkSoft},
+        quoteSection:{padding:'38px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2},
+        quoteText:{fontFamily:disp,fontStyle:'italic',fontSize:'19px',lineHeight:1.55,margin:0,color:c.ink,textAlign:'center'},
+        galleryWrap: isDesktop ? {display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'12px'} : {display:'flex',flexWrap:'wrap',gap:'12px',justifyContent:'center'},
+        addrCard:{flex: isDesktop?1:undefined,background:c.bg2,borderRadius:'22px',padding:'18px 20px',marginBottom: isDesktop?0:'12px'},
+        addrTitle:{fontFamily:disp,fontWeight:500,fontSize:'18px',margin:'0 0 4px',color:c.ink},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11.5px',fontWeight:700,color:'#fff',background:c.accent,padding:'7px 14px',borderRadius:'999px',display:'inline-block'},
+        schedRow:{display:'flex',gap:'14px',alignItems:'center',padding:'8px 14px',background:c.bg2,borderRadius:'999px',marginBottom:'8px'},
+        schedTime:{fontFamily:body,fontWeight:700,fontSize:'12.5px',color:'#fff',background:c.accent2,padding:'4px 10px',borderRadius:'999px'},
+        schedLabel:{fontFamily:body,fontSize:'13.5px',color:c.ink},
+        rsvpSection:{padding:'38px 24px',background:c.bg2,color:c.ink},
+        rsvpTitle:{fontFamily:disp,fontWeight:500,fontSize:'22px',margin:'0 0 4px',color:c.ink},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:c.accent,color:'#fff',fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.accent}`,background:'transparent',color:c.accent2,fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        quizCard:{background:c.bg2,padding:'20px',borderRadius:'22px'},
+        quizQ:{fontFamily:disp,fontSize:'17px',margin:'0 0 12px',color:c.ink},
+        giftCard:{background:c.bg2,padding:'22px',borderRadius:'24px',textAlign:'center'},
+        giftTitle:{fontFamily:disp,fontWeight:500,fontSize:'18px',margin:'0 0 6px',color:c.ink},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        musicTitle:{fontFamily:disp,fontWeight:500,fontSize:'20px',margin:'0 0 6px',color:c.ink},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,minWidth:0,padding:'12px 16px',border:'none',background:c.bg2,fontSize:'13px',fontFamily:body,color:c.ink,borderRadius:'999px'},
+        musicSendBtn:{padding:'12px 18px',border:'none',background:c.accent,color:'#fff',fontWeight:700,fontSize:'12px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:c.bg2,borderRadius:'18px',marginBottom:'8px'},
+        musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:c.ink},
+        musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:body,fontWeight:700,fontSize:'12px',background:c.accent,border:'none',color:'#fff',padding:'6px 12px',cursor:'pointer',borderRadius:'999px'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:c.bg},
+        footerMono:{fontFamily:disp,fontSize:'20px',color:c.accent2,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.6,fontFamily:body,color:c.ink},
+      };
+    }
+    return {...base,
+      splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',background:c.bg,padding:'40px',textAlign:'center'},
+      monogram:{fontFamily:disp,fontWeight:700,fontSize:'20px',letterSpacing:'.04em',color:c.accent,border:`1px solid ${c.accent}`,padding:'14px 18px'},
+      splashGreet:{fontFamily:body,fontSize:'14px',textTransform:'uppercase',letterSpacing:'.1em',color:c.ink,margin:0},
+      splashBtn:{fontFamily:disp,fontWeight:600,fontSize:'12px',letterSpacing:'.08em',textTransform:'uppercase',padding:'14px 30px',border:`1px solid ${c.ink}`,background:'transparent',color:c.ink,cursor:'pointer'},
+      hero:{position:'relative', height: isDesktop?'480px':'360px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1.1fr 1fr':undefined},
+      heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.6) 100%)',filter:'grayscale(.2) contrast(1.05)'},
+      heroContent: isDesktop
+        ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:c.bg}
+        : {position:'relative',padding:'26px 24px',background:c.bg},
+      eyebrow:{fontFamily:body,fontWeight:600,fontSize:'10.5px',letterSpacing:'.18em',textTransform:'uppercase',color:c.accent,margin:'0 0 10px'},
+      title:{fontFamily:disp,fontWeight:700,fontSize: isDesktop?'50px':'36px',lineHeight:1.02,margin:'0 0 12px',color:c.ink,textTransform:'uppercase'},
+      dateLine:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.inkSoft,margin:0},
+      countdownWrap:{display:'flex',gap:'2px',background:c.ink,color:c.bg,padding:'14px 16px',width:'fit-content'},
+      cdNum:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'20px',display:'inline',color:c.bg},
+      cdLabel:{fontSize:'10px',fontFamily:"'Space Mono',monospace",opacity:.7,color:c.bg,marginLeft:'4px',marginRight:'10px'},
+      quoteSection:{padding:'40px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2,textAlign:'left'},
+      quoteText:{fontFamily:disp,fontWeight:600,fontSize:'20px',lineHeight:1.4,margin:0,color:c.ink},
+      galleryWrap: isDesktop ? {display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'2px'} : {display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'2px'},
+      addrCard:{flex: isDesktop?1:undefined,border:`1px solid ${c.ink}`,padding:'18px',marginBottom: isDesktop?0:'12px'},
+      addrTitle:{fontFamily:disp,fontWeight:700,fontSize:'15px',margin:'0 0 4px',color:c.ink,textTransform:'uppercase'},
+      addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+      mapBtn:{fontSize:'11px',fontWeight:700,letterSpacing:'.05em',color:c.accent,fontFamily:body,textDecoration:'underline'},
+      schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+      schedTime:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'13px',color:c.accent,minWidth:'50px'},
+      schedLabel:{fontFamily:body,fontSize:'13px',color:c.ink,letterSpacing:'.03em'},
+      rsvpSection:{padding:'38px 24px',background:'#000',color:c.accent},
+      rsvpTitle:{fontFamily:disp,fontWeight:700,fontSize:'20px',margin:'0 0 4px',color:c.accent},
+      rsvpBtnSolid:{flex:1,padding:'13px',border:`1px solid ${c.accent}`,background:c.accent,color:'#000',fontWeight:700,fontSize:'12.5px',letterSpacing:'.05em',textTransform:'uppercase',cursor:'pointer',fontFamily:disp},
+      rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.onDark}`,background:'transparent',color:c.onDark,fontWeight:700,fontSize:'12.5px',cursor:'pointer',fontFamily:disp},
+      quizCard:{border:`1px solid ${c.line}`,padding:'18px',background:c.bg2},
+      quizQ:{fontFamily:disp,fontWeight:700,fontSize:'15px',margin:'0 0 12px',color:c.ink},
+      giftCard:{border:`1px solid ${c.line}`,padding:'20px',background:c.bg2},
+      giftTitle:{fontFamily:disp,fontWeight:700,fontSize:'15px',margin:'0 0 6px',color:c.ink},
+      giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+      musicTitle:{fontFamily:disp,fontWeight:700,fontSize:'17px',margin:'0 0 6px',color:c.ink},
+      musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+      musicInput:{flex:1,minWidth:0,padding:'12px 14px',border:`1px solid ${c.line}`,background:'#000',fontSize:'13px',fontFamily:"'Space Mono',monospace",color:c.accent},
+      musicSendBtn:{padding:'12px 18px',border:`1px solid ${c.accent}`,background:c.accent,color:'#000',fontWeight:700,fontSize:'12px',cursor:'pointer',fontFamily:disp},
+      musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+      musicRowTitle:{display:'block',fontSize:'13px',fontFamily:body,color:c.ink},
+      musicRowSub:{opacity:.6,fontSize:'11px',fontFamily:body,color:c.inkSoft},
+      musicBadge:{fontFamily:"'Space Mono',monospace",fontSize:'11px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'5px 10px',cursor:'pointer'},
+      footer:{padding:'34px 24px 42px',textAlign:'center',background:'#000',borderTop:`1px solid ${c.line}`},
+      footerMono:{fontFamily:disp,fontWeight:700,fontSize:'18px',letterSpacing:'.06em',color:c.accent,marginBottom:'6px'},
+      footerText:{fontSize:'11px',opacity:.6,fontFamily:"'Space Mono',monospace",color:c.inkSoft,textTransform:'uppercase'},
+    };
+  }
+
+  select(id){ this.setState({activeId:id, opened:false}); }
+  openCard(){ this.setState({opened:true}); }
+  setMobile(){ this.setState({device:'mobile'}); }
+  setDesktop(){ this.setState({device:'desktop'}); }
+  vote(key){ this.setState(s=>({votes:{...s.votes,[key]:(s.votes[key]||0)+1}})); }
+
+  renderVals(){
+    const t = this.find(this.state.activeId);
+    const device = this.state.device;
+    const isDesktop = device==='desktop';
+    const isMobile = !isDesktop;
+    const styles = this.buildStyles(t, device);
+    const showSplash = isMobile && !this.state.opened;
+    const contentVisible = !showSplash;
+
+    return {
+      themesList: this.THEMES.map(th=>({
+        id: th.id, label: th.name,
+        select: ()=>this.select(th.id),
+        chipStyle:{fontFamily:'Sora,sans-serif',fontSize:'12.5px',fontWeight:600,padding:'8px 14px',borderRadius:'999px',border:'1px solid #333',
+          background: th.id===this.state.activeId ? '#fff' : 'transparent',
+          color: th.id===this.state.activeId ? '#000' : '#aaa',
+          borderColor: th.id===this.state.activeId ? '#fff' : '#333',
+          cursor:'pointer'}
+      })),
+      active: t, styles, isMobile, showSplash, contentVisible,
+      mobileBtnStyle:{fontFamily:'Sora,sans-serif',fontSize:'12px',fontWeight:600,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isMobile?'#fff':'transparent',color: isMobile?'#000':'#aaa'},
+      desktopBtnStyle:{fontFamily:'Sora,sans-serif',fontSize:'12px',fontWeight:600,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isDesktop?'#fff':'transparent',color: isDesktop?'#000':'#aaa'},
+      setMobile: ()=>this.setMobile(),
+      setDesktop: ()=>this.setDesktop(),
+      frameHint: isMobile ? 'Modo celular: tocá "Ver invitación" para el flujo completo.' : 'Modo escritorio: layout ancho, sin gesto de apertura.',
+      outerFrameStyle: isMobile
+        ? {width:'390px',maxWidth:'100%',background:'#000',borderRadius:'44px',padding:'14px',boxShadow:'0 30px 60px rgba(0,0,0,.5)',display:'flex',flexDirection:'column'}
+        : {width:'1180px',maxWidth:'100%'},
+      screenStyle: isMobile
+        ? {height:'800px',overflowY:'auto',borderRadius:'30px',background:t.colors.bg,position:'relative',scrollbarWidth:'none'}
+        : {borderRadius:'8px',background:t.colors.bg,position:'relative',boxShadow:'0 30px 70px rgba(0,0,0,.16)',overflow:'hidden'},
+
+      openCard: ()=>this.openCard(),
+
+      countdownBoxes: t.cdBoxes.map(b=>({n:b.n,l:b.l,boxStyle: t.layout==='P'
+        ? {flex:1,textAlign:'center',padding:'0 14px',borderRight:`1px solid ${t.colors.line}`}
+        : t.layout==='Q'
+        ? {flex:1,textAlign:'center',background:t.colors.bg2,borderRadius:'999px',padding:'14px 4px'}
+        : {display:'inline-flex',alignItems:'baseline'}
+      })),
+
+      galleryImages: t.galleryImgs.map((src)=>({src, wrapStyle: {aspectRatio:'1', overflow:'hidden', borderRadius: t.layout==='Q'?'16px':'0'}})),
+
+      addrCards: t.addr,
+      scheduleItems: t.schedule,
+
+      quizOptions: t.quizOpts.map((o)=>({text:o, style:{
+        padding:'11px 14px', marginBottom:'8px', fontSize:'13.5px', fontFamily:t.bodyFont, color:t.colors.ink,
+        border: t.layout==='Q' ? 'none' : `1px solid ${t.colors.line}`,
+        background: t.layout==='Q' ? t.colors.bg : 'transparent',
+        borderRadius: t.layout==='Q' ? '999px' : (t.layout==='P' ? '4px' : '0')
+      }})),
+
+      musicItems: t.musicItems.map((m,i)=>{
+        const key = t.id+'-'+i;
+        const votes = this.state.votes[key]||0;
+        const baseNum = parseInt(m.badge.match(/\d+/)[0],10);
+        return {t:m.t, s:m.s, badge: m.badge.replace(/\d+/, baseNum+votes), vote:()=>this.vote(key)};
+      }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

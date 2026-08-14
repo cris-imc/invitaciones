@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#0d0d10;font-family:'Sora',sans-serif;color:#fff;}
+a{color:inherit;text-decoration:none;}
+a:hover{opacity:.8;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+@keyframes meshShift{0%{background-position:0% 0%,100% 100%,50% 50%;}50%{background-position:100% 50%,0% 50%,60% 40%;}100%{background-position:0% 0%,100% 100%,50% 50%;}}
+@keyframes floatOrb{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(14px,-22px) scale(1.06);}}
+@keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-18px,16px) scale(1.08);}}
+@keyframes glitchFlicker{0%,100%{opacity:1;transform:translate(0,0);}92%{opacity:1;transform:translate(0,0);}93%{opacity:.7;transform:translate(-2px,1px);}94%{opacity:1;transform:translate(2px,-1px);}95%{opacity:.85;transform:translate(-1px,0);}96%{opacity:1;transform:translate(0,0);}}
+@keyframes scanline{0%{transform:translateY(-100%);}100%{transform:translateY(2000%);}}
+@keyframes gridPulse{0%,100%{opacity:.35;}50%{opacity:.7;}}
+@keyframes tilt3d{0%,100%{transform:perspective(900px) rotateX(2deg) rotateY(-3deg);}50%{transform:perspective(900px) rotateX(-2deg) rotateY(3deg);}}
+@keyframes chromeShine{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+@keyframes blinkCursor{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+@keyframes hueRotate{0%{filter:hue-rotate(0deg);}100%{filter:hue-rotate(360deg);}}
+</style>
+</helmet>
+
+<div style="max-width:1400px;margin:0 auto;padding:28px 20px 80px;background:#0d0d10;">
+
+  <div style="max-width:860px;margin:0 0 28px;">
+    <p style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#7a7a86;margin:0 0 10px;">Convite &middot; Pack Tech 15 a&ntilde;os</p>
+    <h1 style="font:700 30px/1.25 'Space Grotesk',sans-serif;margin:0 0 12px;color:#fff;">6 plantillas premium, edici&oacute;n tecnol&oacute;gica</h1>
+    <p style="font:400 14.5px/1.65 'Sora',sans-serif;color:#a8a8b3;margin:0 0 10px;">3 sistemas nuevos, todav&iacute;a m&aacute;s ambiciosos: <strong>Holograma</strong> (glassmorphism iridiscente, orbes con parallax), <strong>Circuito</strong> (cyber/dark UI, glitch, scanline, countdown estilo terminal) y <strong>Cristal 3D</strong> (tarjetas con tilt 3D continuo, profundidad en capas). Countdown real con segundos tickeando en vivo, parallax de scroll en el hero, animaciones ambiente en CSS puro.</p>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px;padding:14px 16px;background:#16161c;border-radius:14px;border:1px solid #26262f;">
+    <span style="font:700 10.5px 'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#7a7a86;margin-right:4px;">Eleg&iacute; una plantilla</span>
+    <sc-for list="{{ themesList }}" as="th" hint-placeholder-count="6">
+      <button onClick="{{ th.select }}" style="{{ th.chipStyle }}">{{ th.label }}</button>
+    </sc-for>
+    <div style="flex:1;"></div>
+    <div style="display:flex;gap:6px;background:#000;border-radius:999px;padding:4px;">
+      <button onClick="{{ setMobile }}" style="{{ mobileBtnStyle }}">&#128241; Celular</button>
+      <button onClick="{{ setDesktop }}" style="{{ desktopBtnStyle }}">&#128421; Escritorio</button>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:26px 0 10px;">
+    <div style="{{ outerFrameStyle }}">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <div style="height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:110px;height:16px;background:#000;border-radius:12px;"></div>
+        </div>
+      </sc-if>
+      <div style="{{ screenStyle }}" onScroll="{{ handleScroll }}">
+
+        <sc-if value="{{ showSplash }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ styles.splash }}">
+            <div style="{{ styles.monogram }}">{{ active.monogram }}</div>
+            <p style="{{ styles.splashGreet }}">{{ active.splashGreeting }}</p>
+            <button onClick="{{ openCard }}" style="{{ styles.splashBtn }}">{{ active.splashCta }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contentVisible }}" hint-placeholder-val="{{ true }}">
+        <div>
+
+          <section style="{{ styles.hero }}">
+            <div style="{{ styles.heroMedia }}">
+              <img src="{{ active.heroImg }}" alt="Portada" style="{{ styles.heroImg }}">
+              <div style="{{ styles.heroOverlay }}"></div>
+              <div style="{{ styles.heroFx }}"></div>
+              <sc-if value="{{ active.showScanline }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ styles.scanlineEl }}"></div>
+              </sc-if>
+            </div>
+            <div style="{{ styles.heroContent }}">
+              <p style="{{ styles.eyebrow }}">{{ active.eyebrow }}</p>
+              <h2 style="{{ styles.title }}">{{ active.titleHtmlA }}<br>{{ active.titleHtmlB }}</h2>
+              <p style="{{ styles.dateLine }}">{{ active.dateLine }}</p>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cuenta regresiva en vivo</p>
+            <div style="{{ styles.countdownWrap }}">
+              <sc-for list="{{ countdownBoxes }}" as="cd" hint-placeholder-count="4">
+                <div style="{{ cd.boxStyle }}">
+                  <span style="{{ styles.cdNum }}">{{ cd.n }}</span>
+                  <span style="{{ styles.cdLabel }}">{{ cd.l }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.quoteSection }}">
+            <p style="{{ styles.quoteText }}">{{ active.quote }}</p>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">&Aacute;lbum</p>
+            <div style="{{ styles.galleryWrap }}">
+              <sc-for list="{{ galleryImages }}" as="g" hint-placeholder-count="3">
+                <div style="{{ g.wrapStyle }}"><img src="{{ g.src }}" alt="Momento" style="{{ styles.galleryImg }}"></div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">D&oacute;nde</p>
+            <div style="{{ styles.addrWrap }}">
+              <sc-for list="{{ addrCards }}" as="ad" hint-placeholder-count="2">
+                <div style="{{ styles.addrCard }}">
+                  <h3 style="{{ styles.addrTitle }}">{{ ad.t }}</h3>
+                  <p style="{{ styles.addrSub }}">{{ ad.s }}</p>
+                  <a href="#" style="{{ styles.mapBtn }}">Ver mapa &#8599;</a>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.section }}">
+            <p style="{{ styles.kicker }}">Cronograma</p>
+            <div style="{{ styles.scheduleWrap }}">
+              <sc-for list="{{ scheduleItems }}" as="sc" hint-placeholder-count="3">
+                <div style="{{ styles.schedRow }}">
+                  <span style="{{ styles.schedTime }}">{{ sc.time }}</span>
+                  <span style="{{ styles.schedLabel }}">{{ sc.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="{{ styles.rsvpSection }}">
+            <p style="{{ styles.kickerOnRsvp }}">Confirmaci&oacute;n</p>
+            <h3 style="{{ styles.rsvpTitle }}">{{ active.rsvpTitle }}</h3>
+            <div style="margin:14px 0;max-width:420px;">
+              <label style="{{ styles.fieldLabel }}">Nombre y apellido</label>
+              <input value="{{ active.rsvpName }}" style="{{ styles.fieldInput }}" readonly>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button style="{{ styles.rsvpBtnSolid }}">{{ active.rsvpBtn }}</button>
+              <button style="{{ styles.rsvpBtnGhost }}">No podr&eacute;</button>
+            </div>
+          </section>
+
+          <div style="{{ styles.bottomGrid }}">
+            <section style="{{ styles.section }}">
+              <p style="{{ styles.kicker }}">Quiz</p>
+              <div style="{{ styles.quizCard }}">
+                <p style="{{ styles.quizQ }}">{{ active.quizQ }}</p>
+                <sc-for list="{{ quizOptions }}" as="qo" hint-placeholder-count="3">
+                  <div style="{{ qo.style }}">{{ qo.text }}</div>
+                </sc-for>
+              </div>
+            </section>
+
+            <section style="{{ styles.section }}">
+              <p style="{{ styles.kicker }}">Regalo</p>
+              <div style="{{ styles.giftCard }}">
+                <h3 style="{{ styles.giftTitle }}">{{ active.giftTitle }}</h3>
+                <p style="{{ styles.giftBody }}">{{ active.giftIntro }}</p>
+                <sc-for list="{{ giftTiers }}" as="gt" hint-placeholder-count="3">
+                  <div style="{{ styles.giftTierRow }}">
+                    <span style="{{ styles.giftTierLabel }}">{{ gt.label }}</span>
+                    <span style="{{ styles.giftTierPrice }}">{{ gt.price }}</span>
+                  </div>
+                </sc-for>
+                <div style="{{ styles.giftAliasGrid }}">
+                  <div style="{{ styles.giftAliasBox }}">
+                    <span style="{{ styles.giftAliasLabel }}">Alias &middot; Regalo</span>
+                    <span style="{{ styles.giftAliasValue }}">{{ active.giftAliasRegalo }}</span>
+                  </div>
+                  <div style="{{ styles.giftAliasBox }}">
+                    <span style="{{ styles.giftAliasLabel }}">Alias &middot; Pago de tarjeta</span>
+                    <span style="{{ styles.giftAliasValue }}">{{ active.giftAliasPago }}</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section style="{{ styles.section }}">
+              <p style="{{ styles.kicker }}">M&uacute;sica</p>
+              <h3 style="{{ styles.musicTitle }}">{{ active.musicTitle }}</h3>
+              <p style="{{ styles.musicSub }}">{{ active.musicSub }}</p>
+              <div style="display:flex;gap:8px;margin:14px 0;">
+                <input placeholder="{{ active.musicPlaceholder }}" style="{{ styles.musicInput }}" readonly>
+                <button style="{{ styles.musicSendBtn }}">Enviar</button>
+              </div>
+              <sc-for list="{{ musicItems }}" as="mi" hint-placeholder-count="2">
+                <div style="{{ styles.musicRow }}">
+                  <div><b style="{{ styles.musicRowTitle }}">{{ mi.t }}</b><span style="{{ styles.musicRowSub }}">{{ mi.s }}</span></div>
+                  <button onClick="{{ mi.vote }}" style="{{ styles.musicBadge }}">{{ mi.badge }}</button>
+                </div>
+              </sc-for>
+            </section>
+          </div>
+
+          <footer style="{{ styles.footer }}">
+            <div style="{{ styles.footerMono }}">{{ active.monogram }}</div>
+            <small style="{{ styles.footerText }}">{{ active.footerText }}</small>
+          </footer>
+
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font:400 12px 'Sora',sans-serif;color:#7a7a86;margin:6px 0 0;">{{ frameHint }}</p>
+
+  <div style="max-width:980px;margin:56px auto 0;">
+    <button onClick="{{ toggleNotes }}" style="display:flex;align-items:center;gap:8px;background:#16161c;color:#fff;border:1px solid #26262f;border-radius:999px;padding:10px 18px;font:600 12.5px 'Sora',sans-serif;cursor:pointer;">
+      {{ notesToggleLabel }}
+    </button>
+    <sc-if value="{{ notesOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
+        <sc-for list="{{ techNotes }}" as="tn" hint-placeholder-count="6">
+          <div style="background:#16161c;border:1px solid #26262f;border-radius:10px;padding:18px 20px;">
+            <p style="margin:0 0 2px;font:700 10px 'Space Mono',monospace;letter-spacing:.08em;color:#7a7a86;text-transform:uppercase;">{{ tn.layout }}</p>
+            <h4 style="margin:2px 0 10px;font:600 16px 'Sora',sans-serif;color:#fff;">{{ tn.name }}</h4>
+            <p style="margin:0 0 6px;font:400 12.5px/1.5 'Sora',sans-serif;color:#a8a8b3;"><b>Archivo:</b> src/components/templates/{{ tn.filename }}.tsx &middot; layoutId <code>{{ tn.layoutId }}</code></p>
+            <p style="margin:0;font:400 12.5px/1.5 'Sora',sans-serif;color:#a8a8b3;"><b>Fuentes:</b> {{ tn.fonts }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:18px;background:#16161c;color:#c9c9d4;border:1px solid #26262f;border-radius:10px;padding:18px 22px;">
+        <p style="margin:0 0 8px;font:600 13px 'Sora',sans-serif;color:#fff;">Notas de implementaci&oacute;n</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Sora',sans-serif;">1. <b>Countdown real</b>: <code>setInterval</code> de 1s sobre <code>invitation.fechaEvento</code>, mostrando d&iacute;as/horas/min/seg &mdash; reemplaza el <code>useCountdown</code> actual agregando la unidad de segundos.</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Sora',sans-serif;">2. <b>Parallax de scroll</b>: listener de scroll sobre el contenedor de la invitaci&oacute;n, aplicando <code>transform: translateY()</code> a la imagen de portada a distinta velocidad que el contenido (efecto de profundidad).</p>
+        <p style="margin:0 0 6px;font:400 12.5px/1.6 'Sora',sans-serif;">3. <b>Animaciones ambiente</b> (glitch, scanline, tilt 3D continuo, orbes flotantes, gradiente iridiscente) son <code>@keyframes</code> CSS puro, sin JS extra ni dependencias nuevas.</p>
+        <p style="margin:0;font:400 12.5px/1.6 'Sora',sans-serif;">4. Mismo patr&oacute;n de integraci&oacute;n que los packs anteriores (theme-config.ts, templatesConfig.ts, StepPreview.tsx) + los mismos flags de precios por franja y doble alias del pack de 15 a&ntilde;os base.</p>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  THEMES = [
+    { id:'holo-1', layout:'G', name:'Priscila (Holograma)', eventDate:'2026-11-14T21:00:00',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#0d0d18',bg2:'#15152a',ink:'#ffffff',inkSoft:'#b7b7d1',accent:'#a78bfa',accent2:'#22d3ee',onDark:'#ffffff',line:'rgba(167,139,250,.3)'},
+      heroImg:'img/15/istockphoto-2277380274-1024x1024.jpg', showScanline:false,
+      galleryImgs:['img/15/istockphoto-2277380413-1024x1024.jpg','img/15/istockphoto-2277379309-1024x1024.jpg','img/15/istockphoto-2277380274-1024x1024.jpg'],
+      monogram:'15', eyebrow:'Mis quince años', titleHtmlA:'Priscila', titleHtmlB:'entra en escena', dateLine:'14 de noviembre de 2026 · 21:00 hs — Córdoba',
+      splashGreeting:'Preparate para algo distinto', splashCta:'Abrir invitación',
+      quote:'“Que la noche brille tanto como yo.”',
+      addr:[{t:'Ceremonia',s:'19:00 hs · Parroquia Santa Rita'},{t:'Fiesta',s:'21:00 hs · Salón Aurora Club'}],
+      schedule:[{time:'19:00',label:'Ceremonia'},{time:'21:00',label:'Recepción'},{time:'22:00',label:'Vals'},{time:'23:30',label:'Fiesta'}],
+      rsvpTitle:'¿Venís a mi fiesta?', rsvpName:'Fam. Ledesma', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál es mi color favorito?', quizOpts:['Violeta','Cian','Magenta'],
+      giftTitle:'Valor de la tarjeta', giftIntro:'Por franja etaria, transferencia o efectivo el día de la fiesta.',
+      giftTiers:[{label:'Adultos',price:'$16.000'},{label:'Adolescentes (13-17)',price:'$10.000'},{label:'Niños (hasta 12)',price:'Sin cargo'}],
+      giftAliasRegalo:'priscila.regalo', giftAliasPago:'priscila.tarjeta',
+      musicTitle:'Sugerí una canción', musicSub:'Para la pista holográfica.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Blinding Lights',s:'The Weeknd',badge:'♥ 24'},{t:'Levitating',s:'Dua Lipa',badge:'♥ 18'}],
+      footerText:'Gracias por brillar conmigo' },
+
+    { id:'holo-2', layout:'G', name:'Aitana (Holograma)', eventDate:'2027-02-20T20:30:00',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#0d0d18',bg2:'#15152a',ink:'#ffffff',inkSoft:'#b7b7d1',accent:'#f472b6',accent2:'#60a5fa',onDark:'#ffffff',line:'rgba(244,114,182,.3)'},
+      heroImg:'img/15/istockphoto-2277379540-1024x1024.jpg', showScanline:false,
+      galleryImgs:['img/15/istockphoto-2277379197-1024x1024.jpg','img/15/istockphoto-2277380180-1024x1024.jpg','img/15/istockphoto-2277379540-1024x1024.jpg'],
+      monogram:'15', eyebrow:'Mis quince años', titleHtmlA:'Aitana', titleHtmlB:'modo fiesta ON', dateLine:'20 de febrero de 2027 · 20:30 hs — Córdoba',
+      splashGreeting:'Cargando la mejor noche...', splashCta:'Abrir invitación',
+      quote:'“Un mundo nuevo empieza esta noche.”',
+      addr:[{t:'Ceremonia',s:'18:30 hs · Parroquia del Carmen'},{t:'Fiesta',s:'20:30 hs · Complejo Nova'}],
+      schedule:[{time:'18:30',label:'Ceremonia'},{time:'20:30',label:'Recepción'},{time:'21:30',label:'Vals'},{time:'23:00',label:'Fiesta'}],
+      rsvpTitle:'¿Venís a mi fiesta?', rsvpName:'Fam. Benítez', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál es mi videojuego favorito?', quizOpts:['Just Dance','Minecraft','Fortnite'],
+      giftTitle:'Valor de la tarjeta', giftIntro:'Por franja etaria, alias o efectivo el día de la fiesta.',
+      giftTiers:[{label:'Adultos',price:'$15.500'},{label:'Adolescentes (13-17)',price:'$9.500'},{label:'Niños (hasta 12)',price:'Sin cargo'}],
+      giftAliasRegalo:'aitana.regalo', giftAliasPago:'aitana.tarjeta',
+      musicTitle:'Sugerí una canción', musicSub:'Para la pista holográfica.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Espresso',s:'Sabrina Carpenter',badge:'♥ 20'},{t:'Good Luck, Babe!',s:'Chappell Roan',badge:'♥ 15'}],
+      footerText:'Gracias por brillar conmigo' },
+
+    { id:'circ-1', layout:'H', name:'Zoe (Circuito)', eventDate:'2026-09-05T21:00:00',
+      displayFont:"'Orbitron',sans-serif", bodyFont:"'Space Grotesk',sans-serif",
+      colors:{bg:'#07090a',bg2:'#0f1416',ink:'#e8fffb',inkSoft:'#7fd8c9',accent:'#39ffd0',accent2:'#ff2e9b',onDark:'#e8fffb',line:'rgba(57,255,208,.3)'},
+      heroImg:'img/15/istockphoto-2277380114-1024x1024.jpg', showScanline:true,
+      galleryImgs:['img/15/istockphoto-2277380177-1024x1024.jpg','img/15/istockphoto-2277379229-1024x1024.jpg','img/15/istockphoto-2277380114-1024x1024.jpg'],
+      monogram:'15', eyebrow:'SYSTEM // MIS QUINCE', titleHtmlA:'ZOE', titleHtmlB:'v15.0', dateLine:'05.09.2026 · 21:00 — CÓRDOBA',
+      splashGreeting:'INICIANDO SECUENCIA...', splashCta:'ABRIR INVITACIÓN',
+      quote:'"CARGANDO RECUERDOS... 100%"',
+      addr:[{t:'CEREMONIA',s:'19:00 · Parroquia San Martín'},{t:'FIESTA',s:'21:00 · Arena Club'}],
+      schedule:[{time:'19:00',label:'CEREMONIA'},{time:'21:00',label:'RECEPCIÓN'},{time:'22:00',label:'VALS'},{time:'23:30',label:'FIESTA'}],
+      rsvpTitle:'CONFIRMÁ TU ACCESO', rsvpName:'Fam. Quiroga', rsvpBtn:'CONFIRMAR',
+      quizQ:'¿CUÁL ES MI SERIE FAVORITA?', quizOpts:['Stranger Things','Wednesday','The Boys'],
+      giftTitle:'VALOR DE LA TARJETA', giftIntro:'Por franja etaria. Transferencia o efectivo el día del evento.',
+      giftTiers:[{label:'ADULTOS',price:'$17.000'},{label:'ADOLESCENTES (13-17)',price:'$11.000'},{label:'NIÑOS (HASTA 12)',price:'SIN CARGO'}],
+      giftAliasRegalo:'zoe.regalo', giftAliasPago:'zoe.tarjeta',
+      musicTitle:'SUGERÍ UNA CANCIÓN', musicSub:'PARA EL DJ.', musicPlaceholder:'CANCIÓN — ARTISTA',
+      musicItems:[{t:'Genesis',s:'Grimes',badge:'♥ 16'},{t:'One More Time',s:'Daft Punk',badge:'♥ 12'}],
+      footerText:'GRACIAS POR CONECTARTE A MI NOCHE' },
+
+    { id:'circ-2', layout:'H', name:'Mora (Circuito)', eventDate:'2027-01-10T20:00:00',
+      displayFont:"'Orbitron',sans-serif", bodyFont:"'Space Grotesk',sans-serif",
+      colors:{bg:'#07090a',bg2:'#0f1416',ink:'#fff2f8',inkSoft:'#d88fc0',accent:'#ff2e9b',accent2:'#39ffd0',onDark:'#fff2f8',line:'rgba(255,46,155,.3)'},
+      heroImg:'img/15/istockphoto-2277380416-1024x1024.jpg', showScanline:true,
+      galleryImgs:['img/15/istockphoto-2277380082-1024x1024.jpg','img/15/istockphoto-2277379550-1024x1024.jpg','img/15/istockphoto-2277380416-1024x1024.jpg'],
+      monogram:'15', eyebrow:'SYSTEM // MIS QUINCE', titleHtmlA:'MORA', titleHtmlB:'v15.0', dateLine:'10.01.2027 · 20:00 — CÓRDOBA',
+      splashGreeting:'INICIANDO SECUENCIA...', splashCta:'ABRIR INVITACIÓN',
+      quote:'"ACCESO CONCEDIDO A LA MEJOR FIESTA"',
+      addr:[{t:'CEREMONIA',s:'18:00 · Parroquia Santa Ana'},{t:'FIESTA',s:'20:00 · Loft Central'}],
+      schedule:[{time:'18:00',label:'CEREMONIA'},{time:'20:00',label:'RECEPCIÓN'},{time:'21:00',label:'VALS'},{time:'22:30',label:'FIESTA'}],
+      rsvpTitle:'CONFIRMÁ TU ACCESO', rsvpName:'Fam. Farías', rsvpBtn:'CONFIRMAR',
+      quizQ:'¿CUÁL ES MI APP FAVORITA?', quizOpts:['TikTok','Spotify','Instagram'],
+      giftTitle:'VALOR DE LA TARJETA', giftIntro:'Por franja etaria. Alias o efectivo esa noche.',
+      giftTiers:[{label:'ADULTOS',price:'$16.500'},{label:'ADOLESCENTES (13-17)',price:'$10.500'},{label:'NIÑOS (HASTA 12)',price:'SIN CARGO'}],
+      giftAliasRegalo:'mora.regalo', giftAliasPago:'mora.tarjeta',
+      musicTitle:'SUGERÍ UNA CANCIÓN', musicSub:'PARA EL DJ.', musicPlaceholder:'CANCIÓN — ARTISTA',
+      musicItems:[{t:'Physical',s:'Dua Lipa',badge:'♥ 14'},{t:'Titanium',s:'David Guetta',badge:'♥ 11'}],
+      footerText:'GRACIAS POR CONECTARTE A MI NOCHE' },
+
+    { id:'crystal-1', layout:'I', name:'Elena (Cristal 3D)', eventDate:'2026-12-12T21:30:00',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#0a0a0d',bg2:'#131318',ink:'#f5f6ff',inkSoft:'#a2a4c2',accent:'#8fd3ff',accent2:'#c9a7ff',onDark:'#f5f6ff',line:'rgba(143,211,255,.3)'},
+      heroImg:'img/15/istockphoto-2277380166-1024x1024.jpg', showScanline:false,
+      galleryImgs:['img/15/istockphoto-2277380274-1024x1024.jpg','img/15/istockphoto-2277380413-1024x1024.jpg','img/15/istockphoto-2277380166-1024x1024.jpg'],
+      monogram:'15', eyebrow:'Mis quince años', titleHtmlA:'Elena', titleHtmlB:'en cristal', dateLine:'12 de diciembre de 2026 · 21:30 hs — Córdoba',
+      splashGreeting:'Una noche con múltiples caras', splashCta:'Abrir invitación',
+      quote:'“Como el cristal: transparente, resistente, única.”',
+      addr:[{t:'Ceremonia',s:'20:00 hs · Parroquia San Francisco'},{t:'Fiesta',s:'21:30 hs · Salón Prisma'}],
+      schedule:[{time:'20:00',label:'Ceremonia'},{time:'21:30',label:'Recepción'},{time:'22:30',label:'Vals'},{time:'00:00',label:'Fiesta'}],
+      rsvpTitle:'¿Venís a mi fiesta?', rsvpName:'Fam. Salcedo', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál es mi piedra favorita?', quizOpts:['Cuarzo','Amatista','Zafiro'],
+      giftTitle:'Valor de la tarjeta', giftIntro:'Por franja etaria, transferencia o efectivo el día de la fiesta.',
+      giftTiers:[{label:'Adultos',price:'$18.000'},{label:'Adolescentes (13-17)',price:'$12.000'},{label:'Niños (hasta 12)',price:'Sin cargo'}],
+      giftAliasRegalo:'elena.regalo', giftAliasPago:'elena.tarjeta',
+      musicTitle:'Sugerí una canción', musicSub:'Para bailar entre reflejos.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Diamonds',s:'Rihanna',badge:'♥ 17'},{t:'Solar Power',s:'Lorde',badge:'♥ 9'}],
+      footerText:'Gracias por reflejar esta noche conmigo' },
+
+    { id:'crystal-2', layout:'I', name:'Nina (Cristal 3D)', eventDate:'2027-03-07T20:00:00',
+      displayFont:"'Space Grotesk',sans-serif", bodyFont:"'Sora',sans-serif",
+      colors:{bg:'#0a0a0d',bg2:'#131318',ink:'#f5f6ff',inkSoft:'#a2a4c2',accent:'#ffd18f',accent2:'#8fd3ff',onDark:'#f5f6ff',line:'rgba(255,209,143,.3)'},
+      heroImg:'img/15/istockphoto-2277380177-1024x1024.jpg', showScanline:false,
+      galleryImgs:['img/15/istockphoto-2277379229-1024x1024.jpg','img/15/istockphoto-2277380180-1024x1024.jpg','img/15/istockphoto-2277380177-1024x1024.jpg'],
+      monogram:'15', eyebrow:'Mis quince años', titleHtmlA:'Nina', titleHtmlB:'en cristal', dateLine:'7 de marzo de 2027 · 20:00 hs — Córdoba',
+      splashGreeting:'Una noche con múltiples caras', splashCta:'Abrir invitación',
+      quote:'“Cada ángulo de esta noche va a brillar distinto.”',
+      addr:[{t:'Ceremonia',s:'18:30 hs · Parroquia Cristo Rey'},{t:'Fiesta',s:'20:00 hs · Salón Prisma'}],
+      schedule:[{time:'18:30',label:'Ceremonia'},{time:'20:00',label:'Recepción'},{time:'21:00',label:'Vals'},{time:'22:30',label:'Fiesta'}],
+      rsvpTitle:'¿Venís a mi fiesta?', rsvpName:'Fam. Ibarra', rsvpBtn:'Confirmar',
+      quizQ:'¿Cuál es mi metal favorito?', quizOpts:['Oro rosa','Plata','Bronce'],
+      giftTitle:'Valor de la tarjeta', giftIntro:'Por franja etaria, alias o efectivo el día de la fiesta.',
+      giftTiers:[{label:'Adultos',price:'$17.500'},{label:'Adolescentes (13-17)',price:'$11.500'},{label:'Niños (hasta 12)',price:'Sin cargo'}],
+      giftAliasRegalo:'nina.regalo', giftAliasPago:'nina.tarjeta',
+      musicTitle:'Sugerí una canción', musicSub:'Para bailar entre reflejos.', musicPlaceholder:'Canción — artista',
+      musicItems:[{t:'Golden Hour',s:'JVKE',badge:'♥ 13'},{t:'Electric',s:'Katy Perry',badge:'♥ 8'}],
+      footerText:'Gracias por reflejar esta noche conmigo' }
+  ];
+
+  state = { activeId: this.THEMES[0].id, device:'mobile', opened:false, notesOpen:false, votes:{}, now: Date.now(), scrollY:0 };
+
+  componentDidMount(){
+    this._timer = setInterval(()=>this.setState({now: Date.now()}), 1000);
+  }
+  componentWillUnmount(){
+    if(this._timer) clearInterval(this._timer);
+  }
+
+  find(id){ return this.THEMES.find(t=>t.id===id) || this.THEMES[0]; }
+
+  handleScroll(e){ this.setState({scrollY: e.target.scrollTop}); }
+
+  buildStyles(t, device, scrollY){
+    const c = t.colors, disp = t.displayFont, body = t.bodyFont;
+    const isDesktop = device==='desktop';
+    const parallax = Math.min(scrollY||0, 300);
+    const base = {
+      section:{padding: isDesktop ? '48px 64px' : '34px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg,color:c.ink,fontFamily:body},
+      kicker:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.accent,margin:'0 0 10px'},
+      kickerOnRsvp:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.12em',textTransform:'uppercase',color:c.onDark,opacity:.75,margin:'0 0 10px'},
+      heroImg:{width:'100%',height:'130%',objectFit:'cover',position:'absolute',inset:0,transform:`translateY(${-parallax*0.25}px)`},
+      galleryImg:{width:'100%',height:'100%',objectFit:'cover',display:'block'},
+      fieldLabel:{display:'block',fontSize:'10.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.6,marginBottom:'6px',fontFamily:body,color:c.ink},
+      fieldInput:{width:'100%',padding:'12px 14px',borderRadius:'8px',border:`1px solid ${c.line}`,background:c.bg2,fontSize:'14px',color:c.ink,fontFamily:body},
+      heroMedia: isDesktop ? {position:'relative',height:'100%',overflow:'hidden'} : {position:'absolute',inset:0,overflow:'hidden'},
+      addrWrap: isDesktop ? {display:'flex',gap:'20px'} : {display:'block'},
+      scheduleWrap: isDesktop ? {maxWidth:'640px',margin:'0 auto'} : {},
+      bottomGrid: isDesktop ? {display:'grid',gridTemplateColumns:'1fr 1fr 1fr'} : {display:'block'},
+      giftTierRow:{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:`1px dashed ${c.line}`,fontFamily:body,fontSize:'13.5px'},
+      giftTierLabel:{color:c.inkSoft},
+      giftTierPrice:{color:c.ink,fontWeight:600,fontFamily:"'Space Mono',monospace"},
+      giftAliasGrid:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',marginTop:'14px'},
+      scanlineEl:{position:'absolute',left:0,right:0,height:'40%',background:`linear-gradient(180deg,transparent,${c.accent}22,transparent)`,animation:'scanline 5s linear infinite',pointerEvents:'none'},
+    };
+    if(t.layout==='G'){
+      return {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',padding:'40px',textAlign:'center',
+          background:`radial-gradient(60% 50% at 20% 20%,${c.accent}33,transparent),radial-gradient(50% 45% at 85% 75%,${c.accent2}33,transparent),${c.bg}`,
+          backgroundSize:'200% 200%',animation:'meshShift 12s ease infinite'},
+        monogram:{fontFamily:disp,fontWeight:700,fontSize:'22px',color:'#fff',background:`linear-gradient(120deg,${c.accent},${c.accent2})`,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundSize:'200% auto',animation:'hueRotate 6s linear infinite'},
+        splashGreet:{fontFamily:body,fontSize:'16px',color:c.inkSoft,margin:0},
+        splashBtn:{fontFamily:body,fontWeight:600,fontSize:'12px',letterSpacing:'.06em',textTransform:'uppercase',padding:'14px 30px',border:'none',background:`linear-gradient(120deg,${c.accent},${c.accent2})`,color:'#0a0a12',cursor:'pointer',borderRadius:'999px'},
+        hero:{position:'relative', height: isDesktop?'480px':'380px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1.1fr 1fr':undefined},
+        heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(10,10,20,0) 30%,rgba(10,10,20,.75) 100%)'},
+        heroFx:{position:'absolute',width:'160px',height:'160px',borderRadius:'50%',background:`radial-gradient(circle,${c.accent}55,transparent 70%)`,top:'10%',left:'10%',filter:'blur(6px)',animation:'floatOrb 7s ease-in-out infinite',transform:`translateY(${parallax*0.15}px)`},
+        heroContent: isDesktop
+          ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:`linear-gradient(160deg,${c.bg2},${c.bg})`}
+          : {position:'relative',padding:'22px 24px',background:`linear-gradient(160deg,${c.bg2},${c.bg})`},
+        eyebrow:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.16em',textTransform:'uppercase',color:c.accent,margin:'0 0 8px'},
+        title:{fontFamily:disp,fontWeight:700,fontSize: isDesktop?'52px':'36px',lineHeight:1.05,margin:'0 0 12px',
+          background:`linear-gradient(120deg,#fff,${c.accent},${c.accent2},#fff)`,backgroundSize:'300% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',animation:'hueRotate 8s linear infinite'},
+        dateLine:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex',gap:'8px'},
+        cdNum:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'22px',display:'block',color:'#fff'},
+        cdLabel:{fontSize:'9px',textTransform:'uppercase',letterSpacing:'.08em',opacity:.6,fontFamily:body,color:c.inkSoft},
+        quoteSection:{padding: isDesktop?'50px 64px':'38px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2,textAlign:'center'},
+        quoteText:{fontFamily:disp,fontWeight:500,fontSize: isDesktop?'26px':'19px',lineHeight:1.5,margin:0,color:'#fff'},
+        galleryWrap: isDesktop ? {display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'10px'} : {display:'grid',gridTemplateColumns:'1.3fr 1fr',gap:'8px',gridAutoRows:'110px'},
+        addrCard:{flex: isDesktop?1:undefined,background:'rgba(255,255,255,.05)',backdropFilter:'blur(10px)',border:`1px solid ${c.line}`,borderRadius:'16px',padding:'18px 20px',marginBottom: isDesktop?0:'12px'},
+        addrTitle:{fontFamily:disp,fontWeight:600,fontSize:'17px',margin:'0 0 4px',color:'#fff'},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11.5px',fontWeight:600,color:c.accent,fontFamily:body},
+        schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'13px',color:c.accent,minWidth:'50px'},
+        schedLabel:{fontFamily:body,fontSize:'14px',color:'#fff'},
+        rsvpSection:{padding: isDesktop?'48px 64px':'38px 24px',background:c.bg2,color:'#fff'},
+        rsvpTitle:{fontFamily:disp,fontWeight:600,fontSize:'23px',margin:'0 0 4px',color:'#fff'},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:`linear-gradient(120deg,${c.accent},${c.accent2})`,color:'#0a0a12',fontWeight:700,fontSize:'12.5px',letterSpacing:'.04em',textTransform:'uppercase',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.line}`,background:'transparent',color:'#fff',fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        quizCard:{background:'rgba(255,255,255,.05)',backdropFilter:'blur(10px)',border:`1px solid ${c.line}`,padding:'18px',borderRadius:'16px'},
+        quizQ:{fontFamily:disp,fontSize:'17px',margin:'0 0 12px',color:'#fff'},
+        giftCard:{background:'rgba(255,255,255,.05)',backdropFilter:'blur(10px)',border:`1px solid ${c.line}`,padding:'20px',borderRadius:'16px'},
+        giftTitle:{fontFamily:disp,fontWeight:600,fontSize:'18px',margin:'0 0 6px',color:'#fff'},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        giftAliasBox:{fontFamily:body,fontSize:'12px',border:`1px solid ${c.line}`,padding:'10px 12px',color:'#fff',display:'flex',flexDirection:'column',gap:'4px',borderRadius:'8px'},
+        giftAliasLabel:{fontSize:'10px',textTransform:'uppercase',letterSpacing:'.05em',opacity:.6},
+        giftAliasValue:{fontFamily:"'Space Mono',monospace",fontSize:'13px'},
+        musicTitle:{fontFamily:disp,fontWeight:600,fontSize:'20px',margin:'0 0 6px',color:'#fff'},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,padding:'12px 14px',border:`1px solid ${c.line}`,background:'rgba(255,255,255,.05)',fontSize:'13px',fontFamily:body,color:'#fff',borderRadius:'999px'},
+        musicSendBtn:{padding:'12px 18px',border:'none',background:`linear-gradient(120deg,${c.accent},${c.accent2})`,color:'#0a0a12',fontWeight:700,fontSize:'12px',cursor:'pointer',borderRadius:'999px',fontFamily:body},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',background:'rgba(255,255,255,.05)',borderRadius:'12px',marginBottom:'8px'},
+        musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:'#fff'},
+        musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:"'Space Mono',monospace",fontSize:'12px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'5px 10px',cursor:'pointer',borderRadius:'999px'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:c.bg},
+        footerMono:{fontFamily:disp,fontWeight:700,fontSize:'20px',color:c.accent,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.55,fontFamily:body,color:c.inkSoft},
+      };
+    }
+    if(t.layout==='H'){
+      return {...base,
+        splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',padding:'40px',textAlign:'center',background:
+          `repeating-linear-gradient(0deg,${c.line} 0 1px,transparent 1px 40px),repeating-linear-gradient(90deg,${c.line} 0 1px,transparent 1px 40px),${c.bg}`,
+          animation:'gridPulse 3s ease-in-out infinite'},
+        monogram:{fontFamily:disp,fontWeight:900,fontSize:'24px',color:c.accent,textShadow:`0 0 12px ${c.accent}`,animation:'glitchFlicker 4s infinite'},
+        splashGreet:{fontFamily:"'Space Mono',monospace",fontSize:'13px',letterSpacing:'.08em',color:c.accent,margin:0},
+        splashBtn:{fontFamily:disp,fontWeight:700,fontSize:'12px',letterSpacing:'.1em',textTransform:'uppercase',padding:'14px 30px',border:`1px solid ${c.accent}`,background:'transparent',color:c.accent,cursor:'pointer',boxShadow:`0 0 14px ${c.line}`},
+        hero:{position:'relative', height: isDesktop?'480px':'380px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1fr 1fr':undefined, borderBottom:`1px solid ${c.line}`},
+        heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(0,0,0,.15),rgba(7,9,10,.85))'},
+        heroFx:{position:'absolute',inset:0,backgroundImage:`repeating-linear-gradient(0deg,${c.line} 0 1px,transparent 1px 34px)`,opacity:.5,animation:'gridPulse 3s ease-in-out infinite',pointerEvents:'none'},
+        heroContent: isDesktop
+          ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:c.bg}
+          : {position:'relative',padding:'22px 24px',background:c.bg},
+        eyebrow:{fontFamily:"'Space Mono',monospace",fontSize:'10.5px',letterSpacing:'.18em',color:c.accent2,margin:'0 0 10px'},
+        title:{fontFamily:disp,fontWeight:900,fontSize: isDesktop?'52px':'36px',lineHeight:1,margin:'0 0 14px',color:c.accent,textShadow:`0 0 16px ${c.line}`,animation:'glitchFlicker 5s infinite'},
+        dateLine:{fontFamily:"'Space Mono',monospace",fontSize:'12px',color:c.inkSoft,margin:0},
+        countdownWrap:{display:'flex',gap:'2px',background:'#000',border:`1px solid ${c.accent}`,padding:'14px 16px',width:'fit-content'},
+        cdNum:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'22px',display:'inline',color:c.accent,textShadow:`0 0 8px ${c.accent}`},
+        cdLabel:{fontSize:'10px',fontFamily:"'Space Mono',monospace",opacity:.7,color:c.accent2,marginLeft:'4px',marginRight:'12px'},
+        quoteSection:{padding: isDesktop?'50px 64px':'40px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2,textAlign:'left'},
+        quoteText:{fontFamily:"'Space Mono',monospace",fontSize: isDesktop?'22px':'16px',lineHeight:1.6,margin:0,color:c.accent},
+        galleryWrap: isDesktop ? {display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'2px'} : {display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'2px'},
+        addrCard:{flex: isDesktop?1:undefined,border:`1px solid ${c.accent}`,padding:'18px',marginBottom: isDesktop?0:'12px',background:'rgba(57,255,208,.03)'},
+        addrTitle:{fontFamily:disp,fontWeight:700,fontSize:'15px',margin:'0 0 4px',color:c.accent},
+        addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+        mapBtn:{fontSize:'11px',fontWeight:700,letterSpacing:'.05em',color:c.accent2,fontFamily:body,textDecoration:'underline'},
+        schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        schedTime:{fontFamily:"'Space Mono',monospace",fontWeight:700,fontSize:'13px',color:c.accent,minWidth:'50px'},
+        schedLabel:{fontFamily:body,fontSize:'13px',color:c.ink,letterSpacing:'.03em'},
+        rsvpSection:{padding: isDesktop?'48px 64px':'38px 24px',background:'#000',color:c.accent},
+        rsvpTitle:{fontFamily:disp,fontWeight:700,fontSize:'20px',margin:'0 0 4px',color:c.accent},
+        rsvpBtnSolid:{flex:1,padding:'13px',border:`1px solid ${c.accent}`,background:c.accent,color:'#000',fontWeight:700,fontSize:'12.5px',letterSpacing:'.05em',textTransform:'uppercase',cursor:'pointer',fontFamily:disp},
+        rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.accent2}`,background:'transparent',color:c.accent2,fontWeight:700,fontSize:'12.5px',cursor:'pointer',fontFamily:disp},
+        quizCard:{border:`1px solid ${c.line}`,padding:'18px',background:'rgba(57,255,208,.03)'},
+        quizQ:{fontFamily:disp,fontWeight:700,fontSize:'15px',margin:'0 0 12px',color:c.accent},
+        giftCard:{border:`1px solid ${c.line}`,padding:'20px',background:'rgba(57,255,208,.03)'},
+        giftTitle:{fontFamily:disp,fontWeight:700,fontSize:'15px',margin:'0 0 6px',color:c.accent},
+        giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+        giftAliasBox:{fontFamily:"'Space Mono',monospace",fontSize:'13px',border:`1px solid ${c.accent}`,padding:'10px 12px',color:c.accent},
+        musicTitle:{fontFamily:disp,fontWeight:700,fontSize:'17px',margin:'0 0 6px',color:c.accent},
+        musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+        musicInput:{flex:1,padding:'12px 14px',border:`1px solid ${c.line}`,background:'#000',fontSize:'13px',fontFamily:"'Space Mono',monospace",color:c.accent},
+        musicSendBtn:{padding:'12px 18px',border:`1px solid ${c.accent}`,background:c.accent,color:'#000',fontWeight:700,fontSize:'12px',cursor:'pointer',fontFamily:disp},
+        musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+        musicRowTitle:{display:'block',fontSize:'13px',fontFamily:body,color:c.ink},
+        musicRowSub:{opacity:.6,fontSize:'11px',fontFamily:body,color:c.inkSoft},
+        musicBadge:{fontFamily:"'Space Mono',monospace",fontSize:'11px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'5px 10px',cursor:'pointer'},
+        footer:{padding:'34px 24px 42px',textAlign:'center',background:'#000',borderTop:`1px solid ${c.line}`},
+        footerMono:{fontFamily:disp,fontWeight:900,fontSize:'18px',letterSpacing:'.1em',color:c.accent,marginBottom:'6px'},
+        footerText:{fontSize:'11px',opacity:.6,fontFamily:"'Space Mono',monospace",color:c.accent2,textTransform:'uppercase'},
+      };
+    }
+    return {...base,
+      splash:{minHeight:'800px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'22px',padding:'40px',textAlign:'center',background:`radial-gradient(70% 60% at 50% 20%,${c.bg2},${c.bg})`},
+      monogram:{fontFamily:disp,fontWeight:700,fontSize:'22px',color:'#fff',border:`1px solid ${c.accent}`,borderRadius:'20px',padding:'18px 22px',
+        background:`linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02))`,boxShadow:`0 0 30px ${c.line}`,animation:'tilt3d 6s ease-in-out infinite'},
+      splashGreet:{fontFamily:body,fontSize:'15px',color:c.inkSoft,margin:0},
+      splashBtn:{fontFamily:body,fontWeight:600,fontSize:'12px',letterSpacing:'.06em',padding:'14px 30px',border:`1px solid ${c.accent}`,background:'rgba(255,255,255,.05)',color:'#fff',cursor:'pointer',borderRadius:'10px'},
+      hero:{position:'relative', height: isDesktop?'480px':'380px', display: isDesktop?'grid':'block', gridTemplateColumns: isDesktop?'1fr 1fr':undefined, perspective:'1000px'},
+      heroOverlay:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(10,10,13,0) 30%,rgba(10,10,13,.8) 100%)'},
+      heroFx:{position:'absolute',inset:'12px',border:`1px solid ${c.accent}`,borderRadius:'18px',pointerEvents:'none',boxShadow:`0 0 40px ${c.line} inset`,animation:'tilt3d 8s ease-in-out infinite'},
+      heroContent: isDesktop
+        ? {position:'relative',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 56px',background:c.bg}
+        : {position:'relative',padding:'26px 24px 30px',background:c.bg},
+      eyebrow:{fontFamily:body,fontSize:'11px',letterSpacing:'.14em',textTransform:'uppercase',color:c.accent,margin:'0 0 8px'},
+      title:{fontFamily:disp,fontWeight:700,fontSize: isDesktop?'50px':'36px',lineHeight:1.1,margin:'0 0 12px',color:'#fff',
+        backgroundImage:`linear-gradient(100deg,transparent 0%,${c.accent}55 45%,#fff 50%,${c.accent2}55 55%,transparent 100%)`,backgroundSize:'250% 100%',
+        WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',animation:'chromeShine 4s linear infinite'},
+      dateLine:{fontFamily:body,fontSize:'12.5px',color:c.inkSoft,margin:0},
+      countdownWrap:{display:'flex',gap:'10px'},
+      cdNum:{fontFamily:disp,fontWeight:700,fontSize:'22px',display:'block',color:'#fff'},
+      cdLabel:{fontSize:'9.5px',textTransform:'uppercase',letterSpacing:'.06em',opacity:.65,fontFamily:body,color:c.inkSoft},
+      quoteSection:{padding: isDesktop?'50px 64px':'38px 24px',borderBottom:`1px solid ${c.line}`,background:c.bg2},
+      quoteText:{fontFamily:disp,fontStyle:'italic',fontSize: isDesktop?'26px':'19px',lineHeight:1.5,margin:0,color:'#fff'},
+      galleryWrap: isDesktop ? {display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'10px'} : {display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'},
+      addrCard:{flex: isDesktop?1:undefined,border:`1px solid ${c.line}`,borderRadius:'14px',padding:'18px 20px',marginBottom: isDesktop?0:'12px',
+        background:'linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.01))'},
+      addrTitle:{fontFamily:disp,fontWeight:600,fontSize:'17px',margin:'0 0 4px',color:'#fff'},
+      addrSub:{margin:'0 0 10px',fontSize:'13px',color:c.inkSoft,fontFamily:body},
+      mapBtn:{fontSize:'11.5px',fontWeight:600,color:c.accent,fontFamily:body},
+      schedRow:{display:'flex',gap:'16px',padding:'12px 0',borderBottom:`1px solid ${c.line}`},
+      schedTime:{fontFamily:"'Space Mono',monospace",fontSize:'13px',color:c.accent,minWidth:'50px'},
+      schedLabel:{fontFamily:body,fontSize:'14px',color:'#fff'},
+      rsvpSection:{padding: isDesktop?'48px 64px':'38px 24px',background:c.bg2,color:'#fff'},
+      rsvpTitle:{fontFamily:disp,fontWeight:600,fontSize:'23px',margin:'0 0 4px',color:'#fff'},
+      rsvpBtnSolid:{flex:1,padding:'13px',border:'none',background:`linear-gradient(120deg,${c.accent},${c.accent2})`,color:'#0a0a0d',fontWeight:700,fontSize:'12.5px',cursor:'pointer',borderRadius:'10px',fontFamily:body},
+      rsvpBtnGhost:{padding:'13px 16px',border:`1px solid ${c.line}`,background:'transparent',color:'#fff',fontWeight:600,fontSize:'12.5px',cursor:'pointer',borderRadius:'10px',fontFamily:body},
+      quizCard:{background:'linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.01))',border:`1px solid ${c.line}`,padding:'20px',borderRadius:'14px'},
+      quizQ:{fontFamily:disp,fontSize:'17px',margin:'0 0 12px',color:'#fff'},
+      giftCard:{background:'linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.01))',border:`1px solid ${c.line}`,padding:'22px',borderRadius:'14px'},
+      giftTitle:{fontFamily:disp,fontWeight:600,fontSize:'18px',margin:'0 0 6px',color:'#fff'},
+      giftBody:{fontSize:'13px',color:c.inkSoft,margin:'0 0 12px',fontFamily:body},
+      giftAliasBox:{fontFamily:body,fontSize:'12px',border:`1px solid ${c.line}`,borderRadius:'10px',padding:'10px 14px',color:'#fff',display:'flex',flexDirection:'column',gap:'4px'},
+      giftAliasLabel:{fontSize:'10px',textTransform:'uppercase',letterSpacing:'.05em',opacity:.6},
+      giftAliasValue:{fontFamily:"'Space Mono',monospace",fontSize:'13px'},
+      musicTitle:{fontFamily:disp,fontWeight:600,fontSize:'20px',margin:'0 0 6px',color:'#fff'},
+      musicSub:{fontSize:'13px',color:c.inkSoft,margin:0,fontFamily:body},
+      musicInput:{flex:1,padding:'12px 16px',border:`1px solid ${c.line}`,background:'rgba(255,255,255,.05)',fontSize:'13px',fontFamily:body,color:'#fff',borderRadius:'10px'},
+      musicSendBtn:{padding:'12px 18px',border:'none',background:`linear-gradient(120deg,${c.accent},${c.accent2})`,color:'#0a0a0d',fontWeight:700,fontSize:'12px',cursor:'pointer',borderRadius:'10px',fontFamily:body},
+      musicRow:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'rgba(255,255,255,.04)',borderRadius:'10px',marginBottom:'8px'},
+      musicRowTitle:{display:'block',fontSize:'13.5px',fontFamily:body,color:'#fff'},
+      musicRowSub:{opacity:.6,fontSize:'11.5px',fontFamily:body,color:c.inkSoft},
+      musicBadge:{fontFamily:body,fontWeight:600,fontSize:'12px',background:'none',border:`1px solid ${c.accent}`,color:c.accent,padding:'6px 12px',cursor:'pointer',borderRadius:'999px'},
+      footer:{padding:'34px 24px 42px',textAlign:'center',background:c.bg},
+      footerMono:{fontFamily:disp,fontWeight:700,fontSize:'20px',color:c.accent,marginBottom:'6px'},
+      footerText:{fontSize:'11px',opacity:.6,fontFamily:body,color:c.inkSoft},
+    };
+  }
+
+  select(id){ this.setState({activeId:id, opened:false, scrollY:0}); }
+  openCard(){ this.setState({opened:true}); }
+  setMobile(){ this.setState({device:'mobile'}); }
+  setDesktop(){ this.setState({device:'desktop'}); }
+  toggleNotes(){ this.setState(s=>({notesOpen:!s.notesOpen})); }
+  vote(key){ this.setState(s=>({votes:{...s.votes,[key]:(s.votes[key]||0)+1}})); }
+
+  renderVals(){
+    const t = this.find(this.state.activeId);
+    const device = this.state.device;
+    const isDesktop = device==='desktop';
+    const isMobile = !isDesktop;
+    const styles = this.buildStyles(t, device, this.state.scrollY);
+    const showSplash = isMobile && !this.state.opened;
+    const contentVisible = !showSplash;
+
+    const target = new Date(t.eventDate).getTime();
+    let diff = Math.max(0, target - this.state.now);
+    const days = Math.floor(diff/86400000); diff -= days*86400000;
+    const hours = Math.floor(diff/3600000); diff -= hours*3600000;
+    const mins = Math.floor(diff/60000); diff -= mins*60000;
+    const secs = Math.floor(diff/1000);
+    const pad = n => String(n).padStart(2,'0');
+
+    return {
+      themesList: this.THEMES.map(th=>({
+        id: th.id, label: th.name,
+        select: ()=>this.select(th.id),
+        chipStyle:{fontFamily:'Sora,sans-serif',fontSize:'12.5px',fontWeight:600,padding:'8px 14px',borderRadius:'999px',border:'1px solid #333',
+          background: th.id===this.state.activeId ? '#fff' : 'transparent',
+          color: th.id===this.state.activeId ? '#000' : '#999',
+          borderColor: th.id===this.state.activeId ? '#fff' : '#333',
+          cursor:'pointer'}
+      })),
+      active: t, styles, isMobile, showSplash, contentVisible,
+      handleScroll: (e)=>this.handleScroll(e),
+      mobileBtnStyle:{fontFamily:'Sora,sans-serif',fontSize:'12px',fontWeight:600,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isMobile?'#fff':'transparent',color: isMobile?'#000':'#999'},
+      desktopBtnStyle:{fontFamily:'Sora,sans-serif',fontSize:'12px',fontWeight:600,padding:'8px 16px',borderRadius:'999px',border:'none',cursor:'pointer',background: isDesktop?'#fff':'transparent',color: isDesktop?'#000':'#999'},
+      setMobile: ()=>this.setMobile(),
+      setDesktop: ()=>this.setDesktop(),
+      frameHint: isMobile ? 'Modo celular: scrolleá para ver el parallax en vivo, y mirá el countdown tickear segundo a segundo.' : 'Modo escritorio: layout ancho, mismas animaciones ambiente.',
+      outerFrameStyle: isMobile
+        ? {width:'390px',maxWidth:'100%',background:'#000',borderRadius:'44px',padding:'14px',boxShadow:'0 30px 60px rgba(0,0,0,.6)',display:'flex',flexDirection:'column'}
+        : {width:'1180px',maxWidth:'100%'},
+      screenStyle: isMobile
+        ? {height:'800px',overflowY:'auto',borderRadius:'30px',background:t.colors.bg,position:'relative',scrollbarWidth:'none'}
+        : {borderRadius:'8px',background:t.colors.bg,position:'relative',boxShadow:'0 30px 70px rgba(0,0,0,.3)',overflow:'hidden'},
+
+      openCard: ()=>this.openCard(),
+      toggleNotes: ()=>this.toggleNotes(),
+      notesOpen: this.state.notesOpen,
+      notesToggleLabel: this.state.notesOpen ? 'Ocultar notas técnicas ▲' : 'Ver notas técnicas para el equipo dev ▼',
+
+      countdownBoxes: [
+        {n:String(days), l:'días', boxStyle: t.layout==='H' ? {display:'inline-flex',alignItems:'baseline'} : {flex:1,textAlign:'center',padding:'10px 6px',background: t.layout==='G'?'rgba(255,255,255,.05)':'rgba(255,255,255,.04)',borderRadius:'10px',border:`1px solid ${t.colors.line}`}},
+        {n:pad(hours), l:'hs', boxStyle: t.layout==='H' ? {display:'inline-flex',alignItems:'baseline'} : {flex:1,textAlign:'center',padding:'10px 6px',background: t.layout==='G'?'rgba(255,255,255,.05)':'rgba(255,255,255,.04)',borderRadius:'10px',border:`1px solid ${t.colors.line}`}},
+        {n:pad(mins), l:'min', boxStyle: t.layout==='H' ? {display:'inline-flex',alignItems:'baseline'} : {flex:1,textAlign:'center',padding:'10px 6px',background: t.layout==='G'?'rgba(255,255,255,.05)':'rgba(255,255,255,.04)',borderRadius:'10px',border:`1px solid ${t.colors.line}`}},
+        {n:pad(secs), l:'seg', boxStyle: t.layout==='H' ? {display:'inline-flex',alignItems:'baseline'} : {flex:1,textAlign:'center',padding:'10px 6px',background: t.layout==='G'?'rgba(255,255,255,.05)':'rgba(255,255,255,.04)',borderRadius:'10px',border:`1px solid ${t.colors.line}`}},
+      ],
+
+      galleryImages: t.galleryImgs.map((src)=>({src, wrapStyle: {aspectRatio:'1', overflow:'hidden', borderRadius: t.layout==='G'?'12px':(t.layout==='I'?'10px':'0')}})),
+
+      addrCards: t.addr,
+      scheduleItems: t.schedule,
+      giftTiers: t.giftTiers,
+
+      quizOptions: t.quizOpts.map((o)=>({text:o, style:{
+        padding:'11px 14px', marginBottom:'8px', fontSize:'13.5px', fontFamily:t.bodyFont, color: t.layout==='H' ? t.colors.accent : '#fff',
+        border: `1px solid ${t.colors.line}`,
+        background: t.layout==='H' ? 'rgba(57,255,208,.04)' : 'rgba(255,255,255,.04)',
+        borderRadius: t.layout==='H' ? '0' : '10px'
+      }})),
+
+      musicItems: t.musicItems.map((m,i)=>{
+        const key = t.id+'-'+i;
+        const votes = this.state.votes[key]||0;
+        const baseNum = parseInt(m.badge.match(/\d+/)[0],10);
+        return {t:m.t, s:m.s, badge: m.badge.replace(/\d+/, baseNum+votes), vote:()=>this.vote(key)};
+      }),
+
+      techNotes: this.THEMES.map(th=>({
+        layout:'Layout '+th.layout, name: th.name,
+        filename: th.name.replace(/[^a-zA-Z0-9]/g,''),
+        layoutId: th.id,
+        fonts: th.displayFont.replace(/'/g,'') + ' + ' + th.bodyFont.replace(/'/g,'')
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>
