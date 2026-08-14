@@ -82,7 +82,7 @@ export default async function InvitacionesPage() {
                         </span>
                     )}
                     {(dbUser.diamondCredits || 0) > 0 && (
-                        <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20">
+                        <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-[#67e8f9]/10 text-[#67e8f9] border border-[#67e8f9]/20">
                             {dbUser.diamondCredits} crédito{dbUser.diamondCredits === 1 ? "" : "s"} Diamond disponible{dbUser.diamondCredits === 1 ? "" : "s"}
                         </span>
                     )}
