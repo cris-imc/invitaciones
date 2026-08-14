@@ -1029,12 +1029,20 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
           className="fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden shadow-md"
           style={{
+            // El portal a document.body rompe la herencia de las CSS vars
+            // del wrapper (mismo bug ya documentado para BottomNavPill,
+            // GUIA_TECNICA_PLANTILLAS.md) -- se redeclaran acá con los
+            // mismos hex del tema para que "Pase Especial" resuelva bien.
+            "--t-acc": "#B98D57",
+            "--t-bg": "#FBF6EE",
+            "--t-muted": "#8a7a68",
+            "--seda-ink": "#332A22",
             border: '1px solid color-mix(in srgb, var(--t-acc) 40%, transparent)',
             backdropFilter: 'blur(8px)',
             ...(isTicketMaximized
               ? { background: 'color-mix(in srgb, var(--t-bg) 95%, transparent)', borderRadius: 999, width: '90%', maxWidth: 384, padding: '10px 20px' }
               : { background: 'color-mix(in srgb, var(--seda-ink) 95%, transparent)', borderRadius: 999, padding: '8px 20px' }),
-          }}
+          } as unknown as React.CSSProperties}
         >
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
