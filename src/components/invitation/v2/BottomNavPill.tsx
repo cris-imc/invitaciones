@@ -17,9 +17,15 @@ interface BottomNavPillProps {
   // heredadas. Los defaults son los colores originales de Moderno.
   accentColor?: string;
   surfaceColor?: string;
+  // Color del texto inactivo en variant="moderno" -- default = accentColor
+  // (comportamiento previo, sin cambios para el resto de las plantillas).
+  // Algunas plantillas (Petalos) tienen una superficie muy clara donde el
+  // accent a baja opacidad no contrasta lo suficiente; ahí conviene pisarlo
+  // con el ink oscuro de la plantilla.
+  inactiveColor?: string;
 }
 
-export function BottomNavPill({ sections, variant = "default", accentColor = "#C9A876", surfaceColor = "#151219" }: BottomNavPillProps) {
+export function BottomNavPill({ sections, variant = "default", accentColor = "#C9A876", surfaceColor = "#151219", inactiveColor }: BottomNavPillProps) {
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "");
 
   // Observa qué sección está visible y marca el nav activo
@@ -62,7 +68,7 @@ export function BottomNavPill({ sections, variant = "default", accentColor = "#C
       className={variant === "moderno" 
         ? "fixed bottom-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-nowrap overflow-x-auto items-center justify-start sm:justify-center gap-x-3 sm:gap-x-4 px-4 sm:px-6 py-3.5 rounded-[2rem] bg-[var(--t-surface)]/95 border border-[var(--t-acc)]/20 shadow-xl backdrop-blur-md w-[95%] max-w-max hide-desktop" 
         : "bottom-nav hide-desktop"}
-      style={variant === "moderno" ? { scrollbarWidth: 'none', msOverflowStyle: 'none', "--t-acc": accentColor, "--t-surface": surfaceColor } as React.CSSProperties : undefined}
+      style={variant === "moderno" ? { scrollbarWidth: 'none', msOverflowStyle: 'none', "--t-acc": accentColor, "--t-surface": surfaceColor, "--t-nav-inactive": inactiveColor ?? accentColor } as React.CSSProperties : undefined}
       aria-label="Navegación de la invitación"
       role="navigation"
     >
@@ -77,7 +83,7 @@ export function BottomNavPill({ sections, variant = "default", accentColor = "#C
           aria-label={`Ir a ${label}`}
           aria-current={activeId === id ? "true" : undefined}
           className={variant === "moderno" 
-            ? `font-sans text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em] transition-colors whitespace-nowrap ${activeId === id ? "text-[var(--t-acc)]" : "text-[var(--t-acc)]/60 hover:text-[var(--t-acc)]"}`
+            ? `font-sans text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em] transition-colors whitespace-nowrap ${activeId === id ? "text-[var(--t-acc)]" : "text-[var(--t-nav-inactive)]/75 hover:text-[var(--t-acc)]"}`
             : undefined}
           style={variant !== "moderno" && activeId === id ? { opacity: 1 } : undefined}
         >

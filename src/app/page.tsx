@@ -84,7 +84,7 @@ export default async function Home() {
                   <Radio className="w-6 h-6 text-[var(--accent)]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Interacción en Vivo (LIVE)</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">Con LIVE tu fiesta se anima</h3>
                   <p className="text-zinc-400">Tus invitados pueden subir fotos y dejar mensajes desde sus teléfonos durante la fiesta. Todo se proyecta y queda guardado de recuerdo.</p>
                 </div>
               </div>

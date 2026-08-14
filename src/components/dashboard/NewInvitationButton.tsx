@@ -119,20 +119,20 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                         <button
                             type="button"
                             onClick={handleCreateDiamond}
-                            className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-[var(--accent,#C79A4B)]/40 hover:border-[var(--accent,#C79A4B)] hover:bg-[var(--accent,#C79A4B)]/5 transition-colors text-left"
+                            className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-[#67e8f9]/40 hover:border-[#67e8f9] hover:bg-[#67e8f9]/5 transition-colors text-left"
                         >
-                            <div className="w-10 h-10 rounded-full bg-[var(--accent,#C79A4B)]/15 flex items-center justify-center shrink-0">
-                                <Diamond className="w-5 h-5 text-[var(--accent,#C79A4B)]" />
+                            <div className="w-10 h-10 rounded-full bg-[#67e8f9]/15 flex items-center justify-center shrink-0">
+                                <Diamond className="w-5 h-5 text-[#67e8f9]" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm text-[var(--accent,#C79A4B)]">Usar Crédito Diamond</p>
+                                <p className="font-semibold text-sm text-[#67e8f9]">Usar Crédito Diamond</p>
                                 <p className="text-xs text-muted-foreground">
                                     {hasUnlimitedPremium
                                         ? "Invitaciones premium ilimitadas por tu plan"
                                         : `${diamondCredits} ${diamondCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}`}
                                 </p>
                             </div>
-                            <ChevronRight className="w-4 h-4 text-[var(--accent,#C79A4B)]/60 shrink-0" />
+                            <ChevronRight className="w-4 h-4 text-[#67e8f9]/60 shrink-0" />
                         </button>
                     </div>
                 </DialogContent>

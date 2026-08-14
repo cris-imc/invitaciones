@@ -5,6 +5,35 @@ import { auth } from "@/auth";
 import { BackLink } from "@/components/ui/BackLink";
 import { EventShareCard } from "@/components/dashboard/EventShareCard";
 import { GuestPageTabs } from "@/components/dashboard/GuestPageTabs";
+import { getEventStatus } from "@/lib/expiration";
+
+// Prueba visual: leyenda animada de estado (en vivo / desconectado) junto al
+// título de "Gestión del Evento". El evento deja de estar "en vivo" una vez
+// pasado (POST_EVENT/EXPIRED, ver getEventStatus) -- ahi el icono se apaga.
+function LiveStatusBadge({ live, className }: { live: boolean; className?: string }) {
+  if (live) {
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-emerald-400 ${className ?? ""}`}
+      >
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+        </span>
+        Datos en tiempo real
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-white/30 ${className ?? ""}`}
+    >
+      <span className="inline-flex rounded-full h-2 w-2 bg-white/25" />
+      Desconectado
+    </span>
+  );
+}
 
 export default async function GuestManagementPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -26,6 +55,9 @@ export default async function GuestManagementPage({ params }: { params: Promise<
   const maxGuestsStr = maxGuests === null ? "∞" : maxGuests.toString();
   const remaining = maxGuests === null ? "∞" : Math.max(0, maxGuests - totalConfirmed);
 
+  const eventStatus = getEventStatus(invitation.fechaEvento);
+  const isLive = eventStatus === "PRE_EVENT" || eventStatus === "EVENT_DAY";
+
   return (
     <div className="p-4 md:p-8 space-y-6">
       {/* ── Breadcrumb ── */}
@@ -42,9 +74,19 @@ export default async function GuestManagementPage({ params }: { params: Promise<
           <p className="adm-breadcrumb" style={{ marginBottom: 4 }}>
             Gestión del Evento
           </p>
-          <h1 className="adm-title" style={{ marginBottom: 0 }}>
-            {invitation.nombreEvento}
-          </h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="adm-title min-w-0" style={{ marginBottom: 0 }}>
+              {invitation.nombreEvento}
+            </h1>
+            {/* Mobile/tablet: a la derecha del título, justificado a la derecha */}
+            <div className="xl:hidden shrink-0 mt-2">
+              <LiveStatusBadge live={isLive} />
+            </div>
+          </div>
+          {/* Desktop: debajo del título */}
+          <div className="hidden xl:block mt-2">
+            <LiveStatusBadge live={isLive} />
+          </div>
         </div>
 
         {/* Metrics card (Horizontal) */}
