@@ -883,8 +883,7 @@ export function NeonTemplateDorado({ invitation, guest, isPersonalized = false }
           margin-bottom: 30px !important;
           display: block !important;
         }
-        #songs.d-sec.dark h2,
-        #songs.d-sec.dark p:not(.t-kicker) {
+        #songs.d-sec.dark h2 {
           display: none !important;
         }
         /* Fix Input Row Overflow */
