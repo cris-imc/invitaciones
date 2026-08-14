@@ -24,14 +24,13 @@ export default async function Home() {
         {/* NAV */}
         <LandingNav registerUrl={registerUrl} isLoggedIn={Boolean(session)} />
 
-        {/* HERO */}
         <section className="l-hero">
           <div>
             <AnimatedHeroText />
             <p className="sub">
-              Elegí una plantilla pensada para tu tipo de evento, personalizá
-              cada detalle y compartí un link. Confirmaciones, mapas, fotos y
-              mensajes de tus invitados, todo en un mismo lugar y en vivo.
+              Elegí una plantilla, personalizá cada detalle y compartí un solo
+              link. Nosotros nos encargamos de las confirmaciones, los pagos
+              y la fiesta en vivo.
             </p>
             <div className="l-hero-ctas font-ui">
               <Link href={registerUrl}>

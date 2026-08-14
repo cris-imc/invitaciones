@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const PREFIX = "Con esta tarjeta no solo invitas, ";
+const PREFIX = "No somos solo una invitación digital. ";
 const SUFFIXES = [
-  "avisas la fecha.",
-  "escribes tu mejor historia.",
-  "compartes fotos en vivo y gestionas los pagos.",
+  "Somos tu plataforma de gestión de invitados.",
+  "Somos un link personal para cada uno de ellos.",
+  "Somos una invitación en tiempo real.",
+  "Con LIVE tu fiesta se anima en vivo.",
 ];
 
 export function AnimatedHeroText() {
@@ -43,6 +44,36 @@ export function AnimatedHeroText() {
     return () => clearTimeout(timeout);
   }, [currentText, phase, suffixIndex]);
 
+  // "LIVE" tiene tratamiento propio dentro del texto tipeado: verde de
+  // marca, brillo pulsante ("encendido") y el ® de marca registrada -- en
+  // vez de heredar el itálica/dorado del resto del texto que se está
+  // tipeando en cada mensaje.
+  const renderSuffix = (suffix: string) => {
+    const parts = suffix.split(/(LIVE)/g);
+    return parts.map((part, i) =>
+      part === "LIVE" ? (
+        <motion.span
+          key={i}
+          className="not-italic font-semibold"
+          style={{ color: "#22c55e" }}
+          animate={{
+            textShadow: [
+              "0 0 4px rgba(34,197,94,.4)",
+              "0 0 12px rgba(34,197,94,.9)",
+              "0 0 4px rgba(34,197,94,.4)",
+            ],
+          }}
+          transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+        >
+          LIVE
+          <sup className="text-[0.5em] ml-px">®</sup>
+        </motion.span>
+      ) : (
+        <span key={i}>{part}</span>
+      )
+    );
+  };
+
   const renderText = (text: string) => {
     if (text.length <= PREFIX.length) {
       return <span>{text}</span>;
@@ -52,13 +83,13 @@ export function AnimatedHeroText() {
     return (
       <>
         <span>{renderedPrefix}</span>
-        <em className="italic text-[var(--accent)]">{renderedSuffix}</em>
+        <em className="italic text-[var(--accent)]">{renderSuffix(renderedSuffix)}</em>
       </>
     );
   };
 
   // La celda del grid tiene que adoptar el tamaño de la frase más larga de
-  // las tres, para que no haya layout shift sin importar cuál se esté
+  // las cuatro, para que no haya layout shift sin importar cuál se esté
   // mostrando en un momento dado.
   const longestSuffix = SUFFIXES.reduce((a, b) => (b.length > a.length ? b : a));
 
