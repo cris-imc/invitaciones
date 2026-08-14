@@ -508,8 +508,11 @@ export function HologramaTemplate({ invitation, guest, isPersonalized = false }:
       leave: "top bottom",
       onUpdate: (self) => {
         const p = self.progress; // 0 a 1 mientras la foto atraviesa el viewport
-        shine.style.opacity = String(Math.sin(p * Math.PI) * 0.4);
-        shine.style.transform = `translateX(${p * 240 - 70}%)`;
+        // Resplandor que respira: sube y baja de opacidad/escala suavemente
+        // en vez de barrer la foto de punta a punta -- mucho más sutil.
+        shine.style.opacity = String(Math.sin(p * Math.PI) * 0.22);
+        const scale = 1 + Math.sin(p * Math.PI) * 0.18;
+        shine.style.transform = `translate(${(p - 0.5) * 30}%, ${Math.sin(p * Math.PI * 2) * 5}%) scale(${scale})`;
         // Orbes de fondo/frente moviéndose a distinta velocidad (parallax) --
         // el de fondo recorre menos distancia que el de frente.
         if (orbBack) orbBack.style.transform = `translateY(${(p - 0.5) * 60}px)`;
@@ -1235,14 +1238,18 @@ export function HologramaTemplate({ invitation, guest, isPersonalized = false }:
               } : { backgroundColor: '#17172E' }}
             />
             <PhotoCornerFrame />
-            {/* Brillo iridiscente que barre la foto según el progreso de
-                scroll (anime.js onScroll, ver useEffect de heroPhotoRef) --
-                degradé violeta→cian→blanco en vez de un solo tono. */}
+            {/* Brillo holográfico: en vez del streak diagonal que usan otras
+                plantillas (Seda, Editorial, Onix...), acá es un resplandor
+                suave que respira/flota -- más parecido a cómo difracta luz
+                un holograma real que a un reflejo sobre vidrio. Elipse
+                radial violeta→cian, desenfocada, moviéndose apenas y
+                pulsando de escala según el progreso de scroll. */}
             <div
               ref={heroShineRef}
               className="absolute inset-0 pointer-events-none z-20"
               style={{
-                background: 'linear-gradient(115deg, transparent 44%, rgba(167,139,250,0.45) 48%, rgba(34,211,238,0.5) 50%, rgba(255,255,255,0.35) 52%, transparent 56%)',
+                background: 'radial-gradient(ellipse 55% 42% at 50% 50%, rgba(167,139,250,0.32), rgba(34,211,238,0.22) 45%, transparent 72%)',
+                filter: 'blur(16px)',
                 opacity: 0,
               }}
             />
