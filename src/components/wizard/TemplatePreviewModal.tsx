@@ -221,6 +221,28 @@ function TemplatePreviewModalBody({
   const frameBoxRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
+  // La fila de tabs (una por TemplateTipo -- ya son 22) desborda el ancho
+  // disponible en mobile, y a veces también en desktop. Sin overflow-x
+  // explícito quedaban tabs inalcanzables (recortadas por el overflow-hidden
+  // del DialogContent). Mismo patrón de flechas semitransparentes que
+  // GuestPageTabs.tsx.
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollTabsLeft, setCanScrollTabsLeft] = useState(false);
+  const [canScrollTabsRight, setCanScrollTabsRight] = useState(false);
+
+  const checkTabsScroll = () => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    setCanScrollTabsLeft(el.scrollLeft > 0);
+    setCanScrollTabsRight(Math.ceil(el.scrollLeft + el.clientWidth) < el.scrollWidth);
+  };
+
+  useEffect(() => {
+    checkTabsScroll();
+    window.addEventListener("resize", checkTabsScroll);
+    return () => window.removeEventListener("resize", checkTabsScroll);
+  }, []);
+
   // El marco visible (frameBoxRef) puede variar de tamaño según la altura
   // del modal; medimos su ancho real y lo convertimos en un factor de escala
   // para el viewport móvil fijo de 390px, en vez de dejar que el iframe se
@@ -272,7 +294,23 @@ function TemplatePreviewModalBody({
 
   return (
     <>
-        <div className="flex gap-2 px-6 pt-4 shrink-0">
+        <div className="relative px-6 pt-4 shrink-0">
+          {canScrollTabsLeft && (
+            <div className="absolute left-6 top-4 bottom-0 w-10 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 flex items-center justify-start">
+              <span className="text-muted-foreground/60 text-lg leading-none">‹</span>
+            </div>
+          )}
+          {canScrollTabsRight && (
+            <div className="absolute right-6 top-4 bottom-0 w-10 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 flex items-center justify-end">
+              <span className="text-muted-foreground/60 text-lg leading-none">›</span>
+            </div>
+          )}
+          <div
+            ref={tabsScrollRef}
+            onScroll={checkTabsScroll}
+            className="flex gap-2 overflow-x-auto no-scrollbar"
+            style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
+          >
           {availableTabs.map(({ tipo, label }) => (
             <button
               key={tipo}
@@ -283,7 +321,7 @@ function TemplatePreviewModalBody({
                 setPreviewLoading(true);
               }}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                "px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0",
                 activeTab === tipo
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/70"
@@ -292,6 +330,7 @@ function TemplatePreviewModalBody({
               {label}
             </button>
           ))}
+          </div>
         </div>
 
         <div className="flex flex-1 min-h-0 mt-4">
