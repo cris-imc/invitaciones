@@ -20,7 +20,7 @@
  * trampa de "inversión mecánica" de la sección 3.5 de la guía). Paleta base
  * (Valentina · Seda Champagne, tema claro):
  *   --t-bg #122019 · --t-surface #1B3026 · --seda-ink #EFE7D8
- *   --t-muted #A8C2B4 · --t-acc #D9BFA0 (rosa polvo) · --t-acc2 #3D6E58 (oro champagne)
+ *   --t-muted #A8C2B4 · --t-acc #3D6E58 (rosa polvo) · --t-acc2 #D9BFA0 (oro champagne)
  *
  * Gating: QUINCE_ANOS + CASAMIENTO (igual patrón dual que NeonTemplate con
  * QUINCE_ANOS+CUMPLEANOS). El gating real vive en TemplatePreviewModal.tsx,
@@ -1207,7 +1207,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--t-acc2) 8%, transparent), transparent 70%), #FFFFFF" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--t-acc2) 8%, transparent), transparent 70%), var(--t-bg)" }}>
             <div className="max-w-2xl mx-auto text-center">
               <IconQuillFlourish className="seda-scroll-doodle opacity-0 mx-auto mb-6" style={{ width: 20, height: 22, color: 'var(--t-acc)' }} />
               <TypewriterText
@@ -1310,7 +1310,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: '#FFFFFF' }}>
+          <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: 'var(--t-bg)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-10 flex items-center gap-2">
                 <IconLaurel className="seda-scroll-doodle opacity-0" style={{ width: 20, height: 12, color: 'var(--t-acc2)' }} />

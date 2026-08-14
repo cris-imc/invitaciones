@@ -25,7 +25,7 @@
  * para variantes claras que para oscuras). Paleta base (Isabella · Luz de
  * Luna Nocturna, tema oscuro):
  *   --t-bg #F4F1F9 · --t-surface #E9E2F3 · --luzluna-ink #3A3450
- *   --t-muted #847ba0 · --t-acc #B9A6D9 (lavanda) · --t-acc2 #7C93B0 (violeta profundo)
+ *   --t-muted #847ba0 · --t-acc #7C93B0 (lavanda) · --t-acc2 #B9A6D9 (violeta profundo)
  *
  * Gating: QUINCE_ANOS + CASAMIENTO (igual patrón dual que NeonTemplate con
  * QUINCE_ANOS+CUMPLEANOS). El gating real vive en TemplatePreviewModal.tsx,

@@ -1216,7 +1216,7 @@ export function PetalosTemplatePastel({ invitation, guest, isPersonalized = fals
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--t-acc2) 8%, transparent), transparent 70%), #FFFFFF" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--t-acc2) 8%, transparent), transparent 70%), var(--t-bg)" }}>
             <div className="max-w-2xl mx-auto text-center">
               <IconHeartBud className="petalos-scroll-doodle opacity-0 mx-auto mb-6" style={{ width: 20, height: 22, color: 'var(--t-acc)' }} />
               <TypewriterText
@@ -1319,7 +1319,7 @@ export function PetalosTemplatePastel({ invitation, guest, isPersonalized = fals
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: '#FFFFFF' }}>
+          <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: 'var(--t-bg)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-10 flex items-center gap-2">
                 <IconBlossom className="petalos-scroll-doodle opacity-0" style={{ width: 18, height: 18, color: 'var(--t-acc2)' }} />
