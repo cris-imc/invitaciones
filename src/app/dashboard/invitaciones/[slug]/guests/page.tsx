@@ -10,11 +10,13 @@ import { getEventStatus } from "@/lib/expiration";
 // Prueba visual: leyenda animada de estado (en vivo / desconectado) junto al
 // título de "Gestión del Evento". El evento deja de estar "en vivo" una vez
 // pasado (POST_EVENT/EXPIRED, ver getEventStatus) -- ahi el icono se apaga.
-function LiveStatusBadge({ live, className }: { live: boolean; className?: string }) {
+function LiveStatusBadge({ live, size = "sm", className }: { live: boolean; size?: "xs" | "sm"; className?: string }) {
+  const textSize = size === "xs" ? "text-[9px]" : "text-[10px]";
+
   if (live) {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-emerald-400 ${className ?? ""}`}
+        className={`inline-flex items-center gap-1.5 ${textSize} font-mono uppercase tracking-wider text-emerald-400 ${className ?? ""}`}
       >
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -27,7 +29,7 @@ function LiveStatusBadge({ live, className }: { live: boolean; className?: strin
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-white/30 ${className ?? ""}`}
+      className={`inline-flex items-center gap-1.5 ${textSize} font-mono uppercase tracking-wider text-white/30 ${className ?? ""}`}
     >
       <span className="inline-flex rounded-full h-2 w-2 bg-white/25" />
       Desconectado
@@ -61,10 +63,16 @@ export default async function GuestManagementPage({ params }: { params: Promise<
   return (
     <div className="p-4 md:p-8 space-y-6">
       {/* ── Breadcrumb ── */}
-      <div className="adm-breadcrumb">
-        <a href="/dashboard">Inicio</a>
-        <span>›</span>
-        <span>Administrar</span>
+      <div className="flex items-center justify-between gap-3">
+        <div className="adm-breadcrumb">
+          <a href="/dashboard">Inicio</a>
+          <span>›</span>
+          <span>Administrar</span>
+        </div>
+        {/* Mobile/tablet: alineado con el breadcrumb, justificado a la derecha */}
+        <div className="xl:hidden shrink-0">
+          <LiveStatusBadge live={isLive} size="xs" />
+        </div>
       </div>
 
       {/* ── Title + status card row ── */}
@@ -74,15 +82,9 @@ export default async function GuestManagementPage({ params }: { params: Promise<
           <p className="adm-breadcrumb" style={{ marginBottom: 4 }}>
             Gestión del Evento
           </p>
-          <div className="flex items-start justify-between gap-3">
-            <h1 className="adm-title min-w-0" style={{ marginBottom: 0 }}>
-              {invitation.nombreEvento}
-            </h1>
-            {/* Mobile/tablet: a la derecha del título, justificado a la derecha */}
-            <div className="xl:hidden shrink-0 mt-2">
-              <LiveStatusBadge live={isLive} />
-            </div>
-          </div>
+          <h1 className="adm-title min-w-0" style={{ marginBottom: 0 }}>
+            {invitation.nombreEvento}
+          </h1>
           {/* Desktop: debajo del título */}
           <div className="hidden xl:block mt-2">
             <LiveStatusBadge live={isLive} />
