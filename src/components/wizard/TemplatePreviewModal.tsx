@@ -300,9 +300,9 @@ function TemplatePreviewModalBody({
               type="button"
               aria-label="Ver plantillas anteriores"
               onClick={() => tabsScrollRef.current?.scrollBy({ left: -240, behavior: "smooth" })}
-              className="absolute left-6 top-4 bottom-0 w-10 bg-gradient-to-r from-background to-transparent z-10 flex items-center justify-start cursor-pointer"
+              className="absolute left-6 top-4 bottom-0 w-10 md:w-14 bg-gradient-to-r from-background to-transparent z-10 flex items-center justify-start cursor-pointer"
             >
-              <span className="text-muted-foreground/60 hover:text-muted-foreground text-lg leading-none transition-colors">‹</span>
+              <span className="text-muted-foreground/60 hover:text-muted-foreground text-lg md:text-3xl leading-none transition-colors">‹</span>
             </button>
           )}
           {canScrollTabsRight && (
@@ -310,9 +310,9 @@ function TemplatePreviewModalBody({
               type="button"
               aria-label="Ver más plantillas"
               onClick={() => tabsScrollRef.current?.scrollBy({ left: 240, behavior: "smooth" })}
-              className="absolute right-6 top-4 bottom-0 w-10 bg-gradient-to-l from-background to-transparent z-10 flex items-center justify-end cursor-pointer"
+              className="absolute right-6 top-4 bottom-0 w-10 md:w-14 bg-gradient-to-l from-background to-transparent z-10 flex items-center justify-end cursor-pointer"
             >
-              <span className="text-muted-foreground/60 hover:text-muted-foreground text-lg leading-none transition-colors">›</span>
+              <span className="text-muted-foreground/60 hover:text-muted-foreground text-lg md:text-3xl leading-none transition-colors">›</span>
             </button>
           )}
           <div
