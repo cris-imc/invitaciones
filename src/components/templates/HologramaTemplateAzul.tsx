@@ -509,7 +509,7 @@ export function HologramaTemplateAzul({ invitation, guest, isPersonalized = fals
       onUpdate: (self) => {
         const p = self.progress; // 0 a 1 mientras la foto atraviesa el viewport
         shine.style.opacity = String(Math.sin(p * Math.PI) * 0.4);
-        shine.style.backgroundPosition = `${p * 220}% 50%`;
+        shine.style.transform = `translateX(${p * 240 - 70}%)`;
         // Orbes de fondo/frente moviéndose a distinta velocidad (parallax) --
         // el de fondo recorre menos distancia que el de frente.
         if (orbBack) orbBack.style.transform = `translateY(${(p - 0.5) * 60}px)`;
@@ -1242,8 +1242,7 @@ export function HologramaTemplateAzul({ invitation, guest, isPersonalized = fals
               ref={heroShineRef}
               className="absolute inset-0 pointer-events-none z-20"
               style={{
-                background: 'linear-gradient(115deg, transparent 20%, rgba(91,140,255,0.35) 35%, rgba(185,166,255,0.45) 50%, rgba(255,255,255,0.3) 58%, transparent 75%)',
-                backgroundSize: '260% 100%',
+                background: 'linear-gradient(115deg, transparent 44%, rgba(91,140,255,0.45) 48%, rgba(185,166,255,0.5) 50%, rgba(255,255,255,0.35) 52%, transparent 56%)',
                 opacity: 0,
               }}
             />

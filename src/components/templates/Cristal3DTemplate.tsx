@@ -1221,7 +1221,7 @@ export function Cristal3DTemplate({ invitation, guest, isPersonalized = false }:
               ref={heroShineRef}
               className="absolute inset-0 pointer-events-none z-20"
               style={{
-                background: 'linear-gradient(115deg, transparent 40%, rgba(143,211,255,0.4) 47%, rgba(255,255,255,0.5) 50%, rgba(185,166,255,0.4) 53%, transparent 60%)',
+                background: 'linear-gradient(115deg, transparent 44%, rgba(143,211,255,0.45) 48%, rgba(255,255,255,0.5) 50%, rgba(185,166,255,0.45) 52%, transparent 56%)',
                 opacity: 0,
               }}
             />
