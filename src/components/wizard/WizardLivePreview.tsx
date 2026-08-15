@@ -127,7 +127,7 @@ export function WizardLivePreview() {
         if (stepLabel === "Frase") section = "quote";
         if (stepLabel === "Detalles del Salón" || stepLabel === "Ceremonia / Civil") section = "details";
         if (stepLabel === "Cronograma") section = "schedule";
-        if (stepLabel === "Galería") section = "album";
+        if (stepLabel === "Galería" || stepLabel === "Álbum") section = "album";
         if (stepLabel === "Música") section = "music";
         if (stepLabel === "Regalo (CBU)") section = "banco";
         if (stepLabel === "Trivia") section = "quiz";

@@ -1,9 +1,9 @@
 ﻿/**
- * ModernoTemplatePurpura.tsx
- * Derivado de DraftTemplate.tsx: misma estructura, props, secciones y componentes
- * reutilizados (CountdownV2, AlbumCarousel, RSVPWizardV2, SongSuggestion, etc).
- * Cambia solo la capa visual: paleta grafito (#0D0412) + dorado champagne (#C9A876)
- * + acento esmeralda, bordes rectos (look "glass" moderno).
+ * ModernoTemplateLab.tsx
+ * Clon aislado de ModernoTemplate.tsx para experimentar (estilos de álbum,
+ * foto de fondo difuminada en la portada, etc) sin tocar la plantilla real
+ * que usan /invite, /preview-plantilla y el wizard. Servido solo desde
+ * /draft-moderno-lab/[slug], ruta no linkeada desde el resto de la app.
  *
  * Para el look tipográfico completo (Fraunces itálica + Sora), alias en tu layout
  * los CSS vars que ya usa este archivo:
@@ -18,8 +18,7 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Fraunces, Sora } from "next/font/google";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
-import { Album } from "@/components/invitation/v2/Album";
-import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { AlbumPolaroidCascade } from "@/components/invitation/v2/AlbumPolaroidCascade";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -32,7 +31,8 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, Heart } from "lucide-react";
+import { animate, stagger } from "animejs";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -79,7 +79,7 @@ function safeJson<T>(val: string | null | undefined, fallback: T): T {
   try { return JSON.parse(val) as T; } catch { return fallback; }
 }
 
-interface ModernoTemplatePurpuraProps {
+interface ModernoTemplateLabProps {
   invitation: Record<string, unknown>;
   guest?: {
     id: string;
@@ -259,14 +259,14 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
         </p>
         
         {isSaving ? (
-          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7 }}>Guardando tus resultados...</p>
+          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7, color: "#9B92AF" }}>Guardando tus resultados...</p>
         ) : (
           stats && stats.count > 0 && (
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "left", maxWidth: "90%" }}>
                 <Users className="w-5 h-5 text-[#C9A876] shrink-0" />
                 <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#EDE9F4" }}>
-                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong>{stats.avg}%</strong>.
+                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#FFFFFF" }}>{stats.avg}%</strong>.
                 </p>
               </div>
             </div>
@@ -334,15 +334,16 @@ const formatNumber = (num: number) => {
   return new Intl.NumberFormat("es-AR").format(num);
 };
 
-export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = false }: ModernoTemplatePurpuraProps) {
+export function ModernoTemplateLab({ invitation, guest, isPersonalized = false }: ModernoTemplateLabProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
 
   // Transición cinemática al abrir: en vez de desmontar la portada de
   // golpe al tocar el botón, se le suma una clase de salida (blur + zoom +
-  // fade, ver COVER_EXIT_STYLE) y recién después de esos ~700ms se
-  // desmonta de verdad. Aplica igual con foto animada o sin ella.
+  // fade, ver .moderno-cover-exit) y recién después de esos ~700ms se
+  // desmonta de verdad. Aplica igual con foto o sin ella, porque vive en
+  // el wrapper compartido de la portada.
   const openInvitation = () => {
     if (isClosingCover) return;
     setIsClosingCover(true);
@@ -434,6 +435,10 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
   const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
   const allPhotos = [...new Set([...galeria, ...albumFotos].filter(Boolean))];
+  // Mismo campo que usará el wizard cuando conectemos el paso real
+  // ("carrusel" | "solapadas"). Acá se puede forzar con ?albumStyle=... en
+  // la URL del Lab sin tocar la DB, ver draft-moderno-lab/[slug]/page.tsx.
+  const albumStyle = String(invitation.albumStyle ?? "carrusel");
 
   const cronograma: CronoItem[] = safeJson<CronoItem[]>(String(invitation.cronogramaEventos ?? ""), []);
 
@@ -468,14 +473,55 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
   // El recorte "desktop" del wizard se recicla como foto opcional de la
-  // portada de bienvenida animada -- sin fallback a mobile a propósito: si
-  // no se cargó nada ahí, la portada queda tal cual la plantilla, sin
-  // ningún efecto. Tinte dorado (firma de Moderno) + tono propio de esta
-  // variante de color.
+  // portada de bienvenida animada -- hoy ese recorte no cumple ningún
+  // propósito propio (el de mobile ya sirve perfecto para desktop también).
+  // Sin fallback a mobile acá a propósito: si el usuario NO cargó nada en
+  // ese recorte puntual, no hay portada animada y se ve la plantilla
+  // clásica de color con doodles (más abajo) -- heroBgDesktop (con
+  // fallback) sigue existiendo tal cual para la sección de después de
+  // abrir la invitación, no se toca. heroBlur en la URL del Lab fuerza el
+  // estado para poder previsualizar sin depender de qué invitación de
+  // prueba tenga o no cargado ese recorte.
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
-  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaTintColor1 = "#C9A876";
-  const portadaTintColor2 = "#15081A";
+  const heroBlurOverride = invitation.portadaFondoDifuminadoHabilitado;
+  const portadaFondoDifuminado = typeof heroBlurOverride === "boolean"
+    ? heroBlurOverride && Boolean(portadaImagenFondoDesktopRaw || heroBgMobile)
+    : Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoSrc = portadaImagenFondoDesktopRaw || heroBgMobile;
+  // Efecto a evaluar: tinte de la foto con los colores de la plantilla,
+  // "como tinta cayendo en agua" -- ver ?coverTint=1 en
+  // draft-moderno-lab/[slug]/page.tsx. Todavía no es parte fija del combo
+  // (Ken Burns + enfoque), es opcional para compararlo antes de decidir.
+  const coverTint = String(invitation.portadaCoverTint ?? "") === "1";
+  // Colores del tinte -- por default el acento de Moderno (dorado/esmeralda,
+  // igual en las 5 variantes de color). ?tintColor1/2 en la URL del Lab los
+  // pisa para demostrar cómo se vería con la paleta de otra familia.
+  const tintColor1 = String(invitation.portadaTintColor1 ?? "#C9A876");
+  const tintColor2 = String(invitation.portadaTintColor2 ?? "#3E7A6A");
+  // Familia de efecto a evaluar (ver ?coverFx en draft-moderno-lab/[slug]/page.tsx):
+  // "enfoque" (boda, delicado -- default), "shimmer" (XV delicado),
+  // "flash" (XV alocado), "bounce" (evento infantil/cumple),
+  // "geometric" (evento corporate). Solo cambia el tratamiento de la
+  // portada con foto; nada de esto toca la plantilla real.
+  const coverFx = String(invitation.portadaCoverFx ?? "enfoque");
+
+  // Animación de entrada de la portada (misma idea que PetalosTemplate: un
+  // solo animate() con stagger, corre una vez al montar la portada, no en
+  // loop). Con foto: nada de JS, el Ken Burns es puro CSS y queda siempre
+  // activo. Sin foto: doodles del tipo de evento entrando con stagger.
+  const coverRootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (isCoverOpen || !coverRootRef.current || portadaFondoDifuminado) return;
+    const root = coverRootRef.current;
+    animate(root.querySelectorAll(".moderno-doodle"), {
+      scale: [0, 1],
+      rotate: [-14, 0],
+      opacity: [0, 1],
+      duration: 900,
+      delay: stagger(140, { start: 300 }),
+      ease: "outBack",
+    });
+  }, [isCoverOpen, portadaFondoDifuminado]);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -495,7 +541,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b bg-[#0D0412] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#12181A] via-[#161F22] to-[#0B1112] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -586,7 +632,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         }
         /* Tarjetas claras (Ceremonia/Fiesta) necesitan texto oscuro, no blanco */
         .desktop-stage .tpl .moderno-light-card h4 {
-          color: #0D0412 !important;
+          color: #0F0E13 !important;
         }
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
@@ -617,10 +663,14 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         .desktop-stage .tpl .album-btn {
           border-radius: 0 !important;
         }
+        .desktop-stage .tpl .album-btn {
+          color: #ffffff !important;
+          border-color: rgba(255, 255, 255, 0.3) !important;
+        }
 
         /* Override Countdown Hardcoded Colors */
         #countdown.dark {
-          background-color: #0D0412 !important;
+          background-color: #0F0E13 !important;
           margin-top: -2px !important;
           position: relative;
           z-index: 20;
@@ -630,10 +680,10 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           border-color: rgba(201, 168, 118, 0.2) !important;
         }
 
-        /* RSVP Custom Aesthetics for DraftTemplate */
+        /* RSVP Custom Aesthetics for ModernoTemplate */
         #rsvp.section.dark {
-          background-color: #0D0412 !important; /* Dark brown/black */
-          color: #15081A !important;
+          background-color: #0F0E13 !important;
+          color: #FFFFFF !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -647,6 +697,10 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           max-width: 340px !important;
           text-align: left !important;
         }
+        #rsvp.section.dark b,
+        #rsvp.section.dark strong {
+          color: #FFFFFF !important;
+        }
         @media (min-width: 640px) {
           #rsvp.section.dark > p.t-kicker,
           #rsvp.section.dark > h2,
@@ -656,7 +710,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         }
         #rsvp.section.dark .t-kicker {
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
-          color: #ffffff !important;
+          color: #C9A876 !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -672,27 +726,34 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           font-size: 10px !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           letter-spacing: 0.15em !important;
-          color: rgba(234, 229, 217, 0.4) !important;
+          color: #9B92AF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
-          background-color: #15081A !important;
+          background-color: #151219 !important;
           color: #FFFFFF !important;
-          border-radius: 0 !important;
-          border: none !important;
-          padding: 16px 20px !important;
-          font-weight: 500 !important;
-          font-size: 15px !important;
+          border-radius: 6px !important;
+          border: 1px solid rgba(201, 168, 118, 0.2) !important;
+          padding: 12px 16px !important;
+          font-weight: 400 !important;
+          font-size: 14px !important;
         }
         #rsvp.section.dark input::placeholder {
           color: #9B92AF !important;
           opacity: 0.8 !important;
         }
         #rsvp.section.dark .t-btn {
-          border-radius: 0 !important;
-          padding: 14px 24px !important;
+          border-radius: 6px !important;
+          padding: 12px 24px !important;
           flex: 1 !important;
           min-width: 120px !important;
+          background-color: #C9A876 !important;
+          color: #0F0E13 !important;
+          font-weight: 600 !important;
+          border: none !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.1em !important;
+          font-size: 13px !important;
         }
         /* Make decision buttons side-by-side */
         #rsvp.section.dark div:has(> button[aria-label="Confirmar asistencia"]) {
@@ -743,7 +804,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #15081A !important;
+          color: #1C1926 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
@@ -753,7 +814,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         
         /* SongSuggestion Custom Aesthetics */
         #songs.d-sec.dark {
-          background-color: #15081A !important;
+          background-color: #15131B !important;
           padding: 80px 24px !important;
           display: flex;
           flex-direction: column;
@@ -783,7 +844,8 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           margin-bottom: 30px !important;
           display: block !important;
         }
-        #songs.d-sec.dark > p:not(.t-kicker) {
+        #songs.d-sec.dark h2,
+        #songs.d-sec.dark p:not(.t-kicker) {
           display: none !important;
         }
         /* Fix Input Row Overflow */
@@ -793,39 +855,9 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           gap: 0 !important;
           width: 100% !important;
         }
-        #songs.d-sec.dark input {
-          width: 100% !important;
-          box-sizing: border-box !important;
-          background-color: #151219 !important;
-          color: #FFFFFF !important;
-          border-radius: 6px !important;
-          border: 1px solid rgba(201, 168, 118, 0.6) !important;
-          padding: 12px 16px !important;
-          font-weight: 400 !important;
-          font-size: 14px !important;
-          margin-bottom: 12px !important;
-        }
-        #songs.d-sec.dark input::placeholder {
-          color: #FFFFFF !important;
-          opacity: 0.5;
-        }
-        #songs.d-sec.dark button[type="submit"] {
-          background-color: #C9A876 !important;
-          color: #0D0412 !important;
-          border-radius: 0 !important;
-          border: none !important;
-          padding: 14px 24px !important;
-          text-transform: uppercase !important;
-          font-weight: 700 !important;
-          letter-spacing: 0.05em !important;
-          font-size: 13px !important;
-          width: 100% !important;
-          margin-top: 8px !important;
-        }
-        
         /* Footer Aesthetics */
         .desktop-stage .d-foot {
-          background-color: #0D0412 !important; /* Matches light sections */
+          background-color: #0F0E13 !important; /* Matches light sections */
           color: #FFFFFF !important;
           padding: 24px 24px 38px 24px !important;
           text-align: center;
@@ -843,7 +875,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         }
         #banco .copy-btn {
           background-color: #C9A876 !important;
-          color: #0D0412 !important;
+          color: #0F0E13 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;
@@ -852,7 +884,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         }
         #banco .copy-btn.copied {
           background-color: #FFFFFF !important;
-          color: #0D0412 !important;
+          color: #0F0E13 !important;
         }
 
         /* Bottom Nav Pill - Liquid Glass Sticky */
@@ -885,36 +917,167 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
       {/* PORTADA / WELCOME OVERLAY (mesh dorado + esmeralda animado, glow pulsante) */}
       {!isCoverOpen && (
         <div
-          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#0D0412', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className={`text-[#EDE9F4] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
+          ref={coverRootRef}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#0F0E13', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
+          className={`text-[#EDE9F4] ${isClosingCover ? "moderno-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div className="acp-mobile-only">
-          {portadaFondoAnimado && (
-            <AnimatedCoverPhoto
-              photoSrc={portadaImagenFondoDesktopRaw as string}
-              tintColor1={portadaTintColor1}
-              tintColor2={portadaTintColor2}
-              effect="enfoque"
-              scrimColorRgb="13,4,18"
-            />
-          )}
-          </div>
-          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+          {portadaFondoDifuminado && coverFx === "geometric" && (
+            <>
+              {/* Evento corporate: la restricción ES el efecto -- foto
+                  nítida fija, sin blur, sin Ken Burns, sin wipe ni ningún
+                  gesto extra. Solo el fade-in de 1s que ya trae el
+                  contenedor. Nada que pueda salir mal ni distraer. */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: `url(${portadaFondoSrc})`,
+                backgroundSize: 'cover', backgroundPosition: 'center',
+              }} />
               <div style={{
                 position: 'absolute', inset: 0, pointerEvents: 'none',
-                background: 'radial-gradient(50% 40% at 15% 15%, rgba(201,168,118,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(201,168,118,0.15), transparent)',
-                backgroundSize: '160% 160%',
-                animation: 'moderno-meshDrift 14s ease-in-out infinite',
+                background: 'linear-gradient(180deg, rgba(15,14,19,.15) 0%, rgba(15,14,19,.25) 40%, rgba(15,14,19,.55) 100%)',
               }} />
+            </>
+          )}
+          {portadaFondoDifuminado && coverFx !== "geometric" && (
+            <>
+              {/* Foto de fondo en degradé de nitidez -- dos copias de la
+                  misma foto superpuestas: una nítida abajo, una difuminada
+                  arriba con una máscara en degradé que la va revelando. El
+                  tercio de arriba queda nítido (la escena real) y se va
+                  perdiendo en blur hacia abajo, donde está el texto.
+                  Envueltas en .moderno-kenburns para que el zoom/pan lento
+                  anime a las dos capas exactamente en sync (una sola
+                  animación CSS en loop, no JS por frame). inset negativo
+                  para que el halo del blur/mask/zoom quede fuera del
+                  viewport (el padre tiene overflow:hidden). Para "flash"
+                  (XV alocado) se le suma un punch de zoom de entrada en vez
+                  de depender solo del drift lento. */}
+              <div
+                className={`moderno-kenburns${coverFx === "flash" ? " moderno-flash-punch" : ""}`}
+                style={{ position: 'absolute', inset: '-40px', pointerEvents: 'none' }}
+              >
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: `url(${portadaFondoSrc})`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                }} />
+                <div
+                  className={coverFx === "enfoque" || coverFx === "shimmer" ? "moderno-focuspull" : undefined}
+                  style={{
+                    position: 'absolute', inset: 0,
+                    backgroundImage: `url(${portadaFondoSrc})`,
+                    backgroundSize: 'cover', backgroundPosition: 'center',
+                    filter: 'blur(22px)',
+                    WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, transparent 28%, black 62%)',
+                    maskImage: 'linear-gradient(180deg, transparent 0%, transparent 28%, black 62%)',
+                  }}
+                />
+              </div>
+              {/* Tinte "tinta en agua" -- gradiente en mix-blend-mode:color,
+                  mantiene la luz/detalle de la foto y solo le cambia el
+                  matiz. clip-path circle() lo expande desde un punto una
+                  sola vez al montar, simulando la gota. Dorado/esmeralda es
+                  el color de firma de Moderno (se repite igual en las 5
+                  variantes de color -- Azul, Bordo, Púrpura, Verde, Negro
+                  solo cambian el FONDO, no el acento). tintColor1/2 en la
+                  URL del Lab lo pisan para probar cómo se vería con la
+                  paleta de otra familia de plantilla (ej. neón). */}
+              {coverTint && (
+                <div className="moderno-inktint" style={{
+                  position: 'absolute', inset: '-40px', pointerEvents: 'none',
+                  background: `radial-gradient(circle at 50% 22%, ${tintColor1}, ${tintColor2} 140%)`,
+                  mixBlendMode: 'color',
+                  opacity: 0.75,
+                }} />
+              )}
+              {/* XV delicado: brillo + 4 destellos puntuales que titilan en
+                  distintos momentos -- lo anterior (un solo glow) se
+                  perdía contra la foto; el titileo puntual es lo que de
+                  verdad se lee como "shimmer" y no como el enfoque de
+                  siempre. */}
+              {coverFx === "shimmer" && (
+                <>
+                  <div className="moderno-shimmer-glow" style={{
+                    position: 'absolute', width: 340, height: 340, borderRadius: '50%',
+                    top: '10%', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none',
+                    background: 'radial-gradient(circle, rgba(255,248,224,.95), rgba(201,168,118,.55) 45%, transparent 74%)',
+                    filter: 'blur(2px)', mixBlendMode: 'screen',
+                  }} />
+                  {[
+                    { top: '8%', left: '28%', delay: 0.6 },
+                    { top: '20%', left: '72%', delay: 1.0 },
+                    { top: '32%', left: '38%', delay: 1.4 },
+                    { top: '15%', left: '58%', delay: 1.8 },
+                  ].map((p, i) => (
+                    <div key={i} className="moderno-shimmer-twinkle" style={{
+                      position: 'absolute', top: p.top, left: p.left, width: 5, height: 5, borderRadius: '50%',
+                      background: '#FFF6DD', boxShadow: '0 0 8px 2px rgba(255,244,214,.9)', pointerEvents: 'none',
+                      animationDelay: `${p.delay}s`,
+                    }} />
+                  ))}
+                </>
+              )}
+              {/* XV alocado: flash real (blanco, muy corto, tipo disparo de
+                  cámara) + un segundo pulso de color, en vez de un solo
+                  glow radial suave que no se leía como "flash". */}
+              {coverFx === "flash" && (
+                <>
+                  <div className="moderno-flash-white" style={{
+                    position: 'absolute', inset: 0, pointerEvents: 'none', background: '#FFFFFF',
+                  }} />
+                  <div className="moderno-flash-strobe" style={{
+                    position: 'absolute', inset: 0, pointerEvents: 'none',
+                    background: 'radial-gradient(circle at 50% 30%, #FF6FD8, #C9A876 55%, transparent 80%)',
+                    mixBlendMode: 'screen',
+                  }} />
+                </>
+              )}
               <div style={{
-                position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(201,168,118,0.13), transparent 70%)',
-                top: '18%', left: '50%', transform: 'translateX(-50%)',
-                animation: 'moderno-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+                position: 'absolute', inset: 0, pointerEvents: 'none',
+                background: 'linear-gradient(180deg, rgba(15,14,19,.1) 0%, rgba(15,14,19,.15) 28%, rgba(15,14,19,.35) 55%, rgba(15,14,19,.6) 100%)',
               }} />
-          </div>
+            </>
+          )}
+          {!portadaFondoDifuminado && (
+            <>
+              {/* Doodles de portada según tipo de evento -- corazones para
+                  boda, estrellas para XV -- mismo mecanismo que los doodles
+                  de PetalosTemplate (opacity-0 inicial + animate() con
+                  stagger al montar, ver useEffect de arriba). */}
+              {tipo === "CASAMIENTO" ? (
+                <>
+                  <Heart className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 16, height: 16, top: '10%', left: '12%', color: 'rgba(201,168,118,.55)', opacity: 0 }} />
+                  <Heart className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 11, height: 11, top: '16%', right: '14%', color: 'rgba(62,122,106,.5)', opacity: 0 }} />
+                  <Heart className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 13, height: 13, bottom: '24%', left: '16%', color: 'rgba(201,168,118,.45)', opacity: 0 }} />
+                  <Heart className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 9, height: 9, bottom: '30%', right: '12%', color: 'rgba(62,122,106,.45)', opacity: 0 }} />
+                </>
+              ) : (
+                <>
+                  <Star className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 16, height: 16, top: '10%', left: '12%', color: 'rgba(201,168,118,.55)', opacity: 0 }} />
+                  <Star className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 11, height: 11, top: '16%', right: '14%', color: 'rgba(62,122,106,.5)', opacity: 0 }} />
+                  <Star className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 13, height: 13, bottom: '24%', left: '16%', color: 'rgba(201,168,118,.45)', opacity: 0 }} />
+                  <Star className="moderno-doodle absolute" strokeWidth={1.5} style={{ width: 9, height: 9, bottom: '30%', right: '12%', color: 'rgba(62,122,106,.45)', opacity: 0 }} />
+                </>
+              )}
+            </>
+          )}
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: 'radial-gradient(50% 40% at 15% 15%, rgba(201,168,118,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(62,122,106,0.2), transparent)',
+            backgroundSize: '160% 160%',
+            animation: 'moderno-meshDrift 14s ease-in-out infinite',
+          }} />
+          <div style={{
+            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(201,168,118,0.13), transparent 70%)',
+            top: '18%', left: '50%', transform: 'translateX(-50%)',
+            animation: 'moderno-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+          }} />
 
-          <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
+          <div
+            className={portadaFondoDifuminado && coverFx === "bounce" ? "moderno-bounce-in" : undefined}
+            style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}
+          >
 
             <div style={{
               width: 44, height: 44, borderRadius: '50%', border: '1px solid #C9A876',
@@ -945,7 +1108,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
                 background: 'rgba(201,168,118,0.08)', backdropFilter: 'blur(6px)',
                 marginTop: '1rem',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A876'; e.currentTarget.style.color = '#0D0412'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A876'; e.currentTarget.style.color = '#0F0E13'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(201,168,118,0.08)'; e.currentTarget.style.color = '#C9A876'; }}
             >
               ABRIR INVITACIÓN
@@ -957,8 +1120,66 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
             @keyframes moderno-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes moderno-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes moderno-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            @keyframes moderno-kenburns { 0% { transform: scale(1) translate(0, 0); } 100% { transform: scale(1.12) translate(-1.5%, -1.5%); } }
+            .moderno-kenburns { animation: moderno-kenburns 26s ease-in-out infinite alternate; transform-origin: center; }
+            @keyframes moderno-focuspull { 0% { opacity: 0; } 100% { opacity: 1; } }
+            .moderno-focuspull { animation: moderno-focuspull 1.8s ease-out 0.2s both; }
+            @keyframes moderno-cover-exit {
+              0% { opacity: 1; transform: scale(1); filter: blur(0px); }
+              100% { opacity: 0; transform: scale(1.08); filter: blur(10px); }
+            }
+            .moderno-cover-exit { animation: moderno-cover-exit 0.7s cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
+            @keyframes moderno-inkbleed {
+              0% { -webkit-clip-path: circle(0% at 50% 22%); clip-path: circle(0% at 50% 22%); }
+              100% { -webkit-clip-path: circle(145% at 50% 22%); clip-path: circle(145% at 50% 22%); }
+            }
+            .moderno-inktint { animation: moderno-inkbleed 2.2s cubic-bezier(.25,.8,.35,1) 0.3s both; }
+
+            /* XV delicado: shimmer -- glow más grande/brillante que antes
+                (screen blend, no solo opacity) + 4 puntos de brillo que
+                titilan en momentos distintos. */
+            @keyframes moderno-shimmerbloom {
+              0% { opacity: 0; transform: translateX(-50%) scale(.4); }
+              45% { opacity: .85; }
+              100% { opacity: 0; transform: translateX(-50%) scale(1.7); }
+            }
+            .moderno-shimmer-glow { animation: moderno-shimmerbloom 2s ease-out .3s both; }
+            @keyframes moderno-twinkle {
+              0%, 100% { opacity: 0; transform: scale(.4); }
+              50% { opacity: 1; transform: scale(1.3); }
+            }
+            .moderno-shimmer-twinkle { animation: moderno-twinkle 1.1s ease-in-out both; }
+
+            /* XV alocado: flash blanco real (tipo disparo de cámara) +
+                pulso de color + punch de zoom más marcado que antes. */
+            @keyframes moderno-flashpunch {
+              0% { transform: scale(1.22); }
+              55% { transform: scale(.97); }
+              100% { transform: scale(1); }
+            }
+            .moderno-flash-punch { animation: moderno-flashpunch .55s cubic-bezier(.2,1.6,.3,1) both; }
+            @keyframes moderno-flashwhite {
+              0% { opacity: 0; }
+              8% { opacity: .95; }
+              100% { opacity: 0; }
+            }
+            .moderno-flash-white { animation: moderno-flashwhite .45s ease-out both; }
+            @keyframes moderno-strobe {
+              0% { opacity: 0; }
+              20% { opacity: .7; }
+              100% { opacity: 0; }
+            }
+            .moderno-flash-strobe { animation: moderno-strobe .7s ease-out .1s both; }
+
+            /* Evento infantil/cumple: rebote juguetón */
+            @keyframes moderno-bouncein {
+              0% { transform: scale(.7); opacity: 0; }
+              55% { transform: scale(1.08); opacity: 1; }
+              75% { transform: scale(.96); }
+              100% { transform: scale(1); }
+            }
+            .moderno-bounce-in { animation: moderno-bouncein .8s cubic-bezier(.34,1.56,.64,1) both; }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -966,7 +1187,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
         <div 
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#C9A876]/40 shadow-md ${isTicketMaximized ? 'bg-[#0D0412]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#FFFFFF]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
+          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#C9A876]/40 shadow-md ${isTicketMaximized ? 'bg-[#0F0E13]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#FFFFFF]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
         >
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
@@ -982,7 +1203,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#C9A876]" />
-              <span className="text-[#15081A]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#1C1926]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1044,9 +1265,9 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
       </aside>
 
       <div className="d-right tpl">
-        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#0D0412]">
+        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#0F0E13]">
           {/* Text Container */}
-          <div className="px-8 pt-16 pb-12 text-left bg-[#0D0412] z-10 relative">
+          <div className="px-8 pt-16 pb-12 text-left bg-[#0F0E13] z-10 relative">
             <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#C9A876] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
@@ -1073,7 +1294,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           
           {/* Image Container */}
           <div className="flex-1 w-full relative">
-            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #0D0412 100%)' }} />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #0F0E13 100%)' }} />
             <div
               className="absolute inset-0 w-full h-full"
               style={heroBgMobile ? {
@@ -1081,7 +1302,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
                 backgroundSize: "cover",
                 backgroundPosition: `${Number(invitation.portadaImagenPosX ?? 50)}% ${Number(invitation.portadaImagenPosY ?? 50)}%`,
                 backgroundRepeat: "no-repeat"
-              } : { backgroundColor: '#15081A' }}
+              } : { backgroundColor: '#1C1926' }}
             />
           </div>
         </div>
@@ -1097,7 +1318,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #C9A87614, transparent 70%), #15081A" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #3E7A6A14, transparent 70%), #1C1926" }}>
             <div className="max-w-2xl mx-auto text-center">
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
@@ -1108,7 +1329,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
           </SectionWrapper>
         ) : null}
 
-        <SectionWrapper id="details" delay={150} className="w-full bg-[#0D0412] py-20 px-6 md:px-12">
+        <SectionWrapper id="details" delay={150} className="w-full bg-[#0F0E13] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
             <p className="t-kicker mb-8  text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               CUÁNDO Y DÓNDE
@@ -1200,14 +1421,18 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#15081A] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#1C1926] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-10">
                 ÁLBUM
               </p>
             </div>
             <div className="w-full">
-              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
+              {albumStyle === "solapadas" ? (
+                <AlbumPolaroidCascade photos={allPhotos} hideHeader />
+              ) : (
+                <AlbumCarousel photos={allPhotos} hideHeader />
+              )}
             </div>
           </SectionWrapper>
         )}
@@ -1258,7 +1483,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
 
 
         {showGiftSection && (
-          <SectionWrapper id="banco" delay={200} className="w-full bg-[#15081A] py-20 px-6 md:px-12 overflow-hidden">
+          <SectionWrapper id="banco" delay={200} className="w-full bg-[#15131B] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
                 <p className="t-kicker mb-10 text-[#C9A876]">
                   DATOS BANCARIOS DEL EVENTO
@@ -1277,7 +1502,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="#C9A876"
-                      cardBg="#1F1224"
+                      cardBg="#1C1926"
                       textPrimary="#FFFFFF"
                       textSecondary="#9B92AF"
                       InfoRow={InfoRow}
@@ -1297,7 +1522,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="#C9A876"
-                      cardBg="#1F1224"
+                      cardBg="#1C1926"
                       textPrimary="#FFFFFF"
                       textSecondary="#9B92AF"
                       InfoRow={InfoRow}
@@ -1310,7 +1535,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         )}
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
-          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #C9A87618, transparent 70%), #15081A" }}>
+          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #3E7A6A18, transparent 70%), #15131B" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <p className="t-kicker mb-8">
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
@@ -1341,13 +1566,12 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
 
         {musicaHabilitada && musicAudioElement}
 
-        <LogoFooterCredit bgColor="#0D0412" />
+        <LogoFooterCredit bgColor="#0F0E13" />
         </div>
       </div>
       
-      {isCoverOpen && <BottomNavPill sections={navSections} />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" />}
       </div>
   );
 }
-
 

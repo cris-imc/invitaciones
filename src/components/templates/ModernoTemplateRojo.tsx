@@ -18,6 +18,8 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Fraunces, Sora } from "next/font/google";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -334,7 +336,22 @@ const formatNumber = (num: number) => {
 
 export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false }: ModernoTemplateRojoProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  // Transición cinemática al abrir: en vez de desmontar la portada de
+  // golpe al tocar el botón, se le suma una clase de salida (blur + zoom +
+  // fade, ver COVER_EXIT_STYLE) y recién después de esos ~700ms se
+  // desmonta de verdad. Aplica igual con foto animada o sin ella.
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -450,6 +467,15 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+  // El recorte "desktop" del wizard se recicla como foto opcional de la
+  // portada de bienvenida animada -- sin fallback a mobile a propósito: si
+  // no se cargó nada ahí, la portada queda tal cual la plantilla, sin
+  // ningún efecto. Tinte dorado (firma de Moderno) + tono propio de esta
+  // variante de color.
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaTintColor1 = "#C9A876";
+  const portadaTintColor2 = "#521010";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -858,22 +884,35 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
       
       {/* PORTADA / WELCOME OVERLAY (mesh dorado + esmeralda animado, glow pulsante) */}
       {!isCoverOpen && (
-        <div 
+        <div
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#3D0808', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#EDE9F4] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#EDE9F4] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(201,168,118,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(201,168,118,0.15), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'moderno-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(201,168,118,0.13), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'moderno-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          <div className="acp-mobile-only">
+          {portadaFondoAnimado && (
+            <AnimatedCoverPhoto
+              photoSrc={portadaImagenFondoDesktopRaw as string}
+              tintColor1={portadaTintColor1}
+              tintColor2={portadaTintColor2}
+              effect="enfoque"
+              scrimColorRgb="61,8,8"
+            />
+          )}
+          </div>
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+              <div style={{
+                position: 'absolute', inset: 0, pointerEvents: 'none',
+                background: 'radial-gradient(50% 40% at 15% 15%, rgba(201,168,118,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(201,168,118,0.15), transparent)',
+                backgroundSize: '160% 160%',
+                animation: 'moderno-meshDrift 14s ease-in-out infinite',
+              }} />
+              <div style={{
+                position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(201,168,118,0.13), transparent 70%)',
+                top: '18%', left: '50%', transform: 'translateX(-50%)',
+                animation: 'moderno-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+              }} />
+          </div>
 
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
@@ -899,7 +938,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #C9A876', color: '#C9A876',
@@ -919,6 +958,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
             @keyframes moderno-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes moderno-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1167,7 +1207,7 @@ export function ModernoTemplateRojo({ invitation, guest, isPersonalized = false 
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

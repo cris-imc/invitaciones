@@ -13,6 +13,7 @@ import { StepBankDetails } from "./StepBankDetails";
 import { StepCeremonia } from "./StepCeremonia";
 import { StepTypography } from "./StepTypography";
 import { StepCountdownStyle } from "./StepCountdownStyle";
+import { StepAlbumStyle } from "./StepAlbumStyle";
 
 export interface WizardStepDef {
     component: ComponentType;
@@ -45,6 +46,7 @@ export function getWizardSteps({
         ...(isCasamiento ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
         { component: StepCronograma, label: "Cronograma" },
         { component: StepGallery, label: "Galería" },
+        { component: StepAlbumStyle, label: "Álbum" },
         { component: StepMusic, label: "Música" },
         { component: StepBankDetails, label: "Regalo (CBU)" },
         { component: StepTrivia, label: "Trivia" },

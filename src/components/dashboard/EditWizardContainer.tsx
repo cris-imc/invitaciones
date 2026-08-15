@@ -112,6 +112,7 @@ function WizardContent({ invitation }: { invitation: any }) {
                 fontTitle: invitation.fontTitle || "fraunces",
                 fontBody: invitation.fontBody || "space-grotesk",
                 countdownStyle: invitation.countdownStyle || "clasico",
+                albumStyle: invitation.albumStyle || "carrusel",
             });
 
             // themeConfig es un slice separado de data (legacy). StepDesign lee

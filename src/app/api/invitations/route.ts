@@ -284,6 +284,7 @@ export async function POST(request: NextRequest) {
                 fontTitle: body.fontTitle || 'fraunces',
                 fontBody: body.fontBody || 'space-grotesk',
                 countdownStyle: body.countdownStyle || 'clasico',
+                albumStyle: body.albumStyle || 'carrusel',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -497,6 +498,7 @@ export async function PUT(request: NextRequest) {
                 fontTitle: body.fontTitle || 'fraunces',
                 fontBody: body.fontBody || 'space-grotesk',
                 countdownStyle: body.countdownStyle || 'clasico',
+                albumStyle: body.albumStyle || 'carrusel',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
