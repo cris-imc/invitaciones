@@ -28,9 +28,8 @@ export default async function Home() {
           <div>
             <AnimatedHeroText />
             <p className="sub">
-              Elegí una plantilla, personalizá cada detalle y compartí un solo
-              link. Nosotros nos encargamos de las confirmaciones, los pagos
-              y la fiesta en vivo.
+              Confirmaciones, pagos, fotos y mensajes en vivo — un solo link,
+              sin suscripciones.
             </p>
             <div className="l-hero-ctas font-ui">
               <Link href={registerUrl}>
