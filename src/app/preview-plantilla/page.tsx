@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   MODERNO_COMPONENTS,
@@ -84,6 +84,9 @@ function PreviewPlantillaContent() {
   // mandar datos en vivo).
   const [liveInvitation, setLiveInvitation] = useState<Record<string, unknown> | null>(null);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  // Contador para invalidar el fallback de scroll (ver más abajo) si llega
+  // un wizard-scroll-to más nuevo antes de que se cumplan los 700ms.
+  const scrollFallbackToken = useRef(0);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -94,10 +97,11 @@ function PreviewPlantillaContent() {
       } else if (event.data?.type === "wizard-scroll-to") {
           const sectionId = event.data.section;
           if (!sectionId) return;
-          
+
           if (sectionId === 'hero') {
               window.scrollTo({ top: 0, behavior: 'smooth' });
               setPendingScrollId(null);
+              scrollFallbackToken.current += 1;
               return;
           }
           const element = document.getElementById(sectionId);
@@ -105,8 +109,24 @@ function PreviewPlantillaContent() {
               const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
               window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
               setPendingScrollId(null);
+              scrollFallbackToken.current += 1;
           } else {
               setPendingScrollId(sectionId);
+              // Algunas secciones nunca existen en el preview del wizard
+              // (Música está deshabilitada a propósito acá para no pisar el
+              // reproductor real; Regalo/Trivia dependen de toggles que
+              // pueden estar apagados en esa invitación puntual) -- sin este
+              // fallback, el preview se queda clavado para siempre en la
+              // última sección que sí encontró. Si en 700ms el elemento
+              // sigue sin aparecer, se asume que esa sección no va a existir y se
+              // baja al final de la página en vez de no moverse.
+              const myToken = ++scrollFallbackToken.current;
+              setTimeout(() => {
+                  if (scrollFallbackToken.current !== myToken) return; // llegó un scroll-to más nuevo mientras tanto
+                  if (document.getElementById(sectionId)) return; // apareció justo a tiempo
+                  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+                  setPendingScrollId(null);
+              }, 700);
           }
       }
     };

@@ -2,6 +2,14 @@
 
 > Bitácora de sesión puntual (rama `portada-y-album`). El conocimiento durable de CÓMO se hace esto vive en `docs/GUIA_TECNICA_PLANTILLAS.md` sección 8 — este archivo es solo el checkpoint de QUÉ falta y en qué estado quedó cada familia. Se actualiza a medida que se avanza.
 
+## Bug encontrado y resuelto — live preview del wizard "se congelaba" después de Álbum
+
+No era un bug de Álbum en sí: `WizardLivePreview.tsx` manda `postMessage({type:"wizard-scroll-to", section})` en cada paso, y `preview-plantilla/page.tsx` busca `document.getElementById(section)` para scrollear. Las secciones `music` (Música está deshabilitada a propósito en el preview, para no pisar el reproductor real -- `musicaHabilitada: false` hardcodeado) y `banco`/`quiz` (dependen de toggles que pueden estar apagados en la invitación de prueba) **nunca existen en el DOM del preview** -- el handler se quedaba esperando ese elemento para siempre, y el preview quedaba visualmente clavado en la última sección que sí encontró. Como Álbum ahora es el paso justo anterior a Música, se volvió mucho más notorio (antes "Galería" ya tenía el mismo problema, solo que menos visible).
+
+**Fix en `src/app/preview-plantilla/page.tsx`**: si a los 700ms el elemento buscado sigue sin aparecer, se asume que esa sección no va a existir en este preview y se hace scroll al final de la página (`document.body.scrollHeight`) en vez de no moverse -- así el preview se sigue sintiendo "vivo" acompañando el proceso, aunque no pueda mostrar la sección puntual. Un contador (`scrollFallbackToken`) invalida el fallback si llega un `wizard-scroll-to` más nuevo antes de los 700ms, para no pisar un scroll más reciente con uno viejo.
+
+Verificado con el flujo completo del wizard (Portada → ... → Álbum → Música → Regalo (CBU) → Trivia) — el preview ya no se queda clavado en ningún punto.
+
 ## Hecho (infraestructura, no depende de plantilla)
 
 - [x] `Invitation.albumStyle` en el schema de Prisma (`carrusel` | `solapadas`), migrado a la DB de dev.
