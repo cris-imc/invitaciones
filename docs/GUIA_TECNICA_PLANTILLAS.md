@@ -356,3 +356,33 @@ Además: **verificar cada reemplazo con un chequeo de "exactamente 1 match" ante
 ### 8.7 Para plantillas nuevas de acá en adelante
 
 Si se agrega una familia nueva (siguiendo las secciones 1-7), el checklist de la sección 6 debería incluir también: "Álbum usa `<Album albumStyle={...}>`, no `<AlbumCarousel>` directo" + "Portada de bienvenida wireada con `AnimatedCoverPhoto` + `COVER_RESPONSIVE_STYLE`, con `effect`/tinte elegidos a propósito según la personalidad de la plantilla (tabla de 8.1), no copiados de Moderno por default".
+
+---
+
+## 9. Live preview del wizard (`WizardLivePreview.tsx` + `preview-plantilla/page.tsx`) — cómo sigue el scroll a cada paso, y su trampa
+
+No es parte de la feature de álbum/portada (es infraestructura preexistente que ya tocaban Countdown/Detalles/Cronograma), pero se encontró y arregló un bug real acá durante la rama `portada-y-album`, y vale la pena documentarlo aparte porque **cualquier paso nuevo que se agregue al wizard de acá en más puede pisar la misma trampa**.
+
+### 9.1 Arquitectura en dos partes
+
+- **`WizardLivePreview.tsx`** (el panel del wizard, ventana padre): en cada cambio de `currentStep`, calcula a qué `section` (`"hero"`, `"countdown"`, `"quote"`, `"details"`, `"schedule"`, `"album"`, `"music"`, `"banco"`, `"quiz"`) corresponde el paso actual (mapeo por `stepLabel`, ver el `useEffect` con el comentario "Sincronizar scroll cuando cambia de paso") y le manda `postMessage({ type: "wizard-scroll-to", section })` al iframe.
+- **`preview-plantilla/page.tsx`** (adentro del iframe, la plantilla real renderizada): escucha ese mensaje, busca `document.getElementById(section)` y hace `window.scrollTo(...)` hasta ahí.
+
+### 9.2 ⚠️ Trampa: varias secciones NO EXISTEN en el preview, a propósito o por datos vacíos
+
+`id="music"` nunca existe en el preview (`musicaHabilitada: false` hardcodeado en `WizardLivePreview.tsx`, a propósito, para no pisar el reproductor real con el que ya está sonando en el resto de la página del dashboard). `id="banco"` y `id="quiz"` dependen de toggles (`regaloHabilitado`/`pagoTarjetaHabilitado`, `triviaHabilitada`) que pueden estar apagados en la invitación que se esté editando. `id="schedule"` (Cronograma) y `id="album"` también pueden faltar si esos datos están vacíos.
+
+**Si el elemento buscado no existe, `document.getElementById` devuelve `null` — sin un fallback, el preview se queda visualmente clavado en la última sección que sí encontró**, aunque el usuario siga avanzando pasos (esto pasó de verdad: se notó recién cuando se agregó el paso "Álbum" justo antes de "Música", pero el bug ya existía antes con "Galería"→"Música", solo que menos visible).
+
+**Solución (`SECTION_ORDER` + `scrollFallbackToken` en `preview-plantilla/page.tsx`)**: si a los 700ms el elemento sigue sin aparecer, se busca la PRÓXIMA sección que sí exista siguiendo el orden natural del wizard (`["hero","countdown","quote","details","schedule","album","music","banco","quiz"]`) — y recién si no queda ninguna más adelante, se hace scroll al final de la página. **No saltar directo al final de la página como primer recurso** — se probó primero así y se sentía roto en pasos del medio con sección vacía (ej. Cronograma sin etapas: saltaba al fondo de toda la invitación en vez de quedarse cerca, en la sección más próxima que sí tenía algo). Un contador (`scrollFallbackToken`) invalida el fallback si llega un `wizard-scroll-to` más nuevo antes de los 700ms, para que un scroll viejo no pise a uno más reciente.
+
+Si se agrega un paso nuevo al wizard cuya sección pueda no existir en el preview (por toggle apagado o dato vacío), agregar su `id` a `SECTION_ORDER` en el lugar que le corresponda por orden de aparición — si no, el fallback no sabe a dónde seguir buscando después de esa sección.
+
+### 9.3 ⚠️ Trampa de debugging: hay DOS `<iframe>` de preview montados a la vez
+
+El wizard monta el preview de escritorio (visible, panel lateral) Y `WizardMobilePreviewSheet.tsx` (colapsado/oculto, `0×0`, hasta que se abre en pantallas angostas) **al mismo tiempo**, siempre, sin importar el tamaño de ventana real. `document.querySelector('iframe')` agarra el primero que encuentre en el DOM, que **no necesariamente es el visible**.
+
+Costó bastante tiempo de diagnóstico en esta sesión: pruebas por JS que parecían dar resultados inconsistentes (a veces el scroll parecía no moverse, a veces sí, con los mismos pasos repetidos) en realidad estaban leyendo el `scrollY` de dos iframes DISTINTOS con estados independientes. **Al inspeccionar/debuggear el preview por JS, filtrar siempre por el iframe visible**:
+```js
+const iframe = [...document.querySelectorAll('iframe')].find(f => f.offsetParent !== null);
+```
