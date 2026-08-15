@@ -1486,7 +1486,7 @@ export function PetalosTemplateCoral({ invitation, guest, isPersonalized = false
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" inactiveColor="var(--petalos-ink)" solid />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#F2946B" surfaceColor="#FCE4D6" inactiveColor="#3D241A" solid />}
       </div>
   );
 }

@@ -1486,7 +1486,7 @@ export function PetalosTemplateVinoVibrante({ invitation, guest, isPersonalized 
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" inactiveColor="var(--petalos-ink)" solid />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#8C1B2A" surfaceColor="#3B131B" inactiveColor="#F6E4E6" solid />}
       </div>
   );
 }

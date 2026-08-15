@@ -1486,7 +1486,7 @@ export function PetalosTemplatePastel({ invitation, guest, isPersonalized = fals
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" inactiveColor="var(--petalos-ink)" solid />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#F0B8C6" surfaceColor="#FDEFF2" inactiveColor="#4A2E35" solid />}
       </div>
   );
 }
