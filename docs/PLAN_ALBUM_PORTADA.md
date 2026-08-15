@@ -16,6 +16,8 @@
 2. Invitación de prueba lista para usar: slug `chic-test-1786819949098` (`/i/chic-test-1786819949098`), ya tiene fotos reales cargadas en ambos campos de portada.
 3. Después de Chic: seguir con el resto de las 20 familias, en el orden y con los colores/efecto ya relevados en la tabla de más abajo (sección "Tabla de familias").
 
+**⚠️ Al terminar TODO el rollout (las 21 familias, no antes)**: pasar una revisión completa de `docs/GUIA_TECNICA_PLANTILLAS.md` secciones 8-9 y actualizarla con cualquier matiz nuevo que haya aparecido en el camino y todavía no esté documentado (nuevas trampas por familia, ajustes al criterio de `effect`/tinte de la sección 8.4, correcciones a la tabla de familias claras/oscuras de la 8.3, etc. — cualquier cosa aprendida familia por familia que no sea específica de una sola sino que la próxima plantilla nueva también pueda pisar). Este archivo (`PLAN_ALBUM_PORTADA.md`) es la bitácora de sesión y se puede borrar/archivar después de eso; la guía técnica es lo que queda. Ver también el ítem 5 del checklist de la sección "Orden de trabajo sugerido" más abajo.
+
 **Si algo de esto ya no es cierto** (por ejemplo, si esta sesión avanzó a otra familia y no actualizó este bloque): confiar en el estado real del código (`git log`, `git diff`) por sobre lo que dice este archivo, y actualizar este bloque antes de seguir.
 
 ---
@@ -116,3 +118,4 @@ Efecto según personalidad (criterio del asistente, sección 8.1 de la guía —
 2. Una familia de **tema claro** primero (Chic) para probar en vivo la solución de texto claro-sobre-foto (sección 8.3 de la guía) antes de repetirla en las otras ~10.
 3. Resto de las familias de tema oscuro (son las más parecidas a Moderno, más rápidas).
 4. Auditoría final: `grep -c "acp-mobile-only" src/components/templates/*Template*.tsx` — tiene que dar 1+ en las 132 archivos de familias reales (todo excepto `ConviteTemplate.tsx`, `DraftTemplate.tsx`, `CollaborativeAlbumModern.tsx`, que no son parte de `TemplateTipo` y no se tocan).
+5. **Última tarea, recién con las 21 familias ya terminadas**: releer `docs/GUIA_TECNICA_PLANTILLAS.md` secciones 8-9 completas y actualizarlas con todos los matices/trampas nuevos que hayan aparecido familia por familia durante el rollout (ver el aviso en el bloque "ESTADO ACTUAL" arriba de este archivo). No hacerlo a mitad de camino, en una sola pasada al final — así la guía queda consistente en vez de parcheada de a poco.
