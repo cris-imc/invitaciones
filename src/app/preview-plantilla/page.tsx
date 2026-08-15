@@ -89,6 +89,22 @@ function PreviewPlantillaContent() {
   const scrollFallbackToken = useRef(0);
 
   useEffect(() => {
+    // Mismo orden que las secciones van apareciendo a medida que se avanza
+    // en el wizard (ver el mapeo stepLabel->section en WizardLivePreview.tsx).
+    // Se usa como ruta de fallback: si la sección pedida no existe en este
+    // preview puntual (Cronograma vacío, Música deshabilitada, Regalo/Quiz
+    // apagados, etc.), no tiene sentido saltar directo al final de la
+    // página -- eso se siente como "se rompió" cuando en realidad solo
+    // faltan datos para esa sección puntual. En vez de eso, se busca la
+    // PRÓXIMA sección real que sí exista, siguiendo el orden del wizard, y
+    // recién si no queda ninguna más adelante se cae al final de la página.
+    const SECTION_ORDER = ["hero", "countdown", "quote", "details", "schedule", "album", "music", "banco", "quiz"];
+
+    const scrollToElement = (element: HTMLElement) => {
+        const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
+        window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
+    };
+
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window.parent) return;
       if (event.data?.type === "wizard-live-data") {
@@ -106,25 +122,33 @@ function PreviewPlantillaContent() {
           }
           const element = document.getElementById(sectionId);
           if (element) {
-              const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
-              window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
+              scrollToElement(element);
               setPendingScrollId(null);
               scrollFallbackToken.current += 1;
           } else {
               setPendingScrollId(sectionId);
-              // Algunas secciones nunca existen en el preview del wizard
-              // (Música está deshabilitada a propósito acá para no pisar el
-              // reproductor real; Regalo/Trivia dependen de toggles que
-              // pueden estar apagados en esa invitación puntual) -- sin este
-              // fallback, el preview se queda clavado para siempre en la
-              // última sección que sí encontró. Si en 700ms el elemento
-              // sigue sin aparecer, se asume que esa sección no va a existir y se
-              // baja al final de la página en vez de no moverse.
+              // Si en 700ms el elemento sigue sin aparecer, se asume que
+              // esa sección no va a existir en este preview y se busca la
+              // próxima que sí exista (ver SECTION_ORDER arriba) en vez de
+              // quedarse clavado o saltar directo al final.
               const myToken = ++scrollFallbackToken.current;
               setTimeout(() => {
                   if (scrollFallbackToken.current !== myToken) return; // llegó un scroll-to más nuevo mientras tanto
                   if (document.getElementById(sectionId)) return; // apareció justo a tiempo
-                  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+
+                  const idx = SECTION_ORDER.indexOf(sectionId);
+                  let nextElement: HTMLElement | null = null;
+                  if (idx !== -1) {
+                      for (let i = idx + 1; i < SECTION_ORDER.length; i++) {
+                          const el = document.getElementById(SECTION_ORDER[i]);
+                          if (el) { nextElement = el; break; }
+                      }
+                  }
+                  if (nextElement) {
+                      scrollToElement(nextElement);
+                  } else {
+                      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+                  }
                   setPendingScrollId(null);
               }, 700);
           }
