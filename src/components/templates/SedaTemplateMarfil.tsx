@@ -1475,7 +1475,7 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#B98D57" surfaceColor="#F3E9D6" inactiveColor="#332A22" solid />}
       </div>
   );
 }

@@ -1484,7 +1484,7 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#7EA3D9" surfaceColor="#182036" inactiveColor="#E4E9F5" solid />}
       </div>
   );
 }

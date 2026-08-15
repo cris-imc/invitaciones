@@ -5,10 +5,9 @@ import { motion } from "framer-motion";
 
 const PREFIX = "No somos solo una invitación digital. ";
 const SUFFIXES = [
-  "Somos tu plataforma de gestión de invitados.",
-  "Somos un link personal para cada uno de ellos.",
+  "Somos un link personal para cada invitado.",
   "Somos una invitación en tiempo real.",
-  "Con LIVE tu fiesta se anima en vivo.",
+  "Con LIVE tu fiesta se anima.",
 ];
 
 export function AnimatedHeroText() {
@@ -45,9 +44,9 @@ export function AnimatedHeroText() {
   }, [currentText, phase, suffixIndex]);
 
   // "LIVE" tiene tratamiento propio dentro del texto tipeado: verde de
-  // marca, brillo pulsante ("encendido") y el ® de marca registrada -- en
-  // vez de heredar el itálica/dorado del resto del texto que se está
-  // tipeando en cada mensaje.
+  // marca, brillo pulsante ("encendido") y el ™ de marca -- en vez de
+  // heredar el itálica/dorado del resto del texto que se está tipeando en
+  // cada mensaje.
   const renderSuffix = (suffix: string) => {
     const parts = suffix.split(/(LIVE)/g);
     return parts.map((part, i) =>
@@ -66,7 +65,7 @@ export function AnimatedHeroText() {
           transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
         >
           LIVE
-          <sup className="text-[0.5em] ml-px">®</sup>
+          <sup className="text-[0.5em] ml-px">™</sup>
         </motion.span>
       ) : (
         <span key={i}>{part}</span>

@@ -1475,7 +1475,7 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#C9A0A6" surfaceColor="#F5E6DC" inactiveColor="#3B2A28" solid />}
       </div>
   );
 }

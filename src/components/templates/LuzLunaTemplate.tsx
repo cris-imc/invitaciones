@@ -1484,7 +1484,7 @@ export function LuzLunaTemplate({ invitation, guest, isPersonalized = false }: L
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#B9A6D9" surfaceColor="#211C36" inactiveColor="#EDE7FB" solid />}
       </div>
   );
 }

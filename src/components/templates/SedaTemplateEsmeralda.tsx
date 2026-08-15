@@ -1475,7 +1475,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#3D6E58" surfaceColor="#1B3026" inactiveColor="#EFE7D8" solid />}
       </div>
   );
 }

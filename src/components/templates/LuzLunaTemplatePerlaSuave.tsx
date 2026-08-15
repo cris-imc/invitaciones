@@ -1484,7 +1484,7 @@ export function LuzLunaTemplatePerlaSuave({ invitation, guest, isPersonalized = 
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#7C93B0" surfaceColor="#E9E2F3" inactiveColor="#3A3450" solid />}
       </div>
   );
 }

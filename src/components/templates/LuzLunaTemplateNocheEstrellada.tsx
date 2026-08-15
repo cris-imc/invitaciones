@@ -1484,7 +1484,7 @@ export function LuzLunaTemplateNocheEstrellada({ invitation, guest, isPersonaliz
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#9FB3E8" surfaceColor="#1B1B30" inactiveColor="#E9E7FB" solid />}
       </div>
   );
 }

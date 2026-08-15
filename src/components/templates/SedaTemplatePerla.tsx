@@ -1475,7 +1475,7 @@ export function SedaTemplatePerla({ invitation, guest, isPersonalized = false }:
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#8FA3B0" surfaceColor="#EAEFF1" inactiveColor="#263238" solid />}
       </div>
   );
 }

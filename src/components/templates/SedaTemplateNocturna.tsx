@@ -1475,7 +1475,7 @@ export function SedaTemplateNocturna({ invitation, guest, isPersonalized = false
         </div>
       </div>
 
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="var(--t-acc)" surfaceColor="var(--t-surface)" />}
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#8C4A52" surfaceColor="#331B20" inactiveColor="#F3E4DC" solid />}
       </div>
   );
 }
