@@ -1,6 +1,24 @@
 # Plan de rollout — Álbum seleccionable + Portada de bienvenida animada
 
-> Bitácora de sesión puntual (rama `portada-y-album`). El conocimiento durable de CÓMO se hace esto vive en `docs/GUIA_TECNICA_PLANTILLAS.md` sección 8 — este archivo es solo el checkpoint de QUÉ falta y en qué estado quedó cada familia. Se actualiza a medida que se avanza.
+> Bitácora de sesión puntual (rama `portada-y-album`). El conocimiento durable de CÓMO se hace esto vive en `docs/GUIA_TECNICA_PLANTILLAS.md` secciones 8-9 — este archivo es solo el checkpoint de QUÉ falta y en qué estado quedó cada familia. Se actualiza a medida que se avanza.
+
+## 🔴 ESTADO ACTUAL — leer esto primero si se retoma en otra sesión
+
+**Rama**: `portada-y-album`, pusheada a `origin` (último commit `0f4712a` al momento de escribir esto — confirmar con `git log origin/portada-y-album -1` que no haya nada más nuevo).
+
+**Terminado y verificado, no tocar de nuevo salvo que se reporte un bug**:
+- Infraestructura completa (schema, componentes compartidos, paso de wizard, fixes de wizard) — ver checklist abajo.
+- **Moderno**: base + 7 variantes de color. Álbum + portada animada + mobile-only + transición de salida, todo verificado en el navegador.
+- **Live preview del wizard**: el freeze después de "Álbum" y el salto exagerado al fondo de la página — los dos arreglados y verificados con el flujo completo. Documentado en `GUIA_TECNICA_PLANTILLAS.md` sección 9.
+
+**Próximo paso exacto (nada más empezar acá)**:
+1. Terminar de verificar **Chic** (wiring ya hecho, ver detalle completo en la sección "PARA RETOMAR ACÁ — Chic" más abajo): falta confirmar la transición de salida al abrir la portada, y falta propagar a sus 6 variantes de color.
+2. Invitación de prueba lista para usar: slug `chic-test-1786819949098` (`/i/chic-test-1786819949098`), ya tiene fotos reales cargadas en ambos campos de portada.
+3. Después de Chic: seguir con el resto de las 20 familias, en el orden y con los colores/efecto ya relevados en la tabla de más abajo (sección "Tabla de familias").
+
+**Si algo de esto ya no es cierto** (por ejemplo, si esta sesión avanzó a otra familia y no actualizó este bloque): confiar en el estado real del código (`git log`, `git diff`) por sobre lo que dice este archivo, y actualizar este bloque antes de seguir.
+
+---
 
 ## Bug encontrado y resuelto — live preview del wizard "se congelaba" después de Álbum
 
