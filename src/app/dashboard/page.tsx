@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { CalendarCheck, Eye, Users, Music, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
@@ -313,6 +313,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
             </p>
             <NewInvitationButton
               premiumCredits={dbUser?.premiumCredits || 0}
+              diamondCredits={dbUser?.diamondCredits || 0}
               totalInvitations={stats.totalInvitations}
               planTier={dbUser?.planTier}
               autoOpen={isAutoOpen}
