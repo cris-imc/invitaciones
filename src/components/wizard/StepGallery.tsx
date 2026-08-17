@@ -35,8 +35,13 @@ export function StepGallery() {
     const isEditing = Boolean(data.id);
     const effectivePlanTier: PlanTier = isEditing
         ? ((data.planTier as PlanTier) || "FREE")
-        : (usePremiumCredit || useDiamondCredit ? "PREMIUM" : "FREE");
-    const maxPhotos = PLAN_LIMITS[effectivePlanTier]?.maxPhotos ?? PLAN_LIMITS.FREE.maxPhotos;
+        : useDiamondCredit
+            ? "DIAMOND"
+            : usePremiumCredit
+                ? "PREMIUM"
+                : "FREE";
+    const tierMaxPhotos = PLAN_LIMITS[effectivePlanTier]?.maxPhotos;
+    const maxPhotos = tierMaxPhotos !== undefined ? tierMaxPhotos : PLAN_LIMITS.FREE.maxPhotos;
     const limitReached = maxPhotos !== null && galeriaPrincipal.length >= maxPhotos;
 
     const handleImageUploaded = (userId: string) => {

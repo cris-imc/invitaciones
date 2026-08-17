@@ -8,11 +8,12 @@ export function getInvitePhrase(tipo: string | null | undefined): string {
     case "QUINCE_ANOS":
       return "mis 15";
     case "CUMPLEANOS":
-      return "mi cumpleaños";
+    case "OTRO":
+      return "este evento";
     case "ANIVERSARIO":
       return "nuestro aniversario";
     default:
-      return "mi evento";
+      return "este evento";
   }
 }
 
