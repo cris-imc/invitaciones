@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import {
     Dialog,
@@ -24,9 +24,21 @@ export function PhoneReminderModal() {
     const [areaCode, setAreaCode] = useState("");
     const [number, setNumber] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    
     // Evita el parpadeo del modal mientras update() (async) todavía no
-    // terminó de propagar phoneModalDismissed a la sesión.
+    // terminó de propagar phoneModalDismissed a la sesión, o si falla
+    // la persistencia de la cookie de sesión tras recargar la página.
     const [dismissedLocally, setDismissedLocally] = useState(false);
+
+    // Revisar localStorage al montar para evitar que vuelva a salir si la sesión no persistió el cambio
+    useEffect(() => {
+        if (session?.user?.id) {
+            const isDismissed = localStorage.getItem(`phoneDismissed_${session.user.id}`);
+            if (isDismissed === "true") {
+                setDismissedLocally(true);
+            }
+        }
+    }, [session?.user?.id]);
 
     const shouldShow =
         status === "authenticated" &&
@@ -39,6 +51,9 @@ export function PhoneReminderModal() {
 
     const handleDismiss = async () => {
         setDismissedLocally(true);
+        if (session?.user?.id) {
+            localStorage.setItem(`phoneDismissed_${session.user.id}`, "true");
+        }
         await update({ phoneModalDismissed: true });
     };
 
@@ -48,6 +63,10 @@ export function PhoneReminderModal() {
         const res = await updateUserPhone(areaCode, number);
         if (res.success) {
             showToast("¡Gracias! Guardamos tu teléfono", "success");
+            setDismissedLocally(true);
+            if (session?.user?.id) {
+                localStorage.setItem(`phoneDismissed_${session.user.id}`, "true");
+            }
             await update({ hasPhone: true });
         } else {
             showToast(res.error || "Error al guardar el teléfono", "error");
