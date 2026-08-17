@@ -182,7 +182,7 @@ export default async function InvitacionesPage() {
                                         </div>
                                         <Link
                                             href={`/dashboard/invitaciones/${inv.slug}/guests`}
-                                            className="btn-action go btn-admin-glow inline-flex items-center justify-center h-[40px] px-4 text-xs font-semibold rounded-lg text-black transition-colors w-full mt-2"
+                                            className="bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_15px_rgba(245,158,11,0.3)] inline-flex items-center justify-center h-[40px] px-4 text-xs font-semibold rounded-lg transition-colors w-full mt-2"
                                         >
                                             Administrar →
                                         </Link>
