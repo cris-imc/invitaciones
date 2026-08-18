@@ -21,6 +21,8 @@ import { createPortal } from "react-dom";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -414,7 +416,18 @@ const formatNumber = (num: number) => {
 
 export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalized = false }: GoldenDuskTemplateRosaAntiguoProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -611,6 +624,9 @@ export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalize
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -999,9 +1015,20 @@ export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalize
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#FDF6F0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#3B2A2A] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#3B2A2A] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="59,42,42"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(185,125,130,0.15), transparent), radial-gradient(45% 40% at 85% 80%, rgba(232,196,160,0.25), transparent)',
             backgroundSize: '160% 160%',
@@ -1022,6 +1049,7 @@ export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalize
           <IconEucalyptus className="golden-doodle opacity-0 absolute" style={{ width: 20, height: 34, bottom: '16%', left: '13%', color: 'rgba(143,160,122,0.45)' }} />
           <IconRanunculus className="golden-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '24%', right: '19%', color: 'rgba(185,125,130,0.4)' }} />
 
+          </div>
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="golden-seal opacity-0" style={{
@@ -1036,12 +1064,12 @@ export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalize
             </p>
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#3B2A2A] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " golden-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic', color: portadaFondoAnimado ? undefined : '#3B2A2A' }}>
               {guestNameDisplay}</h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#9C7C6E] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " golden-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#9C7C6E' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1049,7 +1077,7 @@ export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalize
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #B97D82', color: '#B97D82',
@@ -1068,7 +1096,14 @@ export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalize
             @keyframes golden-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes golden-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes golden-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .golden-cover-text { color: #FDF6F0; }
+            .golden-cover-text-muted { color: rgba(253,246,240,0.75); }
+            @media (min-width: 768px) {
+              .golden-cover-text { color: #3B2A2A; }
+              .golden-cover-text-muted { color: #9C7C6E; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1349,7 +1384,7 @@ export function GoldenDuskTemplateRosaAntiguo({ invitation, guest, isPersonalize
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}
