@@ -22,7 +22,11 @@ import { createPortal } from "react-dom";
 import { Marcellus, Mulish } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -365,7 +369,18 @@ const formatNumber = (num: number) => {
 
 export function RivieraTemplate({ invitation, guest, isPersonalized = false }: RivieraTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -550,7 +565,7 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -563,6 +578,15 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- Riviera es tema claro (bg #FAF1E4, ink #3E2E20) ->
+  // mismo caso que Chic: texto no puede forzarse a claro por JS. Se resuelve
+  // con clases CSS + media query (.riviera-cover-text/-muted). effect=
+  // "enfoque", sin tinte (paleta clara/pastel), scrimColorRgb = rgb del ink
+  // oscuro propio.
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/riviera-boda.png" : undefined;
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -971,29 +995,44 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#FAF1E4', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#3E2E20] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#3E2E20] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(193,115,74,0.14), transparent), radial-gradient(45% 40% at 85% 80%, rgba(232,165,121,0.24), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'riviera-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(193,115,74,0.14), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'riviera-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="62,46,32"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(193,115,74,0.14), transparent), radial-gradient(45% 40% at 85% 80%, rgba(232,165,121,0.24), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'riviera-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(193,115,74,0.14), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'riviera-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
 
-          {/* Doodles decorativos (arco, sol, ramita de olivo) -- animados de
-              entrada con anime.js (ver useEffect de coverRootRef), inertes
-              hasta que corre el JS (opacity-0 inicial). */}
-          <IconArch className="riviera-doodle opacity-0 absolute" style={{ width: 30, height: 32, top: '9%', left: '11%', color: 'rgba(193,115,74,0.5)' }} />
-          <IconSun className="riviera-doodle opacity-0 absolute" style={{ width: 22, height: 22, top: '15%', right: '13%', color: 'rgba(193,115,74,0.5)' }} />
-          <IconOlive className="riviera-doodle opacity-0 absolute" style={{ width: 30, height: 14, bottom: '20%', left: '11%', color: 'rgba(122,143,107,0.5)' }} />
-          <IconSun className="riviera-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '26%', right: '17%', color: 'rgba(193,115,74,0.35)' }} />
+            {/* Doodles decorativos (arco, sol, ramita de olivo) -- animados de
+                entrada con anime.js (ver useEffect de coverRootRef), inertes
+                hasta que corre el JS (opacity-0 inicial). */}
+            <IconArch className="riviera-doodle opacity-0 absolute" style={{ width: 30, height: 32, top: '9%', left: '11%', color: 'rgba(193,115,74,0.5)' }} />
+            <IconSun className="riviera-doodle opacity-0 absolute" style={{ width: 22, height: 22, top: '15%', right: '13%', color: 'rgba(193,115,74,0.5)' }} />
+            <IconOlive className="riviera-doodle opacity-0 absolute" style={{ width: 30, height: 14, bottom: '20%', left: '11%', color: 'rgba(122,143,107,0.5)' }} />
+            <IconSun className="riviera-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '26%', right: '17%', color: 'rgba(193,115,74,0.35)' }} />
+          </div>
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="riviera-seal opacity-0" style={{
@@ -1004,13 +1043,13 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
             </div>
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#3E2E20] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " riviera-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#3E2E20' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#8A7862] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " riviera-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#8A7862' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1018,7 +1057,7 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
             {/* Thin Open Button, borde terracota con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #C1734A', color: '#C1734A',
@@ -1037,7 +1076,14 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
             @keyframes riviera-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes riviera-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes riviera-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .riviera-cover-text { color: #FAF1E4; }
+            .riviera-cover-text-muted { color: rgba(250,241,228,0.75); }
+            @media (min-width: 768px) {
+              .riviera-cover-text { color: #3E2E20; }
+              .riviera-cover-text-muted { color: #8A7862; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
@@ -1197,6 +1243,12 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
           </div>
         </div>
 
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
+
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
             targetDate={fechaEvento}
@@ -1330,7 +1382,7 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

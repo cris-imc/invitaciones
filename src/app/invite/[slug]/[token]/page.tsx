@@ -285,6 +285,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 fontBody: true,
                 tipografiaDisplay: true,
                 countdownStyle: true,
+                albumStyle: true,
                 portadaImagenDesktopEscala: true,
                 album: {
                     select: {

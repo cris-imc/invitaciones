@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   MODERNO_COMPONENTS,
@@ -84,8 +84,27 @@ function PreviewPlantillaContent() {
   // mandar datos en vivo).
   const [liveInvitation, setLiveInvitation] = useState<Record<string, unknown> | null>(null);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  // Contador para invalidar el fallback de scroll (ver más abajo) si llega
+  // un wizard-scroll-to más nuevo antes de que se cumplan los 700ms.
+  const scrollFallbackToken = useRef(0);
 
   useEffect(() => {
+    // Mismo orden que las secciones van apareciendo a medida que se avanza
+    // en el wizard (ver el mapeo stepLabel->section en WizardLivePreview.tsx).
+    // Se usa como ruta de fallback: si la sección pedida no existe en este
+    // preview puntual (Cronograma vacío, Música deshabilitada, Regalo/Quiz
+    // apagados, etc.), no tiene sentido saltar directo al final de la
+    // página -- eso se siente como "se rompió" cuando en realidad solo
+    // faltan datos para esa sección puntual. En vez de eso, se busca la
+    // PRÓXIMA sección real que sí exista, siguiendo el orden del wizard, y
+    // recién si no queda ninguna más adelante se cae al final de la página.
+    const SECTION_ORDER = ["hero", "countdown", "quote", "details", "schedule", "album", "music", "banco", "quiz"];
+
+    const scrollToElement = (element: HTMLElement) => {
+        const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
+        window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
+    };
+
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window.parent) return;
       if (event.data?.type === "wizard-live-data") {
@@ -94,19 +113,44 @@ function PreviewPlantillaContent() {
       } else if (event.data?.type === "wizard-scroll-to") {
           const sectionId = event.data.section;
           if (!sectionId) return;
-          
+
           if (sectionId === 'hero') {
               window.scrollTo({ top: 0, behavior: 'smooth' });
               setPendingScrollId(null);
+              scrollFallbackToken.current += 1;
               return;
           }
           const element = document.getElementById(sectionId);
           if (element) {
-              const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
-              window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
+              scrollToElement(element);
               setPendingScrollId(null);
+              scrollFallbackToken.current += 1;
           } else {
               setPendingScrollId(sectionId);
+              // Si en 700ms el elemento sigue sin aparecer, se asume que
+              // esa sección no va a existir en este preview y se busca la
+              // próxima que sí exista (ver SECTION_ORDER arriba) en vez de
+              // quedarse clavado o saltar directo al final.
+              const myToken = ++scrollFallbackToken.current;
+              setTimeout(() => {
+                  if (scrollFallbackToken.current !== myToken) return; // llegó un scroll-to más nuevo mientras tanto
+                  if (document.getElementById(sectionId)) return; // apareció justo a tiempo
+
+                  const idx = SECTION_ORDER.indexOf(sectionId);
+                  let nextElement: HTMLElement | null = null;
+                  if (idx !== -1) {
+                      for (let i = idx + 1; i < SECTION_ORDER.length; i++) {
+                          const el = document.getElementById(SECTION_ORDER[i]);
+                          if (el) { nextElement = el; break; }
+                      }
+                  }
+                  if (nextElement) {
+                      scrollToElement(nextElement);
+                  } else {
+                      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+                  }
+                  setPendingScrollId(null);
+              }, 700);
           }
       }
     };

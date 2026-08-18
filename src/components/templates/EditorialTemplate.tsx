@@ -21,7 +21,11 @@ import { createPortal } from "react-dom";
 import { Bodoni_Moda, Archivo } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -377,7 +381,18 @@ const formatNumber = (num: number) => {
 
 export function EditorialTemplate({ invitation, guest, isPersonalized = false }: EditorialTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -555,7 +570,7 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -568,6 +583,10 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/editorial-quince.png" : undefined;
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -971,29 +990,44 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#EDEBE5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#17140F] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#17140F] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(163,18,59,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(184,169,140,0.2), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'editorial-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(163,18,59,0.13), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'editorial-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="23,20,15"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(163,18,59,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(184,169,140,0.2), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'editorial-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(163,18,59,0.13), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'editorial-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
 
-          {/* Doodles decorativos (laurel, estrella, rombo) -- animados de
-              entrada con anime.js (ver useEffect de coverRootRef), inertes
-              hasta que corre el JS (opacity-0 inicial). */}
-          <IconRings className="editorial-doodle opacity-0 absolute" style={{ width: 46, height: 24, top: '9%', left: '8%', color: 'rgba(163,18,59,0.5)' }} />
-          <IconHeartDoodle className="editorial-doodle opacity-0 absolute" style={{ width: 18, height: 18, top: '15%', right: '12%', color: 'rgba(184,169,140,0.55)' }} />
-          <IconRibbon className="editorial-doodle opacity-0 absolute" style={{ width: 20, height: 20, bottom: '18%', left: '14%', color: 'rgba(163,18,59,0.4)' }} />
-          <IconHeartDoodle className="editorial-doodle opacity-0 absolute" style={{ width: 12, height: 12, bottom: '24%', right: '20%', color: 'rgba(163,18,59,0.4)' }} />
+            {/* Doodles decorativos (laurel, estrella, rombo) -- animados de
+                entrada con anime.js (ver useEffect de coverRootRef), inertes
+                hasta que corre el JS (opacity-0 inicial). */}
+            <IconRings className="editorial-doodle opacity-0 absolute" style={{ width: 46, height: 24, top: '9%', left: '8%', color: 'rgba(163,18,59,0.5)' }} />
+            <IconHeartDoodle className="editorial-doodle opacity-0 absolute" style={{ width: 18, height: 18, top: '15%', right: '12%', color: 'rgba(184,169,140,0.55)' }} />
+            <IconRibbon className="editorial-doodle opacity-0 absolute" style={{ width: 20, height: 20, bottom: '18%', left: '14%', color: 'rgba(163,18,59,0.4)' }} />
+            <IconHeartDoodle className="editorial-doodle opacity-0 absolute" style={{ width: 12, height: 12, bottom: '24%', right: '20%', color: 'rgba(163,18,59,0.4)' }} />
+          </div>
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="editorial-seal opacity-0" style={{
@@ -1004,13 +1038,13 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
             </div>
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#17140F] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " editorial-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#17140F' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#8A8378] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " editorial-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#8A8378' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1018,8 +1052,8 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
-              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
+              onClick={openInvitation}
+              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #A3123B', color: '#A3123B',
                 background: 'rgba(163,18,59,0.08)', backdropFilter: 'blur(6px)',
@@ -1037,7 +1071,14 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
             @keyframes editorial-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes editorial-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes editorial-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .editorial-cover-text { color: #EDEBE5; }
+            .editorial-cover-text-muted { color: rgba(237,235,229,0.75); }
+            @media (min-width: 768px) {
+              .editorial-cover-text { color: #17140F; }
+              .editorial-cover-text-muted { color: #8A8378; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
@@ -1214,6 +1255,12 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
           <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #A3123B, transparent)' }} />
         </div>
 
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
+
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
             targetDate={fechaEvento}
@@ -1338,7 +1385,7 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

@@ -20,7 +20,11 @@ import { createPortal } from "react-dom";
 import { Playfair_Display, Jost } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -386,7 +390,22 @@ const formatNumber = (num: number) => {
 
 export function ChicTemplate({ invitation, guest, isPersonalized = false }: ChicTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  // Transición cinemática al abrir: en vez de desmontar la portada de
+  // golpe al tocar el botón, se le suma una clase de salida (blur + zoom +
+  // fade, ver COVER_EXIT_STYLE) y recién después de esos ~700ms se
+  // desmonta de verdad. Aplica igual con foto animada o sin ella.
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -579,7 +598,7 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -592,6 +611,27 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+  // El recorte "desktop" del wizard se recicla como foto opcional de la
+  // portada de bienvenida animada -- sin fallback a mobile a propósito: si
+  // no se cargó nada ahí, la portada queda tal cual la plantilla, sin
+  // ningún efecto. Chic es de paleta clara/pastel (crema + dorado suave) ->
+  // sin tinte de color, solo blur + enfoque (criterio: paletas claras van
+  // sin tinte, paletas más cargadas tipo Moderno/Onix sí llevan tinte).
+  // Chic también es de tema claro (texto oscuro sobre fondo crema) -- con
+  // foto de fondo el texto tiene que verse claro, PERO SOLO EN MOBILE (la
+  // foto es mobile-only, ver acp-mobile-only/acp-desktop-only). Si se fuerza
+  // el color por JS (solo mirando portadaFondoAnimado) queda claro también
+  // en desktop, donde no hay foto atrás -- texto claro invisible sobre el
+  // fondo crema claro de siempre. Por eso esto se resuelve con clases CSS +
+  // media query (.chic-cover-text / .chic-cover-text-muted, definidas en el
+  // <style jsx> de la portada), no con un color inline calculado en JS.
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  // Scrim oscuro para que el texto claro forzado se lea bien -- se usa el
+  // tono de tinta oscura que la plantilla YA tiene (no su fondo claro, que
+  // no oscurecería lo suficiente la foto).
+  const coverScrimRgb = "36,30,18"; // rgb(#241E12)
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/chic-boda.png" : undefined;
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -994,20 +1034,34 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#FBF3EA', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#241E12] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#241E12] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(201,168,118,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(107,122,79,0.2), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'chic-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(201,168,118,0.13), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'chic-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {/* Con foto animada, solo en mobile (desktop siempre ve el mesh
+              decorativo original -- sección 8.2 de la guía técnica). */}
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb={coverScrimRgb}
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(201,168,118,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(107,122,79,0.2), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'chic-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(201,168,118,0.13), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'chic-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
+          </div>
 
           {/* Doodles decorativos (anillos, corazón, moño) -- animados de
               entrada con anime.js (ver useEffect de coverRootRef), inertes
@@ -1017,6 +1071,9 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
           <IconRibbon className="chic-doodle opacity-0 absolute" style={{ width: 32, height: 18, bottom: '18%', left: '14%', color: 'rgba(201,168,118,0.45)' }} />
           <IconHeartDoodle className="chic-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '24%', right: '20%', color: 'rgba(201,168,118,0.4)' }} />
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="chic-seal opacity-0" style={{
@@ -1027,13 +1084,13 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
             </div>
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#241E12] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " chic-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#241E12' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#8A7A63] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " chic-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#8A7A63' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1041,7 +1098,7 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #C9A876', color: '#C9A876',
@@ -1060,7 +1117,18 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
             @keyframes chic-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes chic-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes chic-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            /* Texto de la portada claro sobre la foto animada -- SOLO en
+               mobile (la foto es mobile-only). En desktop, sin importar si
+               hay foto cargada, vuelve al oscuro original de Chic (ahí no
+               hay foto atrás, solo el mesh crema de siempre). */
+            .chic-cover-text { color: #FBF3EA; }
+            .chic-cover-text-muted { color: rgba(251,243,234,0.75); }
+            @media (min-width: 768px) {
+              .chic-cover-text { color: #241E12; }
+              .chic-cover-text-muted { color: #8A7A63; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
@@ -1228,6 +1296,12 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
           <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #C9A876, transparent)' }} />
         </div>
 
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
+
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
             targetDate={fechaEvento}
@@ -1352,7 +1426,7 @@ export function ChicTemplate({ invitation, guest, isPersonalized = false }: Chic
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

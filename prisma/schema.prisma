@@ -224,6 +224,7 @@ model Invitation {
   fontTitle                    String?          @default("fraunces")
   fontBody                     String?          @default("space-grotesk")
   countdownStyle               String?          @default("clasico")
+  albumStyle                   String?          @default("carrusel")
   createdAt                    DateTime         @default(now())
   updatedAt                    DateTime         @updatedAt
   ciudad                       String?

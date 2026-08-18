@@ -284,6 +284,7 @@ export async function POST(request: NextRequest) {
                 fontTitle: body.fontTitle || 'fraunces',
                 fontBody: body.fontBody || 'space-grotesk',
                 countdownStyle: body.countdownStyle || 'clasico',
+                albumStyle: body.albumStyle || 'carrusel',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -308,6 +309,7 @@ export async function POST(request: NextRequest) {
                 portadaKicker: body.portadaKicker,
                 portadaTitulo: body.portadaTitulo,
                 portadaDressCode: body.portadaDressCode,
+                dresscodeHabilitado: body.dresscodeHabilitado !== undefined ? body.dresscodeHabilitado : true,
                 portadaMensaje: body.portadaMensaje,
                 portadaTextoBoton: body.portadaTextoBoton,
                 portadaImagenFondo: body.portadaImagenFondo,
@@ -497,6 +499,7 @@ export async function PUT(request: NextRequest) {
                 fontTitle: body.fontTitle || 'fraunces',
                 fontBody: body.fontBody || 'space-grotesk',
                 countdownStyle: body.countdownStyle || 'clasico',
+                albumStyle: body.albumStyle || 'carrusel',
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -522,6 +525,7 @@ export async function PUT(request: NextRequest) {
                 portadaKicker: body.portadaKicker,
                 portadaTitulo: body.portadaTitulo,
                 portadaDressCode: body.portadaDressCode,
+                dresscodeHabilitado: body.dresscodeHabilitado !== undefined ? body.dresscodeHabilitado : true,
                 portadaMensaje: body.portadaMensaje,
                 portadaTextoBoton: body.portadaTextoBoton,
                 portadaImagenFondo: body.portadaImagenFondo,

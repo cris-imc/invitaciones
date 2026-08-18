@@ -232,3 +232,192 @@ Cuando el pedido es "implementá N plantillas" con N grande (esta guía nació d
 **Navegador compartido entre agentes paralelos.** Varios agentes controlando Chrome al mismo tiempo (aunque cada uno cree su propia pestaña) generó inestabilidad real en algunos casos (pestañas navegadas por otro proceso concurrente, `screenshot` devolviendo errores de deserialización persistentes). Cuando el screenshot falla de forma persistente, la salida es inspeccionar el mockup por JS (`document.querySelector`, `getComputedStyle`, leer directamente objetos de configuración embebidos en el `<script>` del mockup si el bundle los expone) en vez de insistir con capturas — sirve igual de bien para sacar paleta/tipografía exactas y no bloquea el avance.
 
 **Auditoría final después de que todos los lotes terminan, antes de creer los reportes al pie de la letra.** Cada agente reporta su propio trabajo como terminado y verificado, pero conviene re-confirmar con comandos propios sobre el código real antes de wiring: `grep` de duplicados de acento entre variantes de una misma familia (sección 3.6), `grep` del nombre de archivo/export function de cada base y variante (que coincidan con lo prometido en el reporte), y `npx tsc --noEmit` general una vez más con todo junto (cada agente lo corrió sobre su propio lote, pero nunca con los 18 lotes ya combinados en el mismo árbol).
+
+---
+
+## 8. Álbum seleccionable + portada de bienvenida animada (foto + Ken Burns + tinte) — feature transversal, no de una plantilla
+
+A diferencia de las secciones 1-7 (que hablan de agregar una plantilla nueva), esto es una **feature que toca a las 22 familias existentes** (`TemplateTipo` en `template-preview-registry.tsx`) y que **toda plantilla nueva de acá en adelante tiene que traer de fábrica**. Nació en la rama `portada-y-album`.
+
+### 8.1 Qué es, en dos partes independientes
+
+**a) Álbum con 2 estilos seleccionables.** Campo `Invitation.albumStyle` (`String?`, default `"carrusel"`), elegido en el paso de wizard `StepAlbumStyle.tsx` (después de "Galería"). Los dos estilos:
+- `"carrusel"` (default, sin cambios): el de siempre, `AlbumCarousel.tsx`.
+- `"solapadas"`: fotos apiladas tipo Polaroid, `AlbumPolaroidCascade.tsx` (tope de 4 fotos — es una pila vertical, con más no funciona).
+
+**No se usan estos dos componentes directamente en las plantillas.** Se usa el wrapper `Album.tsx` (`src/components/invitation/v2/Album.tsx`), que hace el switch por `albumStyle` — mismo patrón que `Countdown.tsx` con `countdownStyle`.
+
+**b) Portada de bienvenida animada, con foto opcional.** El recorte que antes se llamaba "Portada PC" (campo `Invitation.portadaImagenFondoDesktop`) se recicló: ya no es un recorte para pantallas anchas (ese propósito no existía de verdad — la foto de celular ya cubría ese caso). Ahora es **la foto opcional que activa la portada de bienvenida animada**. Wizard: `StepHeroImages.tsx`, campo "Portada de bienvenida" (el otro campo, obligatorio, es "Portada Invitación" = `portadaImagenFondo`, sin cambios de comportamiento, solo se le cambió el nombre).
+
+- Si el campo está vacío → la portada se ve **exactamente** como la plantilla la tenía antes de esta feature. Cero cambios.
+- Si tiene una foto → esa foto reemplaza el fondo decorativo de la portada, con Ken Burns (zoom/pan lento en loop) + "enfoque de apertura" (arranca toda borrosa pareja y el foco se asienta en el tercio de arriba en ~1.8s) + un tinte de color en `mix-blend-mode:color` (mantiene la luz/detalle de la foto, solo le cambia el matiz) con los colores propios de la plantilla — nunca un color fijo.
+
+Todo esto vive en el componente compartido `AnimatedCoverPhoto.tsx` (`src/components/invitation/v2/AnimatedCoverPhoto.tsx`), que expone 4 "efectos" (prop `effect`) pensados para distintas personalidades de plantilla, no una sola:
+
+| `effect` | Pensado para | Qué hace además del Ken Burns + tinte base |
+|---|---|---|
+| `"enfoque"` (default) | Plantillas elegantes/delicadas (bodas, Moderno, Onix, Golden Dusk...) | Nada más — el enfoque de apertura solo. |
+| `"shimmer"` | XV delicado, plantillas románticas suaves (Petalos, Luz de Luna...) | Suma un glow + 4 chispitas que titilan en momentos distintos. |
+| `"flash"` | XV alocado, plantillas vibrantes/fiesta (Neon, Holograma...) | Flash blanco real (tipo disparo de cámara) + punch de zoom más marcado + pulso de color. |
+| `"geometric"` | Plantillas sobrias (Corporate, Loft Industrial...) | Nada — sin blur, sin Ken Burns, sin ningún gesto. La sobriedad ES el efecto. |
+
+**La elección de `effect` + si lleva tinte + los dos colores del tinte (`tintColor1`/`tintColor2`) es una decisión de diseño por familia, no algo que se pueda derivar mecánicamente.** Ver 8.4.
+
+**⚠️ Regla del usuario sobre el tinte (no es automático, criterio explícito confirmado en la rama `portada-y-album`)**: el tinte de color **no va en todas las familias**.
+- **Paleta clara/pastel** (Elegant, Editorial, Seda, Chic y similares — colores suaves/desaturados dominan): **sin tinte**, solo blur (`effect="enfoque"` con `tint={false}`) o blur + shimmer sin tinte.
+- **Paleta más cargada/saturada** (Moderno, Onix y similares): blur + shimmer + tinte, u otra combinación con tinte.
+- **Familias alocadas/extravagantes** (Neon, Holograma, Circuito y similares): blur + tinte + `effect="flash"` (u otro efecto con más energía).
+
+**Excepción confirmada al criterio "paleta clara → sin tinte"**: Infantil tiene bg claro (`#FFF7F2`, crema) pero usa `effect="flash"` CON tinte (rosa `#FF5C8A` + lavanda `#9B7FE8`) — es la familia de cumpleaños infantil, y la energía de fiesta/confetti pesa más que el default de "paleta clara = sin tinte". El criterio de la tabla es un punto de partida, no una regla mecánica; si una familia nueva tiene una personalidad claramente "de fiesta" a pesar de tener bg claro, el tinte + flash puede seguir siendo la elección correcta — usar criterio, no la tabla al pie de la letra.
+
+`AnimatedCoverPhoto` soporta esto con `tintColor1`/`tintColor2` ahora **opcionales** + un prop `tint?: boolean` (default `true`) — si no se pasan colores, o se pasa `tint={false}`, la capa de tinte no se renderiza y solo queda el blur/Ken Burns/enfoque. La familia `"flash"` sí necesita sus dos colores siempre (no es la capa de tinte, es el pulso de color del flash en sí) — tiene fallback dorado si se omiten por error, pero no confiar en el fallback, pasarlos.
+
+Transición de salida al tocar "Abrir invitación" (`COVER_EXIT_STYLE`, blur+zoom+fade ~700ms antes de desmontar la portada) es la misma para las 4, siempre se suma.
+
+### 8.2 ⚠️ Regla no negociable: el efecto animado es SOLO mobile
+
+La foto que se sube es un recorte vertical de celular. Estirada a un panel ancho de escritorio se ve mal encuadrada. **En desktop siempre tiene que verse el decorado original de la plantilla (el que tenía antes de esta feature), haya foto cargada o no.** Mecanismo: `COVER_RESPONSIVE_STYLE` (exportado desde `AnimatedCoverPhoto.tsx`) — envolver `<AnimatedCoverPhoto>` en `<div className="acp-mobile-only">` y el decorado original de la plantilla en `<div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>` (sin envolver cuando NO hay foto — el decorado original va suelto, se ve en todos los tamaños igual que siempre). Las dos clases usan `display: contents` para no crear una caja propia que rompa el `position:absolute` de los hijos contra el contenedor real de la portada.
+
+### 8.3 Wiring por plantilla — los 6 puntos que hay que tocar en cada `XxxTemplate.tsx`
+
+Usando `ModernoTemplate.tsx` como referencia exacta (ya hecho, sirve de diff):
+
+1. **Imports**: agregar `import { Album } from "@/components/invitation/v2/Album";` y `import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";` junto al import existente de `AlbumCarousel` (no sacarlo — sigue haciendo falta si la plantilla usa un carrusel de fotos LIVE separado del álbum principal, ver Moderno).
+2. **Álbum**: la línea `<AlbumCarousel photos={allPhotos} hideHeader />` (el álbum PRINCIPAL, no el de fotos LIVE post-evento si la plantilla tiene uno aparte) pasa a `<Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />`.
+3. **Estado + transición de salida**: al lado de `const [isCoverOpen, setIsCoverOpen] = useState(false);`, agregar `isClosingCover` + `openInvitation()` + el `useEffect` del timeout de 700ms (copiar tal cual de `ModernoTemplate.tsx`, es genérico). El botón "ABRIR INVITACIÓN" pasa de `onClick={() => setIsCoverOpen(true)}` a `onClick={openInvitation}`. El wrapper de la portada pasa de `className="text-[...] transition-all duration-1000 animate-in fade-in"` a `className={\`text-[...] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}\`}`.
+4. **Variables de la foto/trigger** (al lado de `heroBgMobile`/`heroBgDesktop`, que quedan intactas — las sigue usando la sección de después de abrir):
+   ```ts
+   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+   const portadaTintColor1 = "#..."; // ver 8.4
+   const portadaTintColor2 = "#..."; // ver 8.4
+   ```
+   **Sin fallback a `heroBgMobile` acá** — si el campo puntual está vacío, no hay portada animada, punto (esto es lo que hace que "vacío = plantilla de siempre" sea cierto).
+5. **JSX de la portada**: el decorado original (los divs de mesh/glow/lo que tenga cada plantilla) se envuelve como describe 8.2, y ANTES de eso se agrega el bloque de `<AnimatedCoverPhoto>` (ver el diff de Moderno para la forma exacta — el `effect`/`scrimColorRgb` van por variante, no por familia completa, ver 8.4).
+6. **Estilos**: la etiqueta `<style>{COVER_EXIT_STYLE}</style>` (o la que exista) pasa a `<style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>`.
+
+**Nada de esto toca el schema ni el wizard** — `albumStyle` y `portadaImagenFondoDesktop` ya son campos reales (el primero se agregó en esta misma feature, el segundo ya existía). Solo se tocan los `XxxTemplate*.tsx`.
+
+**⚠️ Trampa real (no aplica a Moderno, SÍ a ~10 de las 21 familias restantes): plantillas de tema claro.** Moderno es de fondo oscuro con texto claro (`#EDE9F4`) — con una foto atrás y el scrim oscuro de `AnimatedCoverPhoto`, el texto sigue siendo legible sin tocar nada más. Pero varias familias (Chic, BonVoyage, Editorial, Elegant, GardenParty, GoldenDusk, Infantil, JardinSeda, Nordico, Riviera — confirmar por archivo, no asumir por la lista) tienen la portada de fondo **claro con texto oscuro** (ej. Chic: `background: '#FBF3EA'`, texto `text-[#241E12]`). Texto oscuro sobre una foto con scrim oscuro = ilegible (bajo contraste). Hay que forzar el nombre/dress code a un color claro **cuando hay foto animada** — pero:
+
+**⚠️ Sub-trampa (encontrada al vivo en Chic, rompía la portada en desktop): NO resolver esto con un `color` inline calculado en JS a partir de `portadaFondoAnimado`.** La foto animada es mobile-only (sección 8.2) — pero `portadaFondoAnimado` es una variable de datos (`Boolean(portadaImagenFondoDesktopRaw)`), **no sabe en qué ancho de pantalla se está renderizando**. Un `color: portadaFondoAnimado ? "#FFFFFF" : "#241E12"` inline fuerza el texto a claro en desktop TAMBIÉN, aunque ahí la foto esté oculta por CSS — texto claro invisible sobre el mesh crema claro de siempre. La solución real, mismo mecanismo que `acp-mobile-only`/`acp-desktop-only`: una clase CSS propia de la plantilla + media query, no un valor calculado en JS:
+```tsx
+// En el JSX, sin `color` inline cuando hay foto -- la clase decide:
+<h2
+  className={`text-4xl ... ${portadaFondoAnimado ? "chic-cover-text" : ""}`}
+  style={{ color: portadaFondoAnimado ? undefined : '#241E12' /* el hex oscuro original */ }}
+>
+  {guestNameDisplay}
+</h2>
+```
+```css
+/* En el <style jsx> de la portada de ESA plantilla -- nombre de clase con
+   prefijo propio, no genérico, porque los hex son por familia: */
+.chic-cover-text { color: #FBF3EA; }               /* claro por default (mobile) */
+@media (min-width: 768px) {
+  .chic-cover-text { color: #241E12; }              /* oscuro desde el breakpoint de escritorio (mismo que COVER_RESPONSIVE_STYLE) */
+}
+```
+Repetir para cada elemento de texto que lo necesite (nombre, dress code — el monograma y el botón de Chic usan el acento dorado constante, que se lee bien en cualquier fondo, no necesitaron el mismo tratamiento; confirmar caso por caso, no asumir). **No hace falta tocar nada fuera del bloque de la portada** — el resto de la plantilla (después de abrir) sigue con sus colores de siempre.
+
+### 8.3b ⚠️ Trampa de "familia mixta": no asumir que todas las variantes de color comparten arquitectura
+
+Pasó en **6 de las 22 familias** durante este rollout (Corporate, LoftIndustrial, LuzLuna, Petalos, Seda, GardenParty) — bastante seguido como para tratarlo como el default a sospechar, no la excepción:
+
+- **Split claro/oscuro dentro de la misma familia** (Corporate, LoftIndustrial, LuzLuna, Petalos, Seda): la plantilla base es de un tema (ej. oscuro), pero 1 o más variantes de color son del tema contrario (ej. Corporate-Claro, LoftIndustrial-Claro, Petalos-VinoVibrante es oscura dentro de una familia mayormente clara). Cada variante oscura suele tener su **propio bg** (no comparten `scrimColorRgb` entre sí) — hay que revisar el `backgroundColor` de la portada de CADA archivo de variante, no asumir que todas heredan el de la base.
+- **Mismo tema (todas claras u todas oscuras) pero ink/muted distinto por variante** (GardenParty): las 5 variantes son todas claras, pero Vibrante tiene su propio ink/muted (`#411D14`/`#9c5a45`) distinto de las otras 4 (`#3A2A22`/`#8a7462`), aunque el bg de las 5 sea "claro" en las 5. Esto es más sutil que el split claro/oscuro — hay que comparar el hex exacto de `className="text-[#......] tracking-wide uppercase"` (dress code) y el `text-[#......] transition-all` del wrapper (nombre) variante por variante, no solo mirar si el bg "se ve claro".
+
+**Cómo detectarlo rápido, antes de escribir el script de propagación**: `grep -n "backgroundColor: '#" src/components/templates/Familia*.tsx` (bg de la portada) + `grep -n "className=\"text-\[#" src/components/templates/Familia*.tsx` (ink del wrapper) — si algún hex difiere entre archivos, es familia mixta y el script de propagación necesita el `scrimColorRgb`/clase de texto por-variante en vez de uno compartido para todas (ver el patrón usado en `propagate-gardenparty.tmp.js`/`propagate-editorial.tmp.js` de esa rama, con un array de `{ file, ink, inkRgb, muted, bg }` por variante en vez de un solo set de constantes).
+
+### 8.3c Familias con arquitectura de portada distinta (sin mesh/glow): Elegant e Infantil
+
+La mayoría de las familias comparten la misma "receta" decorativa en la portada: 2 divs de `radial-gradient` animados (mesh + glow) + 3-4 íconos doodle con `opacity-0` animados por `anime.js` via `coverRootRef`. Dos familias rompen ese patrón:
+
+- **Elegant**: portada "elegante y sencilla" — sin mesh/glow/doodles/seal, sin `coverRootRef`, sin animación de entrada. Solo bg plano + nombre + dress code + botón. Como no hay nada decorativo que envolver en `acp-desktop-only` (no hace falta ocultar nada en mobile, el bg plano se tapa solo detrás de la foto), el bloque `acp-mobile-only` + `<AnimatedCoverPhoto>` se agrega directo como primer hijo del contenedor de la portada, sin wrapper `acp-desktop-only` en absoluto.
+- **Infantil**: en vez de mesh + glow, tiene 2 blobs circulares con `filter: blur()` (`infantil-blobFloat`/`blobFloat2`, cuyos `@keyframes` viven en un `<style jsx>` MÁS ARRIBA en el archivo, no local al bloque de la portada) + 4 doodles. Estos 2 blobs + los doodles SÍ se envuelven en `acp-desktop-only`, igual que el mesh/glow de las demás familias — solo cambia la forma del decorado, no el mecanismo de wrapping.
+
+**Antes de wirear una familia nueva**: revisar si tiene `coverRootRef`/mesh de verdad, o si es una de estas arquitecturas alternativas — el wiring de 8.3 asume mesh+glow+doodles por default, pero no es universal.
+
+### 8.4 Cómo elegir `effect` + los dos colores del tinte, por familia
+
+No hay atajo genérico — la textura real es: **grep de los hex no-neutros del archivo base** (`grep -oE "#[0-9A-Fa-f]{6}" ArchivoTemplate.tsx | sort | uniq -c | sort -rn | head -15`, descartando blancos/negros/grises de texto) para encontrar el acento real de la familia, y **decidir a ojo** si esa familia es delicada/alocada/sobria comparándola con el mapa de la tabla de 8.1.
+
+**⚠️ Trampa encontrada en Moderno** (aplica a cualquier familia con variantes de color): el acento "de marca" de una familia **puede no ser el mismo entre todas sus variantes de color**. En Moderno, el dorado (`#C9A876`) sí es constante en las 7 variantes — pero el segundo acento (esmeralda `#3E7A6A`) **solo existe en la variante base**, las 6 variantes de color son monocromáticas (dorado nomás, en distinta opacidad). La solución que se usó: `tintColor1` = acento de marca constante (dorado), `tintColor2` = el tono secundario PROPIO de cada variante (su propia sombra oscura, ej. `#0A1321` para Azul, `#1A070A` para Bordo — el mismo hex que ya usan como "superficie" secundaria dentro de esa variante, buscable con `grep -oE "#[0-9A-Fa-f]{6}" Archivo.tsx | sort | uniq -c | sort -rn | head -6`, es normalmente la 2da entrada más frecuente después del fondo principal). **No asumir que el tinte de todas las variantes de una familia va a ser idéntico — confirmarlo por archivo.**
+
+`scrimColorRgb` (el degradé oscuro de legibilidad al pie de la portada) tiene que ser el mismo tono que el `backgroundColor` que ya usa esa variante puntual para la portada (buscar `backgroundColor: '#...'` dentro del bloque de la portada, convertir a decimal `r,g,b`) — no un valor fijo, si no el degradé se nota pegado/distinto al resto de la paleta de esa variante.
+
+### 8.5 Trampa de Windows: line endings inconsistentes (CRLF/LF/BOM/CR sueltos) al scriptear la propagación a variantes
+
+**No asumir un único estilo de line-ending para todos los archivos de plantilla.** Durante este rollout se encontraron los 3 casos, sin patrón previsible (ni por familia, ni por orden de creación): archivos 100% LF (Chic, BonVoyage, GardenParty, GoldenDusk, Infantil), archivos 100% CRLF con o sin BOM (JardinSeda, y la mayoría de las familias "viejas"), y **Elegant**, que tenía además un `\r` suelto en medio de una línea (no un salto de línea real — un carácter de retorno de carro aislado antes de `style={{`, que ni `\r\n→\n` ni un `replace(/\r\n/g,...)` detectan si no se limpia también `\r` sin `\n` al lado). Cualquiera de estas variantes rompe un script de Node que arma `old_string`/`new_string` con `\n` normal sin chequear primero — el reemplazo da 0 ocurrencias en silencio, o falla con un error de "anchor not found" que hay que diagnosticar a mano.
+
+**Antes de escribir el script de propagación de una familia nueva**, correr esto por cada archivo (base + variantes) para saber qué tratamiento necesita:
+```js
+const s = fs.readFileSync(path, 'utf8');
+const crlf = (s.match(/\r\n/g)||[]).length;
+const strayCR = (s.replace(/\r\n/g,'').match(/\r/g)||[]).length;
+console.log(path, 'crlf:', crlf, 'strayCR:', strayCR); // strayCR > 0 = Elegant-style gotcha
+```
+
+Patrón de script que funciona para los 3 casos (detecta el estilo del archivo puntual, no asume uno fijo):
+```js
+const BOM = "﻿";
+let raw = fs.readFileSync(filePath, "utf8");
+const hasBom = raw.startsWith(BOM);
+const hadCRLF = raw.includes("\r\n");            // el archivo YA tenía CRLF -- no fuerces CRLF si no lo tenía
+if (hasBom) raw = raw.slice(BOM.length);
+let src = raw.replace(/\r\n/g, "\n").replace(/\r/g, "");  // normaliza CRLF *y* los \r sueltos de Elegant
+// ...todos los .replace() acá, con old/new strings en \n normal...
+let out = hadCRLF ? src.replace(/\n/g, "\r\n") : src;     // solo vuelve a CRLF si así estaba
+if (hasBom) out = BOM + out;
+fs.writeFileSync(filePath, out, "utf8");
+```
+
+**Si un `old_string` no matchea pese a normalizar CRLF/`\r` sueltos**, sospechar además de espacios de más (ej. `cursor-pointer"  style={{` con doble espacio en vez de uno) — en ese caso, en lugar de seguir puliendo el string literal a mano, usar `indexOf`/`slice` con anclas cortas y únicas (ej. el texto fijo antes y después del bloque a reemplazar) en vez de comparar el bloque completo por igualdad exacta; es más robusto a estos detalles de formato que no se ven a simple vista en un `Read`.
+
+Además, siempre: **verificar cada reemplazo con un chequeo de "exactamente 1 match" antes de escribir** (`str.split(needle).length - 1 === 1`, si no tirar y no escribir nada) — un archivo de una variante que por alguna razón puntual no matchea exacto (texto ligeramente distinto, typo de una sesión anterior, etc.) se detecta ANTES de dejar el archivo a medio transformar, en vez de silenciosamente no aplicar el cambio o aplicarlo mal.
+
+**Si después de propagar `git status`/`git diff` muestra un archivo con miles de líneas cambiadas** para un cambio que debería ser chico: es casi seguro ruido de EOL, no un error de contenido real. Confirmar con `git diff --ignore-all-space <ref> -- archivo | wc -l` vs `git diff <ref> -- archivo | wc -l` — si el primero es mucho más chico que el segundo, es puro ruido de line-ending (pasó una vez con Elegant, 2825 líneas de diff crudo vs 115 reales) y no bloquea nada (el contenido semántico es correcto), pero conviene normalizar el archivo a LF de una y confirmar con `git hash-object archivo` vs `git rev-parse HEAD:archivo` que quedan bit-a-bit iguales, en vez de dejar el commit con ese ruido.
+
+### 8.6 Checklist de verificación específico de esta feature (además del de la sección 5)
+
+1. `?heroBlur=1` no existe como mecanismo real — eso era solo un override del Lab de pruebas (`draft-moderno-lab`, ya no forma parte de la app). En real, el trigger es 100% `portadaImagenFondoDesktop` con datos de verdad.
+2. Cambiar `albumStyle` de una invitación real en la DB (`prisma.invitation.update(...)`) y confirmar en `/draft-moderno/[slug]` (o el `/draft-<familia>/[slug]` que corresponda si existe, si no directo en `/i/[slug]`) que el álbum principal cambia de estilo.
+3. Cargar/sacar la foto de "Portada de bienvenida" desde el wizard real (no solo por DB) y confirmar: (a) aparece el botón de sacar la foto sobre la miniatura ya cargada, (b) sacarla vuelve la portada a como estaba antes, sin recargar la página a mano.
+4. **Probar en mobile Y en desktop (redimensionar la ventana o `/preview-plantilla` en dos anchos distintos)** — con foto cargada, mobile tiene que verse animado y desktop tiene que verse EXACTAMENTE como se veía esa plantilla antes de esta feature (sección 8.2). Si desktop se ve estirado/con la foto de fondo, el wiring del punto 5 de la sección 8.3 quedó mal.
+5. Con la portada abierta manualmente (click en "Abrir invitación"), confirmar la transición de salida (blur+zoom+fade, ~700ms) — no un corte seco.
+6. `grep -c "acp-mobile-only\|acp-desktop-only" ArchivoTemplate*.tsx` en cada variante — tiene que dar match en todas, ninguna variante debería quedar con el fix viejo (portada animada visible en desktop) sin este wrapping.
+7. Si la familia tiene más de una variante de color: revisar bg/ink/muted de CADA archivo antes de asumir que comparten arquitectura con la base (ver 8.3b) — no alcanza con verificar la base y propagar a ciegas.
+
+### 8.7 Para plantillas nuevas de acá en adelante
+
+Si se agrega una familia nueva (siguiendo las secciones 1-7), el checklist de la sección 6 debería incluir también: "Álbum usa `<Album albumStyle={...}>`, no `<AlbumCarousel>` directo" + "Portada de bienvenida wireada con `AnimatedCoverPhoto` + `COVER_RESPONSIVE_STYLE`, con `effect`/tinte elegidos a propósito según la personalidad de la plantilla (tabla de 8.1), no copiados de Moderno por default".
+
+---
+
+## 9. Live preview del wizard (`WizardLivePreview.tsx` + `preview-plantilla/page.tsx`) — cómo sigue el scroll a cada paso, y su trampa
+
+No es parte de la feature de álbum/portada (es infraestructura preexistente que ya tocaban Countdown/Detalles/Cronograma), pero se encontró y arregló un bug real acá durante la rama `portada-y-album`, y vale la pena documentarlo aparte porque **cualquier paso nuevo que se agregue al wizard de acá en más puede pisar la misma trampa**.
+
+### 9.1 Arquitectura en dos partes
+
+- **`WizardLivePreview.tsx`** (el panel del wizard, ventana padre): en cada cambio de `currentStep`, calcula a qué `section` (`"hero"`, `"countdown"`, `"quote"`, `"details"`, `"schedule"`, `"album"`, `"music"`, `"banco"`, `"quiz"`) corresponde el paso actual (mapeo por `stepLabel`, ver el `useEffect` con el comentario "Sincronizar scroll cuando cambia de paso") y le manda `postMessage({ type: "wizard-scroll-to", section })` al iframe.
+- **`preview-plantilla/page.tsx`** (adentro del iframe, la plantilla real renderizada): escucha ese mensaje, busca `document.getElementById(section)` y hace `window.scrollTo(...)` hasta ahí.
+
+### 9.2 ⚠️ Trampa: varias secciones NO EXISTEN en el preview, a propósito o por datos vacíos
+
+`id="music"` nunca existe en el preview (`musicaHabilitada: false` hardcodeado en `WizardLivePreview.tsx`, a propósito, para no pisar el reproductor real con el que ya está sonando en el resto de la página del dashboard). `id="banco"` y `id="quiz"` dependen de toggles (`regaloHabilitado`/`pagoTarjetaHabilitado`, `triviaHabilitada`) que pueden estar apagados en la invitación que se esté editando. `id="schedule"` (Cronograma) y `id="album"` también pueden faltar si esos datos están vacíos.
+
+**Si el elemento buscado no existe, `document.getElementById` devuelve `null` — sin un fallback, el preview se queda visualmente clavado en la última sección que sí encontró**, aunque el usuario siga avanzando pasos (esto pasó de verdad: se notó recién cuando se agregó el paso "Álbum" justo antes de "Música", pero el bug ya existía antes con "Galería"→"Música", solo que menos visible).
+
+**Solución (`SECTION_ORDER` + `scrollFallbackToken` en `preview-plantilla/page.tsx`)**: si a los 700ms el elemento sigue sin aparecer, se busca la PRÓXIMA sección que sí exista siguiendo el orden natural del wizard (`["hero","countdown","quote","details","schedule","album","music","banco","quiz"]`) — y recién si no queda ninguna más adelante, se hace scroll al final de la página. **No saltar directo al final de la página como primer recurso** — se probó primero así y se sentía roto en pasos del medio con sección vacía (ej. Cronograma sin etapas: saltaba al fondo de toda la invitación en vez de quedarse cerca, en la sección más próxima que sí tenía algo). Un contador (`scrollFallbackToken`) invalida el fallback si llega un `wizard-scroll-to` más nuevo antes de los 700ms, para que un scroll viejo no pise a uno más reciente.
+
+Si se agrega un paso nuevo al wizard cuya sección pueda no existir en el preview (por toggle apagado o dato vacío), agregar su `id` a `SECTION_ORDER` en el lugar que le corresponda por orden de aparición — si no, el fallback no sabe a dónde seguir buscando después de esa sección.
+
+### 9.3 ⚠️ Trampa de debugging: hay DOS `<iframe>` de preview montados a la vez
+
+El wizard monta el preview de escritorio (visible, panel lateral) Y `WizardMobilePreviewSheet.tsx` (colapsado/oculto, `0×0`, hasta que se abre en pantallas angostas) **al mismo tiempo**, siempre, sin importar el tamaño de ventana real. `document.querySelector('iframe')` agarra el primero que encuentre en el DOM, que **no necesariamente es el visible**.
+
+Costó bastante tiempo de diagnóstico en esta sesión: pruebas por JS que parecían dar resultados inconsistentes (a veces el scroll parecía no moverse, a veces sí, con los mismos pasos repetidos) en realidad estaban leyendo el `scrollY` de dos iframes DISTINTOS con estados independientes. **Al inspeccionar/debuggear el preview por JS, filtrar siempre por el iframe visible**:
+```js
+const iframe = [...document.querySelectorAll('iframe')].find(f => f.offsetParent !== null);
+```

@@ -20,7 +20,11 @@ import { createPortal } from "react-dom";
 import { Italiana, Cormorant_Garamond } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -371,7 +375,18 @@ const formatNumber = (num: number) => {
 
 export function OnixTemplate({ invitation, guest, isPersonalized = false }: OnixTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -547,7 +562,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -560,6 +575,14 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- Onix es tema oscuro con paleta rosa piedra preciosa +
+  // ciruela -> tinte + effect="enfoque" (elegante, no extravagante).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/onix-quince.png" : undefined;
+  const portadaTintColor1 = "#D89AA0";
+  const portadaTintColor2 = "#78466E";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -956,20 +979,33 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#140B14', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#F1E4E6] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#F1E4E6] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(216,154,160,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(120,70,110,0.2), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'onix-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(216,154,160,0.13), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'onix-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="enfoque"
+                scrimColorRgb="20,11,20"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(216,154,160,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(120,70,110,0.2), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'onix-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(216,154,160,0.13), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'onix-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
+          </div>
 
           {/* Doodles decorativos (sparkle, luna, laurel) -- animados de
               entrada con anime.js (ver useEffect de coverRootRef), inertes
@@ -979,6 +1015,9 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
           <IconRibbon className="onix-doodle opacity-0 absolute" style={{ width: 34, height: 18, bottom: '18%', left: '12%', color: 'rgba(216,154,160,0.45)' }} />
           <IconRings className="onix-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '24%', right: '18%', color: 'rgba(216,154,160,0.4)' }} />
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="onix-seal opacity-0" style={{
@@ -1003,8 +1042,8 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
-              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
+              onClick={openInvitation}
+              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #D89AA0', color: '#D89AA0',
                 background: 'rgba(216,154,160,0.08)', backdropFilter: 'blur(6px)',
@@ -1023,6 +1062,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
             @keyframes onix-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes onix-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
@@ -1190,6 +1230,12 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
           <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #D89AA0, transparent)' }} />
         </div>
 
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
+
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
             targetDate={fechaEvento}
@@ -1314,7 +1360,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

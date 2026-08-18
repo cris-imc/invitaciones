@@ -12,7 +12,7 @@ export function WizardSteps() {
     const isCasamiento = data.type === "CASAMIENTO";
     const isEditing = Boolean(data.id);
 
-    const steps = getWizardSteps({ isEditing, isCasamiento });
+    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false });
 
     const CurrentComponent = steps[currentStep].component;
     const progress = ((currentStep + 1) / steps.length) * 100;

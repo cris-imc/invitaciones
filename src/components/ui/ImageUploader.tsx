@@ -14,9 +14,13 @@ interface ImageUploaderProps {
     aspectRatio?: number;
     className?: string;
     currentImage?: string;
+    // Opcional: si se pasa, aparece una "x" sobre la imagen cargada para
+    // sacarla sin tener que reemplazarla por otra (ej. portadas opcionales
+    // donde el usuario se arrepiente de haber activado el efecto).
+    onRemove?: () => void;
 }
 
-export function ImageUploader({ onImageUploaded, aspectRatio = 1, className, currentImage }: ImageUploaderProps) {
+export function ImageUploader({ onImageUploaded, aspectRatio = 1, className, currentImage, onRemove }: ImageUploaderProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [showCropper, setShowCropper] = useState(false);
@@ -112,6 +116,16 @@ export function ImageUploader({ onImageUploaded, aspectRatio = 1, className, cur
                             <Upload className="w-6 h-6 text-white" />
                             <span className="text-white font-medium text-sm">Cambiar Imagen</span>
                         </div>
+                        {onRemove && (
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); onRemove(); }}
+                                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-colors cursor-pointer"
+                                aria-label="Quitar imagen"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <>

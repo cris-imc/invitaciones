@@ -18,7 +18,10 @@ import { createPortal } from "react-dom";
 import { Space_Grotesk, Sora } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
 import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
@@ -354,7 +357,18 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
 
 export function CorporateTemplateClaro({ invitation, guest, isPersonalized = false }: CorporateTemplateClaroProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -519,7 +533,7 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -532,6 +546,17 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- a diferencia de la base/Bordo/Verde/Violeta (todas de
+  // tema oscuro), Claro es de paleta clara (bg #F5F6F8, texto #141A2E) --
+  // mismo caso que Chic: el texto no puede forzarse a claro por JS (quedaría
+  // claro también en desktop, donde no hay foto). Se resuelve con clases CSS
+  // + media query propia (.corporate-cover-text/-muted, en el <style jsx>
+  // de este archivo). effect="geometric", sin tinte (igual que el resto de
+  // la familia), scrimColorRgb = rgb del texto oscuro propio (#141A2E), no
+  // del bg claro (no oscurecería lo suficiente la foto).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -910,20 +935,32 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F5F6F8', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#141A2E] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#141A2E] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(92,141,255,0.16), transparent), radial-gradient(45% 40% at 85% 80%, rgba(92,141,255,0.08), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'corporate-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(92,141,255,0.14), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'corporate-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="geometric"
+                tint={false}
+                scrimColorRgb="20,26,46"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(92,141,255,0.16), transparent), radial-gradient(45% 40% at 85% 80%, rgba(92,141,255,0.08), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'corporate-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(92,141,255,0.14), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'corporate-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
+          </div>
 
           <IconNode className="corporate-doodle opacity-0 absolute" style={{ width: 42, height: 30, top: '10%', left: '9%', color: 'rgba(92,141,255,0.5)' }} />
           <IconBars className="corporate-doodle opacity-0 absolute" style={{ width: 20, height: 16, top: '16%', right: '13%', color: 'rgba(92,141,255,0.4)' }} />
@@ -939,19 +976,19 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
               {monogram}
             </div>
 
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#141A2E] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), sans-serif' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " corporate-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), sans-serif', color: portadaFondoAnimado ? undefined : '#141A2E' }}>
               {guestNameDisplay}
             </h2>
 
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#5C6478] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " corporate-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#5C6478' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
 
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #2952E3', color: '#2952E3',
@@ -970,7 +1007,14 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
             @keyframes corporate-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes corporate-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes corporate-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .corporate-cover-text { color: #F5F6F8; }
+            .corporate-cover-text-muted { color: rgba(245,246,248,0.75); }
+            @media (min-width: 768px) {
+              .corporate-cover-text { color: #141A2E; }
+              .corporate-cover-text-muted { color: #5C6478; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1121,6 +1165,12 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
           <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #2952E3, transparent)' }} />
         </div>
 
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
+
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
             targetDate={fechaEvento}
@@ -1242,7 +1292,7 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

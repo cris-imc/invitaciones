@@ -51,35 +51,44 @@ export function StepHeroImages() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        Son las imágenes de fondo de la portada inicial. Ambas se ven verticales: la de celular ocupa la pantalla completa del teléfono (el recorte exacto varía un poco según el tamaño de cada celular) y la de PC se ve como panel lateral. Elegí fotos donde el sujeto principal quede centrado para que se adapten bien en cualquier dispositivo.
+                        La Portada Invitación es la que se ve como foto de portada de la invitación (obligatoria, todas las plantillas la usan). La Portada de bienvenida es opcional: si cargás una foto ahí, reemplaza el fondo original de la portada de bienvenida por esa foto. Si la dejás vacía, la portada se ve tal cual la plantilla que elegiste, sin cambios.
                     </div>
                 )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 max-w-4xl mx-auto">
-                {/* Hero Background Image Desktop */}
+                {/* Foto de la portada de bienvenida (opcional) -- antes
+                    "Portada PC": ese recorte no cumplía un propósito propio
+                    (la de celular ya sirve perfecto en pantallas anchas
+                    también). Se recicla como disparador de la portada de
+                    bienvenida animada -- ver AnimatedCoverPhoto.tsx y su uso
+                    en cada plantilla. Mismo aspectRatio que la de celular
+                    (4/5) a propósito: son el mismo tipo de foto vertical de
+                    portada, así los dos recortes quedan a la misma altura
+                    en esta grilla en vez de desalineados. */}
                 <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
-                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm">Portada PC</Label>
+                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm block min-h-[2.5rem]">Portada de bienvenida</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondoDesktop}
                         onImageUploaded={(url: string) => setData({ portadaImagenFondoDesktop: url })}
-                        aspectRatio={400 / 640}
+                        onRemove={() => setData({ portadaImagenFondoDesktop: "" })}
+                        aspectRatio={4 / 5}
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
-                        Se verá en computadoras o pantallas anchas como panel lateral izquierdo de bienvenida.
+                        Si cargás una foto acá, reemplaza el fondo original de la portada de bienvenida por esta foto.
                     </p>
                 </div>
 
                 {/* Hero Background Image Mobile */}
                 <div className={`space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border ${showMissingImageError && !data.portadaImagenFondo ? 'border-red-500/60' : 'border-white/10'}`}>
-                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm">Portada Celular *</Label>
+                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm block min-h-[2.5rem]">Portada Invitación *</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondo}
                         onImageUploaded={(url: string) => { setData({ portadaImagenFondo: url }); setShowMissingImageError(false); }}
                         aspectRatio={4 / 5}
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
-                        Se verá en teléfonos celulares como cabecera o fondo de pantalla previa. Obligatoria: todos los templates la usan como imagen principal.
+                        Se verá como foto de portada de la invitación. Obligatoria: todos los templates la usan como imagen principal.
                     </p>
                     {showMissingImageError && !data.portadaImagenFondo && (
                         <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">

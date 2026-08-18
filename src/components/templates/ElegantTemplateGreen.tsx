@@ -3,7 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -302,7 +306,18 @@ const formatNumber = (num: number) => {
 
 export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -405,7 +420,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -418,6 +433,13 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/elegant-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/elegant-quince.png"
+    : undefined;
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -975,18 +997,31 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
       {!isCoverOpen && (
         <div 
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F9F7F1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#2C2C2C] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#2C2C2C] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem' }}>
-            
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="44,44,44"
+              />
+            </div>
+          )}
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
+          <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem', position: 'relative' }}>
+
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#2C2C2C] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " elegant-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#2C2C2C' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#7D786F] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " elegant-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#7D786F' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -994,13 +1029,27 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
             {/* Thin Open Button */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
-              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 border border-[#2C2C2C] text-[#2C2C2C] hover:bg-[#2C2C2C] hover:text-[#F9F7F1] transition-colors duration-500 cursor-pointer"  style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}
+              onClick={openInvitation}
+              className={`inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 border transition-colors duration-500 cursor-pointer${portadaFondoAnimado ? " elegant-cover-btn" : " border-[#2C2C2C] text-[#2C2C2C] hover:bg-[#2C2C2C] hover:text-[#F9F7F1]"}`}
+              style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}
             >
               ABRIR INVITACIÓN
             </button>
 
           </div>
+          <style jsx>{`
+            .elegant-cover-text { color: #F9F7F1; }
+            .elegant-cover-text-muted { color: rgba(249,247,241,0.75); }
+            .elegant-cover-btn { border-color: #F9F7F1; color: #F9F7F1; }
+            .elegant-cover-btn:hover { background: #F9F7F1; color: #2C2C2C; }
+            @media (min-width: 768px) {
+              .elegant-cover-text { color: #2C2C2C; }
+              .elegant-cover-text-muted { color: #7D786F; }
+              .elegant-cover-btn { border-color: #2C2C2C; color: #2C2C2C; }
+              .elegant-cover-btn:hover { background: #2C2C2C; color: #F9F7F1; }
+            }
+          `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
@@ -1125,6 +1174,12 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
           </div>
         </div>
 
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
+
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
             targetDate={fechaEvento}
@@ -1245,7 +1300,7 @@ export function ElegantTemplateGreen({ invitation, guest, isPersonalized = false
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

@@ -38,7 +38,11 @@ import { createPortal } from "react-dom";
 import { Cormorant_Garamond, Quicksand } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -393,7 +397,18 @@ const formatNumber = (num: number) => {
 
 export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalized = false }: LuzLunaTemplateMedianocheAzulProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -574,7 +589,7 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -587,6 +602,18 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- mismo criterio que la base de LuzLuna: tinte +
+  // effect="shimmer", valores literales propios de esta variante (no var(),
+  // AnimatedCoverPhoto no lo acepta), scrimColorRgb = rgb del propio --t-bg.
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/luzluna-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/luzluna-quince.png"
+    : undefined;
+  const portadaTintColor1 = "#7EA3D9";
+  const portadaTintColor2 = "#4A5FA0";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -973,8 +1000,20 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: 'var(--t-bg)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="transition-all duration-1000 animate-in fade-in"
+          className={isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}
         >
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="shimmer"
+                scrimColorRgb="15,20,32"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, color-mix(in srgb, var(--t-acc) 16%, transparent), transparent), radial-gradient(45% 40% at 85% 80%, color-mix(in srgb, var(--t-acc2) 20%, transparent), transparent)',
@@ -987,12 +1026,16 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
             top: '18%', left: '50%', transform: 'translateX(-50%)',
             animation: 'luzluna-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
           }} />
+          </div>
 
           <IconMoon className="luzluna-doodle opacity-0 absolute" style={{ width: 30, height: 30, top: '9%', left: '10%', color: 'color-mix(in srgb, var(--t-acc) 60%, transparent)' }} />
           <IconConstellation className="luzluna-doodle opacity-0 absolute" style={{ width: 36, height: 16, top: '15%', right: '9%', color: 'color-mix(in srgb, var(--t-acc2) 55%, transparent)' }} />
           <IconStarSpark className="luzluna-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '22%', left: '14%', color: 'color-mix(in srgb, var(--t-acc) 55%, transparent)' }} />
           <IconCloudWisp className="luzluna-doodle opacity-0 absolute" style={{ width: 26, height: 12, bottom: '26%', right: '16%', color: 'color-mix(in srgb, var(--t-acc2) 45%, transparent)' }} />
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="luzluna-seal opacity-0" style={{
@@ -1014,7 +1057,7 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
 
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid var(--t-acc)', color: 'var(--t-acc)',
@@ -1034,6 +1077,7 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
             @keyframes luzluna-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes luzluna-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
@@ -1213,6 +1257,12 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
           <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, var(--t-acc), transparent)' }} />
         </div>
 
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
+
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
             targetDate={fechaEvento}
@@ -1335,7 +1385,7 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}
