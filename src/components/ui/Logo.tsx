@@ -187,19 +187,6 @@ export function LogoFooterCredit({
           Hecho con amor por
         </span>
         <img src={logoSrc} alt="altainvitacion.com" className="h-4 w-auto" />
-        {/* Atribucion obligatoria de la licencia gratis de Lordicon (iconos
-            animados por seccion) -- texto exacto pedido por su licencia,
-            ver docs/PLAN_ALBUM_PORTADA.md sección Lordicon. Chico y
-            discreto, no reemplaza ni compite con el crédito de arriba. */}
-        <a
-          href="https://lordicon.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[8px] uppercase tracking-[0.1em] hover:underline"
-          style={{ fontFamily: "var(--font-inter), sans-serif", color: textColor, opacity: 0.35 }}
-        >
-          Animated icons by Lordicon.com
-        </a>
       </div>
     </div>
   );
