@@ -184,6 +184,7 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
       ref={rootRef}
       className={`w-full py-12 px-6 flex flex-col items-center justify-center text-center${dark ? " dark" : ""}`}
       id="save-the-date"
+      style={{ backgroundColor: "var(--t-bg)" }}
     >
       <p className="t-kicker" style={{ justifyContent: "center", display: "flex" }}>Save the date</p>
       <p
