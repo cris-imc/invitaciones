@@ -27,13 +27,16 @@ function escapeICSText(s: string) {
   return s.replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\n/g, "\\n");
 }
 
-// iOS Safari abre un link a un .ics (incluso via data: URI) con la hoja
-// nativa "Agregar a Calendario" -- es el mecanismo más confiable ahí. En
-// Android, en cambio, el link de Google Calendar (calendar.google.com/
-// calendar/render) es el que mejor abre la app o la versión web sin
-// fricción. Se detecta la plataforma y se elige el camino que mejor
-// funciona en cada una -- no hay un único link universal que ande bien en
-// las dos a la vez.
+// iOS Safari abre un .ics con la hoja nativa "Agregar a Calendario" SOLO
+// si la navegación llega desde un <a href="data:text/calendar;..."> real
+// (click directo del usuario sobre un link) -- si en cambio se dispara vía
+// JS con `window.location.href = dataUri` dentro de un handler, iOS no lo
+// reconoce como una navegación de link y no pasa nada (confirmado: no
+// funcionaba en un iPhone 15 real). Por eso en iOS se renderiza un <a>
+// verdadero en vez de un <button onClick>. En Android, en cambio, el link
+// de Google Calendar (calendar.google.com/calendar/render) es el que mejor
+// abre la app o la versión web sin fricción -- no hay un único link
+// universal que ande bien en las dos a la vez.
 function isIOS() {
   if (typeof navigator === "undefined") return false;
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
@@ -121,6 +124,14 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
   const rootRef = useRef<HTMLElement>(null);
   const [safeAcc, setSafeAcc] = useState<string | undefined>(undefined);
   const [safeMuted, setSafeMuted] = useState<string | undefined>(undefined);
+  // Arranca en `false` (mismo render que el servidor) y se corrige recién
+  // despues del mount -- evita mismatch de hidratación entre servidor y
+  // cliente por usar `navigator` durante el render.
+  const [isIOSDevice, setIsIOSDevice] = useState(false);
+
+  useEffect(() => {
+    setIsIOSDevice(isIOS());
+  }, []);
 
   useEffect(() => {
     const el = rootRef.current;
@@ -141,39 +152,41 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
   const weekday = weekdayRaw.charAt(0).toUpperCase() + weekdayRaw.slice(1);
   const year = targetDate.getFullYear();
 
-  const handleAddToCalendar = () => {
-    const start = targetDate;
-    const end = new Date(targetDate.getTime() + 4 * 60 * 60 * 1000);
+  const start = targetDate;
+  const end = new Date(targetDate.getTime() + 4 * 60 * 60 * 1000);
 
-    if (isIOS()) {
-      const ics = [
-        "BEGIN:VCALENDAR",
-        "VERSION:2.0",
-        "PRODID:-//Invitaciones//ES",
-        "CALSCALE:GREGORIAN",
-        "BEGIN:VEVENT",
-        `DTSTART:${formatCalendarDate(start)}`,
-        `DTEND:${formatCalendarDate(end)}`,
-        `SUMMARY:${escapeICSText(eventName)}`,
-        description ? `DESCRIPTION:${escapeICSText(description)}` : "",
-        location ? `LOCATION:${escapeICSText(location)}` : "",
-        "STATUS:CONFIRMED",
-        "END:VEVENT",
-        "END:VCALENDAR",
-      ]
-        .filter(Boolean)
-        .join("\r\n");
-      window.location.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
-    } else {
-      const params = new URLSearchParams({
-        action: "TEMPLATE",
-        text: eventName,
-        dates: `${formatCalendarDate(start)}/${formatCalendarDate(end)}`,
-        details: description,
-        location,
-      });
-      window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, "_blank", "noopener,noreferrer");
-    }
+  // Href del .ics para el <a> real en iOS -- se calcula siempre (es barato)
+  // para que el link ya tenga el href correcto apenas se decide renderizarlo
+  // como <a>, sin depender de un onClick que dispare la navegación por JS.
+  const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(
+    [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Invitaciones//ES",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `DTSTART:${formatCalendarDate(start)}`,
+      `DTEND:${formatCalendarDate(end)}`,
+      `SUMMARY:${escapeICSText(eventName)}`,
+      description ? `DESCRIPTION:${escapeICSText(description)}` : "",
+      location ? `LOCATION:${escapeICSText(location)}` : "",
+      "STATUS:CONFIRMED",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ]
+      .filter(Boolean)
+      .join("\r\n")
+  )}`;
+
+  const handleAddToCalendarAndroid = () => {
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: eventName,
+      dates: `${formatCalendarDate(start)}/${formatCalendarDate(end)}`,
+      details: description,
+      location,
+    });
+    window.open(`https://calendar.google.com/calendar/render?${params.toString()}`, "_blank", "noopener,noreferrer");
   };
 
   const accColor = safeAcc ?? "var(--t-acc)";
@@ -212,27 +225,55 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
       >
         {weekday} · {year}
       </p>
-      <button
-        type="button"
-        onClick={handleAddToCalendar}
-        className="inline-flex items-center gap-1.5 font-medium text-[0.7rem] tracking-[0.1em] uppercase cursor-pointer bg-transparent border-0 p-0"
-        style={{
-          fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif",
-          color: mutedColor,
-          opacity: 0.9,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.opacity = "1";
-          e.currentTarget.style.color = accColor;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.opacity = "0.9";
-          e.currentTarget.style.color = mutedColor;
-        }}
-      >
-        <CalendarPlus className="w-3.5 h-3.5" strokeWidth={1.75} />
-        Agregar al calendario
-      </button>
+      {isIOSDevice ? (
+        // <a> real apuntando al data URI del .ics -- en iOS Safari, solo una
+        // navegación de link genuina (no un window.location.href disparado
+        // por JS) abre la hoja nativa "Agregar a Calendario". Sin
+        // target="_blank" y sin download: así Safari la reconoce como
+        // calendario para previsualizar, no como archivo para descargar.
+        <a
+          href={icsHref}
+          className="inline-flex items-center gap-1.5 font-medium text-[0.7rem] tracking-[0.1em] uppercase cursor-pointer no-underline"
+          style={{
+            fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif",
+            color: mutedColor,
+            opacity: 0.9,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = "1";
+            e.currentTarget.style.color = accColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = "0.9";
+            e.currentTarget.style.color = mutedColor;
+          }}
+        >
+          <CalendarPlus className="w-3.5 h-3.5" strokeWidth={1.75} />
+          Agregar al calendario
+        </a>
+      ) : (
+        <button
+          type="button"
+          onClick={handleAddToCalendarAndroid}
+          className="inline-flex items-center gap-1.5 font-medium text-[0.7rem] tracking-[0.1em] uppercase cursor-pointer bg-transparent border-0 p-0"
+          style={{
+            fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif",
+            color: mutedColor,
+            opacity: 0.9,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = "1";
+            e.currentTarget.style.color = accColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = "0.9";
+            e.currentTarget.style.color = mutedColor;
+          }}
+        >
+          <CalendarPlus className="w-3.5 h-3.5" strokeWidth={1.75} />
+          Agregar al calendario
+        </button>
+      )}
     </section>
   );
 }
