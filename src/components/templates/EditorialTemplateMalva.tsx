@@ -21,6 +21,8 @@ import { createPortal } from "react-dom";
 import { Bodoni_Moda, Archivo } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -377,7 +379,18 @@ const formatNumber = (num: number) => {
 
 export function EditorialTemplateMalva({ invitation, guest, isPersonalized = false }: EditorialTemplateMalvaProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -568,6 +581,9 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -971,9 +987,20 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#EDEBE5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#17140F] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#17140F] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="23,20,15"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(107,74,107,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(184,169,140,0.2), transparent)',
             backgroundSize: '160% 160%',
@@ -994,6 +1021,7 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
           <IconRibbon className="editorial-doodle opacity-0 absolute" style={{ width: 20, height: 20, bottom: '18%', left: '14%', color: 'rgba(107,74,107,0.4)' }} />
           <IconHeartDoodle className="editorial-doodle opacity-0 absolute" style={{ width: 12, height: 12, bottom: '24%', right: '20%', color: 'rgba(107,74,107,0.4)' }} />
 
+          </div>
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="editorial-seal opacity-0" style={{
@@ -1004,13 +1032,13 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
             </div>
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#17140F] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " editorial-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#17140F' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#8A8378] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " editorial-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#8A8378' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1018,7 +1046,7 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #6B4A6B', color: '#6B4A6B',
@@ -1037,7 +1065,14 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
             @keyframes editorial-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes editorial-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes editorial-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .editorial-cover-text { color: #EDEBE5; }
+            .editorial-cover-text-muted { color: rgba(237,235,229,0.75); }
+            @media (min-width: 768px) {
+              .editorial-cover-text { color: #17140F; }
+              .editorial-cover-text-muted { color: #8A8378; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1338,7 +1373,7 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}
