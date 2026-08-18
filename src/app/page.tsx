@@ -396,7 +396,7 @@ export default async function Home() {
                 },
                 {
                   q: "¿Cómo comparto mi invitación con los invitados?",
-                  a: "Compartís un único link por WhatsApp, Instagram, email o el medio que prefieras. No hay límite de veces ni de personas: podés reenviarlo cuantas veces quieras."
+                  a: "Generás un link único y personalizado para cada invitado o grupo familiar. Lo enviás de forma individual (uno a uno) por WhatsApp, email o el medio que prefieras. Al ser un link personal, cada persona recibe su propia invitación exclusiva para confirmar su asistencia."
                 },
                 {
                   q: "¿Hay límite de invitados?",
