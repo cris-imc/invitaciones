@@ -24,6 +24,7 @@ import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -590,6 +591,7 @@ export function Cristal3DTemplateVioleta({ invitation, guest, isPersonalized = f
   // scrimColorRgb = rgb(#0A0E16), igual en todas (bg no cambia por variante).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/cristal3d-quince.png" : undefined;
   const portadaTintColor1 = "#C4A6FF";
   const portadaTintColor2 = "#B9A6FF";
 
@@ -1062,6 +1064,9 @@ export function Cristal3DTemplateVioleta({ invitation, guest, isPersonalized = f
           <IconShard className="crys-doodle opacity-0 absolute" style={{ width: 22, height: 22, top: '30%', right: '20%', color: '#8FD3FF' }} />
           <IconShard className="crys-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '22%', right: '28%', color: '#C4A6FF' }} />
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="crys-seal opacity-0" style={{
@@ -1107,7 +1112,7 @@ export function Cristal3DTemplateVioleta({ invitation, guest, isPersonalized = f
             @keyframes crys-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes crys-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 

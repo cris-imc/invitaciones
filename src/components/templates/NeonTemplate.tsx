@@ -21,6 +21,7 @@ import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -576,6 +577,10 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
   // tinte + effect="flash", mismo criterio que Circuito/Holograma.
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  // Neon es QUINCE_ANOS o CUMPLEANOS -- el PNG de fondo solo aplica a
+  // QUINCE_ANOS, no a CUMPLEANOS (esa rama cae en el bucket "Evento", que no
+  // tiene estética fija y por eso no tiene PNG propio, ver plan de rollout).
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/neon-quince.png" : undefined;
   const portadaTintColor1 = "#39FFD0";
   const portadaTintColor2 = "#FF2E9B";
 
@@ -1014,6 +1019,9 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
           <IconSpark className="neon-doodle opacity-0 absolute" style={{ width: 22, height: 22, top: '30%', right: '20%', color: '#FF2E9B' }} />
           <IconSpark className="neon-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '22%', right: '28%', color: '#39FFD0' }} />
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="neon-seal opacity-0" style={{
@@ -1058,7 +1066,7 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
             @keyframes neon-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes neon-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 

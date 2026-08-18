@@ -22,6 +22,7 @@ import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -579,6 +580,7 @@ export function OnixTemplatePlata({ invitation, guest, isPersonalized = false }:
   // scrimColorRgb = rgb(#140B14), igual en todas (bg no cambia por variante).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/onix-quince.png" : undefined;
   const portadaTintColor1 = "#C9C9D1";
   const portadaTintColor2 = "#78466E";
 
@@ -1013,6 +1015,9 @@ export function OnixTemplatePlata({ invitation, guest, isPersonalized = false }:
           <IconRibbon className="onix-doodle opacity-0 absolute" style={{ width: 34, height: 18, bottom: '18%', left: '12%', color: 'rgba(201,201,209,0.45)' }} />
           <IconRings className="onix-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '24%', right: '18%', color: 'rgba(201,201,209,0.4)' }} />
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="onix-seal opacity-0" style={{
@@ -1057,7 +1062,7 @@ export function OnixTemplatePlata({ invitation, guest, isPersonalized = false }:
             @keyframes onix-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes onix-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
