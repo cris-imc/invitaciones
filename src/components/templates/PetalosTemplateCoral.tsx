@@ -37,6 +37,7 @@ import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -605,6 +606,10 @@ export function PetalosTemplateCoral({ invitation, guest, isPersonalized = false
   // (.petalos-cover-text/-muted). scrimColorRgb = rgb del ink oscuro propio.
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/petalos-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/petalos-quince.png"
+    : undefined;
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -1023,6 +1028,9 @@ export function PetalosTemplateCoral({ invitation, guest, isPersonalized = false
           <IconHeartBud className="petalos-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '25%', right: '18%', color: 'color-mix(in srgb, var(--t-acc2) 45%, transparent)' }} />
           </div>
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="petalos-seal opacity-0" style={{
@@ -1070,7 +1078,7 @@ export function PetalosTemplateCoral({ invitation, guest, isPersonalized = false
               .petalos-cover-text-muted { color: var(--t-muted); }
             }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
