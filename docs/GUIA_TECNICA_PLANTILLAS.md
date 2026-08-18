@@ -268,6 +268,8 @@ Todo esto vive en el componente compartido `AnimatedCoverPhoto.tsx` (`src/compon
 - **Paleta más cargada/saturada** (Moderno, Onix y similares): blur + shimmer + tinte, u otra combinación con tinte.
 - **Familias alocadas/extravagantes** (Neon, Holograma, Circuito y similares): blur + tinte + `effect="flash"` (u otro efecto con más energía).
 
+**Excepción confirmada al criterio "paleta clara → sin tinte"**: Infantil tiene bg claro (`#FFF7F2`, crema) pero usa `effect="flash"` CON tinte (rosa `#FF5C8A` + lavanda `#9B7FE8`) — es la familia de cumpleaños infantil, y la energía de fiesta/confetti pesa más que el default de "paleta clara = sin tinte". El criterio de la tabla es un punto de partida, no una regla mecánica; si una familia nueva tiene una personalidad claramente "de fiesta" a pesar de tener bg claro, el tinte + flash puede seguir siendo la elección correcta — usar criterio, no la tabla al pie de la letra.
+
 `AnimatedCoverPhoto` soporta esto con `tintColor1`/`tintColor2` ahora **opcionales** + un prop `tint?: boolean` (default `true`) — si no se pasan colores, o se pasa `tint={false}`, la capa de tinte no se renderiza y solo queda el blur/Ken Burns/enfoque. La familia `"flash"` sí necesita sus dos colores siempre (no es la capa de tinte, es el pulso de color del flash en sí) — tiene fallback dorado si se omiten por error, pero no confiar en el fallback, pasarlos.
 
 Transición de salida al tocar "Abrir invitación" (`COVER_EXIT_STYLE`, blur+zoom+fade ~700ms antes de desmontar la portada) es la misma para las 4, siempre se suma.
@@ -318,6 +320,24 @@ Usando `ModernoTemplate.tsx` como referencia exacta (ya hecho, sirve de diff):
 ```
 Repetir para cada elemento de texto que lo necesite (nombre, dress code — el monograma y el botón de Chic usan el acento dorado constante, que se lee bien en cualquier fondo, no necesitaron el mismo tratamiento; confirmar caso por caso, no asumir). **No hace falta tocar nada fuera del bloque de la portada** — el resto de la plantilla (después de abrir) sigue con sus colores de siempre.
 
+### 8.3b ⚠️ Trampa de "familia mixta": no asumir que todas las variantes de color comparten arquitectura
+
+Pasó en **6 de las 22 familias** durante este rollout (Corporate, LoftIndustrial, LuzLuna, Petalos, Seda, GardenParty) — bastante seguido como para tratarlo como el default a sospechar, no la excepción:
+
+- **Split claro/oscuro dentro de la misma familia** (Corporate, LoftIndustrial, LuzLuna, Petalos, Seda): la plantilla base es de un tema (ej. oscuro), pero 1 o más variantes de color son del tema contrario (ej. Corporate-Claro, LoftIndustrial-Claro, Petalos-VinoVibrante es oscura dentro de una familia mayormente clara). Cada variante oscura suele tener su **propio bg** (no comparten `scrimColorRgb` entre sí) — hay que revisar el `backgroundColor` de la portada de CADA archivo de variante, no asumir que todas heredan el de la base.
+- **Mismo tema (todas claras u todas oscuras) pero ink/muted distinto por variante** (GardenParty): las 5 variantes son todas claras, pero Vibrante tiene su propio ink/muted (`#411D14`/`#9c5a45`) distinto de las otras 4 (`#3A2A22`/`#8a7462`), aunque el bg de las 5 sea "claro" en las 5. Esto es más sutil que el split claro/oscuro — hay que comparar el hex exacto de `className="text-[#......] tracking-wide uppercase"` (dress code) y el `text-[#......] transition-all` del wrapper (nombre) variante por variante, no solo mirar si el bg "se ve claro".
+
+**Cómo detectarlo rápido, antes de escribir el script de propagación**: `grep -n "backgroundColor: '#" src/components/templates/Familia*.tsx` (bg de la portada) + `grep -n "className=\"text-\[#" src/components/templates/Familia*.tsx` (ink del wrapper) — si algún hex difiere entre archivos, es familia mixta y el script de propagación necesita el `scrimColorRgb`/clase de texto por-variante en vez de uno compartido para todas (ver el patrón usado en `propagate-gardenparty.tmp.js`/`propagate-editorial.tmp.js` de esa rama, con un array de `{ file, ink, inkRgb, muted, bg }` por variante en vez de un solo set de constantes).
+
+### 8.3c Familias con arquitectura de portada distinta (sin mesh/glow): Elegant e Infantil
+
+La mayoría de las familias comparten la misma "receta" decorativa en la portada: 2 divs de `radial-gradient` animados (mesh + glow) + 3-4 íconos doodle con `opacity-0` animados por `anime.js` via `coverRootRef`. Dos familias rompen ese patrón:
+
+- **Elegant**: portada "elegante y sencilla" — sin mesh/glow/doodles/seal, sin `coverRootRef`, sin animación de entrada. Solo bg plano + nombre + dress code + botón. Como no hay nada decorativo que envolver en `acp-desktop-only` (no hace falta ocultar nada en mobile, el bg plano se tapa solo detrás de la foto), el bloque `acp-mobile-only` + `<AnimatedCoverPhoto>` se agrega directo como primer hijo del contenedor de la portada, sin wrapper `acp-desktop-only` en absoluto.
+- **Infantil**: en vez de mesh + glow, tiene 2 blobs circulares con `filter: blur()` (`infantil-blobFloat`/`blobFloat2`, cuyos `@keyframes` viven en un `<style jsx>` MÁS ARRIBA en el archivo, no local al bloque de la portada) + 4 doodles. Estos 2 blobs + los doodles SÍ se envuelven en `acp-desktop-only`, igual que el mesh/glow de las demás familias — solo cambia la forma del decorado, no el mecanismo de wrapping.
+
+**Antes de wirear una familia nueva**: revisar si tiene `coverRootRef`/mesh de verdad, o si es una de estas arquitecturas alternativas — el wiring de 8.3 asume mesh+glow+doodles por default, pero no es universal.
+
 ### 8.4 Cómo elegir `effect` + los dos colores del tinte, por familia
 
 No hay atajo genérico — la textura real es: **grep de los hex no-neutros del archivo base** (`grep -oE "#[0-9A-Fa-f]{6}" ArchivoTemplate.tsx | sort | uniq -c | sort -rn | head -15`, descartando blancos/negros/grises de texto) para encontrar el acento real de la familia, y **decidir a ojo** si esa familia es delicada/alocada/sobria comparándola con el mapa de la tabla de 8.1.
@@ -326,23 +346,37 @@ No hay atajo genérico — la textura real es: **grep de los hex no-neutros del 
 
 `scrimColorRgb` (el degradé oscuro de legibilidad al pie de la portada) tiene que ser el mismo tono que el `backgroundColor` que ya usa esa variante puntual para la portada (buscar `backgroundColor: '#...'` dentro del bloque de la portada, convertir a decimal `r,g,b`) — no un valor fijo, si no el degradé se nota pegado/distinto al resto de la paleta de esa variante.
 
-### 8.5 Trampa de Windows: CRLF + BOM al scriptear la propagación a variantes
+### 8.5 Trampa de Windows: line endings inconsistentes (CRLF/LF/BOM/CR sueltos) al scriptear la propagación a variantes
 
-Los archivos de plantilla en este repo están en **CRLF con BOM** (`efbbbf` al inicio + `\r\n`). Un script de Node que lea con `fs.readFileSync(path, "utf8")` y arme los `old_string`/`new_string` con `\n` normal **no va a matchear nada** (0 ocurrencias) aunque el texto visible sea idéntico. Patrón que funciona:
+**No asumir un único estilo de line-ending para todos los archivos de plantilla.** Durante este rollout se encontraron los 3 casos, sin patrón previsible (ni por familia, ni por orden de creación): archivos 100% LF (Chic, BonVoyage, GardenParty, GoldenDusk, Infantil), archivos 100% CRLF con o sin BOM (JardinSeda, y la mayoría de las familias "viejas"), y **Elegant**, que tenía además un `\r` suelto en medio de una línea (no un salto de línea real — un carácter de retorno de carro aislado antes de `style={{`, que ni `\r\n→\n` ni un `replace(/\r\n/g,...)` detectan si no se limpia también `\r` sin `\n` al lado). Cualquiera de estas variantes rompe un script de Node que arma `old_string`/`new_string` con `\n` normal sin chequear primero — el reemplazo da 0 ocurrencias en silencio, o falla con un error de "anchor not found" que hay que diagnosticar a mano.
 
+**Antes de escribir el script de propagación de una familia nueva**, correr esto por cada archivo (base + variantes) para saber qué tratamiento necesita:
+```js
+const s = fs.readFileSync(path, 'utf8');
+const crlf = (s.match(/\r\n/g)||[]).length;
+const strayCR = (s.replace(/\r\n/g,'').match(/\r/g)||[]).length;
+console.log(path, 'crlf:', crlf, 'strayCR:', strayCR); // strayCR > 0 = Elegant-style gotcha
+```
+
+Patrón de script que funciona para los 3 casos (detecta el estilo del archivo puntual, no asume uno fijo):
 ```js
 const BOM = "﻿";
 let raw = fs.readFileSync(filePath, "utf8");
 const hasBom = raw.startsWith(BOM);
+const hadCRLF = raw.includes("\r\n");            // el archivo YA tenía CRLF -- no fuerces CRLF si no lo tenía
 if (hasBom) raw = raw.slice(BOM.length);
-let src = raw.replace(/\r\n/g, "\n");           // normalizar a LF para trabajar
+let src = raw.replace(/\r\n/g, "\n").replace(/\r/g, "");  // normaliza CRLF *y* los \r sueltos de Elegant
 // ...todos los .replace() acá, con old/new strings en \n normal...
-let out = src.replace(/\n/g, "\r\n");            // volver a CRLF
+let out = hadCRLF ? src.replace(/\n/g, "\r\n") : src;     // solo vuelve a CRLF si así estaba
 if (hasBom) out = BOM + out;
 fs.writeFileSync(filePath, out, "utf8");
 ```
 
-Además: **verificar cada reemplazo con un chequeo de "exactamente 1 match" antes de escribir** (`str.split(needle).length - 1 === 1`, si no tirar y no escribir nada) — un archivo de una variante que por alguna razón puntual no matchea exacto (texto ligeramente distinto, typo de una sesión anterior, etc.) se detecta ANTES de dejar el archivo a medio transformar, en vez de silenciosamente no aplicar el cambio o aplicarlo mal.
+**Si un `old_string` no matchea pese a normalizar CRLF/`\r` sueltos**, sospechar además de espacios de más (ej. `cursor-pointer"  style={{` con doble espacio en vez de uno) — en ese caso, en lugar de seguir puliendo el string literal a mano, usar `indexOf`/`slice` con anclas cortas y únicas (ej. el texto fijo antes y después del bloque a reemplazar) en vez de comparar el bloque completo por igualdad exacta; es más robusto a estos detalles de formato que no se ven a simple vista en un `Read`.
+
+Además, siempre: **verificar cada reemplazo con un chequeo de "exactamente 1 match" antes de escribir** (`str.split(needle).length - 1 === 1`, si no tirar y no escribir nada) — un archivo de una variante que por alguna razón puntual no matchea exacto (texto ligeramente distinto, typo de una sesión anterior, etc.) se detecta ANTES de dejar el archivo a medio transformar, en vez de silenciosamente no aplicar el cambio o aplicarlo mal.
+
+**Si después de propagar `git status`/`git diff` muestra un archivo con miles de líneas cambiadas** para un cambio que debería ser chico: es casi seguro ruido de EOL, no un error de contenido real. Confirmar con `git diff --ignore-all-space <ref> -- archivo | wc -l` vs `git diff <ref> -- archivo | wc -l` — si el primero es mucho más chico que el segundo, es puro ruido de line-ending (pasó una vez con Elegant, 2825 líneas de diff crudo vs 115 reales) y no bloquea nada (el contenido semántico es correcto), pero conviene normalizar el archivo a LF de una y confirmar con `git hash-object archivo` vs `git rev-parse HEAD:archivo` que quedan bit-a-bit iguales, en vez de dejar el commit con ese ruido.
 
 ### 8.6 Checklist de verificación específico de esta feature (además del de la sección 5)
 
@@ -352,6 +386,7 @@ Además: **verificar cada reemplazo con un chequeo de "exactamente 1 match" ante
 4. **Probar en mobile Y en desktop (redimensionar la ventana o `/preview-plantilla` en dos anchos distintos)** — con foto cargada, mobile tiene que verse animado y desktop tiene que verse EXACTAMENTE como se veía esa plantilla antes de esta feature (sección 8.2). Si desktop se ve estirado/con la foto de fondo, el wiring del punto 5 de la sección 8.3 quedó mal.
 5. Con la portada abierta manualmente (click en "Abrir invitación"), confirmar la transición de salida (blur+zoom+fade, ~700ms) — no un corte seco.
 6. `grep -c "acp-mobile-only\|acp-desktop-only" ArchivoTemplate*.tsx` en cada variante — tiene que dar match en todas, ninguna variante debería quedar con el fix viejo (portada animada visible en desktop) sin este wrapping.
+7. Si la familia tiene más de una variante de color: revisar bg/ink/muted de CADA archivo antes de asumir que comparten arquitectura con la base (ver 8.3b) — no alcanza con verificar la base y propagar a ciegas.
 
 ### 8.7 Para plantillas nuevas de acá en adelante
 
