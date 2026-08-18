@@ -27,9 +27,16 @@ export interface WizardStepDef {
 export function getWizardSteps({
     isEditing,
     isCasamiento,
+    hasGallery = true,
 }: {
     isEditing: boolean;
     isCasamiento: boolean;
+    // Si la galería está deshabilitada (StepGallery.tsx ->
+    // galeriaPrincipalHabilitada) no tiene sentido pedir un estilo de álbum
+    // para fotos que no se van a mostrar. Default true para no romper
+    // callers que todavía no llegaron a ese paso del wizard (antes de que
+    // exista un valor real, se asume habilitada).
+    hasGallery?: boolean;
 }): WizardStepDef[] {
     return [
         ...(isEditing ? [] : [{ component: StepEventType, label: "Tipo de Evento" }]),
@@ -46,7 +53,7 @@ export function getWizardSteps({
         ...(isCasamiento ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
         { component: StepCronograma, label: "Cronograma" },
         { component: StepGallery, label: "Galería" },
-        { component: StepAlbumStyle, label: "Álbum" },
+        ...(hasGallery ? [{ component: StepAlbumStyle, label: "Álbum" }] : []),
         { component: StepMusic, label: "Música" },
         { component: StepBankDetails, label: "Regalo (CBU)" },
         { component: StepTrivia, label: "Trivia" },

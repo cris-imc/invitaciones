@@ -27,6 +27,7 @@ export const coverPageSchema = z.object({
     portadaKicker: z.string().optional(),
     portadaTitulo: z.string().optional(),
     portadaDressCode: z.string().optional(),
+    dresscodeHabilitado: z.boolean().default(true),
     portadaMensaje: z.string().optional(),
     portadaTextoBoton: z.string().optional(),
     portadaImagenFondo: z.string().optional(),

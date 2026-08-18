@@ -118,7 +118,7 @@ export function WizardLivePreview() {
         
         const isEditing = Boolean(data.id);
         const isCasamiento = data.type === "CASAMIENTO";
-        const steps = getWizardSteps({ isEditing, isCasamiento });
+        const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false });
         const stepLabel = steps[currentStep]?.label || "";
 
         let section = "hero";
@@ -133,7 +133,7 @@ export function WizardLivePreview() {
         if (stepLabel === "Trivia") section = "quiz";
 
         win.postMessage({ type: "wizard-scroll-to", section }, window.location.origin);
-    }, [currentStep, loading, data.id, data.type]);
+    }, [currentStep, loading, data.id, data.type, data.galeriaPrincipalHabilitada]);
 
     return (
         <div

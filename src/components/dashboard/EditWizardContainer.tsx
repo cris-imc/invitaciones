@@ -55,6 +55,7 @@ function WizardContent({ invitation }: { invitation: any }) {
                 portadaKicker: invitation.portadaKicker || "",
                 portadaTitulo: invitation.portadaTitulo || "",
                 portadaDressCode: invitation.portadaDressCode || "",
+                dresscodeHabilitado: invitation.dresscodeHabilitado ?? true,
                 portadaMensaje: invitation.portadaMensaje || "",
                 portadaTextoBoton: invitation.portadaTextoBoton || "",
                 portadaImagenFondo: invitation.portadaImagenFondo || "",
@@ -130,7 +131,7 @@ function WizardContent({ invitation }: { invitation: any }) {
             if (initialStepParam === 'design') {
                 // Calculado por búsqueda (no hardcodeado) para que nunca se
                 // desincronice si se vuelve a reordenar el wizard.
-                const editSteps = getWizardSteps({ isEditing: true, isCasamiento: invitation.tipo === 'CASAMIENTO' });
+                const editSteps = getWizardSteps({ isEditing: true, isCasamiento: invitation.tipo === 'CASAMIENTO', hasGallery: invitation.galeriaPrincipalHabilitada !== false });
                 const designIndex = editSteps.findIndex((s) => s.label === 'Plantilla');
                 setStep(designIndex >= 0 ? designIndex : 0);
             } else {

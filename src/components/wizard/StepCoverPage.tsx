@@ -16,6 +16,11 @@ export function StepCoverPage() {
     const portadaHabilitada = d.portadaHabilitada ?? true;
     const kicker = d.portadaKicker ?? "Con mucho cariño, para";
     const dressCode = d.portadaDressCode ?? "";
+    // Default true: para invitaciones nuevas (sin este campo todavía) el
+    // switch arranca activado, así escribir un dress code lo muestra sin
+    // pasos extra -- igual que el comportamiento de siempre antes de que
+    // existiera este switch.
+    const dresscodeHabilitado = d.dresscodeHabilitado ?? true;
     const textoBoton = d.portadaTextoBoton || "Abrir invitación";
 
     // Computed display names for preview
@@ -182,12 +187,23 @@ export function StepCoverPage() {
 
                         {/* Campo DressCode */}
                         <div className="space-y-3.5 pt-2 border-t border-slate-800/80">
-                            <Label htmlFor="portadaDressCode" className="font-semibold text-sm flex flex-col gap-1">
-                                <span>Dress Code en Portada (Opcional)</span>
-                                <span className="text-xs text-muted-foreground font-normal">Aparecerá como un distintivo en la pantalla inicial.</span>
-                            </Label>
+                            <div className="flex items-center justify-between gap-3">
+                                <Label htmlFor="portadaDressCode" className="font-semibold text-sm flex flex-col gap-1">
+                                    <span>Dress Code en Portada (Opcional)</span>
+                                    <span className="text-xs text-muted-foreground font-normal">Aparecerá como un distintivo en la pantalla inicial.</span>
+                                </Label>
+                                <Switch
+                                    checked={dresscodeHabilitado}
+                                    onCheckedChange={(val) => setData({ dresscodeHabilitado: val })}
+                                />
+                            </div>
+                            {!dresscodeHabilitado && (d.portadaDressCode || d.dresscodeTipo) && (
+                                <p className="text-xs text-amber-300/80 -mt-1">
+                                    Desactivado: aunque haya un dress code cargado, no se va a mostrar en la invitación.
+                                </p>
+                            )}
 
-                            <div className="flex flex-wrap gap-2">
+                            <div className={`flex flex-wrap gap-2 transition-opacity ${!dresscodeHabilitado ? "opacity-40 pointer-events-none" : ""}`}>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -236,7 +252,8 @@ export function StepCoverPage() {
                             {customDress && (
                                 <Input
                                     id="portadaDressCode"
-                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
+                                    disabled={!dresscodeHabilitado}
+                                    className={`bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95 transition-opacity ${!dresscodeHabilitado ? "opacity-40" : ""}`}
                                     placeholder="Ej: Total Black / Fiesta de Disfraces"
                                     value={d.portadaDressCode || ""}
                                     onChange={(e) => setData({ portadaDressCode: e.target.value })}
@@ -341,7 +358,7 @@ export function StepCoverPage() {
                                     </h3>
 
                                     {/* Dress code pill */}
-                                    {dressCode ? (
+                                    {dresscodeHabilitado && dressCode ? (
                                         <div className="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] font-mono tracking-wider uppercase">
                                             Dress Code: {dressCode}
                                         </div>
