@@ -26,6 +26,7 @@ import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -1305,6 +1306,12 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
           <div style={{ width: 48, height: 1, background: 'linear-gradient(90deg, transparent, #7C4DFF, transparent)' }} />
           <IconPrism className="holo-scroll-doodle opacity-0" style={{ width: 24, height: 20, color: 'rgba(255,111,216,0.5)' }} />
         </div>
+
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
 
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown

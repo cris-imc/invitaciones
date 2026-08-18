@@ -25,6 +25,7 @@ import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
+import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -1253,6 +1254,12 @@ export function EditorialTemplateTerracota({ invitation, guest, isPersonalized =
           <IconHeartDoodle className="editorial-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#B8A98C' }} />
           <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #B5502E, transparent)' }} />
         </div>
+
+        <SaveTheDate
+          eventName={title || String(invitation.nombreEvento ?? "")}
+          targetDate={fechaEvento}
+          location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+        />
 
         {(invitation.contadorHabilitado ?? true) ? (
           <Countdown
