@@ -24,6 +24,7 @@ import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -598,6 +599,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaTintColor1 = "#5B8A72";
   const portadaTintColor2 = "#2E4A52";
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/cine-boda.png" : undefined;
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -1044,6 +1046,9 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
           <IconFilmReel className="cine-doodle opacity-0 absolute" style={{ width: 30, height: 18, bottom: '20%', left: '12%', color: 'rgba(91,138,114,0.4)' }} />
           <IconStarDoodle className="cine-doodle opacity-0 absolute" style={{ width: 12, height: 12, bottom: '26%', right: '18%', color: 'rgba(91,138,114,0.35)' }} />
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="cine-seal opacity-0" style={{
@@ -1088,7 +1093,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             @keyframes cine-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes cine-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 

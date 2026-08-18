@@ -20,6 +20,7 @@ import { Fraunces, Sora } from "next/font/google";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -476,6 +477,10 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaTintColor1 = "#C9A876";
   const portadaTintColor2 = "#15081A";
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/moderno-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/moderno-quince.png"
+    : undefined;
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -914,6 +919,10 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
               }} />
           </div>
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
+
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div style={{
@@ -958,7 +967,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
             @keyframes moderno-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes moderno-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 

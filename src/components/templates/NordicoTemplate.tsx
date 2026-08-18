@@ -24,6 +24,7 @@ import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { CoverFallbackBg, COVER_FALLBACK_STYLE } from "@/components/invitation/v2/CoverFallbackBg";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -574,6 +575,7 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
   // oscuro propio (#111111).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/nordico-boda.png" : undefined;
   // El nombre en la portada va en mayúscula fija por diseño (estética
   // editorial de Nordico), pero la tipografía del título la elige el
   // usuario -- con fuentes decorativas/cursivas (Dancing Script, Great
@@ -1023,6 +1025,9 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
             <IconRegisterMark className="nordico-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '27%', right: '16%', color: 'rgba(91,88,80,0.4)' }} />
           </div>
 
+          {portadaFondoFallback && (
+            <CoverFallbackBg photoSrc={portadaFondoFallback} />
+          )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', position: 'relative' }}>
 
             <div className="nordico-seal opacity-0" style={{
@@ -1076,7 +1081,7 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
               .nordico-cover-line { background: #111111; }
             }
           `}</style>
-          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>
       )}
 
