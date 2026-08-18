@@ -22,6 +22,8 @@ import { createPortal } from "react-dom";
 import { Gloock, Quicksand } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -382,7 +384,18 @@ const formatNumber = (num: number) => {
 
 export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = false }: JardinSedaTemplateDuraznoProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -583,6 +596,9 @@ export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = 
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -986,9 +1002,20 @@ export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = 
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#FCEFF1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#3A2E33] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#3A2E33] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="58,46,51"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(224,169,126,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(124,148,115,0.2), transparent)',
             backgroundSize: '160% 160%',
@@ -1009,6 +1036,7 @@ export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = 
           <IconRibbon className="jardinseda-doodle opacity-0 absolute" style={{ width: 26, height: 19, bottom: '18%', left: '14%', color: 'rgba(224,169,126,0.45)' }} />
           <IconHeartDoodle className="jardinseda-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '24%', right: '20%', color: 'rgba(124,148,115,0.4)' }} />
 
+          </div>
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="jardinseda-seal opacity-0" style={{
@@ -1019,13 +1047,13 @@ export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = 
             </div>
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#3A2E33] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " jardinseda-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#3A2E33' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#9C8A9B] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " jardinseda-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#9C8A9B' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1033,7 +1061,7 @@ export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = 
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #E0A97E', color: '#E0A97E',
@@ -1052,7 +1080,14 @@ export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = 
             @keyframes jardinseda-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes jardinseda-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes jardinseda-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .jardinseda-cover-text { color: #FCEFF1; }
+            .jardinseda-cover-text-muted { color: rgba(252,239,241,0.75); }
+            @media (min-width: 768px) {
+              .jardinseda-cover-text { color: #3A2E33; }
+              .jardinseda-cover-text-muted { color: #9C8A9B; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1345,7 +1380,7 @@ export function JardinSedaTemplateDurazno({ invitation, guest, isPersonalized = 
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}
