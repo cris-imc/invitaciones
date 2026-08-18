@@ -22,6 +22,8 @@ import { createPortal } from "react-dom";
 import { Fraunces, Poppins } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -361,7 +363,18 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
 
 export function GardenPartyTemplateAmarillo({ invitation, guest, isPersonalized = false }: GardenPartyTemplateAmarilloProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -548,6 +561,9 @@ export function GardenPartyTemplateAmarillo({ invitation, guest, isPersonalized 
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -943,9 +959,20 @@ export function GardenPartyTemplateAmarillo({ invitation, guest, isPersonalized 
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#FBF4EC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#3A2A22] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#3A2A22] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="58,42,34"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(217,119,87,0.18), transparent), radial-gradient(45% 40% at 85% 80%, rgba(124,148,115,0.22), transparent)',
             backgroundSize: '160% 160%',
@@ -963,6 +990,7 @@ export function GardenPartyTemplateAmarillo({ invitation, guest, isPersonalized 
           <IconButterfly className="gardenparty-doodle opacity-0 absolute" style={{ width: 28, height: 22, bottom: '18%', left: '14%', color: 'rgba(217,119,87,0.45)' }} />
           <IconFlower className="gardenparty-doodle opacity-0 absolute" style={{ width: 18, height: 18, bottom: '24%', right: '18%', color: 'rgba(217,119,87,0.4)' }} />
 
+          </div>
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="gardenparty-seal opacity-0" style={{
@@ -972,19 +1000,19 @@ export function GardenPartyTemplateAmarillo({ invitation, guest, isPersonalized 
               {monogram}
             </div>
 
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#3A2A22] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " gardenparty-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic', color: portadaFondoAnimado ? undefined : '#3A2A22' }}>
               {guestNameDisplay}
             </h2>
 
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#8a7462] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " gardenparty-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#8a7462' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
 
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer rounded-full"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #E8A33D', color: '#E8A33D',
@@ -1003,7 +1031,14 @@ export function GardenPartyTemplateAmarillo({ invitation, guest, isPersonalized 
             @keyframes gardenparty-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes gardenparty-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes gardenparty-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .gardenparty-cover-text { color: #FBF4EC; }
+            .gardenparty-cover-text-muted { color: rgba(58,42,34,0.75); }
+            @media (min-width: 768px) {
+              .gardenparty-cover-text { color: #3A2A22; }
+              .gardenparty-cover-text-muted { color: #8a7462; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1275,7 +1310,7 @@ export function GardenPartyTemplateAmarillo({ invitation, guest, isPersonalized 
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}
