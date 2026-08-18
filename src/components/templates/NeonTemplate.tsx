@@ -19,6 +19,8 @@ import { createPortal } from "react-dom";
 import { Bebas_Neue, Space_Grotesk, Space_Mono } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -366,7 +368,18 @@ const formatNumber = (num: number) => {
 
 export function NeonTemplate({ invitation, guest, isPersonalized = false }: NeonTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -545,7 +558,7 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -558,6 +571,13 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- Neon es "alocada/extravagante" (cian/magenta) ->
+  // tinte + effect="flash", mismo criterio que Circuito/Holograma.
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaTintColor1 = "#39FFD0";
+  const portadaTintColor2 = "#FF2E9B";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -957,20 +977,33 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#0D0D10', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#F2F2F5] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#F2F2F5] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(57,255,208,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(255,46,155,0.2), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'neon-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(57,255,208,0.13), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'neon-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="flash"
+                scrimColorRgb="13,13,16"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(57,255,208,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(255,46,155,0.2), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'neon-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(57,255,208,0.13), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'neon-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
+          </div>
 
           {/* Doodles decorativos (bola de disco, chispas de confeti) --
               animados de entrada con anime.js (ver useEffect de coverRootRef
@@ -1005,8 +1038,8 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
-              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
+              onClick={openInvitation}
+              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #39FFD0', color: '#39FFD0',
                 background: 'rgba(57,255,208,0.08)', backdropFilter: 'blur(6px)',
@@ -1025,6 +1058,7 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
             @keyframes neon-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes neon-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1316,7 +1350,7 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

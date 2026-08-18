@@ -33,6 +33,8 @@ import { createPortal } from "react-dom";
 import { Cormorant_Garamond, Poppins } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -392,7 +394,18 @@ const formatNumber = (num: number) => {
 
 export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = false }: SedaTemplateEsmeraldaProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -559,7 +572,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -572,6 +585,15 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- a diferencia de la base/Marfil/Perla (tema claro),
+  // esta variante es de paleta oscura -- tinte + effect="enfoque", mismo
+  // criterio que la base pero con tinte porque acá SÍ es oscura/cargada.
+  // scrimColorRgb = rgb del propio --t-bg (no comparte bg con las claras).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaTintColor1 = "#3D6E58";
+  const portadaTintColor2 = "#D9BFA0";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -959,8 +981,20 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: 'var(--t-bg)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="transition-all duration-1000 animate-in fade-in"
+          className={isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}
         >
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="enfoque"
+                scrimColorRgb="18,32,25"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, color-mix(in srgb, var(--t-acc2) 16%, transparent), transparent), radial-gradient(45% 40% at 85% 80%, color-mix(in srgb, var(--t-acc) 18%, transparent), transparent)',
@@ -978,6 +1012,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
           <IconRibbonFlow className="seda-doodle opacity-0 absolute" style={{ width: 30, height: 14, top: '15%', right: '10%', color: 'color-mix(in srgb, var(--t-acc) 50%, transparent)' }} />
           <IconQuillFlourish className="seda-doodle opacity-0 absolute" style={{ width: 18, height: 20, bottom: '20%', left: '13%', color: 'color-mix(in srgb, var(--t-acc) 45%, transparent)' }} />
           <IconSparkleSeda className="seda-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '25%', right: '18%', color: 'color-mix(in srgb, var(--t-acc2) 55%, transparent)' }} />
+          </div>
 
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
@@ -1000,7 +1035,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid var(--t-acc)', color: 'var(--t-acc)',
@@ -1020,6 +1055,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             @keyframes seda-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes seda-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1326,7 +1362,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

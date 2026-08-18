@@ -22,6 +22,8 @@ import { createPortal } from "react-dom";
 import { Outfit, Manrope, Space_Mono } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -379,7 +381,18 @@ const formatNumber = (num: number) => {
 
 export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = false }: Cristal3DTemplateMentaProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -558,7 +571,7 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -571,6 +584,14 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- mismo criterio que la base de Cristal3D: tinte +
+  // effect="shimmer", acento propio de esta variante + violeta compartido,
+  // scrimColorRgb = rgb(#0A0E16), igual en todas (bg no cambia por variante).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaTintColor1 = "#8FFFE0";
+  const portadaTintColor2 = "#B9A6FF";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -1004,8 +1025,20 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#0A0E16', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#F0F6FF] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#F0F6FF] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="shimmer"
+                scrimColorRgb="10,14,22"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(143,255,224,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(185,166,255,0.2), transparent)',
@@ -1018,6 +1051,7 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
             top: '18%', left: '50%', transform: 'translateX(-50%)',
             animation: 'crys-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
           }} />
+          </div>
 
           {/* Doodles decorativos (facetas de diamante, esquirlas de cristal) --
               animados de entrada con anime.js (ver useEffect de coverRootRef
@@ -1053,7 +1087,7 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
                 coherente con el resto del sistema de capas de cristal. */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #8FFFE0', color: '#8FFFE0',
@@ -1073,6 +1107,7 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
             @keyframes crys-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes crys-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1362,7 +1397,7 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

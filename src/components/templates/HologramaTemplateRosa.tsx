@@ -22,6 +22,8 @@ import { createPortal } from "react-dom";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -399,7 +401,18 @@ const formatNumber = (num: number) => {
 
 export function HologramaTemplateRosa({ invitation, guest, isPersonalized = false }: HologramaTemplateRosaProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -590,7 +603,7 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -603,6 +616,14 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- mismo criterio que la base de Holograma: tinte +
+  // effect="flash", acento propio de esta variante + cian compartido,
+  // scrimColorRgb = rgb(#0D0D14), igual en todas (bg no cambia por variante).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaTintColor1 = "#FF6FD8";
+  const portadaTintColor2 = "#22D3EE";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -1024,8 +1045,20 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#0D0D14', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#F1EEFF] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#F1EEFF] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="flash"
+                scrimColorRgb="13,13,20"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(255,111,216,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(124,77,255,0.2), transparent)',
@@ -1038,6 +1071,7 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
             top: '18%', left: '50%', transform: 'translateX(-50%)',
             animation: 'holo-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
           }} />
+          </div>
 
           {/* Doodles decorativos (orbes de proyección, partículas de luz) --
               animados de entrada con anime.js (ver useEffect de coverRootRef
@@ -1073,7 +1107,7 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
                 (calcado del mockup Holograma), texto oscuro sobre el degradé. */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-semibold text-xs tracking-[0.2em] px-10 py-3 rounded-full transition-transform duration-300 cursor-pointer hover:scale-105"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif',
@@ -1093,6 +1127,7 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
             @keyframes holo-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes holo-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1390,7 +1425,7 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

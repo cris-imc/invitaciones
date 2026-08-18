@@ -454,7 +454,7 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },

@@ -23,6 +23,8 @@ import { createPortal } from "react-dom";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -414,7 +416,18 @@ const formatNumber = (num: number) => {
 
 export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = false }: BonVoyageTemplateLavandaProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -596,7 +609,7 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -609,6 +622,9 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -997,9 +1013,20 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F4F9FB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#1B3A5C] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#1B3A5C] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="27,58,92"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(107,111,166,0.14), transparent), radial-gradient(45% 40% at 85% 80%, rgba(201,169,110,0.2), transparent)',
             backgroundSize: '160% 160%',
@@ -1021,6 +1048,7 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
           <IconWaves className="bonvoyage-doodle opacity-0 absolute" style={{ width: 46, height: 16, bottom: '17%', left: '12%', color: 'rgba(107,111,166,0.4)' }} />
           <IconStarfish className="bonvoyage-doodle opacity-0 absolute" style={{ width: 15, height: 15, bottom: '25%', right: '18%', color: 'rgba(107,111,166,0.4)' }} />
 
+          </div>
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div className="bonvoyage-seal opacity-0" style={{
@@ -1035,12 +1063,12 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
             </p>
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#1B3A5C] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " bonvoyage-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic', color: portadaFondoAnimado ? undefined : '#1B3A5C' }}>
               {guestNameDisplay}</h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className=" text-sm font-medium text-[#5C87A6] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " bonvoyage-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#5C87A6' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1048,7 +1076,7 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
             {/* Thin Open Button, borde océano con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #6B6FA6', color: '#6B6FA6',
@@ -1067,7 +1095,14 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
             @keyframes bonvoyage-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes bonvoyage-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes bonvoyage-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .bonvoyage-cover-text { color: #F4F9FB; }
+            .bonvoyage-cover-text-muted { color: rgba(244,249,251,0.75); }
+            @media (min-width: 768px) {
+              .bonvoyage-cover-text { color: #1B3A5C; }
+              .bonvoyage-cover-text-muted { color: #5C87A6; }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1347,7 +1382,7 @@ export function BonVoyageTemplateLavanda({ invitation, guest, isPersonalized = f
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

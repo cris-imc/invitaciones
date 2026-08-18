@@ -18,6 +18,8 @@ import { createPortal } from "react-dom";
 import { Space_Grotesk, Sora } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
@@ -354,7 +356,18 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
 
 export function CorporateTemplate({ invitation, guest, isPersonalized = false }: CorporateTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -519,7 +532,7 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -532,6 +545,12 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- Corporate es sobria/minimal: effect="geometric" (foto
+  // nítida, sin blur/Ken Burns) y sin tinte (paleta grafito+azul ya es
+  // suficientemente monocromática, un tinte no aportaría nada limpio acá).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -908,20 +927,32 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#10131C', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#EDEFF5] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#EDEFF5] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, rgba(92,141,255,0.16), transparent), radial-gradient(45% 40% at 85% 80%, rgba(92,141,255,0.08), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'corporate-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(92,141,255,0.14), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'corporate-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="geometric"
+                tint={false}
+                scrimColorRgb="16,19,28"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(92,141,255,0.16), transparent), radial-gradient(45% 40% at 85% 80%, rgba(92,141,255,0.08), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'corporate-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(92,141,255,0.14), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'corporate-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
+          </div>
 
           <IconNode className="corporate-doodle opacity-0 absolute" style={{ width: 42, height: 30, top: '10%', left: '9%', color: 'rgba(92,141,255,0.5)' }} />
           <IconBars className="corporate-doodle opacity-0 absolute" style={{ width: 20, height: 16, top: '16%', right: '13%', color: 'rgba(92,141,255,0.4)' }} />
@@ -949,7 +980,7 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
 
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #5C8DFF', color: '#5C8DFF',
@@ -969,6 +1000,7 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
             @keyframes corporate-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes corporate-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1238,7 +1270,7 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

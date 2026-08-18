@@ -22,6 +22,8 @@ import { createPortal } from "react-dom";
 import { EB_Garamond, Jost, Space_Mono } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -380,7 +382,18 @@ const formatNumber = (num: number) => {
 
 export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = false }: CineTemplateEsmeraldaProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -563,7 +576,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -576,6 +589,15 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- mismo criterio que la base de Cine: tinte activado
+  // (paleta oscura), acento propio de esta variante + teal frío compartido
+  // (grading clásico de cine), scrim = rgb(#17130F), igual en todas las
+  // variantes de Cine (el bg oscuro no cambia por variante, solo el acento).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaTintColor1 = "#5B8A72";
+  const portadaTintColor2 = "#2E4A52";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -986,8 +1008,20 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#17130F', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#E4DAC8] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#E4DAC8] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="enfoque"
+                scrimColorRgb="23,19,15"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(91,138,114,0.14), transparent), radial-gradient(45% 40% at 85% 80%, rgba(107,70,48,0.22), transparent)',
@@ -1000,6 +1034,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             top: '18%', left: '50%', transform: 'translateX(-50%)',
             animation: 'cine-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
           }} />
+          </div>
 
           {/* Doodles decorativos (claqueta, rollo de película, estrella) --
               animados de entrada con anime.js (ver useEffect de
@@ -1033,7 +1068,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #5B8A72', color: '#5B8A72',
@@ -1053,6 +1088,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             @keyframes cine-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes cine-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1361,7 +1397,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

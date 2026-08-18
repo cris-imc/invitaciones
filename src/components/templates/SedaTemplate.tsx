@@ -33,6 +33,8 @@ import { createPortal } from "react-dom";
 import { Cormorant_Garamond, Poppins } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -392,7 +394,18 @@ const formatNumber = (num: number) => {
 
 export function SedaTemplate({ invitation, guest, isPersonalized = false }: SedaTemplateProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -559,7 +572,7 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
 
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -572,6 +585,14 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- Seda es CSS-vars, tema claro (--t-bg #FBF3EE, ink
+  // #3B2A28) -- mismo caso que Perlada/Petalos: texto no puede forzarse a
+  // claro por JS, se resuelve con clases CSS + media query
+  // (.seda-cover-text/-muted), sin tinte. scrimColorRgb = rgb del ink
+  // oscuro propio.
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -959,25 +980,37 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: 'var(--t-bg)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="transition-all duration-1000 animate-in fade-in"
+          className={isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}
         >
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(50% 40% at 15% 15%, color-mix(in srgb, var(--t-acc2) 16%, transparent), transparent), radial-gradient(45% 40% at 85% 80%, color-mix(in srgb, var(--t-acc) 18%, transparent), transparent)',
-            backgroundSize: '160% 160%',
-            animation: 'seda-meshDrift 14s ease-in-out infinite',
-          }} />
-          <div style={{
-            position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-            background: 'radial-gradient(circle, color-mix(in srgb, var(--t-acc2) 16%, transparent), transparent 70%)',
-            top: '18%', left: '50%', transform: 'translateX(-50%)',
-            animation: 'seda-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
-          }} />
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                effect="enfoque"
+                tint={false}
+                scrimColorRgb="59,42,40"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
+            <div style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              background: 'radial-gradient(50% 40% at 15% 15%, color-mix(in srgb, var(--t-acc2) 16%, transparent), transparent), radial-gradient(45% 40% at 85% 80%, color-mix(in srgb, var(--t-acc) 18%, transparent), transparent)',
+              backgroundSize: '160% 160%',
+              animation: 'seda-meshDrift 14s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute', width: 220, height: 220, borderRadius: '50%',
+              background: 'radial-gradient(circle, color-mix(in srgb, var(--t-acc2) 16%, transparent), transparent 70%)',
+              top: '18%', left: '50%', transform: 'translateX(-50%)',
+              animation: 'seda-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+            }} />
 
-          <IconLaurel className="seda-doodle opacity-0 absolute" style={{ width: 42, height: 26, top: '9%', left: '9%', color: 'color-mix(in srgb, var(--t-acc2) 60%, transparent)' }} />
-          <IconRibbonFlow className="seda-doodle opacity-0 absolute" style={{ width: 30, height: 14, top: '15%', right: '10%', color: 'color-mix(in srgb, var(--t-acc) 50%, transparent)' }} />
-          <IconQuillFlourish className="seda-doodle opacity-0 absolute" style={{ width: 18, height: 20, bottom: '20%', left: '13%', color: 'color-mix(in srgb, var(--t-acc) 45%, transparent)' }} />
-          <IconSparkleSeda className="seda-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '25%', right: '18%', color: 'color-mix(in srgb, var(--t-acc2) 55%, transparent)' }} />
+            <IconLaurel className="seda-doodle opacity-0 absolute" style={{ width: 42, height: 26, top: '9%', left: '9%', color: 'color-mix(in srgb, var(--t-acc2) 60%, transparent)' }} />
+            <IconRibbonFlow className="seda-doodle opacity-0 absolute" style={{ width: 30, height: 14, top: '15%', right: '10%', color: 'color-mix(in srgb, var(--t-acc) 50%, transparent)' }} />
+            <IconQuillFlourish className="seda-doodle opacity-0 absolute" style={{ width: 18, height: 20, bottom: '20%', left: '13%', color: 'color-mix(in srgb, var(--t-acc) 45%, transparent)' }} />
+            <IconSparkleSeda className="seda-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '25%', right: '18%', color: 'color-mix(in srgb, var(--t-acc2) 55%, transparent)' }} />
+          </div>
 
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
@@ -988,19 +1021,19 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
               {monogram}
             </div>
 
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: 'var(--seda-ink)' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " seda-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : 'var(--seda-ink)' }}>
               {guestNameDisplay}
             </h2>
 
             {Boolean(activeDressCode) && (
-              <p className="text-sm font-medium tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: 'var(--t-muted)' }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " seda-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : 'var(--t-muted)' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
 
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid var(--t-acc)', color: 'var(--t-acc)',
@@ -1019,7 +1052,14 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
             @keyframes seda-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes seda-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes seda-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .seda-cover-text { color: #FBF3EE; }
+            .seda-cover-text-muted { color: rgba(251,243,238,0.75); }
+            @media (min-width: 768px) {
+              .seda-cover-text { color: var(--seda-ink); }
+              .seda-cover-text-muted { color: var(--t-muted); }
+            }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1326,7 +1366,7 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}

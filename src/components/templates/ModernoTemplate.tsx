@@ -454,7 +454,7 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -906,6 +906,28 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
             }} />
           </div>
 
+          {/* PRUEBA (solo Moderno, sacar si no convence): sin foto de
+              portada de bienvenida cargada, se pone la imagen fija
+              img/fondos/fondoprueba.png bien translúcida ENCIMA del mesh
+              decorativo de arriba (para que se note la textura, no se
+              pierda debajo) pero DEBAJO del contenido (monograma/nombre/
+              dress code/botón, que se renderiza después de esto en el DOM).
+              Solo mobile: en desktop no aplica, se ve el decorado original
+              tal cual. Gateado por CSS/media query, no por JS, mismo motivo
+              que acp-mobile-only/acp-desktop-only. */}
+          {!portadaFondoAnimado && (
+            <div
+              aria-hidden
+              className="moderno-fondoprueba-mobile"
+              style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: 'url(/fondos/fondoprueba.png)',
+                backgroundSize: 'cover', backgroundPosition: 'center',
+                opacity: 0.16, pointerEvents: 'none',
+              }}
+            />
+          )}
+
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
             <div style={{
@@ -949,6 +971,9 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
             @keyframes moderno-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes moderno-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes moderno-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            @media (min-width: 768px) {
+              .moderno-fondoprueba-mobile { display: none; }
+            }
           `}</style>
           <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>

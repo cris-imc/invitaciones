@@ -21,6 +21,8 @@ import { createPortal } from "react-dom";
 import { Orbitron, JetBrains_Mono } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { Album } from "@/components/invitation/v2/Album";
+import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
@@ -381,7 +383,18 @@ const formatNumber = (num: number) => {
 
 export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = false }: CircuitoTemplateAmbarProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
+  const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
+
+  const openInvitation = () => {
+    if (isClosingCover) return;
+    setIsClosingCover(true);
+  };
+  useEffect(() => {
+    if (!isClosingCover) return;
+    const t = setTimeout(() => setIsCoverOpen(true), 700);
+    return () => clearTimeout(t);
+  }, [isClosingCover]);
 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
@@ -561,7 +574,7 @@ export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = fals
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
   
-  const activeDressCode = String((invitation.dresscodeHabilitado ? invitation.dresscodeTipo : "") || invitation.portadaDressCode || "");
+  const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
@@ -574,6 +587,15 @@ export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = fals
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
+
+  // Portada animada -- mismo criterio que la base de Circuito: tinte +
+  // effect="flash" (familia alocada/extravagante), acento propio de esta
+  // variante + magenta compartido, scrim = rgb(#08080A), igual en todas
+  // las variantes (bg no cambia por variante).
+  const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
+  const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
+  const portadaTintColor1 = "#FFB020";
+  const portadaTintColor2 = "#FF2E9B";
 
   const guestNameDisplay = guest?.name
     ? guest.name
@@ -1063,8 +1085,20 @@ export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = fals
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#08080A', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className="text-[#E9FFF6] transition-all duration-1000 animate-in fade-in"
+          className={`text-[#E9FFF6] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
+          {portadaFondoAnimado && (
+            <div className="acp-mobile-only">
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tintColor1={portadaTintColor1}
+                tintColor2={portadaTintColor2}
+                effect="flash"
+                scrimColorRgb="8,8,10"
+              />
+            </div>
+          )}
+          <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
             background: 'radial-gradient(50% 40% at 15% 15%, rgba(255,176,32,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(57,255,208,0.2), transparent)',
@@ -1077,6 +1111,7 @@ export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = fals
             top: '18%', left: '50%', transform: 'translateX(-50%)',
             animation: 'circ-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
           }} />
+          </div>
 
           {/* Doodles decorativos (hexágonos de circuito, nodos/vías de PCB) --
               animados de entrada con anime.js (ver useEffect de coverRootRef
@@ -1112,7 +1147,7 @@ export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = fals
                 brackets tipo comando de consola. */}
             <button
               type="button"
-              onClick={() => setIsCoverOpen(true)}
+              onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
                 fontFamily: 'var(--circ-mono), monospace', border: '1px solid #FFB020', color: '#FFB020',
@@ -1132,6 +1167,7 @@ export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = fals
             @keyframes circ-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes circ-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
           `}</style>
+          <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
 
@@ -1421,7 +1457,7 @@ export function CircuitoTemplateAmbar({ invitation, guest, isPersonalized = fals
               </p>
             </div>
             <div className="w-full">
-              <AlbumCarousel photos={allPhotos} hideHeader />
+              <Album photos={allPhotos} hideHeader albumStyle={invitation.albumStyle as any} />
             </div>
           </SectionWrapper>
         )}
