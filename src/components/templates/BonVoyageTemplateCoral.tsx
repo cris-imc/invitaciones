@@ -1304,7 +1304,7 @@ export function BonVoyageTemplateCoral({ invitation, guest, isPersonalized = fal
               CUÁNDO Y DÓNDE
             </p>
 
-            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+            {Boolean(invitation.ceremoniaHabilitada) && (
               <div className="bg-black/20 border-l-[2px] border-l-[#C97A5C] p-6 sm:p-8 mb-6 shadow-sm">
                 <div>
                   <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5C87A6] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1363,7 +1363,7 @@ export function BonVoyageTemplateCoral({ invitation, guest, isPersonalized = fal
             )}
 
             {cronograma.length > 0 && (
-              <div className="mt-16">
+              <div className="mt-16" id="schedule">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>

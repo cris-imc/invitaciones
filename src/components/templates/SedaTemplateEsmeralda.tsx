@@ -1281,7 +1281,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
               CUÁNDO Y DÓNDE
             </p>
 
-            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+            {Boolean(invitation.ceremoniaHabilitada) && (
               <div className="p-6 sm:p-8 mb-6 shadow-sm" style={{ background: 'color-mix(in srgb, var(--seda-ink) 4%, transparent)', borderLeft: '2px solid var(--t-acc)' }}>
                 <div>
                   <span className="text-[10px] font-semibold uppercase tracking-[0.2em] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))", color: 'var(--t-muted)' }}>
@@ -1340,7 +1340,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             )}
 
             {cronograma.length > 0 && (
-              <div className="mt-16">
+              <div className="mt-16" id="schedule">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>

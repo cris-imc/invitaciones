@@ -1213,7 +1213,7 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
             </p>
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
-            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+            {Boolean(invitation.ceremoniaHabilitada) && (
               <div className="bg-[#FAF8F5] border border-[#C79A4B]/20 rounded-xl p-5 sm:p-7 mb-6 shadow-sm transition-all hover:shadow-md">
                 <div>
                   <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A37B5C] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1274,7 +1274,7 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
 
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
-              <div className="mt-16">
+              <div className="mt-16" id="schedule">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>
@@ -1318,7 +1318,7 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
 
         {mapUrl && (
           <section id="location" style={{ overflow: "hidden" }}>
-            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+            <div className="flex justify-center py-6" style={{ background: "#F9F7F1" }}>
               <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
             <div style={{ height: "220px", overflow: "hidden" }}>

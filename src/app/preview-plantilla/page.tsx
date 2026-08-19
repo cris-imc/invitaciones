@@ -126,11 +126,22 @@ function PreviewPlantillaContent() {
               setPendingScrollId(null);
               scrollFallbackToken.current += 1;
           } else {
+              // OJO: pendingScrollId queda "pegado" en sectionId a propósito
+              // (no se limpia después del fallback de 700ms) -- el usuario
+              // suele tardar bastante más que eso en cargar el primer dato
+              // de la sección (ej. el primer ítem del cronograma, la primera
+              // foto de galería). El efecto de abajo (dependiente de
+              // liveInvitation) sigue reintentando getElementById cada vez
+              // que llega data nueva, así que apenas la sección real
+              // aparece en el DOM, el preview salta ahí solo -- aunque
+              // hayan pasado varios segundos y ya se haya usado el fallback
+              // de abajo como ubicación provisoria mientras tanto.
               setPendingScrollId(sectionId);
-              // Si en 700ms el elemento sigue sin aparecer, se asume que
-              // esa sección no va a existir en este preview y se busca la
-              // próxima que sí exista (ver SECTION_ORDER arriba) en vez de
-              // quedarse clavado o saltar directo al final.
+              // Si en 700ms el elemento sigue sin aparecer, mientras se
+              // sigue esperando la sección real, mostramos algo razonable
+              // en el medio tiempo: la próxima sección que sí exista (ver
+              // SECTION_ORDER arriba) en vez de quedarse clavado o saltar
+              // directo al final.
               const myToken = ++scrollFallbackToken.current;
               setTimeout(() => {
                   if (scrollFallbackToken.current !== myToken) return; // llegó un scroll-to más nuevo mientras tanto
@@ -149,7 +160,6 @@ function PreviewPlantillaContent() {
                   } else {
                       window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
                   }
-                  setPendingScrollId(null);
               }, 700);
           }
       }

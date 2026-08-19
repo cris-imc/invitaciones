@@ -1265,7 +1265,7 @@ export function OnixTemplateOro({ invitation, guest, isPersonalized = false }: O
             </p>
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
-            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+            {Boolean(invitation.ceremoniaHabilitada) && (
               <div className="bg-black/20 border-l-[2px] border-l-[#D4AF62] p-6 sm:p-8 mb-6 shadow-sm">
                 <div>
                   <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B9A6B4] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1326,7 +1326,7 @@ export function OnixTemplateOro({ invitation, guest, isPersonalized = false }: O
 
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
-              <div className="mt-16">
+              <div className="mt-16" id="schedule">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>

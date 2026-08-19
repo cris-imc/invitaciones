@@ -1312,7 +1312,7 @@ export function Cristal3DTemplateVioleta({ invitation, guest, isPersonalized = f
             </p>
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
-            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+            {Boolean(invitation.ceremoniaHabilitada) && (
               <div className="crys-tilt-card bg-white/[0.04] border border-[#C4A6FF]/25 rounded-2xl backdrop-blur-sm p-6 sm:p-8 mb-6" style={{ boxShadow: '0 10px 30px rgba(10,14,22,0.45), 0 2px 0 rgba(196,166,255,0.06)' }}>
                 <div>
                   <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#93A4B8] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1373,7 +1373,7 @@ export function Cristal3DTemplateVioleta({ invitation, guest, isPersonalized = f
 
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
-              <div className="mt-16">
+              <div className="mt-16" id="schedule">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>

@@ -21,7 +21,6 @@ export function ModelosLazyLoader() {
     const queue: HTMLIFrameElement[] = [];
     const seen = new Set<HTMLIFrameElement>();
     let active = 0;
-    let allStarted = false;
 
     const pump = () => {
       while (active < CONCURRENCY && queue.length > 0) {
@@ -43,7 +42,6 @@ export function ModelosLazyLoader() {
 
     const checkVisible = () => {
       const iframes = document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]");
-      let pending = false;
       iframes.forEach((el) => {
         if (seen.has(el) || el.src) return;
         const rect = el.getBoundingClientRect();
@@ -52,19 +50,21 @@ export function ModelosLazyLoader() {
         if (nearViewport) {
           seen.add(el);
           queue.push(el);
-        } else {
-          pending = true;
         }
       });
       pump();
-      if (!pending && queue.length === 0) allStarted = true;
     };
 
     checkVisible();
 
+    // Sin un "ya terminamos, dejar de escuchar" -- las pestañas de
+    // /modelos (ModelosTabs) montan iframes nuevos al cambiar de pestaña,
+    // mucho después de que los de la primera pestaña ya hayan terminado de
+    // cargar. Cortar el listener ahí dejaba las miniaturas de las otras
+    // pestañas en negro para siempre (nunca se les asignaba `src`).
     let ticking = false;
     const onScroll = () => {
-      if (ticking || allStarted) return;
+      if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         checkVisible();

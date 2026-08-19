@@ -105,8 +105,8 @@ export function StepHeroImages() {
                         />
                         {showCinematicoTip && (
                             <div className="absolute left-0 top-full mt-2.5 z-20 w-72 max-w-[85vw] animate-in fade-in slide-in-from-top-1 duration-300">
-                                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-blue-50 border-l border-t border-blue-200 rotate-45" />
-                                <div className="relative flex items-start gap-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 shadow-lg px-3 py-2.5 text-xs leading-relaxed">
+                                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-green-50 border-l border-t border-green-200 rotate-45" />
+                                <div className="relative flex items-start gap-1.5 rounded-lg border border-green-200 bg-green-50 text-green-800 shadow-lg px-3 py-2.5 text-xs leading-relaxed">
                                     <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                                     <span className="flex-1">{CINEMATICO_TIP}</span>
                                     <button

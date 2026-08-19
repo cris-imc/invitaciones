@@ -580,7 +580,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           <h2>Los esperamos</h2>
 
           {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
-          {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+          {Boolean(invitation.ceremoniaHabilitada) && (
             <div className="t-detail" style={{ margin: "0 0 20px 0", borderLeft: "4px solid var(--t-acc)", paddingLeft: "18px" }}>
               <span className="t-kicker" style={{ display: "block", marginBottom: "6px" }}>
                 {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
@@ -629,7 +629,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
           {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
           {cronograma.length > 0 && (
-            <div className="mt-6">
+            <div className="mt-6" id="schedule">
               <span className="t-kicker" style={{ display: "block", marginBottom: "12px" }}>Cronograma del Evento</span>
               <div className="d-cols-2">
                 {cronograma.map((item, i) => (

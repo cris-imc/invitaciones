@@ -1128,7 +1128,7 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
             </p>
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
-            {(Boolean(invitation.ceremoniaHabilitada) || Boolean(invitation.ceremoniaNombre) || Boolean(invitation.ceremoniaDireccion)) && (
+            {Boolean(invitation.ceremoniaHabilitada) && (
               <div className="bg-black/20 border-l-[2px] border-l-[#C9A876] p-6 sm:p-8 mb-6 shadow-sm">
                 <div>
                   <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9B92AF] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1189,7 +1189,7 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
 
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
-              <div className="mt-16">
+              <div className="mt-16" id="schedule">
                 <p className="t-kicker mb-6  text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   CRONOGRAMA
                 </p>
