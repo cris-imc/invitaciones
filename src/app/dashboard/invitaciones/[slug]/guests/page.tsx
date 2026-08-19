@@ -129,6 +129,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         planTier={invitation.planTier}
         fechaEvento={invitation.fechaEvento.toISOString()}
         tipo={invitation.tipo}
+        mostrarNombreInvitadoEnSaludo={invitation.mostrarNombreInvitadoEnSaludo ?? true}
       />
     </div>
   );

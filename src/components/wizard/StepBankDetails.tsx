@@ -242,8 +242,8 @@ export function StepBankDetails() {
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-                            <div className="space-y-1.5 md:col-span-1">
+                        <div className="space-y-4 pt-1">
+                            <div className="space-y-1.5">
                                 <div className="flex justify-between items-center h-5">
                                     <Label htmlFor="cbu" className="text-xs font-medium">CBU / CVU (22 números)</Label>
                                     <span className="text-[10px] font-mono text-muted-foreground">
@@ -260,32 +260,34 @@ export function StepBankDetails() {
                                 />
                             </div>
 
-                            <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="alias" className="text-xs font-medium h-5 flex items-center">Alias</Label>
-                                <Input
-                                    id="alias"
-                                    placeholder="Ej: novios.fiesta.mp"
-                                    value={d.regaloAlias || ""}
-                                    onChange={(e) => setData({ regaloAlias: e.target.value })}
-                                    className={`text-sm ${attemptedNext && missingRegaloCbuAlias ? 'border-red-500/60' : ''}`}
-                                />
-                                {attemptedNext && missingRegaloCbuAlias && (
-                                    <p className="text-[11px] text-red-400">Cargá el CBU/CVU o el Alias.</p>
-                                )}
-                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="alias" className="text-xs font-medium h-5 flex items-center">Alias</Label>
+                                    <Input
+                                        id="alias"
+                                        placeholder="Ej: novios.fiesta.mp"
+                                        value={d.regaloAlias || ""}
+                                        onChange={(e) => setData({ regaloAlias: e.target.value })}
+                                        className={`text-sm ${attemptedNext && missingRegaloCbuAlias ? 'border-red-500/60' : ''}`}
+                                    />
+                                    {attemptedNext && missingRegaloCbuAlias && (
+                                        <p className="text-[11px] text-red-400">Cargá el CBU/CVU o el Alias.</p>
+                                    )}
+                                </div>
 
-                            <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="titular" className="text-xs font-medium h-5 flex items-center">Titular de la Cuenta</Label>
-                                <Input
-                                    id="titular"
-                                    placeholder="Ej: María Pérez"
-                                    value={d.regaloTitular || ""}
-                                    onChange={(e) => setData({ regaloTitular: e.target.value })}
-                                    className={`text-sm ${attemptedNext && missingRegaloTitular ? 'border-red-500/60' : ''}`}
-                                />
-                                {attemptedNext && missingRegaloTitular && (
-                                    <p className="text-[11px] text-red-400">El titular es obligatorio.</p>
-                                )}
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="titular" className="text-xs font-medium h-5 flex items-center">Titular de la Cuenta</Label>
+                                    <Input
+                                        id="titular"
+                                        placeholder="Ej: María Pérez"
+                                        value={d.regaloTitular || ""}
+                                        onChange={(e) => setData({ regaloTitular: e.target.value })}
+                                        className={`text-sm ${attemptedNext && missingRegaloTitular ? 'border-red-500/60' : ''}`}
+                                    />
+                                    {attemptedNext && missingRegaloTitular && (
+                                        <p className="text-[11px] text-red-400">El titular es obligatorio.</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -386,8 +388,8 @@ export function StepBankDetails() {
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-                            <div className="space-y-1.5 md:col-span-1">
+                        <div className="space-y-4 pt-1">
+                            <div className="space-y-1.5">
                                 <div className="flex justify-between items-center h-5">
                                     <Label htmlFor="cbu-tarjeta" className="text-xs font-medium">CBU / CVU (22 números)</Label>
                                     <span className="text-[10px] font-mono text-muted-foreground">
@@ -404,32 +406,34 @@ export function StepBankDetails() {
                                 />
                             </div>
 
-                            <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="alias-tarjeta" className="text-xs font-medium h-5 flex items-center">Alias</Label>
-                                <Input
-                                    id="cardAlias"
-                                    placeholder="Ej: tarjetas.salon.mp"
-                                    value={d.pagoTarjetaAlias || ""}
-                                    onChange={(e) => setData({ pagoTarjetaAlias: e.target.value })}
-                                    className={`text-sm ${attemptedNext && missingTarjetaCbuAlias ? 'border-red-500/60' : ''}`}
-                                />
-                                {attemptedNext && missingTarjetaCbuAlias && (
-                                    <p className="text-[11px] text-red-400">Cargá el CBU/CVU o el Alias.</p>
-                                )}
-                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="alias-tarjeta" className="text-xs font-medium h-5 flex items-center">Alias</Label>
+                                    <Input
+                                        id="cardAlias"
+                                        placeholder="Ej: tarjetas.salon.mp"
+                                        value={d.pagoTarjetaAlias || ""}
+                                        onChange={(e) => setData({ pagoTarjetaAlias: e.target.value })}
+                                        className={`text-sm ${attemptedNext && missingTarjetaCbuAlias ? 'border-red-500/60' : ''}`}
+                                    />
+                                    {attemptedNext && missingTarjetaCbuAlias && (
+                                        <p className="text-[11px] text-red-400">Cargá el CBU/CVU o el Alias.</p>
+                                    )}
+                                </div>
 
-                            <div className="space-y-1.5 md:col-span-1">
-                                <Label htmlFor="titular-tarjeta" className="text-xs font-medium h-5 flex items-center">Titular de la Cuenta</Label>
-                                <Input
-                                    id="cardHolder"
-                                    placeholder="Ej: Salón Los Olivos"
-                                    value={d.pagoTarjetaTitular || ""}
-                                    onChange={(e) => setData({ pagoTarjetaTitular: e.target.value })}
-                                    className={`text-sm ${attemptedNext && missingTarjetaTitular ? 'border-red-500/60' : ''}`}
-                                />
-                                {attemptedNext && missingTarjetaTitular && (
-                                    <p className="text-[11px] text-red-400">El titular es obligatorio.</p>
-                                )}
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="titular-tarjeta" className="text-xs font-medium h-5 flex items-center">Titular de la Cuenta</Label>
+                                    <Input
+                                        id="cardHolder"
+                                        placeholder="Ej: Salón Los Olivos"
+                                        value={d.pagoTarjetaTitular || ""}
+                                        onChange={(e) => setData({ pagoTarjetaTitular: e.target.value })}
+                                        className={`text-sm ${attemptedNext && missingTarjetaTitular ? 'border-red-500/60' : ''}`}
+                                    />
+                                    {attemptedNext && missingTarjetaTitular && (
+                                        <p className="text-[11px] text-red-400">El titular es obligatorio.</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
 

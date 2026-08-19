@@ -1,18 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { useToast } from "@/components/ui/Toast";
-import { Info, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
+import { Info, ChevronDown, ChevronUp, AlertTriangle, X } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+
+const CINEMATICO_TIP = "Probá los dos: con foto (efecto cinemático) y sin foto (fondo decorativo propio de la plantilla).";
 
 export function StepHeroImages() {
     const { data, setData, nextStep } = useWizardStore();
     const { showToast } = useToast();
     const [showInfo, setShowInfo] = useState(false);
     const [showMissingImageError, setShowMissingImageError] = useState(false);
+    const [showCinematicoTip, setShowCinematicoTip] = useState(false);
+    const cinematicoTipTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const triggerCinematicoTip = () => {
+        setShowCinematicoTip(true);
+        if (cinematicoTipTimeout.current) clearTimeout(cinematicoTipTimeout.current);
+        cinematicoTipTimeout.current = setTimeout(() => setShowCinematicoTip(false), 10000);
+    };
+
+    // Se muestra sola apenas se entra al paso si todavía no hay foto cargada
+    // -- así el usuario ve la sugerencia ANTES de decidir, no solo después.
+    useEffect(() => {
+        if (!data.portadaImagenFondoDesktop) {
+            triggerCinematicoTip();
+        }
+        return () => {
+            if (cinematicoTipTimeout.current) clearTimeout(cinematicoTipTimeout.current);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleNext = () => {
         if (!data.portadaImagenFondo) {
@@ -68,18 +90,39 @@ export function StepHeroImages() {
                     en esta grilla en vez de desalineados. */}
                 <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
                     <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm block min-h-[2.5rem]">Portada de bienvenida</Label>
-                    <ImageUploader
-                        currentImage={data.portadaImagenFondoDesktop}
-                        onImageUploaded={(url: string) => setData({ portadaImagenFondoDesktop: url })}
-                        onRemove={() => setData({ portadaImagenFondoDesktop: "" })}
-                        aspectRatio={4 / 5}
-                    />
+                    <div className="relative">
+                        <ImageUploader
+                            currentImage={data.portadaImagenFondoDesktop}
+                            onImageUploaded={(url: string) => {
+                                setData({ portadaImagenFondoDesktop: url });
+                                triggerCinematicoTip();
+                            }}
+                            onRemove={() => {
+                                setData({ portadaImagenFondoDesktop: "" });
+                                triggerCinematicoTip();
+                            }}
+                            aspectRatio={4 / 5}
+                        />
+                        {showCinematicoTip && (
+                            <div className="absolute left-0 top-full mt-2.5 z-20 w-72 max-w-[85vw] animate-in fade-in slide-in-from-top-1 duration-300">
+                                <div className="absolute -top-1.5 left-6 w-3 h-3 bg-blue-50 border-l border-t border-blue-200 rotate-45" />
+                                <div className="relative flex items-start gap-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 shadow-lg px-3 py-2.5 text-xs leading-relaxed">
+                                    <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                    <span className="flex-1">{CINEMATICO_TIP}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCinematicoTip(false)}
+                                        className="shrink-0 hover:opacity-70 transition-opacity"
+                                        aria-label="Cerrar"
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                     <p className="text-xs text-muted-foreground leading-normal">
                         Si cargás una foto acá, reemplaza el fondo original de la portada de bienvenida por esta foto.
-                    </p>
-                    <p className="text-xs leading-normal flex items-start gap-1.5 text-sky-300/90">
-                        <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                        <span>Probá los dos: con foto (efecto cinemático) y sin foto (fondo decorativo propio de la plantilla) — guardá y mirá la vista previa para ver cuál te gusta más.</span>
                     </p>
                 </div>
 

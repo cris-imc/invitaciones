@@ -54,6 +54,7 @@ import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
+import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
 // Doodles de trazo fino "editorial de seda" -- ribbon fluido, ramita de
 // laurel, pluma/quill y sparkle de 4 puntas. Neutros para 15 años/casamiento.
@@ -599,11 +600,7 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
     : tipo === "QUINCE_ANOS" ? "/fondos/seda-quince-claro.png"
     : undefined;
 
-  const guestNameDisplay = guest?.name
-    ? guest.name
-    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio
-        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}`
-        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+  const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
   const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
   const eventStatus = getEventStatus(fechaEventoDate);

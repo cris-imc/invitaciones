@@ -153,6 +153,22 @@ export function StepAlbumStyle() {
                 })}
             </div>
 
+            {selected === "solapadas" && (
+                <p
+                    style={{
+                        fontSize: "12px",
+                        lineHeight: 1.5,
+                        color: "rgba(246,243,236,.55)",
+                        background: "rgba(246,243,236,.04)",
+                        border: "1px solid var(--line)",
+                        borderRadius: "var(--r-s)",
+                        padding: "10px 12px",
+                    }}
+                >
+                    Este estilo muestra solo las primeras 4 fotos de tu Galería (pensado para una selección destacada, no para el álbum completo).
+                </p>
+            )}
+
             <SaveStepButtons isLastStep={false} />
         </div>
     );

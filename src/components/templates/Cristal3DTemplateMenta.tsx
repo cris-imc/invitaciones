@@ -43,6 +43,7 @@ import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
+import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
 // Doodles de trazo fino estilo "cristal facetado" (mockup Cristal 3D) en vez
 // de íconos genéricos de librería -- coherentes con el resto del motivo
@@ -597,11 +598,7 @@ export function Cristal3DTemplateMenta({ invitation, guest, isPersonalized = fal
   const portadaTintColor1 = "#8FFFE0";
   const portadaTintColor2 = "#B9A6FF";
 
-  const guestNameDisplay = guest?.name
-    ? guest.name
-    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio 
-        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}` 
-        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+  const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
   const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
   const eventStatus = getEventStatus(fechaEventoDate);

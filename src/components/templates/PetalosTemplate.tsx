@@ -56,6 +56,7 @@ import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
+import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
 // Doodles de trazo fino "romántico floral" -- flor de 5 pétalos, pétalo
 // suelto, enredadera con hojas y capullo de corazón. Neutros para 15
@@ -615,11 +616,7 @@ export function PetalosTemplate({ invitation, guest, isPersonalized = false }: P
     : tipo === "QUINCE_ANOS" ? "/fondos/petalos-quince.png"
     : undefined;
 
-  const guestNameDisplay = guest?.name
-    ? guest.name
-    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio
-        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}`
-        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+  const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
   const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
   const eventStatus = getEventStatus(fechaEventoDate);

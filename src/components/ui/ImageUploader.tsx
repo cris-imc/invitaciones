@@ -91,11 +91,11 @@ export function ImageUploader({ onImageUploaded, aspectRatio = 1, className, cur
             <div
                 {...getRootProps()}
                 className={cn(
-                    "relative border-2 border-dashed rounded-xl transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-4 bg-slate-50 hover:bg-slate-100",
+                    "relative border-2 border-dashed rounded-xl transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100",
                     isDragActive ? "border-primary bg-primary/5" : "border-slate-300",
-                    (currentImage && !isUploading) ? "border-solid border-slate-200 p-0" : "p-8 min-h-[200px]"
+                    (currentImage && !isUploading) ? "border-solid border-slate-200 p-0" : "p-3"
                 )}
-                style={(currentImage && !isUploading) ? { aspectRatio: aspectRatio } : undefined}
+                style={{ aspectRatio }}
             >
                 <input {...getInputProps()} />
 

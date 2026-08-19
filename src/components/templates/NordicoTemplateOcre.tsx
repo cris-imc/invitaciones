@@ -43,6 +43,7 @@ import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
+import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
 // Doodles de líneas geométricas simples (mockup Sol & Bruno / Atelier
 // Nórdico) en vez de íconos genéricos de librería -- trazo fino, sin relleno,
@@ -581,11 +582,7 @@ export function NordicoTemplateOcre({ invitation, guest, isPersonalized = false 
   // título pensada para mayúscula, el resto usa "capitalize".
   const isCinzelTitle = invitation.fontTitle === "cinzel";
 
-  const guestNameDisplay = guest?.name
-    ? guest.name
-    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio 
-        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}` 
-        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+  const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
   const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
   const eventStatus = getEventStatus(fechaEventoDate);

@@ -24,7 +24,8 @@ export function Sidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
     const role = session?.user?.role || "CLIENT";
-    const { isDirty, setDirty } = useWizardStore();
+    const { isDirty, setDirty, data: wizardData } = useWizardStore();
+    const isNewInvitation = !wizardData.id;
     const router = useRouter();
     const [showWarning, setShowWarning] = useState(false);
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -141,9 +142,11 @@ export function Sidebar() {
             <Dialog open={showWarning} onOpenChange={setShowWarning}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Cambios sin guardar</DialogTitle>
+                        <DialogTitle>{isNewInvitation ? "¿Salir sin terminar?" : "Cambios sin guardar"}</DialogTitle>
                         <DialogDescription>
-                            Tenés cambios sin guardar en la invitación. ¿Estás seguro de que querés salir sin aplicar los cambios?
+                            {isNewInvitation
+                                ? "Todavía no creaste la invitación. Si salís ahora vas a perder todo lo que cargaste hasta acá."
+                                : "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que querés salir sin aplicar los cambios?"}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -151,7 +154,7 @@ export function Sidebar() {
                             Cancelar
                         </Button>
                         <Button variant="destructive" onClick={proceedNavigation}>
-                            Salir sin guardar
+                            {isNewInvitation ? "Salir y perder los cambios" : "Salir sin guardar"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

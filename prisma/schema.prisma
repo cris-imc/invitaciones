@@ -106,6 +106,12 @@ model Invitation {
   // siguen teniendo el resto de las tarjetas/clientes. null = usa el limite
   // del plan tal cual.
   maxLivePhotosOverride        Int?
+  // Saludo de la portada en los links personalizados: true (default, se
+  // mantiene el comportamiento actual) = muestra el nombre del invitado o
+  // familia; false = muestra siempre el nombre de los novios/quinceañera/
+  // evento aunque el link sea personalizado. Configuración genérica del
+  // dueño de la tarjeta, no por invitado individual.
+  mostrarNombreInvitadoEnSaludo Boolean          @default(true)
   tipo                         String
   estado                       String           @default("BORRADOR")
   slug                         String           @unique

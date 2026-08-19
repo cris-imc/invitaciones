@@ -34,3 +34,23 @@ export function getHonoreeNames(invitation: {
   }
   return null;
 }
+
+// Nombre que se muestra en el saludo de la portada de bienvenida (link
+// personalizado de cada invitado). Por defecto prioriza el nombre del
+// invitado/familia sobre el de los novios/quinceañera/evento -- pero es
+// configuración genérica del dueño de la tarjeta (Invitation.mostrarNombreInvitadoEnSaludo,
+// switch en el panel de Administrar > Gestionar invitados), no por invitado
+// individual: si está en false, siempre muestra el nombre del evento aunque
+// el link sea personalizado.
+export function resolveGuestNameDisplay(
+  invitation: Record<string, unknown>,
+  guest?: { name?: string | null } | null
+): string {
+  const tipo = String(invitation.tipo ?? "OTRO");
+  const showGuestName = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
+  if (showGuestName) return String(guest!.name);
+  if (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio) {
+    return `${invitation.nombreNovia} & ${invitation.nombreNovio}`;
+  }
+  return String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial");
+}

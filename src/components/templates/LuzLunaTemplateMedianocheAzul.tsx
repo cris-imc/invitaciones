@@ -59,6 +59,7 @@ import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
+import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
 // Doodles de trazo fino "noche estrellada" -- luna creciente, sparkle de 4
 // puntas, constelación de puntos conectados y voluta de nube/niebla nocturna.
@@ -616,11 +617,7 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
   const portadaTintColor1 = "#7EA3D9";
   const portadaTintColor2 = "#4A5FA0";
 
-  const guestNameDisplay = guest?.name
-    ? guest.name
-    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio
-        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}`
-        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+  const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
   const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
   const eventStatus = getEventStatus(fechaEventoDate);

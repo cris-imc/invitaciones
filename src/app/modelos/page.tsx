@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { ModeloThumbnail } from "@/components/modelos/ModeloThumbnail";
 import { ModelosLazyLoader } from "@/components/modelos/ModelosLazyLoader";
+import { ModelosTabs } from "@/components/modelos/ModelosTabs";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 
@@ -14,13 +15,14 @@ import { prisma } from "@/lib/db";
 // apunta a su propia cuenta sin compartir credenciales ni datos entre sí.
 // Ver docs/PLAN_LANDING_MODELOS.md.
 //
-// Convención de slug (así el dueño de la cuenta controla qué se muestra
-// simplemente nombrando la invitación al crearla, sin ningún campo nuevo
-// en la base):
-//   - empieza con "destacado-" → va en la sección "Personalizá tu tarjeta"
+// Convención de slug (así el dueño de la cuenta controla qué se muestra y en
+// qué pestaña, simplemente nombrando la invitación al crearla -- "Nombre del
+// evento" empezando con "Modelo XV", "Modelo Boda" o "Modelo Evento" -- sin
+// ningún campo nuevo en la base):
+//   - empieza con "destacado-" → va en la sección "Modelos personalizados"
 //     (máx. 2, las más nuevas)
-//   - empieza con "modelo-" → va en la grilla principal (máx. 8, las más
-//     nuevas)
+//   - empieza con "modelo-xv-" / "modelo-boda-" / "modelo-evento-" → va en la
+//     pestaña correspondiente (máx. 8 cada una, las más nuevas)
 //   - cualquier otro slug en esa cuenta se ignora (no ensucia la landing si
 //     la cuenta de prueba también se usa para probar otras cosas)
 
@@ -50,30 +52,54 @@ function labelFor(inv: { templateTipo: string; temaColores: string; portadaImage
   return `${familia}${colorSpaced} ${hasPhoto ? "Cinemático" : "Base"}`;
 }
 
+interface ModeloItem {
+  slug: string;
+  label: string;
+}
+
+const EMPTY_MODELOS: { featured: ModeloItem[]; xv: ModeloItem[]; boda: ModeloItem[]; evento: ModeloItem[] } = {
+  featured: [], xv: [], boda: [], evento: [],
+};
+
 async function getModelos() {
   const email = process.env.DEMO_ACCOUNT_EMAIL;
-  if (!email) return { featured: [], regular: [] };
+  if (!email) return EMPTY_MODELOS;
 
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return { featured: [], regular: [] };
+  if (!user) return EMPTY_MODELOS;
 
   const invitations = await prisma.invitation.findMany({
     where: {
       userId: user.id,
-      OR: [{ slug: { startsWith: "destacado-" } }, { slug: { startsWith: "modelo-" } }],
+      OR: [
+        { slug: { startsWith: "destacado-" } },
+        { slug: { startsWith: "modelo-xv-" } },
+        { slug: { startsWith: "modelo-boda-" } },
+        { slug: { startsWith: "modelo-evento-" } },
+      ],
     },
     orderBy: { createdAt: "desc" },
     select: { slug: true, templateTipo: true, temaColores: true, portadaImagenFondoDesktop: true },
   });
 
-  const featured = invitations.filter((i) => i.slug.startsWith("destacado-")).slice(0, 2);
-  const regular = invitations.filter((i) => !i.slug.startsWith("destacado-")).slice(0, 8);
-  return { featured, regular };
+  const toItems = (prefix: string, max: number) =>
+    invitations
+      .filter((i) => i.slug.startsWith(prefix))
+      .slice(0, max)
+      .map((m) => ({ slug: m.slug, label: labelFor(m) }));
+
+  return {
+    featured: toItems("destacado-", 2),
+    xv: toItems("modelo-xv-", 8),
+    boda: toItems("modelo-boda-", 8),
+    evento: toItems("modelo-evento-", 8),
+  };
 }
 
 export default async function ModelosPage() {
-  const [session, { featured, regular }] = await Promise.all([auth(), getModelos()]);
+  const [session, { featured, xv, boda, evento }] = await Promise.all([auth(), getModelos()]);
   const registerUrl = session ? "/dashboard?new=true" : "/register";
+  const hasTabbedModelos = xv.length > 0 || boda.length > 0 || evento.length > 0;
 
   return (
     <div className="flex min-h-dvh flex-col items-center bg-[var(--ink)]">
@@ -106,19 +132,15 @@ export default async function ModelosPage() {
             </div>
             <div className="flex flex-wrap justify-center gap-6">
               {featured.map((m) => (
-                <ModeloThumbnail key={m.slug} slug={m.slug} label={labelFor(m)} />
+                <ModeloThumbnail key={m.slug} slug={m.slug} label={m.label} />
               ))}
             </div>
           </section>
         )}
 
-        {regular.length > 0 ? (
+        {hasTabbedModelos ? (
           <section className="px-6 pb-16">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 justify-items-center">
-              {regular.map((m) => (
-                <ModeloThumbnail key={m.slug} slug={m.slug} label={labelFor(m)} />
-              ))}
-            </div>
+            <ModelosTabs xv={xv} boda={boda} evento={evento} />
           </section>
         ) : (
           featured.length === 0 && (

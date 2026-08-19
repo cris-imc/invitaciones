@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -151,9 +151,10 @@ interface GuestManagerProps {
   precioAdolescente?: number | null;
   precioNino?: number | null;
   tipo?: string;
+  initialMostrarNombreInvitadoEnSaludo?: boolean;
 }
 
-export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino, tipo }: GuestManagerProps) {
+export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino, tipo, initialMostrarNombreInvitadoEnSaludo = true }: GuestManagerProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
@@ -165,6 +166,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [firstGuestHintDismissed, setFirstGuestHintDismissed] = useState(true);
   const [hintVisible, setHintVisible] = useState(false);
   const [hintMounted, setHintMounted] = useState(false);
+  const [mostrarNombreInvitadoEnSaludo, setMostrarNombreInvitadoEnSaludo] = useState(initialMostrarNombreInvitadoEnSaludo);
+  const [isSavingSaludo, setIsSavingSaludo] = useState(false);
 
   // Edit Form States
   const [editGuestNombre, setEditGuestNombre] = useState("");
@@ -282,6 +285,26 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       showToast("Error al guardar el precio", "error");
     } finally {
       setIsSavingPrice(false);
+    }
+  };
+
+  const handleToggleMostrarNombreInvitado = async (checked: boolean) => {
+    const previous = mostrarNombreInvitadoEnSaludo;
+    setMostrarNombreInvitadoEnSaludo(checked);
+    setIsSavingSaludo(true);
+    try {
+      const res = await fetch(`/api/invitations/${slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mostrarNombreInvitadoEnSaludo: checked }),
+      });
+      if (!res.ok) throw new Error("Error al guardar");
+      showToast("Preferencia guardada", "success");
+    } catch {
+      setMostrarNombreInvitadoEnSaludo(previous);
+      showToast("Error al guardar la preferencia", "error");
+    } finally {
+      setIsSavingSaludo(false);
     }
   };
 
@@ -566,12 +589,24 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
       <div className="grid md:grid-cols-3 gap-6">
         {/* Add Guest Form */}
-        <Card className="md:col-span-1 h-fit">
+        <Card className="md:col-span-1 min-w-0">
           <CardHeader>
             <CardTitle>Agregar Invitados</CardTitle>
             <CardDescription>
               Genera un enlace único para cada invitado/a.
             </CardDescription>
+            <div className="flex items-center justify-between gap-3 pt-3 mt-1 border-t min-w-0">
+              <Label htmlFor="mostrarNombreInvitado" className="text-sm font-normal text-muted-foreground cursor-pointer min-w-0 flex-1">
+                Saludar por nombre del invitado/familia
+              </Label>
+              <Switch
+                id="mostrarNombreInvitado"
+                checked={mostrarNombreInvitadoEnSaludo}
+                disabled={isSavingSaludo}
+                onCheckedChange={handleToggleMostrarNombreInvitado}
+                className="shrink-0"
+              />
+            </div>
           </CardHeader>
           <CardContent>
             {!addGuestOpen ? (
@@ -784,7 +819,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         </Card>
 
         {/* Guest List */}
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 min-w-0">
           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <CardTitle>Lista de Invitados</CardTitle>
@@ -833,11 +868,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   return (
                     <div
                       key={guest.id}
-                      className="flex items-center justify-between p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors flex-wrap gap-3"
+                      className="flex items-center justify-between flex-wrap p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors gap-3 overflow-hidden"
                     >
-                      <div>
-                        <h4 className="font-semibold">{guest.name}</h4>
-                        <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <h4 className="font-semibold truncate" title={guest.name}>{guest.name}</h4>
+                        <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1 truncate">
                           {guest.type === "FAMILY" ? (
                             <span className="flex items-center">
                               <Users className="w-3 h-3 mr-1" /> Familia (
@@ -859,7 +894,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="flex items-center flex-wrap justify-end gap-1.5 shrink-0">
                         <StatusBadge status={guest.status} />
 
                         <a
@@ -893,7 +928,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             onClick={() => copyLink(guest.uniqueToken)}
                           >
                             <LinkIcon className="w-3.5 h-3.5" />
-                            Copiar Link
+                            <span className="sm:hidden">Copiar</span>
+                            <span className="hidden sm:inline">Copiar Link</span>
                           </Button>
 
                           {isFirstGuestHintCandidate && hintMounted && (

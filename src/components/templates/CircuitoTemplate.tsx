@@ -42,6 +42,7 @@ import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
+import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
 // Doodles de trazo fino estilo "circuito/PCB" (mockup Circuito) en vez de
 // íconos genéricos de librería -- coherentes con el resto del motivo
@@ -600,11 +601,7 @@ export function CircuitoTemplate({ invitation, guest, isPersonalized = false }: 
   const portadaTintColor1 = "#39FFD0";
   const portadaTintColor2 = "#FF2E9B";
 
-  const guestNameDisplay = guest?.name
-    ? guest.name
-    : (tipo === "CASAMIENTO" && invitation.nombreNovia && invitation.nombreNovio 
-        ? `${invitation.nombreNovia} & ${invitation.nombreNovio}` 
-        : String(invitation.nombreQuinceanera || invitation.nombreEvento || "Invitado Especial"));
+  const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
   const fechaEventoDate = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
   const eventStatus = getEventStatus(fechaEventoDate);

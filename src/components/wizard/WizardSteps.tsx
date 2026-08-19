@@ -14,6 +14,12 @@ export function WizardSteps() {
 
     const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false });
 
+    // Si viene de editar una invitación existente, "volver" debe llevar de
+    // nuevo al panel de Administrar de esa tarjeta (de donde salió el
+    // usuario), no al listado general -- solo al crear una nueva (sin slug
+    // todavía) cae al listado.
+    const backHref = isEditing && data.slug ? `/dashboard/invitaciones/${data.slug}/guests` : "/dashboard";
+
     const CurrentComponent = steps[currentStep].component;
     const progress = ((currentStep + 1) / steps.length) * 100;
     const showProgress = isEditing || Boolean(data.type);
@@ -51,7 +57,7 @@ export function WizardSteps() {
                         )}
                     </div>
                     <div className="shrink-0 flex items-center">
-                        <BackLink href="/dashboard" confirmIfDirty />
+                        <BackLink href={backHref} confirmIfDirty isNewInvitation={!isEditing} />
                     </div>
                 </div>
 

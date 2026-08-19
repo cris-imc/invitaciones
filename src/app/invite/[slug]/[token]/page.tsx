@@ -281,6 +281,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 despedidaFoto: true,
                 rsvpDaysBeforeEvent: true,
                 templateTipo: true,
+                mostrarNombreInvitadoEnSaludo: true,
                 fontTitle: true,
                 fontBody: true,
                 tipografiaDisplay: true,

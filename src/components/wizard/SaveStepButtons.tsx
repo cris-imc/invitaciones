@@ -17,7 +17,7 @@ function FormTracker({ form, onDirtyChange }: { form: any, onDirtyChange: (d: bo
 }
 
 export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating }: { form?: any, onNext?: () => void, isLastStep?: boolean, onCreate?: () => void, isCreating?: boolean }) {
-    const { prevStep, nextStep, currentStep, setDirty, setData } = useWizardStore();
+    const { prevStep, nextStep, currentStep, setDirty, setData, data } = useWizardStore();
     const router = useRouter();
     const [showWarning, setShowWarning] = useState(false);
     const { saveChanges, isSaving, isEditing } = useSaveStep(form);
@@ -38,29 +38,28 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
         }
     };
 
+    // Navegar ENTRE pasos (currentStep > 0) nunca debe advertir nada: los
+    // datos siguen en el store pase lo que pase, no se pierde nada moviendose
+    // de un paso a otro. Solo el paso 0 -> "Atrás" sale del wizard de verdad
+    // (vuelve a Administrar), ahi si hay algo que se podria perder.
     const handleBackClick = () => {
-        if (currentStep === 1) { // Step 1 is "Información Básica". Going back means going to "Tipo de evento" (Step 0)
-            if (isDirty) {
-                setShowWarning(true);
-            } else {
-                proceedBack();
-            }
-            return;
-        }
         if (isDirty && form) {
             const values = form.getValues();
             setData(values);
         }
-        if (currentStep === 0 && isDirty) { // Step 0 -> "Atrás" sale del wizard entero, hay que avisar
+        if (currentStep === 0 && isDirty) {
             setShowWarning(true);
         } else {
             proceedBack();
         }
     };
 
+    const backHref = isEditing && data.slug ? `/dashboard/invitaciones/${data.slug}/guests` : '/dashboard';
+
     const proceedBack = () => {
         if (currentStep === 0) {
-            router.push('/dashboard');
+            setDirty(false);
+            router.push(backHref);
         } else {
             prevStep();
         }
@@ -72,9 +71,11 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
             <Dialog open={showWarning} onOpenChange={setShowWarning}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Cambios sin guardar</DialogTitle>
+                        <DialogTitle>{isEditing ? "Cambios sin guardar" : "¿Salir sin terminar?"}</DialogTitle>
                         <DialogDescription>
-                            Tenés cambios sin guardar en la invitación. ¿Estás seguro de que querés salir sin aplicar los cambios?
+                            {isEditing
+                                ? "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que querés salir sin aplicar los cambios?"
+                                : "Todavía no creaste la invitación. Si salís ahora vas a perder todo lo que cargaste hasta acá."}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -82,7 +83,7 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                             Cancelar
                         </Button>
                         <Button variant="destructive" onClick={proceedBack}>
-                            Salir sin guardar
+                            {isEditing ? "Salir sin guardar" : "Salir y perder los cambios"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -28,7 +28,7 @@ export default async function EditInvitationPage({
 
     return (
         <div className="p-6 md:p-8 space-y-8">
-            <BackLink href="/dashboard" confirmIfDirty />
+            <BackLink href={`/dashboard/invitaciones/${invitation.slug}/guests`} confirmIfDirty />
             <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tight">Editar Invitación</h1>
                 <p className="text-muted-foreground">
