@@ -1332,6 +1332,9 @@ export function ModernoTemplateLab({ invitation, guest, isPersonalized = false }
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#0F0E13] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-6">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="#C9A876" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8  text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               CUÁNDO Y DÓNDE
             </p>
@@ -1430,9 +1433,6 @@ export function ModernoTemplateLab({ invitation, guest, isPersonalized = false }
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={Camera} size={46} color="#C9A876" strokeWidth={1.5} />
               </div>
-            <div className="flex justify-center mb-6">
-              <DrawLucideIcon icon={CalendarDays} size={46} color="#C9A876" strokeWidth={1.5} />
-            </div>
               <p className="t-kicker mb-10">
                 ÁLBUM
               </p>
