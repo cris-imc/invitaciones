@@ -1,4 +1,41 @@
-# Plan: Landing "Ver modelos" + 18 invitaciones reales de muestra
+# Plan: Landing "Ver modelos" + invitaciones reales de muestra
+
+## 0. ARQUITECTURA FINAL (leer esto primero, reemplaza las secciones de abajo)
+
+Después de varias iteraciones en la misma sesión (18 estáticas → 10
+animadas con lista fija + seed → **dinámica**, que es lo que quedó), la
+versión final es:
+
+- `/modelos` (`src/app/modelos/page.tsx`) consulta en vivo las invitaciones
+  de UNA cuenta de prueba dedicada, identificada por `DEMO_ACCOUNT_EMAIL`
+  (variable de entorno -- local y Railway apuntan cada una a su propia
+  cuenta, nunca se comparten credenciales).
+- El dueño de esa cuenta arma/cambia los modelos con el wizard normal, sin
+  tocar código: slug que empieza con `destacado-` → sección "Personalizá tu
+  tarjeta" (máx. 2, más nuevas primero); slug que empieza con `modelo-` →
+  grilla principal (máx. 8, más nuevas primero). Cualquier otro slug en esa
+  cuenta se ignora.
+- El label de cada miniatura ("Onix Zafiro Base", "Chic Rosa Cinemático",
+  etc.) se genera solo a partir de `templateTipo` + `colorPrincipal` +
+  si tiene foto de portada o no -- no hay que escribirlo a mano.
+- Miniaturas: iframe real (no imagen estática -- se probó y se volvió atrás,
+  ver sección 8) recortado a la portada, cargado con concurrencia limitada
+  (`ModelosLazyLoader.tsx`, cola propia de a 4 a la vez).
+- **`prisma/seed.ts` YA NO crea modelos** (se sacó `seed-modelos.ts`, que
+  existió brevemente en esta sesión) -- el usuario pidió explícitamente no
+  tocar esa cuenta por código, la maneja él mismo.
+- **Pendiente del lado del usuario**: registrarse en producción con una
+  cuenta propia (password que él sepa, no la de `test@example.com` que ya
+  crea `prisma/seed.ts` con password `test123`), y setear
+  `DEMO_ACCOUNT_EMAIL` en las variables de entorno de Railway con ese email.
+  Sin eso, `/modelos` en producción muestra el estado vacío ("Estamos
+  preparando los modelos...") -- no rompe, pero no muestra nada hasta que
+  se configure.
+
+Todo lo que sigue abajo (secciones 1-9) documenta el proceso que llevó hasta
+acá -- útil como historial, pero la sección 5 (tabla de 18) y la mención a
+`seed-modelos.ts`/imágenes en `public/uploads` ya NO reflejan el estado
+actual del código.
 
 Bitácora de sesión — si se corta la conexión o hay problemas técnicos, leer este
 archivo primero para saber exactamente qué está hecho y qué falta. Actualizar el
