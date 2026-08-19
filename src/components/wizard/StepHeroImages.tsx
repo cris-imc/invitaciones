@@ -77,6 +77,10 @@ export function StepHeroImages() {
                     <p className="text-xs text-muted-foreground leading-normal">
                         Si cargás una foto acá, reemplaza el fondo original de la portada de bienvenida por esta foto.
                     </p>
+                    <p className="text-xs leading-normal flex items-start gap-1.5 text-sky-300/90">
+                        <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                        <span>Probá los dos: con foto (efecto cinemático) y sin foto (fondo decorativo propio de la plantilla) — guardá y mirá la vista previa para ver cuál te gusta más.</span>
+                    </p>
                 </div>
 
                 {/* Hero Background Image Mobile */}

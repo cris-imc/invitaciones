@@ -452,6 +452,7 @@ export default async function Home() {
               <div className="flex flex-row flex-wrap gap-x-4 gap-y-2">
                 {[
                   { href: "#plantillas", label: "Plantillas" },
+                  { href: "/modelos", label: "Ver modelos" },
                   { href: "#asi-es-tu-invitacion", label: "Así es tu invitación" },
                   { href: "#como-funciona", label: "Cómo funciona" },
                   { href: "#precios", label: "Precios" },

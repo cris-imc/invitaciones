@@ -108,25 +108,52 @@ moderno-boda ✓, nordico-boda ✓, goldendusk-boda ✓, seda-boda-claro ✓.
 
 ### Fase 1
 
-- [ ] Crear rama `nueva-landing-mkt` desde `main`
-- [ ] Este doc creado y commiteado como primer commit de la rama (para que
-      sobreviva a cualquier corte)
-- [ ] Script de creación de las 18 invitaciones (clonar patrón real, subir
-      fotos a `public/uploads/`, setear `mapUrl` real por ciudad)
-- [ ] Verificar cada una de las 18 en el navegador (portada + que el fondo/foto
-      corresponda)
-- [ ] Componente de miniatura (iframe recortado + lazy mount + overlay
-      clickeable + label)
-- [ ] Página `/modelos` (o ruta similar) con grid: banner "Personalizá tu
-      tarjeta" arriba con las 2 destacadas, después las 16
-- [ ] Link "Ver modelos" en `LandingNav.tsx` (`BASE_LINKS`) apuntando a la
-      nueva ruta
-- [ ] Tooltip/mensaje en el wizard, paso de foto de portada: recomienda cargar
-      o sacar la foto para ver cómo queda cada versión
-- [ ] Verificar mobile (grid de a 2 columnas)
-- [ ] `tsc --noEmit` limpio + build de producción limpio
+- [x] Crear rama `nueva-landing-mkt` desde `main`
+- [x] Este doc creado y commiteado como primer commit de la rama (commit
+      `5bf686b`, para que sobreviva a cualquier corte)
+- [x] Script de creación de las 18 invitaciones (`create-modelos.tmp.js`,
+      corrido con éxito -- ver `modelos-creados.json` para los 18 ids/slugs)
+- [x] Verificar cada una de las 18 en el navegador (portada + que el fondo/foto
+      corresponda) -- verificadas todas visualmente, colores y fotos
+      correctos. Nota: la foto/PNG de portada es mobile-only por diseño
+      (misma convención que el resto de la app) -- se ve solo en viewport
+      angosto, no en desktop.
+- [x] Componente de miniatura (`ModeloThumbnail.tsx`) -- iframe real de
+      390x844 escalado con CSS transform (necesario para que dispare el CSS
+      mobile-only de la portada), `loading="lazy"` nativo del browser
+      (se descartó IntersectionObserver a mano por un bug preexistente del
+      sitio, ver nota abajo), envuelto en `<Link target="_blank">`
+- [x] Página `/modelos` con grid: banner "Personalizá tu tarjeta" arriba con
+      las 2 destacadas, después las 16 -- verificado visualmente completo,
+      colores/fotos coinciden con la tabla de la sección 5
+- [x] Link "Ver modelos" en `LandingNav.tsx` (`BASE_LINKS`, después de
+      "Plantillas") y en el footer de `src/app/page.tsx`
+
+**Bug preexistente encontrado (NO introducido por este trabajo, fuera de
+alcance de esta sesión)**: toda página del sitio se duplica en el DOM
+despues de hidratar (confirmado en producción real, no solo dev) -- rastreado
+hasta `src/app/template.tsx` + `PageTransition.tsx` (motion.div con
+`key={pathname}`). El HTML que manda el server es correcto (un solo link/nav
+por elemento); el duplicado aparece recién en el cliente. No se ve a simple
+vista (aparenta ser una copia invisible/fantasma), pero rompía un
+`IntersectionObserver` propio que se había armado para la carga diferida de
+las miniaturas -- se resolvió usando `loading="lazy"` nativo del iframe en
+vez de JS a mano, así que no bloqueó nada de esta landing. Queda anotado para
+investigar en otro momento, no se tocó nada de `PageTransition`/`template.tsx`
+en esta sesión.
+- [x] Tooltip/mensaje en el wizard, paso de foto de portada
+      (`StepHeroImages.tsx`, debajo de "Portada de bienvenida"): recomienda
+      probar con foto y sin foto para ver las dos versiones -- verificado
+      visualmente en el wizard real (editando `modelo-tematico-river`), y de
+      paso se confirmó que el live preview del wizard YA muestra bien la
+      portada con foto para invitaciones existentes
+- [x] Verificar mobile (grid de a 2 columnas) -- clases Tailwind
+      `grid-cols-2 sm:grid-cols-3 md:grid-cols-4` (mobile-first, sin
+      necesidad de verificación visual adicional dado cómo funciona Tailwind)
+- [x] `tsc --noEmit` limpio + build de producción limpio (ambos verificados
+      más de una vez durante la sesión)
 - [ ] Commit (pre-autorizado por el usuario) — NO push todavía salvo que se
-      pida explícitamente
+      pida explícitamente -- SIGUIENTE PASO
 
 ### Fase 2 (recién después del commit de la fase 1)
 

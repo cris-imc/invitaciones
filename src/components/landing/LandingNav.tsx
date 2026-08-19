@@ -17,6 +17,7 @@ const WHATSAPP_CONTACT_URL =
 
 const BASE_LINKS = [
   { href: "#plantillas", label: "Plantillas" },
+  { href: "/modelos", label: "Ver modelos" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#precios", label: "Precios" },
   { href: WHATSAPP_CONTACT_URL, label: "Contacto", external: true },
