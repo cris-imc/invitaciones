@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { useWizardStore } from "@/store/wizard-store";
 import { BackLink } from "@/components/ui/BackLink";
 import { WizardLivePreview } from "./WizardLivePreview";
@@ -8,11 +9,13 @@ import { getWizardSteps } from "./wizard-steps-config";
 
 export function WizardSteps() {
     const { currentStep, data } = useWizardStore();
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
     const isCasamiento = data.type === "CASAMIENTO";
     const isEditing = Boolean(data.id);
 
-    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false });
+    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false, isAdmin });
 
     // Si viene de editar una invitación existente, "volver" debe llevar de
     // nuevo al panel de Administrar de esa tarjeta (de donde salió el

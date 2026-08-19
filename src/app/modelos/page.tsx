@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LandingNav } from "@/components/landing/LandingNav";
-import { ModeloThumbnail } from "@/components/modelos/ModeloThumbnail";
 import { ModelosLazyLoader } from "@/components/modelos/ModelosLazyLoader";
 import { ModelosTabs } from "@/components/modelos/ModelosTabs";
 import { auth } from "@/auth";
@@ -17,12 +16,11 @@ import { prisma } from "@/lib/db";
 //
 // Convención de slug (así el dueño de la cuenta controla qué se muestra y en
 // qué pestaña, simplemente nombrando la invitación al crearla -- "Nombre del
-// evento" empezando con "Modelo XV", "Modelo Boda" o "Modelo Evento" -- sin
-// ningún campo nuevo en la base):
-//   - empieza con "destacado-" → va en la sección "Modelos personalizados"
-//     (máx. 2, las más nuevas)
-//   - empieza con "modelo-xv-" / "modelo-boda-" / "modelo-evento-" → va en la
-//     pestaña correspondiente (máx. 8 cada una, las más nuevas)
+// evento" empezando con "Modelo XV", "Modelo Boda", "Modelo Evento" o
+// "Personalizado" -- sin ningún campo nuevo en la base):
+//   - empieza con "modelo-xv-" / "modelo-boda-" / "modelo-evento-" /
+//     "personalizado-" → va en la pestaña correspondiente (máx. 8 cada una,
+//     las más nuevas)
 //   - cualquier otro slug en esa cuenta se ignora (no ensucia la landing si
 //     la cuenta de prueba también se usa para probar otras cosas)
 
@@ -57,8 +55,8 @@ interface ModeloItem {
   label: string;
 }
 
-const EMPTY_MODELOS: { featured: ModeloItem[]; xv: ModeloItem[]; boda: ModeloItem[]; evento: ModeloItem[] } = {
-  featured: [], xv: [], boda: [], evento: [],
+const EMPTY_MODELOS: { xv: ModeloItem[]; boda: ModeloItem[]; evento: ModeloItem[]; personalizado: ModeloItem[] } = {
+  xv: [], boda: [], evento: [], personalizado: [],
 };
 
 async function getModelos() {
@@ -72,10 +70,10 @@ async function getModelos() {
     where: {
       userId: user.id,
       OR: [
-        { slug: { startsWith: "destacado-" } },
         { slug: { startsWith: "modelo-xv-" } },
         { slug: { startsWith: "modelo-boda-" } },
         { slug: { startsWith: "modelo-evento-" } },
+        { slug: { startsWith: "personalizado-" } },
       ],
     },
     orderBy: { createdAt: "desc" },
@@ -89,17 +87,17 @@ async function getModelos() {
       .map((m) => ({ slug: m.slug, label: labelFor(m) }));
 
   return {
-    featured: toItems("destacado-", 2),
     xv: toItems("modelo-xv-", 8),
     boda: toItems("modelo-boda-", 8),
     evento: toItems("modelo-evento-", 8),
+    personalizado: toItems("personalizado-", 8),
   };
 }
 
 export default async function ModelosPage() {
-  const [session, { featured, xv, boda, evento }] = await Promise.all([auth(), getModelos()]);
+  const [session, { xv, boda, evento, personalizado }] = await Promise.all([auth(), getModelos()]);
   const registerUrl = session ? "/dashboard?new=true" : "/register";
-  const hasTabbedModelos = xv.length > 0 || boda.length > 0 || evento.length > 0;
+  const hasTabbedModelos = xv.length > 0 || boda.length > 0 || evento.length > 0 || personalizado.length > 0;
 
   return (
     <div className="flex min-h-dvh flex-col items-center bg-[var(--ink)]">
@@ -119,38 +117,17 @@ export default async function ModelosPage() {
           </p>
         </section>
 
-        {featured.length > 0 && (
-          <section className="px-6 pb-14">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-display font-semibold text-white mb-2">
-                Modelos personalizados
-              </h2>
-              <p className="text-zinc-400 max-w-xl mx-auto">
-                La foto de portada puede ser lo que quieras: tu club, tu artista
-                favorito, o cualquier imagen que te represente.
-              </p>
-            </div>
-            <div className="flex flex-wrap justify-center gap-6">
-              {featured.map((m) => (
-                <ModeloThumbnail key={m.slug} slug={m.slug} label={m.label} />
-              ))}
-            </div>
-          </section>
-        )}
-
         {hasTabbedModelos ? (
           <section className="px-6 pb-16">
-            <ModelosTabs xv={xv} boda={boda} evento={evento} />
+            <ModelosTabs xv={xv} boda={boda} evento={evento} personalizado={personalizado} />
           </section>
         ) : (
-          featured.length === 0 && (
-            <section className="px-6 pb-16 text-center">
-              <p className="text-zinc-500 max-w-md mx-auto">
-                Estamos preparando los modelos. Volvé pronto para ver ejemplos
-                reales.
-              </p>
-            </section>
-          )
+          <section className="px-6 pb-16 text-center">
+            <p className="text-zinc-500 max-w-md mx-auto">
+              Estamos preparando los modelos. Volvé pronto para ver ejemplos
+              reales.
+            </p>
+          </section>
         )}
 
         <section className="text-center px-6 pb-20">

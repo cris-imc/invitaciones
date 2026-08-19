@@ -8,18 +8,19 @@ interface Item {
   label: string;
 }
 
-type TabId = "xv" | "boda" | "evento";
+type TabId = "personalizado" | "xv" | "boda" | "evento";
 
 const TAB_LABELS: Record<TabId, string> = {
+  personalizado: "Personalizado",
   xv: "Modelos XV",
   boda: "Modelos Boda",
   evento: "Modelos Evento",
 };
 
-const TAB_ORDER: TabId[] = ["xv", "boda", "evento"];
+const TAB_ORDER: TabId[] = ["personalizado", "xv", "boda", "evento"];
 
-export function ModelosTabs({ xv, boda, evento }: { xv: Item[]; boda: Item[]; evento: Item[] }) {
-  const byTab: Record<TabId, Item[]> = { xv, boda, evento };
+export function ModelosTabs({ xv, boda, evento, personalizado }: { xv: Item[]; boda: Item[]; evento: Item[]; personalizado: Item[] }) {
+  const byTab: Record<TabId, Item[]> = { personalizado, xv, boda, evento };
   const visibleTabs = TAB_ORDER.filter((id) => byTab[id].length > 0);
   const [active, setActive] = useState<TabId>(visibleTabs[0] ?? "xv");
 

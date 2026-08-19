@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import { useSession } from "next-auth/react";
 import { useWizardStore } from "@/store/wizard-store";
 import { WizardSteps } from "@/components/wizard/WizardSteps";
 import { getWizardSteps } from "@/components/wizard/wizard-steps-config";
@@ -11,6 +12,8 @@ function WizardContent({ invitation }: { invitation: any }) {
     const [isInitialized, setIsInitialized] = useState(false);
     const searchParams = useSearchParams();
     const initialStepParam = searchParams.get("step");
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
 
     useEffect(() => {
         if (invitation) {
@@ -131,7 +134,7 @@ function WizardContent({ invitation }: { invitation: any }) {
             if (initialStepParam === 'design') {
                 // Calculado por búsqueda (no hardcodeado) para que nunca se
                 // desincronice si se vuelve a reordenar el wizard.
-                const editSteps = getWizardSteps({ isEditing: true, isCasamiento: invitation.tipo === 'CASAMIENTO', hasGallery: invitation.galeriaPrincipalHabilitada !== false });
+                const editSteps = getWizardSteps({ isEditing: true, isCasamiento: invitation.tipo === 'CASAMIENTO', hasGallery: invitation.galeriaPrincipalHabilitada !== false, isAdmin });
                 const designIndex = editSteps.findIndex((s) => s.label === 'Plantilla');
                 setStep(designIndex >= 0 ? designIndex : 0);
             } else {
@@ -139,7 +142,7 @@ function WizardContent({ invitation }: { invitation: any }) {
             }
             setIsInitialized(true);
         }
-    }, [invitation, setData, setStep, setDirty]);
+    }, [invitation, setData, setStep, setDirty, isAdmin]);
 
     if (!isInitialized) {
         return (

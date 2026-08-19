@@ -1,22 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useWizardStore } from "@/store/wizard-store";
 import { eventTypeSchema } from "@/lib/schemas/invitation";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
-import { CalendarHeart, Crown, PartyPopper } from "lucide-react";
+import { CalendarHeart, Crown, PartyPopper, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 const predefinedCasamiento = ["Nuestra Boda", "Nos Casamos", "¡Nos Casamos!"];
 const predefinedQuince = ["Mis 15 Años", "Mis Quince", "¡Mis 15!"];
+
+const TYPE_LABELS: Record<string, string> = {
+    CASAMIENTO: "Casamiento",
+    QUINCE_ANOS: "15 Años",
+    CUMPLEANOS: "Evento",
+};
 
 const formatName = (value: string) => {
     if (!value) return value;
@@ -31,7 +36,11 @@ const formatName = (value: string) => {
 
 export function StepEventType() {
     const { data, setData, nextStep } = useWizardStore();
-    const router = useRouter();
+    // Solo se llega a este paso en edición si sos admin (ver
+    // wizard-steps-config.ts) -- igual el tipo de evento queda bloqueado:
+    // cambiarlo post-creación mezclaría campos/plantillas de un tipo con
+    // datos ya guardados del otro. Los nombres sí quedan editables.
+    const isEditing = Boolean(data.id);
 
     const [isCustomTitle, setIsCustomTitle] = useState(() => {
         if (data.type === 'CUMPLEANOS') return true;
@@ -95,6 +104,14 @@ export function StepEventType() {
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    {isEditing ? (
+                        <div className="flex items-center gap-3 rounded-xl bg-[var(--ink-2)] border border-white/10 p-4">
+                            <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
+                            <span className="text-sm text-muted-foreground">Tipo de evento:</span>
+                            <span className="text-sm font-semibold">{TYPE_LABELS[data.type ?? ""] ?? data.type}</span>
+                            <span className="text-xs text-muted-foreground ml-auto">No se puede cambiar después de creada</span>
+                        </div>
+                    ) : (
                     <FormField
                         control={form.control}
                         name="type"
@@ -144,6 +161,7 @@ export function StepEventType() {
                             </FormItem>
                         )}
                     />
+                    )}
 
                     {tipo && (
                         <div className="space-y-6 pt-4 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-300">
@@ -290,12 +308,7 @@ export function StepEventType() {
                         </div>
                     )}
 
-                    <div className="flex justify-between items-center mt-8">
-                        <Button type="button" variant="outline" size="lg" onClick={() => router.back()}>
-                            Atrás
-                        </Button>
-                        <Button type="submit" size="lg" disabled={!tipo}>Siguiente Paso</Button>
-                    </div>
+                    <SaveStepButtons form={form} />
                 </form>
             </Form>
         </div>

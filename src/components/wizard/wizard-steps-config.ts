@@ -28,6 +28,7 @@ export function getWizardSteps({
     isEditing,
     isCasamiento,
     hasGallery = true,
+    isAdmin = false,
 }: {
     isEditing: boolean;
     isCasamiento: boolean;
@@ -37,9 +38,16 @@ export function getWizardSteps({
     // callers que todavía no llegaron a ese paso del wizard (antes de que
     // exista un valor real, se asume habilitada).
     hasGallery?: boolean;
+    // Un cliente editando una invitación ya creada no puede tocar tipo de
+    // evento ni nombres (el slug depende de eso al crear y no se debe
+    // reflejar como editable después) -- pero un admin sí necesita poder
+    // corregir un título o nombre mal tipeado, así que el paso reaparece
+    // para admin en edición (el tipo de evento en sí queda bloqueado
+    // igual, ver StepEventType.tsx).
+    isAdmin?: boolean;
 }): WizardStepDef[] {
     return [
-        ...(isEditing ? [] : [{ component: StepEventType, label: "Tipo de Evento" }]),
+        ...(!isEditing || isAdmin ? [{ component: StepEventType, label: "Tipo de Evento" }] : []),
         // Pedido del usuario: la Portada va antes de elegir Plantilla, así la
         // preview real de la plantilla ya refleja la foto de portada real
         // del cliente en vez de una de muestra.
