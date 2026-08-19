@@ -1115,7 +1115,7 @@ export function LoftIndustrialTemplateClaro({ invitation, guest, isPersonalized 
             <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#C0392B] mb-6" style={{ fontFamily: "'Space Mono', var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#161513] leading-[1.0] mb-3 uppercase" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), sans-serif' }}>
+            <h1 className="text-[4rem] font-light text-[#161513] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), sans-serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>

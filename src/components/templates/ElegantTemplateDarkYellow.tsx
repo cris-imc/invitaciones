@@ -1088,7 +1088,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
         document.body
       )}
 
-      <div className="desktop-stage" data-theme={theme} style={{ '--t-acc': '#B8964C', '--t-acc2': '#B8964C', '--c-accent': '#B8964C' , ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) } as React.CSSProperties}>
+      <div className="desktop-stage" data-theme={theme} style={{ '--t-acc': '#B8964C', '--t-acc2': '#B8964C', '--c-accent': '#B8964C' , '--t-bg': '#F9F7F1', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
           className="hero-photo"

@@ -1088,7 +1088,7 @@ export function ElegantTemplateBlue({ invitation, guest, isPersonalized = false 
         document.body
       )}
 
-      <div className="desktop-stage" data-theme={theme} style={{ '--t-acc': '#52718A', '--t-acc2': '#52718A', '--c-accent': '#52718A' , ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) } as React.CSSProperties}>
+      <div className="desktop-stage" data-theme={theme} style={{ '--t-acc': '#52718A', '--t-acc2': '#52718A', '--c-accent': '#52718A' , '--t-bg': '#F9F7F1', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
           className="hero-photo"
