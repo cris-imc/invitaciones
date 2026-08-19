@@ -895,8 +895,9 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       </div>
 
                       <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:items-center shrink-0">
-                        {/* Fila de arriba: WhatsApp + Editar, pegados a la derecha. */}
-                        <div className="flex items-center justify-end gap-1.5">
+                        {/* Fila de arriba (mobile): WhatsApp + Editar, pegados a la derecha.
+                            En desktop pasa a ser el segundo bloque (el estado va primero). */}
+                        <div className="flex items-center justify-end gap-1.5 sm:order-2">
                           <a
                             href={waHref}
                             target="_blank"
@@ -918,8 +919,9 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           </Button>
                         </div>
 
-                        {/* Fila de abajo: el estado (Pendiente/Confirmado/No asistirá) solo a la izquierda, Copiar + Eliminar a la derecha. */}
-                        <div className="flex items-center justify-between gap-1.5">
+                        {/* Fila de abajo (mobile): el estado solo a la izquierda, Copiar + Eliminar a la derecha.
+                            En desktop pasa a ser el primer bloque (izquierda a derecha: estado, luego Copiar/Eliminar, luego WhatsApp/Editar). */}
+                        <div className="flex items-center justify-between gap-1.5 sm:order-1">
                           <StatusBadge status={guest.status} />
 
                           <div className="flex items-center gap-1.5">
