@@ -31,7 +31,8 @@ import { TypewriterText } from "@/components/ui/TypewriterText";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1144,13 +1145,8 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-center gap-3 py-8 bg-[#10131C]" aria-hidden="true">
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #5C8DFF, transparent)' }} />
-          <IconTarget className="corporate-scroll-doodle opacity-0" style={{ width: 20, height: 20, color: '#5C8DFF' }} />
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #5C8DFF, transparent)' }} />
-        </div>
-
         <SaveTheDate
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
@@ -1169,6 +1165,9 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #5C8DFF14, transparent 70%), #171B27" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#EDEFF5] text-2xl md:text-3xl leading-relaxed tracking-wide"
@@ -1180,8 +1179,10 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#10131C] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#5C8DFF]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              <IconMap className="corporate-scroll-doodle opacity-0" style={{ width: 15, height: 15 }} />
               CUÁNDO Y DÓNDE
             </p>
 
@@ -1245,8 +1246,10 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
 
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#5C8DFF]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  <IconBars className="corporate-scroll-doodle opacity-0" style={{ width: 16, height: 12 }} />
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
@@ -1271,8 +1274,10 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full bg-[#171B27] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                <IconGridDots className="corporate-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#5C8DFF' }} />
                 ÁLBUM
               </p>
             </div>
@@ -1283,7 +1288,11 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1293,6 +1302,7 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1328,8 +1338,10 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#171B27] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 flex items-center gap-2 text-[#5C8DFF]">
-                  <IconGift className="corporate-scroll-doodle opacity-0" style={{ width: 18, height: 18 }} />
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1381,8 +1393,10 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #5C8DFF18, transparent 70%), #171B27" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                <IconQuiz className="corporate-scroll-doodle opacity-0" style={{ width: 15, height: 15 }} />
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
               <ProgressiveQuiz
@@ -1396,11 +1410,6 @@ export function CorporateTemplate({ invitation, guest, isPersonalized = false }:
           </SectionWrapper>
         )}
 
-        {songsEnabled && (
-          <div className="w-full flex justify-center pt-16" style={{ background: '#10131C' }} aria-hidden="true">
-            <IconMusic className="corporate-scroll-doodle opacity-0" style={{ width: 22, height: 22, color: '#5C8DFF' }} />
-          </div>
-        )}
         {songsEnabled && (
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}

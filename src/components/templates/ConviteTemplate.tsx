@@ -12,7 +12,8 @@ import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { MusicPlayer } from "@/components/invitation/MusicPlayer";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { toEmbedMapUrl } from "@/lib/google-maps";
@@ -661,7 +662,11 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -671,6 +676,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -767,6 +773,9 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300}>
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker">¿Cuánto sabés?</p>
             <h2>{String(invitation.triviaTitulo ?? "Un juego para vos")}</h2>
             <ProgressiveQuiz 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { X, Camera } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 
 interface AlbumCarouselProps {
   photos: string[];
@@ -98,6 +99,9 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
       `}</style>
       {!hideHeader && (
         <>
+          <div className="t-kicker flex justify-center mb-6">
+            <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+          </div>
           <p className="t-kicker">Álbum</p>
           <h2>Un poco de nuestra historia</h2>
         </>

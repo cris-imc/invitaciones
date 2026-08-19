@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Music } from "lucide-react";
 import { SectionWrapper } from "./SectionWrapper";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 
 interface SongItem {
   id: string;
@@ -128,8 +130,11 @@ export function SongSuggestion({
       <div className={variant === "moderno" ? "w-full max-w-[340px] sm:max-w-xl mx-auto text-left" : ""}>
         {!hideHeader && (
           <>
+            <div className={variant === "moderno" ? "flex justify-center mb-6" : "t-kicker flex justify-center mb-6"} style={variant === "moderno" ? { color: "var(--t-acc)" } : undefined}>
+              <DrawLucideIcon icon={Music} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             {variant === "moderno" ? (
-              <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
+              <p className="t-kicker text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
                 {kicker}
               </p>
             ) : (
@@ -145,9 +150,14 @@ export function SongSuggestion({
         )}
         
         {hideHeader && (
-          <p className={variant === "moderno" ? "text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" : "t-kicker"} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
-            {kicker}
-          </p>
+          <>
+            <div className="flex justify-center mb-6" style={{ color: variant === "moderno" ? "var(--t-acc)" : undefined }}>
+              <DrawLucideIcon icon={Music} size={46} color="var(--t-acc)" strokeWidth={1.5} className={variant === "moderno" ? undefined : "t-kicker"} />
+            </div>
+            <p className={variant === "moderno" ? "t-kicker text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" : "t-kicker"} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
+              {kicker}
+            </p>
+          </>
         )}
 
         {/* Formulario */}

@@ -37,7 +37,8 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1248,14 +1249,9 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
 
         {/* Divisor doodle entre hero y cuenta regresiva: ramita de laurel
             flanqueada por estrellas de trazo fino, motivo editorial. */}
-        <div className="w-full flex items-center justify-center gap-3 py-8 bg-[#EDEBE5]" aria-hidden="true">
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #6B4A6B, transparent)' }} />
-          <IconRings className="editorial-scroll-doodle opacity-0" style={{ width: 26, height: 17, color: '#6B4A6B' }} />
-          <IconHeartDoodle className="editorial-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#B8A98C' }} />
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #6B4A6B, transparent)' }} />
-        </div>
 
         <SaveTheDate
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
@@ -1274,6 +1270,9 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #B8A98C14, transparent 70%), var(--t-surface)" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#17140F] text-2xl md:text-3xl leading-relaxed tracking-wide" 
@@ -1285,8 +1284,10 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#EDEBE5] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#6B4A6B]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              <IconChurch className="editorial-scroll-doodle opacity-0" style={{ width: 15, height: 15 }} />
               CUÁNDO Y DÓNDE
             </p>
 
@@ -1353,8 +1354,10 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#6B4A6B]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  <IconRibbon className="editorial-scroll-doodle opacity-0" style={{ width: 20, height: 12 }} />
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
@@ -1379,8 +1382,10 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: "var(--t-surface)" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                <IconHeartDoodle className="editorial-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#B8A98C' }} />
                 ÁLBUM
               </p>
             </div>
@@ -1391,7 +1396,11 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1401,6 +1410,7 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1438,8 +1448,10 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#E4E1D8] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 flex items-center gap-2 text-[#6B4A6B]">
-                  <IconRings className="editorial-scroll-doodle opacity-0" style={{ width: 22, height: 15 }} />
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1491,8 +1503,10 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #B8A98C18, transparent 70%), #E4E1D8" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                <IconHeartDoodle className="editorial-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#B8A98C' }} />
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
               <ProgressiveQuiz 
@@ -1506,11 +1520,6 @@ export function EditorialTemplateMalva({ invitation, guest, isPersonalized = fal
           </SectionWrapper>
         )}
 
-        {songsEnabled && (
-          <div className="w-full flex justify-center pt-16" style={{ background: '#EDEBE5' }} aria-hidden="true">
-            <IconMusic className="editorial-scroll-doodle opacity-0" style={{ width: 26, height: 26, color: '#6B4A6B' }} />
-          </div>
-        )}
         {songsEnabled && (
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}

@@ -38,7 +38,8 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1242,6 +1243,7 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
         </div>
 
         <SaveTheDate
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
@@ -1260,6 +1262,9 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #8A857814, transparent 70%), #F5F4F1" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#111111] text-2xl md:text-3xl leading-relaxed tracking-wide" 
@@ -1279,8 +1284,10 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#FFFFFF] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#5B5850]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              <IconRegisterMark className="nordico-scroll-doodle opacity-0" style={{ width: 14, height: 14 }} />
               CUÁNDO Y DÓNDE
             </p>
 
@@ -1348,8 +1355,10 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#5B5850]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  <IconSquareDoodle className="nordico-scroll-doodle opacity-0" style={{ width: 11, height: 11 }} />
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
@@ -1374,8 +1383,10 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full bg-[#F5F4F1] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                <IconSquareDoodle className="nordico-scroll-doodle opacity-0" style={{ width: 11, height: 11, color: '#5B5850' }} />
                 ÁLBUM
               </p>
             </div>
@@ -1386,7 +1397,11 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1396,6 +1411,7 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1433,8 +1449,10 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#F0EFEB] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 flex items-center gap-2 text-[#5B5850]">
-                  <IconLineDoodle className="nordico-scroll-doodle opacity-0" style={{ width: 22, height: 6 }} />
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1486,8 +1504,10 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #8A857818, transparent 70%), #F0EFEB" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                <IconRegisterMark className="nordico-scroll-doodle opacity-0" style={{ width: 13, height: 13, color: '#5B5850' }} />
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
               <ProgressiveQuiz 
@@ -1501,11 +1521,6 @@ export function NordicoTemplate({ invitation, guest, isPersonalized = false }: N
           </SectionWrapper>
         )}
 
-        {songsEnabled && (
-          <div className="w-full flex justify-center pt-16" style={{ background: '#F0EFEB' }} aria-hidden="true">
-            <IconMusic className="nordico-scroll-doodle opacity-0" style={{ width: 24, height: 24, color: '#5B5850' }} />
-          </div>
-        )}
         {songsEnabled && (
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}

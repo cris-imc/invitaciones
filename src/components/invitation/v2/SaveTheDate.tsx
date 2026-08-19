@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CalendarPlus } from "lucide-react";
+import { LordIcon } from "@/components/ui/LordIcon";
+import { RingsIcon } from "@/components/ui/icons/RingsIcon";
+import { CrownIcon } from "@/components/ui/icons/CrownIcon";
 
 interface SaveTheDateProps {
   eventName: string;
@@ -11,6 +14,9 @@ interface SaveTheDateProps {
   // true = fondo del bloque toma un tinte oscuro (para familias de tema
   // oscuro, mismo criterio que el prop `dark` de Countdown.tsx).
   dark?: boolean;
+  // Ícono grande centrado arriba de la sección -- "rings" (bodas) o "crown"
+  // (XV años). Sin definir = sin ícono grande (queda como estaba).
+  headerIcon?: "rings" | "crown";
 }
 
 function pad2(n: number) {
@@ -120,7 +126,7 @@ function ensureContrast(fgHex: string, bgHex: string, minRatio: number, maxMix =
   return best;
 }
 
-export function SaveTheDate({ eventName, targetDate, location = "", description = "", dark = false }: SaveTheDateProps) {
+export function SaveTheDate({ eventName, targetDate, location = "", description = "", dark = false, headerIcon }: SaveTheDateProps) {
   const rootRef = useRef<HTMLElement>(null);
   const [safeAcc, setSafeAcc] = useState<string | undefined>(undefined);
   const [safeMuted, setSafeMuted] = useState<string | undefined>(undefined);
@@ -199,7 +205,24 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
       id="save-the-date"
       style={{ backgroundColor: "var(--t-bg)" }}
     >
-      <p className="t-kicker" style={{ justifyContent: "center", display: "flex" }}>Save the date</p>
+      {headerIcon && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          {headerIcon === "rings" ? (
+            <RingsIcon size={84} color={accColor} />
+          ) : (
+            <CrownIcon size={84} color={accColor} />
+          )}
+        </div>
+      )}
+      <p className="t-kicker" style={{ justifyContent: "center", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+        <LordIcon
+          src="/lordicon/system-outline-364-calendar-dots.json"
+          trigger="in"
+          size={18}
+          colors={`primary:${accColor}`}
+        />
+        Save the date
+      </p>
       <p
         style={{
           fontFamily: "var(--font-title, var(--font-cormorant)), serif",

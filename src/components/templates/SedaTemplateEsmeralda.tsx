@@ -49,7 +49,8 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1243,13 +1244,9 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         </div>
 
         {/* Divisor doodle: laurel flanqueado por líneas finas */}
-        <div className="w-full flex items-center justify-center gap-3 py-8" style={{ background: 'var(--t-bg)' }} aria-hidden="true">
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, var(--t-acc), transparent)' }} />
-          <IconLaurel className="seda-scroll-doodle opacity-0" style={{ width: 28, height: 17, color: 'var(--t-acc)' }} />
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, var(--t-acc), transparent)' }} />
-        </div>
 
         <SaveTheDate
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
@@ -1280,8 +1277,10 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
         <SectionWrapper id="details" delay={150} className="w-full py-20 px-6 md:px-12" style={{ background: 'var(--t-bg)' }}>
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))", color: 'var(--t-acc)' }}>
-              <IconArch className="seda-scroll-doodle opacity-0" style={{ width: 15, height: 15 }} />
               CUÁNDO Y DÓNDE
             </p>
 
@@ -1345,8 +1344,10 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))", color: 'var(--t-acc)' }}>
-                  <IconRibbonFlow className="seda-scroll-doodle opacity-0" style={{ width: 20, height: 10 }} />
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
@@ -1371,8 +1372,10 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: 'var(--t-bg)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                <IconLaurel className="seda-scroll-doodle opacity-0" style={{ width: 20, height: 12, color: 'var(--t-acc2)' }} />
                 ÁLBUM
               </p>
             </div>
@@ -1383,7 +1386,11 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1393,6 +1400,7 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1428,8 +1436,10 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full py-20 px-6 md:px-12 overflow-hidden" style={{ background: 'var(--t-surface)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 flex items-center gap-2" style={{ color: 'var(--t-acc)' }}>
-                  <IconRibbonFlow className="seda-scroll-doodle opacity-0" style={{ width: 22, height: 11 }} />
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1481,8 +1491,10 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--t-acc2) 10%, transparent), transparent 70%), var(--t-bg)" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                <IconSparkleSeda className="seda-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: 'var(--t-acc2)' }} />
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
               <ProgressiveQuiz
@@ -1496,11 +1508,6 @@ export function SedaTemplateEsmeralda({ invitation, guest, isPersonalized = fals
           </SectionWrapper>
         )}
 
-        {songsEnabled && (
-          <div className="w-full flex justify-center pt-16" style={{ background: 'var(--t-bg)' }} aria-hidden="true">
-            <IconMusic className="seda-scroll-doodle opacity-0" style={{ width: 24, height: 24, color: 'var(--t-acc)' }} />
-          </div>
-        )}
         {songsEnabled && (
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}

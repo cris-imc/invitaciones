@@ -36,7 +36,8 @@ import { TypewriterText } from "@/components/ui/TypewriterText";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1174,13 +1175,8 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-center gap-3 py-8 bg-[#FFF7F2]" aria-hidden="true">
-          <IconCloudBlob className="infantil-scroll-doodle opacity-0" style={{ width: 30, height: 20, color: '#FF8AA6', opacity: 0.35 }} />
-          <IconConfetti className="infantil-scroll-doodle opacity-0" style={{ width: 26, height: 13, color: '#29B38A' }} />
-          <IconCloudBlob className="infantil-scroll-doodle opacity-0" style={{ width: 30, height: 20, color: '#3FBF9F', opacity: 0.35, transform: 'scaleX(-1)' }} />
-        </div>
-
         <SaveTheDate
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
@@ -1200,6 +1196,9 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center relative" style={{ background: "#FF8AA61A" }}>
             <IconStar className="infantil-scroll-doodle opacity-0 absolute" style={{ width: 14, height: 14, top: '18%', left: '12%', color: '#3FBF9F' }} />
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#2A2140] text-2xl md:text-3xl leading-relaxed tracking-wide"
@@ -1211,8 +1210,10 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#FFF7F2] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase text-[#29B38A]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              <IconMap className="infantil-scroll-doodle opacity-0" style={{ width: 15, height: 15 }} />
               CUÁNDO Y DÓNDE
             </p>
 
@@ -1276,8 +1277,10 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
 
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase text-[#29B38A]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  <IconConfetti className="infantil-scroll-doodle opacity-0" style={{ width: 20, height: 10 }} />
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
@@ -1302,8 +1305,10 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full bg-[#FFF0E4] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                <IconStar className="infantil-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#29B38A' }} />
                 ÁLBUM
               </p>
             </div>
@@ -1314,7 +1319,11 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1324,6 +1333,7 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1359,8 +1369,10 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#FFF0E4] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 flex items-center gap-2 text-[#29B38A]">
-                  <IconGift className="infantil-scroll-doodle opacity-0" style={{ width: 18, height: 18 }} />
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1412,8 +1424,10 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "#3FBF9F1A" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                <IconQuiz className="infantil-scroll-doodle opacity-0" style={{ width: 15, height: 15 }} />
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
               <ProgressiveQuiz
@@ -1427,11 +1441,6 @@ export function InfantilTemplateMenta({ invitation, guest, isPersonalized = fals
           </SectionWrapper>
         )}
 
-        {songsEnabled && (
-          <div className="w-full flex justify-center pt-16" style={{ background: '#FFF7F2' }} aria-hidden="true">
-            <IconMusic className="infantil-scroll-doodle opacity-0" style={{ width: 24, height: 24, color: '#29B38A' }} />
-          </div>
-        )}
         {songsEnabled && (
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}

@@ -13,7 +13,8 @@ import { TypewriterText } from "@/components/ui/TypewriterText";
 import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { toEmbedMapUrl } from "@/lib/google-maps";
@@ -1134,6 +1135,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full bg-[#EAE5D9] py-24 px-6 md:px-12 flex items-center justify-center">
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#2C2C2C] text-2xl md:text-3xl leading-relaxed tracking-wide" 
@@ -1145,6 +1149,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#F9F7F1] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8">
               CUÁNDO Y DÓNDE
             </p>
@@ -1212,6 +1219,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6">
                   CRONOGRAMA
                 </p>
@@ -1237,6 +1247,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full bg-[#EAE5D9] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10">
                 ÁLBUM
               </p>
@@ -1248,7 +1261,11 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1258,6 +1275,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1295,6 +1313,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#F9F7F1] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 text-[#C79A4B]">
                   DATOS BANCARIOS DEL EVENTO
                 </p>
@@ -1415,6 +1436,9 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full bg-[#EAE5D9] py-20 px-6 md:px-12">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8">
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
