@@ -571,7 +571,7 @@ export function ModernoTemplateVerde({ invitation, guest, isPersonalized = false
         "--t-acc": "#C9A876",
         "--t-acc2": "#C9A876",
         "--c-accent": "#C9A876",
-        "--t-bg": "#0F0E13",
+        "--t-bg": "#05120B",
         "--t-surface": "#151219",
         "--t-muted": "#9B92AF",
       } as React.CSSProperties}
