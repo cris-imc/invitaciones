@@ -152,8 +152,9 @@ en esta sesión.
       necesidad de verificación visual adicional dado cómo funciona Tailwind)
 - [x] `tsc --noEmit` limpio + build de producción limpio (ambos verificados
       más de una vez durante la sesión)
-- [ ] Commit (pre-autorizado por el usuario) — NO push todavía salvo que se
-      pida explícitamente -- SIGUIENTE PASO
+- [x] Commit (pre-autorizado por el usuario) — commit `219d878` en
+      `nueva-landing-mkt`. NO se hizo push todavía (esperar pedido explícito).
+      **FASE 1 COMPLETA.**
 
 ### Fase 2 (recién después del commit de la fase 1)
 
