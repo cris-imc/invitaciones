@@ -3,20 +3,25 @@ import { cn } from "@/lib/utils"
 
 export function formatInputText(val: string): string {
   if (!val || typeof val !== 'string') return val;
-  
+
   let isFirstLetterFound = false;
 
   return val.split(/(\s+)/).map((word) => {
     if (!word.trim()) return word;
-    
-    let firstChar = word.charAt(0);
-    const rest = word.slice(1).toLowerCase();
-    
+
     if (!isFirstLetterFound) {
-      firstChar = firstChar.toUpperCase();
+      // La primera palabra puede arrancar con símbolos (ej. "¡Nos casamos!")
+      // -- hay que mayusculizar la primera LETRA real, no el símbolo, para
+      // no dejar la letra que sigue forzada a minúscula.
+      const letterIdx = word.search(/[a-zA-ZÀ-ÿ]/);
+      if (letterIdx === -1) return word.toLowerCase();
       isFirstLetterFound = true;
+      const lower = word.toLowerCase();
+      return lower.slice(0, letterIdx) + lower.charAt(letterIdx).toUpperCase() + lower.slice(letterIdx + 1);
     }
-    
+
+    const firstChar = word.charAt(0);
+    const rest = word.slice(1).toLowerCase();
     return firstChar + rest;
   }).join('');
 }
