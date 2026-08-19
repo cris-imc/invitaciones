@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Camera } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 
 interface AlbumPolaroidCascadeProps {
   photos: string[];
@@ -88,6 +89,9 @@ export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHead
       `}</style>
       {!hideHeader && (
         <>
+          <div className="t-kicker flex justify-center mb-6">
+            <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+          </div>
           <p className="t-kicker">Álbum</p>
           <h2>Un poco de nuestra historia</h2>
         </>

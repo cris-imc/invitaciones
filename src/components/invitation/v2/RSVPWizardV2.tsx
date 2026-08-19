@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PartyPopper, Heart } from "lucide-react";
+import { PartyPopper, Heart, UserCheck } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 
 type PaymentStatus = "PENDING" | "EXEMPT" | "PAID";
 
@@ -324,6 +325,9 @@ export function RSVPWizardV2({
     <section className={sectionClass} id="rsvp">
       {step !== "done" && step !== "declined" && (
         <>
+          <div className="t-kicker flex justify-center mb-4">
+            <DrawLucideIcon icon={UserCheck} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+          </div>
           <p className="t-kicker">Confirmá tu asistencia</p>
           <h2>{maxGuests > 1 ? "¿Van a venir?" : "¿Vas a venir?"}</h2>
         </>

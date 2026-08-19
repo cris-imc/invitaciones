@@ -37,7 +37,8 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1263,13 +1264,9 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         </div>
 
         {/* Divisor doodle "sol / horizonte" entre hero y cuenta regresiva */}
-        <div className="w-full flex items-center justify-center gap-3 py-8 bg-[#FDF6F0]" aria-hidden="true">
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #7C8F6E, transparent)' }} />
-          <IconSunHorizon className="golden-scroll-doodle opacity-0" style={{ width: 34, height: 17, color: '#7C8F6E' }} />
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #7C8F6E, transparent)' }} />
-        </div>
 
         <SaveTheDate
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
@@ -1288,6 +1285,9 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #8FA07A14, transparent 70%), var(--t-surface)" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#3B2A2A] text-2xl md:text-3xl leading-relaxed tracking-wide"
@@ -1299,8 +1299,10 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#FDF6F0] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#7C8F6E]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              <IconArbor className="golden-scroll-doodle opacity-0" style={{ width: 16, height: 15 }} />
               CUÁNDO Y DÓNDE
             </p>
 
@@ -1364,8 +1366,10 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
 
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#7C8F6E]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  <IconRanunculus className="golden-scroll-doodle opacity-0" style={{ width: 16, height: 16 }} />
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
@@ -1390,8 +1394,10 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: "var(--t-surface)" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                <IconRanunculus className="golden-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#8FA07A' }} />
                 ÁLBUM
               </p>
             </div>
@@ -1402,7 +1408,11 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1412,6 +1422,7 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1449,8 +1460,10 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#F5EBE0] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 flex items-center gap-2 text-[#7C8F6E]">
-                  <IconBouquet className="golden-scroll-doodle opacity-0" style={{ width: 20, height: 21 }} />
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1502,8 +1515,10 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #8FA07A18, transparent 70%), #F5EBE0" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                <IconRanunculus className="golden-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#8FA07A' }} />
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
               <ProgressiveQuiz
@@ -1517,11 +1532,6 @@ export function GoldenDuskTemplateSalvia({ invitation, guest, isPersonalized = f
           </SectionWrapper>
         )}
 
-        {songsEnabled && (
-          <div className="w-full flex justify-center pt-16" style={{ background: '#FDF6F0' }} aria-hidden="true">
-            <IconMusic className="golden-scroll-doodle opacity-0" style={{ width: 26, height: 26, color: '#7C8F6E' }} />
-          </div>
-        )}
         {songsEnabled && (
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}

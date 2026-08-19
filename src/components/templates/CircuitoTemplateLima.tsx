@@ -37,7 +37,8 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1331,15 +1332,9 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
 
         {/* Divisor doodle entre hero y cuenta regresiva (dos hexágonos de
             circuito flanqueando una línea con un nodo de PCB al centro). */}
-        <div className="w-full flex items-center justify-center gap-4 py-8 bg-[#08080A]" aria-hidden="true">
-          <IconHex className="circ-scroll-doodle opacity-0" style={{ width: 30, height: 30, color: 'rgba(198,255,59,0.4)' }} />
-          <div style={{ width: 48, height: 1, background: 'linear-gradient(90deg, transparent, #FF2E9B, transparent)' }} />
-          <IconNode className="circ-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#FF2E9B' }} />
-          <div style={{ width: 48, height: 1, background: 'linear-gradient(90deg, transparent, #FF2E9B, transparent)' }} />
-          <IconHex className="circ-scroll-doodle opacity-0" style={{ width: 30, height: 30, color: 'rgba(198,255,59,0.4)' }} />
-        </div>
 
         <SaveTheDate
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
@@ -1358,6 +1353,9 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #FF2E9B14, transparent 70%), #0C0C10" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#E9FFF6] text-2xl md:text-3xl leading-relaxed tracking-wide" 
@@ -1369,8 +1367,10 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
 
         <SectionWrapper id="details" delay={150} className="w-full bg-[#08080A] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+            <div className="flex justify-center mb-4">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C6FF3B]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              <IconNode className="circ-scroll-doodle opacity-0" style={{ width: 14, height: 14 }} />
               CUÁNDO Y DÓNDE
             </p>
 
@@ -1437,8 +1437,10 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
               <div className="mt-16">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C6FF3B]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  <IconHex className="circ-scroll-doodle opacity-0" style={{ width: 16, height: 16 }} />
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
@@ -1463,8 +1465,10 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full bg-[#0C0C10] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                <IconNode className="circ-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#FF2E9B' }} />
                 ÁLBUM
               </p>
             </div>
@@ -1475,7 +1479,11 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ overflow: "hidden" }}>
+            <div className="flex justify-center py-6" style={{ background: "var(--t-bg, #0F0E13)" }}>
+              <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+            </div>
+            <div style={{ height: "220px", overflow: "hidden" }}>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1485,6 +1493,7 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
               title={`Mapa: ${lugarNombre}`}
               referrerPolicy="no-referrer-when-downgrade"
             />
+            </div>
           </section>
         )}
 
@@ -1522,8 +1531,10 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#0A0A0D] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 flex items-center gap-2 text-[#C6FF3B]">
-                  <IconHex className="circ-scroll-doodle opacity-0" style={{ width: 16, height: 16 }} />
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1575,8 +1586,10 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #FF2E9B18, transparent 70%), #0A0A0D" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                <IconNode className="circ-scroll-doodle opacity-0" style={{ width: 14, height: 14, color: '#FF2E9B' }} />
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
               <ProgressiveQuiz 
@@ -1590,11 +1603,6 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
           </SectionWrapper>
         )}
 
-        {songsEnabled && (
-          <div className="w-full flex justify-center pt-16" style={{ background: '#08080A' }} aria-hidden="true">
-            <IconMusic className="circ-scroll-doodle opacity-0" style={{ width: 28, height: 28, color: '#C6FF3B' }} />
-          </div>
-        )}
         {songsEnabled && (
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}
