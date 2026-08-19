@@ -34,7 +34,8 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { HeroV2 } from "@/components/invitation/v2/HeroV2";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
-import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket } from "lucide-react";
+import { Clock, MapPin, Trophy, Star, ThumbsUp, Users, CreditCard, Gift, Ticket, BookOpen, CalendarDays, Camera, HelpCircle, Landmark } from "lucide-react";
+import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
@@ -1112,6 +1113,9 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #C9A87614, transparent 70%), #292A2D" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-6">
+                <DrawLucideIcon icon={BookOpen} size={46} color="#C9A876" strokeWidth={1.5} />
+              </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-[#EDE9F4] text-2xl md:text-3xl leading-relaxed tracking-wide" 
@@ -1190,6 +1194,9 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
             {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
               <div className="mt-16" id="schedule">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Clock} size={46} color="#C9A876" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-6  text-[11px] font-semibold tracking-[0.2em] uppercase text-[#C9A876]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   CRONOGRAMA
                 </p>
@@ -1215,6 +1222,12 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
           <SectionWrapper id="album" delay={200} className="w-full bg-[#292A2D] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={Camera} size={46} color="#C9A876" strokeWidth={1.5} />
+              </div>
+            <div className="flex justify-center mb-6">
+              <DrawLucideIcon icon={CalendarDays} size={46} color="#C9A876" strokeWidth={1.5} />
+            </div>
               <p className="t-kicker mb-10">
                 ÁLBUM
               </p>
@@ -1227,6 +1240,9 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
 
         {mapUrl && (
           <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+            <div className="flex justify-center py-6">
+              <DrawLucideIcon icon={MapPin} size={46} color="#C9A876" strokeWidth={1.5} />
+            </div>
             <iframe
               src={toEmbedMapUrl(mapUrl) ?? mapUrl}
               width="100%"
@@ -1273,6 +1289,9 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#292A2D] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+                <div className="flex justify-center mb-4">
+                  <DrawLucideIcon icon={Landmark} size={46} color="#C9A876" strokeWidth={1.5} />
+                </div>
                 <p className="t-kicker mb-10 text-[#C9A876]">
                   DATOS BANCARIOS DEL EVENTO
                 </p>
@@ -1325,6 +1344,9 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
           <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #C9A87618, transparent 70%), #292A2D" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={HelpCircle} size={46} color="#C9A876" strokeWidth={1.5} />
+              </div>
               <p className="t-kicker mb-8">
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
