@@ -868,7 +868,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   return (
                     <div
                       key={guest.id}
-                      className="flex items-center justify-between flex-wrap p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors gap-3 overflow-hidden"
+                      className="flex items-center justify-between flex-wrap p-4 border rounded-xl bg-card hover:bg-muted/50 transition-colors gap-3"
                     >
                       <div className="flex-1 min-w-0 pr-2">
                         <h4 className="font-semibold truncate" title={guest.name}>{guest.name}</h4>
@@ -894,30 +894,36 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         </div>
                       </div>
 
-                      <div className="flex items-center flex-wrap justify-end gap-1.5 shrink-0">
-                        <StatusBadge status={guest.status} />
+                      <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:items-center shrink-0">
+                        {/* Fila de arriba: WhatsApp + Editar, pegados a la derecha. */}
+                        <div className="flex items-center justify-end gap-1.5">
+                          <a
+                            href={waHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Enviar WhatsApp"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white shadow-sm transition-colors"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                          </a>
 
-                        <a
-                          href={waHref}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Enviar WhatsApp"
-                          className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white shadow-sm transition-colors"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                        </a>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 hover:bg-blue-500/20"
+                            title="Editar"
+                            onClick={() => handleEditClick(guest)}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
 
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 hover:bg-blue-500/20"
-                          title="Editar"
-                          onClick={() => handleEditClick(guest)}
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
+                        {/* Fila de abajo: el estado (Pendiente/Confirmado/No asistirá) solo a la izquierda, Copiar + Eliminar a la derecha. */}
+                        <div className="flex items-center justify-between gap-1.5">
+                          <StatusBadge status={guest.status} />
 
-                        <div className="relative">
+                          <div className="flex items-center gap-1.5">
+                          <div className="relative">
                           {isHintActive && (
                             <span className="absolute -inset-1.5 rounded-full bg-amber-400/60 blur-md animate-pulse pointer-events-none"></span>
                           )}
@@ -967,6 +973,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );

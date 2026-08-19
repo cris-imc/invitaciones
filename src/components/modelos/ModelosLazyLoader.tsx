@@ -9,7 +9,11 @@ import { useEffect } from "react";
 // y se sientan mas lentas de lo que son.
 const CONCURRENCY = 4;
 // Cuanto antes de que la miniatura entre en pantalla la empezamos a cargar.
-const PRELOAD_MARGIN_PX = 600;
+// A propósito chico (no varias pantallas de anticipación): cada miniatura
+// tiene su propio efecto de apertura de portada que arranca apenas carga --
+// si se precarga demasiado antes, el efecto ya terminó de jugarse fuera de
+// vista y el usuario nunca lo ve al llegar scrolleando hasta ahí.
+const PRELOAD_MARGIN_PX = 150;
 
 // Un solo componente para todas las miniaturas (no un hook por tarjeta). Usa
 // scroll/resize + getBoundingClientRect en vez de IntersectionObserver a
