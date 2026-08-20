@@ -105,8 +105,8 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
 // de evento -- ver esa tabla para el detalle de cada una.
 function getAvailableTabs(eventType: string | undefined): { tipo: TemplateTipo; label: string }[] {
   const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D"]);
-  const soloCasamiento = new Set(["CINE", "NORDICO", "RIVIERA", "GOLDENDUSK"]);
-  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE"]);
+  const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK"]);
+  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
     if (tipo === "NEON") return eventType === "QUINCE_ANOS" || eventType === "CUMPLEANOS";

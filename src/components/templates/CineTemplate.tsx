@@ -11,9 +11,9 @@
  * (claqueta, rollo de película, estrella) y foto de portada con filtro sepia,
  * perforaciones tipo filmina en los bordes y un efecto de grano/luz de
  * proyector ligado al scroll.
- * Gating: esta plantilla solo debe ofrecerse para eventos CASAMIENTO (pack
- * exclusivo de casamiento, ver docs/GUIA_TECNICA_PLANTILLAS.md) — el gating
- * vive en TemplatePreviewModal.tsx, este archivo no valida nada por su cuenta.
+ * Gating: se ofrece para CASAMIENTO y QUINCE_ANOS (ver getHeroTitle/eyebrow
+ * más abajo para el copy por tipo de evento) — el gating vive en
+ * TemplatePreviewModal.tsx, este archivo no valida nada por su cuenta.
  */
 "use client";
 

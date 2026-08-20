@@ -13,6 +13,7 @@ export const PRESET_SONGS: PresetSong[] = [
   { id: "david-guetta-titanium", title: "Titanium", artist: "David Guetta ft. Sia", url: "/music/david-guetta-titanium.mp3" },
   { id: "dua-lipa-levitating", title: "Levitating", artist: "Dua Lipa", url: "/music/dua-lipa-levitating.mp3" },
   { id: "ed-sheeran-perfect", title: "Perfect", artist: "Ed Sheeran", url: "/music/ed-sheeran-perfect.mp3" },
+  { id: "goo-goo-dolls-iris", title: "Iris", artist: "Goo Goo Dolls", url: "/music/goo-goo-dolls-iris.mp3" },
   { id: "john-legend-all-of-me", title: "All of Me", artist: "John Legend", url: "/music/john-legend-all-of-me.mp3" },
   { id: "katy-perry-firework", title: "Firework", artist: "Katy Perry", url: "/music/katy-perry-firework.mp3" },
   { id: "kygo-firestone", title: "Firestone", artist: "Kygo", url: "/music/kygo-firestone.mp3" },
