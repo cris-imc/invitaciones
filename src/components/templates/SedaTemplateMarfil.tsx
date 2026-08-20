@@ -142,6 +142,22 @@ function getThemeFromTipo(tipo: string): Theme {
   return "cumple";
 }
 
+// Ancestro real que scrollea a el: document.body en una invitación real
+// (scroll de página completa), pero un <div> con overflow-y propio dentro
+// del "phone frame" de vista previa (/modelos, wizard) -- ver comentario
+// donde se usa, en el useEffect del brillo de seda del hero.
+function getScrollContainer(el: HTMLElement | null): HTMLElement {
+  let node = el?.parentElement ?? null;
+  while (node && node !== document.body) {
+    const cs = getComputedStyle(node);
+    if ((cs.overflowY === "auto" || cs.overflowY === "scroll") && node.scrollHeight > node.clientHeight + 1) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return document.body;
+}
+
 function safeJson<T>(val: string | null | undefined, fallback: T): T {
   if (!val) return fallback;
   try { return JSON.parse(val) as T; } catch { return fallback; }
@@ -496,13 +512,15 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
     const sheen = sheenRef.current;
     const observer = onScroll({
       target: heroPhotoRef.current,
-      container: document.body,
+      container: getScrollContainer(heroPhotoRef.current),
       enter: "bottom top",
       leave: "top bottom",
       onUpdate: (self) => {
         const p = self.progress;
         const intensity = Math.sin(p * Math.PI);
-        sheen.style.opacity = String(intensity * 0.5);
+        // Mas sutil (antes 0.5 de opacidad maxima): quedaba muy marcado,
+        // "grotesco" -- un reflejo de seda real es apenas perceptible.
+        sheen.style.opacity = String(intensity * 0.22);
         sheen.style.left = `${p * 150 - 30}%`;
       },
     });
@@ -1221,8 +1239,8 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
             {/* Banda de brillo de seda: gradiente diagonal que se desliza de
                 punta a punta de la foto con el progreso de scroll. */}
             <div ref={sheenRef} className="pointer-events-none z-20" style={{
-              position: 'absolute', top: '-20%', width: 90, height: '140%',
-              background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--t-acc2) 60%, white) 50%, transparent)',
+              position: 'absolute', top: '-20%', width: 60, height: '140%',
+              background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--t-acc2) 35%, white) 50%, transparent)',
               transform: 'rotate(16deg)', opacity: 0,
             }} />
           </div>
