@@ -15,11 +15,16 @@ interface LandingNavProps {
 const WHATSAPP_CONTACT_URL =
   "https://wa.me/5493517660000?text=Hola%2C%20me%20comunico%20desde%20Alta%20Invitaci%C3%B3n";
 
+// Con "/" adelante (no solo "#ancla"): LandingNav se usa en /modelos y otras
+// páginas además de la home -- un href="#ancla" ahí solo cambia el hash de
+// la URL actual sin navegar, y como esas páginas no tienen esos ids, el
+// click no hace nada visible. Con "/#ancla" Next.js navega a home y baja al
+// ancla sin importar desde qué página se haga click.
 const BASE_LINKS = [
-  { href: "#plantillas", label: "Plantillas" },
+  { href: "/#plantillas", label: "Plantillas" },
   { href: "/modelos", label: "Ver modelos" },
-  { href: "#como-funciona", label: "Cómo funciona" },
-  { href: "#precios", label: "Precios" },
+  { href: "/#como-funciona", label: "Cómo funciona" },
+  { href: "/#precios", label: "Precios" },
   { href: WHATSAPP_CONTACT_URL, label: "Contacto", external: true },
 ];
 

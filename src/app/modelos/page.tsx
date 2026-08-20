@@ -108,7 +108,7 @@ export default async function ModelosPage() {
         <section className="text-center px-6 pt-14 pb-10 md:pt-20 md:pb-14">
           <p className="kicker font-ui mx-auto mb-4">Modelos reales</p>
           <h1 className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-white mb-4">
-            Mirá cómo quedan tus invitados
+            Mirá cómo ven la invitación <em className="italic text-[var(--accent)]">tus invitados</em>
           </h1>
           <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
             Invitaciones reales, con nombre, salón, mapa y fecha de verdad —

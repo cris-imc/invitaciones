@@ -17,7 +17,7 @@ const TAB_LABELS: Record<TabId, string> = {
   personalizado: "Personalizado",
 };
 
-const TAB_ORDER: TabId[] = ["xv", "boda", "evento", "personalizado"];
+const TAB_ORDER: TabId[] = ["boda", "xv", "evento", "personalizado"];
 
 export function ModelosTabs({ xv, boda, evento, personalizado }: { xv: Item[]; boda: Item[]; evento: Item[]; personalizado: Item[] }) {
   const byTab: Record<TabId, Item[]> = { personalizado, xv, boda, evento };
