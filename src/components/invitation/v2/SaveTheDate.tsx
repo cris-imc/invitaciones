@@ -29,23 +29,28 @@ function formatCalendarDate(d: Date) {
   return `${d.getUTCFullYear()}${pad2(d.getUTCMonth() + 1)}${pad2(d.getUTCDate())}T${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}${pad2(d.getUTCSeconds())}Z`;
 }
 
-function escapeICSText(s: string) {
-  return s.replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\n/g, "\\n");
-}
-
 // iOS Safari abre un .ics con la hoja nativa "Agregar a Calendario" SOLO
-// si la navegación llega desde un <a href="data:text/calendar;..."> real
-// (click directo del usuario sobre un link) -- si en cambio se dispara vía
-// JS con `window.location.href = dataUri` dentro de un handler, iOS no lo
-// reconoce como una navegación de link y no pasa nada (confirmado: no
-// funcionaba en un iPhone 15 real). Por eso en iOS se renderiza un <a>
-// verdadero en vez de un <button onClick>. En Android, en cambio, el link
-// de Google Calendar (calendar.google.com/calendar/render) es el que mejor
-// abre la app o la versión web sin fricción -- no hay un único link
+// si la navegación llega desde un <a href> real (click directo del
+// usuario sobre un link) -- si en cambio se dispara vía JS con
+// `window.location.href = ...` dentro de un handler, iOS no lo reconoce
+// como una navegación de link y no pasa nada. Por eso en iOS se renderiza
+// un <a> verdadero en vez de un <button onClick>. El href tampoco debe ser
+// un data: URI: en un intento anterior se probó ese enfoque y un usuario
+// reportó que en su iPhone seguía sin abrir la hoja nativa (WebKit ha
+// restringido navegaciones a data: en distintas versiones por seguridad
+// anti-phishing) -- se lo reemplaza por una URL real servida con
+// Content-Type: text/calendar (/api/calendar), que es el mecanismo mas
+// documentado y estable para esto en iOS. En Android, en cambio, el link
+// de Google Calendar (calendar.google.com/calendar/render) es el que
+// mejor abre la app o la versión web sin fricción -- no hay un único link
 // universal que ande bien en las dos a la vez.
 function isIOS() {
   if (typeof navigator === "undefined") return false;
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
+  // iPadOS 13+ manda un user agent de escritorio ("Macintosh") salvo que
+  // el usuario haya pedido explícitamente el "sitio para celular" -- se
+  // detecta por soporte de touch, que un Mac real no tiene.
+  const isIPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  return (/iPad|iPhone|iPod/.test(navigator.userAgent) || isIPadOS) && !("MSStream" in window);
 }
 
 // --- Corrección automática de contraste (WCAG) ---
@@ -164,25 +169,15 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
   // Href del .ics para el <a> real en iOS -- se calcula siempre (es barato)
   // para que el link ya tenga el href correcto apenas se decide renderizarlo
   // como <a>, sin depender de un onClick que dispare la navegación por JS.
-  const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(
-    [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Invitaciones//ES",
-      "CALSCALE:GREGORIAN",
-      "BEGIN:VEVENT",
-      `DTSTART:${formatCalendarDate(start)}`,
-      `DTEND:${formatCalendarDate(end)}`,
-      `SUMMARY:${escapeICSText(eventName)}`,
-      description ? `DESCRIPTION:${escapeICSText(description)}` : "",
-      location ? `LOCATION:${escapeICSText(location)}` : "",
-      "STATUS:CONFIRMED",
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ]
-      .filter(Boolean)
-      .join("\r\n")
-  )}`;
+  // Apunta a una URL real (no data: URI, ver comentario de isIOS más
+  // arriba) que responde con Content-Type: text/calendar.
+  const icsHref = `/api/calendar?${new URLSearchParams({
+    title: eventName,
+    start: start.toISOString(),
+    end: end.toISOString(),
+    location,
+    description,
+  }).toString()}`;
 
   const handleAddToCalendarAndroid = () => {
     const params = new URLSearchParams({
