@@ -12,8 +12,9 @@ interface LandingNavProps {
   isLoggedIn: boolean;
 }
 
-const WHATSAPP_CONTACT_URL =
-  "https://wa.me/5493517660000?text=Hola%2C%20me%20comunico%20desde%20Alta%20Invitaci%C3%B3n";
+const WHATSAPP_CONTACT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent(
+  "Hola, quiero conocer más sobre las invitaciones de altainvitacion.com"
+)}`;
 
 // Con "/" adelante (no solo "#ancla"): LandingNav se usa en /modelos y otras
 // páginas además de la home -- un href="#ancla" ahí solo cambia el hash de

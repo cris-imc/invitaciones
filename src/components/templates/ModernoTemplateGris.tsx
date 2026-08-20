@@ -427,6 +427,11 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
   const direccion   = String(invitation.direccion ?? "");
   const hora        = String(invitation.hora ?? "");
   const mapUrl      = String(invitation.mapUrl ?? "");
+  // toEmbedMapUrl devuelve null si no pudo convertir el link a un formato
+  // embebible (ej. un link corto de Maps que nunca se resolvio, o esta roto)
+  // -- antes en ese caso se usaba mapUrl crudo como src del iframe, que
+  // Google bloquea (X-Frame-Options) y quedaba como un recuadro blanco.
+  const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
 
   const quoteKicker = "Unas palabras";
 
@@ -1231,15 +1236,26 @@ export function ModernoTemplateGris({ invitation, guest, isPersonalized = false 
             <div className="flex justify-center py-6">
               <DrawLucideIcon icon={MapPin} size={46} color="#C9A876" strokeWidth={1.5} />
             </div>
-            <iframe
-              src={toEmbedMapUrl(mapUrl) ?? mapUrl}
-              width="100%"
-              height="220"
-              style={{ border: 0, display: "block" }}
-              loading="lazy"
-              title={`Mapa: ${lugarNombre}`}
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+            {embedMapUrl ? (
+              <iframe
+                src={embedMapUrl}
+                width="100%"
+                height="220"
+                style={{ border: 0, display: "block" }}
+                loading="lazy"
+                title={`Mapa: ${lugarNombre}`}
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            ) : (
+              <a
+                href={mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "220px", width: "100%", padding: "0 24px", textAlign: "center", color: "var(--t-acc)", fontSize: 13, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                No pudimos mostrar el mapa acá — tocá para verlo en Google Maps
+              </a>
+            )}
           </section>
         )}
 

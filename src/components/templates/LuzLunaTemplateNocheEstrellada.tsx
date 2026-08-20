@@ -579,6 +579,11 @@ export function LuzLunaTemplateNocheEstrellada({ invitation, guest, isPersonaliz
   const direccion   = String(invitation.direccion ?? "");
   const hora        = String(invitation.hora ?? "");
   const mapUrl      = String(invitation.mapUrl ?? "");
+  // toEmbedMapUrl devuelve null si no pudo convertir el link a un formato
+  // embebible (ej. un link corto de Maps que nunca se resolvio, o esta roto)
+  // -- antes en ese caso se usaba mapUrl crudo como src del iframe, que
+  // Google bloquea (X-Frame-Options) y quedaba como un recuadro blanco.
+  const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
 
   const quoteKicker = "Unas palabras";
 
@@ -1274,6 +1279,9 @@ export function LuzLunaTemplateNocheEstrellada({ invitation, guest, isPersonaliz
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--t-acc2) 12%, transparent), transparent 70%), var(--t-surface)" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <IconCloudWisp className="luzluna-scroll-doodle opacity-0 mx-auto mb-6" style={{ width: 28, height: 14, color: 'var(--t-acc)' }} />
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
@@ -1400,15 +1408,26 @@ export function LuzLunaTemplateNocheEstrellada({ invitation, guest, isPersonaliz
               <DrawLucideIcon icon={MapPin} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
             <div style={{ height: "220px", overflow: "hidden" }}>
-            <iframe
-              src={toEmbedMapUrl(mapUrl) ?? mapUrl}
-              width="100%"
-              height="220"
-              style={{ border: 0, display: "block" }}
-              loading="lazy"
-              title={`Mapa: ${lugarNombre}`}
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+            {embedMapUrl ? (
+              <iframe
+                src={embedMapUrl}
+                width="100%"
+                height="220"
+                style={{ border: 0, display: "block" }}
+                loading="lazy"
+                title={`Mapa: ${lugarNombre}`}
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            ) : (
+              <a
+                href={mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "220px", width: "100%", padding: "0 24px", textAlign: "center", color: "var(--t-acc)", fontSize: 13, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                No pudimos mostrar el mapa acá — tocá para verlo en Google Maps
+              </a>
+            )}
             </div>
           </section>
         )}
