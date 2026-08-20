@@ -105,7 +105,12 @@ export default async function ModelosPage() {
         <LandingNav registerUrl={registerUrl} isLoggedIn={Boolean(session)} />
         <ModelosLazyLoader />
 
-        <section className="text-center px-6 pt-14 pb-10 md:pt-20 md:pb-14">
+        {/* pt-24 en mobile (no solo pt-14): el nav pasa a position:fixed
+            debajo de 767px (ver .l-nav en globals.css) y esta pagina, a
+            diferencia de la home (.l-hero ya compensa con 96px), no tenia
+            padding-top suficiente -- el kicker "Modelos reales" quedaba
+            tapado atras del nav fijo. */}
+        <section className="text-center px-6 pt-24 pb-10 md:pt-20 md:pb-14">
           <p className="kicker font-ui mx-auto mb-4">Modelos reales</p>
           <h1 className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-white mb-4">
             Mirá cómo ven la invitación <em className="italic text-[var(--accent)]">tus invitados</em>
