@@ -1,6 +1,11 @@
-﻿import * as React from "react"
+import * as React from "react"
 import { cn } from "@/lib/utils"
 
+// Fuerza "sentence/title case" en campos cortos tipo nombre: mayúscula la
+// primera letra de cada palabra, minúscula el resto -- correcto para
+// "Nombre completo", "Nombre de la novia", etc. NO usar esto para texto
+// libre/frases largas (ver formatFreeTextOnBlur en su lugar), porque ahí
+// termina imponiendo Title Case no deseado en cada palabra.
 export function formatInputText(val: string): string {
   if (!val || typeof val !== 'string') return val;
 
@@ -26,11 +31,34 @@ export function formatInputText(val: string): string {
   }).join('');
 }
 
+// Para texto libre (frases, mensajes largos): a diferencia de un nombre, acá
+// NO queremos Title Case por palabra -- el usuario puede querer "Aqui
+// comienza la historia de mis Quince" tal cual, con mayúsculas solo donde
+// él las puso (incluidas siglas intencionales como "XV"). Lo único que se
+// corrige es el caso patológico de TODO el texto en mayúsculas (ej. Bloq
+// Mayús prendido sin querer). Se aplica en onBlur, no en cada tecla: si
+// corrigiera por keystroke, la primera palabra ya en mayúsculas se
+// arreglaría apenas se termina de tipear, y a partir de ahí el string ya no
+// estaría 100% en mayúsculas -- un usuario que sigue escribiendo con Bloq
+// Mayús prendido nunca más dispararía la corrección para el resto.
+export function formatFreeText(val: string): string {
+  if (!val || typeof val !== 'string') return val;
+
+  const letters = val.replace(/[^a-zA-ZÀ-ÿ]/g, '');
+  const isAllCaps = letters.length >= 4 && letters === letters.toUpperCase() && letters !== letters.toLowerCase();
+  if (!isAllCaps) return val;
+
+  const lower = val.toLowerCase();
+  const letterIdx = lower.search(/[a-zA-ZÀ-ÿ]/);
+  if (letterIdx === -1) return lower;
+  return lower.slice(0, letterIdx) + lower.charAt(letterIdx).toUpperCase() + lower.slice(letterIdx + 1);
+}
+
 export function handleAutoFormatChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, type?: string) {
   if (type !== "email" && type !== "password" && type !== "url" && type !== "number" && type !== "tel") {
     const originalStart = e.target.selectionStart;
     const originalEnd = e.target.selectionEnd;
-    
+
     const formatted = formatInputText(e.target.value);
     if (formatted !== e.target.value) {
       e.target.value = formatted;
@@ -38,6 +66,14 @@ export function handleAutoFormatChange(e: React.ChangeEvent<HTMLInputElement | H
         e.target.setSelectionRange(originalStart, originalEnd);
       }
     }
+  }
+}
+
+export function handleFreeTextBlur(e: React.FocusEvent<HTMLTextAreaElement>) {
+  const formatted = formatFreeText(e.target.value);
+  if (formatted !== e.target.value) {
+    e.target.value = formatted;
+    e.target.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }
 
