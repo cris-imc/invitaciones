@@ -1287,7 +1287,6 @@ export function LuzLunaTemplatePerlada({ invitation, guest, isPersonalized = fal
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
-              <IconCloudWisp className="luzluna-scroll-doodle opacity-0 mx-auto mb-6" style={{ width: 28, height: 14, color: 'var(--t-acc)' }} />
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-2xl md:text-3xl leading-relaxed tracking-wide"
@@ -1467,7 +1466,7 @@ export function LuzLunaTemplatePerlada({ invitation, guest, isPersonalized = fal
         )}
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
-          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden">
+          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden" style={{ background: 'var(--t-surface)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto">
               <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
             </div>

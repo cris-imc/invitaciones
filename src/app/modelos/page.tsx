@@ -136,6 +136,9 @@ export default async function ModelosPage() {
         )}
 
         <section className="text-center px-6 pb-20">
+          <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-6">
+            Un montón de tipografías, colores y efectos: combinalos como quieras.
+          </p>
           <Link href={registerUrl}>
             <Button className="rounded-full bg-[var(--accent)] text-[var(--ink)] transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--accent)]/20 px-8 py-6 text-base font-ui">
               Crear mi invitación

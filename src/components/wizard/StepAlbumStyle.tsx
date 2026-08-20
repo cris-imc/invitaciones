@@ -165,7 +165,7 @@ export function StepAlbumStyle() {
                         padding: "10px 12px",
                     }}
                 >
-                    Este estilo muestra solo las primeras 4 fotos de tu Galería (pensado para una selección destacada, no para el álbum completo).
+                    Este estilo muestra hasta 8 fotos de tu Galería, repartidas en dos bloques a lo largo de la invitación (pensado para una selección destacada, no para el álbum completo).
                 </p>
             )}
 

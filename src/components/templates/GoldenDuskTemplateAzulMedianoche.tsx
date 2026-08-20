@@ -1075,10 +1075,6 @@ export function GoldenDuskTemplateAzulMedianoche({ invitation, guest, isPersonal
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
 
-            <p className="golden-doodle opacity-0 text-[11px] font-medium tracking-[0.18em] uppercase text-[#9C7C6E] max-w-[260px]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
-              {portadaKicker}
-            </p>
-
             {/* Guest Name */}
             <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " golden-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic', color: portadaFondoAnimado ? undefined : '#3B2A2A' }}>
               {guestNameDisplay}</h2>
@@ -1473,7 +1469,7 @@ export function GoldenDuskTemplateAzulMedianoche({ invitation, guest, isPersonal
         )}
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
-          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden">
+          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden" style={{ background: 'var(--t-surface)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto">
               <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
             </div>

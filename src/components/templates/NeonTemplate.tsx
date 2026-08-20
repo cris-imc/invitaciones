@@ -1440,7 +1440,7 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
         )}
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
-          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden">
+          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden" style={{ background: 'var(--t-surface)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto">
               <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
             </div>

@@ -444,11 +444,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           }}
         >
           <div className="relative w-full max-w-lg p-8 sm:p-12 border border-white/20 rounded-3xl bg-[#0F1613]/90 backdrop-blur-xl text-center shadow-2xl flex flex-col items-center justify-center">
-            {/* Kicker */}
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--t-acc,#C79A4B)] mb-3 opacity-90">
-              {portadaKicker}
-            </p>
-
             {/* Guest Name or Event Title */}
             <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-12 text-[#F7F1E4] leading-tight" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {guestNameDisplay}
@@ -555,6 +550,9 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper dark id="quote" delay={100}>
             <div className="d-quote-wrap">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <h2 style={{ margin: 0, fontStyle: "italic", fontWeight: 500, textAlign: "center", position: "relative", padding: "0 10px" }}>
                 <span style={{ color: "var(--t-acc)", fontSize: "1.6em", lineHeight: 0, verticalAlign: "-0.2em", marginRight: "4px" }}>&ldquo;</span>
                 {String(invitation.frasePersonalizadaTexto)}

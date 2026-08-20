@@ -199,7 +199,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3 py-3 border-b" style={{ borderColor: "color-mix(in srgb, var(--t-acc) 20%, transparent)" }}>
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "var(--t-acc)" }}>{label}</span>
+        <span className="block text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "color-mix(in srgb, var(--t-acc) 40%, var(--seda-ink) 60%)" }}>{label}</span>
         <span className="text-xs sm:text-sm font-mono break-all" style={{ color: "var(--seda-ink)" }}>{value}</span>
       </div>
       <button
@@ -217,7 +217,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3 py-3 border-b" style={{ borderColor: "color-mix(in srgb, var(--t-acc) 20%, transparent)" }}>
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "var(--t-acc)" }}>{label}</span>
+        <span className="block text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "color-mix(in srgb, var(--t-acc) 40%, var(--seda-ink) 60%)" }}>{label}</span>
         <span className="text-sm font-medium break-words" style={{ color: "var(--seda-ink)" }}>{value}</span>
       </div>
     </div>
@@ -1276,7 +1276,6 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
-              <IconQuillFlourish className="seda-scroll-doodle opacity-0 mx-auto mb-6" style={{ width: 20, height: 22, color: 'var(--t-acc)' }} />
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
                 className="text-2xl md:text-3xl leading-relaxed tracking-wide"
@@ -1456,7 +1455,7 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
         )}
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
-          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden">
+          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden" style={{ background: 'var(--t-surface)' }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto">
               <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
             </div>
