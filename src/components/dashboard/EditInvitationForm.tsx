@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { TemplateSelector } from "@/components/dashboard/TemplateSelector";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 interface Invitation {
     id: string;
@@ -84,7 +85,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
     const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
     const { data: session } = useSession();
-    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+    const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
     // Parse temaColores
     const temaColores = typeof invitation.temaColores === 'string'

@@ -17,13 +17,14 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useSession } from "next-auth/react";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 import { SaveStepButtons } from "./SaveStepButtons";
 
 export function StepBasicInfo() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
     const [showInfo, setShowInfo] = useState(false);
     const { data: session } = useSession();
-    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+    const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
     const [isCustomTitle, setIsCustomTitle] = useState(false); // No longer needed but kept for TS if used
     const tipo = data.type;

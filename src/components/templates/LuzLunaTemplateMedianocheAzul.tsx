@@ -1055,12 +1055,12 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
 
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: 'var(--luzluna-ink)' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " luzluna-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : 'var(--luzluna-ink)' }}>
               {guestNameDisplay}
             </h2>
 
             {Boolean(activeDressCode) && (
-              <p className="text-sm font-medium tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: 'var(--t-muted)' }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " luzluna-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : 'var(--t-muted)' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
@@ -1086,6 +1086,12 @@ export function LuzLunaTemplateMedianocheAzul({ invitation, guest, isPersonalize
             @keyframes luzluna-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes luzluna-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes luzluna-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .luzluna-cover-text { color: #F4F1F9; }
+            .luzluna-cover-text-muted { color: rgba(244,241,249,0.75); }
+            @media (min-width: 768px) {
+              .luzluna-cover-text { color: var(--luzluna-ink); }
+              .luzluna-cover-text-muted { color: var(--t-muted); }
+            }
           `}</style>
           <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
         </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { checkAndCleanupIfExpired, isEventDateLocked } from '@/lib/expiration-server';
+import { isAdmin as isAdminRole } from '@/lib/roles';
 
 // GET - Obtener invitación por slug (pública)
 export async function GET(
@@ -66,7 +67,7 @@ export async function PATCH(
         const { slug } = await params;
         const body = await request.json();
         const session = await auth().catch(() => null);
-        const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+        const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
         const existing = await prisma.invitation.findUnique({
             where: { slug },

@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { isAdmin } from "@/lib/roles";
 
 export async function deleteInvitation(invitationId: string) {
     try {
@@ -21,7 +22,7 @@ export async function deleteInvitation(invitationId: string) {
             return { success: false, error: "Invitación no encontrada" };
         }
 
-        if (session.user.role !== "ADMIN" && invitation.userId !== session.user.id) {
+        if (!isAdmin(session.user.role) && invitation.userId !== session.user.id) {
             return { success: false, error: "No tienes permisos para eliminar esta invitación" };
         }
 

@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AdminInvitationRow } from "@/components/dashboard/AdminInvitationRow";
 import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
 import { DeleteUserButton } from "@/components/dashboard/DeleteUserButton";
 import { EditCreditsButton } from "@/components/dashboard/EditCreditsButton";
 import { EditUserButton } from "@/components/dashboard/EditUserButton";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, BarChart2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function AdminDashboardClient({ clients }: { clients: any[] }) {
+export function AdminDashboardClient({ clients, admins = [], isSuperUser = false }: { clients: any[]; admins?: any[]; isSuperUser?: boolean }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [expandedClients, setExpandedClients] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -107,6 +108,16 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                                 </div>
                                 
                                 <div className="flex gap-2 items-center flex-wrap">
+                                    <Link href={`/dashboard/clientes/${client.id}`}>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="bg-white/5 hover:bg-white/10 text-white/80 border-white/10"
+                                        >
+                                            <BarChart2 className="w-4 h-4 mr-2" />
+                                            Ver detalle
+                                        </Button>
+                                    </Link>
                                     <EditUserButton userId={client.id} initialName={client.name || ""} initialEmail={client.email || ""} initialPhoneAreaCode={client.phoneAreaCode || ""} initialPhoneNumber={client.phoneNumber || ""} />
                                     <EditCreditsButton
                                         userId={client.id}
@@ -166,6 +177,33 @@ export function AdminDashboardClient({ clients }: { clients: any[] }) {
                     </div>
                 )}
             </div>
+
+            {isSuperUser && (
+                <div className="mt-10 pt-8 border-t border-white/10">
+                    <div className="flex items-center gap-2 mb-4">
+                        <ShieldCheck className="w-4 h-4 text-purple-400" />
+                        <h3 className="font-bold text-lg">Administradores</h3>
+                    </div>
+                    {admins.length === 0 ? (
+                        <p className="text-sm opacity-40">Todavía no diste de alta ninguna cuenta Admin.</p>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {admins.map((admin) => (
+                                <div key={admin.id} className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-[var(--ink-2)] text-[var(--on-ink)] flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                                    <div className="min-w-0">
+                                        <h4 className="font-bold leading-none truncate">{admin.name}</h4>
+                                        <span className="text-sm opacity-50 font-normal truncate block">{admin.email}</span>
+                                    </div>
+                                    <div className="flex gap-2 items-center flex-wrap">
+                                        <EditUserButton userId={admin.id} initialName={admin.name || ""} initialEmail={admin.email || ""} initialPhoneAreaCode={admin.phoneAreaCode || ""} initialPhoneNumber={admin.phoneNumber || ""} />
+                                        <DeleteUserButton userId={admin.id} userName={admin.name} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

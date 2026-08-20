@@ -6,6 +6,7 @@ import type { PlanTier } from '@/lib/plan-limits';
 import { checkAndCleanupIfExpired, isEventDateLocked } from '@/lib/expiration-server';
 import { slugify } from '@/lib/slugify';
 import { resolveGoogleMapsShortLink } from '@/lib/google-maps';
+import { isAdmin as isAdminRole } from '@/lib/roles';
 
 // GET - Obtener invitaciones del usuario o invitación pública por slug
 export async function GET(request: NextRequest) {
@@ -454,7 +455,7 @@ export async function PUT(request: NextRequest) {
         }
 
         const session = await auth().catch(() => null);
-        const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+        const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
         const existingInvitation = await prisma.invitation.findUnique({
             where: { id },

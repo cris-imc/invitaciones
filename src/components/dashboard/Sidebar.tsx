@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
 import { LandingLogo } from "@/components/ui/Logo";
+import { isAdmin } from "@/lib/roles";
 
 const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
@@ -65,7 +66,7 @@ export function Sidebar() {
     }, [role]);
 
     const sidebarItems = allSidebarItems.filter(item => {
-        if (role === "ADMIN") return item.title === "Inicio" || item.title === "Mis Datos" || item.title === "Descuentos" || item.title === "Registros";
+        if (isAdmin(role)) return item.title === "Inicio" || item.title === "Mis Datos" || item.title === "Descuentos" || item.title === "Registros";
         return item.title !== "Descuentos" && item.title !== "Registros";
     });
 
@@ -201,7 +202,7 @@ export function Sidebar() {
                             <span>Salir</span>
                         </button>
 
-                        {role === "ADMIN" ? (
+                        {isAdmin(role) ? (
                             <CreateUserButton
                                 renderTrigger={(onClick) => (
                                     <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nuevo Usuario">
@@ -244,7 +245,7 @@ export function Sidebar() {
                             <span>Datos</span>
                         </Link>
 
-                        {role === "ADMIN" ? (
+                        {isAdmin(role) ? (
                             <Link
                                 href="/dashboard/descuentos"
                                 className={`p-bottom-nav-item ${pathname === "/dashboard/descuentos" ? "active" : ""}`}

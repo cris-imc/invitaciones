@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import { getEventStatus } from "@/lib/expiration";
 import { cleanupExpiredRejectedItems } from "@/lib/live-cleanup";
 import { canUseFeature, PlanTier } from "@/lib/plan-limits";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 const PAGE_SIZE = 4;
 const VALID_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
@@ -35,7 +36,7 @@ export async function GET(req: Request) {
         });
 
         if (!invitation) return new NextResponse("Not Found", { status: 404 });
-        if (invitation.userId !== session.user.id && session.user.role !== "ADMIN") {
+        if (invitation.userId !== session.user.id && !isAdminRole(session.user.role)) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
@@ -110,7 +111,7 @@ export async function POST(req: Request) {
         });
 
         if (!invitation) return new NextResponse("Not Found", { status: 404 });
-        if (invitation.userId !== session.user.id && session.user.role !== "ADMIN") {
+        if (invitation.userId !== session.user.id && !isAdminRole(session.user.role)) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
@@ -120,7 +121,7 @@ export async function POST(req: Request) {
 
         // El LIVE solo se puede ACTIVAR el día del evento, salvo para admins.
         // Apagarlo nunca está restringido.
-        const isAdmin = session.user.role === "ADMIN";
+        const isAdmin = isAdminRole(session.user.role);
         const status = getEventStatus(invitation.fechaEvento);
         const canActivate = isAdmin || status === "EVENT_DAY" || status === "POST_EVENT";
         const hasLiveFeature = isAdmin || canUseFeature(invitation.planTier as PlanTier, "live");

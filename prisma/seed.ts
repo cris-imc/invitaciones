@@ -4,23 +4,40 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Crear usuario ADMIN
-  const adminPassword = await bcrypt.hash('97Chucky-', 10)
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@invitaciones.com' },
-    update: {},
-    create: {
-      id: 'admin-user-id',
-      email: 'admin@invitaciones.com',
-      name: 'User Admin',
-      password: adminPassword,
-      role: 'ADMIN',
-      planTier: 'ADMIN',
-      subscriptionStatus: 'ACTIVE',
-    },
-  })
+  // Super Usuario: reemplaza al admin@invitaciones.com original. Busca por
+  // el email VIEJO primero para renombrar esa fila en su lugar (preserva su
+  // id y todo lo que le pertenece -- invitaciones, sesiones, etc.) en vez de
+  // crear una fila nueva y dejar la vieja huerfana en bases ya existentes
+  // (producción). Si no existe (base nueva), la crea directo con el email
+  // nuevo.
+  const suPassword = await bcrypt.hash('97Chucky-', 10)
+  const legacyAdmin = await prisma.user.findUnique({ where: { email: 'admin@invitaciones.com' } })
+  const adminUser = legacyAdmin
+    ? await prisma.user.update({
+        where: { id: legacyAdmin.id },
+        data: {
+          email: 'admin@altainvitacion.com',
+          name: 'Super Admin',
+          password: suPassword,
+          role: 'SUPERUSER',
+          planTier: 'ADMIN',
+          subscriptionStatus: 'ACTIVE',
+        },
+      })
+    : await prisma.user.upsert({
+        where: { email: 'admin@altainvitacion.com' },
+        update: { password: suPassword, role: 'SUPERUSER' },
+        create: {
+          email: 'admin@altainvitacion.com',
+          name: 'Super Admin',
+          password: suPassword,
+          role: 'SUPERUSER',
+          planTier: 'ADMIN',
+          subscriptionStatus: 'ACTIVE',
+        },
+      })
 
-  console.log('✅ Usuario Admin creado:', adminUser.email)
+  console.log('✅ Super Usuario creado:', adminUser.email)
 
   // Crear usuario de prueba FREE
   const testPassword = await bcrypt.hash('test123', 10)

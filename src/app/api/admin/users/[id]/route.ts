@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/auth';
+import { isAdmin, isSuperUser } from '@/lib/roles';
 
 export async function DELETE(
     request: NextRequest,
@@ -8,8 +9,8 @@ export async function DELETE(
 ) {
     try {
         const session = await auth();
-        
-        if (!session?.user || session.user.role !== 'ADMIN') {
+
+        if (!session?.user || !isAdmin(session.user.role)) {
             return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
         }
 
@@ -18,9 +19,24 @@ export async function DELETE(
         if (!userId) {
             return NextResponse.json({ error: 'ID de usuario requerido' }, { status: 400 });
         }
-        
+
         if (userId === session.user.id) {
             return NextResponse.json({ error: 'No puedes eliminar tu propia cuenta de administrador' }, { status: 400 });
+        }
+
+        const target = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+        if (!target) {
+            return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+        }
+        // Un Super Usuario nunca se elimina desde acá -- ni siquiera otro SU
+        // puede hacerlo (hay un solo SU por el momento).
+        if (target.role === 'SUPERUSER') {
+            return NextResponse.json({ error: 'No se puede eliminar una cuenta de Super Usuario' }, { status: 400 });
+        }
+        // Solo el Super Usuario puede eliminar cuentas Admin -- un Admin
+        // comun no puede borrar a otro Admin.
+        if (target.role === 'ADMIN' && !isSuperUser(session.user.role)) {
+            return NextResponse.json({ error: 'Solo el Super Usuario puede eliminar una cuenta de Admin' }, { status: 403 });
         }
 
         // Primero borramos todas las invitaciones del usuario (esto disparará las eliminaciones en cascada hacia invitados, álbumes, etc)
@@ -49,8 +65,8 @@ export async function PATCH(
 ) {
     try {
         const session = await auth();
-        
-        if (!session?.user || session.user.role !== 'ADMIN') {
+
+        if (!session?.user || !isAdmin(session.user.role)) {
             return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
         }
 

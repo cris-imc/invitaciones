@@ -1,15 +1,13 @@
 import Link from "next/link";
-import { CalendarCheck, Eye, Users, Music, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AdminDashboardClient } from "@/components/dashboard/AdminDashboardClient";
-import { DeleteInvitationButton } from "@/components/dashboard/DeleteInvitationButton";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { GreetingText } from "@/components/dashboard/GreetingText";
-import { PLAN_LIMITS } from "@/lib/plan-limits";
 import { getEventStatus } from "@/lib/expiration";
-import { getStripClass, getEventEmoji, getEventLabel, getDaysUntil } from "@/lib/invitation-card-helpers";
+import { isAdmin, isSuperUser } from "@/lib/roles";
+import { ClientInvitationsGrid } from "@/components/dashboard/ClientInvitationsGrid";
 
 // ── Data fetching ────────────────────────────────────────────────
 async function getDashboardStats(userId: string) {
@@ -83,12 +81,20 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
   });
 
   // ── ADMIN view ───────────────────────────────────────────────
-  if (role === "ADMIN") {
-    const clients = await prisma.user.findMany({
-      where: { role: "CLIENT" },
-      include: { invitations: { orderBy: { createdAt: "desc" } } },
-      orderBy: { createdAt: "desc" },
-    });
+  if (isAdmin(role)) {
+    const [clients, admins] = await Promise.all([
+      prisma.user.findMany({
+        where: { role: "CLIENT" },
+        include: { invitations: { orderBy: { createdAt: "desc" } } },
+        orderBy: { createdAt: "desc" },
+      }),
+      isSuperUser(role)
+        ? prisma.user.findMany({
+            where: { role: "ADMIN" },
+            orderBy: { createdAt: "desc" },
+          })
+        : Promise.resolve([]),
+    ]);
 
     return (
       <>
@@ -99,7 +105,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
           </div>
         </div>
         <div className="mt-6">
-          <AdminDashboardClient clients={clients} />
+          <AdminDashboardClient clients={clients} admins={admins} isSuperUser={isSuperUser(role)} />
         </div>
       </>
     );
@@ -194,119 +200,10 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {stats.activeInvitationsList.length > 0 ? (
-          stats.activeInvitationsList.map((inv) => {
-            const confirmed   = inv.guests.filter((g) => g.status === "CONFIRMED");
-            const people      = confirmed.reduce((s, g) => s + g.attendingCount, 0);
-            const planLimit   = PLAN_LIMITS[inv.planTier as keyof typeof PLAN_LIMITS]?.maxGuests;
-            const maxGuests   = inv.maxGuestsOverride !== null ? inv.maxGuestsOverride : planLimit;
-            const maxGuestsStr = maxGuests === null ? "∞" : maxGuests.toString();
-
-            const daysUntil = getDaysUntil(inv.fechaEvento);
-            const daysLabel =
-              daysUntil > 0
-                ? `Faltan ${daysUntil} días`
-                : daysUntil === 0
-                ? "¡Hoy!"
-                : "Finalizado";
-
-            return (
-              <div className="m-inv-card" key={inv.id}>
-                {/* ── Colored strip ── */}
-                <div className={`m-card-strip ${getStripClass(inv.tipo)}`}>
-                  <div className="m-card-strip-overlay" />
-                  <span className="m-card-type">{getEventLabel(inv.tipo)}</span>
-                  <span className="m-card-emoji">{getEventEmoji(inv.tipo)}</span>
-                </div>
-
-                {/* ── Card body ── */}
-                <div className="m-card-body">
-                  {/* Event name */}
-                  <p className="m-card-title">{inv.nombreEvento}</p>
-
-                  {/* Meta: date + place */}
-                  <div className="m-card-meta">
-                    <span className="m-meta-row">
-                      📅{" "}
-                      {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
-                    {inv.lugarNombre && (
-                      <span className="m-meta-row">🏰 {inv.lugarNombre}</span>
-                    )}
-                    {inv.direccion && (
-                      <span className="m-meta-row">📍 {inv.direccion}</span>
-                    )}
-                  </div>
-
-                  {/* Confirmed count */}
-                  <div className="m-card-confirmed">
-                    <div className="m-card-confirmed-dot" />
-                    <span>
-                      {people} / {maxGuestsStr} confirmadas
-                    </span>
-                  </div>
-
-                  {/* Status tags */}
-                  <div className="m-tags">
-                    <span className={`m-tag ${inv.estado === "ACTIVA" ? "active" : "draft"}`}>
-                      {inv.estado === "ACTIVA"
-                        ? "Activa"
-                        : inv.estado === "BORRADOR"
-                        ? "Borrador"
-                        : "Finalizada"}
-                    </span>
-                    <span
-                      className={`m-tag ${
-                        inv.planTier === "FREE"
-                          ? "free"
-                          : inv.planTier === "DIAMOND" || inv.planTier === "ENTERPRISE"
-                          ? "diamond"
-                          : "premium"
-                      }`}
-                    >
-                      {inv.planTier === "FREE"
-                        ? "Gratis"
-                        : inv.planTier === "DIAMOND"
-                        ? "◆ Diamond"
-                        : inv.planTier === "ENTERPRISE"
-                        ? "◆ Enterprise"
-                        : "✦ Premium"}
-                    </span>
-                    <span className="m-tag days">{daysLabel}</span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="m-card-actions flex-col">
-                    <div className="flex items-center gap-2 w-full">
-                      <Link
-                        href={`/i/${inv.slug}`}
-                        target="_blank"
-                        className="m-btn-ghost flex-1 h-9"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        Ver ejemplo
-                      </Link>
-                      <Link
-                        href={`/dashboard/invitaciones/${inv.slug}/guests`}
-                        className="bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_15px_rgba(245,158,11,0.3)] inline-flex items-center justify-center h-[40px] px-4 text-xs font-semibold rounded-lg transition-colors flex-1"
-                      >
-                        Administrar →
-                      </Link>
-                    </div>
-                    <div className="flex items-center justify-center w-full mt-2">
-                      <DeleteInvitationButton invitationId={inv.id} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        ) : (
+      {stats.activeInvitationsList.length > 0 ? (
+        <ClientInvitationsGrid invitations={stats.activeInvitationsList} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed">
             <p className="text-muted-foreground mb-4 font-ui">
               Todavía no tenés invitaciones activas.
@@ -319,8 +216,8 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
               autoOpen={isAutoOpen}
             />
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Link to inactive */}
       {stats.inactiveCount > 0 && (

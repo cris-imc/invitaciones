@@ -3,12 +3,13 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { isAdmin, isSuperUser } from "@/lib/roles";
 
 export async function toggleInvitationStatus(invitationId: string, currentStatus: string) {
     try {
         const session = await auth();
-        
-        if (session?.user?.role !== "ADMIN") {
+
+        if (!isAdmin(session?.user?.role)) {
             throw new Error("Unauthorized");
         }
 
@@ -30,7 +31,7 @@ export async function toggleInvitationStatus(invitationId: string, currentStatus
 export async function updateInvitationPlan(invitationId: string, planTier: string) {
     try {
         const session = await auth();
-        if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized");
+        if (!isAdmin(session?.user?.role)) throw new Error("Unauthorized");
 
         await prisma.invitation.update({
             where: { id: invitationId },
@@ -48,7 +49,7 @@ export async function updateInvitationPlan(invitationId: string, planTier: strin
 export async function updateInvitationMaxLivePhotos(invitationId: string, maxLivePhotosOverride: number | null) {
     try {
         const session = await auth();
-        if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized");
+        if (!isAdmin(session?.user?.role)) throw new Error("Unauthorized");
 
         await prisma.invitation.update({
             where: { id: invitationId },
@@ -71,7 +72,7 @@ export async function adminUpdateUser(userId: string, data: { name?: string; ema
     try {
         const session = await auth();
 
-        if (session?.user?.role !== "ADMIN") {
+        if (!isAdmin(session?.user?.role)) {
             throw new Error("Unauthorized");
         }
 
@@ -118,12 +119,20 @@ export async function adminUpdateUser(userId: string, data: { name?: string; ema
     }
 }
 
-export async function adminCreateUser(data: { name: string; email: string; password: string; planTier?: "FREE" | "PREMIUM" | "DIAMOND" }) {
+export async function adminCreateUser(data: { name: string; email: string; password: string; planTier?: "FREE" | "PREMIUM" | "DIAMOND"; role?: "CLIENT" | "ADMIN" }) {
     try {
         const session = await auth();
 
-        if (session?.user?.role !== "ADMIN") {
+        if (!isAdmin(session?.user?.role)) {
             throw new Error("Unauthorized");
+        }
+
+        // Solo el Super Usuario puede dar de alta otras cuentas Admin -- un
+        // Admin comun solo puede crear Clientes (rol forzado a CLIENT si no
+        // es SU, sin importar lo que haya llegado en data.role).
+        const requestedRole = data.role === "ADMIN" ? "ADMIN" : "CLIENT";
+        if (requestedRole === "ADMIN" && !isSuperUser(session?.user?.role)) {
+            return { success: false, error: "Solo el Super Usuario puede crear cuentas de Admin" };
         }
 
         const name = data.name?.trim();
@@ -146,9 +155,10 @@ export async function adminCreateUser(data: { name: string; email: string; passw
         const hashedPassword = await bcrypt.hash(password, 10);
         // Igual que en el registro público: "Premium"/"Diamond" acá es un
         // credito para UNA invitacion de ese tipo, nunca un plan ilimitado
-        // (eso se asigna a mano despues, si corresponde).
-        const wantsPremium = data.planTier === "PREMIUM";
-        const wantsDiamond = data.planTier === "DIAMOND";
+        // (eso se asigna a mano despues, si corresponde). No aplica a cuentas
+        // Admin, que no cargan invitaciones propias.
+        const wantsPremium = requestedRole === "CLIENT" && data.planTier === "PREMIUM";
+        const wantsDiamond = requestedRole === "CLIENT" && data.planTier === "DIAMOND";
 
         await prisma.user.create({
             data: {
@@ -156,11 +166,11 @@ export async function adminCreateUser(data: { name: string; email: string; passw
                 email,
                 password: hashedPassword,
                 mustChangePassword: true,
-                planTier: "FREE",
+                planTier: requestedRole === "ADMIN" ? "ADMIN" : "FREE",
                 premiumCredits: wantsPremium ? 1 : 0,
                 diamondCredits: wantsDiamond ? 1 : 0,
-                subscriptionStatus: wantsPremium || wantsDiamond ? "ACTIVE" : "TRIAL",
-                role: "CLIENT",
+                subscriptionStatus: requestedRole === "ADMIN" || wantsPremium || wantsDiamond ? "ACTIVE" : "TRIAL",
+                role: requestedRole,
             },
         });
 
@@ -177,7 +187,7 @@ import { normalizeDiscountCode, isValidPercentage } from "@/lib/discount-codes";
 export async function adminCreateDiscountCode(data: { code: string; percentage: number }) {
     try {
         const session = await auth();
-        if (session?.user?.role !== "ADMIN") {
+        if (!isAdmin(session?.user?.role)) {
             throw new Error("Unauthorized");
         }
 
@@ -209,7 +219,7 @@ export async function adminCreateDiscountCode(data: { code: string; percentage: 
 export async function toggleDiscountCode(id: string, currentEnabled: boolean) {
     try {
         const session = await auth();
-        if (session?.user?.role !== "ADMIN") {
+        if (!isAdmin(session?.user?.role)) {
             throw new Error("Unauthorized");
         }
 

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db';
+import { isAdmin } from '@/lib/roles';
 
 // Diagnostico temporal: inspecciona las QuizResponse guardadas para
 // entender por que el promedio de aciertos no coincide con lo esperado.
 export async function GET() {
     const session = await auth();
-    if (!session?.user || session.user.role !== 'ADMIN') {
+    if (!session?.user || !isAdmin(session.user.role)) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 

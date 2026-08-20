@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
 
 import { useSession } from "next-auth/react";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 export function StepMusic() {
     const { data, setData } = useWizardStore();
@@ -16,7 +17,7 @@ export function StepMusic() {
     const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
     const [showMusicInfo, setShowMusicInfo] = useState(false);
     const { data: session } = useSession();
-    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+    const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit/useDiamondCredit (creación)
     const isEditing = Boolean(data.id);

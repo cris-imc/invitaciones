@@ -6,11 +6,12 @@ import { BackLink } from "@/components/ui/BackLink";
 import { WizardLivePreview } from "./WizardLivePreview";
 import { WizardMobilePreviewSheet } from "./WizardMobilePreviewSheet";
 import { getWizardSteps } from "./wizard-steps-config";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 export function WizardSteps() {
     const { currentStep, data } = useWizardStore();
     const { data: session } = useSession();
-    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+    const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
     const isCasamiento = data.type === "CASAMIENTO";
     const isEditing = Boolean(data.id);

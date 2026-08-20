@@ -13,6 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { getEventStatus } from "@/lib/expiration";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 type ItemStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -66,7 +67,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
     const [page, setPage] = useState(1);
 
     const { data: authSession } = useSession();
-    const isAdmin = authSession?.user?.role === "ADMIN" || authSession?.user?.planTier === "ADMIN";
+    const isAdmin = isAdminRole(authSession?.user?.role) || authSession?.user?.planTier === "ADMIN";
     const status = getEventStatus(fechaEvento);
     const canActivate = isAdmin || status === "EVENT_DAY" || status === "POST_EVENT";
 

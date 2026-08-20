@@ -3,10 +3,11 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { BackLink } from "@/components/ui/BackLink";
 import { DiscountCodesClient } from "@/components/dashboard/DiscountCodesClient";
+import { isAdmin } from "@/lib/roles";
 
 export default async function DescuentosPage() {
     const session = await auth().catch(() => null);
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user || !isAdmin(session.user.role)) {
         redirect("/dashboard");
     }
 

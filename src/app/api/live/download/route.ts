@@ -6,6 +6,7 @@ import path from "path";
 import fs from "fs";
 import { Readable } from "stream";
 import { getUploadsDir } from "@/lib/uploads";
+import { isAdmin } from "@/lib/roles";
 
 export async function GET(req: Request) {
     try {
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
         });
 
         if (!invitation) return new NextResponse("Not Found", { status: 404 });
-        if (invitation.userId !== session.user.id && session.user.role !== "ADMIN") {
+        if (invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 

@@ -6,6 +6,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { WizardSteps } from "@/components/wizard/WizardSteps";
 import { getWizardSteps } from "@/components/wizard/wizard-steps-config";
 import { useSearchParams } from "next/navigation";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 function WizardContent({ invitation }: { invitation: any }) {
     const { setData, setThemeConfig, setStep, setDirty } = useWizardStore();
@@ -13,7 +14,7 @@ function WizardContent({ invitation }: { invitation: any }) {
     const searchParams = useSearchParams();
     const initialStepParam = searchParams.get("step");
     const { data: session } = useSession();
-    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+    const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
     useEffect(() => {
         if (invitation) {

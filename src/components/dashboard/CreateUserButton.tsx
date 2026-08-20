@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -9,13 +10,17 @@ import { UserPlus, Loader2, Mail, Lock, User } from "lucide-react";
 import { adminCreateUser } from "@/app/actions/admin";
 import { useToast } from "@/components/ui/Toast";
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
+import { isSuperUser } from "@/lib/roles";
 
 export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: () => void) => React.ReactNode } = {}) {
+    const { data: session } = useSession();
+    const canCreateAdmin = isSuperUser(session?.user?.role);
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [planTier, setPlanTier] = useState<"FREE" | "PREMIUM" | "DIAMOND">("FREE");
+    const [role, setRole] = useState<"CLIENT" | "ADMIN">("CLIENT");
     const [isLoading, setIsLoading] = useState(false);
     const { showToast } = useToast();
 
@@ -24,6 +29,7 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
         setEmail("");
         setPassword("");
         setPlanTier("FREE");
+        setRole("CLIENT");
     };
 
     const handleCreate = async () => {
@@ -39,7 +45,7 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
 
         setIsLoading(true);
         try {
-            const res = await adminCreateUser({ name, email, password, planTier });
+            const res = await adminCreateUser({ name, email, password, planTier, role: canCreateAdmin ? role : "CLIENT" });
             if (res.success) {
                 showToast("Usuario creado correctamente", "success");
                 setOpen(false);
@@ -120,6 +126,29 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                             />
                         </div>
 
+                        {canCreateAdmin && (
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-white/70">Tipo de perfil</label>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRole("CLIENT")}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${role === "CLIENT" ? "bg-white/15 border-white/30 text-white" : "bg-white/5 border-white/10 text-white/50"}`}
+                                    >
+                                        Cliente
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setRole("ADMIN")}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${role === "ADMIN" ? "bg-purple-500/20 border-purple-400/40 text-purple-300" : "bg-white/5 border-white/10 text-white/50"}`}
+                                    >
+                                        Admin
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {role === "CLIENT" && (
                         <div className="space-y-2">
                             <label className="text-xs font-medium text-white/70">Plan inicial</label>
                             <div className="flex gap-2">
@@ -146,6 +175,7 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                                 </button>
                             </div>
                         </div>
+                        )}
                     </div>
 
                     <DialogFooter>

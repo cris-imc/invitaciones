@@ -12,6 +12,7 @@ import { SaveStepButtons } from "./SaveStepButtons";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { saveInvitationFromWizard } from "@/lib/save-invitation";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 const PREDEFINED_TITULOS_REGALO = ["Regalo", "Mesa de Regalos", "Colaboración"];
 const PREDEFINED_TITULOS_TARJETA = ["Pago de Tarjetas", "Pago de Invitaciones", "Entrada al Evento"];
@@ -22,7 +23,7 @@ export function StepBankDetails() {
     const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
     const { showToast } = useToast();
     const { data: session } = useSession();
-    const isAdmin = session?.user?.role === "ADMIN" || session?.user?.planTier === "ADMIN";
+    const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
     const [attemptedNext, setAttemptedNext] = useState(false);

@@ -6,6 +6,7 @@ import { BackLink } from "@/components/ui/BackLink";
 import { EventShareCard } from "@/components/dashboard/EventShareCard";
 import { GuestPageTabs } from "@/components/dashboard/GuestPageTabs";
 import { getEventStatus } from "@/lib/expiration";
+import { isAdmin } from "@/lib/roles";
 
 // Prueba visual: leyenda animada de estado (en vivo / desconectado) junto al
 // título de "Gestión del Evento". El evento deja de estar "en vivo" una vez
@@ -45,7 +46,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
 
   const invitation = await prisma.invitation.findUnique({ where: { slug } });
   if (!invitation) return notFound();
-  if (invitation.userId !== session.user.id && session.user.role !== "ADMIN") {
+  if (invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
     return redirect("/dashboard");
   }
 

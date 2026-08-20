@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { readdir } from 'fs/promises';
 import { auth } from '@/auth';
 import { getUploadsDir } from '@/lib/uploads';
+import { isAdmin } from '@/lib/roles';
 
 // Diagnóstico temporal: confirma si Railway realmente está inyectando
 // RAILWAY_VOLUME_MOUNT_PATH (Volume conectado) o si getUploadsDir() está
@@ -9,7 +10,7 @@ import { getUploadsDir } from '@/lib/uploads';
 // borra en cada redeploy — la sospecha detrás de fotos que "se rompen".
 export async function GET() {
     const session = await auth();
-    if (!session?.user || session.user.role !== 'ADMIN') {
+    if (!session?.user || !isAdmin(session.user.role)) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 

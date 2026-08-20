@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { deleteLiveItemFile } from "@/lib/live-cleanup";
+import { isAdmin } from "@/lib/roles";
 
 const VALID_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
 type ItemStatus = (typeof VALID_STATUSES)[number];
@@ -37,7 +38,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         const invitation = liveItem.session.invitation;
         
         // Verify ownership or admin
-        if (invitation.userId !== session.user.id && session.user.role !== "ADMIN") {
+        if (invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
@@ -91,7 +92,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         const invitation = liveItem.session.invitation;
         
         // Verify ownership or admin
-        if (invitation.userId !== session.user.id && session.user.role !== "ADMIN") {
+        if (invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
