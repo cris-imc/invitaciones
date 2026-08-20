@@ -19,6 +19,7 @@ const allSidebarItems = [
     { title: "Inactivas", href: "/dashboard/invitaciones", icon: Archive },
     { title: "Mis Datos", href: "/dashboard/perfil", icon: User },
     { title: "Descuentos", href: "/dashboard/descuentos", icon: Percent },
+    { title: "Registros", href: "/dashboard/registros", icon: BarChart3 },
 ];
 
 export function Sidebar() {
@@ -64,8 +65,8 @@ export function Sidebar() {
     }, [role]);
 
     const sidebarItems = allSidebarItems.filter(item => {
-        if (role === "ADMIN") return item.title === "Inicio" || item.title === "Mis Datos" || item.title === "Descuentos";
-        return item.title !== "Descuentos";
+        if (role === "ADMIN") return item.title === "Inicio" || item.title === "Mis Datos" || item.title === "Descuentos" || item.title === "Registros";
+        return item.title !== "Descuentos" && item.title !== "Registros";
     });
 
     const handleNavClick = (e: React.MouseEvent, href: string, originalOnClick?: () => void) => {
@@ -245,13 +246,13 @@ export function Sidebar() {
 
                         {role === "ADMIN" ? (
                             <Link
-                                href="/dashboard/registros"
-                                className={`p-bottom-nav-item ${pathname === "/dashboard/registros" ? "active" : ""}`}
-                                onClick={(e) => handleNavClick(e, "/dashboard/registros")}
-                                aria-label="Registros"
+                                href="/dashboard/descuentos"
+                                className={`p-bottom-nav-item ${pathname === "/dashboard/descuentos" ? "active" : ""}`}
+                                onClick={(e) => handleNavClick(e, "/dashboard/descuentos")}
+                                aria-label="Descuentos"
                             >
-                                <BarChart3 className="w-5 h-5" />
-                                <span>Registros</span>
+                                <Percent className="w-5 h-5" />
+                                <span>Descuentos</span>
                             </Link>
                         ) : (
                             <NewInvitationButton

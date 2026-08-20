@@ -163,7 +163,7 @@ export function StepPhrase() {
                                     id="phraseText"
                                     placeholder={phrasePlaceholder}
                                     value={phraseValue}
-                                    onChange={(e) => setData({ frasePersonalizadaTexto: e.target.value })}
+                                    onChange={(e) => setData({ frasePersonalizadaTexto: e.target.value.replace(/[\r\n]+/g, " ") })}
                                     className="min-h-[110px] resize-none text-base bg-[var(--ink)] border border-white/15 rounded-xl p-3"
                                     maxLength={300}
                                 />

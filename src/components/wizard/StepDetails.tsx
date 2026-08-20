@@ -208,7 +208,7 @@ export function StepDetails() {
                                         <FormItem className="animate-in fade-in slide-in-from-top-2 duration-200">
                                             <FormLabel>Especifíca tu Dress Code</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Ej: Total White, Disfraz, etc." {...field} />
+                                                <Input placeholder="Ej: Total White, Disfraz, etc." maxLength={20} {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
