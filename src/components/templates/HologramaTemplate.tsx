@@ -143,6 +143,22 @@ function getThemeFromTipo(tipo: string): Theme {
   return "cumple";
 }
 
+// Ancestro real que scrollea a `el`: document.body en una invitación real
+// (scroll de página completa), pero un <div> con overflow-y propio dentro
+// del "phone frame" de vista previa (/modelos, wizard) -- ver comentario
+// donde se usa, en el useEffect del brillo del hero.
+function getScrollContainer(el: HTMLElement | null): HTMLElement {
+  let node = el?.parentElement ?? null;
+  while (node && node !== document.body) {
+    const cs = getComputedStyle(node);
+    if ((cs.overflowY === "auto" || cs.overflowY === "scroll") && node.scrollHeight > node.clientHeight + 1) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return document.body;
+}
+
 function safeJson<T>(val: string | null | undefined, fallback: T): T {
   if (!val) return fallback;
   try { return JSON.parse(val) as T; } catch { return fallback; }
@@ -516,11 +532,18 @@ export function HologramaTemplate({ invitation, guest, isPersonalized = false }:
     const orbFront = orbFrontRef.current;
     // El scroll real de la página ocurre en document.body (tiene su propio
     // overflow-y:auto, ver docs/PLAN_TEMPLATES_NEON_CHIC.md), no en window
-    // -- sin este container explícito, onScroll nunca detecta el scroll y
-    // el brillo queda congelado en su valor inicial.
+    // -- sin un container explícito, onScroll nunca detecta el scroll y el
+    // brillo queda congelado en su valor inicial. Pero document.body
+    // tampoco es siempre correcto: dentro del marco de vista previa
+    // ("phone frame" de /modelos y el wizard, clase .d-right) el que
+    // realmente scrollea es ese div anidado, no la página -- si se le
+    // pasa document.body ahi, el brillo queda tildado igual porque nunca
+    // llega el evento de scroll que anime.js espera. Se busca el
+    // ancestro que scrollea de verdad y se cae a document.body solo si
+    // no hay ninguno (caso real de invitación, sin phone frame).
     const observer = onScroll({
       target: heroPhotoRef.current,
-      container: document.body,
+      container: getScrollContainer(heroPhotoRef.current),
       enter: "bottom top",
       leave: "top bottom",
       onUpdate: (self) => {
@@ -563,11 +586,6 @@ export function HologramaTemplate({ invitation, guest, isPersonalized = false }:
     : tipo === "CASAMIENTO" ? "Nos casamos"
     : tipo === "QUINCE_ANOS" ? "Mis quince años"
     : "Te invitamos";
-
-  const monogram =
-    tipo === "CASAMIENTO" ? "♥"
-    : tipo === "QUINCE_ANOS" ? "✦"
-    : "●";
 
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
@@ -1090,12 +1108,6 @@ export function HologramaTemplate({ invitation, guest, isPersonalized = false }:
           )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', position: 'relative' }}>
 
-            <div className="holo-seal opacity-0" style={{
-              width: 44, height: 44, borderRadius: '50%', border: '1px solid #A78BFA',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#A78BFA',
-            }}>
-              {monogram}
-            </div>
 
             {/* Guest Name */}
             <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#F1EEFF] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
@@ -1198,9 +1210,6 @@ export function HologramaTemplate({ invitation, guest, isPersonalized = false }:
           } : undefined}
         />
         <div className="d-left-top drop-shadow-md">
-          <div className="seal" style={{ borderColor: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-            <span style={{ color: "white", fontFamily: "var(--font-cormorant), serif", textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}>{monogram}</span>
-          </div>
           <p className=" text-[11px] font-semibold uppercase tracking-[0.2em] text-white mb-6 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{eyebrow}</p>
           <h1 className="text-5xl font-light text-white leading-tight mb-2 drop-shadow-md" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
             {em ? (

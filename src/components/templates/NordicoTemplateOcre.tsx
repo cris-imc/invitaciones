@@ -513,11 +513,6 @@ export function NordicoTemplateOcre({ invitation, guest, isPersonalized = false 
     : tipo === "QUINCE_ANOS" ? "Mis quince años"
     : "Te invitamos";
 
-  const monogram =
-    tipo === "CASAMIENTO" ? "♥"
-    : tipo === "QUINCE_ANOS" ? "✦"
-    : "●";
-
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
     : new Date();
@@ -1021,12 +1016,6 @@ export function NordicoTemplateOcre({ invitation, guest, isPersonalized = false 
           )}
           <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', position: 'relative' }}>
 
-            <div className="nordico-seal opacity-0" style={{
-              width: 40, height: 40, border: '1px solid #A97D2A',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#A97D2A',
-            }}>
-              {monogram}
-            </div>
 
             {/* Guest Name */}
             <h2 className={`text-3xl sm:text-4xl font-bold tracking-tight leading-tight${portadaFondoAnimado ? " nordico-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), sans-serif', color: portadaFondoAnimado ? undefined : '#111111', textTransform: isCinzelTitle ? 'uppercase' : 'capitalize' }}>
@@ -1145,9 +1134,6 @@ export function NordicoTemplateOcre({ invitation, guest, isPersonalized = false 
           <IconRegisterMark style={{ position: "absolute", bottom: -11, right: -11, width: 20, height: 20, color: "#FFFFFF" }} />
         </div>
         <div className="d-left-top drop-shadow-md">
-          <div className="seal" style={{ borderColor: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-            <span style={{ color: "white", fontFamily: "var(--font-cormorant), serif", textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}>{monogram}</span>
-          </div>
           <p className=" text-[11px] font-semibold uppercase tracking-[0.2em] text-white mb-6 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{eyebrow}</p>
           <h1 className="text-5xl font-light text-white leading-tight mb-2 drop-shadow-md" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
             {em ? (

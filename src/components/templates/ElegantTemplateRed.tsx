@@ -379,11 +379,6 @@ export function ElegantTemplateRed({ invitation, guest, isPersonalized = false }
     : tipo === "QUINCE_ANOS" ? "Mis quince años"
     : "Te invitamos";
 
-  const monogram =
-    tipo === "CASAMIENTO" ? "♥"
-    : tipo === "QUINCE_ANOS" ? "✦"
-    : "●";
-
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
     : new Date();
@@ -1100,9 +1095,6 @@ export function ElegantTemplateRed({ invitation, guest, isPersonalized = false }
           } : undefined}
         />
         <div className="d-left-top drop-shadow-md">
-          <div className="seal" style={{ borderColor: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-            <span style={{ color: "white", fontFamily: "var(--font-cormorant), serif", textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}>{monogram}</span>
-          </div>
           <p className=" text-[11px] font-semibold uppercase tracking-[0.2em] text-white mb-6 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{eyebrow}</p>
           <h1 className="text-5xl font-light text-white leading-tight mb-4 drop-shadow-md" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
             {em ? (

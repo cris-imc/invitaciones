@@ -294,11 +294,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
     : tipo === "QUINCE_ANOS" ? "Mis quince años"
     : "Te invitamos";
 
-  const monogram =
-    tipo === "CASAMIENTO" ? "♥"
-    : tipo === "QUINCE_ANOS" ? "✦"
-    : "●";
-
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
     : new Date();
@@ -444,11 +439,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           }}
         >
           <div className="relative w-full max-w-lg p-8 sm:p-12 border border-white/20 rounded-3xl bg-[#0F1613]/90 backdrop-blur-xl text-center shadow-2xl flex flex-col items-center justify-center">
-            {/* Monogram Seal */}
-            <div className="w-16 h-16 rounded-full border-2 border-[var(--t-acc,#C79A4B)] flex items-center justify-center mb-6 shadow-inner bg-black/20">
-              <span className="font-serif text-xl font-bold text-[var(--t-acc,#C79A4B)]">{monogram}</span>
-            </div>
-
             {/* Kicker */}
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--t-acc,#C79A4B)] mb-3 opacity-90">
               {portadaKicker}
@@ -500,9 +490,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           } : undefined}
         />
         <div className="d-left-top">
-          <div className="seal" style={{ borderColor: "var(--t-acc)" }}>
-            <span style={{ color: "var(--t-acc)", fontFamily: "var(--t-font-d)" }}>{monogram}</span>
-          </div>
           <p className="t-kicker" style={{ color: "var(--t-acc)" }}>{eyebrow}</p>
           <h1 style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
             {em ? (
@@ -537,9 +524,6 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 backgroundRepeat: "no-repeat"
               } : undefined}
             />
-            <div className="p-seal">
-              <span style={{ color: "var(--t-acc)", fontFamily: "var(--t-font-d)" }}>{monogram}</span>
-            </div>
             <p className="t-kicker" style={{ color: "var(--t-acc)" }}>{eyebrow}</p>
             <h1 style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
