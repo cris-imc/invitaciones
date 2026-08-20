@@ -198,7 +198,7 @@ export function Sidebar() {
                     {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ── */}
                     <div className="p-bottom-nav md:hidden">
                         <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label="Cerrar sesión">
-                            <LogOut className="w-5 h-5" />
+                            <LogOut className="w-5 h-5 text-red-500" />
                             <span>Salir</span>
                         </button>
 
@@ -235,15 +235,27 @@ export function Sidebar() {
                             <span>Inicio</span>
                         </Link>
 
-                        <Link
-                            href="/dashboard/perfil"
-                            className={`p-bottom-nav-item ${pathname === "/dashboard/perfil" ? "active" : ""}`}
-                            onClick={(e) => handleNavClick(e, "/dashboard/perfil")}
-                            aria-label="Mis Datos"
-                        >
-                            <User className="w-5 h-5" />
-                            <span>Datos</span>
-                        </Link>
+                        {isAdmin(role) ? (
+                            <Link
+                                href="/dashboard/registros"
+                                className={`p-bottom-nav-item ${pathname === "/dashboard/registros" ? "active" : ""}`}
+                                onClick={(e) => handleNavClick(e, "/dashboard/registros")}
+                                aria-label="Registros"
+                            >
+                                <BarChart3 className="w-5 h-5" />
+                                <span>Reg.</span>
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/dashboard/perfil"
+                                className={`p-bottom-nav-item ${pathname === "/dashboard/perfil" ? "active" : ""}`}
+                                onClick={(e) => handleNavClick(e, "/dashboard/perfil")}
+                                aria-label="Mis Datos"
+                            >
+                                <User className="w-5 h-5" />
+                                <span>Datos</span>
+                            </Link>
+                        )}
 
                         {isAdmin(role) ? (
                             <Link
@@ -253,7 +265,7 @@ export function Sidebar() {
                                 aria-label="Descuentos"
                             >
                                 <Percent className="w-5 h-5" />
-                                <span>Descuentos</span>
+                                <span>Desc.</span>
                             </Link>
                         ) : (
                             <NewInvitationButton
@@ -263,7 +275,7 @@ export function Sidebar() {
                                 planTier={session?.user?.planTier}
                                 renderTrigger={(onClick) => (
                                     <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nueva invitación">
-                                        <Plus className="w-5 h-5" />
+                                        <Plus className="w-5 h-5 text-yellow-400" />
                                         <span>Nueva</span>
                                     </button>
                                 )}

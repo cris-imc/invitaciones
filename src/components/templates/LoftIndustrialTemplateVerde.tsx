@@ -1356,6 +1356,14 @@ export function LoftIndustrialTemplateVerde({ invitation, guest, isPersonalized 
           />
         )}
 
+        {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
+          <SectionWrapper id="album-2" delay={150} className="w-full py-16 overflow-hidden">
+            <div className="w-full max-w-[340px] sm:max-w-xl mx-auto">
+              <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
+            </div>
+          </SectionWrapper>
+        )}
+
         {showGiftSection && (
           <SectionWrapper id="banco" delay={200} className="w-full bg-[#1A2016] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
