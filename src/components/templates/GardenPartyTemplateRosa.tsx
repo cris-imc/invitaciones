@@ -114,6 +114,24 @@ function getThemeFromTipo(tipo: string): Theme {
   return "cumple";
 }
 
+// Ancestro real que scrollea al hero: document.body en una invitación real
+// (scroll de página completa), pero un <div> con overflow-y propio dentro
+// del "phone frame" de vista previa (/modelos, wizard) -- pasarle
+// document.body ahi hace que anime.js escuche scroll de la ventana, que
+// nunca ocurre (solo scrollea el div interno), y el efecto queda
+// congelado/con tirones en vez de animar con el scroll real.
+function getScrollContainer(el: HTMLElement | null): HTMLElement {
+  let node = el?.parentElement ?? null;
+  while (node && node !== document.body) {
+    const cs = getComputedStyle(node);
+    if ((cs.overflowY === "auto" || cs.overflowY === "scroll") && node.scrollHeight > node.clientHeight + 1) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return document.body;
+}
+
 function safeJson<T>(val: string | null | undefined, fallback: T): T {
   if (!val) return fallback;
   try { return JSON.parse(val) as T; } catch { return fallback; }
@@ -468,7 +486,7 @@ export function GardenPartyTemplateRosa({ invitation, guest, isPersonalized = fa
     const sun2 = heroSun2Ref.current;
     const observer = onScroll({
       target: heroPhotoRef.current,
-      container: document.body,
+      container: getScrollContainer(heroPhotoRef.current),
       enter: "bottom top",
       leave: "top bottom",
       onUpdate: (self) => {
