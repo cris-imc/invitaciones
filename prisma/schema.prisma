@@ -80,18 +80,38 @@ model VerificationToken {
 }
 
 model Payment {
-  id            String   @id @default(cuid())
-  userId        String
-  amount        Float
-  currency      String   @default("ARS")
-  status        String
-  paymentMethod String?
-  planTier      String
-  mercadoPagoId String?  @unique
-  createdAt     DateTime @default(now())
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  userId         String
+  amount         Float
+  currency       String        @default("ARS")
+  status         String
+  paymentMethod  String?
+  planTier       String
+  mercadoPagoId  String?       @unique
+  createdAt      DateTime      @default(now())
+  discountCodeId String?
+  discountAmount Float?
+  discountCode   DiscountCode? @relation(fields: [discountCodeId], references: [id])
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([discountCodeId])
+}
+
+// Codigos de descuento configurables por el admin (/dashboard/descuentos):
+// un codigo = un porcentaje extra sobre el precio ya vigente del plan
+// (incluido el 20% base de Diamond), reutilizable mientras enabled=true.
+// Sin limite de usos, sin expiracion, sin edicion de porcentaje -- si un
+// codigo quedo mal, se deshabilita y se crea uno nuevo (mantiene el
+// historial de Payment.discountAmount consistente).
+model DiscountCode {
+  id         String    @id @default(cuid())
+  code       String    @unique
+  percentage Int
+  enabled    Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  payments   Payment[]
 }
 
 model Invitation {

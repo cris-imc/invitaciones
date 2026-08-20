@@ -4,9 +4,9 @@ import bcrypt from "bcryptjs";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword } from "@/lib/password";
-import { PLAN_LIMITS, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
 import { createCheckoutPreference, getPublicBaseUrl } from "@/lib/mercadopago";
 import { getRequestIp } from "@/lib/request-ip";
+import { resolveDiscountForPlan } from "@/lib/discount-codes";
 
 export async function POST(request: NextRequest) {
   if (!REGISTRATION_ENABLED) {
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, email, password, planTier, phoneAreaCode, phoneNumber, acceptedTerms } = body;
+    const { name, email, password, planTier, phoneAreaCode, phoneNumber, acceptedTerms, discountCode } = body;
 
     // Validate input
     if (!name || !email || !password) {
@@ -65,9 +65,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // "Premium"/"Diamond" en el registro es una compra de UN crédito para
     // hacer UNA invitación de ese tipo, nunca un plan de invitaciones
     // ilimitadas. El planTier de la cuenta queda siempre FREE acá — un plan
@@ -79,6 +76,22 @@ export async function POST(request: NextRequest) {
     // acredita cuando el webhook de Mercado Pago confirma el pago aprobado.
     const wantsPremium = planTier === "PREMIUM";
     const wantsDiamond = planTier === "DIAMOND";
+    const paidPlanTier = wantsDiamond ? "DIAMOND" : "PREMIUM";
+
+    // El código de descuento se valida ANTES de crear la cuenta -- si se
+    // validara después y fallara, la cuenta ya existiría y un reintento con
+    // el código corregido chocaría con "Este email ya está registrado" sin
+    // que se haya cobrado nada.
+    const discountResult = wantsPremium || wantsDiamond
+      ? await resolveDiscountForPlan(discountCode, paidPlanTier)
+      : { ok: true as const, discountCodeId: null, amount: 0, discountAmount: 0 };
+
+    if (!discountResult.ok) {
+      return NextResponse.json({ error: discountResult.error }, { status: 400 });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
     const user = await prisma.user.create({
@@ -112,8 +125,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const amount = wantsDiamond ? DIAMOND_DISCOUNT_PRICE : PLAN_LIMITS.PREMIUM.price;
-    const paidPlanTier = wantsDiamond ? "DIAMOND" : "PREMIUM";
+    const { amount, discountCodeId, discountAmount } = discountResult;
 
     try {
       const payment = await prisma.payment.create({
@@ -123,6 +135,8 @@ export async function POST(request: NextRequest) {
           currency: "ARS",
           status: "PENDING",
           planTier: paidPlanTier,
+          discountCodeId,
+          discountAmount: discountAmount || null,
         },
       });
 

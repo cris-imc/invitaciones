@@ -8,7 +8,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
-import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft } from "lucide-react";
+import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft, Tag } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PLAN_LIMITS, formatPrice, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
@@ -130,6 +130,47 @@ function RegisterForm() {
   });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
+  // Código de descuento: se valida en vivo contra el servidor (botón
+  // "Aplicar") antes de mandarlo en el submit final -- así el usuario ve
+  // confirmado el precio recalculado antes de ir a pagar a Mercado Pago,
+  // que solo muestra un monto en pesos, no si un código se aplicó o no.
+  const [discountInput, setDiscountInput] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percentage: number; amount: number } | null>(null);
+  const [isValidatingCode, setIsValidatingCode] = useState(false);
+  const [discountError, setDiscountError] = useState<string | null>(null);
+
+  // El monto del código depende del plan elegido -- si el usuario vuelve a
+  // "Cambiar plan" y elige otro, el descuento aplicado quedaría calculado
+  // sobre el precio del plan viejo.
+  useEffect(() => {
+    setAppliedDiscount(null);
+    setDiscountError(null);
+  }, [selectedPlan]);
+
+  const handleApplyDiscountCode = async () => {
+    if (!discountInput.trim()) return;
+    setIsValidatingCode(true);
+    setDiscountError(null);
+    try {
+      const response = await fetch("/api/auth/validate-discount-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: discountInput, planTier: selectedPlan }),
+      });
+      const data = await response.json();
+      if (!data.valid) {
+        setDiscountError(data.error || "Código inválido");
+        setAppliedDiscount(null);
+        return;
+      }
+      setAppliedDiscount({ code: data.code, percentage: data.percentage, amount: data.amount });
+    } catch {
+      setDiscountError("Error al validar el código");
+    } finally {
+      setIsValidatingCode(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -161,6 +202,11 @@ function RegisterForm() {
       return;
     }
 
+    if (discountInput.trim() && !appliedDiscount) {
+      showToast("Aplicá el código de descuento antes de continuar, o borralo si no lo vas a usar", "error");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -175,6 +221,7 @@ function RegisterForm() {
           phoneAreaCode: normalizeDigits(formData.phoneAreaCode),
           phoneNumber: normalizeDigits(formData.phoneNumber),
           acceptedTerms,
+          discountCode: appliedDiscount?.code,
         }),
       });
 
@@ -324,8 +371,68 @@ function RegisterForm() {
                   <p className="text-xs uppercase tracking-wide opacity-60">Plan elegido</p>
                   <p className="text-lg font-display">{PLAN_CARDS.find((p) => p.key === selectedPlan)?.name}</p>
                 </div>
-                <p className="text-xl font-display text-[var(--accent)]">{planPriceLabel(selectedPlan)}</p>
+                <div className="flex items-baseline gap-2 flex-wrap justify-end">
+                  {appliedDiscount && (
+                    <span className="text-sm font-normal text-[var(--on-ink)]/40 line-through">
+                      {planPriceLabel(selectedPlan)}
+                    </span>
+                  )}
+                  <p className="text-xl font-display text-[var(--accent)]">
+                    {appliedDiscount ? formatPrice(appliedDiscount.amount) : planPriceLabel(selectedPlan)}
+                  </p>
+                </div>
               </div>
+
+              {selectedPlan !== "FREE" && (
+                <div className="mb-6">
+                  <Label htmlFor="discountCode" className="flex items-center gap-2 mb-2 opacity-80">
+                    <Tag className="w-4 h-4" />
+                    Código de descuento (opcional)
+                  </Label>
+                  {appliedDiscount ? (
+                    <div className="flex items-center justify-between gap-2 h-12 px-4 rounded-xl bg-green-500/10 border border-green-500/30">
+                      <span className="text-sm text-green-400 font-semibold">
+                        {appliedDiscount.code} · {appliedDiscount.percentage}% OFF aplicado
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAppliedDiscount(null);
+                          setDiscountInput("");
+                        }}
+                        className="text-xs opacity-60 hover:opacity-100 transition-opacity underline"
+                      >
+                        Quitar
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        id="discountCode"
+                        type="text"
+                        placeholder="Ej: PROMO30"
+                        value={discountInput}
+                        onChange={(e) => {
+                          setDiscountInput(e.target.value);
+                          setDiscountError(null);
+                        }}
+                        className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl uppercase"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleApplyDiscountCode}
+                        disabled={isValidatingCode || !discountInput.trim()}
+                        className="h-12 px-5 rounded-xl bg-[var(--ink-2)] border border-[var(--on-ink)]/20 text-[var(--on-ink)] hover:bg-[var(--ink-2)]/80 shrink-0"
+                      >
+                        {isValidatingCode ? "..." : "Aplicar"}
+                      </Button>
+                    </div>
+                  )}
+                  {discountError && (
+                    <p className="text-xs text-red-400 mt-1.5">{discountError}</p>
+                  )}
+                </div>
+              )}
 
               <h2 className="text-2xl font-display mb-6">Datos de tu cuenta</h2>
 

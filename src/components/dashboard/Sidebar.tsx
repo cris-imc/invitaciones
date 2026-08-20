@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Archive, BarChart3, Home, LogOut, User, UserPlus, Plus, MessageCircle, HelpCircle } from "lucide-react";
+import { Archive, BarChart3, Home, LogOut, User, UserPlus, Plus, MessageCircle, HelpCircle, Percent } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ const allSidebarItems = [
     { title: "Inicio", href: "/dashboard", icon: Home },
     { title: "Inactivas", href: "/dashboard/invitaciones", icon: Archive },
     { title: "Mis Datos", href: "/dashboard/perfil", icon: User },
+    { title: "Descuentos", href: "/dashboard/descuentos", icon: Percent },
 ];
 
 export function Sidebar() {
@@ -63,8 +64,8 @@ export function Sidebar() {
     }, [role]);
 
     const sidebarItems = allSidebarItems.filter(item => {
-        if (role === "ADMIN") return item.title === "Inicio" || item.title === "Mis Datos";
-        return true;
+        if (role === "ADMIN") return item.title === "Inicio" || item.title === "Mis Datos" || item.title === "Descuentos";
+        return item.title !== "Descuentos";
     });
 
     const handleNavClick = (e: React.MouseEvent, href: string, originalOnClick?: () => void) => {

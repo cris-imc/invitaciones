@@ -171,3 +171,57 @@ export async function adminCreateUser(data: { name: string; email: string; passw
         return { success: false, error: error.message || "Failed to create user" };
     }
 }
+
+import { normalizeDiscountCode, isValidPercentage } from "@/lib/discount-codes";
+
+export async function adminCreateDiscountCode(data: { code: string; percentage: number }) {
+    try {
+        const session = await auth();
+        if (session?.user?.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const code = normalizeDiscountCode(data.code || "");
+        if (!code) {
+            return { success: false, error: "El código no puede estar vacío" };
+        }
+        if (!isValidPercentage(data.percentage)) {
+            return { success: false, error: "El porcentaje debe ser un número entero entre 1 y 100" };
+        }
+
+        const existing = await prisma.discountCode.findUnique({ where: { code } });
+        if (existing) {
+            return { success: false, error: "Ya existe un código con ese nombre" };
+        }
+
+        await prisma.discountCode.create({
+            data: { code, percentage: data.percentage },
+        });
+
+        revalidatePath("/dashboard/descuentos");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error creating discount code:", error);
+        return { success: false, error: error.message || "Failed to create discount code" };
+    }
+}
+
+export async function toggleDiscountCode(id: string, currentEnabled: boolean) {
+    try {
+        const session = await auth();
+        if (session?.user?.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        await prisma.discountCode.update({
+            where: { id },
+            data: { enabled: !currentEnabled },
+        });
+
+        revalidatePath("/dashboard/descuentos");
+        return { success: true, newEnabled: !currentEnabled };
+    } catch (error: any) {
+        console.error("Error toggling discount code:", error);
+        return { success: false, error: "Failed to toggle discount code" };
+    }
+}
