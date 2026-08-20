@@ -106,12 +106,12 @@ const CRONO_ICONS: Record<string, string> = {
   Gift: "🎁", Camera: "📷", Clock: "🕐",
 };
 
-type Theme = "boda" | "xv" | "ejecutivo";
+type Theme = "boda" | "xv" | "cumple";
 
 function getThemeFromTipo(tipo: string): Theme {
   if (tipo === "CASAMIENTO") return "boda";
   if (tipo === "QUINCE_ANOS") return "xv";
-  return "ejecutivo";
+  return "cumple";
 }
 
 function safeJson<T>(val: string | null | undefined, fallback: T): T {
