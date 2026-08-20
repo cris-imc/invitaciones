@@ -1268,6 +1268,9 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
           <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, color-mix(in srgb, var(--t-acc2) 8%, transparent), transparent 70%), var(--t-bg)" }}>
             <div className="max-w-2xl mx-auto text-center">
+              <div className="flex justify-center mb-4">
+                <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
+              </div>
               <IconQuillFlourish className="seda-scroll-doodle opacity-0 mx-auto mb-6" style={{ width: 20, height: 22, color: 'var(--t-acc)' }} />
               <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
@@ -1460,8 +1463,8 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
                       }}
                       accentColor="var(--t-acc)"
                       cardBg="#FFFFFF"
-                      textPrimary="var(--seda-ink)"
-                      textSecondary="var(--t-muted)"
+                      textPrimary="#2B2320"
+                      textSecondary="#8a7a72"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
                     />
@@ -1480,8 +1483,8 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
                       }}
                       accentColor="var(--t-acc)"
                       cardBg="#FFFFFF"
-                      textPrimary="var(--seda-ink)"
-                      textSecondary="var(--t-muted)"
+                      textPrimary="#2B2320"
+                      textSecondary="#8a7a72"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
                     />
