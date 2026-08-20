@@ -11,13 +11,13 @@ interface Item {
 type TabId = "personalizado" | "xv" | "boda" | "evento";
 
 const TAB_LABELS: Record<TabId, string> = {
+  xv: "XV",
+  boda: "Boda",
+  evento: "Evento",
   personalizado: "Personalizado",
-  xv: "Modelos XV",
-  boda: "Modelos Boda",
-  evento: "Modelos Evento",
 };
 
-const TAB_ORDER: TabId[] = ["personalizado", "xv", "boda", "evento"];
+const TAB_ORDER: TabId[] = ["xv", "boda", "evento", "personalizado"];
 
 export function ModelosTabs({ xv, boda, evento, personalizado }: { xv: Item[]; boda: Item[]; evento: Item[]; personalizado: Item[] }) {
   const byTab: Record<TabId, Item[]> = { personalizado, xv, boda, evento };
@@ -40,20 +40,26 @@ export function ModelosTabs({ xv, boda, evento, personalizado }: { xv: Item[]; b
 
   return (
     <div>
-      <div className="flex justify-center gap-2 mb-8 flex-wrap">
-        {visibleTabs.map((id) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setActive(id)}
-            className={`px-5 py-2 rounded-full text-sm font-ui font-medium transition-colors border ${
-              active === id
-                ? "bg-[var(--accent)] text-[var(--ink)] border-[var(--accent)]"
-                : "bg-transparent text-zinc-400 border-white/15 hover:text-white hover:border-white/30"
-            }`}
-          >
-            {TAB_LABELS[id]}
-          </button>
+      <div className="flex justify-center items-center gap-6 sm:gap-10 mb-10 flex-wrap">
+        {visibleTabs.map((id, i) => (
+          <div key={id} className="flex items-center gap-6 sm:gap-10">
+            {i > 0 && <span className="h-3 w-px bg-white/15" aria-hidden="true" />}
+            <button
+              type="button"
+              onClick={() => setActive(id)}
+              className={`relative pb-2 text-xs sm:text-sm font-ui uppercase tracking-[0.18em] transition-colors ${
+                active === id ? "text-[var(--accent)]" : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {TAB_LABELS[id]}
+              <span
+                className={`absolute left-0 right-0 -bottom-0.5 h-px transition-opacity ${
+                  active === id ? "bg-[var(--accent)] opacity-100" : "opacity-0"
+                }`}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
         ))}
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 justify-items-center">
