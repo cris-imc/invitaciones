@@ -1448,7 +1448,7 @@ export function ModernoTemplateLab({ invitation, guest, isPersonalized = false }
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ height: "220px", overflow: "hidden", background: "#0F0E13" }}>
             <div className="flex justify-center py-6">
               <DrawLucideIcon icon={MapPin} size={46} color="#C9A876" strokeWidth={1.5} />
             </div>

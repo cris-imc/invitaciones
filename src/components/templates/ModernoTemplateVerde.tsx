@@ -1098,6 +1098,8 @@ export function ModernoTemplateVerde({ invitation, guest, isPersonalized = false
           eventName={title || String(invitation.nombreEvento ?? "")}
           targetDate={fechaEvento}
           location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+          dark
+          headerIcon={tipo === "QUINCE_ANOS" ? "crown" : "rings"}
         />
 
         {(invitation.contadorHabilitado ?? true) ? (
@@ -1239,7 +1241,7 @@ export function ModernoTemplateVerde({ invitation, guest, isPersonalized = false
         )}
 
         {mapUrl && (
-          <section id="location" style={{ height: "220px", overflow: "hidden" }}>
+          <section id="location" style={{ height: "220px", overflow: "hidden", background: "#05120B" }}>
             <div className="flex justify-center py-6">
               <DrawLucideIcon icon={MapPin} size={46} color="#C9A876" strokeWidth={1.5} />
             </div>
