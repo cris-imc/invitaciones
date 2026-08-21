@@ -32,6 +32,7 @@ import { ModernoTemplateVerde } from "@/components/templates/ModernoTemplateVerd
 import { ModernoTemplateRojo } from "@/components/templates/ModernoTemplateRojo";
 import { ModernoTemplateGris } from "@/components/templates/ModernoTemplateGris";
 import { EditorialTemplate } from "@/components/templates/EditorialTemplate";
+import { EditorialTemplateGrafito } from "@/components/templates/EditorialTemplateGrafito";
 import { EditorialTemplateAzul } from "@/components/templates/EditorialTemplateAzul";
 import { EditorialTemplateGris } from "@/components/templates/EditorialTemplateGris";
 import { EditorialTemplateMalva } from "@/components/templates/EditorialTemplateMalva";
@@ -188,6 +189,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ slug: 
             }
         } else if (invitation.templateTipo === 'EDITORIAL') {
             switch (color) {
+                case 'Grafito': return <EditorialTemplateGrafito invitation={invRecord} guest={null} isPersonalized={false} />;
                 case 'Azul': return <EditorialTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
                 case 'Gris': return <EditorialTemplateGris invitation={invRecord} guest={null} isPersonalized={false} />;
                 case 'Malva': return <EditorialTemplateMalva invitation={invRecord} guest={null} isPersonalized={false} />;

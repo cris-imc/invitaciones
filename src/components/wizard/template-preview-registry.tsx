@@ -50,7 +50,13 @@ export const CHIC_COLORS: ColorOption[] = [
 ];
 
 
+// Grafito va primero a propósito: es la única variante de esta familia con
+// una base gris fría genuina (el resto comparte el mismo beige cálido
+// #EDEBE5 de "default", solo cambia el acento) -- así la primera vista de
+// Editorial en el selector de familias no repite la base clara de la
+// familia anterior en la fila de tabs (ver TemplatePreviewModal.tsx).
 export const EDITORIAL_COLORS: ColorOption[] = [
+  { id: "Grafito", name: "Grafito", color: "#4B4F58" },
   { id: "default", name: "Burdeos Editorial", color: "#A3123B" },
   { id: "Azul", name: "Azul", color: "#1B3A5C" },
   { id: "Gris", name: "Gris", color: "#4A4640" },
@@ -260,6 +266,7 @@ export const CHIC_COMPONENTS: Record<string, PreviewComponent> = {
 
 
 export const EDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
+  Grafito: dynamic(() => import("@/components/templates/EditorialTemplateGrafito").then((m) => m.EditorialTemplateGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/EditorialTemplate").then((m) => m.EditorialTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Azul: dynamic(() => import("@/components/templates/EditorialTemplateAzul").then((m) => m.EditorialTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Gris: dynamic(() => import("@/components/templates/EditorialTemplateGris").then((m) => m.EditorialTemplateGris), { ssr: false, loading: PreviewLoading }) as PreviewComponent,

@@ -327,7 +327,14 @@ function TemplatePreviewModalBody({
               type="button"
               onClick={() => {
                 setActiveTab(tipo);
-                setPreviewColor("default");
+                // La primera opción de la lista de colores de la familia (no
+                // siempre "default") -- así se puede elegir a propósito qué
+                // variante se ve primero al entrar a cada familia, para que
+                // no repita la misma base clara/oscura que la familia
+                // anterior en la fila de tabs. No afecta invitaciones reales
+                // ya guardadas (esas usan su propio colorPrincipal, no pasan
+                // por acá).
+                setPreviewColor(getColorsForTipo(tipo)[0]?.id ?? "default");
                 setPreviewLoading(true);
               }}
               className={cn(
