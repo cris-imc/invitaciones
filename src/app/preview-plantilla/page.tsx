@@ -277,22 +277,31 @@ function PreviewPlantillaContent() {
       return;
     }
 
+    let openTimeout: ReturnType<typeof setTimeout> | null = null;
     const tryOpen = () => {
       const btn = Array.from(document.querySelectorAll("button")).find((b) =>
         /abrir/i.test(b.textContent || "")
       );
       if (!btn) return false;
-      btn.click();
-      requestAnimationFrame(() => requestAnimationFrame(notifyReady));
+      // La portada ya está montada y es una vista válida para mostrar -- avisar
+      // "ready" ya (saca el spinner del modal) en vez de esperar a la apertura.
+      notifyReady();
+      // Sostener la portada de bienvenida un rato antes de autoabrir, para que
+      // se alcance a ver (antes pasaba a la parte superior casi instantáneo).
+      openTimeout = setTimeout(() => {
+        btn.click();
+      }, 3000);
       return true;
     };
 
-    if (tryOpen()) return;
+    const openedImmediately = tryOpen();
 
     const observer = new MutationObserver(() => {
       if (tryOpen()) observer.disconnect();
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    if (!openedImmediately) {
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
 
     // Red de seguridad: si nunca aparece un botón "abrir" (plantilla sin
     // portada), no dejar el preview esperando para siempre.
@@ -302,6 +311,7 @@ function PreviewPlantillaContent() {
     }, 4000);
 
     return () => {
+      if (openTimeout) clearTimeout(openTimeout);
       observer.disconnect();
       clearTimeout(timeout);
     };
