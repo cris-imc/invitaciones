@@ -455,12 +455,23 @@ export async function PUT(request: NextRequest) {
         }
 
         const session = await auth().catch(() => null);
-        const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+        }
+        const isAdmin = isAdminRole(session.user.role) || session.user.planTier === "ADMIN";
 
         const existingInvitation = await prisma.invitation.findUnique({
             where: { id },
-            select: { regaloMonto: true, fechaEvento: true }
+            select: { userId: true, regaloMonto: true, fechaEvento: true }
         });
+
+        if (!existingInvitation) {
+            return NextResponse.json({ error: 'Invitación no encontrada' }, { status: 404 });
+        }
+
+        if (existingInvitation.userId !== session.user.id && !isAdmin) {
+            return NextResponse.json({ error: 'Sin permiso' }, { status: 403 });
+        }
 
         if (existingInvitation && fechaEvento && fechaEvento.getTime() !== new Date(existingInvitation.fechaEvento).getTime()) {
             if (!isAdmin && isEventDateLocked(existingInvitation.fechaEvento)) {
@@ -613,6 +624,11 @@ export async function PUT(request: NextRequest) {
 // DELETE - Eliminar invitación por slug
 export async function DELETE(request: NextRequest) {
     try {
+        const session = await auth().catch(() => null);
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+        }
+
         const { searchParams } = new URL(request.url);
         const slug = searchParams.get('slug');
 
@@ -623,10 +639,9 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        // TODO: Verificar que el usuario sea dueño de la invitación
         const invitation = await prisma.invitation.findUnique({
             where: { slug },
-            select: { id: true }
+            select: { id: true, userId: true }
         });
 
         if (!invitation) {
@@ -634,6 +649,10 @@ export async function DELETE(request: NextRequest) {
                 { error: 'Invitación no encontrada' },
                 { status: 404 }
             );
+        }
+
+        if (invitation.userId !== session.user.id && !isAdminRole(session.user.role)) {
+            return NextResponse.json({ error: 'Sin permiso' }, { status: 403 });
         }
 
         // Eliminar la invitación (cascade eliminará album, fotos, rsvps, etc)

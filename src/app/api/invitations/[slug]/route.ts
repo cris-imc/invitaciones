@@ -58,6 +58,21 @@ export async function GET(
 
 import { auth } from "@/auth";
 
+// Campos editables por este endpoint -- allowlist explícita en vez de
+// aceptar el body entero como `data` (eso hubiera permitido pisar
+// `userId`, `planTier`, `estado`, etc. con solo mandarlos en el JSON).
+// Cubre exactamente lo que usan los callers reales de este PATCH
+// (GuestManager.tsx: precios y saludo; QuickEditPrice.tsx: precios y
+// monto de regalo) más fechaEvento, que el propio endpoint ya valida
+// más abajo contra el bloqueo anti-fraude de 30 días.
+const PATCHABLE_FIELDS = [
+    "fechaEvento",
+    "precioNino",
+    "precioAdolescente",
+    "regaloMonto",
+    "mostrarNombreInvitadoEnSaludo",
+] as const;
+
 // PATCH - Actualizar invitación (edición visual)
 export async function PATCH(
     request: NextRequest,
@@ -67,7 +82,10 @@ export async function PATCH(
         const { slug } = await params;
         const body = await request.json();
         const session = await auth().catch(() => null);
-        const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+        }
+        const isAdmin = isAdminRole(session.user.role) || session.user.planTier === "ADMIN";
 
         const existing = await prisma.invitation.findUnique({
             where: { slug },
@@ -80,6 +98,10 @@ export async function PATCH(
             );
         }
 
+        if (existing.userId !== session.user.id && !isAdmin) {
+            return NextResponse.json({ error: 'Sin permiso' }, { status: 403 });
+        }
+
         // Si se intenta modificar la fecha y faltan 30 días o menos para la fecha original (exento si es ADMIN)
         if (body.fechaEvento && new Date(body.fechaEvento).getTime() !== new Date(existing.fechaEvento).getTime()) {
             if (!isAdmin && isEventDateLocked(existing.fechaEvento)) {
@@ -90,9 +112,14 @@ export async function PATCH(
             }
         }
 
+        const data: Record<string, unknown> = {};
+        for (const field of PATCHABLE_FIELDS) {
+            if (body[field] !== undefined) data[field] = body[field];
+        }
+
         const invitation = await prisma.invitation.update({
             where: { slug },
-            data: body,
+            data,
         });
 
         return NextResponse.json(invitation);
