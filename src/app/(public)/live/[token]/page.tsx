@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Camera, MessageSquare, Loader2, Smile } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { LivePhotoGallery } from "@/components/live/LivePhotoGallery";
 
 import { LiveItem } from "@prisma/client";
 
@@ -392,26 +393,27 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             </div>
 
             <div className="w-full max-w-sm mx-auto mt-12 px-4">
-                <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Últimas Subidas</p>
+                <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Fotos de la Fiesta</p>
                 {items.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-2">
-                        {items.slice(0, 9).map(item => (
-                            <div key={item.id} className="aspect-square rounded-lg overflow-hidden bg-white/5 border border-white/10">
-                                {item.type === "PHOTO" ? (
-                                    <img src={item.fileUrl} alt="Live" className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center text-indigo-400 bg-indigo-900/20 p-2">
-                                        <MessageSquare className="w-4 h-4 mb-1 opacity-50" />
-                                        <p className="text-[8px] text-center line-clamp-3 text-white/70 px-1 leading-tight">{item.fileUrl}</p>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                    <LivePhotoGallery items={items} />
                 ) : (
                     <p className="text-center text-white/30 text-sm">Aún no hay fotos ni audios.</p>
                 )}
             </div>
+
+            {items.some(item => item.type === "TEXT") && (
+                <div className="w-full max-w-sm mx-auto mt-10 px-4">
+                    <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Mensajes</p>
+                    <div className="grid grid-cols-3 gap-2">
+                        {items.filter(item => item.type === "TEXT").slice(0, 9).map(item => (
+                            <div key={item.id} className="aspect-square rounded-lg overflow-hidden bg-indigo-900/20 border border-white/10 flex flex-col items-center justify-center text-indigo-400 p-2">
+                                <MessageSquare className="w-4 h-4 mb-1 opacity-50" />
+                                <p className="text-[8px] text-center line-clamp-3 text-white/70 px-1 leading-tight">{item.fileUrl}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
