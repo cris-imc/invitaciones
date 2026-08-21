@@ -197,10 +197,30 @@ export function Sidebar() {
 
                     {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ── */}
                     <div className="p-bottom-nav md:hidden">
-                        <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label="Cerrar sesión">
-                            <LogOut className="w-5 h-5 text-red-500" />
-                            <span>Salir</span>
-                        </button>
+                        {isAdmin(role) ? (
+                            <Link
+                                href="/dashboard/descuentos"
+                                className={`p-bottom-nav-item ${pathname === "/dashboard/descuentos" ? "active" : ""}`}
+                                onClick={(e) => handleNavClick(e, "/dashboard/descuentos")}
+                                aria-label="Descuentos"
+                            >
+                                <Percent className="w-5 h-5" />
+                                <span>Desc.</span>
+                            </Link>
+                        ) : (
+                            <NewInvitationButton
+                                premiumCredits={premiumCredits}
+                                diamondCredits={diamondCredits}
+                                totalInvitations={0}
+                                planTier={session?.user?.planTier}
+                                renderTrigger={(onClick) => (
+                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nueva invitación">
+                                        <Plus className="w-5 h-5" style={{ color: "var(--accent)" }} />
+                                        <span>Nueva</span>
+                                    </button>
+                                )}
+                            />
+                        )}
 
                         {isAdmin(role) ? (
                             <CreateUserButton
@@ -257,30 +277,10 @@ export function Sidebar() {
                             </Link>
                         )}
 
-                        {isAdmin(role) ? (
-                            <Link
-                                href="/dashboard/descuentos"
-                                className={`p-bottom-nav-item ${pathname === "/dashboard/descuentos" ? "active" : ""}`}
-                                onClick={(e) => handleNavClick(e, "/dashboard/descuentos")}
-                                aria-label="Descuentos"
-                            >
-                                <Percent className="w-5 h-5" />
-                                <span>Desc.</span>
-                            </Link>
-                        ) : (
-                            <NewInvitationButton
-                                premiumCredits={premiumCredits}
-                                diamondCredits={diamondCredits}
-                                totalInvitations={0}
-                                planTier={session?.user?.planTier}
-                                renderTrigger={(onClick) => (
-                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nueva invitación">
-                                        <Plus className="w-5 h-5 text-yellow-400" />
-                                        <span>Nueva</span>
-                                    </button>
-                                )}
-                            />
-                        )}
+                        <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label="Cerrar sesión">
+                            <LogOut className="w-5 h-5 text-red-500" />
+                            <span>Salir</span>
+                        </button>
                     </div>
                 </>,
                 document.body
