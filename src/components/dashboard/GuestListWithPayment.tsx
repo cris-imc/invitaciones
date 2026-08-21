@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Info, ChevronUp, ChevronDown } from "lucide-react";
+import { Info, ChevronUp, ChevronDown, Download } from "lucide-react";
 
 interface Guest {
   id: string;
@@ -40,6 +40,8 @@ const PAYMENT_STATUS_COLORS: Record<string, string> = {
   PAID:    "#5a8a6e",
 };
 
+const PAGE_SIZE = 10;
+
 export function GuestListWithPayment({
   invitationId,
   paymentAmount,
@@ -52,6 +54,7 @@ export function GuestListWithPayment({
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showPaymentInfo, setShowPaymentInfo] = useState(true);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     if (showPaymentInfo) {
@@ -105,6 +108,14 @@ export function GuestListWithPayment({
     return matchFilter && matchSearch;
   });
 
+  useEffect(() => {
+    setPage(1);
+  }, [filter, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
   // Resumen
   const confirmed  = guests.filter((g) => g.status === "CONFIRMED");
   const totalPeople = confirmed.reduce((s, g) => s + g.attendingCount, 0);
@@ -124,6 +135,35 @@ export function GuestListWithPayment({
 
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+
+  const handleExportExcel = () => {
+    if (guests.length === 0) return;
+
+    const escape = (str: string) => `"${(str ?? "").replace(/"/g, '""')}"`;
+    const header = "Nombre;Estado;Personas;Pago;Restricciones alimentarias\n";
+    const rows = guests
+      .map((g) => {
+        const personas = g.status === "CONFIRMED" ? g.attendingCount : g.expectedCount;
+        const pago = g.status === "CONFIRMED" ? PAYMENT_STATUS_LABELS[g.paymentStatus] ?? g.paymentStatus : "—";
+        return [
+          escape(g.name),
+          escape(STATUS_LABELS[g.status] ?? g.status),
+          personas,
+          escape(pago),
+          escape(g.dietaryRestrictions || ""),
+        ].join(";");
+      })
+      .join("\n");
+
+    const csvContent = "﻿" + header + rows;
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "lista-invitados.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (loading) {
     return (
@@ -258,6 +298,33 @@ export function GuestListWithPayment({
         ))}
       </div>
 
+      {/* Descarga discreta de la lista */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "12px" }}>
+        <button
+          onClick={handleExportExcel}
+          disabled={guests.length === 0}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "6px 10px",
+            borderRadius: "999px",
+            border: "1px solid #ddd",
+            background: "transparent",
+            color: "#777",
+            fontSize: "11.5px",
+            fontWeight: 600,
+            cursor: guests.length === 0 ? "default" : "pointer",
+            opacity: guests.length === 0 ? 0.4 : 1,
+            fontFamily: "var(--font-body)",
+          }}
+          aria-label="Descargar lista completa de invitados en Excel"
+        >
+          <Download size={13} />
+          Descargar lista (Excel)
+        </button>
+      </div>
+
       {/* Lista */}
       {filtered.length === 0 ? (
         <p style={{ textAlign: "center", color: "#888", padding: "32px", fontSize: "13px" }}>
@@ -265,7 +332,7 @@ export function GuestListWithPayment({
         </p>
       ) : (
         <div>
-          {filtered.map((guest) => (
+          {paginated.map((guest) => (
             <div
               key={guest.id}
               className="inv-guest-row"
@@ -338,6 +405,54 @@ export function GuestListWithPayment({
               )}
             </div>
           ))}
+
+          {totalPages > 1 && (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "20px" }}>
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  border: "1px solid #ddd",
+                  background: "#fff",
+                  color: "#555",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: currentPage === 1 ? "default" : "pointer",
+                  opacity: currentPage === 1 ? 0.4 : 1,
+                  fontFamily: "var(--font-body)",
+                  minHeight: "44px",
+                }}
+                aria-label="Página anterior"
+              >
+                ‹
+              </button>
+              <span style={{ fontSize: "12px", color: "#888", minWidth: "90px", textAlign: "center" }}>
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  border: "1px solid #ddd",
+                  background: "#fff",
+                  color: "#555",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: currentPage === totalPages ? "default" : "pointer",
+                  opacity: currentPage === totalPages ? 0.4 : 1,
+                  fontFamily: "var(--font-body)",
+                  minHeight: "44px",
+                }}
+                aria-label="Página siguiente"
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

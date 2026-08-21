@@ -28,11 +28,14 @@ const STATUS_LABEL: Record<string, string> = {
   HIDDEN:   "Oculta",
 };
 
+const PAGE_SIZE = 10;
+
 export function SongModerationPanel({ invitationId }: SongModerationPanelProps) {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "PENDING" | "APPROVED" | "HIDDEN">("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     // El admin llama con auth y ve todas
@@ -84,7 +87,17 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
     URL.revokeObjectURL(url);
   };
 
-  const filtered = filter === "all" ? songs : songs.filter((s) => s.status === filter);
+  const filtered = (filter === "all" ? songs : songs.filter((s) => s.status === filter))
+    .slice()
+    .sort((a, b) => b.votes - a.votes);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   if (loading) {
     return <div style={{ padding: "32px", textAlign: "center", color: "#888", fontSize: "13px" }}>Cargando sugerencias…</div>;
@@ -178,9 +191,7 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
         </p>
       ) : (
         <div>
-          {filtered
-            .sort((a, b) => b.votes - a.votes)
-            .map((song) => (
+          {paginated.map((song) => (
               <div
                 key={song.id}
                 style={{
@@ -265,6 +276,54 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
                 </div>
               </div>
             ))}
+
+          {totalPages > 1 && (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "20px" }}>
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  border: "1px solid #ddd",
+                  background: "#fff",
+                  color: "#555",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: currentPage === 1 ? "default" : "pointer",
+                  opacity: currentPage === 1 ? 0.4 : 1,
+                  fontFamily: "var(--font-body)",
+                  minHeight: "44px",
+                }}
+                aria-label="Página anterior"
+              >
+                ‹
+              </button>
+              <span style={{ fontSize: "12px", color: "#888", minWidth: "90px", textAlign: "center" }}>
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  border: "1px solid #ddd",
+                  background: "#fff",
+                  color: "#555",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: currentPage === totalPages ? "default" : "pointer",
+                  opacity: currentPage === totalPages ? 0.4 : 1,
+                  fontFamily: "var(--font-body)",
+                  minHeight: "44px",
+                }}
+                aria-label="Página siguiente"
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -12,7 +12,9 @@ interface AlbumCarouselProps {
 
 export function AlbumCarousel({ photos, dark = false, hideHeader = false }: AlbumCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
+  const isVisible = useRef(false);
   const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null);
 
   // Multiplicamos las fotos varias veces (x10) para asegurar que el carril tenga 
@@ -55,9 +57,20 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
     };
 
     track.addEventListener("scroll", handleScroll, { passive: true });
-    
+
+    const wrap = wrapRef.current;
+    const observer = wrap
+      ? new IntersectionObserver(
+          ([entry]) => {
+            isVisible.current = entry.isIntersecting;
+          },
+          { threshold: 0.3 }
+        )
+      : null;
+    if (wrap && observer) observer.observe(wrap);
+
     const step = () => {
-      if (!isHovered.current && !isManualScrolling) {
+      if (isVisible.current && !isHovered.current && !isManualScrolling) {
         scrollPos += 1; // 1px por frame (entero evita saltos y parpadeos de sub-píxel)
         
         if (scrollPos >= setWidth) {
@@ -75,6 +88,7 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
       cancelAnimationFrame(animationId);
       track.removeEventListener("scroll", handleScroll);
       clearTimeout(scrollTimeout);
+      if (wrap && observer) observer.unobserve(wrap);
     };
   }, [photos.length]);
 
@@ -107,6 +121,7 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
         </>
       )}
       <div
+        ref={wrapRef}
         className="album-wrap w-full !max-w-[1000px] mx-auto"
         onMouseEnter={() => (isHovered.current = true)}
         onMouseLeave={() => (isHovered.current = false)}
