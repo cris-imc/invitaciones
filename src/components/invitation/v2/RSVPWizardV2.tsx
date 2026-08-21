@@ -107,12 +107,12 @@ export function RSVPWizardV2({
 
   const sectionClass = `section${dark ? " dark" : ""}`;
 
+  const adultPrice = paymentAmount ?? 0;
+  const teenPrice = precioAdolescente != null ? precioAdolescente : adultPrice;
+  const childPrice = precioNino != null ? precioNino : adultPrice;
+
   let totalPayment = 0;
   if (!isExempt) {
-    const adultPrice = paymentAmount ?? 0;
-    const teenPrice = precioAdolescente != null ? precioAdolescente : adultPrice;
-    const childPrice = precioNino != null ? precioNino : adultPrice;
-    
     totalPayment = (adultPrice * adultCount) + (teenPrice * teenCount) + (childPrice * childCount);
   }
 
@@ -350,6 +350,25 @@ export function RSVPWizardV2({
                 ({adultCount} adultos{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} adolescentes` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} niños` : ""})
               </span>
             </p>
+            {maxGuests > 1 && (
+              <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px dashed currentColor", opacity: 0.85, display: "flex", flexDirection: "column", gap: "2px" }}>
+                {adultCount > 0 && (
+                  <span style={{ fontSize: "12px" }}>
+                    {adultCount} adulto{adultCount !== 1 ? "s" : ""} × {formatARS(adultPrice)}
+                  </span>
+                )}
+                {teenCount > 0 && (
+                  <span style={{ fontSize: "12px" }}>
+                    {teenCount} adolescente{teenCount !== 1 ? "s" : ""} × {formatARS(teenPrice)}
+                  </span>
+                )}
+                {childCount > 0 && (
+                  <span style={{ fontSize: "12px" }}>
+                    {childCount} niño{childCount !== 1 ? "s" : ""} × {formatARS(childPrice)}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
