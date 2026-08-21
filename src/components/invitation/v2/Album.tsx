@@ -2,14 +2,15 @@
 
 import { AlbumCarousel } from "./AlbumCarousel";
 import { AlbumPolaroidCascade } from "./AlbumPolaroidCascade";
+import { AlbumCarouselPolaroid } from "./AlbumCarouselPolaroid";
 
-// Componente de álbum unificado con 2 estilos visuales seleccionables desde
+// Componente de álbum unificado con 3 estilos visuales seleccionables desde
 // el wizard (StepAlbumStyle) -- mismo patrón que Countdown.tsx con
 // CountdownStyleId. Reemplaza el uso directo de <AlbumCarousel> en las
 // plantillas (ese componente queda intacto, "carrusel" sigue siendo el
 // default).
 
-export type AlbumStyleId = "carrusel" | "solapadas";
+export type AlbumStyleId = "carrusel" | "solapadas" | "carrusel-polaroid";
 
 // "solapadas" no muestra el álbum completo (selección destacada, ver
 // AlbumPolaroidCascade) -- de 5 a 8 fotos se reparten en dos tandas para no
@@ -46,6 +47,9 @@ export function Album({ photos, dark = false, hideHeader = false, albumStyle = "
       return <AlbumPolaroidCascade photos={photos.slice(first, first + second)} dark={dark} hideHeader={hideHeader} />;
     }
     return <AlbumPolaroidCascade photos={photos.slice(0, first)} dark={dark} hideHeader={hideHeader} />;
+  }
+  if (albumStyle === "carrusel-polaroid") {
+    return <AlbumCarouselPolaroid photos={photos} dark={dark} hideHeader={hideHeader} />;
   }
   return <AlbumCarousel photos={photos} dark={dark} hideHeader={hideHeader} />;
 }

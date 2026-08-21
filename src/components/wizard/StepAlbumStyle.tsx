@@ -6,6 +6,7 @@ import { SaveStepButtons } from "./SaveStepButtons";
 const ALBUM_STYLE_OPTIONS: { id: string; label: string; description: string }[] = [
     { id: "carrusel", label: "Carrusel", description: "Fotos deslizando en una tira horizontal" },
     { id: "solapadas", label: "Solapadas", description: "Fotos apiladas, con marco y sombra" },
+    { id: "carrusel-polaroid", label: "Carrusel Polaroid", description: "Carrusel con cada foto enmarcada tipo instantánea" },
 ];
 
 // Preview chico y autocontenido de cada estilo -- no reusa los componentes
@@ -31,6 +32,30 @@ function MiniPreview({ styleId }: { styleId: string }) {
                         }}
                     >
                         <div style={{ width: "100%", height: "100%", background: "var(--accent)", opacity: 0.35, borderRadius: 1 }} />
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    if (styleId === "carrusel-polaroid") {
+        const rotations = [-6, 0, 6];
+        return (
+            <div style={{ display: "flex", gap: 6, justifyContent: "center", height: 54, alignItems: "center" }}>
+                {rotations.map((rot, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            width: 26, height: 34,
+                            background: "#faf8f4",
+                            padding: 2,
+                            paddingBottom: 5,
+                            borderRadius: 1,
+                            boxShadow: "0 3px 6px rgba(0,0,0,.3)",
+                            transform: `rotate(${rot}deg)`,
+                        }}
+                    >
+                        <div style={{ width: "100%", height: "100%", background: "var(--accent)", opacity: i === 1 ? 0.5 : 0.3 }} />
                     </div>
                 ))}
             </div>
