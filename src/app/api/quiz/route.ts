@@ -5,9 +5,9 @@ import { prisma } from "@/lib/db";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { invitationId, guestName, guestToken, answers, score, totalQuestions } = body;
+        const { invitationId, guestName, guestToken, answers } = body;
 
-        if (!invitationId || !guestName || !answers || score === undefined || !totalQuestions) {
+        if (!invitationId || !guestName || !Array.isArray(answers) || answers.length === 0) {
             return NextResponse.json(
                 { error: "Faltan datos requeridos" },
                 { status: 400 }
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
         // Check if this guest already answered the quiz
         const existingResponse = await prisma.quizResponse.findFirst({
-            where: guestToken 
+            where: guestToken
                 ? { invitationId, guestToken }
                 : { invitationId, guestName }
         });
@@ -27,6 +27,32 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
+
+        // El puntaje se recalcula acá contra las respuestas correctas reales
+        // de la invitación -- nunca se confía en el score que manda el
+        // cliente (un invitado podía mandar cualquier puntaje falso y quedar
+        // primero en el ranking/promedio).
+        const invitation = await prisma.invitation.findUnique({
+            where: { id: invitationId },
+            select: { triviaPreguntas: true },
+        });
+        if (!invitation) {
+            return NextResponse.json({ error: "Invitación no encontrada" }, { status: 404 });
+        }
+        let preguntas: { respuestaCorrecta?: number }[] = [];
+        try {
+            preguntas = JSON.parse(invitation.triviaPreguntas || "[]");
+        } catch {
+            preguntas = [];
+        }
+        if (preguntas.length === 0) {
+            return NextResponse.json({ error: "Esta invitación no tiene trivia configurada" }, { status: 400 });
+        }
+        const totalQuestions = preguntas.length;
+        const score = answers.reduce(
+            (acc: number, answer: unknown, i: number) => acc + (i < preguntas.length && answer === preguntas[i].respuestaCorrecta ? 1 : 0),
+            0
+        );
 
         // Save the quiz response
         const quizResponse = await prisma.quizResponse.create({

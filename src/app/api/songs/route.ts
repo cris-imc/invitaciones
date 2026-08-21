@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 // GET — Lista pública de canciones aprobadas (o todas para admin)
 export async function GET(request: NextRequest) {
@@ -15,12 +16,27 @@ export async function GET(request: NextRequest) {
 
   try {
     const session = await auth().catch(() => null);
-    const isAdmin = Boolean(session?.user);
+    // "admin" acá significa "es el anfitrión de ESTA invitación (o un admin
+    // real de la plataforma)", no simplemente "hay alguna sesión" -- sin
+    // esto, cualquier cliente logueado podía pasar ?admin=true&invitationId
+    // de un evento ajeno y ver las sugerencias pendientes de moderar de otro.
+    let isHostOrAdmin = false;
+    if (session?.user?.id) {
+      if (isAdminRole(session.user.role)) {
+        isHostOrAdmin = true;
+      } else {
+        const owned = await prisma.invitation.findFirst({
+          where: { id: invitationId, userId: session.user.id },
+          select: { id: true },
+        });
+        isHostOrAdmin = Boolean(owned);
+      }
+    }
 
     const whereClause: any = { invitationId };
     let statusFilter: any = { status: "APPROVED" };
 
-    if (adminRequest && isAdmin) {
+    if (adminRequest && isHostOrAdmin) {
       // Admin en el dashboard: ve todo
       statusFilter = {}; // sin filtro de estado
     } else {

@@ -76,6 +76,23 @@ export async function PATCH(
             return NextResponse.json({ error: 'ID de usuario requerido' }, { status: 400 });
         }
 
+        // Mismas restricciones de jerarquía que DELETE (arriba) -- sin esto,
+        // un Admin comun podia auto-asignarse creditos o tocar los de otro
+        // Admin/Super Usuario con solo llamar a este PATCH.
+        if (userId === session.user.id) {
+            return NextResponse.json({ error: 'No podés modificar tus propios créditos' }, { status: 400 });
+        }
+        const target = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+        if (!target) {
+            return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+        }
+        if (target.role === 'SUPERUSER') {
+            return NextResponse.json({ error: 'No se pueden modificar los créditos de una cuenta de Super Usuario' }, { status: 400 });
+        }
+        if (target.role === 'ADMIN' && !isSuperUser(session.user.role)) {
+            return NextResponse.json({ error: 'Solo el Super Usuario puede modificar créditos de una cuenta de Admin' }, { status: 403 });
+        }
+
         const body = await request.json();
         const data: { premiumCredits?: number; diamondCredits?: number } = {};
 
