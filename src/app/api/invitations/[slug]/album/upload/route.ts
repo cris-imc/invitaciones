@@ -78,9 +78,10 @@ export async function POST(
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Create unique filename
+        // Create unique filename -- solo alfanumérico, punto y guion (nada de
+        // "/" ni ".." ) para que no se pueda escribir fuera de uploadDir.
         const timestamp = Date.now();
-        const originalName = file.name.replace(/\s+/g, "-");
+        const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "");
         const filename = `${timestamp}-${originalName}`;
 
         const uploadDir = getUploadsDir();

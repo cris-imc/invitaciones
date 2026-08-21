@@ -1,19 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { randomBytes } from "crypto";
+import { auth } from "@/auth";
+import { isAdmin } from "@/lib/roles";
 
-// GET - Obtener todos los invitados de una invitación
+// GET - Obtener todos los invitados de una invitación (solo el anfitrión o admin --
+// incluye uniqueToken, el secreto con el que cualquiera podría confirmar/rechazar
+// asistencia en nombre de ese invitado, así que no puede ser público)
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
+        const session = await auth().catch(() => null);
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+        }
+
         const { slug } = await params;
 
         // Primero obtener la invitación para conseguir su ID
         const invitation = await prisma.invitation.findUnique({
             where: { slug },
-            select: { id: true }
+            select: { id: true, userId: true }
         });
 
         if (!invitation) {
@@ -21,6 +30,10 @@ export async function GET(
                 { error: "Invitación no encontrada" },
                 { status: 404 }
             );
+        }
+
+        if (invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
+            return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
         }
 
         const guests = await prisma.guest.findMany({
@@ -44,13 +57,18 @@ export async function POST(
     { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
+        const session = await auth().catch(() => null);
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+        }
+
         const { slug } = await params;
         const body = await request.json();
 
         // Primero obtener la invitación para conseguir su ID y plan
         const invitation = await prisma.invitation.findUnique({
             where: { slug },
-            select: { id: true, planTier: true, maxGuestsOverride: true }
+            select: { id: true, userId: true, planTier: true, maxGuestsOverride: true }
         });
 
         if (!invitation) {
@@ -58,6 +76,10 @@ export async function POST(
                 { error: "Invitación no encontrada" },
                 { status: 404 }
             );
+        }
+
+        if (invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
+            return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
         }
 
         // Obtener límite de invitados (override o el del plan)
