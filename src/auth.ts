@@ -4,6 +4,17 @@ import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { PlanTier } from "@/lib/plan-limits";
 
+// Nunca caer en un secreto conocido/hardcodeado en el código fuente -- si un
+// deploy pierde AUTH_SECRET/NEXTAUTH_SECRET, alguien con ese secreto (que
+// estaria publico en el repo) podria forjar un JWT valido con cualquier rol,
+// incluido SUPERUSER. Mejor romper el build/arranque que degradar en
+// silencio a un secreto compartido. En desarrollo local sin .env se permite
+// un secreto fijo (no hay nada real que proteger).
+const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+if (!authSecret && process.env.NODE_ENV === "production") {
+  throw new Error("AUTH_SECRET (o NEXTAUTH_SECRET) es obligatorio en producción -- no hay fallback seguro.");
+}
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -41,17 +52,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("[AUTH DEBUG] Attempting login with:", credentials?.email, "Password length:", (credentials?.password as string)?.length);
         if (!credentials?.email || !credentials?.password) {
-          console.log("[AUTH DEBUG] Missing email or password");
           return null;
         }
 
         const user = await prisma.user.findUnique({
           where: { email: (credentials.email as string).trim().toLowerCase() },
         });
-
-        console.log("[AUTH DEBUG] User found in DB:", user ? user.email : "NO USER FOUND");
 
         if (!user || !user.password) {
           return null;
@@ -61,8 +68,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           (credentials.password as string).trim(),
           user.password
         );
-
-        console.log("[AUTH DEBUG] Password valid?:", isPasswordValid);
 
         if (!isPasswordValid) {
           return null;
@@ -166,6 +171,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signOut: "/login",
     error: "/login",
   },
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "secret-invitaciones-dev-key-2026",
+  secret: authSecret || "dev-only-insecure-secret-do-not-use-in-prod",
 });
 
