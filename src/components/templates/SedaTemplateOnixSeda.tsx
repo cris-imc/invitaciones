@@ -1489,8 +1489,8 @@ export function SedaTemplateOnixSeda({ invitation, guest, isPersonalized = false
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="var(--t-acc)"
-                      cardBg="#FFFFFF"
-                      textPrimary="#2B2320"
+                      cardBg="#182029"
+                      textPrimary="#EAEFF5"
                       textSecondary="#8a7a72"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
@@ -1509,8 +1509,8 @@ export function SedaTemplateOnixSeda({ invitation, guest, isPersonalized = false
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="var(--t-acc)"
-                      cardBg="#FFFFFF"
-                      textPrimary="#2B2320"
+                      cardBg="#182029"
+                      textPrimary="#EAEFF5"
                       textSecondary="#8a7a72"
                       InfoRow={InfoRow}
                       CopyField={CopyField}

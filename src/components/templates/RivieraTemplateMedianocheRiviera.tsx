@@ -622,7 +622,7 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#12181A] via-[#161F22] to-[#0B1112] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#1A1712] via-[#23201A] to-[#1A1712] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -696,7 +696,7 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
         "--t-acc2": "#E8B4A0",
         "--c-accent": "#E8B4A0",
         "--t-bg": "#1A1712",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#23201A",
         "--t-muted": "#A89A85",
         // Countdown.tsx/RSVPWizardV2.tsx tienen textos hardcodeados como
         // `dark ? var(--chic-ink, #FFFFFF) : "inherit"` -- nombre de variable
@@ -1143,7 +1143,7 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
         "--t-acc2": "#E8B4A0",
         "--c-accent": "#E8B4A0",
         "--t-bg": "#1A1712",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#23201A",
         "--t-muted": "#A89A85",
         "--chic-ink": "#F2ECE0",
       } as React.CSSProperties}>

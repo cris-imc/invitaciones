@@ -696,7 +696,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
         "--t-acc2": "#C9A15C",
         "--c-accent": "#C9A15C",
         "--t-bg": "#171512",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#2A251E",
         "--t-muted": "#8F8880",
         // Usado por Countdown.tsx/RSVPWizardV2.tsx (dark ? var(--editorial-ink, #FFFFFF) : ...)
         // -- sin definir esto, esos componentes muestran texto blanco
@@ -1142,7 +1142,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
         "--t-acc2": "#C9A15C",
         "--c-accent": "#C9A15C",
         "--t-bg": "#171512",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#2A251E",
         "--t-muted": "#8F8880",
         "--editorial-ink": "#EDE9E2",
         "--chic-ink": "#EDE9E2",
@@ -1493,7 +1493,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="#C9A15C"
-                      cardBg="#FFFFFF"
+                      cardBg="#2A251E"
                       textPrimary="#EDE9E2"
                       textSecondary="#8F8880"
                       InfoRow={InfoRow}
@@ -1513,7 +1513,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="#C9A15C"
-                      cardBg="#FFFFFF"
+                      cardBg="#2A251E"
                       textPrimary="#EDE9E2"
                       textSecondary="#8F8880"
                       InfoRow={InfoRow}

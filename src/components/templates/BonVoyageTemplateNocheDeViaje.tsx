@@ -736,7 +736,7 @@ export function BonVoyageTemplateNocheDeViaje({ invitation, guest, isPersonalize
         "--t-acc2": "#8C7A4A",
         "--c-accent": "#C9A15C",
         "--t-bg": "#0F1620",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#141B26",
         "--t-muted": "#8595A8",
         // Usado por Countdown.tsx/RSVPWizardV2.tsx (dark ? var(--bonvoyage-ink, #FFFFFF) : ...)
         // -- sin definir esto, esos componentes muestran texto blanco
@@ -1164,7 +1164,7 @@ export function BonVoyageTemplateNocheDeViaje({ invitation, guest, isPersonalize
         "--t-acc2": "#8C7A4A",
         "--c-accent": "#C9A15C",
         "--t-bg": "#0F1620",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#141B26",
         "--t-muted": "#8595A8",
         "--bonvoyage-ink": "#EAF0F5",
         "--chic-ink": "#EAF0F5",
@@ -1502,7 +1502,7 @@ export function BonVoyageTemplateNocheDeViaje({ invitation, guest, isPersonalize
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="#C9A15C"
-                      cardBg="#FFFFFF"
+                      cardBg="#141B26"
                       textPrimary="#EAF0F5"
                       textSecondary="#8595A8"
                       InfoRow={InfoRow}
@@ -1522,7 +1522,7 @@ export function BonVoyageTemplateNocheDeViaje({ invitation, guest, isPersonalize
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="#C9A15C"
-                      cardBg="#FFFFFF"
+                      cardBg="#141B26"
                       textPrimary="#EAF0F5"
                       textSecondary="#8595A8"
                       InfoRow={InfoRow}

@@ -13,6 +13,7 @@ import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink"
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
 import { NeonTemplateBlackout } from "@/components/templates/NeonTemplateBlackout";
 import { NeonTemplateTropical } from "@/components/templates/NeonTemplateTropical";
+import { NeonTemplateManzana } from "@/components/templates/NeonTemplateManzana";
 import { NeonTemplateAscuas } from "@/components/templates/NeonTemplateAscuas";
 import { NeonTemplateEclipse } from "@/components/templates/NeonTemplateEclipse";
 import { NeonTemplate } from "@/components/templates/NeonTemplate";
@@ -89,6 +90,9 @@ import { Cristal3DTemplateAmbar } from "@/components/templates/Cristal3DTemplate
 import { Cristal3DTemplateEsmeralda } from "@/components/templates/Cristal3DTemplateEsmeralda";
 import { Cristal3DTemplateMenta } from "@/components/templates/Cristal3DTemplateMenta";
 import { Cristal3DTemplateRosaCuarzo } from "@/components/templates/Cristal3DTemplateRosaCuarzo";
+import { Cristal3DTemplateAmbarFundido } from "@/components/templates/Cristal3DTemplateAmbarFundido";
+import { Cristal3DTemplateCristalBlanco } from "@/components/templates/Cristal3DTemplateCristalBlanco";
+import { Cristal3DTemplateRosaCristalOscuro } from "@/components/templates/Cristal3DTemplateRosaCristalOscuro";
 import { Cristal3DTemplateVioleta } from "@/components/templates/Cristal3DTemplateVioleta";
 import { CineTemplateBlancoYNegro } from "@/components/templates/CineTemplateBlancoYNegro";
 import { CineTemplateMedianocheDeCine } from "@/components/templates/CineTemplateMedianocheDeCine";
@@ -110,6 +114,7 @@ import { NordicoTemplateOcre } from "@/components/templates/NordicoTemplateOcre"
 import { NordicoTemplateTerracota } from "@/components/templates/NordicoTemplateTerracota";
 import { RivieraTemplateMedianocheRiviera } from "@/components/templates/RivieraTemplateMedianocheRiviera";
 import { RivieraTemplatePiedraGris } from "@/components/templates/RivieraTemplatePiedraGris";
+import { RivieraTemplateOcasoAzulejo } from "@/components/templates/RivieraTemplateOcasoAzulejo";
 import { RivieraTemplateLavandaCostera } from "@/components/templates/RivieraTemplateLavandaCostera";
 import { RivieraTemplateCal } from "@/components/templates/RivieraTemplateCal";
 import { RivieraTemplate } from "@/components/templates/RivieraTemplate";
@@ -119,6 +124,7 @@ import { RivieraTemplateOcre } from "@/components/templates/RivieraTemplateOcre"
 import { RivieraTemplateOliva } from "@/components/templates/RivieraTemplateOliva";
 import { GoldenDuskTemplateNocheDorada } from "@/components/templates/GoldenDuskTemplateNocheDorada";
 import { GoldenDuskTemplatePiedraCalida } from "@/components/templates/GoldenDuskTemplatePiedraCalida";
+import { GoldenDuskTemplateNocheCiruela } from "@/components/templates/GoldenDuskTemplateNocheCiruela";
 import { GoldenDuskTemplateBrumaAzul } from "@/components/templates/GoldenDuskTemplateBrumaAzul";
 import { GoldenDuskTemplateOcaso } from "@/components/templates/GoldenDuskTemplateOcaso";
 import { GoldenDuskTemplate } from "@/components/templates/GoldenDuskTemplate";
@@ -147,6 +153,7 @@ import { LuzLunaTemplatePerlada } from "@/components/templates/LuzLunaTemplatePe
 import { LuzLunaTemplatePerlaSuave } from "@/components/templates/LuzLunaTemplatePerlaSuave";
 import { BonVoyageTemplateNocheDeViaje } from "@/components/templates/BonVoyageTemplateNocheDeViaje";
 import { BonVoyageTemplateArenaCalida } from "@/components/templates/BonVoyageTemplateArenaCalida";
+import { BonVoyageTemplateCoralTropical } from "@/components/templates/BonVoyageTemplateCoralTropical";
 import { BonVoyageTemplateMapaVintage } from "@/components/templates/BonVoyageTemplateMapaVintage";
 import { BonVoyageTemplateIvoire } from "@/components/templates/BonVoyageTemplateIvoire";
 import { BonVoyageTemplate } from "@/components/templates/BonVoyageTemplate";
@@ -425,6 +432,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 switch (color) {
                     case 'Blackout': return <NeonTemplateBlackout invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Tropical': return <NeonTemplateTropical invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Manzana': return <NeonTemplateManzana invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ascuas': return <NeonTemplateAscuas invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Eclipse': return <NeonTemplateEclipse invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Violeta': return <NeonTemplateVioleta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -526,6 +534,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Esmeralda': return <Cristal3DTemplateEsmeralda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Menta': return <Cristal3DTemplateMenta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'RosaCuarzo': return <Cristal3DTemplateRosaCuarzo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'AmbarFundido': return <Cristal3DTemplateAmbarFundido invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'CristalBlanco': return <Cristal3DTemplateCristalBlanco invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'RosaCristalOscuro': return <Cristal3DTemplateRosaCristalOscuro invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Violeta': return <Cristal3DTemplateVioleta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <Cristal3DTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
@@ -557,6 +568,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 switch (color) {
                     case 'MedianocheRiviera': return <RivieraTemplateMedianocheRiviera invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'PiedraGris': return <RivieraTemplatePiedraGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'OcasoAzulejo': return <RivieraTemplateOcasoAzulejo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'LavandaCostera': return <RivieraTemplateLavandaCostera invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Cal': return <RivieraTemplateCal invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Azulejo': return <RivieraTemplateAzulejo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -569,6 +581,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 switch (color) {
                     case 'NocheDorada': return <GoldenDuskTemplateNocheDorada invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'PiedraCalida': return <GoldenDuskTemplatePiedraCalida invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'NocheCiruela': return <GoldenDuskTemplateNocheCiruela invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'BrumaAzul': return <GoldenDuskTemplateBrumaAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ocaso': return <GoldenDuskTemplateOcaso invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'AzulMedianoche': return <GoldenDuskTemplateAzulMedianoche invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -609,6 +622,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 switch (color) {
                     case 'NocheDeViaje': return <BonVoyageTemplateNocheDeViaje invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'ArenaCalida': return <BonVoyageTemplateArenaCalida invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'CoralTropical': return <BonVoyageTemplateCoralTropical invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'MapaVintage': return <BonVoyageTemplateMapaVintage invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ivoire': return <BonVoyageTemplateIvoire invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Coral': return <BonVoyageTemplateCoral invitation={invRecord} guest={guestRecord} isPersonalized={true} />;

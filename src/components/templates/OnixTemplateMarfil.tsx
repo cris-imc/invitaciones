@@ -4,7 +4,7 @@
  * componentes reutilizados (Countdown, AlbumCarousel, RSVPWizardV2,
  * SongSuggestion, etc). Cambia la capa visual al sistema "Noir & Oro"
  * (mockup/nuevo, botón "Ónix"): fondo negro mármol (#F2ECE4) + tinta clara
- * rosa-hueso (#EDE0E2) + acento oro-rosado fijo (#8C3F52), tipografía
+ * rosa-hueso (#201A1E) + acento oro-rosado fijo (#8C3F52), tipografía
  * Italiana (display) + Cormorant Garamond (texto/citas), insignias
  * circulares doradas, doodles de trazo fino de gala (destello, luna
  * creciente, ramita de laurel, gema facetada), marco dorado completo en la
@@ -313,7 +313,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
         <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#FFFFFF" }}>
           ¡Juego Completado!
         </h3>
-        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#EDE0E2" }}>
+        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#201A1E" }}>
           RESPONDISTE {score} DE {preguntas.length} CORRECTAMENTE ({percent}%)
         </p>
         
@@ -324,7 +324,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "left", maxWidth: "90%" }}>
                 <Users className="w-5 h-5 text-[#8C3F52] shrink-0" />
-                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#EDE0E2" }}>
+                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#201A1E" }}>
                   El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#FFFFFF" }}>{stats.avg}%</strong>.
                 </p>
               </div>
@@ -352,7 +352,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
   return (
     <div className="quiz-box flex flex-col items-center text-center">
       <div className="quiz-q w-full max-w-lg" key={currentIdx}>
-        <p className="text-[#EDE0E2] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
+        <p className="text-[#201A1E] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
           {formatQuestion(q.pregunta)}
         </p>
         <div className="quiz-opts flex flex-wrap justify-center gap-3">
@@ -602,7 +602,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/onix-quince.png" : undefined;
   const portadaTintColor1 = "#8C3F52";
-  const portadaTintColor2 = "#78466E";
+  const portadaTintColor2 = "#8C3F52";
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -618,7 +618,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#12181A] via-[#161F22] to-[#0B1112] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#F2ECE4] via-[#FFFFFF] to-[#F2ECE4] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -694,6 +694,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         "--t-bg": "#F2ECE4",
         "--t-surface": "#FFFFFF",
         "--t-muted": "#7A6E74",
+        "--chic-ink": "#201A1E",
       } as React.CSSProperties}
     >
       <style>{`
@@ -705,11 +706,11 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         .desktop-stage .tpl .quiz-container h2,
         .desktop-stage .tpl .quiz-container h3 {
           font-family: var(--font-title, var(--font-cormorant)), serif !important;
-          color: #FFFFFF !important;
+          color: #201A1E !important;
         }
         /* Tarjetas claras (Ceremonia/Fiesta) necesitan texto oscuro, no blanco */
         .desktop-stage .tpl .moderno-light-card h4 {
-          color: #F2ECE4 !important;
+          color: #201A1E !important;
         }
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
@@ -760,7 +761,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         /* RSVP Custom Aesthetics for OnixTemplate */
         #rsvp.section.dark {
           background-color: #F2ECE4 !important;
-          color: #FFFFFF !important;
+          color: #201A1E !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -776,7 +777,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         }
         #rsvp.section.dark b,
         #rsvp.section.dark strong {
-          color: #FFFFFF !important;
+          color: #201A1E !important;
         }
         @media (min-width: 640px) {
           #rsvp.section.dark > p.t-kicker,
@@ -808,7 +809,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #FFFFFF !important;
+          color: #201A1E !important;
           border-radius: 6px !important;
           border: 1px solid rgba(216, 154, 160, 0.2) !important;
           padding: 12px 16px !important;
@@ -862,7 +863,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(234, 229, 217, 0.5) !important;
+          color: rgba(32, 26, 30, 0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -872,7 +873,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(234, 229, 217, 0.7) !important;
+          color: rgba(32, 26, 30, 0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -881,11 +882,11 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #D8C8A8 !important;
+          color: #201A1E !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(234, 229, 217, 0.4) !important;
+          color: rgba(32, 26, 30, 0.4) !important;
           font-size: 12px !important;
         }
         
@@ -934,7 +935,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         /* Footer Aesthetics */
         .desktop-stage .d-foot {
           background-color: #F2ECE4 !important; /* Matches light sections */
-          color: #FFFFFF !important;
+          color: #201A1E !important;
           padding: 24px 24px 38px 24px !important;
           text-align: center;
         }
@@ -995,7 +996,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F2ECE4', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className={`text-[#EDE0E2] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
+          className={`text-[#201A1E] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
           {portadaFondoAnimado && (
             <div className="acp-mobile-only">
@@ -1038,7 +1039,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
 
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#EDE0E2] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#201A1E] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {guestNameDisplay}
             </h2>
 
@@ -1124,6 +1125,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
         "--t-bg": "#F2ECE4",
         "--t-surface": "#FFFFFF",
         "--t-muted": "#7A6E74",
+        "--chic-ink": "#201A1E",
       } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
@@ -1174,7 +1176,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
             <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#8C3F52] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#EDE0E2] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h1 className="text-[4rem] font-light text-[#201A1E] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
@@ -1256,7 +1258,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
               </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
-                className="text-[#EDE0E2] text-2xl md:text-3xl leading-relaxed tracking-wide" 
+                className="text-[#201A1E] text-2xl md:text-3xl leading-relaxed tracking-wide" 
                 style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500 }}
               />
             </div>
@@ -1469,7 +1471,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
                       }}
                       accentColor="#8C3F52"
                       cardBg="#D8C8A8"
-                      textPrimary="#FFFFFF"
+                      textPrimary="#201A1E"
                       textSecondary="#7A6E74"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
@@ -1489,7 +1491,7 @@ export function OnixTemplateMarfil({ invitation, guest, isPersonalized = false }
                       }}
                       accentColor="#8C3F52"
                       cardBg="#D8C8A8"
-                      textPrimary="#FFFFFF"
+                      textPrimary="#201A1E"
                       textSecondary="#7A6E74"
                       InfoRow={InfoRow}
                       CopyField={CopyField}

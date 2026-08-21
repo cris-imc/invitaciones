@@ -741,7 +741,7 @@ export function ChicTemplateAzulMedianocheChic({ invitation, guest, isPersonaliz
         "--t-acc2": "#7FA8D9",
         "--c-accent": "#7FA8D9",
         "--t-bg": "#10141C",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#181E2A",
         "--t-muted": "#8590A0",
         // Usado por Countdown.tsx/RSVPWizardV2.tsx (dark ? var(--chic-ink, #FFFFFF) : ...)
         // -- sin definir esto, esos componentes muestran texto blanco
@@ -1192,7 +1192,7 @@ export function ChicTemplateAzulMedianocheChic({ invitation, guest, isPersonaliz
         "--t-acc2": "#7FA8D9",
         "--c-accent": "#7FA8D9",
         "--t-bg": "#10141C",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#181E2A",
         "--t-muted": "#8590A0",
         "--chic-ink": "#EAEEF5",
       } as React.CSSProperties}>
@@ -1534,7 +1534,7 @@ export function ChicTemplateAzulMedianocheChic({ invitation, guest, isPersonaliz
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="#7FA8D9"
-                      cardBg="#FFFFFF"
+                      cardBg="#181E2A"
                       textPrimary="#EAEEF5"
                       textSecondary="#8590A0"
                       InfoRow={InfoRow}
@@ -1554,7 +1554,7 @@ export function ChicTemplateAzulMedianocheChic({ invitation, guest, isPersonaliz
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="#7FA8D9"
-                      cardBg="#FFFFFF"
+                      cardBg="#181E2A"
                       textPrimary="#EAEEF5"
                       textSecondary="#8590A0"
                       InfoRow={InfoRow}

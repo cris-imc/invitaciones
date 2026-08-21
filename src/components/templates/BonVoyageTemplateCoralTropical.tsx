@@ -1,25 +1,26 @@
-﻿/**
- * JardinSedaTemplate.tsx
- * Derivado de ModernoTemplate.tsx: misma estructura, props, secciones y
- * componentes reutilizados (Countdown, AlbumCarousel, RSVPWizardV2,
- * SongSuggestion, etc). Cambia la capa visual al sistema "Botánico"
- * (mockup/nuevo, botón "Jardín de Seda"): fondo degradé rosa-lavanda suave
- * (base #120E14) + tinta ciruela oscura (#F2ECF0) + acento malva/lavanda
- * fijo (#9C7FB4) + un verde salvia secundario (#6F9A76, variable por
- * color), tipografía Gloock (display) + Quicksand (texto, redondeada),
- * todo con bordes muy redondeados, doodles orgánicos de trazo fino (hoja,
- * flor de 5 pétalos, mariposa, zarcillo/vid), fotos tipo polaroid con
- * leve rotación en el álbum, blobs acuarela de fondo y un efecto de
- * "florecimiento" (bloom de color) sobre la foto de portada al hacer
- * scroll.
- * Gating: por definir en TemplatePreviewModal.tsx — este archivo no valida
- * nada por su cuenta.
+/**
+ * BonVoyageTemplateCoralTropical.tsx
+ * Derivado de ModernoTemplate.tsx (misma arquitectura que ChicTemplate.tsx):
+ * misma estructura, props, secciones y componentes reutilizados (Countdown,
+ * AlbumCarousel, RSVPWizardV2, SongSuggestion, etc). Cambia la capa visual a
+ * la estética "Bon Voyage Travel" (mockup/nuevo/Bon Voyage Travel wedding &
+ * 15.dc.html): espuma de mar (#1A0E08), arena (#241608), océano profundo
+ * (tinta #FDEEE0), acento azul océano (#FF6B35, variable por color) + acento
+ * secundario arena (#2CA6A4), tipografía itálica elegante (Playfair Display)
+ * + texto geométrico (DM Sans), doodles de viaje de trazo fino (avioneta
+ * vintage con ruta punteada, olas con estrella de mar, brújula en el marco,
+ * valija con estampillas, cámara polaroid, sol asomándose).
+ * Dual CASAMIENTO + QUINCE_ANOS: todo el texto ("eyebrow", monograma, título
+ * de cuenta regresiva) ya rama por `tipo` (mismo patrón que NeonTemplate.tsx,
+ * que es dual QUINCE_ANOS+CUMPLEANOS) para que funcione en ambos eventos.
+ * Gating: QUINCE_ANOS + CASAMIENTO — el gating vive en
+ * TemplatePreviewModal.tsx, este archivo no valida nada por su cuenta.
  */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Gloock, Quicksand } from "next/font/google";
+import { Playfair_Display, DM_Sans } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
@@ -45,71 +46,108 @@ import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
-// Doodles orgánicos de trazo fino estilo "Botánico" en vez de íconos
-// genéricos de librería -- coherentes con el resto del motivo decorativo.
+// Doodles de viaje de trazo fino estilo "Bon Voyage" en vez de íconos
+// genéricos de librería -- coherentes con el resto del motivo decorativo
+// (avioneta, olas, estrella de mar, brújula, valija, cámara, sol).
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 15.5v-4M12 8.2h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
 const IconMusic = ({ className, style }: { className?: string; style?: React.CSSProperties } = {}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} className={className} style={style} aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/></svg>;
 const IconMap   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
 const IconGift  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>;
 const IconQuiz  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
-// Zarcillo/vid doodle -- decorativa, usada en portada/hero. Tallo curvo con
-// hojitas alternadas y un rulo final, trazo fino sin relleno.
-const IconRings = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 32 22" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
-    <path d="M1 18c6 2 10-2 12-6s2-9 8-9c4 0 5 3 3 5" />
-    <path d="M9 15c1.5-1.5 1-3.5-1-4M15 8c1.8-.6 3-2 2.4-3.6" />
-    <path d="M24 8a3 3 0 1 1-3-3" strokeWidth={0.9} />
+// Avioneta vintage doodle -- silueta simple de biplano con ruta punteada
+// detrás, usada en portada.
+const IconAirplane = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 64 46" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <path d="M8 30 L44 18 L58 12 L54 20 L38 26 L28 34 L20 32 L23 25 Z" />
+    <path d="M38 26 L42 14 M28 34 L32 44" strokeWidth={0.9} />
+    <circle cx="52" cy="16" r="1.8" />
+    <path d="M60 10 C 54 8, 50 10, 46 8" strokeDasharray="1.5 3" strokeWidth={0.9} />
+    <path d="M46 8 C 40 6, 36 8, 30 6" strokeDasharray="1.5 3" strokeWidth={0.9} />
   </svg>
 );
-// Flor de cinco pétalos doodle -- acompaña títulos y separadores, trazo
-// fino sin relleno con un centro pequeño.
-const IconHeartDoodle = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
-    <circle cx="12" cy="12" r="2.1" />
-    <path d="M12 9.5c-1.4-1.8-1.4-4.4 0-6 1.4 1.6 1.4 4.2 0 6Z" />
-    <path d="M14.5 10.3c2-1.1 4.5-.8 5.9.7-1.7 1.2-4.2.9-5.9-.7Z" />
-    <path d="M14.2 14.1c1.1 2 .8 4.5-.7 5.9-1.2-1.7-.9-4.2.7-5.9Z" />
-    <path d="M9.6 14.2c-1.1 2-3.6 2.7-5.6 1.6 1-1.9 3.5-2.7 5.6-1.6Z" />
-    <path d="M9.7 10.1c-2 1-4.5.6-5.8-1 1.8-1.1 4.2-.7 5.8 1Z" />
+// Olas doodle -- líneas onduladas apiladas, decorativo y como divisor.
+const IconWaves = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 60 20" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <path d="M2 8 C 8 3, 14 3, 20 8 C 26 13, 32 13, 38 8 C 44 3, 50 3, 56 8" />
+    <path d="M2 15 C 8 11, 14 11, 20 15 C 26 19, 32 19, 38 15 C 44 11, 50 11, 56 15" strokeWidth={0.85} opacity={0.7} />
   </svg>
 );
-// Mariposa doodle -- separador de secciones, dos pares de alas con vetas
-// finas y un cuerpo/antenas central, trazo sin relleno.
-const IconRibbon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 28 20" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
-    <path d="M14 6c-2-4-8-5-11-2.4-2.6 2.3-1 6.4 3 6.8 3 .3 6.2-1.3 8-4.4" />
-    <path d="M14 6c2-4 8-5 11-2.4 2.6 2.3 1 6.4-3 6.8-3 .3-6.2-1.3-8-4.4" />
-    <path d="M14 14c-1.6-3-6.4-3.8-8.8-1.6-2 1.9-.6 5 2.4 5.3 2.4.2 5-1 6.4-3.7" />
-    <path d="M14 14c1.6-3 6.4-3.8 8.8-1.6 2 1.9.6 5-2.4 5.3-2.4.2-5-1-6.4-3.7" />
-    <path d="M14 2v14" strokeWidth={1.3} />
-    <path d="M14 2 12.6.6M14 2l1.4-1.4" strokeWidth={0.7} />
+// Estrella de mar doodle -- cinco brazos redondeados, se usa junto a las
+// olas y como ícono repetido en kickers.
+const IconStarfish = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.15} className={className} style={style} aria-hidden="true">
+    <path d="M12 2 C 13 6, 14 7.5, 18 8.5 C 15 10.5, 14 12, 14.5 16 C 12 13.5, 11 13.5, 8.5 16 C 9 12, 8 10.5, 5 8.5 C 9 7.5, 10 6, 12 2Z" />
+    <circle cx="12" cy="10.3" r="1.1" />
   </svg>
 );
-// Hoja doodle -- para la tarjeta de Ceremonia/Fiesta y kickers, hoja
-// orgánica con nervadura central y venas alternadas, trazo fino.
-const IconChurch = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
-    <path d="M4 20C3 11 9 4 20 3c1 11-5 18-16 17Z" />
-    <path d="M5 19 18 5" strokeWidth={0.8} />
-    <path d="M8 15.5c1.4-.4 2.4-1.2 3-2M11 11.8c1.4-.4 2.4-1.2 3-2" strokeWidth={0.7} opacity={0.7} />
+// Brújula doodle -- círculo, marcas cardinales y aguja romboidal, usada en el
+// marco de la foto de portada ("brújula en el marco").
+const IconCompass = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <circle cx="20" cy="20" r="15" />
+    <path d="M20 3 L20 8M20 32 L20 37M3 20 L8 20M32 20 L37 20" strokeWidth={0.9} />
+    <path d="M20 10 L23.5 20 L20 30 L16.5 20 Z" />
+    <circle cx="20" cy="20" r="1.6" />
+  </svg>
+);
+// Valija con estampillas doodle -- maleta de viaje vintage con manija y
+// pequeños sellos, "saliendo" de una esquina del marco.
+const IconSuitcase = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 46 40" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <rect x="4" y="12" width="34" height="24" rx="2" />
+    <path d="M14 12 V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5" />
+    <path d="M4 22 H38" strokeWidth={0.9} />
+    <rect x="30" y="2" width="9" height="7" transform="rotate(12 34.5 5.5)" strokeWidth={0.85} />
+    <circle cx="42" cy="14" r="3" strokeWidth={0.85} />
+  </svg>
+);
+// Cámara polaroid doodle -- cuerpo rectangular, lente circular y flash,
+// "saliendo" de la otra esquina del marco.
+const IconPolaroid = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 46 38" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <rect x="3" y="8" width="40" height="27" rx="3" />
+    <circle cx="23" cy="22" r="9" />
+    <circle cx="23" cy="22" r="4.5" />
+    <rect x="10" y="2" width="10" height="7" rx="1.5" strokeWidth={0.9} />
+    <circle cx="35" cy="14" r="1.6" strokeWidth={0.9} />
+  </svg>
+);
+// Sol asomándose doodle -- semicírculo de sol con rayos sobre una línea de
+// olas, usado como divisor de secciones.
+const IconSunWaves = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 48 26" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <path d="M2 19 C 8 15, 12 15, 18 19 C 24 23, 28 23, 34 19 C 40 15, 44 15, 46 17" />
+    <path d="M12 18a12 12 0 0 1 24 0" />
+    <path d="M24 2v3M15 5.5l1.6 2.4M33 5.5l-1.6 2.4" strokeWidth={0.9} />
+  </svg>
+);
+// Ancla doodle -- silueta náutica fina, usada en el kicker de "Cuándo y
+// dónde".
+const IconAnchor = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 24 26" fill="none" stroke="currentColor" strokeWidth={1.2} className={className} style={style} aria-hidden="true">
+    <circle cx="12" cy="4" r="2.2" />
+    <path d="M12 6.2V22" />
+    <path d="M6 10h12" strokeWidth={0.9} />
+    <path d="M3 14c0 5 4 8 9 8s9-3 9-8" />
   </svg>
 );
 
-// Tipografía del sistema "Botánico" (Gloock display + Quicksand texto
-// redondeado), escopeada solo a este componente vía CSS var override en el
+// Tipografía exacta del mockup "Bon Voyage" (Playfair Display itálica + DM
+// Sans), escopeada solo a este componente vía CSS var override en el
 // wrapper raíz — no toca layout.tsx ni las demás plantillas que comparten
 // --font-cormorant/--font-inter/--font-sans.
-const jardinsedaGloock = Gloock({
+const bonvoyagePlayfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400"],
-  variable: "--jardinseda-gloock",
+  style: ["normal", "italic"],
+  weight: ["500", "600", "700"],
+  variable: "--bonvoyage-playfair",
   display: "swap",
 });
-const jardinsedaQuicksand = Quicksand({
+const bonvoyageDmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--jardinseda-quicksand",
+  weight: ["300", "400", "500", "600"],
+  variable: "--bonvoyage-dmsans",
   display: "swap",
 });
 
@@ -149,7 +187,7 @@ function safeJson<T>(val: string | null | undefined, fallback: T): T {
   try { return JSON.parse(val) as T; } catch { return fallback; }
 }
 
-interface JardinSedaTemplateJardinNocturnoProps {
+interface BonVoyageTemplateCoralTropicalProps {
   invitation: Record<string, unknown>;
   guest?: {
     id: string;
@@ -183,14 +221,14 @@ function CopyField({ label, value }: { label: string; value: string }) {
     });
   };
   return (
-    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#9C7FB4]/20 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#FF6B35]/20 last:border-b-0">
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold text-[#9C7FB4] uppercase tracking-wider mb-0.5">{label}</span>
-        <span className="text-xs sm:text-sm font-mono text-[#F2ECF0] break-all">{value}</span>
+        <span className="block text-[10px] font-semibold text-[#FF6B35] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="text-xs sm:text-sm font-mono text-[#FDEEE0] break-all">{value}</span>
       </div>
-      <button 
-        className={`copy-btn shrink-0 px-4 py-2 transition-all ${copied ? "copied" : ""}`} 
-        type="button" 
+      <button
+        className={`copy-btn shrink-0 px-4 py-2 transition-all ${copied ? "copied" : ""}`}
+        type="button"
         onClick={handle}
       >
         {copied ? "✓ Copiado" : "Copiar"}
@@ -201,10 +239,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#9C7FB4]/20 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#FF6B35]/20 last:border-b-0">
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold text-[#9C7FB4] uppercase tracking-wider mb-0.5">{label}</span>
-        <span className="text-sm font-medium text-[#F2ECF0] break-words">{value}</span>
+        <span className="block text-[10px] font-semibold text-[#FF6B35] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="text-sm font-medium text-[#FDEEE0] break-words">{value}</span>
       </div>
     </div>
   );
@@ -230,11 +268,10 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
       setHasLoaded(true);
       return;
     }
-    
-    // Fetch latest stats and guest past response from database
+
     const params = new URLSearchParams({ invitationId });
     if (guestToken) params.append("guestToken", guestToken);
-    
+
     fetch(`/api/quiz?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
@@ -245,7 +282,6 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
           setPicks(data.guestScore.answers || {});
           setFinished(true);
         } else {
-          // Check local/session storage scoped to this specific guest
           const storageKey = guestToken ? `quiz_finished_${invitationId}_${guestToken}` : `quiz_finished_${invitationId}`;
           const localPicks = localStorage.getItem(storageKey);
           if (localPicks) {
@@ -262,17 +298,15 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
     if (picks[currentIdx] !== undefined) return;
     const newPicks = { ...picks, [currentIdx]: oi };
     setPicks(newPicks);
-    
+
     setTimeout(async () => {
       if (currentIdx < preguntas.length - 1) {
         setCurrentIdx(currentIdx + 1);
       } else {
         setFinished(true);
-        // Save to backend and get stats
         if (invitationId) {
           setIsSaving(true);
           try {
-            // Compute score
             let score = 0;
             preguntas.forEach((q, i) => {
               if (newPicks[i] === q.respuestaCorrecta) score++;
@@ -289,8 +323,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
                 totalQuestions: preguntas.length
               })
             });
-            
-            // fetch stats
+
             const params = new URLSearchParams({ invitationId });
             if (guestToken) params.append("guestToken", guestToken);
             const statsRes = await fetch(`/api/quiz?${params.toString()}`);
@@ -298,8 +331,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
               const data = await statsRes.json();
               setStats({ avg: data.averagePercentage, count: data.totalResponses });
             }
-            
-            // Save to local storage as fallback
+
             const storageKey = guestToken ? `quiz_finished_${invitationId}_${guestToken}` : `quiz_finished_${invitationId}`;
             localStorage.setItem(storageKey, JSON.stringify(newPicks));
           } catch (e) {
@@ -318,25 +350,25 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
     let score = 0;
     preguntas.forEach((q, i) => { if (picks[i] === q.respuestaCorrecta) score++; });
     const percent = Math.round((score / preguntas.length) * 100);
-    
+
     return (
       <div className="quiz-box text-center flex flex-col items-center">
-        <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#F2ECF0" }}>
+        <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#FDEEE0" }}>
           ¡Juego Completado!
         </h3>
-        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#F2ECF0" }}>
+        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#FDEEE0" }}>
           RESPONDISTE {score} DE {preguntas.length} CORRECTAMENTE ({percent}%)
         </p>
-        
+
         {isSaving ? (
-          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7, color: "#A89AA5" }}>Guardando tus resultados...</p>
+          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7, color: "#C9A08A" }}>Guardando tus resultados...</p>
         ) : (
           stats && stats.count > 0 && (
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "left", maxWidth: "90%" }}>
-                <Users className="w-5 h-5 text-[#9C7FB4] shrink-0" />
-                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#F2ECF0" }}>
-                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#F2ECF0" }}>{stats.avg}%</strong>.
+                <Users className="w-5 h-5 text-[#FF6B35] shrink-0" />
+                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#FDEEE0" }}>
+                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#FDEEE0" }}>{stats.avg}%</strong>.
                 </p>
               </div>
             </div>
@@ -363,7 +395,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
   return (
     <div className="quiz-box flex flex-col items-center text-center">
       <div className="quiz-q w-full max-w-lg" key={currentIdx}>
-        <p className="text-[#F2ECF0] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
+        <p className="text-[#FDEEE0] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
           {formatQuestion(q.pregunta)}
         </p>
         <div className="quiz-opts flex flex-wrap justify-center gap-3">
@@ -381,10 +413,10 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
               <button
                 key={oi}
                 type="button"
-                style={{ 
-                  borderColor: 'var(--t-acc)', 
-                  color: chosen ? 'var(--t-onacc)' : 'var(--t-acc)', 
-                  backgroundColor: chosen ? 'var(--t-acc)' : 'transparent' 
+                style={{
+                  borderColor: 'var(--t-acc)',
+                  color: chosen ? 'var(--t-onacc)' : 'var(--t-acc)',
+                  backgroundColor: chosen ? 'var(--t-acc)' : 'transparent'
                 }}
                 className={`px-5 py-2.5 rounded-full border text-sm transition-all hover:bg-[var(--t-acc)] hover:text-[var(--t-onacc)] ${className}`}
                 disabled={picks[currentIdx] !== undefined}
@@ -404,7 +436,7 @@ const formatNumber = (num: number) => {
   return new Intl.NumberFormat("es-AR").format(num);
 };
 
-export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonalized = false }: JardinSedaTemplateJardinNocturnoProps) {
+export function BonVoyageTemplateCoralTropical({ invitation, guest, isPersonalized = false }: BonVoyageTemplateCoralTropicalProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
@@ -440,9 +472,6 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
   const theme  = getThemeFromTipo(tipo);
 
   useEffect(() => {
-    // No bloquear el scroll del body si no hay portada que tapar (ej. la
-    // vista post-evento) -- si no, overflow queda en "hidden" para siempre
-    // porque isCoverOpen nunca pasa a true en esas vistas.
     const isPostEventNow = getEventStatus(invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date()) === "POST_EVENT";
     if (!isCoverOpen && !isPostEventNow) {
       document.body.style.overflow = "hidden";
@@ -452,15 +481,13 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
     return () => { document.body.style.overflow = ""; };
   }, [isCoverOpen, invitation.fechaEvento]);
 
-  // Entrada animada de los doodles de la portada (vid, flor, mariposa) con
-  // anime.js -- ver docs/GUIA_TECNICA_PLANTILLAS.md. Corre una sola vez,
-  // cuando la portada aparece (isCoverOpen pasa a false al montar, así que
-  // esto dispara en el primer render real).
+  // Entrada animada de los doodles de la portada (avioneta, estrella de mar,
+  // valija) con anime.js. Corre una sola vez, cuando la portada aparece.
   const coverRootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (isCoverOpen || !coverRootRef.current) return;
     const root = coverRootRef.current;
-    animate(root.querySelectorAll(".jardinseda-doodle"), {
+    animate(root.querySelectorAll(".bonvoyage-doodle"), {
       scale: [0, 1],
       rotate: [-15, 0],
       opacity: [0, 1],
@@ -468,7 +495,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
       delay: stagger(140, { start: 300 }),
       ease: "outBack",
     });
-    animate(root.querySelectorAll(".jardinseda-seal"), {
+    animate(root.querySelectorAll(".bonvoyage-seal"), {
       scale: [0.6, 1],
       opacity: [0, 1],
       duration: 700,
@@ -477,12 +504,11 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
     });
   }, [isCoverOpen]);
 
-  // Doodles del CUERPO de la invitación (divisor, hero, secciones, footer):
-  // se animan al entrar en viewport (scroll) con un IntersectionObserver,
-  // uno por elemento, disparando una sola vez.
+  // Doodles del CUERPO de la invitación: se animan al entrar en viewport
+  // (scroll) con un IntersectionObserver, uno por elemento, una sola vez.
   useEffect(() => {
     if (!isCoverOpen) return;
-    const els = document.querySelectorAll(".jardinseda-scroll-doodle");
+    const els = document.querySelectorAll(".bonvoyage-scroll-doodle");
     if (!els.length) return;
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -501,9 +527,10 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
     return () => observer.disconnect();
   }, [isCoverOpen]);
 
-  // "Florecimiento": un blob de color acuarela que crece desde una esquina
-  // de la foto de portada y se desvanece, ligado al progreso de scroll (en
-  // vez de un lens-flare) -- como una mancha de acuarela floreciendo.
+  // Reflejo de sol en el agua sobre la foto de portada, ligado al progreso de
+  // scroll (ScrollObserver de anime.js): una franja horizontal de brillo tipo
+  // glint que recorre la foto + un par de destellos chicos de "spray",
+  // como el sol pegando sobre el agua.
   const heroPhotoRef = useRef<HTMLDivElement>(null);
   const heroFlareRef = useRef<HTMLDivElement>(null);
   const heroGhost1Ref = useRef<HTMLDivElement>(null);
@@ -521,16 +548,16 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
       onUpdate: (self) => {
         const p = self.progress; // 0 a 1 mientras la foto atraviesa el viewport
         const intensity = Math.sin(p * Math.PI); // 0 -> 1 -> 0
-        const scale = 0.7 + intensity * 0.6; // el blob "crece" al centro del recorrido
+        const x = p * 130 - 15;
         flare.style.opacity = String(intensity * 0.5);
-        flare.style.transform = `translate(-50%,-50%) scale(${scale})`;
+        flare.style.left = `${x}%`;
         if (ghost1) {
           ghost1.style.opacity = String(intensity * 0.35);
-          ghost1.style.transform = `translate(-50%,-50%) scale(${scale * 0.8})`;
+          ghost1.style.left = `${x - 20}%`;
         }
         if (ghost2) {
-          ghost2.style.opacity = String(intensity * 0.3);
-          ghost2.style.transform = `translate(-50%,-50%) scale(${scale * 0.6})`;
+          ghost2.style.opacity = String(intensity * 0.22);
+          ghost2.style.left = `${x + 24}%`;
         }
       },
     });
@@ -540,7 +567,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
   // Cover / Welcome Overlay data
   const portadaHabilitada = Boolean(invitation.portadaHabilitada ?? true);
   const ciudad = String(invitation.ciudad ?? "");
-  const portadaKicker = String(invitation.portadaKicker || "Con mucho cariño, para");
+  const portadaKicker = String(invitation.portadaKicker || "Empezamos el viaje más importante de nuestras vidas");
   const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || "Te invitamos a compartir este día tan especial con nosotros");
   const portadaBoton = String(invitation.portadaTextoBoton || "Abrir invitación");
 
@@ -556,11 +583,11 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
   const { title, em } = getHeroTitle();
 
-  const eyebrow = invitation.nombreEvento 
+  const eyebrow = invitation.nombreEvento
     ? String(invitation.nombreEvento)
-    : tipo === "CASAMIENTO" ? "Nos casamos"
-    : tipo === "QUINCE_ANOS" ? "Mis quince años"
-    : "Te invitamos";
+    : tipo === "CASAMIENTO" ? "Nos casamos frente al mar"
+    : tipo === "QUINCE_ANOS" ? "Mis quince, la gran aventura"
+    : "Bon voyage";
 
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
@@ -595,7 +622,6 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
   const pagoTarjetaHabilitado = Boolean(invitation.pagoTarjetaHabilitado);
   const showGiftSection = regaloHabilitado || pagoTarjetaHabilitado;
 
-  // PAGOS Y COBROS DE TARJETAS SOLO ACTIVOS SI PAGO DE TARJETAS ESTÁ HABILITADO
   const paymentEnabled = pagoTarjetaHabilitado;
   const paymentAmount  = paymentEnabled ? (Number((invitation as any).pagoTarjetaMonto ?? invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined)) : undefined;
   const guestPayStatus = paymentEnabled ? ((guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID") : undefined;
@@ -604,7 +630,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
   const triviaPreguntas: QuizQuestion[] = safeJson<QuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
 
   const songsEnabled = Boolean(invitation.sugerenciaMusicaHabilitada ?? true);
-  
+
   const activeDressCode = invitation.dresscodeHabilitado ? String(invitation.dresscodeTipo || invitation.portadaDressCode || "") : "";
 
   const navSections = [
@@ -621,7 +647,10 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/jardinseda-quince.png" : undefined;
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/bonvoyage-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/bonvoyage-quince.png"
+    : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -637,25 +666,22 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#120E14] via-[#1E1820] to-[#FFFFFF] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
-        {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#1A0E08] via-[#241608] to-[#FFFFFF] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
 
         <main className="relative z-10 max-w-5xl mx-auto w-full px-4 md:px-6 py-12 lg:py-20">
           <div className="rounded-[2rem] bg-black/40 border border-white/10 shadow-2xl backdrop-blur-3xl text-center max-w-4xl mx-auto relative overflow-hidden flex flex-col">
-            {/* Elegant top accent line */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-amber-200/50 to-transparent" />
-            
-            {/* Header Content */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-sky-200/50 to-transparent" />
+
             <div className="p-10 md:p-16 space-y-8">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white tracking-wide drop-shadow-md">
-                Un momento <AnimatedSynonyms words={["inolvidable", "único", "eterno", "mágico"]} className="italic text-amber-200/90 font-serif" />
+                Un momento <AnimatedSynonyms words={["inolvidable", "único", "eterno", "mágico"]} className="italic text-sky-200/90 font-serif" />
               </h1>
-              
+
               <div className="flex justify-center items-center gap-4 py-2 opacity-60">
                 <div className="h-[1px] w-12 bg-white/20" />
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-200/50" />
+                <div className="w-1.5 h-1.5 rounded-full bg-sky-200/50" />
                 <div className="h-[1px] w-12 bg-white/20" />
               </div>
 
@@ -665,13 +691,12 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
               <div className="pt-6">
                 <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs  tracking-widest uppercase backdrop-blur-md" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400/80 animate-pulse" />
                   <span>Álbum disponible hasta el {expirationDateStr}</span>
                 </div>
               </div>
             </div>
 
-            {/* Carrusel de Fotos LIVE integrado */}
             <SectionWrapper id="album" className="w-full bg-black/20 border-t border-white/5 py-8 md:py-12">
               <div className="px-4 md:px-10">
                 {livePhotos.length > 0 ? (
@@ -694,7 +719,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         </main>
 
         <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">
-          <LogoFooterCredit bgColor="transparent" textColor="var(--jardinseda-ink, #F2ECF0)" />
+          <LogoFooterCredit bgColor="transparent" textColor="var(--bonvoyage-ink, #FDEEE0)" />
         </footer>
       </div>
     );
@@ -702,45 +727,44 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
   return (
     <div
-      className={`${jardinsedaGloock.variable} ${jardinsedaQuicksand.variable}`}
+      className={`${bonvoyagePlayfair.variable} ${bonvoyageDmSans.variable}`}
       style={{
-        "--font-cormorant": "var(--jardinseda-gloock)",
-        "--font-inter": "var(--jardinseda-quicksand)",
-        "--font-sans": "var(--jardinseda-quicksand)",
-        "--t-acc": "#9C7FB4",
-        "--t-acc2": "#9C7FB4",
-        "--c-accent": "#9C7FB4",
-        "--t-bg": "#120E14",
-        "--t-surface": "#1E1820",
-        "--t-muted": "#A89AA5",
-        // Usado por Countdown.tsx/RSVPWizardV2.tsx (dark ? var(--jardinseda-ink, #FFFFFF) : ...)
+        "--font-cormorant": "var(--bonvoyage-playfair)",
+        "--font-inter": "var(--bonvoyage-dmsans)",
+        "--font-sans": "var(--bonvoyage-dmsans)",
+        "--t-acc": "#FF6B35",
+        "--t-acc2": "#2CA6A4",
+        "--c-accent": "#FF6B35",
+        "--t-bg": "#1A0E08",
+        "--t-surface": "#241608",
+        "--t-muted": "#C9A08A",
+        // Usado por Countdown.tsx/RSVPWizardV2.tsx (dark ? var(--bonvoyage-ink, #FFFFFF) : ...)
         // -- sin definir esto, esos componentes muestran texto blanco
         // hardcodeado (pensado para Moderno/Neon) invisible sobre el fondo
-        // claro de Chic. Moderno/Neon no definen esta var, así que su
+        // claro de Bon Voyage. Moderno/Neon no definen esta var, así que su
         // fallback (#FFFFFF/#EDE9F4) los deja exactamente como estaban.
-        "--jardinseda-ink": "#F2ECF0",
-        "--chic-ink": "#F2ECF0",
+        "--bonvoyage-ink": "#FDEEE0",
+        "--chic-ink": "#FDEEE0",
       } as React.CSSProperties}
     >
       <style>{`
-        .desktop-stage .tpl h2, 
-        .desktop-stage .tpl h3, 
+        .desktop-stage .tpl h2,
+        .desktop-stage .tpl h3,
         .desktop-stage .tpl h4,
         .desktop-stage .tpl .rsvp-container h2,
         .desktop-stage .tpl .rsvp-container h3,
         .desktop-stage .tpl .quiz-container h2,
         .desktop-stage .tpl .quiz-container h3 {
           font-family: var(--font-title, var(--font-cormorant)), serif !important;
-          color: #F2ECF0 !important;
+          color: #FDEEE0 !important;
         }
-        /* Tarjetas claras (Ceremonia/Fiesta) necesitan texto oscuro, no blanco */
         .desktop-stage .tpl .moderno-light-card h4 {
-          color: #F2ECF0 !important;
+          color: #FDEEE0 !important;
         }
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
-          color: #9C7FB4 !important;
+          color: #FF6B35 !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -754,39 +778,37 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         .desktop-stage .tpl p.kicker::before {
           display: none !important;
         }
-        
-        /* Sistema "Botánico": todo redondeado -- lo opuesto al ángulo recto
-           de Chic/Moderno, coherente con los blobs orgánicos del mockup. */
+
+        .desktop-stage .tpl div:not(#countdown div),
+        .desktop-stage .tpl section,
         .desktop-stage .tpl button,
         .desktop-stage .tpl input,
-        .desktop-stage .tpl .t-btn {
-          border-radius: 999px !important;
-        }
         .desktop-stage .tpl iframe,
-        .desktop-stage .tpl .album-item {
-          border-radius: 18px !important;
+        .desktop-stage .tpl .t-btn,
+        .desktop-stage .tpl .album-item,
+        .desktop-stage .tpl .album-btn {
+          border-radius: 0 !important;
         }
         .desktop-stage .tpl .album-btn {
-          color: #F2ECF0 !important;
+          color: #FDEEE0 !important;
           border-color: rgba(255, 255, 255, 0.3) !important;
         }
 
-        /* Override Countdown Hardcoded Colors */
         #countdown.dark {
-          background-color: #120E14 !important;
+          background-color: #1A0E08 !important;
           margin-top: -2px !important;
           position: relative;
           z-index: 20;
         }
         #countdown[data-style="clasico"].dark > div > div > div {
           background-color: rgba(0, 0, 0, 0.2) !important;
-          border-color: rgba(183, 159, 196, 0.2) !important;
+          border-color: rgba(46, 126, 166, 0.2) !important;
         }
 
-        /* RSVP Custom Aesthetics for JardinSedaTemplate */
+        /* RSVP Custom Aesthetics for BonVoyageTemplateCoralTropical */
         #rsvp.section.dark {
-          background-color: #120E14 !important;
-          color: #F2ECF0 !important;
+          background-color: #1A0E08 !important;
+          color: #FDEEE0 !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -802,18 +824,18 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         }
         #rsvp.section.dark b,
         #rsvp.section.dark strong {
-          color: #F2ECF0 !important;
+          color: #FDEEE0 !important;
         }
         @media (min-width: 640px) {
           #rsvp.section.dark > p.t-kicker,
           #rsvp.section.dark > h2,
           #rsvp.section.dark > .d-rsvp-grid {
-            max-width: 36rem !important; /* 576px to match sm:max-w-xl */
+            max-width: 36rem !important;
           }
         }
         #rsvp.section.dark .t-kicker {
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
-          color: #9C7FB4 !important;
+          color: #FF6B35 !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -829,44 +851,40 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           font-size: 10px !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           letter-spacing: 0.15em !important;
-          color: #A89AA5 !important;
+          color: #C9A08A !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #F2ECF0 !important;
-          border-radius: 999px !important;
-          border: 1px solid rgba(183, 159, 196, 0.2) !important;
+          color: #FDEEE0 !important;
+          border-radius: 6px !important;
+          border: 1px solid rgba(46, 126, 166, 0.2) !important;
           padding: 12px 16px !important;
           font-weight: 400 !important;
           font-size: 14px !important;
         }
         #rsvp.section.dark input::placeholder {
-          color: #A89AA5 !important;
+          color: #C9A08A !important;
           opacity: 0.8 !important;
         }
         #rsvp.section.dark .t-btn {
-          border-radius: 999px !important;
+          border-radius: 6px !important;
           padding: 12px 24px !important;
           flex: 1 !important;
           min-width: 120px !important;
-          background-color: #9C7FB4 !important;
-          color: #F2ECF0 !important;
+          background-color: #2CA6A4 !important;
+          color: #FDEEE0 !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
           letter-spacing: 0.1em !important;
           font-size: 13px !important;
         }
-        /* Make decision buttons side-by-side */
         #rsvp.section.dark div:has(> button[aria-label="Confirmar asistencia"]) {
           flex-direction: row !important;
           gap: 12px !important;
         }
-        
-        
-        
-        /* Subtle Calculated Prices Styling Below the Form */
+
         .desktop-stage .tpl .d-rsvp-grid {
           display: flex !important;
           flex-direction: column !important;
@@ -876,19 +894,19 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         .desktop-stage .tpl .d-rsvp-grid > div {
           width: 100% !important;
         }
-        
+
         #rsvp.section.dark .t-detail {
           background-color: transparent !important;
           border: none !important;
-          border-radius: 12px !important;
+          border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(58,46,51,0.1) !important;
+          border-top: 1px solid rgba(27,58,92,0.1) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(58,46,51,0.5) !important;
+          color: rgba(27,58,92,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -898,7 +916,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(58,46,51,0.7) !important;
+          color: rgba(27,58,92,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -907,17 +925,17 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #F2ECF0 !important;
+          color: #FDEEE0 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(58,46,51,0.4) !important;
+          color: rgba(27,58,92,0.4) !important;
           font-size: 12px !important;
         }
-        
+
         /* SongSuggestion Custom Aesthetics */
         #songs.d-sec.dark {
-          background-color: #1E1820 !important;
+          background-color: #241608 !important;
           padding: 80px 24px !important;
           display: flex;
           flex-direction: column;
@@ -934,12 +952,12 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           #songs.d-sec.dark > p.t-kicker,
           #songs.d-sec.dark > form,
           #songs.d-sec.dark > div {
-            max-width: 36rem !important; /* 576px */
+            max-width: 36rem !important;
           }
         }
         #songs.d-sec.dark .t-kicker {
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
-          color: #9C7FB4 !important; /* Gold/Orange */
+          color: #FF6B35 !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -950,46 +968,42 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         #songs.d-sec.dark h2 {
           display: none !important;
         }
-        /* Fix Input Row Overflow */
         #songs.d-sec.dark .mod-input-row {
           display: flex !important;
           flex-direction: column !important;
           gap: 0 !important;
           width: 100% !important;
         }
-        /* Footer Aesthetics */
         .desktop-stage .d-foot {
-          background-color: #120E14 !important; /* Matches light sections */
-          color: #F2ECF0 !important;
+          background-color: #1A0E08 !important;
+          color: #FDEEE0 !important;
           padding: 24px 24px 38px 24px !important;
           text-align: center;
         }
         .desktop-stage .d-foot .mono {
-          color: #9C7FB4 !important;
+          color: #FF6B35 !important;
           font-family: var(--font-title, var(--font-cormorant)), serif !important;
           font-size: 20px !important;
           margin-bottom: 8px !important;
         }
 
-        /* Bank Section Overrides */
         #banco .t-kicker {
           text-align: left !important;
         }
         #banco .copy-btn {
-          background-color: #9C7FB4 !important;
-          color: #F2ECF0 !important;
+          background-color: #FF6B35 !important;
+          color: #FFFFFF !important;
           border: none !important;
-          border-radius: 999px !important;
+          border-radius: 0 !important;
           font-weight: 700 !important;
           text-transform: uppercase !important;
           letter-spacing: 0.05em !important;
         }
         #banco .copy-btn.copied {
-          background-color: #F2ECF0 !important;
-          color: #120E14 !important;
+          background-color: #FDEEE0 !important;
+          color: #1A0E08 !important;
         }
 
-        /* Bottom Nav Pill - Liquid Glass Sticky */
         .desktop-stage .bottom-nav {
           position: fixed !important;
           bottom: 24px !important;
@@ -997,7 +1011,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           transform: translateX(-50%) !important;
           display: flex !important;
           justify-content: space-between !important;
-          background: rgba(26, 21, 18, 0.95) !important;
+          background: rgba(27, 58, 92, 0.95) !important;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
           backdrop-filter: blur(12px) !important;
           width: calc(100% - 32px) !important;
@@ -1007,21 +1021,21 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           z-index: 999999 !important;
         }
         .desktop-stage .bottom-nav a {
-          color: #F2ECF0 !important;
+          color: #FDEEE0 !important;
           opacity: 0.6 !important;
         }
         .desktop-stage .bottom-nav a[aria-current="true"] {
           opacity: 1 !important;
-          color: #9C7FB4 !important;
+          color: #FF6B35 !important;
         }
       `}</style>
-      
-      {/* PORTADA / WELCOME OVERLAY (mesh dorado + esmeralda animado, glow pulsante) */}
+
+      {/* PORTADA / WELCOME OVERLAY (mesh océano + arena animado, glow pulsante) */}
       {!isCoverOpen && (
         <div
           ref={coverRootRef}
-          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#120E14', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className={`text-[#F2ECF0] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#1A0E08', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
+          className={`text-[#FDEEE0] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
           {portadaFondoAnimado && (
             <div className="acp-mobile-only">
@@ -1029,31 +1043,32 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
                 photoSrc={portadaImagenFondoDesktopRaw as string}
                 effect="enfoque"
                 tint={false}
-                scrimColorRgb="58,46,51"
+                scrimColorRgb="27,58,92"
               />
             </div>
           )}
           <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
             <div style={{
               position: 'absolute', inset: 0, pointerEvents: 'none',
-              background: 'radial-gradient(50% 40% at 15% 15%, rgba(183,159,196,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(124,148,115,0.2), transparent)',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(46,126,166,0.14), transparent), radial-gradient(45% 40% at 85% 80%, rgba(201,169,110,0.2), transparent)',
               backgroundSize: '160% 160%',
-              animation: 'jardinseda-meshDrift 14s ease-in-out infinite',
+              animation: 'bonvoyage-meshDrift 14s ease-in-out infinite',
             }} />
             <div style={{
               position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(183,159,196,0.13), transparent 70%)',
+              background: 'radial-gradient(circle, rgba(46,126,166,0.14), transparent 70%)',
               top: '18%', left: '50%', transform: 'translateX(-50%)',
-              animation: 'jardinseda-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+              animation: 'bonvoyage-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
             }} />
 
-            {/* Doodles decorativos (vid, flor, mariposa) -- animados de
-                entrada con anime.js (ver useEffect de coverRootRef), inertes
-                hasta que corre el JS (opacity-0 inicial). */}
-            <IconRings className="jardinseda-doodle opacity-0 absolute" style={{ width: 40, height: 26, top: '9%', left: '10%', color: 'rgba(124,148,115,0.55)' }} />
-            <IconHeartDoodle className="jardinseda-doodle opacity-0 absolute" style={{ width: 22, height: 22, top: '15%', right: '12%', color: 'rgba(183,159,196,0.5)' }} />
-            <IconRibbon className="jardinseda-doodle opacity-0 absolute" style={{ width: 26, height: 19, bottom: '18%', left: '14%', color: 'rgba(183,159,196,0.45)' }} />
-            <IconHeartDoodle className="jardinseda-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '24%', right: '20%', color: 'rgba(124,148,115,0.4)' }} />
+            {/* Doodles decorativos (avioneta, estrella de mar, valija) --
+                animados de entrada con anime.js (ver useEffect de
+                coverRootRef), inertes hasta que corre el JS (opacity-0
+                inicial). */}
+            <IconAirplane className="bonvoyage-doodle opacity-0 absolute" style={{ width: 56, height: 40, top: '9%', left: '8%', color: 'rgba(46,126,166,0.5)' }} />
+            <IconStarfish className="bonvoyage-doodle opacity-0 absolute" style={{ width: 20, height: 20, top: '15%', right: '13%', color: 'rgba(201,169,110,0.5)' }} />
+            <IconWaves className="bonvoyage-doodle opacity-0 absolute" style={{ width: 46, height: 16, bottom: '17%', left: '12%', color: 'rgba(46,126,166,0.4)' }} />
+            <IconStarfish className="bonvoyage-doodle opacity-0 absolute" style={{ width: 15, height: 15, bottom: '25%', right: '18%', color: 'rgba(46,126,166,0.4)' }} />
           </div>
 
           {portadaFondoFallback && (
@@ -1063,44 +1078,43 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
 
             {/* Guest Name */}
-            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " jardinseda-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#F2ECF0' }}>
-              {guestNameDisplay}
-            </h2>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " bonvoyage-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', fontStyle: 'italic', color: portadaFondoAnimado ? undefined : '#FDEEE0' }}>
+              {guestNameDisplay}</h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " jardinseda-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#A89AA5' }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " bonvoyage-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#C9A08A' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
 
-            {/* Thin Open Button, borde dorado con vidrio esmerilado */}
+            {/* Thin Open Button, borde océano con vidrio esmerilado */}
             <button
               type="button"
               onClick={openInvitation}
               className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
               style={{
-                fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #9C7FB4', color: '#9C7FB4',
-                background: 'rgba(183,159,196,0.08)', backdropFilter: 'blur(6px)',
+                fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #FF6B35', color: '#FF6B35',
+                background: 'rgba(46,126,166,0.08)', backdropFilter: 'blur(6px)',
                 marginTop: '1rem',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#9C7FB4'; e.currentTarget.style.color = '#120E14'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(183,159,196,0.08)'; e.currentTarget.style.color = '#9C7FB4'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#FF6B35'; e.currentTarget.style.color = '#1A0E08'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(46,126,166,0.08)'; e.currentTarget.style.color = '#FF6B35'; }}
             >
-              ABRIR INVITACIÓN
+              {portadaBoton.toUpperCase()}
             </button>
 
           </div>
 
           <style jsx>{`
-            @keyframes jardinseda-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
-            @keyframes jardinseda-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
-            @keyframes jardinseda-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .jardinseda-cover-text { color: #120E14; }
-            .jardinseda-cover-text-muted { color: rgba(252,239,241,0.75); }
+            @keyframes bonvoyage-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
+            @keyframes bonvoyage-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+            @keyframes bonvoyage-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            .bonvoyage-cover-text { color: #1A0E08; }
+            .bonvoyage-cover-text-muted { color: rgba(244,249,251,0.75); }
             @media (min-width: 768px) {
-              .jardinseda-cover-text { color: #F2ECF0; }
-              .jardinseda-cover-text-muted { color: #A89AA5; }
+              .bonvoyage-cover-text { color: #FDEEE0; }
+              .bonvoyage-cover-text-muted { color: #C9A08A; }
             }
           `}</style>
           <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
@@ -1109,24 +1123,24 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
       {/* Sticky Ticket Bubble via Portal */}
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
-        <div 
+        <div
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#9C7FB4]/40 shadow-md ${isTicketMaximized ? 'bg-[#120E14]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#F2ECF0]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
+          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#FF6B35]/40 shadow-md ${isTicketMaximized ? 'bg-[#1A0E08]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#FDEEE0]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
         >
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
-                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#9C7FB4] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
-                <span className="text-[#F2ECF0] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
+                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#FF6B35] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
+                <span className="text-[#FDEEE0] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
               </div>
-              <div className="flex flex-col items-end border-l border-[#9C7FB4]/20 pl-3">
-                <span className="text-[#F2ECF0] font-bold text-sm leading-none">{guest.expectedCount}</span>
-                <span className="text-[#A89AA5] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
+              <div className="flex flex-col items-end border-l border-[#FF6B35]/20 pl-3">
+                <span className="text-[#FDEEE0] font-bold text-sm leading-none">{guest.expectedCount}</span>
+                <span className="text-[#C9A08A] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
-              <Ticket className="w-4 h-4 text-[#9C7FB4]" />
+              <Ticket className="w-4 h-4 text-[#FF6B35]" />
               <span className="text-[#FFFFFF]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
@@ -1146,21 +1160,14 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
       <div className="desktop-stage" data-theme={theme} style={{
         ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string),
-        // Este wrapper (vista de escritorio, separado del de arriba que es
-        // el de mobile) nunca tuvo las CSS vars del tema -- ni siquiera en
-        // ModernoTemplate.tsx original. Ahí "no se nota" porque el fallback
-        // de los componentes compartidos (Countdown, RSVPWizardV2) es un
-        // color claro que igual se lee sobre el fondo oscuro de Moderno.
-        // En Chic (tema claro) ese mismo fallback es invisible, así que acá
-        // SÍ hace falta definir todo explícitamente.
-        "--t-acc": "#9C7FB4",
-        "--t-acc2": "#9C7FB4",
-        "--c-accent": "#9C7FB4",
-        "--t-bg": "#120E14",
-        "--t-surface": "#1E1820",
-        "--t-muted": "#A89AA5",
-        "--jardinseda-ink": "#F2ECF0",
-        "--chic-ink": "#F2ECF0",
+        "--t-acc": "#FF6B35",
+        "--t-acc2": "#2CA6A4",
+        "--c-accent": "#FF6B35",
+        "--t-bg": "#1A0E08",
+        "--t-surface": "#241608",
+        "--t-muted": "#C9A08A",
+        "--bonvoyage-ink": "#FDEEE0",
+        "--chic-ink": "#FDEEE0",
       } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
@@ -1184,7 +1191,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
               <span className="block">{title}</span>
             )}
           </h1>
-          <div style={{ width: 40, height: 2, background: '#9C7FB4', margin: '6px 0 14px', animation: 'jardinseda-lineExpand 1.2s ease-out' }} />
+          <div style={{ width: 40, height: 2, background: '#2CA6A4', margin: '6px 0 14px', animation: 'bonvoyage-lineExpand 1.2s ease-out' }} />
           <p className=" text-sm font-medium text-white/90 tracking-wide drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
           {Boolean(activeDressCode) && (
             <p className=" text-xs font-semibold text-white/80 tracking-widest uppercase mt-4 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1203,40 +1210,39 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
       </aside>
 
       <div className="d-right tpl">
-        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#120E14]">
+        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#1A0E08]">
           {/* Text Container */}
-          <div className="px-8 pt-16 pb-12 text-left bg-[#120E14] z-10 relative">
-            <IconHeartDoodle className="jardinseda-scroll-doodle opacity-0 absolute" style={{ width: 18, height: 18, top: 12, right: 28, color: 'rgba(124,148,115,0.4)' }} />
-            <IconRibbon className="jardinseda-scroll-doodle opacity-0 absolute" style={{ width: 26, height: 15, top: 64, right: 52, color: 'rgba(183,159,196,0.4)' }} />
-            <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#9C7FB4] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+          <div className="px-8 pt-16 pb-12 text-left bg-[#1A0E08] z-10 relative">
+            <IconStarfish className="bonvoyage-scroll-doodle opacity-0 absolute" style={{ width: 18, height: 18, top: 12, right: 28, color: 'rgba(201,169,110,0.5)' }} />
+            <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#FF6B35] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#F2ECF0] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h1 className="text-[4rem] font-light text-[#FDEEE0] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
-                  <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', color: '#9C7FB4' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
+                  <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', color: '#2CA6A4' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
                 </>
               ) : (
                 <span className="block">{title}</span>
               )}
             </h1>
-            <div style={{ width: 40, height: 2, background: '#9C7FB4', margin: '0 0 20px', animation: 'jardinseda-lineExpand 1.2s ease-out' }} />
-            <p className=" text-sm font-medium text-[#A89AA5] tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+            <div style={{ width: 40, height: 2, background: '#2CA6A4', margin: '0 0 20px', animation: 'bonvoyage-lineExpand 1.2s ease-out' }} />
+            <p className=" text-sm font-medium text-[#C9A08A] tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {fechaStr}{lugarNombre ? ` · ${lugarNombre}` : ""}{ciudad ? ` — ${ciudad}` : ""}
             </p>
             {Boolean(activeDressCode) && (
-              <p className=" text-xs font-semibold text-[#9C7FB4] tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+              <p className=" text-xs font-semibold text-[#FF6B35] tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                 Dress code: {activeDressCode}
               </p>
             )}
           </div>
-          
-          {/* Image Container -- marco redondeado completo + florecimiento
-              acuarela ligado al scroll (ver useEffect de heroPhotoRef). Todo
-              con esquinas muy redondeadas, coherente con el sistema Botánico. */}
-          <div ref={heroPhotoRef} className="flex-1 w-full relative overflow-hidden rounded-b-[2.5rem]">
-            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #120E14 100%)' }} />
+
+          {/* Image Container -- marco océano completo, brújula en la esquina
+              superior, valija y cámara polaroid "saliendo" del marco +
+              reflejo de sol en el agua ligado al scroll. */}
+          <div ref={heroPhotoRef} className="flex-1 w-full relative overflow-hidden">
+            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #1A0E08 100%)' }} />
             <div
               className="absolute inset-0 w-full h-full"
               style={heroBgMobile ? {
@@ -1244,24 +1250,23 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
                 backgroundSize: "cover",
                 backgroundPosition: `${Number(invitation.portadaImagenPosX ?? 50)}% ${Number(invitation.portadaImagenPosY ?? 50)}%`,
                 backgroundRepeat: "no-repeat"
-              } : { backgroundColor: '#FFFFFF' }}
+              } : { backgroundColor: '#241608' }}
             />
-            {/* Marco redondeado completo + hoja y flor "saliendo" del borde. */}
-            <div className="absolute inset-3 pointer-events-none z-20 rounded-[2rem]" aria-hidden="true" style={{ border: "1px solid rgba(183,159,196,0.6)" }}>
-              <IconRings style={{ position: "absolute", top: -10, left: -8, width: 30, height: 20, color: "#6F9A76" }} />
-              <IconHeartDoodle style={{ position: "absolute", bottom: -8, right: -6, width: 18, height: 18, color: "#9C7FB4" }} />
+            <div className="absolute inset-3 pointer-events-none z-20" aria-hidden="true">
+              <div className="absolute inset-0" style={{ border: "1px solid rgba(46,126,166,0.6)" }} />
+              <IconCompass style={{ position: "absolute", top: -14, left: -12, width: 32, height: 32, color: "#FF6B35" }} />
+              <IconSuitcase style={{ position: "absolute", bottom: -12, right: -14, width: 30, height: 26, color: "#2CA6A4" }} />
             </div>
-            {/* Florecimiento acuarela: un blob de color que crece desde una
-                esquina y se desvanece, en vez de un lens-flare -- + 2 blobs
-                más chicos siguiéndolo, todos ligados al progreso de scroll. */}
-            <div ref={heroFlareRef} className="pointer-events-none z-20" style={{ position: "absolute", width: 140, height: 140, top: "10%", left: "8%", borderRadius: "50%", background: "radial-gradient(circle, rgba(183,159,196,0.55) 0%, rgba(124,148,115,0.3) 55%, transparent 75%)", opacity: 0, transform: "translate(-50%,-50%)", filter: "blur(2px)" }} />
-            <div ref={heroGhost1Ref} className="pointer-events-none z-20" style={{ position: "absolute", width: 70, height: 70, bottom: "18%", right: "12%", borderRadius: "50%", background: "radial-gradient(circle, rgba(124,148,115,0.5), transparent 70%)", opacity: 0, transform: "translate(-50%,-50%)", filter: "blur(1.5px)" }} />
-            <div ref={heroGhost2Ref} className="pointer-events-none z-20" style={{ position: "absolute", width: 40, height: 40, top: "55%", right: "22%", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.7), transparent 70%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
+            {/* Reflejo de sol en el agua: franja horizontal de brillo tipo
+                glint + dos destellos de "spray" acompañando, ligados al
+                progreso de scroll. */}
+            <div ref={heroFlareRef} className="pointer-events-none z-20" style={{ position: "absolute", top: '58%', width: 120, height: 26, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,255,255,0.85), rgba(168,216,232,0.35) 55%, transparent 80%)", opacity: 0, transform: "translate(-50%,-50%)", filter: "blur(1px)" }} />
+            <div ref={heroGhost1Ref} className="pointer-events-none z-20" style={{ position: "absolute", top: '54%', width: 26, height: 10, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,255,255,0.8), transparent 75%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
+            <div ref={heroGhost2Ref} className="pointer-events-none z-20" style={{ position: "absolute", top: '63%', width: 18, height: 8, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,255,255,0.7), transparent 75%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
           </div>
         </div>
 
-        {/* Divisor doodle entre hero y cuenta regresiva: zarcillo flanqueado
-            por flores de trazo fino, motivo Botánico. */}
+        {/* Divisor doodle "sol / olas" entre hero y cuenta regresiva */}
 
         <SaveTheDate
           headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
@@ -1281,53 +1286,52 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6F9A7614, transparent 70%), var(--t-surface)" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #2CA6A414, transparent 70%), var(--t-surface)" }}>
             <div className="max-w-2xl mx-auto text-center">
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
-              <TypewriterText 
+              <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
-                className="text-[#F2ECF0] text-2xl md:text-3xl leading-relaxed tracking-wide" 
+                className="text-[#FDEEE0] text-2xl md:text-3xl leading-relaxed tracking-wide"
                 style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500 }}
               />
             </div>
           </SectionWrapper>
         ) : null}
 
-        <SectionWrapper id="details" delay={150} className="w-full bg-[#120E14] py-20 px-6 md:px-12">
+        <SectionWrapper id="details" delay={150} className="w-full bg-[#1A0E08] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
             <div className="flex justify-center mb-4">
               <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
-            <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#9C7FB4]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+            <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#FF6B35]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               CUÁNDO Y DÓNDE
             </p>
 
-            {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
             {Boolean(invitation.ceremoniaHabilitada) && (
-              <div className="bg-black/20 border-l-[2px] border-l-[#9C7FB4] p-6 sm:p-8 mb-6 shadow-sm">
+              <div className="bg-black/20 border-l-[2px] border-l-[#FF6B35] p-6 sm:p-8 mb-6 shadow-sm">
                 <div>
-                  <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A89AA5] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A08A] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     {String(invitation.ceremoniaTitulo || "CEREMONIA")}
                   </span>
                   {Boolean(invitation.ceremoniaNombre) && (
-                    <h4 className="text-2xl sm:text-3xl font-light text-[#F2ECF0] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                    <h4 className="text-2xl sm:text-3xl font-light text-[#FDEEE0] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
                       {String(invitation.ceremoniaNombre)}
                     </h4>
                   )}
                   {Boolean(invitation.ceremoniaHora) && (
-                    <p className="text-[#A89AA5]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                    <p className="text-[#C9A08A]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       {String(invitation.ceremoniaHora)} hs
                     </p>
                   )}
                   {Boolean(invitation.ceremoniaDireccion) && (
-                    <p className="text-[#A89AA5]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                    <p className="text-[#C9A08A]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       {String(invitation.ceremoniaDireccion)}
                     </p>
                   )}
                   {Boolean(invitation.ceremoniaMapUrl) && (
-                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#9C7FB4] hover:text-white transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#FF6B35] hover:text-[#FDEEE0] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       Ver mapa ceremonia ↗
                     </a>
                   )}
@@ -1335,53 +1339,51 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
               </div>
             )}
 
-            {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
             {(lugarNombre || direccion) && (
-              <div className="bg-black/20 border-l-[2px] border-l-[#9C7FB4] p-6 sm:p-8 mb-10 shadow-sm">
-                <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A89AA5] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+              <div className="bg-black/20 border-l-[2px] border-l-[#FF6B35] p-6 sm:p-8 mb-10 shadow-sm">
+                <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A08A] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   FIESTA / SALÓN
                 </span>
                 {lugarNombre && (
-                  <h4 className="text-2xl sm:text-3xl font-light text-[#F2ECF0] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                  <h4 className="text-2xl sm:text-3xl font-light text-[#FDEEE0] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
                     {lugarNombre}
                   </h4>
                 )}
                 {hora && (
-                  <p className="text-[#A89AA5]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <p className="text-[#C9A08A]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     {hora} hs
                   </p>
                 )}
                 {direccion && (
-                  <p className="text-[#A89AA5]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <p className="text-[#C9A08A]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     {direccion}
                   </p>
                 )}
                 {mapUrl && (
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#9C7FB4] hover:text-white transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#FF6B35] hover:text-[#FDEEE0] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     Ver mapa fiesta ↗
                   </a>
                 )}
               </div>
             )}
 
-            {/* CRONOGRAMA DE ACTIVIDADES (Si existe) */}
             {cronograma.length > 0 && (
               <div className="mt-16" id="schedule">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>
-                <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#9C7FB4]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#FF6B35]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
                   {cronograma.map((item, i) => (
-                    <div key={i} className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-[#9C7FB4]/10 last:border-b-0">
+                    <div key={i} className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-[#FF6B35]/10 last:border-b-0">
                       {item.time && (
-                        <span className=" text-sm sm:text-base text-[#A89AA5] font-medium w-24 flex-shrink-0 mb-1 sm:mb-0" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                        <span className=" text-sm sm:text-base text-[#C9A08A] font-medium w-24 flex-shrink-0 mb-1 sm:mb-0" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                           {item.time}
                         </span>
                       )}
-                      <span className="text-[1.2rem] sm:text-[1.3rem] text-[#F2ECF0] font-light" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                      <span className="text-[1.2rem] sm:text-[1.3rem] text-[#FDEEE0] font-light" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
                         {item.title}
                       </span>
                     </div>
@@ -1478,12 +1480,12 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
 
         {showGiftSection && (
-          <SectionWrapper id="banco" delay={200} className="w-full bg-[#1E1820] py-20 px-6 md:px-12 overflow-hidden">
+          <SectionWrapper id="banco" delay={200} className="w-full bg-[#241608] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>
-                <p className="t-kicker mb-10 flex items-center gap-2 text-[#9C7FB4]">
+                <p className="t-kicker mb-10 flex items-center gap-2 text-[#FF6B35]">
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1499,10 +1501,10 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
                         alias: String((invitation as any).pagoTarjetaAlias || ""),
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
-                      accentColor="#9C7FB4"
-                      cardBg="#1E1820"
-                      textPrimary="#F2ECF0"
-                      textSecondary="#A89AA5"
+                      accentColor="#FF6B35"
+                      cardBg="#241608"
+                      textPrimary="#FDEEE0"
+                      textSecondary="#C9A08A"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
                     />
@@ -1519,10 +1521,10 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
                         alias: String((invitation as any).regaloAlias || ""),
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
-                      accentColor="#9C7FB4"
-                      cardBg="#1E1820"
-                      textPrimary="#F2ECF0"
-                      textSecondary="#A89AA5"
+                      accentColor="#FF6B35"
+                      cardBg="#241608"
+                      textPrimary="#FDEEE0"
+                      textSecondary="#C9A08A"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
                     />
@@ -1533,7 +1535,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         )}
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
-          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #6F9A7618, transparent 70%), #1E1820" }}>
+          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #FF6B3518, transparent 70%), #241608" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1541,8 +1543,8 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
               <p className="t-kicker mb-8 flex items-center gap-2">
                 {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
               </p>
-              <ProgressiveQuiz 
-                preguntas={triviaPreguntas} 
+              <ProgressiveQuiz
+                preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
                 guestName={guest?.name}
@@ -1567,22 +1569,18 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
 
         {musicaHabilitada && musicAudioElement}
 
-        {/* Separador doodle de footer: ramita, motivo Botánico coherente
-            con los separadores del resto de la plantilla. */}
-        <div className="w-full flex items-center justify-center gap-2 py-6" style={{ background: '#120E14' }} aria-hidden="true">
-          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #9C7FB4, transparent)' }} />
-          <svg className="jardinseda-scroll-doodle opacity-0" viewBox="0 0 16 12" width="16" height="12" fill="none" stroke="#6F9A76" strokeWidth="1.1" aria-hidden="true">
-            <path d="M8 11V2M8 5 4 3M8 5l4-2M8 8 4.5 6.3M8 8l3.5-1.7" />
-          </svg>
-          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #9C7FB4, transparent)' }} />
+        {/* Separador doodle de footer: olas pequeñas */}
+        <div className="w-full flex items-center justify-center gap-2 py-6" style={{ background: '#1A0E08' }} aria-hidden="true">
+          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #FF6B35, transparent)' }} />
+          <IconWaves className="bonvoyage-scroll-doodle opacity-0" style={{ width: 22, height: 8, color: '#FF6B35' }} />
+          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #FF6B35, transparent)' }} />
         </div>
 
-        <LogoFooterCredit bgColor="#120E14" textColor="var(--jardinseda-ink, #F2ECF0)" />
+        <LogoFooterCredit bgColor="#1A0E08" textColor="var(--bonvoyage-ink, #FDEEE0)" />
         </div>
       </div>
-      
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#9C7FB4" surfaceColor="#FFFFFF" />}
+
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#FF6B35" surfaceColor="#FFFFFF" />}
       </div>
   );
 }
-

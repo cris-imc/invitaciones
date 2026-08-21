@@ -619,7 +619,7 @@ export function NeonTemplateBlackout({ invitation, guest, isPersonalized = false
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#0C0D0F] via-[#121316] to-[#08090A] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#000000] via-[#0A0A0A] to-[#000000] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -1450,7 +1450,7 @@ export function NeonTemplateBlackout({ invitation, guest, isPersonalized = false
 
 
         {showGiftSection && (
-          <SectionWrapper id="banco" delay={200} className="w-full bg-[#111114] py-20 px-6 md:px-12 overflow-hidden">
+          <SectionWrapper id="banco" delay={200} className="w-full bg-[#0A0A0A] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />

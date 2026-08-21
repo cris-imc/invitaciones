@@ -669,7 +669,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#0C0D0F] via-[#121316] to-[#08090A] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#F4F2FF] via-[#EDE9FF] to-[#F4F2FF] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -745,6 +745,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         "--t-bg": "#F4F2FF",
         "--t-surface": "#FFFFFF",
         "--t-muted": "#7C76A0",
+        "--chic-ink": "#1A1730",
       } as React.CSSProperties}
     >
       <style>{`
@@ -781,11 +782,11 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         .desktop-stage .tpl .quiz-container h2,
         .desktop-stage .tpl .quiz-container h3 {
           font-family: var(--font-title, var(--font-cormorant)), serif !important;
-          color: #FFFFFF !important;
+          color: #1A1730 !important;
         }
         /* Tarjetas claras (Ceremonia/Fiesta) necesitan texto oscuro, no blanco */
         .desktop-stage .tpl .moderno-light-card h4 {
-          color: #F4F2FF !important;
+          color: #1A1730 !important;
         }
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
@@ -836,7 +837,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         /* RSVP Custom Aesthetics for HologramaTemplate */
         #rsvp.section.dark {
           background-color: #F4F2FF !important;
-          color: #FFFFFF !important;
+          color: #1A1730 !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -852,7 +853,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         }
         #rsvp.section.dark b,
         #rsvp.section.dark strong {
-          color: #FFFFFF !important;
+          color: #1A1730 !important;
         }
         @media (min-width: 640px) {
           #rsvp.section.dark > p.t-kicker,
@@ -883,8 +884,8 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
-          background-color: #121229 !important;
-          color: #FFFFFF !important;
+          background-color: #FFFFFF !important;
+          color: #1A1730 !important;
           border-radius: 6px !important;
           border: 1px solid rgba(167,139,250,0.2) !important;
           padding: 12px 16px !important;
@@ -938,7 +939,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(242,242,245,0.5) !important;
+          color: rgba(26, 23, 48,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -948,7 +949,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(242,242,245,0.7) !important;
+          color: rgba(26, 23, 48,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -957,11 +958,11 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #E0DCF7 !important;
+          color: #1A1730 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(242,242,245,0.4) !important;
+          color: rgba(26, 23, 48,0.4) !important;
           font-size: 12px !important;
         }
         
@@ -1010,7 +1011,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         /* Footer Aesthetics */
         .desktop-stage .d-foot {
           background-color: #F4F2FF !important; /* Matches light sections */
-          color: #FFFFFF !important;
+          color: #1A1730 !important;
           padding: 24px 24px 38px 24px !important;
           text-align: center;
         }
@@ -1203,6 +1204,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         "--t-bg": "#F4F2FF",
         "--t-surface": "#FFFFFF",
         "--t-muted": "#7C76A0",
+        "--chic-ink": "#1A1730",
       } as React.CSSProperties}>
       <aside className="d-left hide-mobile">
         <div
@@ -1529,7 +1531,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
 
 
         {showGiftSection && (
-          <SectionWrapper id="banco" delay={200} className="w-full bg-[#131228] py-20 px-6 md:px-12 overflow-hidden">
+          <SectionWrapper id="banco" delay={200} className="w-full bg-[#E0DCF7] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1552,7 +1554,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
                       }}
                       accentColor="#6F4BE0"
                       cardBg="#E0DCF7"
-                      textPrimary="#FFFFFF"
+                      textPrimary="#1A1730"
                       textSecondary="#7C76A0"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
@@ -1572,7 +1574,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
                       }}
                       accentColor="#6F4BE0"
                       cardBg="#E0DCF7"
-                      textPrimary="#FFFFFF"
+                      textPrimary="#1A1730"
                       textSecondary="#7C76A0"
                       InfoRow={InfoRow}
                       CopyField={CopyField}

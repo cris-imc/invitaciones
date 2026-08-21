@@ -322,7 +322,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
         <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#1A1815" }}>
           ¡Juego Completado!
         </h3>
-        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#D8D4CC" }}>
+        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#1A1815" }}>
           RESPONDISTE {score} DE {preguntas.length} CORRECTAMENTE ({percent}%)
         </p>
         
@@ -333,7 +333,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "left", maxWidth: "90%" }}>
                 <Users className="w-5 h-5 text-[#3A3A3A] shrink-0" />
-                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#D8D4CC" }}>
+                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#1A1815" }}>
                   El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#1A1815" }}>{stats.avg}%</strong>.
                 </p>
               </div>
@@ -361,7 +361,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
   return (
     <div className="quiz-box flex flex-col items-center text-center">
       <div className="quiz-q w-full max-w-lg" key={currentIdx}>
-        <p className="text-[#D8D4CC] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
+        <p className="text-[#1A1815] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
           {formatQuestion(q.pregunta)}
         </p>
         <div className="quiz-opts flex flex-wrap justify-center gap-3">
@@ -638,7 +638,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#14100B] via-[#1A1510] to-[#0C0906] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#F2F0EC] via-[#E4E0D8] to-[#F2F0EC] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -714,6 +714,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
         "--t-bg": "#F2F0EC",
         "--t-surface": "#FFFFFF",
         "--t-muted": "#8A8580",
+        "--chic-ink": "#1A1815",
       } as React.CSSProperties}
     >
       <style>{`
@@ -915,7 +916,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #E8E4DC !important;
+          color: #1A1815 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
@@ -1029,7 +1030,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F2F0EC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className={`text-[#D8D4CC] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
+          className={`text-[#1A1815] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
           {portadaFondoAnimado && (
             <div className="acp-mobile-only">
@@ -1072,7 +1073,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
 
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#D8D4CC] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#1A1815] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {guestNameDisplay}
             </h2>
 
@@ -1130,7 +1131,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#3A3A3A]" />
-              <span className="text-[#E8E4DC]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#1A1815]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1159,6 +1160,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
         "--t-bg": "#F2F0EC",
         "--t-surface": "#FFFFFF",
         "--t-muted": "#8A8580",
+        "--chic-ink": "#1A1815",
       } as React.CSSProperties}>
       <aside className="d-left hide-mobile" style={{ position: "relative", overflow: "hidden" }}>
         <div
@@ -1217,7 +1219,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
             <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#3A3A3A] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#D8D4CC] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h1 className="text-[4rem] font-light text-[#1A1815] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
@@ -1251,7 +1253,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
                 backgroundPosition: `${Number(invitation.portadaImagenPosX ?? 50)}% ${Number(invitation.portadaImagenPosY ?? 50)}%`,
                 backgroundRepeat: "no-repeat",
                 filter: "sepia(0.45) contrast(1.06) brightness(0.92)",
-              } : { backgroundColor: '#E8E4DC' }}
+              } : { backgroundColor: '#1A1815' }}
             />
             {/* Grano de película -- velo de ruido fino, opacidad titila con
                 el scroll (efecto "parpadeo de proyector"). */}
@@ -1297,14 +1299,14 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B463014, transparent 70%), #E8E4DC" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B463014, transparent 70%), #1A1815" }}>
             <div className="max-w-2xl mx-auto text-center">
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
-                className="text-[#D8D4CC] text-2xl md:text-3xl leading-relaxed tracking-wide" 
+                className="text-[#1A1815] text-2xl md:text-3xl leading-relaxed tracking-wide" 
                 style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500 }}
               />
             </div>
@@ -1418,7 +1420,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#E8E4DC] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#1A1815] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1525,7 +1527,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="#3A3A3A"
-                      cardBg="#E8E4DC"
+                      cardBg="#E4E0D8"
                       textPrimary="#1A1815"
                       textSecondary="#8A8580"
                       InfoRow={InfoRow}
@@ -1545,7 +1547,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="#3A3A3A"
-                      cardBg="#E8E4DC"
+                      cardBg="#E4E0D8"
                       textPrimary="#1A1815"
                       textSecondary="#8A8580"
                       InfoRow={InfoRow}

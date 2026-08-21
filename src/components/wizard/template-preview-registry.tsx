@@ -39,6 +39,7 @@ export const NEON_COLORS: ColorOption[] = [
   { id: "Blackout", name: "Blackout", color: "#00E5FF" },
   { id: "Tropical", name: "Tropical", color: "#FF8A3D" },
   { id: "Ascuas", name: "Ascuas", color: "#FFD166" },
+  { id: "Manzana", name: "Manzana", color: "#7ED321" },
 ];
 
 // Chic ("Doodle Wedding") solo se ofrece para CASAMIENTO -- el gating vive
@@ -136,6 +137,9 @@ export const CRISTAL3D_COLORS: ColorOption[] = [
   { id: "Menta", name: "Menta", color: "#8FFFE0" },
   { id: "RosaCuarzo", name: "Rosa Cuarzo", color: "#FFB3D1" },
   { id: "Violeta", name: "Violeta", color: "#C4A6FF" },
+  { id: "AmbarFundido", name: "Ámbar Fundido", color: "#FFB347" },
+  { id: "CristalBlanco", name: "Cristal Blanco", color: "#4A7FBF" },
+  { id: "RosaCristalOscuro", name: "Rosa Cristal Oscuro", color: "#FF6FD8" },
 ];
 
 // Café va primero: base marrón café más pronunciada (el resto, incluido
@@ -180,6 +184,7 @@ export const RIVIERA_COLORS: ColorOption[] = [
   { id: "MedianocheRiviera", name: "Medianoche Riviera", color: "#E8B4A0" },
   { id: "PiedraGris", name: "Piedra Gris", color: "#6E7A6E" },
   { id: "LavandaCostera", name: "Lavanda Costera", color: "#6E7CA8" },
+  { id: "OcasoAzulejo", name: "Ocaso Azulejo", color: "#4A8C99" },
 ];
 
 // Ocaso va primero: base malva/ciruela pálida genuina (el resto comparte el
@@ -195,6 +200,7 @@ export const GOLDENDUSK_COLORS: ColorOption[] = [
   { id: "NocheDorada", name: "Noche Dorada", color: "#D9A15C" },
   { id: "PiedraCalida", name: "Piedra Cálida", color: "#A97D5C" },
   { id: "BrumaAzul", name: "Bruma Azul", color: "#5C7A96" },
+  { id: "NocheCiruela", name: "Noche Ciruela", color: "#9C6B8C" },
 ];
 
 export const SEDA_COLORS: ColorOption[] = [
@@ -237,6 +243,7 @@ export const BONVOYAGE_COLORS: ColorOption[] = [
   { id: "NocheDeViaje", name: "Noche de Viaje", color: "#C9A15C" },
   { id: "ArenaCalida", name: "Arena Cálida", color: "#6E8299" },
   { id: "MapaVintage", name: "Mapa Vintage", color: "#6E7A4A" },
+  { id: "CoralTropical", name: "Coral Tropical", color: "#FF6B35" },
 ];
 
 export const CORPORATE_COLORS: ColorOption[] = [
@@ -319,6 +326,7 @@ export const NEON_COMPONENTS: Record<string, PreviewComponent> = {
   Blackout: dynamic(() => import("@/components/templates/NeonTemplateBlackout").then((m) => m.NeonTemplateBlackout), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Tropical: dynamic(() => import("@/components/templates/NeonTemplateTropical").then((m) => m.NeonTemplateTropical), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Ascuas: dynamic(() => import("@/components/templates/NeonTemplateAscuas").then((m) => m.NeonTemplateAscuas), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Manzana: dynamic(() => import("@/components/templates/NeonTemplateManzana").then((m) => m.NeonTemplateManzana), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CHIC_COMPONENTS: Record<string, PreviewComponent> = {
@@ -403,6 +411,9 @@ export const CRISTAL3D_COMPONENTS: Record<string, PreviewComponent> = {
   Menta: dynamic(() => import("@/components/templates/Cristal3DTemplateMenta").then((m) => m.Cristal3DTemplateMenta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   RosaCuarzo: dynamic(() => import("@/components/templates/Cristal3DTemplateRosaCuarzo").then((m) => m.Cristal3DTemplateRosaCuarzo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Violeta: dynamic(() => import("@/components/templates/Cristal3DTemplateVioleta").then((m) => m.Cristal3DTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AmbarFundido: dynamic(() => import("@/components/templates/Cristal3DTemplateAmbarFundido").then((m) => m.Cristal3DTemplateAmbarFundido), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  CristalBlanco: dynamic(() => import("@/components/templates/Cristal3DTemplateCristalBlanco").then((m) => m.Cristal3DTemplateCristalBlanco), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  RosaCristalOscuro: dynamic(() => import("@/components/templates/Cristal3DTemplateRosaCristalOscuro").then((m) => m.Cristal3DTemplateRosaCristalOscuro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CINE_COMPONENTS: Record<string, PreviewComponent> = {
@@ -439,6 +450,7 @@ export const RIVIERA_COMPONENTS: Record<string, PreviewComponent> = {
   MedianocheRiviera: dynamic(() => import("@/components/templates/RivieraTemplateMedianocheRiviera").then((m) => m.RivieraTemplateMedianocheRiviera), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   PiedraGris: dynamic(() => import("@/components/templates/RivieraTemplatePiedraGris").then((m) => m.RivieraTemplatePiedraGris), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   LavandaCostera: dynamic(() => import("@/components/templates/RivieraTemplateLavandaCostera").then((m) => m.RivieraTemplateLavandaCostera), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  OcasoAzulejo: dynamic(() => import("@/components/templates/RivieraTemplateOcasoAzulejo").then((m) => m.RivieraTemplateOcasoAzulejo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const GOLDENDUSK_COMPONENTS: Record<string, PreviewComponent> = {
@@ -452,6 +464,7 @@ export const GOLDENDUSK_COMPONENTS: Record<string, PreviewComponent> = {
   NocheDorada: dynamic(() => import("@/components/templates/GoldenDuskTemplateNocheDorada").then((m) => m.GoldenDuskTemplateNocheDorada), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   PiedraCalida: dynamic(() => import("@/components/templates/GoldenDuskTemplatePiedraCalida").then((m) => m.GoldenDuskTemplatePiedraCalida), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   BrumaAzul: dynamic(() => import("@/components/templates/GoldenDuskTemplateBrumaAzul").then((m) => m.GoldenDuskTemplateBrumaAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  NocheCiruela: dynamic(() => import("@/components/templates/GoldenDuskTemplateNocheCiruela").then((m) => m.GoldenDuskTemplateNocheCiruela), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const SEDA_COMPONENTS: Record<string, PreviewComponent> = {
@@ -492,6 +505,7 @@ export const BONVOYAGE_COMPONENTS: Record<string, PreviewComponent> = {
   NocheDeViaje: dynamic(() => import("@/components/templates/BonVoyageTemplateNocheDeViaje").then((m) => m.BonVoyageTemplateNocheDeViaje), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   ArenaCalida: dynamic(() => import("@/components/templates/BonVoyageTemplateArenaCalida").then((m) => m.BonVoyageTemplateArenaCalida), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   MapaVintage: dynamic(() => import("@/components/templates/BonVoyageTemplateMapaVintage").then((m) => m.BonVoyageTemplateMapaVintage), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  CoralTropical: dynamic(() => import("@/components/templates/BonVoyageTemplateCoralTropical").then((m) => m.BonVoyageTemplateCoralTropical), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CORPORATE_COMPONENTS: Record<string, PreviewComponent> = {

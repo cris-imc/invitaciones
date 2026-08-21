@@ -602,7 +602,7 @@ export function OnixTemplateCarbon({ invitation, guest, isPersonalized = false }
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/onix-quince.png" : undefined;
   const portadaTintColor1 = "#B0C9D6";
-  const portadaTintColor2 = "#78466E";
+  const portadaTintColor2 = "#B0C9D6";
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -618,7 +618,7 @@ export function OnixTemplateCarbon({ invitation, guest, isPersonalized = false }
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#12181A] via-[#161F22] to-[#0B1112] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#0A0A0B] via-[#131315] to-[#0A0A0B] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />

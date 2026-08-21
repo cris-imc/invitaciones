@@ -735,7 +735,7 @@ export function GoldenDuskTemplateNocheDorada({ invitation, guest, isPersonalize
         "--t-acc2": "#D9A15C",
         "--c-accent": "#D9A15C",
         "--t-bg": "#1A140F",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#241C14",
         "--t-muted": "#B8A08F",
         // Usado por Countdown.tsx/RSVPWizardV2.tsx (dark ? var(--goldendusk-ink, #FFFFFF) : ...)
         // -- sin definir esto, esos componentes muestran texto blanco
@@ -1162,7 +1162,7 @@ export function GoldenDuskTemplateNocheDorada({ invitation, guest, isPersonalize
         "--t-acc2": "#D9A15C",
         "--c-accent": "#D9A15C",
         "--t-bg": "#1A140F",
-        "--t-surface": "#FFFFFF",
+        "--t-surface": "#241C14",
         "--t-muted": "#B8A08F",
         "--goldendusk-ink": "#F5EBE0",
         "--chic-ink": "#F5EBE0",
@@ -1501,7 +1501,7 @@ export function GoldenDuskTemplateNocheDorada({ invitation, guest, isPersonalize
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="#D9A15C"
-                      cardBg="#FFFFFF"
+                      cardBg="#241C14"
                       textPrimary="#F5EBE0"
                       textSecondary="#B8A08F"
                       InfoRow={InfoRow}
@@ -1521,7 +1521,7 @@ export function GoldenDuskTemplateNocheDorada({ invitation, guest, isPersonalize
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="#D9A15C"
-                      cardBg="#FFFFFF"
+                      cardBg="#241C14"
                       textPrimary="#F5EBE0"
                       textSecondary="#B8A08F"
                       InfoRow={InfoRow}

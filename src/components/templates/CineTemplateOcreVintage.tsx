@@ -322,7 +322,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
         <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#F0E8D0" }}>
           ¡Juego Completado!
         </h3>
-        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#2E260E" }}>
+        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#F0E8D0" }}>
           RESPONDISTE {score} DE {preguntas.length} CORRECTAMENTE ({percent}%)
         </p>
         
@@ -333,7 +333,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "left", maxWidth: "90%" }}>
                 <Users className="w-5 h-5 text-[#8C9A4A] shrink-0" />
-                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#2E260E" }}>
+                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#F0E8D0" }}>
                   El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#F0E8D0" }}>{stats.avg}%</strong>.
                 </p>
               </div>
@@ -361,7 +361,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
   return (
     <div className="quiz-box flex flex-col items-center text-center">
       <div className="quiz-q w-full max-w-lg" key={currentIdx}>
-        <p className="text-[#2E260E] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
+        <p className="text-[#F0E8D0] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
           {formatQuestion(q.pregunta)}
         </p>
         <div className="quiz-opts flex flex-wrap justify-center gap-3">
@@ -638,7 +638,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#14100B] via-[#1A1510] to-[#0C0906] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#1A1608] via-[#241E0C] to-[#1A1608] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -915,7 +915,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #291F0A !important;
+          color: #F0E8D0 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
@@ -1029,7 +1029,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
         <div
           ref={coverRootRef}
           style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#1A1608', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className={`text-[#2E260E] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
+          className={`text-[#F0E8D0] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
           {portadaFondoAnimado && (
             <div className="acp-mobile-only">
@@ -1072,7 +1072,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
 
 
             {/* Guest Name */}
-            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#2E260E] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-light tracking-wide text-[#F0E8D0] leading-relaxed" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {guestNameDisplay}
             </h2>
 
@@ -1130,7 +1130,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#8C9A4A]" />
-              <span className="text-[#291F0A]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#F0E8D0]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1217,7 +1217,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
             <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#8C9A4A] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#2E260E] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h1 className="text-[4rem] font-light text-[#F0E8D0] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
@@ -1251,7 +1251,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
                 backgroundPosition: `${Number(invitation.portadaImagenPosX ?? 50)}% ${Number(invitation.portadaImagenPosY ?? 50)}%`,
                 backgroundRepeat: "no-repeat",
                 filter: "sepia(0.45) contrast(1.06) brightness(0.92)",
-              } : { backgroundColor: '#291F0A' }}
+              } : { backgroundColor: '#F0E8D0' }}
             />
             {/* Grano de película -- velo de ruido fino, opacidad titila con
                 el scroll (efecto "parpadeo de proyector"). */}
@@ -1297,14 +1297,14 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B463014, transparent 70%), #291F0A" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B463014, transparent 70%), #F0E8D0" }}>
             <div className="max-w-2xl mx-auto text-center">
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
-                className="text-[#2E260E] text-2xl md:text-3xl leading-relaxed tracking-wide" 
+                className="text-[#F0E8D0] text-2xl md:text-3xl leading-relaxed tracking-wide" 
                 style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500 }}
               />
             </div>
@@ -1418,7 +1418,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#291F0A] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#F0E8D0] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1525,7 +1525,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
                       accentColor="#8C9A4A"
-                      cardBg="#291F0A"
+                      cardBg="#241E0C"
                       textPrimary="#F0E8D0"
                       textSecondary="#A8987A"
                       InfoRow={InfoRow}
@@ -1545,7 +1545,7 @@ export function CineTemplateOcreVintage({ invitation, guest, isPersonalized = fa
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
                       accentColor="#8C9A4A"
-                      cardBg="#291F0A"
+                      cardBg="#241E0C"
                       textPrimary="#F0E8D0"
                       textSecondary="#A8987A"
                       InfoRow={InfoRow}
