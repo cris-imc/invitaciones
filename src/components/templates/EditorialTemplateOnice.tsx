@@ -1081,7 +1081,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
             @keyframes editorial-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes editorial-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes editorial-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .editorial-cover-text { color: #171512; }
+            .editorial-cover-text { color: #EDE9E2; }
             .editorial-cover-text-muted { color: rgba(237,235,229,0.75); }
             @media (min-width: 768px) {
               .editorial-cover-text { color: #EDE9E2; }

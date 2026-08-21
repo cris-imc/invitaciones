@@ -1086,7 +1086,7 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
             @keyframes riviera-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes riviera-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes riviera-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .riviera-cover-text { color: #0A1416; }
+            .riviera-cover-text { color: #E8F2F0; }
             .riviera-cover-text-muted { color: rgba(250,241,228,0.75); }
             @media (min-width: 768px) {
               .riviera-cover-text { color: #E8F2F0; }

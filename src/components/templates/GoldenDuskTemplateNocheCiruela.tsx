@@ -1108,7 +1108,7 @@ export function GoldenDuskTemplateNocheCiruela({ invitation, guest, isPersonaliz
             @keyframes golden-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes golden-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes golden-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .golden-cover-text { color: #140A14; }
+            .golden-cover-text { color: #F2E8F0; }
             .golden-cover-text-muted { color: rgba(253,246,240,0.75); }
             @media (min-width: 768px) {
               .golden-cover-text { color: #F2E8F0; }

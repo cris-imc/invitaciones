@@ -1096,7 +1096,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
             @keyframes jardinseda-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes jardinseda-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes jardinseda-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .jardinseda-cover-text { color: #120E14; }
+            .jardinseda-cover-text { color: #F2ECF0; }
             .jardinseda-cover-text-muted { color: rgba(252,239,241,0.75); }
             @media (min-width: 768px) {
               .jardinseda-cover-text { color: #F2ECF0; }

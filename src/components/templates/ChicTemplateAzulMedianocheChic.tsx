@@ -1131,7 +1131,7 @@ export function ChicTemplateAzulMedianocheChic({ invitation, guest, isPersonaliz
                mobile (la foto es mobile-only). En desktop, sin importar si
                hay foto cargada, vuelve al oscuro original de Chic (ahí no
                hay foto atrás, solo el mesh crema de siempre). */
-            .chic-cover-text { color: #10141C; }
+            .chic-cover-text { color: #EAEEF5; }
             .chic-cover-text-muted { color: rgba(251,243,234,0.75); }
             @media (min-width: 768px) {
               .chic-cover-text { color: #EAEEF5; }

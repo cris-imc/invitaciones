@@ -1083,7 +1083,7 @@ export function NordicoTemplateCarbonNordico({ invitation, guest, isPersonalized
           <style jsx>{`
             .nordico-lineExpand { animation: nordico-lineExpand 1.2s ease-out; }
             @keyframes nordico-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .nordico-cover-text { color: #14161A; }
+            .nordico-cover-text { color: #EDEFF2; }
             .nordico-cover-text-muted { color: rgba(255,255,255,0.75); }
             .nordico-cover-line { background: #14161A; }
             @media (min-width: 768px) {

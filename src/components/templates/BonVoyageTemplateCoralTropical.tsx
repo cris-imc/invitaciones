@@ -1110,7 +1110,7 @@ export function BonVoyageTemplateCoralTropical({ invitation, guest, isPersonaliz
             @keyframes bonvoyage-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes bonvoyage-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes bonvoyage-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .bonvoyage-cover-text { color: #1A0E08; }
+            .bonvoyage-cover-text { color: #FDEEE0; }
             .bonvoyage-cover-text-muted { color: rgba(244,249,251,0.75); }
             @media (min-width: 768px) {
               .bonvoyage-cover-text { color: #FDEEE0; }
