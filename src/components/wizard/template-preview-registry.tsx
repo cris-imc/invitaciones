@@ -26,7 +26,10 @@ export const MODERNO_COLORS: ColorOption[] = [
 
 // Neon ("Doodle Disco 15") solo se ofrece para QUINCE_ANOS/CUMPLEANOS -- el
 // gating vive en TemplatePreviewModal.tsx, no acá.
+// Eclipse va primero: unica variante con base violeta-negra genuina (el
+// resto comparte el mismo #0D0D10 casi neutro de "default").
 export const NEON_COLORS: ColorOption[] = [
+  { id: "Eclipse", name: "Eclipse", color: "#FF6EC7" },
   { id: "default", name: "Cian y Magenta", color: "#39FFD0" },
   { id: "Violeta", name: "Violeta y Cian", color: "#B24BFF" },
   { id: "Dorado", name: "Dorado y Magenta", color: "#FFC94B" },
@@ -40,6 +43,7 @@ export const NEON_COLORS: ColorOption[] = [
 // acento principal SÍ varía por completo en cada variante (--t-acc deja de
 // ser dorado fijo) -- ver docs/GUIA_TECNICA_PLANTILLAS.md, "Bug 6".
 export const CHIC_COLORS: ColorOption[] = [
+  { id: "Ambar", name: "Ámbar Cálido", color: "#B8823E" },
   { id: "default", name: "Dorado Clásico", color: "#C9A876" },
   { id: "Rosa", name: "Rosa Antiguo", color: "#B08590" },
   { id: "Azul", name: "Azul Grisáceo", color: "#6E8299" },
@@ -65,7 +69,10 @@ export const EDITORIAL_COLORS: ColorOption[] = [
   { id: "Verde", name: "Verde", color: "#1F4B3F" },
 ];
 
+// Medianoche va primero: base azul-negra genuina (el resto comparte el
+// mismo violeta-negro #140B14 de "default").
 export const ONIX_COLORS: ColorOption[] = [
+  { id: "Medianoche", name: "Medianoche", color: "#C9D4E8" },
   { id: "default", name: "Oro Rosado", color: "#D89AA0" },
   { id: "Amatista", name: "Amatista", color: "#B48CD9" },
   { id: "Esmeralda", name: "Esmeralda", color: "#6FBF9B" },
@@ -83,7 +90,10 @@ export const JARDINSEDA_COLORS: ColorOption[] = [
   { id: "Salvia", name: "Salvia", color: "#6F9A76" },
 ];
 
+// Aurora va primero: base verde-azulada genuina (el resto comparte el mismo
+// negro neutro #0D0D14 de "default").
 export const HOLOGRAMA_COLORS: ColorOption[] = [
+  { id: "Aurora", name: "Aurora", color: "#4FE8C8" },
   { id: "default", name: "Violeta Holográfico", color: "#A78BFA" },
   { id: "Azul", name: "Azul", color: "#5B8CFF" },
   { id: "Coral", name: "Coral", color: "#FF8A65" },
@@ -110,7 +120,11 @@ export const CRISTAL3D_COLORS: ColorOption[] = [
   { id: "Violeta", name: "Violeta", color: "#C4A6FF" },
 ];
 
+// Café va primero: base marrón café más pronunciada (el resto, incluido
+// "default"/Sepia, comparte el mismo casi-negro #17130F -- se nota marrón
+// recién en el acento, no en el fondo).
 export const CINE_COLORS: ColorOption[] = [
+  { id: "Ambar", name: "Café Tostado", color: "#CE9A4A" },
   { id: "default", name: "Sepia", color: "#C08A3E" },
   { id: "Borgona", name: "Borgoña", color: "#8C4A56" },
   { id: "Esmeralda", name: "Esmeralda", color: "#5B8A72" },
@@ -118,7 +132,11 @@ export const CINE_COLORS: ColorOption[] = [
   { id: "Tecnicolor", name: "Tecnicolor", color: "#C1442E" },
 ];
 
+// Pizarra va primero: base gris-pizarra fría genuina (el resto, incluido
+// "default"/Grafito -- que solo tiñe el acento -- comparte el mismo blanco
+// puro #FFFFFF de fondo).
 export const NORDICO_COLORS: ColorOption[] = [
+  { id: "Pizarra", name: "Pizarra", color: "#4A5A66" },
   { id: "default", name: "Grafito", color: "#5B5850" },
   { id: "Bosque", name: "Bosque", color: "#3F5D45" },
   { id: "Marino", name: "Marino", color: "#35507A" },
@@ -126,7 +144,10 @@ export const NORDICO_COLORS: ColorOption[] = [
   { id: "Terracota", name: "Terracota", color: "#B15E3D" },
 ];
 
+// Cal va primero: base blanco-cal/verde pálida genuina (el resto comparte
+// el mismo crema #FAF1E4 de "default").
 export const RIVIERA_COLORS: ColorOption[] = [
+  { id: "Cal", name: "Cal", color: "#D9899C" },
   { id: "default", name: "Terracota Riviera", color: "#C1734A" },
   { id: "Azulejo", name: "Azulejo", color: "#3E7C8C" },
   { id: "Coral", name: "Coral", color: "#D97757" },
@@ -134,7 +155,10 @@ export const RIVIERA_COLORS: ColorOption[] = [
   { id: "Oliva", name: "Oliva", color: "#7A8F5E" },
 ];
 
+// Ocaso va primero: base malva/ciruela pálida genuina (el resto comparte el
+// mismo crema #FDF6F0 de "default").
 export const GOLDENDUSK_COLORS: ColorOption[] = [
+  { id: "Ocaso", name: "Ocaso", color: "#A8899C" },
   { id: "default", name: "Atardecer", color: "#C8956C" },
   { id: "AzulMedianoche", name: "Azul Medianoche", color: "#3B5773" },
   { id: "Borgona", name: "Borgoña", color: "#8C4A4A" },
@@ -167,7 +191,10 @@ export const LUZLUNA_COLORS: ColorOption[] = [
   { id: "PerlaSuave", name: "Perla Suave", color: "#7C93B0" },
 ];
 
+// Ivoire va primero: base marfil cálida genuina (el resto comparte el mismo
+// celeste pálido #F4F9FB de "default").
 export const BONVOYAGE_COLORS: ColorOption[] = [
+  { id: "Ivoire", name: "Ivoire", color: "#9C8A4A" },
   { id: "default", name: "Océano", color: "#2E7EA6" },
   { id: "Coral", name: "Coral", color: "#C97A5C" },
   { id: "Esmeralda", name: "Esmeralda", color: "#2E8B72" },
@@ -246,6 +273,7 @@ export const MODERNO_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const NEON_COMPONENTS: Record<string, PreviewComponent> = {
+  Eclipse: dynamic(() => import("@/components/templates/NeonTemplateEclipse").then((m) => m.NeonTemplateEclipse), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/NeonTemplate").then((m) => m.NeonTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Violeta: dynamic(() => import("@/components/templates/NeonTemplateVioleta").then((m) => m.NeonTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Dorado: dynamic(() => import("@/components/templates/NeonTemplateDorado").then((m) => m.NeonTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -255,6 +283,7 @@ export const NEON_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const CHIC_COMPONENTS: Record<string, PreviewComponent> = {
+  Ambar: dynamic(() => import("@/components/templates/ChicTemplateAmbar").then((m) => m.ChicTemplateAmbar), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/ChicTemplate").then((m) => m.ChicTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Rosa: dynamic(() => import("@/components/templates/ChicTemplateRosa").then((m) => m.ChicTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Azul: dynamic(() => import("@/components/templates/ChicTemplateAzul").then((m) => m.ChicTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -276,6 +305,7 @@ export const EDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const ONIX_COMPONENTS: Record<string, PreviewComponent> = {
+  Medianoche: dynamic(() => import("@/components/templates/OnixTemplateMedianoche").then((m) => m.OnixTemplateMedianoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/OnixTemplate").then((m) => m.OnixTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Amatista: dynamic(() => import("@/components/templates/OnixTemplateAmatista").then((m) => m.OnixTemplateAmatista), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Esmeralda: dynamic(() => import("@/components/templates/OnixTemplateEsmeralda").then((m) => m.OnixTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -294,6 +324,7 @@ export const JARDINSEDA_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const HOLOGRAMA_COMPONENTS: Record<string, PreviewComponent> = {
+  Aurora: dynamic(() => import("@/components/templates/HologramaTemplateAurora").then((m) => m.HologramaTemplateAurora), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/HologramaTemplate").then((m) => m.HologramaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Azul: dynamic(() => import("@/components/templates/HologramaTemplateAzul").then((m) => m.HologramaTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Coral: dynamic(() => import("@/components/templates/HologramaTemplateCoral").then((m) => m.HologramaTemplateCoral), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -321,6 +352,7 @@ export const CRISTAL3D_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const CINE_COMPONENTS: Record<string, PreviewComponent> = {
+  Ambar: dynamic(() => import("@/components/templates/CineTemplateAmbar").then((m) => m.CineTemplateAmbar), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/CineTemplate").then((m) => m.CineTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Borgona: dynamic(() => import("@/components/templates/CineTemplateBorgona").then((m) => m.CineTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Esmeralda: dynamic(() => import("@/components/templates/CineTemplateEsmeralda").then((m) => m.CineTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -329,6 +361,7 @@ export const CINE_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const NORDICO_COMPONENTS: Record<string, PreviewComponent> = {
+  Pizarra: dynamic(() => import("@/components/templates/NordicoTemplatePizarra").then((m) => m.NordicoTemplatePizarra), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/NordicoTemplate").then((m) => m.NordicoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Bosque: dynamic(() => import("@/components/templates/NordicoTemplateBosque").then((m) => m.NordicoTemplateBosque), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Marino: dynamic(() => import("@/components/templates/NordicoTemplateMarino").then((m) => m.NordicoTemplateMarino), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -337,6 +370,7 @@ export const NORDICO_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const RIVIERA_COMPONENTS: Record<string, PreviewComponent> = {
+  Cal: dynamic(() => import("@/components/templates/RivieraTemplateCal").then((m) => m.RivieraTemplateCal), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/RivieraTemplate").then((m) => m.RivieraTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Azulejo: dynamic(() => import("@/components/templates/RivieraTemplateAzulejo").then((m) => m.RivieraTemplateAzulejo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Coral: dynamic(() => import("@/components/templates/RivieraTemplateCoral").then((m) => m.RivieraTemplateCoral), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -345,6 +379,7 @@ export const RIVIERA_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const GOLDENDUSK_COMPONENTS: Record<string, PreviewComponent> = {
+  Ocaso: dynamic(() => import("@/components/templates/GoldenDuskTemplateOcaso").then((m) => m.GoldenDuskTemplateOcaso), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/GoldenDuskTemplate").then((m) => m.GoldenDuskTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   AzulMedianoche: dynamic(() => import("@/components/templates/GoldenDuskTemplateAzulMedianoche").then((m) => m.GoldenDuskTemplateAzulMedianoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Borgona: dynamic(() => import("@/components/templates/GoldenDuskTemplateBorgona").then((m) => m.GoldenDuskTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
@@ -378,6 +413,7 @@ export const LUZLUNA_COMPONENTS: Record<string, PreviewComponent> = {
 };
 
 export const BONVOYAGE_COMPONENTS: Record<string, PreviewComponent> = {
+  Ivoire: dynamic(() => import("@/components/templates/BonVoyageTemplateIvoire").then((m) => m.BonVoyageTemplateIvoire), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   default: dynamic(() => import("@/components/templates/BonVoyageTemplate").then((m) => m.BonVoyageTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Coral: dynamic(() => import("@/components/templates/BonVoyageTemplateCoral").then((m) => m.BonVoyageTemplateCoral), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Esmeralda: dynamic(() => import("@/components/templates/BonVoyageTemplateEsmeralda").then((m) => m.BonVoyageTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
