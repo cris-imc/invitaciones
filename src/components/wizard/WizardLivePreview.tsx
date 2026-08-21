@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { getWizardSteps } from "./wizard-steps-config";
+import { isAdmin as isAdminRole } from "@/lib/roles";
 
 // Corrección 1 (docs/correcciones.md): preview del wizard con fidelidad
 // real — reemplaza al mockup de teléfono inventado (WizardPreviewPane) por
@@ -21,13 +23,27 @@ const MOBILE_ASPECT_RATIO = 19 / 9;
 const LIVE_DATA_DEBOUNCE_MS = 200;
 
 export function WizardLivePreview() {
-    const { data, themeConfig } = useWizardStore();
+    const { data, themeConfig, currentStep } = useWizardStore();
     if (typeof window !== "undefined") (window as any).__debugRenderPortada = data.portadaImagenFondo;
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const frameBoxRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
     const [loading, setLoading] = useState(true);
-    
+
+    // Mientras el paso activo sea "Portada" (las 2 fotos de portada, antes
+    // de elegir Plantilla), el preview debe quedarse mostrando la portada de
+    // bienvenida en vez de saltar directo al interior -- así el cliente ve
+    // sus propias fotos de portada tal cual van a lucir. Apenas avanza a
+    // "Plantilla" (o cualquier paso posterior), vuelve al comportamiento de
+    // siempre (auto-abrir y mostrar el interior).
+    const { data: session } = useSession();
+    const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
+    const isEditing = Boolean(data.id);
+    const isCasamiento = data.type === "CASAMIENTO";
+    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false, isAdmin });
+    const stepLabel = steps[currentStep]?.label || "";
+    const showCoverOnly = stepLabel === "Portada";
+
     // Función para enviar los datos actuales al iframe
     const sendLiveData = () => {
         const win = iframeRef.current?.contentWindow;
@@ -59,7 +75,7 @@ export function WizardLivePreview() {
         };
 
         (window as any).__debugLastPosted = invitation;
-        win.postMessage({ type: "wizard-live-data", invitation }, window.location.origin);
+        win.postMessage({ type: "wizard-live-data", invitation, showCoverOnly }, window.location.origin);
     };
 
     useEffect(() => {
@@ -84,7 +100,7 @@ export function WizardLivePreview() {
         };
         window.addEventListener("message", onMessage);
         return () => window.removeEventListener("message", onMessage);
-    }, [data, themeConfig]); // Necesita dependencias porque sendLiveData lee de data y themeConfig
+    }, [data, themeConfig, showCoverOnly]); // Necesita dependencias porque sendLiveData lee de data, themeConfig y showCoverOnly
 
     // El src del iframe (fuerza recarga completa) solo depende de tipo de
     // evento / plantilla / color
@@ -98,7 +114,25 @@ export function WizardLivePreview() {
     ]);
     const tipo = data.templateTipo && DESIGN_TEMPLATE_TIPOS.has(data.templateTipo) ? data.templateTipo : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
-    const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(evento)}&tipo=${tipo}&color=${encodeURIComponent(color)}`;
+
+    // Si el usuario ya pasó por un paso anterior que auto-abre la invitación
+    // (ej. admin viendo "Tipo de Evento" antes de "Portada") y ahora vuelve a
+    // un momento en el que se quiere ver la portada cerrada, no hay forma de
+    // "re-cerrarla" en el mismo iframe ya abierto -- el estado de apertura
+    // vive adentro del componente de plantilla. Se fuerza una recarga limpia
+    // del iframe únicamente en esa transición (false -> true) agregando un
+    // parámetro que cambia el src; en la dirección contraria (true -> false)
+    // no hace falta: el mismo iframe ya montado se autoabre solita.
+    const prevShowCoverOnlyRef = useRef(showCoverOnly);
+    const [coverEpoch, setCoverEpoch] = useState(0);
+    useEffect(() => {
+        if (showCoverOnly && !prevShowCoverOnlyRef.current) {
+            setCoverEpoch((e) => e + 1);
+        }
+        prevShowCoverOnlyRef.current = showCoverOnly;
+    }, [showCoverOnly]);
+
+    const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(evento)}&tipo=${tipo}&color=${encodeURIComponent(color)}&ce=${coverEpoch}`;
 
     useEffect(() => {
         setLoading(true);
@@ -108,18 +142,12 @@ export function WizardLivePreview() {
     useEffect(() => {
         const timeout = setTimeout(sendLiveData, LIVE_DATA_DEBOUNCE_MS);
         return () => clearTimeout(timeout);
-    }, [data, themeConfig]);
-    
-    const { currentStep } = useWizardStore();
+    }, [data, themeConfig, showCoverOnly]);
+
     // Sincronizar scroll cuando cambia de paso
     useEffect(() => {
         const win = iframeRef.current?.contentWindow;
         if (!win || loading) return;
-        
-        const isEditing = Boolean(data.id);
-        const isCasamiento = data.type === "CASAMIENTO";
-        const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false });
-        const stepLabel = steps[currentStep]?.label || "";
 
         let section = "hero";
         if (stepLabel === "Portada" || stepLabel === "Plantilla" || stepLabel === "Tipografía") section = "hero";
@@ -133,7 +161,7 @@ export function WizardLivePreview() {
         if (stepLabel === "Trivia") section = "quiz";
 
         win.postMessage({ type: "wizard-scroll-to", section }, window.location.origin);
-    }, [currentStep, loading, data.id, data.type, data.galeriaPrincipalHabilitada]);
+    }, [stepLabel, loading]);
 
     return (
         <div

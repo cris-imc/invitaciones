@@ -84,9 +84,29 @@ function PreviewPlantillaContent() {
   // mandar datos en vivo).
   const [liveInvitation, setLiveInvitation] = useState<Record<string, unknown> | null>(null);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  // Mientras el wizard está en el paso "Portada" (eligiendo las 2 fotos de
+  // portada, antes de elegir Plantilla), no hay que autoabrir la invitación
+  // -- se queda mostrando la portada de bienvenida con las fotos reales del
+  // cliente. Apenas el wizard avanza a "Plantilla" (o más adelante), este
+  // flag pasa a false y el efecto de abajo autoabre como siempre.
+  const [showCoverOnly, setShowCoverOnly] = useState(false);
+  // showCoverOnly arranca en `false` por default, pero recién sabemos su
+  // valor REAL cuando llega el primer wizard-live-data del padre -- si se
+  // decidiera si autoabrir antes de eso, se autoabriría siempre (con el
+  // default) antes de que el flag real (true) llegue, y ya no hay forma de
+  // "cerrar de nuevo" la portada. hasFirstContact frena esa decisión hasta
+  // tener el dato real, con un fallback corto para los usos de este mismo
+  // iframe que nunca reciben nada (showcase de la landing, modal de
+  // plantillas) -- ahí se procede con el comportamiento de siempre.
+  const [hasFirstContact, setHasFirstContact] = useState(false);
   // Contador para invalidar el fallback de scroll (ver más abajo) si llega
   // un wizard-scroll-to más nuevo antes de que se cumplan los 700ms.
   const scrollFallbackToken = useRef(0);
+
+  useEffect(() => {
+    const t = setTimeout(() => setHasFirstContact(true), 200);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     // Mismo orden que las secciones van apareciendo a medida que se avanza
@@ -110,6 +130,8 @@ function PreviewPlantillaContent() {
       if (event.data?.type === "wizard-live-data") {
           (window as any).__debugLastReceived = event.data.invitation;
           setLiveInvitation(event.data.invitation ?? {});
+          setShowCoverOnly(Boolean(event.data.showCoverOnly));
+          setHasFirstContact(true);
       } else if (event.data?.type === "wizard-scroll-to") {
           const sectionId = event.data.section;
           if (!sectionId) return;
@@ -217,11 +239,23 @@ function PreviewPlantillaContent() {
     
   displayInvitation.isPreviewMode = true;
 
+  // Avisa de entrada (sin esperar nada) que el iframe ya existe -- es lo que
+  // hace que el padre (wizard/modal/showcase) responda con wizard-live-data
+  // (con el showCoverOnly real) lo antes posible. Separado a propósito de la
+  // decisión de autoabrir de abajo: esa decisión SÍ necesita esperar a
+  // conocer el valor real de showCoverOnly (ver hasFirstContact), sin que
+  // eso demore que el padre sepa que ya puede mandar datos.
+  useEffect(() => {
+    window.parent.postMessage({ type: "template-preview-ready" }, window.location.origin);
+  }, [evento, tipo, color, scrollable]);
+
   // Salta la portada de bienvenida ("Abrir invitación") y recién ahí avisa
   // al padre (el modal del wizard) que ya se puede mostrar. Sin esto se ve
   // un flash roto: la portada fixed/z-99999 tapando todo, o el spinner
   // desapareciendo antes de que el componente real termine de montar.
   useEffect(() => {
+    if (!hasFirstContact) return;
+
     if (!scrollable) {
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
@@ -233,6 +267,15 @@ function PreviewPlantillaContent() {
       settled = true;
       window.parent.postMessage({ type: "template-preview-ready" }, window.location.origin);
     };
+
+    // Paso "Portada" del wizard: se queda mostrando la portada de bienvenida
+    // (con las fotos reales que el cliente ya subió) en vez de autoabrir. No
+    // hace falta esperar nada más para avisar que está listo -- la portada
+    // ya es lo que se quiere mostrar.
+    if (showCoverOnly) {
+      notifyReady();
+      return;
+    }
 
     const tryOpen = () => {
       const btn = Array.from(document.querySelectorAll("button")).find((b) =>
@@ -262,7 +305,7 @@ function PreviewPlantillaContent() {
       observer.disconnect();
       clearTimeout(timeout);
     };
-  }, [evento, tipo, color, scrollable]);
+  }, [evento, tipo, color, scrollable, showCoverOnly, hasFirstContact]);
 
   return <Template invitation={displayInvitation} guest={null} isPersonalized={false} />;
 }
