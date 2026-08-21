@@ -1,23 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { isAdmin } from "@/lib/roles";
 
 // DELETE /api/guests/[id] — Eliminar invitado
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth().catch(() => null);
+  if (!session?.user) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
   try {
     const { id } = await params;
 
-    const guest = await prisma.guest.findUnique({ where: { id }, select: { uniqueToken: true } });
+    const guest = await prisma.guest.findUnique({
+      where: { id },
+      select: { uniqueToken: true, invitation: { select: { userId: true } } },
+    });
+
+    if (!guest) {
+      return NextResponse.json({ error: "Invitado no encontrado" }, { status: 404 });
+    }
+
+    if (guest.invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
+      return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
+    }
 
     // QuizResponse no tiene relacion (ni cascade) con Guest -- sin este borrado
     // manual, las respuestas de trivia de un invitado eliminado quedan
     // huerfanas y siguen contando en el promedio de aciertos.
-    if (guest) {
-      await prisma.quizResponse.deleteMany({ where: { guestToken: guest.uniqueToken } });
-    }
+    await prisma.quizResponse.deleteMany({ where: { guestToken: guest.uniqueToken } });
 
     await prisma.guest.delete({
       where: { id },
@@ -35,13 +50,25 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth().catch(() => null);
+  if (!session?.user) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
   try {
     const { id } = await params;
     const body = await request.json();
 
-    const existingGuest = await prisma.guest.findUnique({ where: { id } });
+    const existingGuest = await prisma.guest.findUnique({
+      where: { id },
+      include: { invitation: { select: { userId: true } } },
+    });
     if (!existingGuest) {
       return NextResponse.json({ error: "Invitado no encontrado" }, { status: 404 });
+    }
+
+    if (existingGuest.invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
+      return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
     }
 
     const updateData: Record<string, unknown> = {
