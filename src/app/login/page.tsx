@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { authenticate } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { Sparkles, Mail, Lock, ChevronLeft } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { update } = useSession();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,12 +32,21 @@ export default function LoginPage() {
         showToast(res.error, "error");
       } else {
         showToast("¡Bienvenido!", "success");
+        await update();
         router.push("/dashboard");
         router.refresh();
       }
     } catch (error: any) {
       if (error?.digest?.startsWith("NEXT_REDIRECT")) {
-        // Next.js redirection succeeded
+        // Next.js redirection succeeded -- signIn() ya dejó la cookie de
+        // sesión seteada en el server, pero el SessionProvider del cliente
+        // (useSession en Sidebar, CreateUserButton, etc.) no se entera solo
+        // con la redirección: sigue sirviendo el session viejo (sin
+        // rol/o con el rol previo) hasta el próximo refetch automático, que
+        // recién pasaba al hacer F5. Forzar el refetch acá es lo que hace
+        // que la botonera de admin y la opción de crear admin aparezcan sin
+        // recargar.
+        await update();
         showToast("¡Bienvenido!", "success");
         return;
       }
