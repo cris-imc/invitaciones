@@ -28,7 +28,7 @@ const STATUS_LABEL: Record<string, string> = {
   HIDDEN:   "Oculta",
 };
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 3;
 
 export function SongModerationPanel({ invitationId }: SongModerationPanelProps) {
   const [songs, setSongs] = useState<Song[]>([]);

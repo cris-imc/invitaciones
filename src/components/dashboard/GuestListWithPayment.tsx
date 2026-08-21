@@ -40,7 +40,7 @@ const PAYMENT_STATUS_COLORS: Record<string, string> = {
   PAID:    "#5a8a6e",
 };
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 3;
 
 export function GuestListWithPayment({
   invitationId,

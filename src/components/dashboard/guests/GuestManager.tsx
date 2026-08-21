@@ -679,6 +679,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     placeholder="Ej: Pérez, o Amigos del Trabajo"
                     value={newGuestApellido}
                     onChange={(e) => setNewGuestApellido(e.target.value)}
+                    maxLength={30}
                     required
                   />
                   <p className="text-xs text-muted-foreground">
@@ -1093,6 +1094,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   placeholder="Ej: Pérez, o Amigos del Trabajo"
                   value={editGuestApellido}
                   onChange={(e) => setEditGuestApellido(e.target.value)}
+                  maxLength={30}
                   required
                 />
                 <p className="text-xs text-muted-foreground">
