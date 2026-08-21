@@ -1,25 +1,23 @@
 ﻿/**
- * RivieraTemplate.tsx
- * Derivado de ModernoTemplate.tsx (misma arquitectura que Chic/Neon/Cine/
- * Nordico): misma estructura, props, secciones y componentes reutilizados
- * (Countdown, AlbumCarousel, RSVPWizardV2, SongSuggestion, etc). Cambia la
- * capa visual a la estética "Riviera" (mediterráneo cálido, mockup/nuevo
- * Plantillas Casamiento -> Marina & Diego): fondo lino cálido (#F0F4F0) +
- * tinta café (#2A3B36) + acento terracota (#D9899C, variable por color),
- * tipografía serif elegante recta (Marcellus) + texto geométrico (Mulish),
- * cuenta regresiva en cápsulas circulares, foto de portada con arco superior
- * (silueta de puerta mediterránea) y un reflejo cálido tipo "sol pegando en
- * el mar" ligado al scroll, doodles de trazo fino (arco, sol, ramita de
- * olivo).
- * Gating: esta plantilla solo debe ofrecerse para eventos CASAMIENTO (pack
- * exclusivo de casamiento, ver docs/GUIA_TECNICA_PLANTILLAS.md) — el gating
- * vive en TemplatePreviewModal.tsx, este archivo no valida nada por su cuenta.
+ * ChicTemplate.tsx
+ * Derivado de ModernoTemplate.tsx (misma arquitectura que DraftTemplate.tsx):
+ * misma estructura, props, secciones y componentes reutilizados (Countdown,
+ * AlbumCarousel, RSVPWizardV2, SongSuggestion, etc). Cambia la capa visual a
+ * la estética "Doodle Wedding" (mockup/nuevo/chic.html): fondo crema
+ * (#17140F) + tinta oscura (#F2ECE0) + dorado fijo (#D9A15C) + acento oliva
+ * (#6B7A4F, variable por color), tipografía itálica elegante (Playfair
+ * Display) + texto geométrico (Jost), doodles de trazo fino de boda
+ * (anillos, corazones, moños, ramitas) como motivo decorativo y "marca de
+ * agua" de fondo.
+ * Gating: esta plantilla solo debe ofrecerse para eventos CASAMIENTO (ver
+ * docs/PLAN_TEMPLATES_NEON_CHIC.md) — el gating vive en
+ * TemplatePreviewModal.tsx, este archivo no valida nada por su cuenta.
  */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Marcellus, Mulish } from "next/font/google";
+import { Playfair_Display, Jost } from "next/font/google";
 import { animate, stagger, onScroll } from "animejs";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { Album } from "@/components/invitation/v2/Album";
@@ -45,54 +43,77 @@ import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 
-// Doodles de trazo fino estilo "Riviera" (mockup Marina & Diego) en vez de
-// íconos genéricos de librería -- coherentes con el motivo decorativo
-// mediterráneo (arco, sol, ramita de olivo).
+// Doodles de trazo fino estilo "boda" (mockup chic.html) en vez de íconos
+// genéricos de librería -- coherentes con el resto del motivo decorativo.
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 15.5v-4M12 8.2h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
 const IconMusic = ({ className, style }: { className?: string; style?: React.CSSProperties } = {}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} className={className} style={style} aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/></svg>;
-const IconMap   = ({ className, style }: { className?: string; style?: React.CSSProperties } = {}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} className={className} style={style} aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
+const IconMap   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
 const IconGift  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>;
 const IconQuiz  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
-// Arco mediterráneo doodle -- decorativa, portada/hero y marco de la foto.
-const IconArch = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 24 26" fill="none" stroke="currentColor" strokeWidth={1.15} className={className} style={style} aria-hidden="true">
-    <path d="M3 25V12a9 9 0 0 1 18 0v13" />
-    <path d="M3 25h18" />
-    <path d="M7 25V13.5a5 5 0 0 1 10 0V25" strokeWidth={0.85} opacity={0.7} />
+// Anillos entrelazados doodle -- decorativa, usada en portada/hero. Doble
+// trazo (banda con grosor) + brillos tipo diamante en vez de círculos lisos.
+const IconRings = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 32 22" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <circle cx="12" cy="11" r="7.2" />
+    <circle cx="12" cy="11" r="5.6" />
+    <circle cx="20" cy="11" r="7.2" />
+    <circle cx="20" cy="11" r="5.6" />
+    <path d="M9.5 4.2 8.7 2.6M9.5 4.2 11 3.6M9.5 4.2 10 5.6" strokeWidth={0.9} />
+    <path d="M22.5 4.2 21.7 2.6M22.5 4.2 23.2 3.6" strokeWidth={0.9} />
   </svg>
 );
-// Sol de trazo fino con rayos cortos -- separador de secciones y kickers.
-const IconSun = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.15} className={className} style={style} aria-hidden="true">
-    <circle cx="12" cy="12" r="5.5" />
-    <path d="M12 1.6v3M12 19.4v3M22.4 12h-3M4.6 12h-3M19.2 4.8l-2.1 2.1M6.9 17.1l-2.1 2.1M19.2 19.2l-2.1-2.1M6.9 6.9 4.8 4.8" />
+// Corazón doodle de trazo fino -- acompaña títulos y separadores, con una
+// pequeña voluta/cola en la punta y una línea de brillo interna.
+const IconHeartDoodle = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 24 26" fill="none" stroke="currentColor" strokeWidth={1.2} className={className} style={style} aria-hidden="true">
+    <path d="M12 20.5C6 16.8 2.5 13 2.5 9a5 5 0 0 1 9.5-2.2A5 5 0 0 1 21.5 9c0 4-3.5 7.8-9.5 11.5Z" />
+    <path d="M12 20.5c-.8 1.6-.6 3-2 3.6" strokeWidth={0.9} />
+    <path d="M8.2 8.4a3 3 0 0 1 3-2" strokeWidth={0.8} opacity={0.7} />
   </svg>
 );
-// Ramita de olivo doodle -- separador de secciones, con hojas alternadas de
-// trazo fino y una pequeña aceituna en la punta.
-const IconOlive = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 30 14" fill="none" stroke="currentColor" strokeWidth={1.05} className={className} style={style} aria-hidden="true">
-    <path d="M2 9c8-6 18-6 26 1" />
-    <path d="M8 6.4 5.6 3.4M13 5.2 11.4 2M18 5.6l.6-3.4M22.5 7 24 3.8" strokeLinecap="round" />
-    <circle cx="27.2" cy="10.8" r="2" />
+// Moño/cinta doodle -- separador de secciones, con dos lazos, colas
+// dentadas en la punta y un nudo central con líneas de textura.
+const IconRibbon = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 28 18" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <path d="M14 9C11 3 5 2 2.5 3.6c-2.3 1.5-1 5 1 5.8 1.6.6 3.2.2 4.2-.6" />
+    <path d="M14 9c3 6 9 7 11.5 5.4c2.3-1.5 1-5-1-5.8-1.6-.6-3.2-.2-4.2.6" />
+    <path d="M2.5 3.6 1 1.8M2.5 3.6 1.5 5.6" strokeWidth={0.8} />
+    <path d="M25.5 14.4 27 16.2M25.5 14.4 26.5 12.4" strokeWidth={0.8} />
+    <circle cx="14" cy="9" r="1.8" />
+    <path d="M13.1 9h1.8M14 8.1v1.8" strokeWidth={0.7} />
+  </svg>
+);
+// Capillita con cruz chica -- para la tarjeta de Ceremonia, con puerta en
+// arco, rosetón y tejas marcadas. La cruz se hace deliberadamente
+// pequeña/proporcional (pedido del usuario: una cruz grande "parece un
+// cementerio").
+const IconChurch = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.1} className={className} style={style} aria-hidden="true">
+    <path d="M4 21V11l8-5 8 5v10" />
+    <path d="M4 21h16" />
+    <path d="M9 21v-6a3 3 0 0 1 6 0v6" />
+    <circle cx="12" cy="10.4" r="1.7" strokeWidth={0.8} />
+    <path d="M6 13.2h1.4M16.6 13.2H18" strokeWidth={0.7} opacity={0.7} />
+    <path d="M12 6.4V4.6M11.3 5h1.4" strokeWidth={0.9} />
   </svg>
 );
 
-// Tipografía exacta del mockup "Riviera" (Marcellus recta + Mulish texto),
-// escopeada solo a este componente vía CSS var override en el wrapper raíz —
-// no toca layout.tsx ni las demás plantillas que comparten
+// Tipografía exacta del mockup "Doodle Wedding" (Playfair Display itálica +
+// Jost texto), escopeada solo a este componente vía CSS var override en el
+// wrapper raíz — no toca layout.tsx ni las demás plantillas que comparten
 // --font-cormorant/--font-inter/--font-sans.
-const rivieraMarcellus = Marcellus({
+const chicPlayfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400"],
-  variable: "--riviera-marcellus",
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
+  variable: "--chic-playfair",
   display: "swap",
 });
-const rivieraMulish = Mulish({
+const chicJost = Jost({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--riviera-mulish",
+  weight: ["300", "400", "500", "600"],
+  variable: "--chic-jost",
   display: "swap",
 });
 
@@ -132,7 +153,7 @@ function safeJson<T>(val: string | null | undefined, fallback: T): T {
   try { return JSON.parse(val) as T; } catch { return fallback; }
 }
 
-interface RivieraTemplateCalProps {
+interface ChicTemplateNocheChicProps {
   invitation: Record<string, unknown>;
   guest?: {
     id: string;
@@ -166,10 +187,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
     });
   };
   return (
-    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#D9899C]/20 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#D9A15C]/20 last:border-b-0">
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold text-[#D9899C] uppercase tracking-wider mb-0.5">{label}</span>
-        <span className="text-xs sm:text-sm font-mono text-[#2A3B36] break-all">{value}</span>
+        <span className="block text-[10px] font-semibold text-[#D9A15C] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="text-xs sm:text-sm font-mono text-[#F2ECE0] break-all">{value}</span>
       </div>
       <button 
         className={`copy-btn shrink-0 px-4 py-2 transition-all ${copied ? "copied" : ""}`} 
@@ -184,10 +205,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#D9899C]/20 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 py-3 border-b border-[#D9A15C]/20 last:border-b-0">
       <div className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold text-[#D9899C] uppercase tracking-wider mb-0.5">{label}</span>
-        <span className="text-sm font-medium text-[#2A3B36] break-words">{value}</span>
+        <span className="block text-[10px] font-semibold text-[#D9A15C] uppercase tracking-wider mb-0.5">{label}</span>
+        <span className="text-sm font-medium text-[#F2ECE0] break-words">{value}</span>
       </div>
     </div>
   );
@@ -304,22 +325,22 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
     
     return (
       <div className="quiz-box text-center flex flex-col items-center">
-        <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#2A3B36" }}>
+        <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#F2ECE0" }}>
           ¡Juego Completado!
         </h3>
-        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#2A3B36" }}>
+        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#F2ECE0" }}>
           RESPONDISTE {score} DE {preguntas.length} CORRECTAMENTE ({percent}%)
         </p>
         
         {isSaving ? (
-          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7, color: "#7A8F82" }}>Guardando tus resultados...</p>
+          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7, color: "#A89A85" }}>Guardando tus resultados...</p>
         ) : (
           stats && stats.count > 0 && (
             <div style={{ marginTop: "28px" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(62,46,32,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(62,46,32,0.12)", textAlign: "left", maxWidth: "90%" }}>
-                <Users className="w-5 h-5 text-[#D9899C] shrink-0" />
-                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#2A3B36" }}>
-                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#2A3B36" }}>{stats.avg}%</strong>.
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "left", maxWidth: "90%" }}>
+                <Users className="w-5 h-5 text-[#D9A15C] shrink-0" />
+                <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#F2ECE0" }}>
+                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#F2ECE0" }}>{stats.avg}%</strong>.
                 </p>
               </div>
             </div>
@@ -346,7 +367,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
   return (
     <div className="quiz-box flex flex-col items-center text-center">
       <div className="quiz-q w-full max-w-lg" key={currentIdx}>
-        <p className="text-[#2A3B36] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
+        <p className="text-[#F2ECE0] text-2xl md:text-3xl leading-relaxed tracking-wide" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500, marginBottom: "3.5rem" }}>
           {formatQuestion(q.pregunta)}
         </p>
         <div className="quiz-opts flex flex-wrap justify-center gap-3">
@@ -387,11 +408,15 @@ const formatNumber = (num: number) => {
   return new Intl.NumberFormat("es-AR").format(num);
 };
 
-export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }: RivieraTemplateCalProps) {
+export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = false }: ChicTemplateNocheChicProps) {
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
 
+  // Transición cinemática al abrir: en vez de desmontar la portada de
+  // golpe al tocar el botón, se le suma una clase de salida (blur + zoom +
+  // fade, ver COVER_EXIT_STYLE) y recién después de esos ~700ms se
+  // desmonta de verdad. Aplica igual con foto animada o sin ella.
   const openInvitation = () => {
     if (isClosingCover) return;
     setIsClosingCover(true);
@@ -435,23 +460,23 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
     return () => { document.body.style.overflow = ""; };
   }, [isCoverOpen, invitation.fechaEvento]);
 
-  // Entrada animada de los doodles de la portada (arco, sol, ramita de
-  // olivo) con anime.js. Corre una sola vez, cuando la portada aparece
-  // (isCoverOpen pasa a false al montar, así que esto dispara en el primer
-  // render real).
+  // Entrada animada de los doodles de la portada (anillos, corazón, moño) con
+  // anime.js -- ver docs/PLAN_TEMPLATES_NEON_CHIC.md. Corre una sola vez,
+  // cuando la portada aparece (isCoverOpen pasa a false al montar, así que
+  // esto dispara en el primer render real).
   const coverRootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (isCoverOpen || !coverRootRef.current) return;
     const root = coverRootRef.current;
-    animate(root.querySelectorAll(".riviera-doodle"), {
+    animate(root.querySelectorAll(".chic-doodle"), {
       scale: [0, 1],
-      rotate: [-12, 0],
+      rotate: [-15, 0],
       opacity: [0, 1],
       duration: 900,
       delay: stagger(140, { start: 300 }),
       ease: "outBack",
     });
-    animate(root.querySelectorAll(".riviera-seal"), {
+    animate(root.querySelectorAll(".chic-seal"), {
       scale: [0.6, 1],
       opacity: [0, 1],
       duration: 700,
@@ -465,14 +490,14 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
   // uno por elemento, disparando una sola vez.
   useEffect(() => {
     if (!isCoverOpen) return;
-    const els = document.querySelectorAll(".riviera-scroll-doodle");
+    const els = document.querySelectorAll(".chic-scroll-doodle");
     if (!els.length) return;
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         animate(entry.target, {
           scale: [0, 1],
-          rotate: [-10, 0],
+          rotate: [-12, 0],
           opacity: [0, 1],
           duration: 800,
           ease: "outBack",
@@ -484,16 +509,19 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
     return () => observer.disconnect();
   }, [isCoverOpen]);
 
-  // Reflejo cálido tipo "sol pegando en el mar" sobre la foto de portada,
-  // ligado al progreso de scroll: un punto de luz dorado que recorre la foto
-  // en diagonal + un reflejo fantasma más chico siguiéndolo.
+  // Destello tipo "sol en el lente de una cámara" sobre la foto de portada,
+  // ligado al progreso de scroll (ScrollObserver de anime.js): un punto de
+  // luz cálido que recorre la foto en diagonal + un par de reflejos
+  // fantasma más chicos siguiéndolo, como un lens flare real.
   const heroPhotoRef = useRef<HTMLDivElement>(null);
   const heroFlareRef = useRef<HTMLDivElement>(null);
-  const heroGhostRef = useRef<HTMLDivElement>(null);
+  const heroGhost1Ref = useRef<HTMLDivElement>(null);
+  const heroGhost2Ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isCoverOpen || !heroPhotoRef.current || !heroFlareRef.current) return;
     const flare = heroFlareRef.current;
-    const ghost = heroGhostRef.current;
+    const ghost1 = heroGhost1Ref.current;
+    const ghost2 = heroGhost2Ref.current;
     const observer = onScroll({
       target: heroPhotoRef.current,
       container: getScrollContainer(heroPhotoRef.current),
@@ -502,15 +530,20 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
       onUpdate: (self) => {
         const p = self.progress; // 0 a 1 mientras la foto atraviesa el viewport
         const intensity = Math.sin(p * Math.PI); // 0 -> 1 -> 0
-        const x = p * 130 - 15;
+        const x = p * 130 - 15; // % a lo largo de la diagonal, de punta a punta
         const y = p * 110 - 5;
         flare.style.opacity = String(intensity * 0.55);
         flare.style.left = `${x}%`;
         flare.style.top = `${y}%`;
-        if (ghost) {
-          ghost.style.opacity = String(intensity * 0.3);
-          ghost.style.left = `${x - 24}%`;
-          ghost.style.top = `${y - 20}%`;
+        if (ghost1) {
+          ghost1.style.opacity = String(intensity * 0.28);
+          ghost1.style.left = `${x - 22}%`;
+          ghost1.style.top = `${y - 18}%`;
+        }
+        if (ghost2) {
+          ghost2.style.opacity = String(intensity * 0.18);
+          ghost2.style.left = `${x - 40}%`;
+          ghost2.style.top = `${y - 33}%`;
         }
       },
     });
@@ -598,15 +631,27 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
   const heroBgDesktop = String(invitation.portadaImagenFondoDesktop ?? "") || heroBgMobile;
-
-  // Portada animada -- Riviera es tema claro (bg #F0F4F0, ink #2A3B36) ->
-  // mismo caso que Chic: texto no puede forzarse a claro por JS. Se resuelve
-  // con clases CSS + media query (.riviera-cover-text/-muted). effect=
-  // "enfoque", sin tinte (paleta clara/pastel), scrimColorRgb = rgb del ink
-  // oscuro propio.
+  // El recorte "desktop" del wizard se recicla como foto opcional de la
+  // portada de bienvenida animada -- sin fallback a mobile a propósito: si
+  // no se cargó nada ahí, la portada queda tal cual la plantilla, sin
+  // ningún efecto. Chic es de paleta clara/pastel (crema + dorado suave) ->
+  // sin tinte de color, solo blur + enfoque (criterio: paletas claras van
+  // sin tinte, paletas más cargadas tipo Moderno/Onix sí llevan tinte).
+  // Chic también es de tema claro (texto oscuro sobre fondo crema) -- con
+  // foto de fondo el texto tiene que verse claro, PERO SOLO EN MOBILE (la
+  // foto es mobile-only, ver acp-mobile-only/acp-desktop-only). Si se fuerza
+  // el color por JS (solo mirando portadaFondoAnimado) queda claro también
+  // en desktop, donde no hay foto atrás -- texto claro invisible sobre el
+  // fondo crema claro de siempre. Por eso esto se resuelve con clases CSS +
+  // media query (.chic-cover-text / .chic-cover-text-muted, definidas en el
+  // <style jsx> de la portada), no con un color inline calculado en JS.
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/riviera-boda.png" : undefined;
+  // Scrim oscuro para que el texto claro forzado se lea bien -- se usa el
+  // tono de tinta oscura que la plantilla YA tiene (no su fondo claro, que
+  // no oscurecería lo suficiente la foto).
+  const coverScrimRgb = "36,30,18"; // rgb(#F2ECE0)
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/chic-boda.png" : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -622,7 +667,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className="min-h-dvh w-full bg-gradient-to-b from-[#12181A] via-[#161F22] to-[#0B1112] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
+      <div className="min-h-dvh w-full bg-gradient-to-b from-[#17140F] via-[#201C14] to-[#FFFFFF] text-white relative overflow-x-hidden flex flex-col justify-between" data-theme={theme}>
         {/* Glow decorativo (mismo estilo que la seccion "Plantillas" del landing) en vez de foto de fondo */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
@@ -679,7 +724,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         </main>
 
         <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">
-          <LogoFooterCredit bgColor="transparent" />
+          <LogoFooterCredit bgColor="transparent" textColor="var(--chic-ink, #F2ECE0)" />
         </footer>
       </div>
     );
@@ -687,24 +732,23 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
   return (
     <div
-      className={`${rivieraMarcellus.variable} ${rivieraMulish.variable}`}
+      className={`${chicPlayfair.variable} ${chicJost.variable}`}
       style={{
-        "--font-cormorant": "var(--riviera-marcellus)",
-        "--font-inter": "var(--riviera-mulish)",
-        "--font-sans": "var(--riviera-mulish)",
-        "--t-acc": "#D9899C",
-        "--t-acc2": "#D9899C",
-        "--c-accent": "#D9899C",
-        "--t-bg": "#F0F4F0",
+        "--font-cormorant": "var(--chic-playfair)",
+        "--font-inter": "var(--chic-jost)",
+        "--font-sans": "var(--chic-jost)",
+        "--t-acc": "#D9A15C",
+        "--t-acc2": "#D9A15C",
+        "--c-accent": "#D9A15C",
+        "--t-bg": "#17140F",
         "--t-surface": "#FFFFFF",
-        "--t-muted": "#7A8F82",
-        // Countdown.tsx/RSVPWizardV2.tsx tienen textos hardcodeados como
-        // `dark ? var(--chic-ink, #FFFFFF) : "inherit"` -- nombre de variable
-        // fijo en esos archivos compartidos (no editable, ver límite
-        // estricto de la consigna). Definir `--chic-ink` acá (mismo nombre
-        // literal) es la forma de que esos textos internos lean tinta oscura
-        // en vez del blanco hardcodeado pensado para Moderno/Neon/Cine.
-        "--chic-ink": "#2A3B36",
+        "--t-muted": "#A89A85",
+        // Usado por Countdown.tsx/RSVPWizardV2.tsx (dark ? var(--chic-ink, #FFFFFF) : ...)
+        // -- sin definir esto, esos componentes muestran texto blanco
+        // hardcodeado (pensado para Moderno/Neon) invisible sobre el fondo
+        // claro de Chic. Moderno/Neon no definen esta var, así que su
+        // fallback (#FFFFFF/#EDE9F4) los deja exactamente como estaban.
+        "--chic-ink": "#F2ECE0",
       } as React.CSSProperties}
     >
       <style>{`
@@ -716,15 +760,16 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         .desktop-stage .tpl .quiz-container h2,
         .desktop-stage .tpl .quiz-container h3 {
           font-family: var(--font-title, var(--font-cormorant)), serif !important;
-          color: #2A3B36 !important;
+          color: #F2ECE0 !important;
         }
-        .desktop-stage .tpl .riviera-light-card h4 {
-          color: #2A3B36 !important;
+        /* Tarjetas claras (Ceremonia/Fiesta) necesitan texto oscuro, no blanco */
+        .desktop-stage .tpl .moderno-light-card h4 {
+          color: #F2ECE0 !important;
         }
         .desktop-stage .tpl .t-kicker,
         .desktop-stage .tpl p.kicker {
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
-          color: #D9899C !important;
+          color: #D9A15C !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -751,32 +796,26 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           border-radius: 0 !important;
         }
         .desktop-stage .tpl .album-btn {
-          color: #2A3B36 !important;
-          border-color: rgba(62, 46, 32, 0.25) !important;
+          color: #F2ECE0 !important;
+          border-color: rgba(255, 255, 255, 0.3) !important;
         }
 
-        /* Override Countdown Hardcoded Colors -- cápsulas circulares tipo
-           "sol", calcado del mockup Marina & Diego. */
+        /* Override Countdown Hardcoded Colors */
         #countdown.dark {
-          background-color: #F0F4F0 !important;
+          background-color: #17140F !important;
           margin-top: -2px !important;
           position: relative;
           z-index: 20;
         }
         #countdown[data-style="clasico"].dark > div > div > div {
-          background-color: #E3ECE4 !important;
-          border-color: rgba(193,115,74, 0.35) !important;
-          border-radius: 50% !important;
-          aspect-ratio: 1 / 1 !important;
-          flex: none !important;
-          width: 4.1rem !important;
-          height: 4.1rem !important;
+          background-color: rgba(0, 0, 0, 0.2) !important;
+          border-color: rgba(201, 168, 118, 0.2) !important;
         }
 
-        /* RSVP Custom Aesthetics for RivieraTemplate */
+        /* RSVP Custom Aesthetics for ChicTemplate */
         #rsvp.section.dark {
-          background-color: #F0F4F0 !important;
-          color: #2A3B36 !important;
+          background-color: #17140F !important;
+          color: #F2ECE0 !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -792,7 +831,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         }
         #rsvp.section.dark b,
         #rsvp.section.dark strong {
-          color: #2A3B36 !important;
+          color: #F2ECE0 !important;
         }
         @media (min-width: 640px) {
           #rsvp.section.dark > p.t-kicker,
@@ -803,7 +842,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         }
         #rsvp.section.dark .t-kicker {
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
-          color: #D9899C !important;
+          color: #D9A15C !important;
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -819,20 +858,20 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           font-size: 10px !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           letter-spacing: 0.15em !important;
-          color: #7A8F82 !important;
+          color: #A89A85 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #2A3B36 !important;
+          color: #F2ECE0 !important;
           border-radius: 6px !important;
-          border: 1px solid rgba(193,115,74, 0.2) !important;
+          border: 1px solid rgba(201, 168, 118, 0.2) !important;
           padding: 12px 16px !important;
           font-weight: 400 !important;
           font-size: 14px !important;
         }
         #rsvp.section.dark input::placeholder {
-          color: #7A8F82 !important;
+          color: #A89A85 !important;
           opacity: 0.8 !important;
         }
         #rsvp.section.dark .t-btn {
@@ -840,8 +879,8 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           padding: 12px 24px !important;
           flex: 1 !important;
           min-width: 120px !important;
-          background-color: #D9899C !important;
-          color: #F0F4F0 !important;
+          background-color: #D9A15C !important;
+          color: #F2ECE0 !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -872,13 +911,13 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(62, 46, 32, 0.12) !important;
+          border-top: 1px solid rgba(36,30,18,0.1) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(62, 46, 32, 0.55) !important;
+          color: rgba(36,30,18,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -888,7 +927,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(62, 46, 32, 0.72) !important;
+          color: rgba(36,30,18,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -897,17 +936,17 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #2A3B36 !important;
+          color: #F2ECE0 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(62, 46, 32, 0.45) !important;
+          color: rgba(36,30,18,0.4) !important;
           font-size: 12px !important;
         }
         
         /* SongSuggestion Custom Aesthetics */
         #songs.d-sec.dark {
-          background-color: #E3ECE4 !important;
+          background-color: #201C14 !important;
           padding: 80px 24px !important;
           display: flex;
           flex-direction: column;
@@ -929,7 +968,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         }
         #songs.d-sec.dark .t-kicker {
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
-          color: #D9899C !important; /* Gold/Orange */
+          color: #D9A15C !important; /* Gold/Orange */
           font-size: 11px !important;
           font-weight: 600 !important;
           text-transform: uppercase !important;
@@ -949,13 +988,13 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         }
         /* Footer Aesthetics */
         .desktop-stage .d-foot {
-          background-color: #F0F4F0 !important; /* Matches light sections */
-          color: #2A3B36 !important;
+          background-color: #17140F !important; /* Matches light sections */
+          color: #F2ECE0 !important;
           padding: 24px 24px 38px 24px !important;
           text-align: center;
         }
         .desktop-stage .d-foot .mono {
-          color: #D9899C !important;
+          color: #D9A15C !important;
           font-family: var(--font-title, var(--font-cormorant)), serif !important;
           font-size: 20px !important;
           margin-bottom: 8px !important;
@@ -966,8 +1005,8 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           text-align: left !important;
         }
         #banco .copy-btn {
-          background-color: #D9899C !important;
-          color: #F0F4F0 !important;
+          background-color: #D9A15C !important;
+          color: #F2ECE0 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;
@@ -975,8 +1014,8 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           letter-spacing: 0.05em !important;
         }
         #banco .copy-btn.copied {
-          background-color: #2A3B36 !important;
-          color: #F0F4F0 !important;
+          background-color: #F2ECE0 !important;
+          color: #17140F !important;
         }
 
         /* Bottom Nav Pill - Liquid Glass Sticky */
@@ -997,54 +1036,56 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           z-index: 999999 !important;
         }
         .desktop-stage .bottom-nav a {
-          color: #F0F4F0 !important;
-          opacity: 0.65 !important;
+          color: #F2ECE0 !important;
+          opacity: 0.6 !important;
         }
         .desktop-stage .bottom-nav a[aria-current="true"] {
           opacity: 1 !important;
-          color: #E8A579 !important;
+          color: #D9A15C !important;
         }
       `}</style>
       
-      {/* PORTADA / WELCOME OVERLAY (mesh terracota + sol cálido animado, glow pulsante) */}
+      {/* PORTADA / WELCOME OVERLAY (mesh dorado + esmeralda animado, glow pulsante) */}
       {!isCoverOpen && (
         <div
           ref={coverRootRef}
-          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#F0F4F0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
-          className={`text-[#2A3B36] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#17140F', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '25vh', overflow: 'hidden', ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) }}
+          className={`text-[#F2ECE0] ${isClosingCover ? "acp-cover-exit" : "transition-all duration-1000 animate-in fade-in"}`}
         >
+          {/* Con foto animada, solo en mobile (desktop siempre ve el mesh
+              decorativo original -- sección 8.2 de la guía técnica). */}
           {portadaFondoAnimado && (
             <div className="acp-mobile-only">
               <AnimatedCoverPhoto
                 photoSrc={portadaImagenFondoDesktopRaw as string}
                 effect="enfoque"
                 tint={false}
-                scrimColorRgb="62,46,32"
+                scrimColorRgb={coverScrimRgb}
               />
             </div>
           )}
           <div className={portadaFondoAnimado ? "acp-desktop-only" : undefined}>
             <div style={{
               position: 'absolute', inset: 0, pointerEvents: 'none',
-              background: 'radial-gradient(50% 40% at 15% 15%, rgba(193,115,74,0.14), transparent), radial-gradient(45% 40% at 85% 80%, rgba(232,165,121,0.24), transparent)',
+              background: 'radial-gradient(50% 40% at 15% 15%, rgba(201,168,118,0.13), transparent), radial-gradient(45% 40% at 85% 80%, rgba(107,122,79,0.2), transparent)',
               backgroundSize: '160% 160%',
-              animation: 'riviera-meshDrift 14s ease-in-out infinite',
+              animation: 'chic-meshDrift 14s ease-in-out infinite',
             }} />
             <div style={{
               position: 'absolute', width: 220, height: 220, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(193,115,74,0.14), transparent 70%)',
+              background: 'radial-gradient(circle, rgba(201,168,118,0.13), transparent 70%)',
               top: '18%', left: '50%', transform: 'translateX(-50%)',
-              animation: 'riviera-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
+              animation: 'chic-glowPulse 5s ease-in-out infinite', pointerEvents: 'none',
             }} />
-
-            {/* Doodles decorativos (arco, sol, ramita de olivo) -- animados de
-                entrada con anime.js (ver useEffect de coverRootRef), inertes
-                hasta que corre el JS (opacity-0 inicial). */}
-            <IconArch className="riviera-doodle opacity-0 absolute" style={{ width: 30, height: 32, top: '9%', left: '11%', color: 'rgba(193,115,74,0.5)' }} />
-            <IconSun className="riviera-doodle opacity-0 absolute" style={{ width: 22, height: 22, top: '15%', right: '13%', color: 'rgba(193,115,74,0.5)' }} />
-            <IconOlive className="riviera-doodle opacity-0 absolute" style={{ width: 30, height: 14, bottom: '20%', left: '11%', color: 'rgba(122,143,107,0.5)' }} />
-            <IconSun className="riviera-doodle opacity-0 absolute" style={{ width: 14, height: 14, bottom: '26%', right: '17%', color: 'rgba(193,115,74,0.35)' }} />
           </div>
+
+          {/* Doodles decorativos (anillos, corazón, moño) -- animados de
+              entrada con anime.js (ver useEffect de coverRootRef), inertes
+              hasta que corre el JS (opacity-0 inicial). */}
+          <IconRings className="chic-doodle opacity-0 absolute" style={{ width: 40, height: 26, top: '9%', left: '10%', color: 'rgba(201,168,118,0.55)' }} />
+          <IconHeartDoodle className="chic-doodle opacity-0 absolute" style={{ width: 22, height: 22, top: '15%', right: '12%', color: 'rgba(107,122,79,0.45)' }} />
+          <IconRibbon className="chic-doodle opacity-0 absolute" style={{ width: 32, height: 18, bottom: '18%', left: '14%', color: 'rgba(201,168,118,0.45)' }} />
+          <IconHeartDoodle className="chic-doodle opacity-0 absolute" style={{ width: 16, height: 16, bottom: '24%', right: '20%', color: 'rgba(201,168,118,0.4)' }} />
 
           {portadaFondoFallback && (
             <CoverFallbackBg photoSrc={portadaFondoFallback} />
@@ -1053,29 +1094,29 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
 
             {/* Guest Name */}
-            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " riviera-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#2A3B36' }}>
+            <h2 className={`text-4xl sm:text-5xl font-light tracking-wide leading-relaxed${portadaFondoAnimado ? " chic-cover-text" : ""}`} style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif', color: portadaFondoAnimado ? undefined : '#F2ECE0' }}>
               {guestNameDisplay}
             </h2>
 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
-              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " riviera-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#7A8F82' }}>
+              <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " chic-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#A89A85' }}>
                 Dress code: {activeDressCode}
               </p>
             )}
 
-            {/* Thin Open Button, borde terracota con vidrio esmerilado */}
+            {/* Thin Open Button, borde dorado con vidrio esmerilado */}
             <button
               type="button"
               onClick={openInvitation}
-              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer"
+              className="inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 transition-colors duration-500 cursor-pointer" 
               style={{
-                fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #D9899C', color: '#D9899C',
-                background: 'rgba(193,115,74,0.08)', backdropFilter: 'blur(6px)',
+                fontFamily: 'var(--font-body-custom, var(--font-inter)), sans-serif', border: '1px solid #D9A15C', color: '#D9A15C',
+                background: 'rgba(201,168,118,0.08)', backdropFilter: 'blur(6px)',
                 marginTop: '1rem',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#D9899C'; e.currentTarget.style.color = '#F0F4F0'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(193,115,74,0.08)'; e.currentTarget.style.color = '#D9899C'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#D9A15C'; e.currentTarget.style.color = '#17140F'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(201,168,118,0.08)'; e.currentTarget.style.color = '#D9A15C'; }}
             >
               ABRIR INVITACIÓN
             </button>
@@ -1083,14 +1124,18 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
           </div>
 
           <style jsx>{`
-            @keyframes riviera-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
-            @keyframes riviera-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
-            @keyframes riviera-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .riviera-cover-text { color: #F0F4F0; }
-            .riviera-cover-text-muted { color: rgba(250,241,228,0.75); }
+            @keyframes chic-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
+            @keyframes chic-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+            @keyframes chic-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
+            /* Texto de la portada claro sobre la foto animada -- SOLO en
+               mobile (la foto es mobile-only). En desktop, sin importar si
+               hay foto cargada, vuelve al oscuro original de Chic (ahí no
+               hay foto atrás, solo el mesh crema de siempre). */
+            .chic-cover-text { color: #17140F; }
+            .chic-cover-text-muted { color: rgba(251,243,234,0.75); }
             @media (min-width: 768px) {
-              .riviera-cover-text { color: #2A3B36; }
-              .riviera-cover-text-muted { color: #7A8F82; }
+              .chic-cover-text { color: #F2ECE0; }
+              .chic-cover-text-muted { color: #A89A85; }
             }
           `}</style>
           <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}{COVER_FALLBACK_STYLE}</style>
@@ -1101,23 +1146,23 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
         <div 
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#D9899C]/40 shadow-md ${isTicketMaximized ? 'bg-[#F0F4F0]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#2A3B36]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
+          className={`fixed top-3 left-1/2 -translate-x-1/2 z-[99999] transition-all duration-500 cursor-pointer overflow-hidden border border-[#D9A15C]/40 shadow-md ${isTicketMaximized ? 'bg-[#17140F]/95 backdrop-blur-md rounded-full w-[90%] max-w-sm px-5 py-2.5' : 'bg-[#F2ECE0]/95 backdrop-blur-md rounded-full px-5 py-2'}`}
         >
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
-                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D9899C] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
-                <span className="text-[#2A3B36] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
+                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D9A15C] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
+                <span className="text-[#F2ECE0] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
               </div>
-              <div className="flex flex-col items-end border-l border-[#D9899C]/20 pl-3">
-                <span className="text-[#2A3B36] font-bold text-sm leading-none">{guest.expectedCount}</span>
-                <span className="text-[#7A8F82] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
+              <div className="flex flex-col items-end border-l border-[#D9A15C]/20 pl-3">
+                <span className="text-[#F2ECE0] font-bold text-sm leading-none">{guest.expectedCount}</span>
+                <span className="text-[#A89A85] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
-              <Ticket className="w-4 h-4 text-[#D9899C]" />
-              <span className="text-[#E9F0EA]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <Ticket className="w-4 h-4 text-[#D9A15C]" />
+              <span className="text-[#FFFFFF]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1136,18 +1181,22 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
       <div className="desktop-stage" data-theme={theme} style={{
         ...getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string),
-        // Este wrapper (vista de escritorio) necesita las mismas CSS vars de
-        // color que el wrapper de mobile de más arriba -- ver sección 3.2 de
-        // docs/GUIA_TECNICA_PLANTILLAS.md.
-        "--t-acc": "#D9899C",
-        "--t-acc2": "#D9899C",
-        "--c-accent": "#D9899C",
-        "--t-bg": "#F0F4F0",
+        // Este wrapper (vista de escritorio, separado del de arriba que es
+        // el de mobile) nunca tuvo las CSS vars del tema -- ni siquiera en
+        // ModernoTemplate.tsx original. Ahí "no se nota" porque el fallback
+        // de los componentes compartidos (Countdown, RSVPWizardV2) es un
+        // color claro que igual se lee sobre el fondo oscuro de Moderno.
+        // En Chic (tema claro) ese mismo fallback es invisible, así que acá
+        // SÍ hace falta definir todo explícitamente.
+        "--t-acc": "#D9A15C",
+        "--t-acc2": "#D9A15C",
+        "--c-accent": "#D9A15C",
+        "--t-bg": "#17140F",
         "--t-surface": "#FFFFFF",
-        "--t-muted": "#7A8F82",
-        "--chic-ink": "#2A3B36",
+        "--t-muted": "#A89A85",
+        "--chic-ink": "#F2ECE0",
       } as React.CSSProperties}>
-      <aside className="d-left hide-mobile" style={{ position: "relative", overflow: "hidden" }}>
+      <aside className="d-left hide-mobile">
         <div
           className="hero-photo"
           style={heroBgDesktop ? {
@@ -1157,13 +1206,6 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
             backgroundRepeat: "no-repeat"
           } : undefined}
         />
-        {/* Marco fino + doodle sol en la esquina, calcado del motivo
-            mediterráneo del mockup Marina & Diego -- estático en escritorio
-            (el reflejo cálido ligado al scroll vive en la foto de mobile). */}
-        <div className="absolute inset-3 pointer-events-none z-20" aria-hidden="true">
-          <div className="absolute inset-0" style={{ border: "1px solid rgba(255,255,255,0.7)" }} />
-          <IconSun style={{ position: "absolute", top: -12, right: -6, width: 24, height: 24, color: "#F0F4F0" }} />
-        </div>
         <div className="d-left-top drop-shadow-md">
           <p className=" text-[11px] font-semibold uppercase tracking-[0.2em] text-white mb-6 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{eyebrow}</p>
           <h1 className="text-5xl font-light text-white leading-tight mb-2 drop-shadow-md" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
@@ -1176,7 +1218,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
               <span className="block">{title}</span>
             )}
           </h1>
-          <div style={{ width: 40, height: 2, background: '#D9899C', margin: '6px 0 14px', animation: 'riviera-lineExpand 1.2s ease-out' }} />
+          <div style={{ width: 40, height: 2, background: '#D9A15C', margin: '6px 0 14px', animation: 'chic-lineExpand 1.2s ease-out' }} />
           <p className=" text-sm font-medium text-white/90 tracking-wide drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
           {Boolean(activeDressCode) && (
             <p className=" text-xs font-semibold text-white/80 tracking-widest uppercase mt-4 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1195,39 +1237,39 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
       </aside>
 
       <div className="d-right tpl">
-        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#F0F4F0]">
+        <div className="hide-desktop w-full flex flex-col min-h-[100dvh] bg-[#17140F]">
           {/* Text Container */}
-          <div className="px-8 pt-16 pb-12 text-left bg-[#F0F4F0] z-10 relative">
-            <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#D9899C] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+          <div className="px-8 pt-16 pb-12 text-left bg-[#17140F] z-10 relative">
+            <IconHeartDoodle className="chic-scroll-doodle opacity-0 absolute" style={{ width: 18, height: 18, top: 12, right: 28, color: 'rgba(107,122,79,0.4)' }} />
+            <IconRibbon className="chic-scroll-doodle opacity-0 absolute" style={{ width: 26, height: 15, top: 64, right: 52, color: 'rgba(201,168,118,0.4)' }} />
+            <p className=" text-xs font-semibold uppercase tracking-[0.2em] text-[#D9A15C] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {eyebrow}
             </p>
-            <h1 className="text-[4rem] font-light text-[#2A3B36] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
+            <h1 className="text-[4rem] font-light text-[#F2ECE0] leading-[1.0] mb-3" style={{ fontFamily: 'var(--font-title, var(--font-cormorant)), serif' }}>
               {em ? (
                 <>
                   <span className="block">{title.slice(0, title.indexOf(em)).trim()}</span>
-                  <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', color: '#D9899C' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
+                  <span className="block"><em style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', color: '#D9A15C' }}>&amp;</em> {em.replace('& ', '').trim()}</span>
                 </>
               ) : (
                 <span className="block">{title}</span>
               )}
             </h1>
-            <div style={{ width: 40, height: 2, background: '#D9899C', margin: '0 0 20px', animation: 'riviera-lineExpand 1.2s ease-out' }} />
-            <p className=" text-sm font-medium text-[#7A8F82] tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+            <div style={{ width: 40, height: 2, background: '#D9A15C', margin: '0 0 20px', animation: 'chic-lineExpand 1.2s ease-out' }} />
+            <p className=" text-sm font-medium text-[#A89A85] tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               {fechaStr}{lugarNombre ? ` · ${lugarNombre}` : ""}{ciudad ? ` — ${ciudad}` : ""}
             </p>
             {Boolean(activeDressCode) && (
-              <p className=" text-xs font-semibold text-[#D9899C] tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+              <p className=" text-xs font-semibold text-[#D9A15C] tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                 Dress code: {activeDressCode}
               </p>
             )}
           </div>
           
-          {/* Image Container -- arco mediterráneo en la base (silueta de
-              puerta), marco fino + doodles y reflejo cálido tipo "sol
-              pegando en el mar" ligado al scroll (ver useEffect de
-              heroPhotoRef). */}
-          <div ref={heroPhotoRef} className="flex-1 w-full relative overflow-hidden" style={{ borderRadius: "0 0 50% 50% / 0 0 9% 9%" }}>
-            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #F0F4F0 100%)' }} />
+          {/* Image Container -- marco dorado completo + destello tipo lente
+              de cámara ligado al scroll (ver useEffect de heroPhotoRef). */}
+          <div ref={heroPhotoRef} className="flex-1 w-full relative overflow-hidden">
+            <div className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #17140F 100%)' }} />
             <div
               className="absolute inset-0 w-full h-full"
               style={heroBgMobile ? {
@@ -1235,20 +1277,25 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
                 backgroundSize: "cover",
                 backgroundPosition: `${Number(invitation.portadaImagenPosX ?? 50)}% ${Number(invitation.portadaImagenPosY ?? 50)}%`,
                 backgroundRepeat: "no-repeat"
-              } : { backgroundColor: '#E9F0EA' }}
+              } : { backgroundColor: '#FFFFFF' }}
             />
-            {/* Reflejo cálido tipo "sol en el mar" + un reflejo fantasma más
-                chico, ligados al progreso de scroll. */}
-            <div ref={heroFlareRef} className="pointer-events-none z-20" style={{ position: "absolute", width: 100, height: 100, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,224,168,0.9) 0%, rgba(232,165,121,0.4) 45%, transparent 72%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
-            <div ref={heroGhostRef} className="pointer-events-none z-20" style={{ position: "absolute", width: 34, height: 34, borderRadius: "50%", background: "radial-gradient(circle, rgba(193,115,74,0.5), transparent 70%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
-            {/* Marco fino + doodles (sol, olivo) "saliendo" del borde. */}
+            {/* Marco completo + un par de doodles "saliendo" del borde (anillos
+                y corazón), calcado del mockup chic.html. */}
             <div className="absolute inset-3 pointer-events-none z-20" aria-hidden="true">
-              <div className="absolute inset-0" style={{ border: "1px solid rgba(255,255,255,0.75)" }} />
-              <IconSun style={{ position: "absolute", top: -10, right: -8, width: 26, height: 26, color: "#F0F4F0" }} />
-              <IconOlive style={{ position: "absolute", bottom: 6, left: -6, width: 22, height: 10, color: "#F0F4F0" }} />
+              <div className="absolute inset-0" style={{ border: "1px solid rgba(201,168,118,0.65)" }} />
+              <IconRings style={{ position: "absolute", top: -10, left: -8, width: 30, height: 20, color: "#D9A15C" }} />
+              <IconHeartDoodle style={{ position: "absolute", bottom: -8, right: -6, width: 18, height: 18, color: "#6B7A4F" }} />
             </div>
+            {/* Destello cálido tipo "sol en el lente" + 2 reflejos fantasma
+                más chicos, todos ligados al progreso de scroll. */}
+            <div ref={heroFlareRef} className="pointer-events-none z-20" style={{ position: "absolute", width: 90, height: 90, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,247,224,0.9) 0%, rgba(201,168,118,0.35) 45%, transparent 72%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
+            <div ref={heroGhost1Ref} className="pointer-events-none z-20" style={{ position: "absolute", width: 30, height: 30, borderRadius: "50%", background: "radial-gradient(circle, rgba(201,168,118,0.5), transparent 70%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
+            <div ref={heroGhost2Ref} className="pointer-events-none z-20" style={{ position: "absolute", width: 16, height: 16, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)", opacity: 0, transform: "translate(-50%,-50%)" }} />
           </div>
         </div>
+
+        {/* Divisor doodle tipo "guirnalda" entre hero y cuenta regresiva
+            (anillos flanqueados por ramitas, calcado del mockup chic.html). */}
 
         <SaveTheDate
           headerIcon={tipo === "QUINCE_ANOS" ? "crown" : tipo === "CASAMIENTO" ? "rings" : undefined}
@@ -1268,62 +1315,53 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #7A8F6B14, transparent 70%), #E9F0EA" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B7A4F14, transparent 70%), #FFFFFF" }}>
             <div className="max-w-2xl mx-auto text-center">
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
               <TypewriterText 
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
-                className="text-[#2A3B36] text-2xl md:text-3xl leading-relaxed tracking-wide" 
+                className="text-[#F2ECE0] text-2xl md:text-3xl leading-relaxed tracking-wide" 
                 style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500 }}
               />
             </div>
           </SectionWrapper>
         ) : null}
 
-        {/* Divisor doodle tipo "guirnalda mediterránea": sol flanqueado por
-            ramitas de olivo, entre el hero y la cuenta regresiva. */}
-        <div className="w-full flex items-center justify-center gap-3 py-8 bg-[#F0F4F0]" aria-hidden="true">
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #D9899C, transparent)' }} />
-          <IconSun className="riviera-scroll-doodle opacity-0" style={{ width: 22, height: 22, color: '#D9899C' }} />
-          <IconOlive className="riviera-scroll-doodle opacity-0" style={{ width: 20, height: 10, color: '#7A8F6B' }} />
-          <div style={{ width: 40, height: 1, background: 'linear-gradient(90deg, transparent, #D9899C, transparent)' }} />
-        </div>
-
-        <SectionWrapper id="details" delay={150} className="w-full bg-[#F0F4F0] py-20 px-6 md:px-12">
+        <SectionWrapper id="details" delay={150} className="w-full bg-[#17140F] py-20 px-6 md:px-12">
           <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
             <div className="flex justify-center mb-4">
               <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
-            <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#D9899C]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+            <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#D9A15C]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
               CUÁNDO Y DÓNDE
             </p>
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
             {Boolean(invitation.ceremoniaHabilitada) && (
-              <div className="bg-black/20 border-l-[2px] border-l-[#D9899C] p-6 sm:p-8 mb-6 shadow-sm">
+              <div className="bg-black/20 border-l-[2px] border-l-[#D9A15C] p-6 sm:p-8 mb-6 shadow-sm">
                 <div>
-                  <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7A8F82] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A89A85] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     {String(invitation.ceremoniaTitulo || "CEREMONIA")}
                   </span>
                   {Boolean(invitation.ceremoniaNombre) && (
-                    <h4 className="text-2xl sm:text-3xl font-light text-[#2A3B36] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                    <h4 className="text-2xl sm:text-3xl font-light text-[#F2ECE0] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
                       {String(invitation.ceremoniaNombre)}
                     </h4>
                   )}
                   {Boolean(invitation.ceremoniaHora) && (
-                    <p className="text-[#7A8F82]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                    <p className="text-[#A89A85]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       {String(invitation.ceremoniaHora)} hs
                     </p>
                   )}
                   {Boolean(invitation.ceremoniaDireccion) && (
-                    <p className="text-[#7A8F82]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                    <p className="text-[#A89A85]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       {String(invitation.ceremoniaDireccion)}
                     </p>
                   )}
                   {Boolean(invitation.ceremoniaMapUrl) && (
-                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#D9899C] hover:text-[#2A3B36] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                    <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#D9A15C] hover:text-white transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                       Ver mapa ceremonia ↗
                     </a>
                   )}
@@ -1333,27 +1371,27 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
             {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
             {(lugarNombre || direccion) && (
-              <div className="bg-black/20 border-l-[2px] border-l-[#D9899C] p-6 sm:p-8 mb-10 shadow-sm">
-                <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7A8F82] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+              <div className="bg-black/20 border-l-[2px] border-l-[#D9A15C] p-6 sm:p-8 mb-10 shadow-sm">
+                <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A89A85] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   FIESTA / SALÓN
                 </span>
                 {lugarNombre && (
-                  <h4 className="text-2xl sm:text-3xl font-light text-[#2A3B36] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                  <h4 className="text-2xl sm:text-3xl font-light text-[#F2ECE0] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
                     {lugarNombre}
                   </h4>
                 )}
                 {hora && (
-                  <p className="text-[#7A8F82]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <p className="text-[#A89A85]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     {hora} hs
                   </p>
                 )}
                 {direccion && (
-                  <p className="text-[#7A8F82]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <p className="text-[#A89A85]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     {direccion}
                   </p>
                 )}
                 {mapUrl && (
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#D9899C] hover:text-[#2A3B36] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#D9A15C] hover:text-white transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                     Ver mapa fiesta ↗
                   </a>
                 )}
@@ -1366,18 +1404,18 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Clock} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>
-                <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#D9899C]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                <p className="t-kicker mb-6 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#D9A15C]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   CRONOGRAMA
                 </p>
                 <div className="flex flex-col w-full">
                   {cronograma.map((item, i) => (
-                    <div key={i} className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-[#D9899C]/10 last:border-b-0">
+                    <div key={i} className="flex flex-col sm:flex-row sm:items-center py-4 border-b border-[#D9A15C]/10 last:border-b-0">
                       {item.time && (
-                        <span className=" text-sm sm:text-base text-[#7A8F82] font-medium w-24 flex-shrink-0 mb-1 sm:mb-0" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
+                        <span className=" text-sm sm:text-base text-[#A89A85] font-medium w-24 flex-shrink-0 mb-1 sm:mb-0" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                           {item.time}
                         </span>
                       )}
-                      <span className="text-[1.2rem] sm:text-[1.3rem] text-[#2A3B36] font-light" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
+                      <span className="text-[1.2rem] sm:text-[1.3rem] text-[#F2ECE0] font-light" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
                         {item.title}
                       </span>
                     </div>
@@ -1389,7 +1427,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#E9F0EA] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full bg-[#FFFFFF] py-20 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1474,12 +1512,12 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
 
         {showGiftSection && (
-          <SectionWrapper id="banco" delay={200} className="w-full bg-[#E3ECE4] py-20 px-6 md:px-12 overflow-hidden">
+          <SectionWrapper id="banco" delay={200} className="w-full bg-[#201C14] py-20 px-6 md:px-12 overflow-hidden">
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
                 <div className="flex justify-center mb-4">
                   <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>
-                <p className="t-kicker mb-10 flex items-center gap-2 text-[#D9899C]">
+                <p className="t-kicker mb-10 flex items-center gap-2 text-[#D9A15C]">
                   DATOS BANCARIOS DEL EVENTO
                 </p>
 
@@ -1495,10 +1533,10 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
                         alias: String((invitation as any).pagoTarjetaAlias || ""),
                         titular: String((invitation as any).pagoTarjetaTitular || ""),
                       }}
-                      accentColor="#D9899C"
-                      cardBg="#E9F0EA"
-                      textPrimary="#2A3B36"
-                      textSecondary="#7A8F82"
+                      accentColor="#D9A15C"
+                      cardBg="#FFFFFF"
+                      textPrimary="#F2ECE0"
+                      textSecondary="#A89A85"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
                     />
@@ -1515,10 +1553,10 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
                         alias: String((invitation as any).regaloAlias || ""),
                         titular: String((invitation as any).regaloTitular || ""),
                       }}
-                      accentColor="#D9899C"
-                      cardBg="#E9F0EA"
-                      textPrimary="#2A3B36"
-                      textSecondary="#7A8F82"
+                      accentColor="#D9A15C"
+                      cardBg="#FFFFFF"
+                      textPrimary="#F2ECE0"
+                      textSecondary="#A89A85"
                       InfoRow={InfoRow}
                       CopyField={CopyField}
                     />
@@ -1529,7 +1567,7 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
         )}
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
-          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #7A8F6B18, transparent 70%), #E3ECE4" }}>
+          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #6B7A4F18, transparent 70%), #201C14" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1563,18 +1601,21 @@ export function RivieraTemplateCal({ invitation, guest, isPersonalized = false }
 
         {musicaHabilitada && musicAudioElement}
 
-        {/* Separador doodle de footer: guirnalda de olivo. */}
-        <div className="w-full flex items-center justify-center gap-2 py-6" style={{ background: '#F0F4F0' }} aria-hidden="true">
-          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #D9899C, transparent)' }} />
-          <IconOlive className="riviera-scroll-doodle opacity-0" style={{ width: 20, height: 10, color: '#7A8F6B' }} />
-          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #D9899C, transparent)' }} />
+        {/* Separador doodle de footer: guirnalda de ramitas, calcado del
+            mockup (separadores tipo guirnalda entre secciones). */}
+        <div className="w-full flex items-center justify-center gap-2 py-6" style={{ background: '#17140F' }} aria-hidden="true">
+          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #D9A15C, transparent)' }} />
+          <svg className="chic-scroll-doodle opacity-0" viewBox="0 0 16 12" width="16" height="12" fill="none" stroke="#6B7A4F" strokeWidth="1.1" aria-hidden="true">
+            <path d="M8 11V2M8 5 4 3M8 5l4-2M8 8 4.5 6.3M8 8l3.5-1.7" />
+          </svg>
+          <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #D9A15C, transparent)' }} />
         </div>
 
-        <LogoFooterCredit bgColor="#F0F4F0" textColor="var(--chic-ink, #2A3B36)" />
+        <LogoFooterCredit bgColor="#17140F" textColor="var(--chic-ink, #F2ECE0)" />
         </div>
       </div>
-
-      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#D9899C" surfaceColor="#FFFFFF" />}
+      
+      {isCoverOpen && <BottomNavPill sections={navSections} variant="moderno" accentColor="#D9A15C" surfaceColor="#FFFFFF" />}
       </div>
   );
 }

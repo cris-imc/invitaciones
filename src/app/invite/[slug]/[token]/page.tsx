@@ -11,6 +11,9 @@ import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray"
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
+import { NeonTemplateBlackout } from "@/components/templates/NeonTemplateBlackout";
+import { NeonTemplateTropical } from "@/components/templates/NeonTemplateTropical";
+import { NeonTemplateAscuas } from "@/components/templates/NeonTemplateAscuas";
 import { NeonTemplateEclipse } from "@/components/templates/NeonTemplateEclipse";
 import { NeonTemplate } from "@/components/templates/NeonTemplate";
 import { NeonTemplateVioleta } from "@/components/templates/NeonTemplateVioleta";
@@ -18,6 +21,9 @@ import { NeonTemplateDorado } from "@/components/templates/NeonTemplateDorado";
 import { NeonTemplateVerde } from "@/components/templates/NeonTemplateVerde";
 import { NeonTemplateAzul } from "@/components/templates/NeonTemplateAzul";
 import { NeonTemplateRojo } from "@/components/templates/NeonTemplateRojo";
+import { ChicTemplateNocheChic } from "@/components/templates/ChicTemplateNocheChic";
+import { ChicTemplatePiedraChic } from "@/components/templates/ChicTemplatePiedraChic";
+import { ChicTemplateAzulMedianocheChic } from "@/components/templates/ChicTemplateAzulMedianocheChic";
 import { ChicTemplateAmbar } from "@/components/templates/ChicTemplateAmbar";
 import { ChicTemplate } from "@/components/templates/ChicTemplate";
 import { ChicTemplateRosa } from "@/components/templates/ChicTemplateRosa";
@@ -34,12 +40,18 @@ import { ModernoTemplateVerde } from "@/components/templates/ModernoTemplateVerd
 import { ModernoTemplateRojo } from "@/components/templates/ModernoTemplateRojo";
 import { ModernoTemplateGris } from "@/components/templates/ModernoTemplateGris";
 import { EditorialTemplate } from "@/components/templates/EditorialTemplate";
+import { EditorialTemplateOnice } from "@/components/templates/EditorialTemplateOnice";
+import { EditorialTemplatePiedra } from "@/components/templates/EditorialTemplatePiedra";
+import { EditorialTemplateCobalto } from "@/components/templates/EditorialTemplateCobalto";
 import { EditorialTemplateGrafito } from "@/components/templates/EditorialTemplateGrafito";
 import { EditorialTemplateAzul } from "@/components/templates/EditorialTemplateAzul";
 import { EditorialTemplateGris } from "@/components/templates/EditorialTemplateGris";
 import { EditorialTemplateMalva } from "@/components/templates/EditorialTemplateMalva";
 import { EditorialTemplateTerracota } from "@/components/templates/EditorialTemplateTerracota";
 import { EditorialTemplateVerde } from "@/components/templates/EditorialTemplateVerde";
+import { OnixTemplateCarbon } from "@/components/templates/OnixTemplateCarbon";
+import { OnixTemplateMarfil } from "@/components/templates/OnixTemplateMarfil";
+import { OnixTemplateBosque } from "@/components/templates/OnixTemplateBosque";
 import { OnixTemplateMedianoche } from "@/components/templates/OnixTemplateMedianoche";
 import { OnixTemplate } from "@/components/templates/OnixTemplate";
 import { OnixTemplateAmatista } from "@/components/templates/OnixTemplateAmatista";
@@ -47,12 +59,18 @@ import { OnixTemplateEsmeralda } from "@/components/templates/OnixTemplateEsmera
 import { OnixTemplateOro } from "@/components/templates/OnixTemplateOro";
 import { OnixTemplatePlata } from "@/components/templates/OnixTemplatePlata";
 import { OnixTemplateZafiro } from "@/components/templates/OnixTemplateZafiro";
+import { JardinSedaTemplateJardinNocturno } from "@/components/templates/JardinSedaTemplateJardinNocturno";
+import { JardinSedaTemplatePiedraJardin } from "@/components/templates/JardinSedaTemplatePiedraJardin";
+import { JardinSedaTemplateTerracotaJardin } from "@/components/templates/JardinSedaTemplateTerracotaJardin";
 import { JardinSedaTemplate } from "@/components/templates/JardinSedaTemplate";
 import { JardinSedaTemplateCielo } from "@/components/templates/JardinSedaTemplateCielo";
 import { JardinSedaTemplateDurazno } from "@/components/templates/JardinSedaTemplateDurazno";
 import { JardinSedaTemplateLila } from "@/components/templates/JardinSedaTemplateLila";
 import { JardinSedaTemplateRosaAntiguo } from "@/components/templates/JardinSedaTemplateRosaAntiguo";
 import { JardinSedaTemplateSalvia } from "@/components/templates/JardinSedaTemplateSalvia";
+import { HologramaTemplateNebulosaRoja } from "@/components/templates/HologramaTemplateNebulosaRoja";
+import { HologramaTemplateBlancoPrisma } from "@/components/templates/HologramaTemplateBlancoPrisma";
+import { HologramaTemplateGrafitoCuantico } from "@/components/templates/HologramaTemplateGrafitoCuantico";
 import { HologramaTemplateAurora } from "@/components/templates/HologramaTemplateAurora";
 import { HologramaTemplate } from "@/components/templates/HologramaTemplate";
 import { HologramaTemplateAzul } from "@/components/templates/HologramaTemplateAzul";
@@ -72,24 +90,36 @@ import { Cristal3DTemplateEsmeralda } from "@/components/templates/Cristal3DTemp
 import { Cristal3DTemplateMenta } from "@/components/templates/Cristal3DTemplateMenta";
 import { Cristal3DTemplateRosaCuarzo } from "@/components/templates/Cristal3DTemplateRosaCuarzo";
 import { Cristal3DTemplateVioleta } from "@/components/templates/Cristal3DTemplateVioleta";
+import { CineTemplateBlancoYNegro } from "@/components/templates/CineTemplateBlancoYNegro";
+import { CineTemplateMedianocheDeCine } from "@/components/templates/CineTemplateMedianocheDeCine";
+import { CineTemplateOcreVintage } from "@/components/templates/CineTemplateOcreVintage";
 import { CineTemplateAmbar } from "@/components/templates/CineTemplateAmbar";
 import { CineTemplate } from "@/components/templates/CineTemplate";
 import { CineTemplateBorgona } from "@/components/templates/CineTemplateBorgona";
 import { CineTemplateEsmeralda } from "@/components/templates/CineTemplateEsmeralda";
 import { CineTemplateNoir } from "@/components/templates/CineTemplateNoir";
 import { CineTemplateTecnicolor } from "@/components/templates/CineTemplateTecnicolor";
+import { NordicoTemplateCarbonNordico } from "@/components/templates/NordicoTemplateCarbonNordico";
+import { NordicoTemplateMusgo } from "@/components/templates/NordicoTemplateMusgo";
+import { NordicoTemplateArticoAzul } from "@/components/templates/NordicoTemplateArticoAzul";
 import { NordicoTemplatePizarra } from "@/components/templates/NordicoTemplatePizarra";
 import { NordicoTemplate } from "@/components/templates/NordicoTemplate";
 import { NordicoTemplateBosque } from "@/components/templates/NordicoTemplateBosque";
 import { NordicoTemplateMarino } from "@/components/templates/NordicoTemplateMarino";
 import { NordicoTemplateOcre } from "@/components/templates/NordicoTemplateOcre";
 import { NordicoTemplateTerracota } from "@/components/templates/NordicoTemplateTerracota";
+import { RivieraTemplateMedianocheRiviera } from "@/components/templates/RivieraTemplateMedianocheRiviera";
+import { RivieraTemplatePiedraGris } from "@/components/templates/RivieraTemplatePiedraGris";
+import { RivieraTemplateLavandaCostera } from "@/components/templates/RivieraTemplateLavandaCostera";
 import { RivieraTemplateCal } from "@/components/templates/RivieraTemplateCal";
 import { RivieraTemplate } from "@/components/templates/RivieraTemplate";
 import { RivieraTemplateAzulejo } from "@/components/templates/RivieraTemplateAzulejo";
 import { RivieraTemplateCoral } from "@/components/templates/RivieraTemplateCoral";
 import { RivieraTemplateOcre } from "@/components/templates/RivieraTemplateOcre";
 import { RivieraTemplateOliva } from "@/components/templates/RivieraTemplateOliva";
+import { GoldenDuskTemplateNocheDorada } from "@/components/templates/GoldenDuskTemplateNocheDorada";
+import { GoldenDuskTemplatePiedraCalida } from "@/components/templates/GoldenDuskTemplatePiedraCalida";
+import { GoldenDuskTemplateBrumaAzul } from "@/components/templates/GoldenDuskTemplateBrumaAzul";
 import { GoldenDuskTemplateOcaso } from "@/components/templates/GoldenDuskTemplateOcaso";
 import { GoldenDuskTemplate } from "@/components/templates/GoldenDuskTemplate";
 import { GoldenDuskTemplateAzulMedianoche } from "@/components/templates/GoldenDuskTemplateAzulMedianoche";
@@ -97,6 +127,9 @@ import { GoldenDuskTemplateBorgona } from "@/components/templates/GoldenDuskTemp
 import { GoldenDuskTemplateChampagneDorado } from "@/components/templates/GoldenDuskTemplateChampagneDorado";
 import { GoldenDuskTemplateRosaAntiguo } from "@/components/templates/GoldenDuskTemplateRosaAntiguo";
 import { GoldenDuskTemplateSalvia } from "@/components/templates/GoldenDuskTemplateSalvia";
+import { SedaTemplateOnixSeda } from "@/components/templates/SedaTemplateOnixSeda";
+import { SedaTemplatePiedra } from "@/components/templates/SedaTemplatePiedra";
+import { SedaTemplateCiruela } from "@/components/templates/SedaTemplateCiruela";
 import { SedaTemplate } from "@/components/templates/SedaTemplate";
 import { SedaTemplateEsmeralda } from "@/components/templates/SedaTemplateEsmeralda";
 import { SedaTemplateMarfil } from "@/components/templates/SedaTemplateMarfil";
@@ -112,6 +145,9 @@ import { LuzLunaTemplateMedianocheAzul } from "@/components/templates/LuzLunaTem
 import { LuzLunaTemplateNocheEstrellada } from "@/components/templates/LuzLunaTemplateNocheEstrellada";
 import { LuzLunaTemplatePerlada } from "@/components/templates/LuzLunaTemplatePerlada";
 import { LuzLunaTemplatePerlaSuave } from "@/components/templates/LuzLunaTemplatePerlaSuave";
+import { BonVoyageTemplateNocheDeViaje } from "@/components/templates/BonVoyageTemplateNocheDeViaje";
+import { BonVoyageTemplateArenaCalida } from "@/components/templates/BonVoyageTemplateArenaCalida";
+import { BonVoyageTemplateMapaVintage } from "@/components/templates/BonVoyageTemplateMapaVintage";
 import { BonVoyageTemplateIvoire } from "@/components/templates/BonVoyageTemplateIvoire";
 import { BonVoyageTemplate } from "@/components/templates/BonVoyageTemplate";
 import { BonVoyageTemplateCoral } from "@/components/templates/BonVoyageTemplateCoral";
@@ -387,6 +423,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
 
             if (validInvitation.templateTipo === 'NEON') {
                 switch (color) {
+                    case 'Blackout': return <NeonTemplateBlackout invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Tropical': return <NeonTemplateTropical invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Ascuas': return <NeonTemplateAscuas invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Eclipse': return <NeonTemplateEclipse invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Violeta': return <NeonTemplateVioleta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Dorado': return <NeonTemplateDorado invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -397,6 +436,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'CHIC') {
                 switch (color) {
+                    case 'NocheChic': return <ChicTemplateNocheChic invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'PiedraChic': return <ChicTemplatePiedraChic invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'AzulMedianocheChic': return <ChicTemplateAzulMedianocheChic invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ambar': return <ChicTemplateAmbar invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Rosa': return <ChicTemplateRosa invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Azul': return <ChicTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -420,6 +462,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'EDITORIAL') {
                 switch (color) {
+                    case 'Onice': return <EditorialTemplateOnice invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Piedra': return <EditorialTemplatePiedra invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Cobalto': return <EditorialTemplateCobalto invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Grafito': return <EditorialTemplateGrafito invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Azul': return <EditorialTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Gris': return <EditorialTemplateGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -430,6 +475,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'ONIX') {
                 switch (color) {
+                    case 'Carbon': return <OnixTemplateCarbon invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Marfil': return <OnixTemplateMarfil invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Bosque': return <OnixTemplateBosque invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Medianoche': return <OnixTemplateMedianoche invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Amatista': return <OnixTemplateAmatista invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Esmeralda': return <OnixTemplateEsmeralda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -440,6 +488,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'JARDINSEDA') {
                 switch (color) {
+                    case 'JardinNocturno': return <JardinSedaTemplateJardinNocturno invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'PiedraJardin': return <JardinSedaTemplatePiedraJardin invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'TerracotaJardin': return <JardinSedaTemplateTerracotaJardin invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Cielo': return <JardinSedaTemplateCielo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Durazno': return <JardinSedaTemplateDurazno invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Lila': return <JardinSedaTemplateLila invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -449,6 +500,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'HOLOGRAMA') {
                 switch (color) {
+                    case 'NebulosaRoja': return <HologramaTemplateNebulosaRoja invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'BlancoPrisma': return <HologramaTemplateBlancoPrisma invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'GrafitoCuantico': return <HologramaTemplateGrafitoCuantico invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Aurora': return <HologramaTemplateAurora invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Azul': return <HologramaTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Coral': return <HologramaTemplateCoral invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -477,6 +531,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'CINE') {
                 switch (color) {
+                    case 'BlancoYNegro': return <CineTemplateBlancoYNegro invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'MedianocheDeCine': return <CineTemplateMedianocheDeCine invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'OcreVintage': return <CineTemplateOcreVintage invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ambar': return <CineTemplateAmbar invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Borgona': return <CineTemplateBorgona invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Esmeralda': return <CineTemplateEsmeralda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -486,6 +543,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'NORDICO') {
                 switch (color) {
+                    case 'CarbonNordico': return <NordicoTemplateCarbonNordico invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Musgo': return <NordicoTemplateMusgo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'ArticoAzul': return <NordicoTemplateArticoAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Pizarra': return <NordicoTemplatePizarra invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Bosque': return <NordicoTemplateBosque invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Marino': return <NordicoTemplateMarino invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -495,6 +555,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'RIVIERA') {
                 switch (color) {
+                    case 'MedianocheRiviera': return <RivieraTemplateMedianocheRiviera invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'PiedraGris': return <RivieraTemplatePiedraGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'LavandaCostera': return <RivieraTemplateLavandaCostera invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Cal': return <RivieraTemplateCal invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Azulejo': return <RivieraTemplateAzulejo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Coral': return <RivieraTemplateCoral invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -504,6 +567,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'GOLDENDUSK') {
                 switch (color) {
+                    case 'NocheDorada': return <GoldenDuskTemplateNocheDorada invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'PiedraCalida': return <GoldenDuskTemplatePiedraCalida invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'BrumaAzul': return <GoldenDuskTemplateBrumaAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ocaso': return <GoldenDuskTemplateOcaso invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'AzulMedianoche': return <GoldenDuskTemplateAzulMedianoche invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Borgona': return <GoldenDuskTemplateBorgona invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -514,6 +580,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'SEDA') {
                 switch (color) {
+                    case 'OnixSeda': return <SedaTemplateOnixSeda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Piedra': return <SedaTemplatePiedra invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Ciruela': return <SedaTemplateCiruela invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Esmeralda': return <SedaTemplateEsmeralda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Marfil': return <SedaTemplateMarfil invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Nocturna': return <SedaTemplateNocturna invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
@@ -538,6 +607,9 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 }
             } else if (validInvitation.templateTipo === 'BONVOYAGE') {
                 switch (color) {
+                    case 'NocheDeViaje': return <BonVoyageTemplateNocheDeViaje invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'ArenaCalida': return <BonVoyageTemplateArenaCalida invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'MapaVintage': return <BonVoyageTemplateMapaVintage invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ivoire': return <BonVoyageTemplateIvoire invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Coral': return <BonVoyageTemplateCoral invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Esmeralda': return <BonVoyageTemplateEsmeralda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;

@@ -36,6 +36,9 @@ export const NEON_COLORS: ColorOption[] = [
   { id: "Verde", name: "Verde Lima y Magenta", color: "#B6FF3C" },
   { id: "Azul", name: "Azul Eléctrico y Magenta", color: "#3C8CFF" },
   { id: "Rojo", name: "Rojo y Cian", color: "#FF3C5C" },
+  { id: "Blackout", name: "Blackout", color: "#00E5FF" },
+  { id: "Tropical", name: "Tropical", color: "#FF8A3D" },
+  { id: "Ascuas", name: "Ascuas", color: "#FFD166" },
 ];
 
 // Chic ("Doodle Wedding") solo se ofrece para CASAMIENTO -- el gating vive
@@ -51,6 +54,9 @@ export const CHIC_COLORS: ColorOption[] = [
   { id: "Violeta", name: "Violeta Apagado", color: "#8779A0" },
   { id: "VerdeBotella", name: "Verde Botella", color: "#3F5F4A" },
   { id: "Gris", name: "Gris Cálido", color: "#8C8275" },
+  { id: "NocheChic", name: "Noche Chic", color: "#D9A15C" },
+  { id: "PiedraChic", name: "Piedra Chic", color: "#6E7A6E" },
+  { id: "AzulMedianocheChic", name: "Azul Medianoche", color: "#7FA8D9" },
 ];
 
 
@@ -67,6 +73,9 @@ export const EDITORIAL_COLORS: ColorOption[] = [
   { id: "Malva", name: "Malva", color: "#6B4A6B" },
   { id: "Terracota", name: "Terracota", color: "#B5502E" },
   { id: "Verde", name: "Verde", color: "#1F4B3F" },
+  { id: "Onice", name: "Onice", color: "#C9A15C" },
+  { id: "Piedra", name: "Piedra", color: "#6B7A6E" },
+  { id: "Cobalto", name: "Cobalto", color: "#3B5773" },
 ];
 
 // Medianoche va primero: base azul-negra genuina (el resto comparte el
@@ -79,6 +88,9 @@ export const ONIX_COLORS: ColorOption[] = [
   { id: "Oro", name: "Oro", color: "#D4AF62" },
   { id: "Plata", name: "Plata", color: "#C9C9D1" },
   { id: "Zafiro", name: "Zafiro", color: "#7FA8D9" },
+  { id: "Carbon", name: "Carbón", color: "#B0C9D6" },
+  { id: "Marfil", name: "Marfil", color: "#8C3F52" },
+  { id: "Bosque", name: "Bosque", color: "#C97B4A" },
 ];
 
 export const JARDINSEDA_COLORS: ColorOption[] = [
@@ -88,6 +100,9 @@ export const JARDINSEDA_COLORS: ColorOption[] = [
   { id: "Lila", name: "Lila", color: "#9C8AD1" },
   { id: "RosaAntiguo", name: "Rosa Antiguo", color: "#D68FA0" },
   { id: "Salvia", name: "Salvia", color: "#6F9A76" },
+  { id: "JardinNocturno", name: "Jardín Nocturno", color: "#9C7FB4" },
+  { id: "PiedraJardin", name: "Piedra Jardín", color: "#7A8570" },
+  { id: "TerracotaJardin", name: "Terracota Jardín", color: "#C1734A" },
 ];
 
 // Aurora va primero: base verde-azulada genuina (el resto comparte el mismo
@@ -100,6 +115,9 @@ export const HOLOGRAMA_COLORS: ColorOption[] = [
   { id: "Dorado", name: "Dorado", color: "#F5C452" },
   { id: "Esmeralda", name: "Esmeralda", color: "#2EE6A8" },
   { id: "Rosa", name: "Rosa", color: "#FF6FD8" },
+  { id: "NebulosaRoja", name: "Nebulosa Roja", color: "#FF3355" },
+  { id: "BlancoPrisma", name: "Blanco Prisma", color: "#6F4BE0" },
+  { id: "GrafitoCuantico", name: "Grafito Cuántico", color: "#00D9FF" },
 ];
 
 export const CIRCUITO_COLORS: ColorOption[] = [
@@ -130,6 +148,9 @@ export const CINE_COLORS: ColorOption[] = [
   { id: "Esmeralda", name: "Esmeralda", color: "#5B8A72" },
   { id: "Noir", name: "Noir", color: "#8FA3B0" },
   { id: "Tecnicolor", name: "Tecnicolor", color: "#C1442E" },
+  { id: "BlancoYNegro", name: "Blanco y Negro", color: "#3A3A3A" },
+  { id: "MedianocheDeCine", name: "Medianoche de Cine", color: "#4A7BA8" },
+  { id: "OcreVintage", name: "Ocre Vintage", color: "#8C9A4A" },
 ];
 
 // Pizarra va primero: base gris-pizarra fría genuina (el resto, incluido
@@ -142,6 +163,9 @@ export const NORDICO_COLORS: ColorOption[] = [
   { id: "Marino", name: "Marino", color: "#35507A" },
   { id: "Ocre", name: "Ocre", color: "#A97D2A" },
   { id: "Terracota", name: "Terracota", color: "#B15E3D" },
+  { id: "CarbonNordico", name: "Carbón Nórdico", color: "#C9B08A" },
+  { id: "Musgo", name: "Musgo", color: "#5B6E52" },
+  { id: "ArticoAzul", name: "Ártico Azul", color: "#2E6B8F" },
 ];
 
 // Cal va primero: base blanco-cal/verde pálida genuina (el resto comparte
@@ -153,6 +177,9 @@ export const RIVIERA_COLORS: ColorOption[] = [
   { id: "Coral", name: "Coral", color: "#D97757" },
   { id: "Ocre", name: "Ocre", color: "#C6963B" },
   { id: "Oliva", name: "Oliva", color: "#7A8F5E" },
+  { id: "MedianocheRiviera", name: "Medianoche Riviera", color: "#E8B4A0" },
+  { id: "PiedraGris", name: "Piedra Gris", color: "#6E7A6E" },
+  { id: "LavandaCostera", name: "Lavanda Costera", color: "#6E7CA8" },
 ];
 
 // Ocaso va primero: base malva/ciruela pálida genuina (el resto comparte el
@@ -165,6 +192,9 @@ export const GOLDENDUSK_COLORS: ColorOption[] = [
   { id: "ChampagneDorado", name: "Champagne Dorado", color: "#B8863E" },
   { id: "RosaAntiguo", name: "Rosa Antiguo", color: "#B97D82" },
   { id: "Salvia", name: "Salvia", color: "#7C8F6E" },
+  { id: "NocheDorada", name: "Noche Dorada", color: "#D9A15C" },
+  { id: "PiedraCalida", name: "Piedra Cálida", color: "#A97D5C" },
+  { id: "BrumaAzul", name: "Bruma Azul", color: "#5C7A96" },
 ];
 
 export const SEDA_COLORS: ColorOption[] = [
@@ -173,6 +203,9 @@ export const SEDA_COLORS: ColorOption[] = [
   { id: "Marfil", name: "Marfil", color: "#B98D57" },
   { id: "Nocturna", name: "Nocturna", color: "#8C4A52" },
   { id: "Perla", name: "Perla", color: "#8FA3B0" },
+  { id: "OnixSeda", name: "Ónix Seda", color: "#7FA8D9" },
+  { id: "Piedra", name: "Piedra", color: "#6E7A6E" },
+  { id: "Ciruela", name: "Ciruela", color: "#6B4A6B" },
 ];
 
 export const PETALOS_COLORS: ColorOption[] = [
@@ -201,6 +234,9 @@ export const BONVOYAGE_COLORS: ColorOption[] = [
   { id: "Lavanda", name: "Lavanda", color: "#6B6FA6" },
   { id: "Medianoche", name: "Medianoche", color: "#24506B" },
   { id: "Turquesa", name: "Turquesa", color: "#2CA6A4" },
+  { id: "NocheDeViaje", name: "Noche de Viaje", color: "#C9A15C" },
+  { id: "ArenaCalida", name: "Arena Cálida", color: "#6E8299" },
+  { id: "MapaVintage", name: "Mapa Vintage", color: "#6E7A4A" },
 ];
 
 export const CORPORATE_COLORS: ColorOption[] = [
@@ -280,6 +316,9 @@ export const NEON_COMPONENTS: Record<string, PreviewComponent> = {
   Verde: dynamic(() => import("@/components/templates/NeonTemplateVerde").then((m) => m.NeonTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Azul: dynamic(() => import("@/components/templates/NeonTemplateAzul").then((m) => m.NeonTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Rojo: dynamic(() => import("@/components/templates/NeonTemplateRojo").then((m) => m.NeonTemplateRojo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Blackout: dynamic(() => import("@/components/templates/NeonTemplateBlackout").then((m) => m.NeonTemplateBlackout), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Tropical: dynamic(() => import("@/components/templates/NeonTemplateTropical").then((m) => m.NeonTemplateTropical), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ascuas: dynamic(() => import("@/components/templates/NeonTemplateAscuas").then((m) => m.NeonTemplateAscuas), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CHIC_COMPONENTS: Record<string, PreviewComponent> = {
@@ -291,6 +330,9 @@ export const CHIC_COMPONENTS: Record<string, PreviewComponent> = {
   Violeta: dynamic(() => import("@/components/templates/ChicTemplateVioleta").then((m) => m.ChicTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   VerdeBotella: dynamic(() => import("@/components/templates/ChicTemplateVerdeBotella").then((m) => m.ChicTemplateVerdeBotella), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Gris: dynamic(() => import("@/components/templates/ChicTemplateGris").then((m) => m.ChicTemplateGris), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  NocheChic: dynamic(() => import("@/components/templates/ChicTemplateNocheChic").then((m) => m.ChicTemplateNocheChic), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  PiedraChic: dynamic(() => import("@/components/templates/ChicTemplatePiedraChic").then((m) => m.ChicTemplatePiedraChic), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AzulMedianocheChic: dynamic(() => import("@/components/templates/ChicTemplateAzulMedianocheChic").then((m) => m.ChicTemplateAzulMedianocheChic), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 
@@ -302,6 +344,9 @@ export const EDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
   Malva: dynamic(() => import("@/components/templates/EditorialTemplateMalva").then((m) => m.EditorialTemplateMalva), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Terracota: dynamic(() => import("@/components/templates/EditorialTemplateTerracota").then((m) => m.EditorialTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Verde: dynamic(() => import("@/components/templates/EditorialTemplateVerde").then((m) => m.EditorialTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Onice: dynamic(() => import("@/components/templates/EditorialTemplateOnice").then((m) => m.EditorialTemplateOnice), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Piedra: dynamic(() => import("@/components/templates/EditorialTemplatePiedra").then((m) => m.EditorialTemplatePiedra), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cobalto: dynamic(() => import("@/components/templates/EditorialTemplateCobalto").then((m) => m.EditorialTemplateCobalto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ONIX_COMPONENTS: Record<string, PreviewComponent> = {
@@ -312,6 +357,9 @@ export const ONIX_COMPONENTS: Record<string, PreviewComponent> = {
   Oro: dynamic(() => import("@/components/templates/OnixTemplateOro").then((m) => m.OnixTemplateOro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Plata: dynamic(() => import("@/components/templates/OnixTemplatePlata").then((m) => m.OnixTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Zafiro: dynamic(() => import("@/components/templates/OnixTemplateZafiro").then((m) => m.OnixTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Carbon: dynamic(() => import("@/components/templates/OnixTemplateCarbon").then((m) => m.OnixTemplateCarbon), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Marfil: dynamic(() => import("@/components/templates/OnixTemplateMarfil").then((m) => m.OnixTemplateMarfil), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Bosque: dynamic(() => import("@/components/templates/OnixTemplateBosque").then((m) => m.OnixTemplateBosque), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const JARDINSEDA_COMPONENTS: Record<string, PreviewComponent> = {
@@ -321,6 +369,9 @@ export const JARDINSEDA_COMPONENTS: Record<string, PreviewComponent> = {
   Lila: dynamic(() => import("@/components/templates/JardinSedaTemplateLila").then((m) => m.JardinSedaTemplateLila), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   RosaAntiguo: dynamic(() => import("@/components/templates/JardinSedaTemplateRosaAntiguo").then((m) => m.JardinSedaTemplateRosaAntiguo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Salvia: dynamic(() => import("@/components/templates/JardinSedaTemplateSalvia").then((m) => m.JardinSedaTemplateSalvia), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  JardinNocturno: dynamic(() => import("@/components/templates/JardinSedaTemplateJardinNocturno").then((m) => m.JardinSedaTemplateJardinNocturno), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  PiedraJardin: dynamic(() => import("@/components/templates/JardinSedaTemplatePiedraJardin").then((m) => m.JardinSedaTemplatePiedraJardin), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  TerracotaJardin: dynamic(() => import("@/components/templates/JardinSedaTemplateTerracotaJardin").then((m) => m.JardinSedaTemplateTerracotaJardin), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const HOLOGRAMA_COMPONENTS: Record<string, PreviewComponent> = {
@@ -331,6 +382,9 @@ export const HOLOGRAMA_COMPONENTS: Record<string, PreviewComponent> = {
   Dorado: dynamic(() => import("@/components/templates/HologramaTemplateDorado").then((m) => m.HologramaTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Esmeralda: dynamic(() => import("@/components/templates/HologramaTemplateEsmeralda").then((m) => m.HologramaTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Rosa: dynamic(() => import("@/components/templates/HologramaTemplateRosa").then((m) => m.HologramaTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  NebulosaRoja: dynamic(() => import("@/components/templates/HologramaTemplateNebulosaRoja").then((m) => m.HologramaTemplateNebulosaRoja), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BlancoPrisma: dynamic(() => import("@/components/templates/HologramaTemplateBlancoPrisma").then((m) => m.HologramaTemplateBlancoPrisma), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  GrafitoCuantico: dynamic(() => import("@/components/templates/HologramaTemplateGrafitoCuantico").then((m) => m.HologramaTemplateGrafitoCuantico), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CIRCUITO_COMPONENTS: Record<string, PreviewComponent> = {
@@ -358,6 +412,9 @@ export const CINE_COMPONENTS: Record<string, PreviewComponent> = {
   Esmeralda: dynamic(() => import("@/components/templates/CineTemplateEsmeralda").then((m) => m.CineTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Noir: dynamic(() => import("@/components/templates/CineTemplateNoir").then((m) => m.CineTemplateNoir), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Tecnicolor: dynamic(() => import("@/components/templates/CineTemplateTecnicolor").then((m) => m.CineTemplateTecnicolor), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BlancoYNegro: dynamic(() => import("@/components/templates/CineTemplateBlancoYNegro").then((m) => m.CineTemplateBlancoYNegro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  MedianocheDeCine: dynamic(() => import("@/components/templates/CineTemplateMedianocheDeCine").then((m) => m.CineTemplateMedianocheDeCine), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  OcreVintage: dynamic(() => import("@/components/templates/CineTemplateOcreVintage").then((m) => m.CineTemplateOcreVintage), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const NORDICO_COMPONENTS: Record<string, PreviewComponent> = {
@@ -367,6 +424,9 @@ export const NORDICO_COMPONENTS: Record<string, PreviewComponent> = {
   Marino: dynamic(() => import("@/components/templates/NordicoTemplateMarino").then((m) => m.NordicoTemplateMarino), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Ocre: dynamic(() => import("@/components/templates/NordicoTemplateOcre").then((m) => m.NordicoTemplateOcre), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Terracota: dynamic(() => import("@/components/templates/NordicoTemplateTerracota").then((m) => m.NordicoTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  CarbonNordico: dynamic(() => import("@/components/templates/NordicoTemplateCarbonNordico").then((m) => m.NordicoTemplateCarbonNordico), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Musgo: dynamic(() => import("@/components/templates/NordicoTemplateMusgo").then((m) => m.NordicoTemplateMusgo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  ArticoAzul: dynamic(() => import("@/components/templates/NordicoTemplateArticoAzul").then((m) => m.NordicoTemplateArticoAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const RIVIERA_COMPONENTS: Record<string, PreviewComponent> = {
@@ -376,6 +436,9 @@ export const RIVIERA_COMPONENTS: Record<string, PreviewComponent> = {
   Coral: dynamic(() => import("@/components/templates/RivieraTemplateCoral").then((m) => m.RivieraTemplateCoral), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Ocre: dynamic(() => import("@/components/templates/RivieraTemplateOcre").then((m) => m.RivieraTemplateOcre), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Oliva: dynamic(() => import("@/components/templates/RivieraTemplateOliva").then((m) => m.RivieraTemplateOliva), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  MedianocheRiviera: dynamic(() => import("@/components/templates/RivieraTemplateMedianocheRiviera").then((m) => m.RivieraTemplateMedianocheRiviera), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  PiedraGris: dynamic(() => import("@/components/templates/RivieraTemplatePiedraGris").then((m) => m.RivieraTemplatePiedraGris), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  LavandaCostera: dynamic(() => import("@/components/templates/RivieraTemplateLavandaCostera").then((m) => m.RivieraTemplateLavandaCostera), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const GOLDENDUSK_COMPONENTS: Record<string, PreviewComponent> = {
@@ -386,6 +449,9 @@ export const GOLDENDUSK_COMPONENTS: Record<string, PreviewComponent> = {
   ChampagneDorado: dynamic(() => import("@/components/templates/GoldenDuskTemplateChampagneDorado").then((m) => m.GoldenDuskTemplateChampagneDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   RosaAntiguo: dynamic(() => import("@/components/templates/GoldenDuskTemplateRosaAntiguo").then((m) => m.GoldenDuskTemplateRosaAntiguo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Salvia: dynamic(() => import("@/components/templates/GoldenDuskTemplateSalvia").then((m) => m.GoldenDuskTemplateSalvia), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  NocheDorada: dynamic(() => import("@/components/templates/GoldenDuskTemplateNocheDorada").then((m) => m.GoldenDuskTemplateNocheDorada), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  PiedraCalida: dynamic(() => import("@/components/templates/GoldenDuskTemplatePiedraCalida").then((m) => m.GoldenDuskTemplatePiedraCalida), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BrumaAzul: dynamic(() => import("@/components/templates/GoldenDuskTemplateBrumaAzul").then((m) => m.GoldenDuskTemplateBrumaAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const SEDA_COMPONENTS: Record<string, PreviewComponent> = {
@@ -394,6 +460,9 @@ export const SEDA_COMPONENTS: Record<string, PreviewComponent> = {
   Marfil: dynamic(() => import("@/components/templates/SedaTemplateMarfil").then((m) => m.SedaTemplateMarfil), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Nocturna: dynamic(() => import("@/components/templates/SedaTemplateNocturna").then((m) => m.SedaTemplateNocturna), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Perla: dynamic(() => import("@/components/templates/SedaTemplatePerla").then((m) => m.SedaTemplatePerla), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  OnixSeda: dynamic(() => import("@/components/templates/SedaTemplateOnixSeda").then((m) => m.SedaTemplateOnixSeda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Piedra: dynamic(() => import("@/components/templates/SedaTemplatePiedra").then((m) => m.SedaTemplatePiedra), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ciruela: dynamic(() => import("@/components/templates/SedaTemplateCiruela").then((m) => m.SedaTemplateCiruela), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const PETALOS_COMPONENTS: Record<string, PreviewComponent> = {
@@ -420,6 +489,9 @@ export const BONVOYAGE_COMPONENTS: Record<string, PreviewComponent> = {
   Lavanda: dynamic(() => import("@/components/templates/BonVoyageTemplateLavanda").then((m) => m.BonVoyageTemplateLavanda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Medianoche: dynamic(() => import("@/components/templates/BonVoyageTemplateMedianoche").then((m) => m.BonVoyageTemplateMedianoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Turquesa: dynamic(() => import("@/components/templates/BonVoyageTemplateTurquesa").then((m) => m.BonVoyageTemplateTurquesa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  NocheDeViaje: dynamic(() => import("@/components/templates/BonVoyageTemplateNocheDeViaje").then((m) => m.BonVoyageTemplateNocheDeViaje), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  ArenaCalida: dynamic(() => import("@/components/templates/BonVoyageTemplateArenaCalida").then((m) => m.BonVoyageTemplateArenaCalida), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  MapaVintage: dynamic(() => import("@/components/templates/BonVoyageTemplateMapaVintage").then((m) => m.BonVoyageTemplateMapaVintage), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CORPORATE_COMPONENTS: Record<string, PreviewComponent> = {

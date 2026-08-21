@@ -761,7 +761,7 @@ export function CineTemplateAmbar({ invitation, guest, isPersonalized = false }:
           border-radius: 0 !important;
         }
         .desktop-stage .tpl .album-btn {
-          color: #f0e9dc !important;
+          color: #F5E6C8 !important;
           border-color: rgba(255, 255, 255, 0.3) !important;
         }
 
@@ -1015,7 +1015,7 @@ export function CineTemplateAmbar({ invitation, guest, isPersonalized = false }:
           z-index: 999999 !important;
         }
         .desktop-stage .bottom-nav a {
-          color: #f0e9dc !important;
+          color: #F5E6C8 !important;
           opacity: 0.6 !important;
         }
         .desktop-stage .bottom-nav a[aria-current="true"] {
