@@ -6,6 +6,7 @@ import { Camera, MessageSquare, Loader2, Smile } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LivePhotoGallery } from "@/components/live/LivePhotoGallery";
+import { LiveMyPhotosCarousel } from "@/components/live/LiveMyPhotosCarousel";
 
 import { LiveItem } from "@prisma/client";
 
@@ -392,7 +393,9 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                 )}
             </div>
 
-            <div className="w-full max-w-sm mx-auto mt-12 px-4">
+            {acceptanceId && <LiveMyPhotosCarousel items={items} acceptanceId={acceptanceId} />}
+
+            <div className="w-full max-w-sm mx-auto mt-10 px-4">
                 <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Fotos de la Fiesta</p>
                 {items.length > 0 ? (
                     <LivePhotoGallery items={items} />

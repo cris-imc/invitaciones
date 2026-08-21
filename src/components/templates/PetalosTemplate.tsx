@@ -1555,7 +1555,7 @@ export function PetalosTemplate({ invitation, guest, isPersonalized = false }: P
             invitationId={String(invitation.id ?? "")}
             guestToken={guest?.uniqueToken}
             guestName={guest?.name ?? "Invitado"}
-            kicker="SUGERÍ UNA CANCIÓN"
+            kicker="¿Armamos la playlist de la fiesta?"
             hideHeader
             dark
             showPublicList

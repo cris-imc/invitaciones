@@ -1462,7 +1462,7 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
             invitationId={String(invitation.id ?? "")}
             guestToken={guest?.uniqueToken}
             guestName={guest?.name ?? "Invitado"}
-            kicker="SUGERÍ UNA CANCIÓN"
+            kicker="¿Armamos la playlist de la fiesta?"
             hideHeader
             dark
             showPublicList

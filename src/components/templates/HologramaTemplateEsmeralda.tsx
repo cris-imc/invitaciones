@@ -1601,7 +1601,7 @@ export function HologramaTemplateEsmeralda({ invitation, guest, isPersonalized =
             invitationId={String(invitation.id ?? "")}
             guestToken={guest?.uniqueToken}
             guestName={guest?.name ?? "Invitado"}
-            kicker="SUGERÍ UNA CANCIÓN"
+            kicker="¿Armamos la playlist de la fiesta?"
             hideHeader
             dark
             showPublicList

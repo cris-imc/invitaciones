@@ -1557,7 +1557,7 @@ export function JardinSedaTemplatePiedraJardin({ invitation, guest, isPersonaliz
             invitationId={String(invitation.id ?? "")}
             guestToken={guest?.uniqueToken}
             guestName={guest?.name ?? "Invitado"}
-            kicker="SUGERÍ UNA CANCIÓN"
+            kicker="¿Armamos la playlist de la fiesta?"
             hideHeader
             dark
             showPublicList

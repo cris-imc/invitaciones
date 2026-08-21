@@ -32,7 +32,7 @@ export function SongSuggestion({
   guestName = "Invitado",
   dark = true,
   showPublicList = true,
-  kicker = "Sugerí una canción",
+  kicker = "¿Armamos la playlist de la fiesta?",
   title = "Que no falte en la pista",
   hideHeader = false,
   variant = "default",
