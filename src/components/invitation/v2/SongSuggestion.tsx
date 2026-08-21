@@ -46,19 +46,31 @@ export function SongSuggestion({
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Cuántas canciones sugirió ESTE invitado (no el total del evento) --
+  // el backend ya corta en 3 por guestToken/guestName (ver /api/songs
+  // POST), esto solo evita que la UI siga ofreciendo "Sugerir otra" cuando
+  // ya sabemos que la próxima va a rebotar.
+  const [mySongCount, setMySongCount] = useState(0);
+  const limitReached = mySongCount >= 3;
+
   // Cargar canciones aprobadas o sugeridas por el invitado
   useEffect(() => {
     if (!showPublicList) return;
-    const url = guestToken 
+    const url = guestToken
       ? `/api/songs?invitationId=${invitationId}&guestToken=${guestToken}`
       : `/api/songs?invitationId=${invitationId}`;
     fetch(url)
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setSongs(data);
+        if (Array.isArray(data)) {
+          setSongs(data);
+          // Con guestToken, el endpoint ya filtra a solo las canciones de
+          // este invitado (cualquier estado) -- ver /api/songs GET.
+          if (guestToken) setMySongCount(data.length);
+        }
       })
       .catch(() => {});
-  }, [invitationId, showPublicList]);
+  }, [invitationId, guestToken, showPublicList]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,11 +103,18 @@ export function SongSuggestion({
       setInputValue("");
       setArtistValue("");
       // Refrescar lista
-      const url = guestToken 
+      const url = guestToken
         ? `/api/songs?invitationId=${invitationId}&guestToken=${guestToken}`
         : `/api/songs?invitationId=${invitationId}`;
       const data = await fetch(url).then((r) => r.json());
-      if (Array.isArray(data)) setSongs(data);
+      if (Array.isArray(data)) {
+        setSongs(data);
+        if (guestToken) {
+          setMySongCount(data.length);
+        } else {
+          setMySongCount((c) => c + 1);
+        }
+      }
     } catch (err: any) {
       setError(err.message || "No se pudo enviar. Intentá de nuevo.");
     } finally {
@@ -161,7 +180,21 @@ export function SongSuggestion({
         )}
 
         {/* Formulario */}
-        {!submitted ? (
+        {!submitted && limitReached ? (
+          <div
+            className={variant === "moderno" ? "bg-[var(--t-surface)] border border-[var(--t-acc)]/20 text-[var(--t-acc)] p-4 rounded-md mb-6 text-sm" : ""}
+            style={variant === "moderno" ? {} : {
+              padding: "var(--sp-4)",
+              background: "rgba(255,255,255,.07)",
+              borderRadius: "var(--radius-s)",
+              marginBottom: "var(--sp-4)",
+              fontSize: "13px",
+            }}
+            role="status"
+          >
+            Ya sugeriste el máximo de 3 canciones para esta invitación. ¡Gracias!
+          </div>
+        ) : !submitted ? (
           <form onSubmit={handleSubmit} noValidate>
             {variant === "moderno" ? (
               <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 mb-4 w-full items-center">
@@ -243,13 +276,15 @@ export function SongSuggestion({
             role="status"
           >
             <span>✓ ¡Gracias! Tu canción fue enviada.</span>
-            <button
-              onClick={() => setSubmitted(false)}
-              className={variant === "moderno" ? "text-white underline text-xs ml-4" : ""}
-              style={variant === "moderno" ? {} : { background: "none", border: "none", color: "var(--c-accent)", cursor: "pointer", fontSize: "inherit", padding: 0, textDecoration: "underline" }}
-            >
-              Sugerir otra
-            </button>
+            {!limitReached && (
+              <button
+                onClick={() => setSubmitted(false)}
+                className={variant === "moderno" ? "text-white underline text-xs ml-4" : ""}
+                style={variant === "moderno" ? {} : { background: "none", border: "none", color: "var(--c-accent)", cursor: "pointer", fontSize: "inherit", padding: 0, textDecoration: "underline" }}
+              >
+                Sugerir otra
+              </button>
+            )}
           </div>
         )}
 
