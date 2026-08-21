@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { isAdmin } from "@/lib/roles";
 
 // GET /api/guests?invitationId=X — Lista de invitados del anfitrión
 export async function GET(request: NextRequest) {
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
       select: { userId: true },
     });
 
-    if (!invitation || invitation.userId !== session.user.id) {
+    if (!invitation || (invitation.userId !== session.user.id && !isAdmin(session.user.role))) {
       return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
     }
 

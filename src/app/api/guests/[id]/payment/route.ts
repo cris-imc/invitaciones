@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { isAdmin } from "@/lib/roles";
 
 // PATCH /api/guests/[id]/payment — Cambiar estado de pago (solo anfitrión autenticado)
 export async function PATCH(
@@ -34,7 +35,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invitado no encontrado" }, { status: 404 });
     }
 
-    if (guest.invitation.userId !== session.user.id) {
+    if (guest.invitation.userId !== session.user.id && !isAdmin(session.user.role)) {
       return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
     }
 
