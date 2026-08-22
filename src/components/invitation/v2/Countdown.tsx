@@ -110,6 +110,12 @@ export function Countdown({
                     lineHeight: 1,
                     color: "#ffffff",
                     fontFamily: "var(--font-cormorant), serif",
+                    // El texto blanco es fijo pero var(--t-acc) -- el fondo
+                    // de la cápsula -- no siempre es lo bastante oscuro
+                    // (algunos acentos son dorado/pastel claro): la sombra
+                    // actúa de halo para mantenerlo legible en cualquier
+                    // acento, sin depender de su luminosidad.
+                    textShadow: "0 1px 3px rgba(0,0,0,.45), 0 1px 8px rgba(0,0,0,.25)",
                   }}
                 >
                   {value}
@@ -125,6 +131,7 @@ export function Countdown({
                     marginTop: "4px",
                     color: "#ffffff",
                     opacity: 0.9,
+                    textShadow: "0 1px 3px rgba(0,0,0,.45), 0 1px 8px rgba(0,0,0,.25)",
                   }}
                 >
                   {label}
