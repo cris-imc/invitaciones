@@ -1074,7 +1074,7 @@ export function SedaTemplateOnixSeda({ invitation, guest, isPersonalized = false
             @keyframes seda-meshDrift { 0%, 100% { background-position: 0% 0%, 100% 100%; } 50% { background-position: 30% 20%, 70% 80%; } }
             @keyframes seda-glowPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
             @keyframes seda-lineExpand { 0% { width: 0; } 100% { width: 40px; } }
-            .seda-cover-text { color: #10141A; }
+            .seda-cover-text { color: #EAEFF5; }
             .seda-cover-text-muted { color: rgba(251,243,238,0.75); }
             @media (min-width: 768px) {
               .seda-cover-text { color: var(--seda-ink); }
