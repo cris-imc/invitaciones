@@ -76,7 +76,7 @@ export const INFO_ADICIONAL_MAX_LENGTH = {
     alojamiento: 300,
     estacionamiento: 300,
     transporte: 300,
-    adicional: 600,
+    adicional: 400,
 } as const;
 
 export const infoAdicionalSchema = z.object({
