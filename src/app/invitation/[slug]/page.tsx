@@ -85,6 +85,15 @@ async function getInvitation(slug: string) {
             despedidaFoto: true,
             rsvpDaysBeforeEvent: true,
             templateTipo: true,
+            infoAdicionalSeccionHabilitada: true,
+            infoAlojamientoHabilitado: true,
+            infoAlojamientoTexto: true,
+            infoEstacionamientoHabilitado: true,
+            infoEstacionamientoTexto: true,
+            infoTransporteHabilitado: true,
+            infoTransporteTexto: true,
+            infoAdicionalHabilitado: true,
+            infoAdicionalTexto: true,
             album: {
                 select: {
                     id: true,

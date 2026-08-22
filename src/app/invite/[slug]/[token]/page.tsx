@@ -341,6 +341,15 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 countdownStyle: true,
                 albumStyle: true,
                 portadaImagenDesktopEscala: true,
+                infoAdicionalSeccionHabilitada: true,
+                infoAlojamientoHabilitado: true,
+                infoAlojamientoTexto: true,
+                infoEstacionamientoHabilitado: true,
+                infoEstacionamientoTexto: true,
+                infoTransporteHabilitado: true,
+                infoTransporteTexto: true,
+                infoAdicionalHabilitado: true,
+                infoAdicionalTexto: true,
                 album: {
                     select: {
                         id: true,
