@@ -932,7 +932,7 @@ export function Cristal3DTemplateAmbarFundido({ invitation, guest, isPersonalize
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #241A0C !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

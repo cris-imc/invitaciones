@@ -638,7 +638,7 @@ export function ModernoTemplateBordo({ invitation, guest, isPersonalized = false
         /* RSVP Custom Aesthetics for DraftTemplate */
         #rsvp.section.dark {
           background-color: #120406 !important; /* Dark brown/black */
-          color: #1A070A !important;
+          color: #FFFFFF !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -748,7 +748,7 @@ export function ModernoTemplateBordo({ invitation, guest, isPersonalized = false
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #1A070A !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

@@ -1474,7 +1474,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
 
         {musicaHabilitada && musicAudioElement}
 
-        <LogoFooterCredit bgColor="#B8964C" />
+        <LogoFooterCredit bgColor="#B8964C" textColor="#1A2B33" />
         </div>
       </div>
       

@@ -763,7 +763,7 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #1C1926 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

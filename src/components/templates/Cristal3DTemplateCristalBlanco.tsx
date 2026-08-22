@@ -689,7 +689,7 @@ export function Cristal3DTemplateCristalBlanco({ invitation, guest, isPersonaliz
         </main>
 
         <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">
-          <LogoFooterCredit bgColor="transparent" />
+          <LogoFooterCredit bgColor="transparent" textColor="#101826" />
         </footer>
       </div>
     );
@@ -765,8 +765,8 @@ export function Cristal3DTemplateCristalBlanco({ invitation, guest, isPersonaliz
            (bordes redondeados + profundidad), así que -- a propósito -- NO
            se eliminan los border-radius acá; se mantienen los de cada card. */
         .desktop-stage .tpl .album-btn {
-          color: #ffffff !important;
-          border-color: rgba(255, 255, 255, 0.3) !important;
+          color: #101826 !important;
+          border-color: rgba(16,24,38,0.3) !important;
           border-radius: 999px !important;
         }
         .desktop-stage .tpl button,
@@ -1011,7 +1011,7 @@ export function Cristal3DTemplateCristalBlanco({ invitation, guest, isPersonaliz
         }
         #banco .copy-btn.copied {
           background-color: #FFFFFF !important;
-          color: #F8FBFF !important;
+          color: #101826 !important;
         }
 
         /* Bottom Nav Pill - Liquid Glass Sticky */
@@ -1139,17 +1139,17 @@ export function Cristal3DTemplateCristalBlanco({ invitation, guest, isPersonaliz
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
                 <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#4A7FBF] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
-                <span className="text-[#FFFFFF] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
+                <span className="text-[#101826] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
               </div>
               <div className="flex flex-col items-end border-l border-[#4A7FBF]/20 pl-3">
-                <span className="text-[#FFFFFF] font-bold text-sm leading-none">{guest.expectedCount}</span>
+                <span className="text-[#101826] font-bold text-sm leading-none">{guest.expectedCount}</span>
                 <span className="text-[#7C8A9C] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#4A7FBF]" />
-              <span className="text-[#E6EEFB]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#101826]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1595,7 +1595,7 @@ export function Cristal3DTemplateCristalBlanco({ invitation, guest, isPersonaliz
           <IconFacet className="crys-scroll-doodle opacity-0" style={{ width: 14, height: 15, color: 'rgba(143,211,255,0.5)' }} />
         </div>
 
-        <LogoFooterCredit bgColor="#F8FBFF" />
+        <LogoFooterCredit bgColor="#F8FBFF" textColor="#101826" />
         </div>
       </div>
       

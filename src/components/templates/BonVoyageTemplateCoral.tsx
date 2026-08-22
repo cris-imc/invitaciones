@@ -993,7 +993,7 @@ export function BonVoyageTemplateCoral({ invitation, guest, isPersonalized = fal
         }
         #banco .copy-btn {
           background-color: #C97A5C !important;
-          color: #FFFFFF !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

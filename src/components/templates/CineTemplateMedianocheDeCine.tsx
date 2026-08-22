@@ -623,7 +623,10 @@ export function CineTemplateMedianocheDeCine({ invitation, guest, isPersonalized
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaTintColor1 = "#4A7BA8"; // ámbar, acento propio de Cine
   const portadaTintColor2 = "#2E4A52"; // teal frío, grading clásico de cine
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/cine-boda.png" : undefined;
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/cine-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/cine-quince.png"
+    : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -1131,7 +1134,7 @@ export function CineTemplateMedianocheDeCine({ invitation, guest, isPersonalized
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#4A7BA8]" />
-              <span className="text-[#E8EEF5]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#0D131C]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1298,7 +1301,7 @@ export function CineTemplateMedianocheDeCine({ invitation, guest, isPersonalized
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B463014, transparent 70%), #E8EEF5" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B463014, transparent 70%), #0D131C" }}>
             <div className="max-w-2xl mx-auto text-center">
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />

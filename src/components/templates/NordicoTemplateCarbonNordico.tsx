@@ -874,13 +874,13 @@ export function NordicoTemplateCarbonNordico({ invitation, guest, isPersonalized
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(17, 17, 17, 0.14) !important;
+          border-top: 1px solid rgba(237,239,242,0.14) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(17, 17, 17, 0.55) !important;
+          color: rgba(237,239,242,0.55) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -890,7 +890,7 @@ export function NordicoTemplateCarbonNordico({ invitation, guest, isPersonalized
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(17, 17, 17, 0.72) !important;
+          color: rgba(237,239,242,0.72) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -903,7 +903,7 @@ export function NordicoTemplateCarbonNordico({ invitation, guest, isPersonalized
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(17, 17, 17, 0.45) !important;
+          color: rgba(237,239,242,0.45) !important;
           font-size: 12px !important;
         }
 

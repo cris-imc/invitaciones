@@ -837,7 +837,7 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #A3123B !important;
-          color: #17140F !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -963,7 +963,7 @@ export function EditorialTemplate({ invitation, guest, isPersonalized = false }:
         }
         #banco .copy-btn {
           background-color: #A3123B !important;
-          color: #17140F !important;
+          color: #FFFFFF !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

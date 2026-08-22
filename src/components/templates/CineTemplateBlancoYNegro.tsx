@@ -623,7 +623,10 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaTintColor1 = "#3A3A3A"; // ámbar, acento propio de Cine
   const portadaTintColor2 = "#2E4A52"; // teal frío, grading clásico de cine
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/cine-boda.png" : undefined;
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/cine-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/cine-quince.png"
+    : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -696,7 +699,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
         </main>
 
         <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">
-          <LogoFooterCredit bgColor="transparent" />
+          <LogoFooterCredit bgColor="transparent" textColor="#1A1815" />
         </footer>
       </div>
     );
@@ -892,13 +895,13 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(234, 229, 217, 0.1) !important;
+          border-top: 1px solid rgba(26,24,21,0.1) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(234, 229, 217, 0.5) !important;
+          color: rgba(26,24,21,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -908,7 +911,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(234, 229, 217, 0.7) !important;
+          color: rgba(26,24,21,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -921,7 +924,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(234, 229, 217, 0.4) !important;
+          color: rgba(26,24,21,0.4) !important;
           font-size: 12px !important;
         }
         
@@ -979,6 +982,17 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           font-family: var(--font-title, var(--font-cormorant)), serif !important;
           font-size: 20px !important;
           margin-bottom: 8px !important;
+        }
+
+        /* Album Section Overrides -- panel oscuro tipo "noir" (unico junto
+           a quote/countdown), el kicker por defecto usa --t-acc2 oscuro
+           pensado para las demas secciones (claras); sin este override
+           queda ilegible. */
+        #album .t-kicker {
+          color: #F2F0EC !important;
+        }
+        #album .t-kicker::before {
+          background: #F2F0EC !important;
         }
 
         /* Bank Section Overrides */
@@ -1132,7 +1146,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#3A3A3A]" />
-              <span className="text-[#1A1815]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#F2F0EC]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1305,9 +1319,9 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
-              <TypewriterText 
+              <TypewriterText
                 text={`"${String(invitation.frasePersonalizadaTexto)}"`}
-                className="text-[#1A1815] text-2xl md:text-3xl leading-relaxed tracking-wide" 
+                className="text-[#F2F0EC] text-2xl md:text-3xl leading-relaxed tracking-wide"
                 style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic', margin: 0, fontWeight: 500 }}
               />
             </div>
@@ -1605,7 +1619,7 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           <div style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, #3A3A3A, transparent)' }} />
         </div>
 
-        <LogoFooterCredit bgColor="#F2F0EC" />
+        <LogoFooterCredit bgColor="#F2F0EC" textColor="#1A1815" />
         </div>
       </div>
       

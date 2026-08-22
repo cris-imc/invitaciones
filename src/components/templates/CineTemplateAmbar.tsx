@@ -623,7 +623,10 @@ export function CineTemplateAmbar({ invitation, guest, isPersonalized = false }:
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaTintColor1 = "#CE9A4A"; // ámbar, acento propio de Cine
   const portadaTintColor2 = "#2E4A52"; // teal frío, grading clásico de cine
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/cine-boda.png" : undefined;
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/cine-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/cine-quince.png"
+    : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -916,7 +919,7 @@ export function CineTemplateAmbar({ invitation, guest, isPersonalized = false }:
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #3A2814 !important;
+          color: #F5E6C8 !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

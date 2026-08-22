@@ -820,7 +820,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #EDE9E2 !important;
+          color: #171512 !important;
           border-radius: 6px !important;
           border: 1px solid rgba(163, 18, 59, 0.2) !important;
           padding: 12px 16px !important;
@@ -837,7 +837,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #C9A15C !important;
-          color: #EDE9E2 !important;
+          color: #000000 !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -868,13 +868,13 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(23,20,15,0.1) !important;
+          border-top: 1px solid rgba(237,233,226,0.1) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(23,20,15,0.5) !important;
+          color: rgba(237,233,226,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -884,7 +884,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(23,20,15,0.7) !important;
+          color: rgba(237,233,226,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -897,7 +897,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(23,20,15,0.4) !important;
+          color: rgba(237,233,226,0.4) !important;
           font-size: 12px !important;
         }
         
@@ -963,7 +963,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
         }
         #banco .copy-btn {
           background-color: #C9A15C !important;
-          color: #EDE9E2 !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;
@@ -1113,7 +1113,7 @@ export function EditorialTemplateOnice({ invitation, guest, isPersonalized = fal
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#C9A15C]" />
-              <span className="text-[#FFFFFF]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#171512]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,

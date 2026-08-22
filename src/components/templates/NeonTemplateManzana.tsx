@@ -886,7 +886,7 @@ export function NeonTemplateManzana({ invitation, guest, isPersonalized = false 
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #132C13 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

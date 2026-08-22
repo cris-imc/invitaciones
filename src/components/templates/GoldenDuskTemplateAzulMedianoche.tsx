@@ -873,7 +873,7 @@ export function GoldenDuskTemplateAzulMedianoche({ invitation, guest, isPersonal
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #3B5773 !important;
-          color: #3B2A2A !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -992,7 +992,7 @@ export function GoldenDuskTemplateAzulMedianoche({ invitation, guest, isPersonal
         }
         #banco .copy-btn {
           background-color: #3B5773 !important;
-          color: #3B2A2A !important;
+          color: #FFFFFF !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

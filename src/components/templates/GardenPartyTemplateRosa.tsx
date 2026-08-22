@@ -934,7 +934,7 @@ export function GardenPartyTemplateRosa({ invitation, guest, isPersonalized = fa
         }
         #banco .copy-btn {
           background-color: #E0709A !important;
-          color: #FFFFFF !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 999px !important;
           font-weight: 700 !important;

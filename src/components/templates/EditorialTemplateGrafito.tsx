@@ -835,7 +835,7 @@ export function EditorialTemplateGrafito({ invitation, guest, isPersonalized = f
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #4B4F58 !important;
-          color: #1B1C1E !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -961,7 +961,7 @@ export function EditorialTemplateGrafito({ invitation, guest, isPersonalized = f
         }
         #banco .copy-btn {
           background-color: #4B4F58 !important;
-          color: #1B1C1E !important;
+          color: #FFFFFF !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

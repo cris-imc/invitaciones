@@ -727,7 +727,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         </main>
 
         <footer className="relative z-10 pt-4 pb-2 text-center border-t border-white/10 font-sans">
-          <LogoFooterCredit bgColor="transparent" />
+          <LogoFooterCredit bgColor="transparent" textColor="#1A1730" />
         </footer>
       </div>
     );
@@ -811,8 +811,8 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
            redondeados + vidrio esmerilado), así que -- a propósito -- NO se
            eliminan los border-radius acá; se mantienen los de cada card. */
         .desktop-stage .tpl .album-btn {
-          color: #ffffff !important;
-          border-color: rgba(255, 255, 255, 0.3) !important;
+          color: #1A1730 !important;
+          border-color: rgba(26,23,48,0.3) !important;
           border-radius: 999px !important;
         }
         .desktop-stage .tpl button,
@@ -1038,7 +1038,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         }
         #banco .copy-btn.copied {
           background-color: #FFFFFF !important;
-          color: #F4F2FF !important;
+          color: #1A1730 !important;
         }
 
         /* Bottom Nav Pill - Liquid Glass Sticky */
@@ -1166,17 +1166,17 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
                 <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#6F4BE0] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
-                <span className="text-[#FFFFFF] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
+                <span className="text-[#1A1730] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
               </div>
               <div className="flex flex-col items-end border-l border-[#6F4BE0]/20 pl-3">
-                <span className="text-[#FFFFFF] font-bold text-sm leading-none">{guest.expectedCount}</span>
+                <span className="text-[#1A1730] font-bold text-sm leading-none">{guest.expectedCount}</span>
                 <span className="text-[#7C76A0] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#6F4BE0]" />
-              <span className="text-[#E0DCF7]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#1A1730]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,
@@ -1633,7 +1633,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
           </svg>
         </div>
 
-        <LogoFooterCredit bgColor="#F4F2FF" />
+        <LogoFooterCredit bgColor="#F4F2FF" textColor="#1A1730" />
         </div>
       </div>
       

@@ -856,7 +856,7 @@ export function GoldenDuskTemplateNocheCiruela({ invitation, guest, isPersonaliz
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #F2E8F0 !important;
+          color: #140A14 !important;
           border-radius: 6px !important;
           border: 1px solid rgba(200, 149, 108, 0.2) !important;
           padding: 12px 16px !important;
@@ -900,13 +900,13 @@ export function GoldenDuskTemplateNocheCiruela({ invitation, guest, isPersonaliz
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(59,42,42,0.1) !important;
+          border-top: 1px solid rgba(242,232,240,0.1) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(59,42,42,0.5) !important;
+          color: rgba(242,232,240,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -916,7 +916,7 @@ export function GoldenDuskTemplateNocheCiruela({ invitation, guest, isPersonaliz
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(59,42,42,0.7) !important;
+          color: rgba(242,232,240,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -929,7 +929,7 @@ export function GoldenDuskTemplateNocheCiruela({ invitation, guest, isPersonaliz
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(59,42,42,0.4) !important;
+          color: rgba(242,232,240,0.4) !important;
           font-size: 12px !important;
         }
 
@@ -1140,7 +1140,7 @@ export function GoldenDuskTemplateNocheCiruela({ invitation, guest, isPersonaliz
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#9C6B8C]" />
-              <span className="text-[#FFFFFF]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#140A14]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,

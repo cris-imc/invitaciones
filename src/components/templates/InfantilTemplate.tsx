@@ -812,7 +812,7 @@ export function InfantilTemplate({ invitation, guest, isPersonalized = false }: 
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #FF5C8A !important;
-          color: #FFFFFF !important;
+          color: #000000 !important;
           font-weight: 700 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -930,7 +930,7 @@ export function InfantilTemplate({ invitation, guest, isPersonalized = false }: 
         }
         #banco .copy-btn {
           background-color: #FF5C8A !important;
-          color: #FFFFFF !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 999px !important;
           font-weight: 700 !important;

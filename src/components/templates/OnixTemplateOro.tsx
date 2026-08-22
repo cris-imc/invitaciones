@@ -883,7 +883,7 @@ export function OnixTemplateOro({ invitation, guest, isPersonalized = false }: O
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #231A22 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

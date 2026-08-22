@@ -835,7 +835,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #F2ECF0 !important;
+          color: #120E14 !important;
           border-radius: 999px !important;
           border: 1px solid rgba(183, 159, 196, 0.2) !important;
           padding: 12px 16px !important;
@@ -852,7 +852,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #9C7FB4 !important;
-          color: #F2ECF0 !important;
+          color: #000000 !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -883,13 +883,13 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           border: none !important;
           border-radius: 12px !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(58,46,51,0.1) !important;
+          border-top: 1px solid rgba(242,236,240,0.1) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(58,46,51,0.5) !important;
+          color: rgba(242,236,240,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -899,7 +899,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(58,46,51,0.7) !important;
+          color: rgba(242,236,240,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -912,7 +912,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(58,46,51,0.4) !important;
+          color: rgba(242,236,240,0.4) !important;
           font-size: 12px !important;
         }
         
@@ -978,7 +978,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
         }
         #banco .copy-btn {
           background-color: #9C7FB4 !important;
-          color: #F2ECF0 !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 999px !important;
           font-weight: 700 !important;
@@ -1128,7 +1128,7 @@ export function JardinSedaTemplateJardinNocturno({ invitation, guest, isPersonal
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#9C7FB4]" />
-              <span className="text-[#FFFFFF]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#120E14]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,

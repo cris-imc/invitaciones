@@ -873,7 +873,7 @@ export function GoldenDuskTemplateBorgona({ invitation, guest, isPersonalized = 
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #8C4A4A !important;
-          color: #3B2A2A !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -992,7 +992,7 @@ export function GoldenDuskTemplateBorgona({ invitation, guest, isPersonalized = 
         }
         #banco .copy-btn {
           background-color: #8C4A4A !important;
-          color: #3B2A2A !important;
+          color: #FFFFFF !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

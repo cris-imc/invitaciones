@@ -752,8 +752,8 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
           border-radius: 0 !important;
         }
         .desktop-stage .tpl .album-btn {
-          color: #3e2e20 !important;
-          border-color: rgba(62, 46, 32, 0.25) !important;
+          color: #E8F2F0 !important;
+          border-color: rgba(232,242,240,0.25) !important;
         }
 
         /* Override Countdown Hardcoded Colors -- cápsulas circulares tipo
@@ -825,7 +825,7 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #E8F2F0 !important;
+          color: #0A1416 !important;
           border-radius: 6px !important;
           border: 1px solid rgba(193,115,74, 0.2) !important;
           padding: 12px 16px !important;
@@ -873,13 +873,13 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(62, 46, 32, 0.12) !important;
+          border-top: 1px solid rgba(232,242,240,0.12) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(62, 46, 32, 0.55) !important;
+          color: rgba(232,242,240,0.55) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -889,7 +889,7 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(62, 46, 32, 0.72) !important;
+          color: rgba(232,242,240,0.72) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -902,7 +902,7 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(62, 46, 32, 0.45) !important;
+          color: rgba(232,242,240,0.45) !important;
           font-size: 12px !important;
         }
         
@@ -1118,7 +1118,7 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#4A8C99]" />
-              <span className="text-[#F5E9D8]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#0A1416]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,

@@ -638,7 +638,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         /* RSVP Custom Aesthetics for DraftTemplate */
         #rsvp.section.dark {
           background-color: #0D0412 !important; /* Dark brown/black */
-          color: #15081A !important;
+          color: #FFFFFF !important;
           border: none !important;
           padding: 48px !important;
           display: flex;
@@ -748,7 +748,7 @@ export function ModernoTemplatePurpura({ invitation, guest, isPersonalized = fal
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #15081A !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

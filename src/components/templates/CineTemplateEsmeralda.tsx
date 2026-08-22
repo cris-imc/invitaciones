@@ -621,7 +621,10 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaTintColor1 = "#5B8A72";
   const portadaTintColor2 = "#2E4A52";
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/cine-boda.png" : undefined;
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/cine-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/cine-quince.png"
+    : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -914,7 +917,7 @@ export function CineTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #221C15 !important;
+          color: #F0E9DC !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

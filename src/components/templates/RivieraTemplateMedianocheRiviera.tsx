@@ -825,7 +825,7 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #F2ECE0 !important;
+          color: #1A1712 !important;
           border-radius: 6px !important;
           border: 1px solid rgba(193,115,74, 0.2) !important;
           padding: 12px 16px !important;
@@ -873,13 +873,13 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(62, 46, 32, 0.12) !important;
+          border-top: 1px solid rgba(242,236,224,0.12) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(62, 46, 32, 0.55) !important;
+          color: rgba(242,236,224,0.55) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -889,7 +889,7 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(62, 46, 32, 0.72) !important;
+          color: rgba(242,236,224,0.72) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -902,7 +902,7 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(62, 46, 32, 0.45) !important;
+          color: rgba(242,236,224,0.45) !important;
           font-size: 12px !important;
         }
         

@@ -712,8 +712,8 @@ export function LoftIndustrialTemplateClaro({ invitation, guest, isPersonalized 
           border-radius: 0 !important;
         }
         .desktop-stage .tpl .album-btn {
-          color: #ffffff !important;
-          border-color: rgba(255, 255, 255, 0.3) !important;
+          color: #C0392B !important;
+          border-color: rgba(192,57,43,0.3) !important;
         }
 
         #countdown.dark {
@@ -826,7 +826,7 @@ export function LoftIndustrialTemplateClaro({ invitation, guest, isPersonalized 
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(224, 184, 75, 0.6) !important;
+          color: rgba(192,57,43,0.6) !important;
           font-family: 'Space Mono', monospace !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -836,7 +836,7 @@ export function LoftIndustrialTemplateClaro({ invitation, guest, isPersonalized 
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(240, 239, 236, 0.75) !important;
+          color: rgba(192,57,43,0.75) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -849,7 +849,7 @@ export function LoftIndustrialTemplateClaro({ invitation, guest, isPersonalized 
           font-weight: 700 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(240, 239, 236, 0.4) !important;
+          color: rgba(192,57,43,0.4) !important;
           font-size: 12px !important;
         }
 

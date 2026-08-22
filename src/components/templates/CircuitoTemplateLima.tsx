@@ -987,7 +987,7 @@ export function CircuitoTemplateLima({ invitation, guest, isPersonalized = false
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #0C0C10 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

@@ -968,7 +968,7 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
         }
         #banco .copy-btn {
           background-color: #C1734A !important;
-          color: #FAF1E4 !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

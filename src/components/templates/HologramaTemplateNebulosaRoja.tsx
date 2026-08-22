@@ -958,7 +958,7 @@ export function HologramaTemplateNebulosaRoja({ invitation, guest, isPersonalize
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #2A0A10 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

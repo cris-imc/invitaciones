@@ -958,7 +958,7 @@ export function HologramaTemplateGrafitoCuantico({ invitation, guest, isPersonal
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #1F1F26 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

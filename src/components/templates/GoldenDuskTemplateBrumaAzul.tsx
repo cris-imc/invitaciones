@@ -992,7 +992,7 @@ export function GoldenDuskTemplateBrumaAzul({ invitation, guest, isPersonalized 
         }
         #banco .copy-btn {
           background-color: #5C7A96 !important;
-          color: #232A33 !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

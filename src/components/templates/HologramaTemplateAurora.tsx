@@ -958,7 +958,7 @@ export function HologramaTemplateAurora({ invitation, guest, isPersonalized = fa
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #0D2422 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

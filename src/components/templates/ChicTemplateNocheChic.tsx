@@ -864,7 +864,7 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
         }
         #rsvp.section.dark input {
           background-color: #FFFFFF !important;
-          color: #F2ECE0 !important;
+          color: #17140F !important;
           border-radius: 6px !important;
           border: 1px solid rgba(201, 168, 118, 0.2) !important;
           padding: 12px 16px !important;
@@ -881,7 +881,7 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #D9A15C !important;
-          color: #F2ECE0 !important;
+          color: #000000 !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -912,13 +912,13 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
           border: none !important;
           border-radius: 0 !important;
           padding: 16px 0 0 0 !important;
-          border-top: 1px solid rgba(36,30,18,0.1) !important;
+          border-top: 1px solid rgba(242,236,224,0.1) !important;
           text-align: left !important;
           box-shadow: none !important;
           width: 100% !important;
         }
         #rsvp.section.dark .t-detail h4 {
-          color: rgba(36,30,18,0.5) !important;
+          color: rgba(242,236,224,0.5) !important;
           font-family: var(--font-body-custom, var(--font-inter)), sans-serif !important;
           text-transform: uppercase !important;
           font-size: 10px !important;
@@ -928,7 +928,7 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
           margin-bottom: 6px !important;
         }
         #rsvp.section.dark .t-detail p {
-          color: rgba(36,30,18,0.7) !important;
+          color: rgba(242,236,224,0.7) !important;
           font-size: 13px !important;
           display: flex;
           align-items: center;
@@ -941,7 +941,7 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
-          color: rgba(36,30,18,0.4) !important;
+          color: rgba(242,236,224,0.4) !important;
           font-size: 12px !important;
         }
         
@@ -1007,7 +1007,7 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
         }
         #banco .copy-btn {
           background-color: #D9A15C !important;
-          color: #F2ECE0 !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;
@@ -1163,7 +1163,7 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#D9A15C]" />
-              <span className="text-[#FFFFFF]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#17140F]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
             </div>
           )}
         </div>,

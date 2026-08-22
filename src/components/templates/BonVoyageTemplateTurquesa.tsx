@@ -993,7 +993,7 @@ export function BonVoyageTemplateTurquesa({ invitation, guest, isPersonalized = 
         }
         #banco .copy-btn {
           background-color: #2CA6A4 !important;
-          color: #FFFFFF !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;

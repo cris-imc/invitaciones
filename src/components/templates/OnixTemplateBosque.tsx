@@ -882,7 +882,7 @@ export function OnixTemplateBosque({ invitation, guest, isPersonalized = false }
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #1A2A20 !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

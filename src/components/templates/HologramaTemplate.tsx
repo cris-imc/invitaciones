@@ -958,7 +958,7 @@ export function HologramaTemplate({ invitation, guest, isPersonalized = false }:
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #17172E !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {

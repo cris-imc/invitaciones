@@ -1474,7 +1474,7 @@ export function ElegantTemplate({ invitation, guest, isPersonalized = false }: C
 
         {musicaHabilitada && musicAudioElement}
 
-        <LogoFooterCredit bgColor="#C79A4B" />
+        <LogoFooterCredit bgColor="#C79A4B" textColor="#1A2B33" />
         </div>
       </div>
       

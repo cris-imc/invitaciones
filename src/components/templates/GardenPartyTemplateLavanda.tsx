@@ -934,7 +934,7 @@ export function GardenPartyTemplateLavanda({ invitation, guest, isPersonalized =
         }
         #banco .copy-btn {
           background-color: #8B7FD1 !important;
-          color: #FFFFFF !important;
+          color: #000000 !important;
           border: none !important;
           border-radius: 999px !important;
           font-weight: 700 !important;

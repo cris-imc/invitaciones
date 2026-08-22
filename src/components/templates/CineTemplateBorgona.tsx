@@ -621,7 +621,10 @@ export function CineTemplateBorgona({ invitation, guest, isPersonalized = false 
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaTintColor1 = "#8C4A56";
   const portadaTintColor2 = "#2E4A52";
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/cine-boda.png" : undefined;
+  const portadaFondoFallback = portadaFondoAnimado ? undefined
+    : tipo === "CASAMIENTO" ? "/fondos/cine-boda.png"
+    : tipo === "QUINCE_ANOS" ? "/fondos/cine-quince.png"
+    : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
@@ -858,7 +861,7 @@ export function CineTemplateBorgona({ invitation, guest, isPersonalized = false 
           flex: 1 !important;
           min-width: 120px !important;
           background-color: #8C4A56 !important;
-          color: #17130F !important;
+          color: #FFFFFF !important;
           font-weight: 600 !important;
           border: none !important;
           text-transform: uppercase !important;
@@ -914,7 +917,7 @@ export function CineTemplateBorgona({ invitation, guest, isPersonalized = false 
         }
         #rsvp.section.dark .t-detail p b {
           font-size: 1.1rem !important;
-          color: #221C15 !important;
+          color: #F0E9DC !important;
           font-weight: 600 !important;
         }
         #rsvp.section.dark .t-detail span {
@@ -984,7 +987,7 @@ export function CineTemplateBorgona({ invitation, guest, isPersonalized = false 
         }
         #banco .copy-btn {
           background-color: #8C4A56 !important;
-          color: #17130F !important;
+          color: #FFFFFF !important;
           border: none !important;
           border-radius: 0 !important;
           font-weight: 700 !important;
