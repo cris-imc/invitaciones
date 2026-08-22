@@ -74,10 +74,33 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
   if (!invitation.infoAdicionalSeccionHabilitada) return null;
   if (items.length === 0) return null;
 
+  // Estilo fijo, no depende de las variables de tema de cada plantilla --
+  // llegamos acá porque `.t-btn` (var(--t-onpaper)) daba fondo/texto blanco
+  // sobre blanco en algunos temas claros (ej. Luz de Luna). El botón y el
+  // modal se ven idénticos en todas las plantillas a propósito.
+  const FONT_STACK = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+
   return (
     <div id="info-adicional" style={{ display: "flex", justifyContent: "center", padding: "8px 0 32px" }}>
-      <button type="button" className="t-btn" onClick={() => setOpen(true)}>
-        <CircleQuestionMark className="w-4 h-4" />
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{
+          fontFamily: FONT_STACK,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "11px 20px",
+          borderRadius: "999px",
+          border: "none",
+          background: "#1a1a1a",
+          color: "#fff",
+          fontSize: "13px",
+          fontWeight: 600,
+          cursor: "pointer",
+        }}
+      >
+        <CircleQuestionMark className="w-4 h-4" style={{ color: "#fff" }} />
         ¿Qué necesitás saber?
       </button>
 
@@ -92,7 +115,7 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
             aria-label="¿Qué necesitás saber?"
             onClick={(e) => e.stopPropagation()}
             style={{
-              fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+              fontFamily: FONT_STACK,
               background: "#fff",
               color: "#1a1a1a",
               width: "100%",
@@ -115,7 +138,7 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
                 borderBottom: "1px solid #eee",
               }}
             >
-              <h3 style={{ fontSize: "17px", fontWeight: 700, margin: 0 }}>¿Qué necesitás saber?</h3>
+              <h3 style={{ fontFamily: FONT_STACK, fontSize: "17px", fontWeight: 700, margin: 0, color: "#1a1a1a" }}>¿Qué necesitás saber?</h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -147,8 +170,8 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
                       <Icon className="w-4.5 h-4.5" />
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ fontSize: "14px", fontWeight: 700, margin: "0 0 4px" }}>{item.title}</p>
-                      <p style={{ fontSize: "13.5px", lineHeight: 1.55, margin: 0, whiteSpace: "pre-wrap", color: "#333" }}>
+                      <p style={{ fontFamily: FONT_STACK, fontSize: "14px", fontWeight: 700, margin: "0 0 4px", color: "#1a1a1a" }}>{item.title}</p>
+                      <p style={{ fontFamily: FONT_STACK, fontSize: "13.5px", lineHeight: 1.55, margin: 0, whiteSpace: "pre-wrap", color: "#333" }}>
                         {item.text}
                       </p>
                     </div>
