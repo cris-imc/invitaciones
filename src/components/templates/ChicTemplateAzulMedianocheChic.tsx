@@ -1316,7 +1316,7 @@ export function ChicTemplateAzulMedianocheChic({ invitation, guest, isPersonaliz
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B7A4F14, transparent 70%), #FFFFFF" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #6B7A4F14, transparent 70%), var(--t-surface)" }}>
             <div className="max-w-2xl mx-auto text-center">
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1428,7 +1428,7 @@ export function ChicTemplateAzulMedianocheChic({ invitation, guest, isPersonaliz
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#FFFFFF] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: "var(--t-surface)" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />

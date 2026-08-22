@@ -969,7 +969,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         
         /* SongSuggestion Custom Aesthetics */
         #songs.d-sec.dark {
-          background-color: #131228 !important;
+          background-color: #E0DCF7 !important;
           padding: 80px 24px !important;
           display: flex;
           flex-direction: column;
@@ -1587,7 +1587,7 @@ export function HologramaTemplateBlancoPrisma({ invitation, guest, isPersonalize
         )}
 
         {triviaHabilitada && triviaPreguntas.length > 0 && (
-          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #22D3EE18, transparent 70%), #131228" }}>
+          <SectionWrapper id="quiz" delay={300} className="w-full py-20 px-6 md:px-12" style={{ background: "linear-gradient(160deg, #22D3EE18, transparent 70%), #E0DCF7" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
