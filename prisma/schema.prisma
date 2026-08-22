@@ -232,6 +232,7 @@ model Invitation {
   triviaSubtitulo              String?
   triviaPreguntas              String?
   triviaBotonTexto             String?
+  infoAdicionalSeccionHabilitada Boolean        @default(false)
   infoAlojamientoHabilitado    Boolean          @default(false)
   infoAlojamientoTexto         String?
   infoEstacionamientoHabilitado Boolean         @default(false)

@@ -80,6 +80,12 @@ export const INFO_ADICIONAL_MAX_LENGTH = {
 } as const;
 
 export const infoAdicionalSchema = z.object({
+    // Switch maestro: apaga el botón "¿Qué necesitás saber?" aunque haya
+    // secciones individuales con contenido cargado. Arranca en false tanto
+    // para invitaciones nuevas como para las ya existentes (la migración le
+    // puso false a todas las filas viejas), así el anfitrión lo prende
+    // explícitamente cuando quiere mostrarlo.
+    infoAdicionalSeccionHabilitada: z.boolean().default(false),
     infoAlojamientoHabilitado: z.boolean().default(false),
     infoAlojamientoTexto: z.string().max(INFO_ADICIONAL_MAX_LENGTH.alojamiento).optional(),
     infoEstacionamientoHabilitado: z.boolean().default(false),

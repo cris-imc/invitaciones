@@ -378,6 +378,7 @@ export async function POST(request: NextRequest) {
                 triviaPreguntas: body.triviaPreguntas,
 
                 // 13. INFO ADICIONAL
+                infoAdicionalSeccionHabilitada: body.infoAdicionalSeccionHabilitada !== undefined ? Boolean(body.infoAdicionalSeccionHabilitada) : false,
                 infoAlojamientoHabilitado: body.infoAlojamientoHabilitado !== undefined ? Boolean(body.infoAlojamientoHabilitado) : false,
                 infoAlojamientoTexto: body.infoAlojamientoTexto,
                 infoEstacionamientoHabilitado: body.infoEstacionamientoHabilitado !== undefined ? Boolean(body.infoEstacionamientoHabilitado) : false,
@@ -613,6 +614,7 @@ export async function PUT(request: NextRequest) {
                 triviaPreguntas: body.triviaPreguntas,
 
                 // 13. INFO ADICIONAL
+                infoAdicionalSeccionHabilitada: body.infoAdicionalSeccionHabilitada,
                 infoAlojamientoHabilitado: body.infoAlojamientoHabilitado,
                 infoAlojamientoTexto: body.infoAlojamientoTexto,
                 infoEstacionamientoHabilitado: body.infoEstacionamientoHabilitado,

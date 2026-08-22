@@ -98,6 +98,23 @@ export function StepInfoAdicional() {
                 </p>
             </div>
 
+            <div className="flex items-center justify-between gap-3 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl shadow-sm">
+                <div className="min-w-0">
+                    <Label htmlFor="enable-info-adicional" className="text-base font-semibold cursor-pointer">
+                        Mostrar esta sección en la invitación
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                        Es el interruptor general: si está apagado, el botón "¿Qué necesitás saber?" no aparece
+                        aunque hayas cargado texto abajo -- podés dejar todo preparado y activarlo cuando quieras.
+                    </p>
+                </div>
+                <Switch
+                    id="enable-info-adicional"
+                    checked={Boolean(d.infoAdicionalSeccionHabilitada)}
+                    onCheckedChange={(checked) => setData({ infoAdicionalSeccionHabilitada: checked } as any)}
+                />
+            </div>
+
             {FIELDS.map((field) => {
                 const isActive = Boolean(d[field.habilitadoField]);
                 const text = d[field.textField] || "";

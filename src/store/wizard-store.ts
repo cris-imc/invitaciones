@@ -71,6 +71,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         precioNinoHabilitado: false,
         precioAdolescenteHabilitado: false,
 
+        infoAdicionalSeccionHabilitada: false,
         infoAlojamientoHabilitado: false,
         infoAlojamientoTexto: "",
         infoEstacionamientoHabilitado: false,
@@ -176,6 +177,7 @@ export const useWizardStore = create<WizardState>((set) => ({
             triviaHabilitada: false,
             albumCompartidoHabilitado: true,
             sugerenciaMusicaHabilitada: true,
+            infoAdicionalSeccionHabilitada: false,
             infoAlojamientoHabilitado: false,
             infoEstacionamientoHabilitado: false,
             infoTransporteHabilitado: false,

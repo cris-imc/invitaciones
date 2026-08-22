@@ -120,6 +120,7 @@ function WizardContent({ invitation }: { invitation: any }) {
                 albumStyle: invitation.albumStyle || "carrusel",
 
                 // Info Adicional
+                infoAdicionalSeccionHabilitada: Boolean(invitation.infoAdicionalSeccionHabilitada),
                 infoAlojamientoHabilitado: Boolean(invitation.infoAlojamientoHabilitado),
                 infoAlojamientoTexto: invitation.infoAlojamientoTexto || "",
                 infoEstacionamientoHabilitado: Boolean(invitation.infoEstacionamientoHabilitado),

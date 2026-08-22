@@ -118,7 +118,7 @@ function PreviewPlantillaContent() {
     // faltan datos para esa sección puntual. En vez de eso, se busca la
     // PRÓXIMA sección real que sí exista, siguiendo el orden del wizard, y
     // recién si no queda ninguna más adelante se cae al final de la página.
-    const SECTION_ORDER = ["hero", "countdown", "quote", "details", "schedule", "album", "music", "banco", "quiz"];
+    const SECTION_ORDER = ["hero", "countdown", "quote", "details", "schedule", "album", "music", "banco", "quiz", "info-adicional"];
 
     const scrollToElement = (element: HTMLElement) => {
         const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;

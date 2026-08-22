@@ -159,6 +159,7 @@ export function WizardLivePreview() {
         if (stepLabel === "Música") section = "music";
         if (stepLabel === "Regalo (CBU)") section = "banco";
         if (stepLabel === "Trivia") section = "quiz";
+        if (stepLabel === "Info Adicional") section = "info-adicional";
 
         win.postMessage({ type: "wizard-scroll-to", section }, window.location.origin);
     }, [stepLabel, loading]);

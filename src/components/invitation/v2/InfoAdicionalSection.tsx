@@ -5,6 +5,7 @@ import { BedDouble, CircleParking, Bus, Info, X, CircleQuestionMark } from "luci
 
 interface InfoAdicionalSectionProps {
   invitation: {
+    infoAdicionalSeccionHabilitada?: boolean;
     infoAlojamientoHabilitado?: boolean;
     infoAlojamientoTexto?: string | null;
     infoEstacionamientoHabilitado?: boolean;
@@ -68,10 +69,13 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
     };
   }, [open]);
 
+  // Switch maestro (StepInfoAdicional): apaga el botón entero aunque haya
+  // secciones individuales con contenido cargado.
+  if (!invitation.infoAdicionalSeccionHabilitada) return null;
   if (items.length === 0) return null;
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "8px 0 32px" }}>
+    <div id="info-adicional" style={{ display: "flex", justifyContent: "center", padding: "8px 0 32px" }}>
       <button type="button" className="t-btn" onClick={() => setOpen(true)}>
         <CircleQuestionMark className="w-4 h-4" />
         ¿Qué necesitás saber?
