@@ -186,7 +186,8 @@ export function StepBankDetails() {
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                         <div className="space-y-2">
                             <Label className="text-xs font-medium">Título de la Sección</Label>
-                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}>
+                            <div className="relative">
+                            <div className="flex gap-2 overflow-x-auto md:flex-wrap md:overflow-visible no-scrollbar pb-1" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}>
                                 {PREDEFINED_TITULOS_REGALO.map((opt) => (
                                     <button
                                         key={opt}
@@ -196,10 +197,10 @@ export function StepBankDetails() {
                                             setIsCustomRegaloTitulo(false);
                                         }}
                                         className={cn(
-                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
+                                            "text-xs px-3 py-2 rounded-xl border transition-all duration-200 whitespace-nowrap shrink-0",
                                             (d.regaloTitulo || "Regalo") === opt && !isCustomRegaloTitulo
-                                                ? "bg-amber-500 text-white border-amber-600"
-                                                : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                                ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
                                         )}
                                     >
                                         {opt}
@@ -214,14 +215,16 @@ export function StepBankDetails() {
                                         }
                                     }}
                                     className={cn(
-                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
+                                        "text-xs px-3 py-2 rounded-xl border transition-all duration-200 whitespace-nowrap shrink-0",
                                         isCustomRegaloTitulo
-                                            ? "bg-amber-500 text-white border-amber-600"
-                                            : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                            ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                            : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
                                     )}
                                 >
                                     Personalizado
                                 </button>
+                            </div>
+                            <div className="pointer-events-none absolute right-0 top-0 bottom-1 w-8 bg-gradient-to-l from-[var(--ink-2)] to-transparent md:hidden" />
                             </div>
                             {isCustomRegaloTitulo && (
                                 <Input
@@ -332,7 +335,8 @@ export function StepBankDetails() {
                     <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                         <div className="space-y-2">
                             <Label className="text-xs font-medium">Título de la Sección</Label>
-                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}>
+                            <div className="relative">
+                            <div className="flex gap-2 overflow-x-auto md:flex-wrap md:overflow-visible no-scrollbar pb-1" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}>
                                 {PREDEFINED_TITULOS_TARJETA.map((opt) => (
                                     <button
                                         key={opt}
@@ -342,10 +346,10 @@ export function StepBankDetails() {
                                             setIsCustomTarjetaTitulo(false);
                                         }}
                                         className={cn(
-                                            "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
+                                            "text-xs px-3 py-2 rounded-xl border transition-all duration-200 whitespace-nowrap shrink-0",
                                             (d.pagoTarjetaTitulo || "Pago de Tarjetas") === opt && !isCustomTarjetaTitulo
-                                                ? "bg-amber-500 text-white border-amber-600"
-                                                : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                                ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
                                         )}
                                     >
                                         {opt}
@@ -360,14 +364,16 @@ export function StepBankDetails() {
                                         }
                                     }}
                                     className={cn(
-                                        "px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0",
+                                        "text-xs px-3 py-2 rounded-xl border transition-all duration-200 whitespace-nowrap shrink-0",
                                         isCustomTarjetaTitulo
-                                            ? "bg-amber-500 text-white border-amber-600"
-                                            : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                            ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
+                                            : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
                                     )}
                                 >
                                     Personalizado
                                 </button>
+                            </div>
+                            <div className="pointer-events-none absolute right-0 top-0 bottom-1 w-8 bg-gradient-to-l from-[var(--ink-2)] to-transparent md:hidden" />
                             </div>
                             {isCustomTarjetaTitulo && (
                                 <Input
