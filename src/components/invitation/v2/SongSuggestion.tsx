@@ -205,7 +205,7 @@ export function SongSuggestion({
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   maxLength={100}
-                  className="w-full h-[46px] !m-0 bg-[var(--t-surface)] border border-[var(--t-acc)]/40 rounded-none px-4 text-sm text-[#FFFFFF] placeholder-[var(--t-muted)] focus:outline-none focus:border-[var(--t-acc)]/70 transition-colors"
+                  className="w-full h-[46px] !m-0 bg-white border border-[var(--t-acc)]/40 rounded-none px-4 text-sm text-[#1A1A1A] placeholder-[var(--t-muted)] focus:outline-none focus:border-[var(--t-acc)]/70 transition-colors"
                 />
                 <input
                   type="text"
@@ -213,7 +213,7 @@ export function SongSuggestion({
                   value={artistValue}
                   onChange={(e) => setArtistValue(e.target.value)}
                   maxLength={80}
-                  className="w-full h-[46px] !m-0 bg-[var(--t-surface)] border border-[var(--t-acc)]/40 rounded-none px-4 text-sm text-[#FFFFFF] placeholder-[var(--t-muted)] focus:outline-none focus:border-[var(--t-acc)]/70 transition-colors"
+                  className="w-full h-[46px] !m-0 bg-white border border-[var(--t-acc)]/40 rounded-none px-4 text-sm text-[#1A1A1A] placeholder-[var(--t-muted)] focus:outline-none focus:border-[var(--t-acc)]/70 transition-colors"
                 />
                 <button
                   type="submit"
@@ -297,9 +297,9 @@ export function SongSuggestion({
               .map((song) => {
                 const alreadyVoted = votedIds.has(song.id);
                 return variant === "moderno" ? (
-                  <div key={song.id} className="bg-[var(--t-surface)] border border-[var(--t-acc)]/10 rounded-md p-4 flex items-center justify-between">
+                  <div key={song.id} className="bg-white border border-[var(--t-acc)]/10 rounded-md p-4 flex items-center justify-between">
                     <div className="flex flex-col flex-1 min-w-0 pr-4">
-                      <b className="text-white font-sans text-base font-bold truncate">
+                      <b className="text-[#1A1A1A] font-sans text-base font-bold truncate">
                         {song.title}
                       </b>
                       <span className="text-[var(--t-muted)] font-sans text-sm truncate">
