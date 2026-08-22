@@ -995,6 +995,16 @@ export function CineTemplateBlancoYNegro({ invitation, guest, isPersonalized = f
           background: #F2F0EC !important;
         }
 
+        /* Quote Section Override -- la frase es un panel oscuro (noir),
+           pero la regla generica ".tpl h2" (mas arriba) fuerza el ink
+           oscuro pensado para el resto de la plantilla (clara) con
+           !important, tapando el color claro del propio TypewriterText.
+           Selector por ID le gana en especificidad a la regla de clase,
+           ambos con !important. */
+        #quote h2 {
+          color: #F2F0EC !important;
+        }
+
         /* Bank Section Overrides */
         #banco .t-kicker {
           text-align: left !important;
