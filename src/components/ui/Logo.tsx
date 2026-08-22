@@ -176,7 +176,7 @@ export function LogoFooterCredit({
   // (.desktop-stage) en vez del color de la plantilla.
   return (
     <div
-      className={`flex justify-center py-8 ${className ?? ""}`}
+      className={`flex justify-center pt-8 pb-8 max-[900px]:pb-24 ${className ?? ""}`}
       style={{ backgroundColor: bgColor }}
     >
       <div className="flex flex-col items-center gap-2 px-5 py-4">
