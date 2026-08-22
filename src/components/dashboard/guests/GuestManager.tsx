@@ -201,7 +201,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [editTeensEnabled, setEditTeensEnabled] = useState(false);
   const [editChildrenEnabled, setEditChildrenEnabled] = useState(false);
 
-  const itemsPerPage = 3;
+  const itemsPerPage = 8;
   const { showToast } = useToast();
 
   // Form States

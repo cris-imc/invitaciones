@@ -34,13 +34,21 @@ const PAYMENT_STATUS_LABELS: Record<string, string> = {
   PAID: "Pagado",
 };
 
+const PAYMENT_FILTER_LABELS: Record<string, string> = {
+  PAID: "Pago",
+  PENDING: "No pago",
+};
+
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
   PENDING: "#B98B3E",
   EXEMPT:  "#8b8b8b",
   PAID:    "#5a8a6e",
 };
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 8;
+
+type AttendanceFilter = "all" | "CONFIRMED" | "PENDING" | "DECLINED";
+type PaymentFilter = "all" | "PAID" | "PENDING";
 
 export function GuestListWithPayment({
   invitationId,
@@ -50,7 +58,8 @@ export function GuestListWithPayment({
 }: GuestListWithPaymentProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "CONFIRMED" | "PENDING" | "DECLINED">("all");
+  const [attendanceFilter, setAttendanceFilter] = useState<AttendanceFilter>("all");
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showPaymentInfo, setShowPaymentInfo] = useState(true);
@@ -103,14 +112,42 @@ export function GuestListWithPayment({
   };
 
   const filtered = guests.filter((g) => {
-    const matchFilter = filter === "all" || g.status === filter;
+    const matchAttendance = attendanceFilter === "all" || g.status === attendanceFilter;
+    const matchPayment = paymentFilter === "all" || (g.status === "CONFIRMED" && g.paymentStatus === paymentFilter);
     const matchSearch = g.name.toLowerCase().includes(search.toLowerCase());
-    return matchFilter && matchSearch;
+    return matchAttendance && matchPayment && matchSearch;
   });
 
   useEffect(() => {
     setPage(1);
-  }, [filter, search]);
+  }, [attendanceFilter, paymentFilter, search]);
+
+  // Los pills de estado y de pago son combinables (ej: Confirmó + No pago),
+  // pero no todas las combinaciones tienen sentido -- el pago solo aplica a
+  // invitados CONFIRMADOS, así que si el estado activo es Pendiente/No
+  // asistirá los pills de pago se deshabilitan (y viceversa). Dentro de cada
+  // grupo, además, son mutuamente excluyentes entre sí.
+  const isAttendanceDisabled = (value: AttendanceFilter) => {
+    if (value === "all") return false;
+    if (attendanceFilter !== "all" && attendanceFilter !== value) return true;
+    if (value !== "CONFIRMED" && paymentFilter !== "all") return true;
+    return false;
+  };
+
+  const isPaymentDisabled = (value: Exclude<PaymentFilter, "all">) => {
+    if (paymentFilter !== "all" && paymentFilter !== value) return true;
+    if (attendanceFilter === "PENDING" || attendanceFilter === "DECLINED") return true;
+    return false;
+  };
+
+  const toggleAttendance = (value: AttendanceFilter) => {
+    if (value === "all") { setAttendanceFilter("all"); return; }
+    setAttendanceFilter((prev) => (prev === value ? "all" : value));
+  };
+
+  const togglePayment = (value: Exclude<PaymentFilter, "all">) => {
+    setPaymentFilter((prev) => (prev === value ? "all" : value));
+  };
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -276,26 +313,64 @@ export function GuestListWithPayment({
           }}
           aria-label="Buscar invitado por nombre"
         />
-        {(["all", "CONFIRMED", "PENDING", "DECLINED"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            style={{
-              padding: "8px 14px",
-              borderRadius: "999px",
-              border: "1px solid #ddd",
-              background: filter === f ? "#1a1a1a" : "#fff",
-              color: filter === f ? "#fff" : "#555",
-              fontSize: "12px",
-              fontWeight: 600,
-              cursor: "pointer",
-              fontFamily: "var(--font-body)",
-              minHeight: "44px",
-            }}
-          >
-            {f === "all" ? "Todos" : STATUS_LABELS[f]}
-          </button>
-        ))}
+        {(["all", "CONFIRMED", "PENDING", "DECLINED"] as const).map((f) => {
+          const disabled = isAttendanceDisabled(f);
+          const active = attendanceFilter === f;
+          return (
+            <button
+              key={f}
+              onClick={() => !disabled && toggleAttendance(f)}
+              disabled={disabled}
+              style={{
+                padding: "5px 10px",
+                borderRadius: "999px",
+                border: "1px solid #ddd",
+                background: active ? "#1a1a1a" : "#fff",
+                color: active ? "#fff" : "#555",
+                fontSize: "11px",
+                fontWeight: 600,
+                cursor: disabled ? "not-allowed" : "pointer",
+                opacity: disabled ? 0.35 : 1,
+                fontFamily: "var(--font-body)",
+                minHeight: "32px",
+              }}
+            >
+              {f === "all" ? "Todos" : STATUS_LABELS[f]}
+            </button>
+          );
+        })}
+
+        {pagoTarjetaHabilitado && (
+          <>
+            <span style={{ width: "1px", alignSelf: "stretch", background: "#e2e2e2", margin: "2px 2px" }} />
+            {(["PAID", "PENDING"] as const).map((p) => {
+              const disabled = isPaymentDisabled(p);
+              const active = paymentFilter === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => !disabled && togglePayment(p)}
+                  disabled={disabled}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: "999px",
+                    border: `1px solid ${active ? PAYMENT_STATUS_COLORS[p] : "#ddd"}`,
+                    background: active ? PAYMENT_STATUS_COLORS[p] : "#fff",
+                    color: active ? "#fff" : "#555",
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    cursor: disabled ? "not-allowed" : "pointer",
+                    opacity: disabled ? 0.35 : 1,
+                    fontFamily: "var(--font-body)",
+                    minHeight: "32px",
+                  }}
+                >
+                  {PAYMENT_FILTER_LABELS[p]}
+                </button>
+              );
+            })}
+          </>
+        )}
       </div>
 
       {/* Descarga discreta de la lista */}

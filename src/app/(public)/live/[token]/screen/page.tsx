@@ -117,15 +117,10 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                         </div>
                                     )}
                                     {item.guestName && (
-                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm font-medium flex justify-between items-center bg-[#0F1613]">
-                                            <span className="truncate pr-2 opacity-80 font-normal">
+                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm bg-[#0F1613] text-center">
+                                            <span className="opacity-80 font-normal">
                                                 Enviado por <strong className="text-[#C79A4B] font-semibold">{item.guestName}</strong>
                                             </span>
-                                            {item.createdAt && (
-                                                <span className="text-xs opacity-50 whitespace-nowrap font-mono">
-                                                    {new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                                </span>
-                                            )}
                                         </div>
                                     )}
                                 </motion.div>
@@ -155,15 +150,10 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                         </div>
                                     )}
                                     {item.guestName && (
-                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm font-medium flex justify-between items-center bg-[#0F1613]">
-                                            <span className="truncate pr-2 opacity-80 font-normal">
+                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm bg-[#0F1613] text-center">
+                                            <span className="opacity-80 font-normal">
                                                 Enviado por <strong className="text-[#C79A4B] font-semibold">{item.guestName}</strong>
                                             </span>
-                                            {item.createdAt && (
-                                                <span className="text-xs opacity-50 whitespace-nowrap font-mono">
-                                                    {new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                                </span>
-                                            )}
                                         </div>
                                     )}
                                 </div>
