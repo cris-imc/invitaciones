@@ -141,7 +141,12 @@ export function GuestListWithPayment({
   };
 
   const toggleAttendance = (value: AttendanceFilter) => {
-    if (value === "all") { setAttendanceFilter("all"); return; }
+    if (value === "all") {
+      // "Todos" es el reset general: borra también el filtro de pago.
+      setAttendanceFilter("all");
+      setPaymentFilter("all");
+      return;
+    }
     setAttendanceFilter((prev) => (prev === value ? "all" : value));
   };
 
