@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/db";
-import { PLAN_LIMITS } from "@/lib/plan-limits";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { BackLink } from "@/components/ui/BackLink";
 import { EventShareCard } from "@/components/dashboard/EventShareCard";
+import { GuestStatsBar } from "@/components/dashboard/GuestStatsBar";
 import { GuestPageTabs } from "@/components/dashboard/GuestPageTabs";
 import { getEventStatus } from "@/lib/expiration";
 import { isAdmin } from "@/lib/roles";
@@ -50,14 +50,6 @@ export default async function GuestManagementPage({ params }: { params: Promise<
     return redirect("/dashboard");
   }
 
-  const totalConfirmed = await prisma.guest.count({
-    where: { invitationId: invitation.id },
-  });
-  const planLimit = PLAN_LIMITS[invitation.planTier as keyof typeof PLAN_LIMITS]?.maxGuests;
-  const maxGuests = invitation.maxGuestsOverride !== null ? invitation.maxGuestsOverride : planLimit;
-  const maxGuestsStr = maxGuests === null ? "∞" : maxGuests.toString();
-  const remaining = maxGuests === null ? "∞" : Math.max(0, maxGuests - totalConfirmed);
-
   const eventStatus = getEventStatus(invitation.fechaEvento);
   const isLive = eventStatus === "PRE_EVENT" || eventStatus === "EVENT_DAY";
 
@@ -77,7 +69,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
       </div>
 
       {/* ── Title + status card row ── */}
-      <div className="flex flex-col xl:flex-row items-start justify-between gap-6 mb-2">
+      <div className="flex flex-col gap-6 mb-2">
         {/* Title */}
         <div className="min-w-0 flex-1">
           <p className="adm-breadcrumb" style={{ marginBottom: 4 }}>
@@ -91,28 +83,10 @@ export default async function GuestManagementPage({ params }: { params: Promise<
             <LiveStatusBadge live={isLive} />
           </div>
         </div>
-
-        {/* Metrics card (Horizontal) */}
-        <div className="adm-status-card w-full xl:w-auto" style={{ marginBottom: 0 }}>
-          <p className="adm-status-kicker mb-3">
-            <span style={{ fontSize: 12 }}>●</span> Capacidad
-          </p>
-          <div className="flex flex-row items-center gap-3">
-            <div className="adm-metric flex-1 xl:flex-none px-4 py-2">
-              <span className="adm-metric-val gold text-2xl">{remaining}</span>
-              <span className="adm-metric-lbl text-[10px]">Cupos Libres</span>
-            </div>
-            <div className="adm-metric flex-1 xl:flex-none px-4 py-2">
-              <span className="adm-metric-val text-2xl">{maxGuestsStr}</span>
-              <span className="adm-metric-lbl text-[10px]">Total</span>
-            </div>
-            <div className="adm-metric flex-1 xl:flex-none px-4 py-2">
-              <span className="adm-metric-val sage text-2xl">{totalConfirmed}</span>
-              <span className="adm-metric-lbl text-[10px]">Invitados</span>
-            </div>
-          </div>
-        </div>
       </div>
+
+      {/* ── Estadísticas fijas (reemplaza al viejo recuadro "Capacidad") ── */}
+      <GuestStatsBar invitationId={invitation.id} pagoTarjetaHabilitado={!!invitation.pagoTarjetaHabilitado} />
 
       {/* ── Share card ── */}
       <EventShareCard slug={slug} eventName={invitation.nombreEvento} invitationId={invitation.id} />

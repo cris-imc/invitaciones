@@ -58,6 +58,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { getInvitePhrase } from "@/lib/invitation-copy";
+import { PLAN_LIMITS } from "@/lib/plan-limits";
 
 // Burbuja animada del primer invitado (y su halo en "Copiar Link"). Se
 // descartó como causa del bug de scroll extra en Chrome-iOS (persistía con
@@ -110,19 +111,21 @@ function QuantityStepper({
   min = 0,
   max = 20,
   ariaLabel,
+  disabled = false,
 }: {
   value: number;
   onChange: (value: number) => void;
   min?: number;
   max?: number;
   ariaLabel: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex items-center justify-center gap-4">
       <button
         type="button"
         onClick={() => onChange(Math.max(min, value - 1))}
-        disabled={value <= min}
+        disabled={disabled || value <= min}
         aria-label={`Restar ${ariaLabel}`}
         className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-muted-foreground/30 text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
       >
@@ -132,7 +135,7 @@ function QuantityStepper({
       <button
         type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
-        disabled={value >= max}
+        disabled={disabled || value >= max}
         aria-label={`Sumar ${ariaLabel}`}
         className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-muted-foreground/30 text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
       >
@@ -542,58 +545,41 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     currentPage * itemsPerPage,
   );
 
-  // Stats
-  const totalGuests = guests.length;
-  const confirmedGuests = guests.filter((g) => g.status === "CONFIRMED").length;
-  const totalAttending = guests.reduce(
-    (sum, g) => sum + (g.attendingCount || 0),
-    0,
-  );
-  const pendingGuests = guests.filter((g) => g.status === "PENDING").length;
-
   // El primer invitado creado es el de menor createdAt (la lista viene ordenada desc del servidor)
   const firstGuestId = guests.length > 0
     ? guests.reduce((oldest, g) => (new Date(g.createdAt) < new Date(oldest.createdAt) ? g : oldest), guests[0]).id
     : null;
 
+  // Cupo del plan Gratis: cuenta PERSONAS invitadas (suma de expectedCount),
+  // no registros/familias -- una familia de 5 descuenta 5 del cupo de 20.
+  const freePlanLimit = planTier === "FREE" ? PLAN_LIMITS.FREE.maxGuests : null;
+  const totalPeopleExpected = guests.reduce((sum, g) => sum + (g.expectedCount || 0), 0);
+
+  // Una vez que el invitado confirmó asistencia, el nombre y la cantidad de
+  // invitados quedan fijos -- reflejan lo que el invitado ya declaró, no lo
+  // que el admin originalmente esperaba. Solo "Exento de pago" sigue editable.
+  const isEditLocked = guestToEdit?.status === "CONFIRMED";
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-        {/* Stats Cards */}
-        <Card className="flex flex-col justify-center py-4 px-4 md:py-6 md:px-6 gap-1 md:gap-2">
-          <div className="text-xs md:text-sm font-medium text-muted-foreground leading-none">
-            Total Invitados
-          </div>
-          <div className="text-2xl md:text-3xl font-bold leading-none mt-1">{totalGuests}</div>
-          <p className="text-[10px] md:text-xs text-muted-foreground leading-none">Registros en lista</p>
-        </Card>
-        <Card className="flex flex-col justify-center py-4 px-4 md:py-6 md:px-6 gap-1 md:gap-2">
-          <div className="text-xs md:text-sm font-medium text-muted-foreground leading-none">
-            Confirmados
-          </div>
-          <div className="text-2xl md:text-3xl font-bold text-green-600 leading-none mt-1">
-            {totalAttending}
-          </div>
-          <p className="text-[10px] md:text-xs text-muted-foreground leading-tight">
-            Asistirán ({confirmedGuests} grupos)
-          </p>
-        </Card>
-        <Card className="col-span-2 md:col-span-1 flex flex-col justify-center py-4 px-4 md:py-6 md:px-6 gap-1 md:gap-2">
-          <div className="text-xs md:text-sm font-medium text-muted-foreground leading-none">
-            Pendientes
-          </div>
-          <div className="text-2xl md:text-3xl font-bold text-yellow-600 leading-none mt-1">
-            {pendingGuests}
-          </div>
-          <p className="text-[10px] md:text-xs text-muted-foreground leading-none">Sin responder</p>
-        </Card>
-      </div>
-
       <div className="grid md:grid-cols-3 gap-6">
         {/* Add Guest Form */}
         <Card className="md:col-span-1 min-w-0">
           <CardHeader>
-            <CardTitle>Agregar Invitados</CardTitle>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <CardTitle>Agregar Invitados</CardTitle>
+              {freePlanLimit !== null && (
+                <span
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                    totalPeopleExpected >= freePlanLimit
+                      ? "text-red-500 border-red-500/30 bg-red-500/10"
+                      : "text-muted-foreground border-border bg-muted/40"
+                  }`}
+                >
+                  {totalPeopleExpected}/{freePlanLimit} personas
+                </span>
+              )}
+            </div>
             <CardDescription>
               Genera un enlace único para cada invitado/a.
             </CardDescription>
@@ -875,21 +861,21 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     >
                       <div className="flex-1 min-w-0 pr-2">
                         <h4 className="font-semibold truncate" title={guest.name}>{guest.name}</h4>
-                        <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1 truncate">
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
                           {guest.type === "FAMILY" ? (
-                            <span className="flex items-center">
+                            <span className="flex items-center shrink-0">
                               <Users className="w-3 h-3 mr-1" /> Familia (
                               {guest.expectedCount})
                             </span>
                           ) : (
-                            <span className="flex items-center">
+                            <span className="flex items-center shrink-0">
                               <Users className="w-3 h-3 mr-1" /> Individual
                             </span>
                           )}
                           {guest.isExempt && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] h-4 leading-3 border-green-200 text-green-700 bg-green-50 uppercase tracking-wider"
+                              className="text-[10px] h-4 leading-3 border-green-200 text-green-700 bg-green-50 uppercase tracking-wider shrink-0"
                             >
                               Exento
                             </Badge>
@@ -897,7 +883,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:items-center shrink-0">
+                      <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end shrink-0">
                         {/* Fila de arriba (mobile): WhatsApp + Editar, pegados a la derecha.
                             En desktop pasa a ser el segundo bloque (el estado va primero). */}
                         <div className="flex items-center justify-end gap-1.5 sm:order-2">
@@ -1049,6 +1035,14 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
             <DialogTitle>Editar Invitado</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-4">
+            {isEditLocked && (
+              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs">
+                <Lock className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>
+                  Este invitado ya confirmó asistencia -- la cantidad de invitados ya no se puede modificar. Podés seguir editando el nombre y si está exento de pago.
+                </span>
+              </div>
+            )}
             <div className="space-y-2">
               <Label>Tipo de Invitación</Label>
               <div className="flex gap-4">
@@ -1059,6 +1053,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     name="edit-type"
                     checked={editGuestType === "INDIVIDUAL"}
                     onChange={() => setEditGuestType("INDIVIDUAL")}
+                    disabled={isEditLocked}
                     className="accent-primary"
                   />
                   <Label htmlFor="edit-individual">Individual</Label>
@@ -1070,7 +1065,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     name="edit-type"
                     checked={editGuestType === "FAMILY"}
                     onChange={() => setEditGuestType("FAMILY")}
-                    disabled={planTier === 'FREE'}
+                    disabled={planTier === 'FREE' || isEditLocked}
                     className="accent-primary"
                   />
                   <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier === 'FREE' ? ' cursor-not-allowed' : ''}`}>
@@ -1136,7 +1131,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   <button
                     type="button"
                     onClick={() => setEditIndividualCategory('adult')}
-                    className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${editIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
+                    disabled={isEditLocked}
+                    className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-50 disabled:pointer-events-none ${editIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                   >
                     <span>Adulto</span>
                     {currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
@@ -1144,7 +1140,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   <button
                     type="button"
                     onClick={() => setEditIndividualCategory('teen')}
-                    className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${editIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
+                    disabled={isEditLocked}
+                    className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-50 disabled:pointer-events-none ${editIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                   >
                     <span>Adolescente</span>
                     {currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
@@ -1166,10 +1163,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Switch
                       checked={editAdultsEnabled}
                       onCheckedChange={() => tryToggle('adult', editAdultsEnabled, setEditAdultsEnabled, 'edit')}
+                      disabled={isEditLocked}
                     />
                   </div>
                   {editAdultsEnabled && (
-                    <QuantityStepper value={editGuestAdultCount} onChange={setEditGuestAdultCount} min={1} max={20} ariaLabel="adultos" />
+                    <QuantityStepper value={editGuestAdultCount} onChange={setEditGuestAdultCount} min={1} max={20} ariaLabel="adultos" disabled={isEditLocked} />
                   )}
                 </div>
 
@@ -1184,10 +1182,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Switch
                       checked={editTeensEnabled}
                       onCheckedChange={() => tryToggle('teen', editTeensEnabled, setEditTeensEnabled, 'edit')}
+                      disabled={isEditLocked}
                     />
                   </div>
                   {editTeensEnabled && (
-                    <QuantityStepper value={editGuestTeenCount} onChange={setEditGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" />
+                    <QuantityStepper value={editGuestTeenCount} onChange={setEditGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" disabled={isEditLocked} />
                   )}
                 </div>
 
@@ -1202,10 +1201,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Switch
                       checked={editChildrenEnabled}
                       onCheckedChange={() => tryToggle('child', editChildrenEnabled, setEditChildrenEnabled, 'edit')}
+                      disabled={isEditLocked}
                     />
                   </div>
                   {editChildrenEnabled && (
-                    <QuantityStepper value={editGuestChildCount} onChange={setEditGuestChildCount} min={0} max={20} ariaLabel="niños" />
+                    <QuantityStepper value={editGuestChildCount} onChange={setEditGuestChildCount} min={0} max={20} ariaLabel="niños" disabled={isEditLocked} />
                   )}
                 </div>
               </div>
