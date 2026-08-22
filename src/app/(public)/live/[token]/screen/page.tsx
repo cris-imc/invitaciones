@@ -103,7 +103,16 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                     className="bg-[#182420] rounded-xl overflow-hidden shadow-xl border border-[#F6F3EC]/5 shrink-0 w-64 md:w-80"
                                 >
                                     {item.type === "PHOTO" ? (
-                                        <img src={item.fileUrl} alt="Live" className="w-full h-64 md:h-80 object-cover" />
+                                        <div className="relative w-full h-64 md:h-80">
+                                            <img src={item.fileUrl} alt="Live" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                                            <img
+                                                src="/landing/logo-blanco-v2.png"
+                                                alt=""
+                                                aria-hidden
+                                                className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 max-w-[110px] opacity-90 pointer-events-none"
+                                            />
+                                        </div>
                                     ) : (
                                         <div className="w-full h-64 md:h-80 flex flex-col items-center justify-center bg-indigo-500/10 text-[#F6F3EC] p-8 text-center border border-indigo-500/20">
                                             <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center mb-6">
@@ -117,10 +126,15 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                         </div>
                                     )}
                                     {item.guestName && (
-                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm bg-[#0F1613] text-center">
-                                            <span className="opacity-80 font-normal">
+                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm font-medium flex justify-between items-center bg-[#0F1613]">
+                                            <span className="truncate pr-2 opacity-80 font-normal">
                                                 Enviado por <strong className="text-[#C79A4B] font-semibold">{item.guestName}</strong>
                                             </span>
+                                            {item.createdAt && (
+                                                <span className="text-xs opacity-50 whitespace-nowrap font-mono">
+                                                    {new Date(item.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                                </span>
+                                            )}
                                         </div>
                                     )}
                                 </motion.div>
@@ -136,7 +150,16 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                     className="bg-[#182420] rounded-xl overflow-hidden shadow-xl border border-[#F6F3EC]/5 shrink-0 mx-4 w-64 md:w-80"
                                 >
                                     {item.type === "PHOTO" ? (
-                                        <img src={item.fileUrl} alt="Live" className="w-full h-64 md:h-80 object-cover" />
+                                        <div className="relative w-full h-64 md:h-80">
+                                            <img src={item.fileUrl} alt="Live" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                                            <img
+                                                src="/landing/logo-blanco-v2.png"
+                                                alt=""
+                                                aria-hidden
+                                                className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 max-w-[110px] opacity-90 pointer-events-none"
+                                            />
+                                        </div>
                                     ) : (
                                         <div className="w-full h-64 md:h-80 flex flex-col items-center justify-center bg-indigo-500/10 text-[#F6F3EC] p-8 text-center border border-indigo-500/20">
                                             <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center mb-6">
@@ -150,10 +173,15 @@ export default function LiveScreenPage({ params }: { params: Promise<{ token: st
                                         </div>
                                     )}
                                     {item.guestName && (
-                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm bg-[#0F1613] text-center">
-                                            <span className="opacity-80 font-normal">
+                                        <div className="p-3 border-t border-[#F6F3EC]/10 text-sm font-medium flex justify-between items-center bg-[#0F1613]">
+                                            <span className="truncate pr-2 opacity-80 font-normal">
                                                 Enviado por <strong className="text-[#C79A4B] font-semibold">{item.guestName}</strong>
                                             </span>
+                                            {item.createdAt && (
+                                                <span className="text-xs opacity-50 whitespace-nowrap font-mono">
+                                                    {new Date(item.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                                </span>
+                                            )}
                                         </div>
                                     )}
                                 </div>

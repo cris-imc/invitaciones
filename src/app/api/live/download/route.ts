@@ -7,6 +7,7 @@ import fs from "fs";
 import { Readable } from "stream";
 import { getUploadsDir } from "@/lib/uploads";
 import { isAdmin } from "@/lib/roles";
+import { buildWatermarkedJpegBuffer } from "@/lib/liveWatermarkServer";
 
 export async function GET(req: Request) {
     try {
@@ -72,8 +73,23 @@ export async function GET(req: Request) {
                 const urlPath = item.fileUrl.split('?')[0];
                 const fileName = urlPath.replace("/uploads/", "");
                 const filePath = getUploadsDir(fileName);
-                
-                if (fs.existsSync(filePath)) {
+
+                if (!fs.existsSync(filePath)) continue;
+
+                if (item.type === "PHOTO") {
+                    // Le agregamos el isologotipo de altainvitacion.com antes de
+                    // empaquetarla -- mismo criterio visual que al compartir una
+                    // foto desde el celular (ver src/lib/liveShare.ts), pero acá
+                    // resuelto server-side con sharp porque no hay Canvas/Image
+                    // del navegador disponibles en esta ruta.
+                    try {
+                        const watermarked = await buildWatermarkedJpegBuffer(filePath);
+                        archive.append(watermarked, { name: fileName });
+                    } catch (err) {
+                        console.error("[live download] fallo watermark, se usa original:", err);
+                        archive.file(filePath, { name: fileName });
+                    }
+                } else {
                     archive.file(filePath, { name: fileName });
                 }
             }
