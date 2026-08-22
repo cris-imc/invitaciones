@@ -86,7 +86,19 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
   const FONT_STACK = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
 
   return (
-    <div id="info-adicional" style={{ display: "flex", justifyContent: "center", padding: "8px 0 32px" }}>
+    <div
+      id="info-adicional"
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        padding: "24px 0 40px",
+        // Fondo de la plantilla en este punto de la página (misma var que
+        // usa cada template para sus separadores/secciones de fondo) -- sin
+        // esto quedaba una franja sin estilo (blanca/cruda) encajada entre
+        // dos secciones oscuras, quebrando el diseño de la tarjeta.
+        background: "var(--t-bg, transparent)",
+      }}
+    >
       <style>{`
         #ia-trigger-btn, #ia-trigger-btn * {
           font-family: ${FONT_STACK} !important;
