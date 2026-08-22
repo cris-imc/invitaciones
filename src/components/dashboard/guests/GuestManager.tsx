@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -161,6 +162,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [activeTab, setActiveTab] = useState("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const isMobile = useIsMobile();
   const [guestToDelete, setGuestToDelete] = useState<Guest | null>(null);
   const [guestToEdit, setGuestToEdit] = useState<Guest | null>(null);
   const [firstGuestHintDismissed, setFirstGuestHintDismissed] = useState(true);
@@ -201,7 +203,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [editTeensEnabled, setEditTeensEnabled] = useState(false);
   const [editChildrenEnabled, setEditChildrenEnabled] = useState(false);
 
-  const itemsPerPage = 8;
+  const itemsPerPage = isMobile ? 5 : 8;
   const { showToast } = useToast();
 
   // Form States

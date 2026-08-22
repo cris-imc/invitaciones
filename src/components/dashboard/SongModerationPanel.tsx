@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Song {
   id: string;
@@ -28,7 +29,8 @@ const STATUS_LABEL: Record<string, string> = {
   HIDDEN:   "Oculta",
 };
 
-const PAGE_SIZE = 8;
+const DESKTOP_PAGE_SIZE = 8;
+const MOBILE_PAGE_SIZE = 5;
 
 export function SongModerationPanel({ invitationId }: SongModerationPanelProps) {
   const [songs, setSongs] = useState<Song[]>([]);
@@ -36,6 +38,7 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
   const [filter, setFilter] = useState<"all" | "PENDING" | "APPROVED" | "HIDDEN">("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // El admin llama con auth y ve todas
@@ -95,6 +98,7 @@ export function SongModerationPanel({ invitationId }: SongModerationPanelProps) 
     setPage(1);
   }, [filter]);
 
+  const PAGE_SIZE = isMobile ? MOBILE_PAGE_SIZE : DESKTOP_PAGE_SIZE;
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Info, ChevronUp, ChevronDown, Download } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Guest {
   id: string;
@@ -45,7 +46,8 @@ const PAYMENT_STATUS_COLORS: Record<string, string> = {
   PAID:    "#5a8a6e",
 };
 
-const PAGE_SIZE = 8;
+const DESKTOP_PAGE_SIZE = 8;
+const MOBILE_PAGE_SIZE = 5;
 
 type AttendanceFilter = "all" | "CONFIRMED" | "PENDING" | "DECLINED";
 type PaymentFilter = "all" | "PAID" | "PENDING";
@@ -64,6 +66,7 @@ export function GuestListWithPayment({
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showPaymentInfo, setShowPaymentInfo] = useState(true);
   const [page, setPage] = useState(1);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (showPaymentInfo) {
@@ -154,6 +157,7 @@ export function GuestListWithPayment({
     setPaymentFilter((prev) => (prev === value ? "all" : value));
   };
 
+  const PAGE_SIZE = isMobile ? MOBILE_PAGE_SIZE : DESKTOP_PAGE_SIZE;
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
