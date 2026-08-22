@@ -74,33 +74,54 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
   if (!invitation.infoAdicionalSeccionHabilitada) return null;
   if (items.length === 0) return null;
 
-  // Estilo fijo, no depende de las variables de tema de cada plantilla --
-  // llegamos acá porque `.t-btn` (var(--t-onpaper)) daba fondo/texto blanco
-  // sobre blanco en algunos temas claros (ej. Luz de Luna). El botón y el
-  // modal se ven idénticos en todas las plantillas a propósito.
+  // Estilo fijo, no depende de las variables de tema de cada plantilla. No
+  // alcanza con estilos inline: varias plantillas (ej. LuzLunaTemplate) traen
+  // reglas globales tipo ".desktop-stage .tpl h3 { color: ... !important }"
+  // o ".tpl button { font-family: ... !important }" que apuntan a CUALQUIER
+  // h3/button de la página -- eso le gana a un inline style común, sin
+  // importar cuán explícito sea. Por eso estas reglas van en un <style> propio
+  // con selector por id (máxima especificidad) + !important: es la única
+  // combinación que gana siempre, en las 184 plantillas, sin tener que salir
+  // a parchear el CSS de cada una.
   const FONT_STACK = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
 
   return (
     <div id="info-adicional" style={{ display: "flex", justifyContent: "center", padding: "8px 0 32px" }}>
+      <style>{`
+        #ia-trigger-btn, #ia-trigger-btn * {
+          font-family: ${FONT_STACK} !important;
+          color: #fff !important;
+        }
+        #ia-trigger-btn {
+          background: #1a1a1a !important;
+          border: none !important;
+          border-radius: 999px !important;
+        }
+        #ia-modal, #ia-modal h3, #ia-modal p, #ia-modal button {
+          font-family: ${FONT_STACK} !important;
+        }
+        #ia-modal { color: #1a1a1a !important; border-radius: 18px !important; }
+        #ia-modal .ia-icon-box { border-radius: 10px !important; }
+        #ia-modal-title { color: #1a1a1a !important; }
+        #ia-modal .ia-item-title { color: #1a1a1a !important; }
+        #ia-modal .ia-item-text { color: #333 !important; }
+        #ia-modal-close { color: #888 !important; background: none !important; border: none !important; }
+      `}</style>
       <button
+        id="ia-trigger-btn"
         type="button"
         onClick={() => setOpen(true)}
         style={{
-          fontFamily: FONT_STACK,
           display: "inline-flex",
           alignItems: "center",
           gap: "8px",
           padding: "11px 20px",
-          borderRadius: "999px",
-          border: "none",
-          background: "#1a1a1a",
-          color: "#fff",
           fontSize: "13px",
           fontWeight: 600,
           cursor: "pointer",
         }}
       >
-        <CircleQuestionMark className="w-4 h-4" style={{ color: "#fff" }} />
+        <CircleQuestionMark className="w-4 h-4" />
         ¿Qué necesitás saber?
       </button>
 
@@ -110,14 +131,13 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
           onClick={() => setOpen(false)}
         >
           <div
+            id="ia-modal"
             role="dialog"
             aria-modal="true"
             aria-label="¿Qué necesitás saber?"
             onClick={(e) => e.stopPropagation()}
             style={{
-              fontFamily: FONT_STACK,
               background: "#fff",
-              color: "#1a1a1a",
               width: "100%",
               maxWidth: "480px",
               maxHeight: "85vh",
@@ -138,12 +158,13 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
                 borderBottom: "1px solid #eee",
               }}
             >
-              <h3 style={{ fontFamily: FONT_STACK, fontSize: "17px", fontWeight: 700, margin: 0, color: "#1a1a1a" }}>¿Qué necesitás saber?</h3>
+              <h3 id="ia-modal-title" style={{ fontSize: "17px", fontWeight: 700, margin: 0 }}>¿Qué necesitás saber?</h3>
               <button
+                id="ia-modal-close"
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Cerrar"
-                style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#888" }}
+                style={{ cursor: "pointer", padding: "4px" }}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -155,6 +176,7 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
                 return (
                   <div key={item.key} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
                     <div
+                      className="ia-icon-box"
                       style={{
                         flexShrink: 0,
                         width: "36px",
@@ -170,8 +192,8 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
                       <Icon className="w-4.5 h-4.5" />
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ fontFamily: FONT_STACK, fontSize: "14px", fontWeight: 700, margin: "0 0 4px", color: "#1a1a1a" }}>{item.title}</p>
-                      <p style={{ fontFamily: FONT_STACK, fontSize: "13.5px", lineHeight: 1.55, margin: 0, whiteSpace: "pre-wrap", color: "#333" }}>
+                      <p className="ia-item-title" style={{ fontSize: "14px", fontWeight: 700, margin: "0 0 4px" }}>{item.title}</p>
+                      <p className="ia-item-text" style={{ fontSize: "13.5px", lineHeight: 1.55, margin: 0, whiteSpace: "pre-wrap" }}>
                         {item.text}
                       </p>
                     </div>
