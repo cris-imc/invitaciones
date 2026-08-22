@@ -400,7 +400,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                 {items.length > 0 ? (
                     <LivePhotoGallery items={items} />
                 ) : (
-                    <p className="text-center text-white/30 text-sm">Aún no hay fotos ni audios.</p>
+                    <p className="text-center text-white/30 text-sm">Aún no hay fotos ni mensajes.</p>
                 )}
             </div>
 
