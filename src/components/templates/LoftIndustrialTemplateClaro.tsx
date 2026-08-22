@@ -727,7 +727,7 @@ export function LoftIndustrialTemplateClaro({ invitation, guest, isPersonalized 
         }
 
         #rsvp.section.dark {
-          background-color: #000000 !important;
+          background-color: #F2F1EE !important;
           color: #C0392B !important;
           border: none !important;
           padding: 48px !important;
@@ -775,7 +775,7 @@ export function LoftIndustrialTemplateClaro({ invitation, guest, isPersonalized 
           font-weight: 600 !important;
         }
         #rsvp.section.dark input {
-          background-color: #000000 !important;
+          background-color: #FFFFFF !important;
           color: #C0392B !important;
           border: 1px solid rgba(224, 184, 75, 0.3) !important;
           padding: 12px 16px !important;

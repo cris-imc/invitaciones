@@ -1268,7 +1268,7 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
         ) : null}
 
         {(Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto)) ? (
-          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #7A8F6B14, transparent 70%), #F5E9D8" }}>
+          <SectionWrapper id="quote" delay={100} className="w-full py-24 px-6 md:px-12 flex items-center justify-center" style={{ background: "linear-gradient(160deg, #7A8F6B14, transparent 70%), var(--t-surface)" }}>
             <div className="max-w-2xl mx-auto text-center">
               <div className="flex justify-center mb-6">
                 <DrawLucideIcon icon={BookOpen} size={46} color="var(--t-acc)" strokeWidth={1.5} />
@@ -1389,7 +1389,7 @@ export function RivieraTemplateOcasoAzulejo({ invitation, guest, isPersonalized 
         </SectionWrapper>
 
         {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-          <SectionWrapper id="album" delay={200} className="w-full bg-[#F5E9D8] py-20 overflow-hidden">
+          <SectionWrapper id="album" delay={200} className="w-full py-20 overflow-hidden" style={{ background: "var(--t-surface)" }}>
             <div className="w-full max-w-[340px] sm:max-w-xl mx-auto text-left">
               <div className="flex justify-center mb-4">
                 <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
