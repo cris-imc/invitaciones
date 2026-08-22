@@ -98,15 +98,18 @@ export function StepInfoAdicional() {
                 </p>
             </div>
 
-            <div className="flex items-center justify-between gap-3 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl shadow-sm">
-                <div className="min-w-0">
-                    <Label htmlFor="enable-info-adicional" className="text-base font-semibold cursor-pointer">
-                        Mostrar esta sección en la invitación
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                        Es el interruptor general: si está apagado, el botón "¿Qué necesitás saber?" no aparece
-                        aunque hayas cargado texto abajo -- podés dejar todo preparado y activarlo cuando quieras.
-                    </p>
+            <div className="flex items-center justify-between gap-3 bg-amber-500/10 border border-amber-500/30 p-5 rounded-2xl shadow-sm">
+                <div className="flex items-start gap-2.5 min-w-0">
+                    <Info className="w-4.5 h-4.5 shrink-0 text-amber-400 mt-0.5" />
+                    <div className="min-w-0">
+                        <Label htmlFor="enable-info-adicional" className="text-base font-semibold text-amber-100 cursor-pointer">
+                            Mostrar esta sección en la invitación
+                        </Label>
+                        <p className="text-xs text-amber-200/80">
+                            Es el interruptor general: si está apagado, el botón "¿Qué necesitás saber?" no aparece
+                            aunque hayas cargado información abajo -- podés dejar todo preparado y activarlo cuando quieras.
+                        </p>
+                    </div>
                 </div>
                 <Switch
                     id="enable-info-adicional"
