@@ -118,6 +118,16 @@ function WizardContent({ invitation }: { invitation: any }) {
                 fontBody: invitation.fontBody || "space-grotesk",
                 countdownStyle: invitation.countdownStyle || "clasico",
                 albumStyle: invitation.albumStyle || "carrusel",
+
+                // Info Adicional
+                infoAlojamientoHabilitado: Boolean(invitation.infoAlojamientoHabilitado),
+                infoAlojamientoTexto: invitation.infoAlojamientoTexto || "",
+                infoEstacionamientoHabilitado: Boolean(invitation.infoEstacionamientoHabilitado),
+                infoEstacionamientoTexto: invitation.infoEstacionamientoTexto || "",
+                infoTransporteHabilitado: Boolean(invitation.infoTransporteHabilitado),
+                infoTransporteTexto: invitation.infoTransporteTexto || "",
+                infoAdicionalHabilitado: Boolean(invitation.infoAdicionalHabilitado),
+                infoAdicionalTexto: invitation.infoAdicionalTexto || "",
             });
 
             // themeConfig es un slice separado de data (legacy). StepDesign lee

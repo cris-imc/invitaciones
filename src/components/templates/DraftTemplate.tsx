@@ -7,6 +7,7 @@ import { Countdown } from "@/components/invitation/v2/Countdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
+import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
 import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
 import { TypewriterText } from "@/components/ui/TypewriterText";
@@ -1469,6 +1470,8 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
             showPublicList
           />
         )}
+
+        <InfoAdicionalSection invitation={invitation} />
 
         {musicaHabilitada && musicAudioElement}
 

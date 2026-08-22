@@ -14,6 +14,7 @@ import { StepCeremonia } from "./StepCeremonia";
 import { StepTypography } from "./StepTypography";
 import { StepCountdownStyle } from "./StepCountdownStyle";
 import { StepAlbumStyle } from "./StepAlbumStyle";
+import { StepInfoAdicional } from "./StepInfoAdicional";
 
 export interface WizardStepDef {
     component: ComponentType;
@@ -65,5 +66,6 @@ export function getWizardSteps({
         { component: StepMusic, label: "Música" },
         { component: StepBankDetails, label: "Regalo (CBU)" },
         { component: StepTrivia, label: "Trivia" },
+        { component: StepInfoAdicional, label: "Info Adicional" },
     ];
 }

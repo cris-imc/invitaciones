@@ -69,6 +69,27 @@ export const triviaSchema = z.object({
     triviaPreguntas: z.string().optional(), // JSON string
 });
 
+// Límites de caracteres del paso "Info Adicional" del wizard -- Datos
+// Adicionales es el único campo de uso libre (no tiene una categoría
+// predefinida como los otros 3), así que admite bastante más texto.
+export const INFO_ADICIONAL_MAX_LENGTH = {
+    alojamiento: 300,
+    estacionamiento: 300,
+    transporte: 300,
+    adicional: 600,
+} as const;
+
+export const infoAdicionalSchema = z.object({
+    infoAlojamientoHabilitado: z.boolean().default(false),
+    infoAlojamientoTexto: z.string().max(INFO_ADICIONAL_MAX_LENGTH.alojamiento).optional(),
+    infoEstacionamientoHabilitado: z.boolean().default(false),
+    infoEstacionamientoTexto: z.string().max(INFO_ADICIONAL_MAX_LENGTH.estacionamiento).optional(),
+    infoTransporteHabilitado: z.boolean().default(false),
+    infoTransporteTexto: z.string().max(INFO_ADICIONAL_MAX_LENGTH.transporte).optional(),
+    infoAdicionalHabilitado: z.boolean().default(false),
+    infoAdicionalTexto: z.string().max(INFO_ADICIONAL_MAX_LENGTH.adicional).optional(),
+});
+
 export const ceremoniaSchema = z.object({
     ceremoniaHabilitada: z.boolean().default(false),
     ceremoniaTitulo: z.string().optional(),
@@ -88,6 +109,7 @@ export const invitationSchema = z.object({
     ...musicSchema.shape,
     ...designSchema.shape,
     ...triviaSchema.shape,
+    ...infoAdicionalSchema.shape,
     // Nuevas secciones
     sugerenciaMusicaHabilitada: z.boolean().default(true),
     frasePersonalizadaHabilitada: z.boolean().default(false),

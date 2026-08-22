@@ -232,6 +232,14 @@ model Invitation {
   triviaSubtitulo              String?
   triviaPreguntas              String?
   triviaBotonTexto             String?
+  infoAlojamientoHabilitado    Boolean          @default(false)
+  infoAlojamientoTexto         String?
+  infoEstacionamientoHabilitado Boolean         @default(false)
+  infoEstacionamientoTexto     String?
+  infoTransporteHabilitado     Boolean          @default(false)
+  infoTransporteTexto          String?
+  infoAdicionalHabilitado      Boolean          @default(false)
+  infoAdicionalTexto           String?
   rsvpEnabled                  Boolean          @default(true)
   rsvpType                     String?          @default("INDIVIDUAL")
   rsvpDeadline                 DateTime?

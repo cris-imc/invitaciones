@@ -43,6 +43,7 @@ import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { PaymentBadge } from "@/components/invitation/v2/PaymentBadge";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
+import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
@@ -1562,6 +1563,8 @@ export function PetalosTemplate({ invitation, guest, isPersonalized = false }: P
             variant="moderno"
           />
         )}
+
+        <InfoAdicionalSection invitation={invitation} />
 
         {musicaHabilitada && musicAudioElement}
 

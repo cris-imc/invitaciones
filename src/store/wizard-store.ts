@@ -71,6 +71,15 @@ export const useWizardStore = create<WizardState>((set) => ({
         precioNinoHabilitado: false,
         precioAdolescenteHabilitado: false,
 
+        infoAlojamientoHabilitado: false,
+        infoAlojamientoTexto: "",
+        infoEstacionamientoHabilitado: false,
+        infoEstacionamientoTexto: "",
+        infoTransporteHabilitado: false,
+        infoTransporteTexto: "",
+        infoAdicionalHabilitado: false,
+        infoAdicionalTexto: "",
+
         // Cronograma events
         cronogramaEventos: JSON.stringify([]),
 
@@ -167,6 +176,10 @@ export const useWizardStore = create<WizardState>((set) => ({
             triviaHabilitada: false,
             albumCompartidoHabilitado: true,
             sugerenciaMusicaHabilitada: true,
+            infoAlojamientoHabilitado: false,
+            infoEstacionamientoHabilitado: false,
+            infoTransporteHabilitado: false,
+            infoAdicionalHabilitado: false,
         },
         themeConfig: DEFAULT_THEME_CONFIG,
         usePremiumCredit: state.usePremiumCredit,

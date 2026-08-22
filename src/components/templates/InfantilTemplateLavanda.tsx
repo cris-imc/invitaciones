@@ -29,6 +29,7 @@ import { Countdown } from "@/components/invitation/v2/Countdown";
 import { SaveTheDate } from "@/components/invitation/v2/SaveTheDate";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
+import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { SectionWrapper } from "@/components/invitation/v2/SectionWrapper";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { BottomNavPill } from "@/components/invitation/v2/BottomNavPill";
@@ -1478,6 +1479,8 @@ export function InfantilTemplateLavanda({ invitation, guest, isPersonalized = fa
             variant="moderno"
           />
         )}
+
+        <InfoAdicionalSection invitation={invitation} />
 
         {musicaHabilitada && musicAudioElement}
 

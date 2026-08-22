@@ -377,6 +377,16 @@ export async function POST(request: NextRequest) {
                 triviaSubtitulo: body.triviaSubtitulo,
                 triviaPreguntas: body.triviaPreguntas,
 
+                // 13. INFO ADICIONAL
+                infoAlojamientoHabilitado: body.infoAlojamientoHabilitado !== undefined ? Boolean(body.infoAlojamientoHabilitado) : false,
+                infoAlojamientoTexto: body.infoAlojamientoTexto,
+                infoEstacionamientoHabilitado: body.infoEstacionamientoHabilitado !== undefined ? Boolean(body.infoEstacionamientoHabilitado) : false,
+                infoEstacionamientoTexto: body.infoEstacionamientoTexto,
+                infoTransporteHabilitado: body.infoTransporteHabilitado !== undefined ? Boolean(body.infoTransporteHabilitado) : false,
+                infoTransporteTexto: body.infoTransporteTexto,
+                infoAdicionalHabilitado: body.infoAdicionalHabilitado !== undefined ? Boolean(body.infoAdicionalHabilitado) : false,
+                infoAdicionalTexto: body.infoAdicionalTexto,
+
                 // RSVP
                 rsvpDaysBeforeEvent: body.rsvpDaysBeforeEvent || 7,
 
@@ -601,6 +611,16 @@ export async function PUT(request: NextRequest) {
                 triviaTitulo: body.triviaTitulo,
                 triviaSubtitulo: body.triviaSubtitulo,
                 triviaPreguntas: body.triviaPreguntas,
+
+                // 13. INFO ADICIONAL
+                infoAlojamientoHabilitado: body.infoAlojamientoHabilitado,
+                infoAlojamientoTexto: body.infoAlojamientoTexto,
+                infoEstacionamientoHabilitado: body.infoEstacionamientoHabilitado,
+                infoEstacionamientoTexto: body.infoEstacionamientoTexto,
+                infoTransporteHabilitado: body.infoTransporteHabilitado,
+                infoTransporteTexto: body.infoTransporteTexto,
+                infoAdicionalHabilitado: body.infoAdicionalHabilitado,
+                infoAdicionalTexto: body.infoAdicionalTexto,
             } as any,
             include: {
                 album: true,

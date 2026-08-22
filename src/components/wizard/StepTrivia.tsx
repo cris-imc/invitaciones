@@ -11,7 +11,6 @@ import { Trash2, Plus, Pencil, Lock, Info, ChevronDown, ChevronUp, Check, AlertT
 import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { cn } from "@/lib/utils";
-import { saveInvitationFromWizard } from "@/lib/save-invitation";
 import { isAdmin as isAdminRole } from "@/lib/roles";
 
 const PREDEFINED_TITULOS_CASAMIENTO = ["¿Cuánto Nos Conocés?", "Trivia de los Novios", "¿Qué Tanto Sabés de Nosotros?"];
@@ -32,8 +31,6 @@ export function StepTrivia() {
     const [showTriviaInfo, setShowTriviaInfo] = useState(false);
     const { data: session } = useSession();
     const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
-    const themeConfig = useWizardStore((state) => state.themeConfig);
-    const [isCreating, setIsCreating] = useState(false);
 
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit/useDiamondCredit (creación)
     const isEditing = Boolean(data.id);
@@ -175,45 +172,6 @@ export function StepTrivia() {
         nextStep();
     };
 
-    const handleCreate = async () => {
-        if (isPendingPartial) {
-            showToast(
-                "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
-                "error"
-            );
-            return;
-        }
-
-        let finalPreguntas = [...preguntas];
-        if (isPendingComplete) {
-            finalPreguntas.push(currentQuestion);
-            setCurrentQuestion({ pregunta: "", opciones: ["", "", "", ""], respuestaCorrecta: 0 });
-            showToast("Se agregó tu última pregunta antes de continuar.", "success");
-        }
-
-        if (data.triviaHabilitada && finalPreguntas.length === 0) {
-            showToast("Agregá al menos una pregunta a la Trivia, o deshabilitá la sección.", "error");
-            return;
-        }
-
-        const triviaPreguntas = JSON.stringify(finalPreguntas);
-        setData({ triviaPreguntas });
-        setIsCreating(true);
-        try {
-            const invitation = await saveInvitationFromWizard(
-                { ...data, triviaPreguntas },
-                themeConfig,
-                usePremiumCredit,
-                useDiamondCredit
-            );
-            useWizardStore.getState().setDirty(false);
-            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
-        } catch (error) {
-            console.error('Error creating invitation:', error);
-            showToast(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`, "error");
-            setIsCreating(false);
-        }
-    };
 
     return (
         <div className="space-y-6">
@@ -475,7 +433,7 @@ export function StepTrivia() {
                 )}
             </div>
 
-            <SaveStepButtons onNext={handleNext} isLastStep={true} onCreate={handleCreate} isCreating={isCreating} />
+            <SaveStepButtons onNext={handleNext} />
         </div>
     );
 }
