@@ -1,19 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Loader2, Share2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { LiveItem } from "@prisma/client";
-import { shareWatermarkedPhoto } from "@/lib/liveShare";
 
 const AUTO_ADVANCE_MS = 4000;
 const RESUME_AFTER_MANUAL_MS = 6000;
 
+// Esta galería muestra las fotos de TODOS los invitados -- a diferencia de
+// LiveMyPhotosCarousel (solo las propias), acá deliberadamente no hay botón
+// de compartir: un invitado no puede reenviar a sus redes una foto que subió
+// otra persona.
 export function LivePhotoGallery({ items }: { items: LiveItem[] }) {
   const photos = items.filter((item) => item.type === "PHOTO");
   const [index, setIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const [sharing, setSharing] = useState(false);
-  const [shareError, setShareError] = useState<string | null>(null);
   const pausedUntilRef = useRef(0);
 
   // Si llegan fotos nuevas y el índice quedó fuera de rango, lo reacomoda.
@@ -61,32 +62,8 @@ export function LivePhotoGallery({ items }: { items: LiveItem[] }) {
     goTo(index + 1);
   };
 
-  const handleShare = async () => {
-    const current = photos[index];
-    if (!current) return;
-    setShareError(null);
-    setSharing(true);
-    const errorMsg = await shareWatermarkedPhoto(current.fileUrl);
-    if (errorMsg) setShareError(errorMsg);
-    setSharing(false);
-  };
-
   if (photos.length === 0) return null;
   const current = photos[index];
-
-  const shareButton = (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        handleShare();
-      }}
-      disabled={sharing}
-      className="w-full bg-[#C79A4B] text-black font-semibold rounded-full py-3 flex items-center justify-center gap-2 disabled:opacity-50"
-    >
-      {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
-      {sharing ? "Preparando..." : "Compartir esta foto"}
-    </button>
-  );
 
   return (
     <>
@@ -177,15 +154,10 @@ export function LivePhotoGallery({ items }: { items: LiveItem[] }) {
           </div>
 
           {current.guestName && (
-            <p className="text-center text-white/60 text-xs pt-3 shrink-0">
+            <p className="text-center text-white/60 text-xs py-3 shrink-0">
               Enviado por <span className="text-[#C79A4B] font-semibold">{current.guestName}</span>
             </p>
           )}
-
-          <div className="p-4 pb-6 shrink-0" onClick={(e) => e.stopPropagation()}>
-            {shareError && <p className="text-red-400 text-xs text-center mb-2">{shareError}</p>}
-            {shareButton}
-          </div>
         </div>
       )}
     </>
