@@ -106,6 +106,26 @@ export async function PUT(
       updateData.responseDate = new Date();
     }
 
+    // El dueño de la tarjeta puede editar la cantidad de invitados de un
+    // invitado que ya confirmó (antes esto estaba bloqueado). Si la nueva
+    // cantidad esperada queda por DEBAJO de lo que el invitado ya había
+    // confirmado, esa confirmación ya no es válida -- se resetea a PENDING
+    // para que tenga que volver a confirmar (con el nuevo tope). Si el
+    // dueño aumenta el cupo, el invitado conserva su confirmación y puede
+    // entrar a su link a subir la cantidad hasta el nuevo máximo.
+    if (
+      body.expectedCount !== undefined &&
+      existingGuest.status === "CONFIRMED" &&
+      body.expectedCount < existingGuest.attendingCount
+    ) {
+      updateData.status = "PENDING";
+      updateData.attendingCount = 0;
+      updateData.attendingAdults = 0;
+      updateData.attendingTeens = 0;
+      updateData.attendingChildren = 0;
+      updateData.responseDate = null;
+    }
+
     const updatedGuest = await prisma.guest.update({
       where: { id },
       data: updateData,

@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/db";
-import { PLAN_LIMITS, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
+import { PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
 
 // Códigos de descuento configurables por el admin (/dashboard/descuentos):
 // un código aplica un % EXTRA sobre el precio que el plan ya tiene vigente
-// (para Diamond, sobre DIAMOND_DISCOUNT_PRICE -- el 20% base ya aplicado --
-// no sobre el precio de lista). Centralizado acá junto con plan-limits.ts
-// para que registro y el cobro de Mercado Pago nunca se desincronicen.
+// (PREMIUM_DISCOUNT_PRICE / DIAMOND_DISCOUNT_PRICE -- el descuento base ya
+// aplicado -- no sobre el precio de lista sin descontar). Centralizado acá
+// junto con plan-limits.ts para que registro y el cobro de Mercado Pago
+// nunca se desincronicen.
 
 export type PaidPlanTier = "PREMIUM" | "DIAMOND";
 
@@ -18,7 +19,7 @@ export function isValidPercentage(percentage: number): boolean {
 }
 
 export function computeDiscountedAmount(planTier: PaidPlanTier, percentage: number): number {
-  const basePrice = planTier === "DIAMOND" ? DIAMOND_DISCOUNT_PRICE : PLAN_LIMITS.PREMIUM.price;
+  const basePrice = planTier === "DIAMOND" ? DIAMOND_DISCOUNT_PRICE : PREMIUM_DISCOUNT_PRICE;
   return Math.round(basePrice * (1 - percentage / 100));
 }
 
@@ -56,7 +57,7 @@ export async function resolveDiscountForPlan(
   rawCode: string | undefined | null,
   planTier: PaidPlanTier
 ): Promise<ResolveResult> {
-  const basePrice = planTier === "DIAMOND" ? DIAMOND_DISCOUNT_PRICE : PLAN_LIMITS.PREMIUM.price;
+  const basePrice = planTier === "DIAMOND" ? DIAMOND_DISCOUNT_PRICE : PREMIUM_DISCOUNT_PRICE;
 
   if (!rawCode || !rawCode.trim()) {
     return { ok: true, discountCodeId: null, amount: basePrice, discountAmount: 0 };

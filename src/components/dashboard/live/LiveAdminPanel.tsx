@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Trash2, ExternalLink, RefreshCw, Power, ChevronLeft, ChevronRight, Check, X, RotateCcw, Download } from "lucide-react";
+import { Trash2, ExternalLink, RefreshCw, Power, ChevronLeft, ChevronRight, Check, X, RotateCcw, Download, Square, CheckSquare } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -65,6 +65,11 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<ItemStatus>("PENDING");
     const [page, setPage] = useState(1);
+    // Selección múltiple (fotos/mensajes): se puede acumular mucho contenido
+    // pendiente si el moderador no está mirando todo el tiempo, y moderar
+    // de a una se vuelve engorroso. Disponible en las 3 pestañas.
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
     const { data: authSession } = useSession();
     const isAdmin = isAdminRole(authSession?.user?.role) || authSession?.user?.planTier === "ADMIN";
@@ -101,10 +106,44 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
         return () => clearInterval(interval);
     }, [fetchSession, session?.isActive]);
 
+    // El polling silencioso (u otro moderador actuando en paralelo) puede
+    // sacar un item de la lista sin pasar por nuestros handlers -- si quedó
+    // seleccionado, lo descartamos para no mandarlo en la próxima bulk action.
+    useEffect(() => {
+        if (!session) return;
+        setSelectedIds(prev => {
+            const validIds = new Set(session.items.map(i => i.id));
+            const next = new Set(Array.from(prev).filter(id => validIds.has(id)));
+            return next.size === prev.size ? prev : next;
+        });
+    }, [session]);
+
     const changeTab = (tab: ItemStatus) => {
         if (tab === activeTab) return;
         setActiveTab(tab);
         setPage(1);
+        setSelectedIds(new Set());
+    };
+
+    const goToPage = (p: number) => {
+        setPage(p);
+        setSelectedIds(new Set());
+    };
+
+    const toggleSelect = (id: string) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (!session) return;
+        setSelectedIds(prev =>
+            prev.size === session.items.length ? new Set() : new Set(session.items.map(i => i.id))
+        );
     };
 
     const toggleLive = async () => {
@@ -188,6 +227,49 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
             console.error("Error deleting item", err);
         } finally {
             setDeleteItemId(null);
+        }
+    };
+
+    const bulkSetStatus = async (status: ItemStatus) => {
+        const ids = Array.from(selectedIds);
+        if (ids.length === 0) return;
+        // Mismo criterio optimista que setItemStatus: las sacamos ya de la
+        // pestaña actual, van a aparecer en la suya la próxima vez que el
+        // moderador la abra.
+        setSession(prev => prev ? {
+            ...prev,
+            items: prev.items.filter(i => !selectedIds.has(i.id)),
+            counts: { ...prev.counts, [activeTab]: Math.max(0, prev.counts[activeTab] - ids.length), [status]: prev.counts[status] + ids.length },
+        } : prev);
+        setSelectedIds(new Set());
+        try {
+            const results = await Promise.all(ids.map(id =>
+                fetch(`/api/live/admin/item/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status }),
+                })
+            ));
+            if (results.some(r => !r.ok)) throw new Error("failed");
+        } catch (err) {
+            console.error("Error updating items status", err);
+            fetchSession(); // revertir el optimismo si algo falló
+        }
+    };
+
+    const bulkDelete = async () => {
+        const ids = Array.from(selectedIds);
+        if (ids.length === 0) return;
+        try {
+            const results = await Promise.all(ids.map(id => fetch(`/api/live/admin/item/${id}`, { method: "DELETE" })));
+            setSession(prev => prev ? { ...prev, items: prev.items.filter(i => !selectedIds.has(i.id)) } : prev);
+            if (results.some(r => !r.ok)) throw new Error("failed");
+        } catch (err) {
+            console.error("Error deleting items", err);
+            fetchSession();
+        } finally {
+            setSelectedIds(new Set());
+            setBulkDeleteConfirmOpen(false);
         }
     };
 
@@ -314,9 +396,66 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
 
                         {session.items && session.items.length > 0 ? (
                             <>
+                                <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                                    <button
+                                        type="button"
+                                        onClick={toggleSelectAll}
+                                        className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {selectedIds.size === session.items.length ? (
+                                            <CheckSquare className="w-4 h-4" />
+                                        ) : (
+                                            <Square className="w-4 h-4" />
+                                        )}
+                                        {selectedIds.size > 0 ? `${selectedIds.size} seleccionadas` : "Seleccionar todo"}
+                                    </button>
+
+                                    {selectedIds.size > 0 && (
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            {activeTab === "PENDING" && (
+                                                <>
+                                                    <Button size="sm" className="gap-1.5 bg-green-600 hover:bg-green-600/90" onClick={() => bulkSetStatus("APPROVED")}>
+                                                        <Check className="w-4 h-4" /> Aprobar
+                                                    </Button>
+                                                    <Button size="sm" variant="destructive" className="gap-1.5" onClick={() => bulkSetStatus("REJECTED")}>
+                                                        <X className="w-4 h-4" /> Rechazar
+                                                    </Button>
+                                                </>
+                                            )}
+                                            {activeTab === "APPROVED" && (
+                                                <Button size="sm" variant="destructive" className="gap-1.5" onClick={() => bulkSetStatus("REJECTED")}>
+                                                    <X className="w-4 h-4" /> Rechazar
+                                                </Button>
+                                            )}
+                                            {activeTab === "REJECTED" && (
+                                                <>
+                                                    <Button size="sm" className="gap-1.5 bg-yellow-500 hover:bg-yellow-500/90" onClick={() => bulkSetStatus("APPROVED")}>
+                                                        <RotateCcw className="w-4 h-4" /> Restaurar
+                                                    </Button>
+                                                    <Button size="sm" variant="destructive" className="gap-1.5" onClick={() => setBulkDeleteConfirmOpen(true)}>
+                                                        <Trash2 className="w-4 h-4" /> Eliminar ahora
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {session.items.map(item => (
-                                        <div key={item.id} className="relative rounded-lg overflow-hidden border border-white/10 bg-muted/20">
+                                        <div
+                                            key={item.id}
+                                            className={`relative rounded-lg overflow-hidden border bg-muted/20 ${selectedIds.has(item.id) ? "border-primary ring-2 ring-primary" : "border-white/10"}`}
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleSelect(item.id)}
+                                                aria-label={selectedIds.has(item.id) ? "Deseleccionar" : "Seleccionar"}
+                                                aria-pressed={selectedIds.has(item.id)}
+                                                className={`absolute top-2 left-1/2 -translate-x-1/2 z-10 w-5 h-5 rounded-full border-2 flex items-center justify-center shadow-lg transition-colors ${selectedIds.has(item.id) ? "bg-primary border-primary" : "bg-black/50 border-white/60 hover:border-white"}`}
+                                            >
+                                                {selectedIds.has(item.id) && <Check className="w-3 h-3 text-white" />}
+                                            </button>
                                             {item.type === "PHOTO" ? (
                                                 <img src={item.fileUrl} alt="Live" className="w-full h-40 object-cover" />
                                             ) : item.type === "AUDIO" ? (
@@ -407,7 +546,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                             variant="outline"
                                             size="sm"
                                             disabled={page <= 1}
-                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                            onClick={() => goToPage(Math.max(1, page - 1))}
                                         >
                                             <ChevronLeft className="w-4 h-4" />
                                         </Button>
@@ -417,7 +556,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                                 variant={p === page ? "default" : "outline"}
                                                 size="sm"
                                                 className="w-9"
-                                                onClick={() => setPage(p)}
+                                                onClick={() => goToPage(p)}
                                             >
                                                 {p}
                                             </Button>
@@ -426,7 +565,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                                             variant="outline"
                                             size="sm"
                                             disabled={page >= session.pagination.totalPages}
-                                            onClick={() => setPage(p => Math.min(session.pagination.totalPages, p + 1))}
+                                            onClick={() => goToPage(Math.min(session.pagination.totalPages, page + 1))}
                                         >
                                             <ChevronRight className="w-4 h-4" />
                                         </Button>
@@ -456,6 +595,22 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setDeleteItemId(null)}>Cancelar</Button>
                         <Button variant="destructive" onClick={confirmDelete}>Eliminar</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal para Confirmar Eliminar Contenido (selección múltiple) */}
+            <Dialog open={bulkDeleteConfirmOpen} onOpenChange={setBulkDeleteConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Eliminar contenido seleccionado</DialogTitle>
+                        <DialogDescription>
+                            ¿Estás seguro de que querés eliminar {selectedIds.size} {selectedIds.size === 1 ? "elemento" : "elementos"} ahora mismo? No se podrán recuperar.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setBulkDeleteConfirmOpen(false)}>Cancelar</Button>
+                        <Button variant="destructive" onClick={bulkDelete}>Eliminar</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +10,9 @@ import { BedDouble, CircleParking, Bus, Info } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { INFO_ADICIONAL_MAX_LENGTH } from "@/lib/schemas/invitation";
 import { useToast } from "@/components/ui/Toast";
-import { saveInvitationFromWizard } from "@/lib/save-invitation";
+import { saveInvitationFromWizard, SaveInvitationError } from "@/lib/save-invitation";
+import { savePendingWizardInvitation } from "@/lib/pending-wizard-invitation";
+import { WizardPlanLimitDialog } from "./WizardPlanLimitDialog";
 
 interface InfoField {
     key: "alojamiento" | "estacionamiento" | "transporte" | "adicional";
@@ -65,26 +68,99 @@ export function StepInfoAdicional() {
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
     const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
     const themeConfig = useWizardStore((state) => state.themeConfig);
+    const { data: session } = useSession();
     const { showToast } = useToast();
     const [isCreating, setIsCreating] = useState(false);
+    const [showPlanLimitDialog, setShowPlanLimitDialog] = useState(false);
     const d = data as any;
 
     const missingText = FIELDS.some((field) => d[field.habilitadoField] && !String(d[field.textField] || "").trim());
+    const overLimitField = FIELDS.find(
+        (field) => d[field.habilitadoField] && String(d[field.textField] || "").length > INFO_ADICIONAL_MAX_LENGTH[field.key]
+    );
+
+    // Intenta crear la invitación con un crédito puntual (o sin ninguno, para
+    // el alta normal) -- separado de handleCreate para poder reintentarlo
+    // desde WizardPlanLimitDialog sin repetir las validaciones de arriba.
+    const attemptCreate = async (creditOverride?: { usePremiumCredit: boolean; useDiamondCredit: boolean }) => {
+        setIsCreating(true);
+        try {
+            const invitation = await saveInvitationFromWizard(
+                data,
+                themeConfig,
+                creditOverride ? creditOverride.usePremiumCredit : usePremiumCredit,
+                creditOverride ? creditOverride.useDiamondCredit : useDiamondCredit
+            );
+            useWizardStore.getState().setDirty(false);
+            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
+        } catch (error) {
+            console.error('Error creating invitation:', error);
+            if (error instanceof SaveInvitationError && error.code === 'FREE_LIMIT_REACHED') {
+                // Ya tiene una tarjeta Gratis activa (el plan Gratis admite
+                // una sola) -- en vez de un error plano, ofrecemos elegir
+                // Premium/Diamond ahí mismo, sin perder lo ya cargado en el
+                // wizard.
+                setIsCreating(false);
+                setShowPlanLimitDialog(true);
+                return;
+            }
+            showToast(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`, "error");
+            setIsCreating(false);
+        }
+    };
 
     const handleCreate = async () => {
         if (missingText) {
             showToast("Completá el texto de las secciones que activaste, o desactivalas.", "error");
             return;
         }
-        setIsCreating(true);
-        try {
-            const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit, useDiamondCredit);
+        if (overLimitField) {
+            showToast(`El texto de "${overLimitField.title}" se pasó del límite -- acortalo para poder continuar.`, "error");
+            return;
+        }
+        if (!session?.user) {
+            // Visitante sin cuenta (vino de "Empezar gratis" en la landing
+            // directo al wizard, sin registrarse antes). Recién acá -- al
+            // tocar "Crear invitación" -- lo mandamos a crear la cuenta y
+            // elegir plan; si nunca llega a este paso, no se crea nada. La
+            // invitación real se termina de crear cuando vuelva con sesión
+            // (ver PendingWizardInvitationBridge).
+            savePendingWizardInvitation({ data, themeConfig });
             useWizardStore.getState().setDirty(false);
-            window.location.href = `/dashboard/invitaciones/${invitation.slug}/guests`;
+            window.location.href = "/register?from=wizard";
+            return;
+        }
+        await attemptCreate();
+    };
+
+    // El cliente ya tiene crédito de ese tier -- reintenta la creación de
+    // una sin salir del wizard.
+    const handleUseCredit = (credit: "PREMIUM" | "DIAMOND") => {
+        useWizardStore.getState().setUsePremiumCredit(credit === "PREMIUM");
+        useWizardStore.getState().setUseDiamondCredit(credit === "DIAMOND");
+        attemptCreate({ usePremiumCredit: credit === "PREMIUM", useDiamondCredit: credit === "DIAMOND" });
+    };
+
+    // Sin crédito de ese tier -- guarda el wizard como pendiente (la compra
+    // en Mercado Pago es una redirección dura, se pierde el estado en
+    // memoria) y manda a pagar; PendingWizardInvitationBridge termina de
+    // crear la invitación cuando el crédito se acredite.
+    const handlePayMercadoPago = async (credit: "PREMIUM" | "DIAMOND") => {
+        try {
+            savePendingWizardInvitation({ data, themeConfig, desiredCredit: credit });
+            const res = await fetch("/api/user/buy-credit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ planTier: credit }),
+            });
+            const responseData = await res.json();
+            if (!res.ok || !responseData.checkoutUrl) {
+                throw new Error(responseData.error || "Error al iniciar el pago");
+            }
+            useWizardStore.getState().setDirty(false);
+            window.location.href = responseData.checkoutUrl;
         } catch (error) {
-            console.error('Error creating invitation:', error);
-            showToast(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`, "error");
-            setIsCreating(false);
+            showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
         }
     };
 
@@ -122,6 +198,7 @@ export function StepInfoAdicional() {
                 const isActive = Boolean(d[field.habilitadoField]);
                 const text = d[field.textField] || "";
                 const maxLength = INFO_ADICIONAL_MAX_LENGTH[field.key];
+                const isOverLimit = text.length > maxLength;
                 const Icon = field.icon;
 
                 return (
@@ -149,25 +226,42 @@ export function StepInfoAdicional() {
                             <div className="space-y-1.5 pt-4 border-t border-white/10 animate-in fade-in duration-200">
                                 <div className="flex justify-between items-center h-5">
                                     <Label htmlFor={`text-${field.key}`} className="text-xs font-medium">Texto que van a ver tus invitados</Label>
-                                    <span className="text-[10px] font-mono text-muted-foreground">
+                                    <span className={`text-[10px] font-mono ${isOverLimit ? "text-red-400 font-bold" : "text-muted-foreground"}`}>
                                         {text.length}/{maxLength}
                                     </span>
                                 </div>
+                                {/* Sin maxLength en el textarea a propósito: un maxLength nativo trunca
+                                    en silencio -- si el usuario pega un texto más largo, pierde el final
+                                    sin darse cuenta. Dejamos escribir/pegar de más, marcamos en rojo el
+                                    contador y bloqueamos "Crear invitación" hasta que lo acorte (mismo
+                                    criterio que X/Twitter). */}
                                 <Textarea
                                     id={`text-${field.key}`}
                                     placeholder={field.placeholder}
                                     value={text}
-                                    maxLength={maxLength}
                                     rows={3}
+                                    className={isOverLimit ? "border-red-500 focus-visible:ring-red-500" : undefined}
                                     onChange={(e) => setData({ [field.textField]: e.target.value } as any)}
                                 />
+                                {isOverLimit && (
+                                    <p className="text-xs text-red-400">
+                                        Te pasaste por {text.length - maxLength} caracteres -- acortá el texto para poder continuar.
+                                    </p>
+                                )}
                             </div>
                         )}
                     </div>
                 );
             })}
 
-            <SaveStepButtons isLastStep onCreate={handleCreate} isCreating={isCreating} />
+            <SaveStepButtons isLastStep onCreate={handleCreate} isCreating={isCreating} disableSave={missingText || Boolean(overLimitField)} />
+
+            <WizardPlanLimitDialog
+                open={showPlanLimitDialog}
+                onOpenChange={setShowPlanLimitDialog}
+                onUseCredit={handleUseCredit}
+                onPayMercadoPago={handlePayMercadoPago}
+            />
         </div>
     );
 }

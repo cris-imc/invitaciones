@@ -555,10 +555,12 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const freePlanLimit = planTier === "FREE" ? PLAN_LIMITS.FREE.maxGuests : null;
   const totalPeopleExpected = guests.reduce((sum, g) => sum + (g.expectedCount || 0), 0);
 
-  // Una vez que el invitado confirmó asistencia, el nombre y la cantidad de
-  // invitados quedan fijos -- reflejan lo que el invitado ya declaró, no lo
-  // que el admin originalmente esperaba. Solo "Exento de pago" sigue editable.
-  const isEditLocked = guestToEdit?.status === "CONFIRMED";
+  // El dueño de la tarjeta puede editar la cantidad de invitados aunque ya
+  // haya confirmado (antes esto estaba bloqueado). Si el nuevo tope queda
+  // por debajo de lo que el invitado ya confirmó, el back (PUT
+  // /api/guests/[id]) resetea su respuesta a PENDING y debe reconfirmar --
+  // este flag solo controla el aviso que se lo explica en el modal.
+  const guestAlreadyConfirmed = guestToEdit?.status === "CONFIRMED";
 
   return (
     <div className="space-y-6">
@@ -710,7 +712,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${newIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                     >
                       <span>Adulto</span>
-                      {currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
+                      {pagoTarjetaHabilitado && currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
                     </button>
                     <button
                       type="button"
@@ -718,7 +720,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${newIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                     >
                       <span>Adolescente</span>
-                      {currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
+                      {pagoTarjetaHabilitado && currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
                     </button>
                   </div>
                 </div>
@@ -1035,11 +1037,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
             <DialogTitle>Editar Invitado</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-4">
-            {isEditLocked && (
+            {guestAlreadyConfirmed && (
               <div className="flex items-start gap-2.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs">
-                <Lock className="w-4 h-4 shrink-0 mt-0.5" />
+                <Info className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>
-                  Este invitado ya confirmó asistencia -- la cantidad de invitados ya no se puede modificar. Podés seguir editando el nombre y si está exento de pago.
+                  Este invitado ya confirmó asistencia. Podés aumentar la cantidad de invitados para que después pueda entrar a su link y sumar más gente. Si en cambio la reducís por debajo de lo que ya confirmó, su respuesta se reinicia y va a tener que volver a confirmar.
                 </span>
               </div>
             )}
@@ -1053,7 +1055,6 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     name="edit-type"
                     checked={editGuestType === "INDIVIDUAL"}
                     onChange={() => setEditGuestType("INDIVIDUAL")}
-                    disabled={isEditLocked}
                     className="accent-primary"
                   />
                   <Label htmlFor="edit-individual">Individual</Label>
@@ -1065,7 +1066,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     name="edit-type"
                     checked={editGuestType === "FAMILY"}
                     onChange={() => setEditGuestType("FAMILY")}
-                    disabled={planTier === 'FREE' || isEditLocked}
+                    disabled={planTier === 'FREE'}
                     className="accent-primary"
                   />
                   <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier === 'FREE' ? ' cursor-not-allowed' : ''}`}>
@@ -1131,20 +1132,18 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   <button
                     type="button"
                     onClick={() => setEditIndividualCategory('adult')}
-                    disabled={isEditLocked}
                     className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-50 disabled:pointer-events-none ${editIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                   >
                     <span>Adulto</span>
-                    {currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
+                    {pagoTarjetaHabilitado && currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditIndividualCategory('teen')}
-                    disabled={isEditLocked}
                     className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-50 disabled:pointer-events-none ${editIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                   >
                     <span>Adolescente</span>
-                    {currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
+                    {pagoTarjetaHabilitado && currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
                   </button>
                 </div>
               </div>
@@ -1163,11 +1162,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Switch
                       checked={editAdultsEnabled}
                       onCheckedChange={() => tryToggle('adult', editAdultsEnabled, setEditAdultsEnabled, 'edit')}
-                      disabled={isEditLocked}
                     />
                   </div>
                   {editAdultsEnabled && (
-                    <QuantityStepper value={editGuestAdultCount} onChange={setEditGuestAdultCount} min={1} max={20} ariaLabel="adultos" disabled={isEditLocked} />
+                    <QuantityStepper value={editGuestAdultCount} onChange={setEditGuestAdultCount} min={1} max={20} ariaLabel="adultos" />
                   )}
                 </div>
 
@@ -1182,11 +1180,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Switch
                       checked={editTeensEnabled}
                       onCheckedChange={() => tryToggle('teen', editTeensEnabled, setEditTeensEnabled, 'edit')}
-                      disabled={isEditLocked}
                     />
                   </div>
                   {editTeensEnabled && (
-                    <QuantityStepper value={editGuestTeenCount} onChange={setEditGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" disabled={isEditLocked} />
+                    <QuantityStepper value={editGuestTeenCount} onChange={setEditGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" />
                   )}
                 </div>
 
@@ -1201,11 +1198,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <Switch
                       checked={editChildrenEnabled}
                       onCheckedChange={() => tryToggle('child', editChildrenEnabled, setEditChildrenEnabled, 'edit')}
-                      disabled={isEditLocked}
                     />
                   </div>
                   {editChildrenEnabled && (
-                    <QuantityStepper value={editGuestChildCount} onChange={setEditGuestChildCount} min={0} max={20} ariaLabel="niños" disabled={isEditLocked} />
+                    <QuantityStepper value={editGuestChildCount} onChange={setEditGuestChildCount} min={0} max={20} ariaLabel="niños" />
                   )}
                 </div>
               </div>

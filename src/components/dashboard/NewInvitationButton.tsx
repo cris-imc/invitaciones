@@ -8,20 +8,20 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Gift, Sparkles, Diamond, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { NoCreditsDialog } from "./NoCreditsDialog";
+import { useToast } from "@/components/ui/Toast";
 
-const WHATSAPP_SUPPORT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent("Hola! Quiero comprar créditos premium para crear una invitación")}`;
-
-export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalInvitations, planTier, autoOpen = false, renderTrigger }: { premiumCredits: number, diamondCredits?: number, totalInvitations: number, planTier?: string, autoOpen?: boolean, renderTrigger?: (onClick: () => void) => React.ReactNode }) {
+export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalInvitations, planTier, hasFreeInvitation = false, autoOpen = false, renderTrigger }: { premiumCredits: number, diamondCredits?: number, totalInvitations: number, planTier?: string, hasFreeInvitation?: boolean, autoOpen?: boolean, renderTrigger?: (onClick: () => void) => React.ReactNode }) {
     const [open, setOpen] = useState(autoOpen);
     const [showError, setShowError] = useState(false);
     const [errorCreditType, setErrorCreditType] = useState<'premium' | 'diamond'>('premium');
+    const [isPaying, setIsPaying] = useState(false);
     const router = useRouter();
+    const { showToast } = useToast();
     const setUsePremiumCredit = useWizardStore((state) => state.setUsePremiumCredit);
     const setUseDiamondCredit = useWizardStore((state) => state.setUseDiamondCredit);
     const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'DIAMOND' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
@@ -64,6 +64,25 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
         router.push("/dashboard/invitaciones/crear?diamond=1");
     };
 
+    const handlePayMercadoPago = async () => {
+        setIsPaying(true);
+        try {
+            const res = await fetch("/api/user/buy-credit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ planTier: errorCreditType === "diamond" ? "DIAMOND" : "PREMIUM" }),
+            });
+            const responseData = await res.json();
+            if (!res.ok || !responseData.checkoutUrl) {
+                throw new Error(responseData.error || "Error al iniciar el pago");
+            }
+            window.location.href = responseData.checkoutUrl;
+        } catch (error) {
+            showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
+            setIsPaying(false);
+        }
+    };
+
     return (
         <>
             {renderTrigger ? renderTrigger(handleNewClick) : (
@@ -82,20 +101,26 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                     </DialogHeader>
 
                     <div className="flex flex-col gap-2.5 mt-2">
-                        <button
-                            type="button"
-                            onClick={handleCreateFree}
-                            className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-foreground/25 hover:bg-muted/50 transition-colors text-left"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
-                                <Gift className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm">Crear Gratis</p>
-                                <p className="text-xs text-muted-foreground">Sin costo, funciones básicas</p>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                        </button>
+                        {/* El plan Gratis solo admite una tarjeta activa -- si ya
+                            tiene una, ni mostramos la opción (evita que elija
+                            Gratis solo para chocar con el límite al final del
+                            wizard, ver StepInfoAdicional.tsx). */}
+                        {!hasFreeInvitation && (
+                            <button
+                                type="button"
+                                onClick={handleCreateFree}
+                                className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-foreground/25 hover:bg-muted/50 transition-colors text-left"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                    <Gift className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-sm">Crear Gratis</p>
+                                    <p className="text-xs text-muted-foreground">Sin costo, funciones básicas</p>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                            </button>
+                        )}
 
                         <button
                             type="button"
@@ -138,28 +163,14 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={showError} onOpenChange={setShowError}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="text-red-600 flex items-center gap-2">
-                            <span>⚠️</span> Sin créditos {errorCreditType === 'diamond' ? 'diamond' : 'premium'}
-                        </DialogTitle>
-                        <DialogDescription className="pt-2">
-                            No tenés créditos {errorCreditType === 'diamond' ? 'diamond' : 'premium'} disponibles en tu cuenta. Comunicate con nosotros para adquirir más, o creá una invitación gratis por ahora.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-2">
-                        <Button variant="outline" onClick={handleCreateFree} className="w-full sm:w-auto">
-                            Crear Gratis
-                        </Button>
-                        <Link href={WHATSAPP_SUPPORT_URL} target="_blank" className="w-full sm:w-auto">
-                            <Button variant="default" className="w-full bg-slate-800 text-white">
-                                Contactar por WhatsApp
-                            </Button>
-                        </Link>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <NoCreditsDialog
+                open={showError}
+                onOpenChange={setShowError}
+                planLabel={errorCreditType}
+                onCreateFree={hasFreeInvitation ? undefined : handleCreateFree}
+                onPayMercadoPago={handlePayMercadoPago}
+                isPaying={isPaying}
+            />
         </>
     );
 }

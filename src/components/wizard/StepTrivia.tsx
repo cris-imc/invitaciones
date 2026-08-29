@@ -35,7 +35,14 @@ export function StepTrivia() {
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit/useDiamondCredit (creación)
     const isEditing = Boolean(data.id);
     const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit && !useDiamondCredit;
-    const isLocked = !isAdmin && rawLocked;
+    // Visitante sin cuenta armando el wizard antes de registrarse (ver
+    // /dashboard/invitaciones/crear sin sesión): puede configurar todo,
+    // incluidas las funciones de Premium -- recién al registrarse eligiendo
+    // Gratis se descartan server-side (ver saveInvitationFromWizard). Acá
+    // solo cambia el candado por un cartel informativo "Solo en Premium o Diamond".
+    const isAnonymous = !session?.user && !isEditing;
+    const isLocked = !isAdmin && rawLocked && !isAnonymous;
+    const showPremiumOnlyBadge = !isAdmin && rawLocked && isAnonymous;
 
     // Parse existing questions or initialize empty array
     const [preguntas, setPreguntas] = useState<TriviaQuestion[]>(() => {
@@ -228,6 +235,11 @@ export function StepTrivia() {
                             Disponible en Premium
                             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
                         </div>
+                    )}
+                    {showPremiumOnlyBadge && (
+                        <span className="text-[10px] uppercase tracking-wide font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5 whitespace-nowrap">
+                            Solo en Premium o Diamond
+                        </span>
                     )}
                 </div>
 

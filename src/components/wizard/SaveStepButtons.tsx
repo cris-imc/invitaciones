@@ -16,7 +16,7 @@ function FormTracker({ form, onDirtyChange }: { form: any, onDirtyChange: (d: bo
     return null;
 }
 
-export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating }: { form?: any, onNext?: () => void, isLastStep?: boolean, onCreate?: () => void, isCreating?: boolean }) {
+export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating, disableSave }: { form?: any, onNext?: () => void, isLastStep?: boolean, onCreate?: () => void, isCreating?: boolean, disableSave?: boolean }) {
     const { prevStep, nextStep, currentStep, setDirty, setData, data } = useWizardStore();
     const router = useRouter();
     const [showWarning, setShowWarning] = useState(false);
@@ -134,7 +134,7 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                                 variant={isDirty ? "default" : "secondary"}
                                 className={isDirty ? "bg-amber-500 hover:bg-amber-600 text-black font-semibold flex-1 sm:flex-none" : "flex-1 sm:flex-none"}
                                 onClick={handleSaveClick}
-                                disabled={isSaving || !isDirty}
+                                disabled={isSaving || !isDirty || disableSave}
                             >
                             {isSaving ? (
                                 <>
@@ -152,7 +152,7 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                                     type="button" 
                                     className="px-8 gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold flex-1 sm:flex-none"
                                     onClick={onCreate}
-                                    disabled={isSaving || isCreating}
+                                    disabled={isSaving || isCreating || disableSave}
                                 >
                                     {isCreating ? (
                                         <>

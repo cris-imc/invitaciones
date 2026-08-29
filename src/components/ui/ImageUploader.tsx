@@ -93,9 +93,15 @@ export function ImageUploader({ onImageUploaded, aspectRatio = 1, className, cur
                 className={cn(
                     "relative border-2 border-dashed rounded-xl transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100",
                     isDragActive ? "border-primary bg-primary/5" : "border-slate-300",
-                    (currentImage && !isUploading) ? "border-solid border-slate-200 p-0" : "p-3"
+                    (currentImage && !isUploading) ? "border-solid border-slate-200 p-0" : "p-3 min-h-[150px]"
                 )}
-                style={{ aspectRatio }}
+                // El aspect-ratio solo hace falta para que la vista previa de
+                // la imagen ya subida (currentImage) mantenga la proporción
+                // real del recorte -- aplicado también al estado vacío, un
+                // aspectRatio:1 (cuadrado) hacía que el cuadro creciera tan
+                // alto como ancho fuera el panel del wizard, gigante para
+                // solo un ícono y dos líneas de texto (ver min-h de arriba).
+                style={currentImage ? { aspectRatio } : undefined}
             >
                 <input {...getInputProps()} />
 

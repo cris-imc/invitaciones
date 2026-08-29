@@ -149,10 +149,18 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   },
 };
 
-// Precio real de Diamond con 20% OFF aplicado -- es lo que efectivamente se
-// cobra. Centralizado acá para que landing, registro y el cobro de
-// Mercado Pago nunca se desincronicen entre sí.
-export const DIAMOND_DISCOUNT_PRICE = Math.round(PLAN_LIMITS.DIAMOND.price * 0.8);
+// Precio de lista real de Premium/Diamond, con descuento ya aplicado -- no
+// es un cupón (esos son configurables desde /dashboard/descuentos, ver
+// discount-codes.ts), es el precio base efectivo. Centralizado acá para que
+// landing, registro y el cobro de Mercado Pago (alta de cuenta y compra
+// suelta de un crédito) nunca se desincronicen entre sí.
+// El precio es la fuente de verdad (números redondos que se piden a
+// propósito); el porcentaje que se muestra en la UI se calcula a partir de
+// él, no al revés -- así nunca quedan desincronizados entre sí.
+export const PREMIUM_DISCOUNT_PRICE = 29000; // antes $50.000
+export const DIAMOND_DISCOUNT_PRICE = 40000; // antes $90.000
+export const PREMIUM_DISCOUNT_PERCENTAGE = Math.round((1 - PREMIUM_DISCOUNT_PRICE / PLAN_LIMITS.PREMIUM.price) * 100);
+export const DIAMOND_DISCOUNT_PERCENTAGE = Math.round((1 - DIAMOND_DISCOUNT_PRICE / PLAN_LIMITS.DIAMOND.price) * 100);
 
 export interface PlanValidationError {
   field: string;

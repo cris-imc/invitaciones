@@ -48,11 +48,18 @@ async function getInvitations() {
             guests: inv.guests.reduce((sum, g) => sum + (g.attendingCount || 0), 0)
         }
     }));
-    return { invitations, dbUser };
+
+    // Mismo criterio que el límite del plan Gratis en /api/invitations POST
+    // -- oculta "Crear Gratis" del diálogo de "Nueva invitación" cuando ya
+    // tiene una tarjeta Gratis activa (puede estar entre las activas, no
+    // necesariamente en esta lista de inactivas).
+    const hasFreeInvitation = invitationsData.some((inv) => inv.estado === "ACTIVA" && inv.planTier === "FREE");
+
+    return { invitations, dbUser, hasFreeInvitation };
 }
 
 export default async function InvitacionesPage() {
-    const { invitations, dbUser } = await getInvitations();
+    const { invitations, dbUser, hasFreeInvitation } = await getInvitations();
     const hasUnlimitedPremium =
         dbUser?.planTier === 'PREMIUM' || dbUser?.planTier === 'DIAMOND' || dbUser?.planTier === 'ADMIN' || dbUser?.planTier === 'ENTERPRISE';
 
@@ -70,7 +77,7 @@ export default async function InvitacionesPage() {
                         )}
                     </p>
                 </div>
-                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} diamondCredits={dbUser?.diamondCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} />
+                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} diamondCredits={dbUser?.diamondCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} hasFreeInvitation={hasFreeInvitation} />
             </div>
 
             {/* Créditos remanentes */}

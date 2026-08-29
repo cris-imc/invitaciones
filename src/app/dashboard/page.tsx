@@ -48,6 +48,12 @@ async function getDashboardStats(userId: string) {
 
   const totalPremiumUsadas = invitations.filter((i) => i.planTier === "PREMIUM").length;
 
+  // Mismo criterio que el límite del plan Gratis en /api/invitations POST
+  // (estado ACTIVA + planTier FREE, sin filtrar por vencimiento) -- así el
+  // botón "Crear Gratis" se oculta exactamente cuando el servidor rechazaría
+  // igual el alta.
+  const hasFreeInvitation = invitations.some((i) => i.estado === "ACTIVA" && i.planTier === "FREE");
+
   return {
     totalInvitations,
     activeInvitations,
@@ -56,6 +62,7 @@ async function getDashboardStats(userId: string) {
     totalPending,
     totalSongsPending,
     totalPremiumUsadas,
+    hasFreeInvitation,
     activeInvitationsList: invitations.filter((i) => i.estado === "ACTIVA" && getEventStatus(i.fechaEvento) !== "EXPIRED" && getEventStatus(i.fechaEvento) !== "POST_EVENT"),
     inactiveCount: invitations.filter(
       (i) => i.estado !== "ACTIVA" || getEventStatus(i.fechaEvento) === "EXPIRED" || getEventStatus(i.fechaEvento) === "POST_EVENT"
@@ -162,6 +169,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
             diamondCredits={dbUser?.diamondCredits || 0}
             totalInvitations={stats.totalInvitations}
             planTier={dbUser?.planTier}
+            hasFreeInvitation={stats.hasFreeInvitation}
             autoOpen={isAutoOpen}
           />
         </div>
@@ -213,6 +221,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
               diamondCredits={dbUser?.diamondCredits || 0}
               totalInvitations={stats.totalInvitations}
               planTier={dbUser?.planTier}
+              hasFreeInvitation={stats.hasFreeInvitation}
               autoOpen={isAutoOpen}
             />
           </div>

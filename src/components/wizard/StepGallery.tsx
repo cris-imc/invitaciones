@@ -17,9 +17,11 @@ import { Button } from "@/components/ui/button";
 import { X, Info, ChevronDown, ChevronUp, AlertCircle, ImageOff } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { PLAN_LIMITS, type PlanTier } from "@/lib/plan-limits";
+import { useSession } from "next-auth/react";
 
 export function StepGallery() {
     const { data, setData, usePremiumCredit, useDiamondCredit } = useWizardStore();
+    const { data: session } = useSession();
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
     const [showLimitModal, setShowLimitModal] = useState(false);
@@ -41,7 +43,16 @@ export function StepGallery() {
                 ? "PREMIUM"
                 : "FREE";
     const tierMaxPhotos = PLAN_LIMITS[effectivePlanTier]?.maxPhotos;
-    const maxPhotos = tierMaxPhotos !== undefined ? tierMaxPhotos : PLAN_LIMITS.FREE.maxPhotos;
+    const baseMaxPhotos = tierMaxPhotos !== undefined ? tierMaxPhotos : PLAN_LIMITS.FREE.maxPhotos;
+
+    // Visitante sin cuenta armando el wizard antes de registrarse: lo dejamos
+    // cargar hasta el tope de Premium/Diamond (15), igual que el resto de las
+    // funciones premium en este flujo -- si termina eligiendo Gratis al
+    // registrarse, el servidor se queda solo con las primeras 5 (ver
+    // /api/invitations POST, isFreeTier).
+    const isAnonymous = !session?.user && !isEditing;
+    const freeMaxPhotos = PLAN_LIMITS.FREE.maxPhotos ?? 0;
+    const maxPhotos = isAnonymous ? PLAN_LIMITS.PREMIUM.maxPhotos : baseMaxPhotos;
     const limitReached = maxPhotos !== null && galeriaPrincipal.length >= maxPhotos;
 
     const handleImageUploaded = (userId: string) => {
@@ -129,6 +140,12 @@ export function StepGallery() {
                             )}
                         </div>
 
+                        {isAnonymous && (
+                            <div className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
+                                Podés cargar hasta {maxPhotos} fotos para probar (Premium o Diamond). Si al crear tu cuenta elegís Gratis, la invitación va a mostrar solo las primeras {freeMaxPhotos}.
+                            </div>
+                        )}
+
                         <div className="space-y-2 pt-1">
                             <Label className="text-sm font-medium">Agregar nueva foto (de a una)</Label>
                             {limitReached ? (
@@ -161,6 +178,11 @@ export function StepGallery() {
                                                 alt={`Foto ${index + 1}`}
                                                 className="w-full h-full object-cover"
                                             />
+                                            {isAnonymous && index >= freeMaxPhotos && (
+                                                <span className="absolute bottom-2 left-2 text-[9px] uppercase tracking-wide font-bold text-amber-300 bg-black/70 border border-amber-500/40 rounded-full px-2 py-0.5">
+                                                    Premium o Diamond
+                                                </span>
+                                            )}
                                             <button
                                                 type="button"
                                                 onClick={() => removePhoto(index)}
@@ -188,8 +210,16 @@ export function StepGallery() {
                             Llegaste al límite de fotos
                         </DialogTitle>
                         <DialogDescription className="pt-2">
-                            Tu plan {PLAN_LIMITS[effectivePlanTier].name} permite hasta{" "}
-                            <strong>{maxPhotos} fotos</strong> en el álbum. Actualizá tu plan para agregar más.
+                            {isAnonymous ? (
+                                <>
+                                    Podés cargar hasta <strong>{maxPhotos} fotos</strong> para probar (Premium o Diamond). Recordá que si elegís Gratis al crear tu cuenta, la invitación va a mostrar solo las primeras {freeMaxPhotos}.
+                                </>
+                            ) : (
+                                <>
+                                    Tu plan {PLAN_LIMITS[effectivePlanTier].name} permite hasta{" "}
+                                    <strong>{maxPhotos} fotos</strong> en el álbum. Actualizá tu plan para agregar más.
+                                </>
+                            )}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>

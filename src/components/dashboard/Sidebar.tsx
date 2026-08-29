@@ -6,12 +6,13 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Archive, BarChart3, Home, LogOut, User, UserPlus, Plus, MessageCircle, HelpCircle, Percent } from "lucide-react";
+import { Archive, BarChart3, Home, LogOut, User, UserPlus, Plus, Percent } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton";
 import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
+import { HelpMenu } from "@/components/dashboard/HelpMenu";
 import { LandingLogo } from "@/components/ui/Logo";
 import { isAdmin } from "@/lib/roles";
 
@@ -26,6 +27,7 @@ const allSidebarItems = [
 export function Sidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
+    const isAuthenticated = Boolean(session?.user);
     const role = session?.user?.role || "CLIENT";
     const { isDirty, setDirty, data: wizardData } = useWizardStore();
     const isNewInvitation = !wizardData.id;
@@ -34,6 +36,7 @@ export function Sidebar() {
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [premiumCredits, setPremiumCredits] = useState(0);
     const [diamondCredits, setDiamondCredits] = useState(0);
+    const [hasFreeInvitation, setHasFreeInvitation] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     // El PageTransition global (template.tsx) anima "filter" en cada cambio
@@ -60,13 +63,20 @@ export function Sidebar() {
                 if (data) {
                     setPremiumCredits(data.premiumCredits || 0);
                     setDiamondCredits(data.diamondCredits || 0);
+                    setHasFreeInvitation(Boolean(data.hasFreeInvitation));
                 }
             })
             .catch(() => {});
     }, [role]);
 
+    // Wizard público sin cuenta (/dashboard/invitaciones/crear visitado desde
+    // "Empezar gratis" en la landing, sin sesión -- ver StepInfoAdicional.tsx
+    // y /register?from=wizard): el menú se ve casi igual que logueado, pero
+    // sin nada que dependa de una cuenta real (Inactivas, Mis Datos, cerrar
+    // sesión, la botonera mobile entera).
     const sidebarItems = allSidebarItems.filter(item => {
         if (isAdmin(role)) return item.title === "Inicio" || item.title === "Mis Datos" || item.title === "Descuentos" || item.title === "Registros";
+        if (!isAuthenticated) return item.title === "Inicio";
         return item.title !== "Descuentos" && item.title !== "Registros";
     });
 
@@ -107,14 +117,17 @@ export function Sidebar() {
     const NavLinks = ({ onClick }: { onClick?: () => void }) => (
         <>
             {sidebarItems.map((item, index) => {
+                // Sin sesión, "/dashboard" redirige a /login -- "Inicio" va a
+                // la landing en su lugar.
+                const href = !isAuthenticated && item.href === "/dashboard" ? "/" : item.href;
                 const isActive = pathname === item.href;
 
                 return (
                     <Link
                         key={index}
-                        href={item.href}
+                        href={href}
                         className={isActive ? "active" : ""}
-                        onClick={(e) => handleNavClick(e, item.href, onClick)}
+                        onClick={(e) => handleNavClick(e, href, onClick)}
                     >
                         <b><item.icon className="w-4 h-4" /></b>
                         {item.title}
@@ -122,21 +135,16 @@ export function Sidebar() {
                 );
             })}
 
-            <a
-                href="https://wa.me/5493517660000?text=Hola%2C%20necesito%20ayuda%20con%20Alta%20Invitaci%C3%B3n"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                <b><HelpCircle className="w-4 h-4" /></b>
-                Ayuda
-            </a>
+            <HelpMenu variant="desktop" />
 
-            <div className="mt-4 px-2">
-                <button onClick={handleSignOut} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 py-2 rounded-lg text-sm font-semibold transition-colors">
-                    <LogOut className="w-4 h-4" />
-                    Cerrar Sesión
-                </button>
-            </div>
+            {isAuthenticated && (
+                <div className="mt-4 px-2">
+                    <button onClick={handleSignOut} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 py-2 rounded-lg text-sm font-semibold transition-colors">
+                        <LogOut className="w-4 h-4" />
+                        Cerrar Sesión
+                    </button>
+                </div>
+            )}
         </>
     );
 
@@ -182,20 +190,13 @@ export function Sidebar() {
                         <div className="p-brand" style={{ margin: 0 }}>
                             <LandingLogo className="h-[50px] w-auto" />
                         </div>
-                        <a
-                            href="https://wa.me/5493517660000?text=Hola%2C%20necesito%20ayuda%20con%20Alta%20Invitaci%C3%B3n"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Ayuda"
-                            style={{ color: "var(--accent)" }}
-                            className="flex items-center gap-1.5 text-xs font-semibold font-ui"
-                        >
-                            <MessageCircle className="w-5 h-5" />
-                            <span>Ayuda</span>
-                        </a>
+                        <HelpMenu variant="mobile" />
                     </header>
 
-                    {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ── */}
+                    {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ──
+                        Todos sus items dependen de una cuenta real -- sin
+                        sesión (wizard público) se oculta entera. */}
+                    {isAuthenticated && (
                     <div className="p-bottom-nav md:hidden">
                         {isAdmin(role) ? (
                             <Link
@@ -213,6 +214,7 @@ export function Sidebar() {
                                 diamondCredits={diamondCredits}
                                 totalInvitations={0}
                                 planTier={session?.user?.planTier}
+                                hasFreeInvitation={hasFreeInvitation}
                                 renderTrigger={(onClick) => (
                                     <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nueva invitación">
                                         <Plus className="w-5 h-5" style={{ color: "var(--accent)" }} />
@@ -282,6 +284,7 @@ export function Sidebar() {
                             <span>Salir</span>
                         </button>
                     </div>
+                    )}
                 </>,
                 document.body
             )}

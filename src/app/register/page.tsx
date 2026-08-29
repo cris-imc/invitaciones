@@ -8,12 +8,13 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
-import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft, Tag } from "lucide-react";
+import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft, Tag, Radio } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PLAN_LIMITS, formatPrice, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
+import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
+import { setPendingWizardDesiredCredit } from "@/lib/pending-wizard-invitation";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
 
@@ -34,7 +35,7 @@ const PLAN_CARDS: {
       "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum`,
     ],
-    negativeFeatures: ["Sin musica de fondo", "Sin LIVE (fotos en vivo)", "Sin Trivia", "Sin sugerencias DJ"],
+    negativeFeatures: ["Sin gestión de pagos", "Sin musica de fondo", "Sin Modo LIVE (fotos y mensajes en vivo)", "Sin Trivia", "Sin sugerencias DJ"],
   },
   {
     key: "PREMIUM",
@@ -49,7 +50,7 @@ const PLAN_CARDS: {
       "Con Trivia",
       "Con sugerencias DJ",
     ],
-    negativeFeatures: ["Sin función Live"],
+    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)"],
   },
   {
     key: "DIAMOND",
@@ -61,7 +62,7 @@ const PLAN_CARDS: {
       "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.DIAMOND.maxPhotos} fotos en el álbum`,
       "Con musica de fondo",
-      `Con LIVE (hasta ${PLAN_LIMITS.DIAMOND.maxLivePhotos} fotos)`,
+      "Con LIVE (fotos y mensajes en vivo)",
       "Con Trivia",
       "Con sugerencias DJ",
     ],
@@ -72,7 +73,7 @@ const PLAN_CARDS: {
 function planPriceLabel(plan: PlanType): string {
   if (plan === "FREE") return formatPrice(PLAN_LIMITS.FREE.price);
   if (plan === "DIAMOND") return formatPrice(DIAMOND_DISCOUNT_PRICE);
-  return formatPrice(PLAN_LIMITS[plan].price);
+  return formatPrice(PREMIUM_DISCOUNT_PRICE);
 }
 
 export default function RegisterPage() {
@@ -113,12 +114,18 @@ function RegisterForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("DIAMOND");
 
+  const fromWizard = searchParams?.get("from") === "wizard";
+
   useEffect(() => {
     const plan = searchParams?.get("plan");
     if (plan === "premium") setSelectedPlan("PREMIUM");
     else if (plan === "diamond") setSelectedPlan("DIAMOND");
     else if (plan === "free") setSelectedPlan("FREE");
-  }, [searchParams]);
+    // Sin plan explícito en la URL: si viene de "Empezar gratis" (wizard
+    // público, ver /dashboard/invitaciones/crear sin sesión), preseleccionar Free -- si no, queda
+    // el default (Diamond, recomendado) para quien entra directo a /register.
+    else if (fromWizard) setSelectedPlan("FREE");
+  }, [searchParams, fromWizard]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -233,6 +240,14 @@ function RegisterForm() {
       }
 
       if (data.checkoutUrl) {
+        // La cuenta que se crea acá siempre queda en plan Gratis (ver
+        // /api/auth/register) -- lo que compra Premium/Diamond es un
+        // crédito. Si venía del wizard público, hay que dejar guardado con
+        // qué crédito termina de crear la invitación cuando vuelva
+        // autenticado (ver PendingWizardInvitationBridge).
+        if (fromWizard) {
+          setPendingWizardDesiredCredit(selectedPlan === "DIAMOND" ? "DIAMOND" : "PREMIUM");
+        }
         showToast("¡Cuenta creada! Redirigiendo a Mercado Pago...", "success");
         window.location.href = data.checkoutUrl;
         return;
@@ -262,12 +277,18 @@ function RegisterForm() {
       </Link>
 
       <div className="max-w-5xl mx-auto w-full relative z-10 text-[var(--on-ink)] font-body">
+        {fromWizard && (
+          <div className="max-w-md mx-auto mb-6 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-sm text-center justify-center">
+            <Check className="w-4 h-4 text-[var(--accent)] shrink-0" />
+            <span>Ya armaste tu invitación -- creá tu cuenta para publicarla.</span>
+          </div>
+        )}
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-display mb-2">Crea tu cuenta</h1>
           <p className="opacity-70 text-lg font-body">
             {step === 1
-              ? "Elegí el plan que mejor se adapta a tu evento"
+              ? "Elegí la invitación que mejor se adapta a tu evento"
               : "Ya casi terminamos, completá tus datos"}
           </p>
         </div>
@@ -299,14 +320,24 @@ function RegisterForm() {
                       <div>
                         <h3 className="text-lg sm:text-xl font-display leading-tight">{plan.name}</h3>
                         <div className="mt-1 flex items-baseline gap-2 flex-wrap">
-                          {plan.key === "DIAMOND" && (
+                          {(plan.key === "DIAMOND" || plan.key === "PREMIUM") && (
                             <span className="text-sm font-normal text-[var(--on-ink)]/40 line-through">
-                              {formatPrice(PLAN_LIMITS.DIAMOND.price)}
+                              {formatPrice(PLAN_LIMITS[plan.key].price)}
                             </span>
                           )}
                           <span className="text-xl sm:text-2xl font-display text-[var(--accent)]">
                             {planPriceLabel(plan.key)}
                           </span>
+                          {plan.key === "DIAMOND" && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)]">
+                              {DIAMOND_DISCOUNT_PERCENTAGE}% OFF
+                            </span>
+                          )}
+                          {plan.key === "PREMIUM" && (
+                            <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)]">
+                              {PREMIUM_DISCOUNT_PERCENTAGE}% OFF
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div
@@ -319,12 +350,34 @@ function RegisterForm() {
                     </div>
 
                     <ul className="space-y-2 opacity-90 text-xs sm:text-sm flex-1">
-                      {plan.features.map((f) => (
-                        <li key={f} className="flex items-center gap-1.5">
-                          <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                          <span>{f}</span>
-                        </li>
-                      ))}
+                      {plan.features.map((f) => {
+                        // LIVE es LA diferencia entre Premium y Diamond -- se
+                        // destaca aparte del resto del check-list (que es
+                        // igual en ambos) para que quede clarísimo qué es lo
+                        // que realmente se paga de más.
+                        if (f.startsWith("Con LIVE")) {
+                          return (
+                            <li
+                              key={f}
+                              className="!opacity-100 mt-1 -mx-1 px-2.5 py-2 rounded-lg bg-[var(--accent)]/15 border border-[var(--accent)]/40"
+                            >
+                              <div className="flex items-center gap-1.5 font-semibold text-[var(--accent)]">
+                                <Radio className="w-4 h-4 shrink-0" />
+                                <span>{f}</span>
+                              </div>
+                              <p className="text-[11px] font-normal text-[var(--on-ink)]/70 mt-1 leading-snug">
+                                Único plan con &ldquo;Modo LIVE&rdquo;: las fotos y mensajes que suben tus invitados se proyectan en pantalla en tiempo real, durante la fiesta.
+                              </p>
+                            </li>
+                          );
+                        }
+                        return (
+                          <li key={f} className="flex items-center gap-1.5">
+                            <Check className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                            <span>{f}</span>
+                          </li>
+                        );
+                      })}
                       {plan.negativeFeatures?.map((f) => (
                         <li key={f} className="flex items-center gap-1.5 opacity-50">
                           <span className="text-red-400 font-bold px-0.5 shrink-0">✕</span>

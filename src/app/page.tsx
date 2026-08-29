@@ -8,13 +8,23 @@ import { LandingLogo } from "@/components/ui/Logo";
 import { HeroParallaxPhoto } from "@/components/landing/HeroParallaxPhoto";
 import { Settings2, Users, Radio, CalendarDays, MapPin, ListChecks, Gift, Images, Music, MessageCircleHeart, Rss } from "lucide-react";
 import { auth } from "@/auth";
-import { PLAN_LIMITS, formatPrice, DIAMOND_DISCOUNT_PRICE } from "@/lib/plan-limits";
+import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
+import { FAQ_ITEMS } from "@/lib/faq-data";
 
 export default async function Home() {
   const session = await auth();
-  const registerUrl = session ? "/dashboard?new=true" : "/register";
+  // "Empezar gratis"/"Crear cuenta gratis": para un visitante sin cuenta va
+  // directo al wizard (/dashboard/invitaciones/crear) sin pasar por
+  // /register antes -- ni esa ruta ni el layout de /dashboard exigen sesión
+  // (Sidebar.tsx se ve casi igual sin cuenta, solo oculta lo que depende de
+  // una). Recién al terminar el wizard y tocar "Crear invitación" se le pide
+  // crear la cuenta (ver StepInfoAdicional.tsx). Con sesión ya iniciada,
+  // sigue yendo directo ahí también, mostrando primero el diálogo de
+  // gratis/premium/diamond de siempre (?new=true).
+  const registerUrl = session ? "/dashboard?new=true" : "/dashboard/invitaciones/crear";
   const premiumUrl = session ? "/dashboard?new=true&plan=premium" : "/register?plan=premium";
   const diamondUrl = session ? "/dashboard?new=true&plan=diamond" : "/register?plan=diamond";
+  const premiumDiscountPrice = PREMIUM_DISCOUNT_PRICE;
   const diamondDiscountPrice = DIAMOND_DISCOUNT_PRICE;
   const whatsappEnterpriseUrl = `https://wa.me/5493517660000?text=${encodeURIComponent(
     "Hola, me interesa el plan Enterprise de Alta Invitación"
@@ -270,6 +280,10 @@ export default async function Home() {
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Sin gestión de pagos</span>
+                </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>Sin función LIVE</span>
                 </li>
               </ul>
@@ -281,7 +295,12 @@ export default async function Home() {
             {/* Premium */}
             <div className="bg-[var(--ink)]/40 border border-[var(--ink-2)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
               <h3 className="text-xl font-semibold text-white mb-2">Premium</h3>
-              <div className="text-4xl font-display text-white mb-4">{formatPrice(PLAN_LIMITS.PREMIUM.price)}<span className="text-lg text-zinc-500 font-sans font-normal">/evento</span></div>
+              <div className="mb-1 flex items-baseline gap-2 flex-wrap">
+                <span className="text-base text-zinc-500 font-sans line-through">{formatPrice(PLAN_LIMITS.PREMIUM.price)}</span>
+                <span className="text-4xl font-display text-white">{formatPrice(premiumDiscountPrice)}</span>
+                <span className="text-lg text-zinc-500 font-sans font-normal">/evento</span>
+              </div>
+              <p className="text-xs font-semibold text-[var(--accent)] mb-4">{PREMIUM_DISCOUNT_PERCENTAGE}% OFF</p>
               <p className="text-zinc-400 mb-6 flex-1 text-sm">Todas las herramientas interactivas, sin límite de invitados.</p>
 
               <ul className="space-y-3 mb-6 text-zinc-300 text-sm">
@@ -324,7 +343,7 @@ export default async function Home() {
                 <span className="text-4xl font-display text-white">{formatPrice(diamondDiscountPrice)}</span>
                 <span className="text-lg text-zinc-500 font-sans font-normal">/evento</span>
               </div>
-              <p className="text-xs font-semibold text-[var(--accent)] mb-4">20% OFF</p>
+              <p className="text-xs font-semibold text-[var(--accent)] mb-4">{DIAMOND_DISCOUNT_PERCENTAGE}% OFF</p>
               <p className="text-zinc-400 mb-6 flex-1 text-sm">Todo Premium, más el Modo Live para tu evento en vivo.</p>
 
               <ul className="space-y-3 mb-6 text-zinc-300 text-sm">
@@ -381,48 +400,7 @@ export default async function Home() {
               <h2 id="faq-title" className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-white">¿Tenés dudas?</h2>
             </div>
             <div className="space-y-0 divide-y" style={{ borderColor: 'var(--line)' }}>
-              {[
-                {
-                  q: "¿Necesito saber de diseño o programación para armar mi invitación?",
-                  a: "No. Elegís una plantilla y la personalizás con un wizard guiado paso a paso: nombres, fecha, lugar, fotos y mensaje. Vas viendo la vista previa en vivo, tal cual la va a ver cada invitado en su teléfono, así que no hay sorpresas al final."
-                },
-                {
-                  q: "¿Cómo es el proceso, paso a paso?",
-                  a: "Elegís una plantilla según tu evento, la personalizás con tus datos y fotos en el wizard viendo la vista previa en tiempo real, y publicás para compartir el link por WhatsApp, Instagram o el medio que prefieras. No hay tiempos de espera ni formularios que enviar a un tercero: vos controlás todo el proceso."
-                },
-                {
-                  q: "¿Puedo editar mi invitación después de haberla publicado?",
-                  a: "Sí, podés volver a tu panel y modificar textos, fotos, fecha o cualquier dato las veces que necesites. Si cambia el lugar o la fecha del evento, el link no cambia: tus invitados van a ver la información actualizada automáticamente."
-                },
-                {
-                  q: "¿Cómo comparto mi invitación con los invitados?",
-                  a: "Generás un link único y personalizado para cada invitado o grupo familiar. Lo enviás de forma individual (uno a uno) por WhatsApp, email o el medio que prefieras. Al ser un link personal, cada persona recibe su propia invitación exclusiva para confirmar su asistencia."
-                },
-                {
-                  q: "¿Hay límite de invitados?",
-                  a: "En el plan Gratis podés cargar hasta 20 invitados. En Premium y Diamond no hay límite: podés invitar a todos los que quieras sin restricciones."
-                },
-                {
-                  q: "¿Qué diferencia hay entre los planes Gratis, Premium y Diamond?",
-                  a: "El plan Gratis incluye invitación personalizable completa, RSVP y álbum de hasta 5 fotos para hasta 20 invitados: ideal para probar la plataforma o eventos íntimos. Premium suma invitados ilimitados, álbum de hasta 15 fotos, música de fondo, trivias, sugerencias de DJ y gestión de pagos. Diamond agrega el Modo LIVE, con proyección de fotos en vivo durante la fiesta."
-                },
-                {
-                  q: "¿Puedo cambiar de plan después de haber empezado?",
-                  a: "Sí, podés empezar gratis y subir de plan en cualquier momento sin perder lo que ya cargaste."
-                },
-                {
-                  q: "¿Mi invitación se va a ver bien en el celular de mis invitados?",
-                  a: "Sí. Cada plantilla está pensada mobile-first, porque la gran mayoría de tus invitados la va a abrir desde WhatsApp en su teléfono. También se ve correctamente en tablet y PC."
-                },
-                {
-                  q: "¿Puedo usar Alta Invitación para otro evento que no sea una boda?",
-                  a: "Sí, tenemos plantillas para bodas, XV años, cumpleaños y otros eventos, cada una con su propio estilo, tipografía y estructura."
-                },
-                {
-                  q: "¿Hay algún costo por usar el plan Gratis?",
-                  a: "No, el plan Gratis es $0 por evento, sin suscripción ni tarjeta requerida. Solo pagás si elegís desbloquear funcionalidades con Premium o Diamond, y es un pago único por evento, nunca una suscripción recurrente."
-                },
-              ].map((item) => (
+              {FAQ_ITEMS.map((item) => (
                 <details key={item.q} className="group py-5">
                   <summary className="flex justify-between items-center cursor-pointer list-none text-white font-semibold text-sm md:text-base gap-4 hover:text-[var(--accent)] transition-colors">
                     {item.q}

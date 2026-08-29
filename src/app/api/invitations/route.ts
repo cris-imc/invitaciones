@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/auth';
-import { checkPlanLimits } from '@/lib/plan-limits';
+import { checkPlanLimits, PLAN_LIMITS } from '@/lib/plan-limits';
 import type { PlanTier } from '@/lib/plan-limits';
 import { checkAndCleanupIfExpired, isEventDateLocked } from '@/lib/expiration-server';
 import { slugify } from '@/lib/slugify';
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
 
                 if (!user || user.premiumCredits <= 0) {
                     return NextResponse.json(
-                        { error: 'No tienes créditos premium disponibles' },
+                        { error: 'No tienes créditos premium disponibles', code: 'NO_PREMIUM_CREDITS' },
                         { status: 403 }
                     );
                 }
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
                 if (!user || user.diamondCredits <= 0) {
                     return NextResponse.json(
-                        { error: 'No tienes créditos diamond disponibles' },
+                        { error: 'No tienes créditos diamond disponibles', code: 'NO_DIAMOND_CREDITS' },
                         { status: 403 }
                     );
                 }
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
 
             if (limitError) {
                 return NextResponse.json(
-                    { error: limitError.message },
+                    { error: limitError.message, code: 'FREE_LIMIT_REACHED' },
                     { status: 403 }
                 );
             }
@@ -226,6 +226,15 @@ export async function POST(request: NextRequest) {
         // corresponde o no.
         const willSpendCredit = Boolean(body.usePremiumCredit) && !hasUnlimitedPremium;
         const willSpendDiamondCredit = Boolean(body.useDiamondCredit) && !hasUnlimitedPremium;
+
+        // El wizard público (/dashboard/invitaciones/crear sin sesión) deja
+        // configurar música, trivia, regalo y pago de tarjeta aunque el
+        // visitante todavía no eligió plan -- recién acá,
+        // al crear la invitación de verdad, sabemos si terminó en un plan
+        // FREE. Si es así, esas funciones se fuerzan a apagadas server-side
+        // sin importar lo que haya mandado el cliente (mismo criterio que ya
+        // aplica el candado del wizard para un usuario FREE logueado).
+        const isFreeTier = invitationPlanTier === 'FREE';
 
         let invitation;
         try {
@@ -324,11 +333,25 @@ export async function POST(request: NextRequest) {
 
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada !== undefined ? body.galeriaPrincipalHabilitada : true,
-                galeriaPrincipalFotos: (() => { const g = body.galeriaPrincipalFotos; if (!g) return '[]'; if (typeof g === 'string') return g; return JSON.stringify(g); })(),
+                // El wizard público deja cargar hasta el tope de Premium/Diamond
+                // (15) sin cuenta todavía -- si termina en un plan FREE, acá se
+                // recorta a las primeras 5 (mismo criterio que las funciones
+                // premium de arriba, ver isFreeTier).
+                galeriaPrincipalFotos: (() => {
+                    const g = body.galeriaPrincipalFotos;
+                    let fotos: unknown[];
+                    if (!g) fotos = [];
+                    else if (typeof g === 'string') { try { fotos = JSON.parse(g); } catch { fotos = []; } }
+                    else fotos = g;
+                    if (isFreeTier && Array.isArray(fotos) && PLAN_LIMITS.FREE.maxPhotos !== null) {
+                        fotos = fotos.slice(0, PLAN_LIMITS.FREE.maxPhotos);
+                    }
+                    return JSON.stringify(fotos);
+                })(),
                 galeriaPrincipalAutoplay: body.galeriaPrincipalAutoplay !== undefined ? Boolean(body.galeriaPrincipalAutoplay) : false,
                 galeriaPrincipalEstilo: body.galeriaPrincipalEstilo || 'carrusel',
 
-                sugerenciaMusicaHabilitada: body.sugerenciaMusicaHabilitada !== undefined ? body.sugerenciaMusicaHabilitada : true,
+                sugerenciaMusicaHabilitada: isFreeTier ? false : (body.sugerenciaMusicaHabilitada !== undefined ? body.sugerenciaMusicaHabilitada : true),
 
                 // 9. FRASE PERSONALIZADA
                 frasePersonalizadaHabilitada: body.frasePersonalizadaHabilitada !== undefined ? Boolean(body.frasePersonalizadaHabilitada) : false,
@@ -339,7 +362,7 @@ export async function POST(request: NextRequest) {
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : '[]',
 
                 // 11. REGALO Y PAGO DE TARJETAS
-                regaloHabilitado: body.regaloHabilitado !== undefined ? body.regaloHabilitado : false,
+                regaloHabilitado: isFreeTier ? false : (body.regaloHabilitado !== undefined ? body.regaloHabilitado : false),
                 regaloTitulo: body.regaloTitulo,
                 regaloMensaje: body.regaloMensaje,
                 regaloMostrarDatos: body.regaloMostrarDatos,
@@ -350,7 +373,7 @@ export async function POST(request: NextRequest) {
                 regaloMonto: body.regaloMonto ? parseFloat(body.regaloMonto) : null,
                 regaloMontoUpdatedAt: body.regaloMonto ? new Date() : null,
 
-                pagoTarjetaHabilitado: body.pagoTarjetaHabilitado !== undefined ? body.pagoTarjetaHabilitado : false,
+                pagoTarjetaHabilitado: isFreeTier ? false : (body.pagoTarjetaHabilitado !== undefined ? body.pagoTarjetaHabilitado : false),
                 pagoTarjetaTitulo: body.pagoTarjetaTitulo,
                 pagoTarjetaMensaje: body.pagoTarjetaMensaje,
                 pagoTarjetaMostrarDatos: body.pagoTarjetaMostrarDatos,
@@ -365,13 +388,13 @@ export async function POST(request: NextRequest) {
                 precioAdolescenteHabilitado: body.precioAdolescenteHabilitado !== undefined ? Boolean(body.precioAdolescenteHabilitado) : false,
 
                 // 2. MÚSICA
-                musicaHabilitada: body.musicaHabilitada !== undefined ? body.musicaHabilitada : false,
+                musicaHabilitada: isFreeTier ? false : (body.musicaHabilitada !== undefined ? body.musicaHabilitada : false),
                 musicaAutoplay: body.musicaAutoplay !== undefined ? body.musicaAutoplay : false,
                 musicaLoop: body.musicaLoop !== undefined ? body.musicaLoop : true,
                 musicaUrl: body.musicaUrl,
 
                 // 3. TRIVIA
-                triviaHabilitada: body.triviaHabilitada !== undefined ? body.triviaHabilitada : false,
+                triviaHabilitada: isFreeTier ? false : (body.triviaHabilitada !== undefined ? body.triviaHabilitada : false),
                 triviaIcono: body.triviaIcono,
                 triviaTitulo: body.triviaTitulo,
                 triviaSubtitulo: body.triviaSubtitulo,

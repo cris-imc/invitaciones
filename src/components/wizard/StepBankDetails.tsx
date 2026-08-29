@@ -40,7 +40,14 @@ export function StepBankDetails() {
 
     // Si la invitación ya tiene un ID (edición) usamos su planTier, sino usamos usePremiumCredit/useDiamondCredit (creación)
     const rawLocked = isEditing ? data.planTier === "FREE" : !usePremiumCredit && !useDiamondCredit;
-    const isLocked = !isAdmin && rawLocked;
+    // Visitante sin cuenta armando el wizard antes de registrarse (ver
+    // /dashboard/invitaciones/crear sin sesión): puede configurar todo,
+    // incluidas las funciones de Premium -- recién al registrarse eligiendo
+    // Gratis se descartan server-side (ver saveInvitationFromWizard). Acá
+    // solo cambia el candado por un cartel informativo "Solo en Premium o Diamond".
+    const isAnonymous = !session?.user && !isEditing;
+    const isLocked = !isAdmin && rawLocked && !isAnonymous;
+    const showPremiumOnlyBadge = !isAdmin && rawLocked && isAnonymous;
 
     const [isCustomRegaloTitulo, setIsCustomRegaloTitulo] = useState(() => {
         const current = d.regaloTitulo || "Regalo";
@@ -164,9 +171,14 @@ export function StepBankDetails() {
                             <p className="text-xs text-muted-foreground">
                                 CBU/Alias para que tus invitados te hagan un regalo voluntario
                             </p>
+                            {showPremiumOnlyBadge && (
+                                <span className="inline-block mt-1.5 text-[10px] uppercase tracking-wide font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5">
+                                    Solo en Premium o Diamond
+                                </span>
+                            )}
                         </div>
                     </div>
-                    <div className="relative group self-end sm:self-auto">
+                    <div className="relative group self-end sm:self-auto shrink-0">
                         <Switch
                             id="enableGift"
                             checked={isRegaloActive && (!isLocked || isAdmin)}
@@ -313,9 +325,14 @@ export function StepBankDetails() {
                             <p className="text-xs text-muted-foreground">
                                 CBU/Alias destinado a saldar la tarjeta de invitación o pase del evento
                             </p>
+                            {showPremiumOnlyBadge && (
+                                <span className="inline-block mt-1.5 text-[10px] uppercase tracking-wide font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5">
+                                    Solo en Premium o Diamond
+                                </span>
+                            )}
                         </div>
                     </div>
-                    <div className="relative group self-end sm:self-auto">
+                    <div className="relative group self-end sm:self-auto shrink-0">
                         <Switch
                             id="enableCardPayment"
                             checked={isPagoTarjetaActive && (!isLocked || isAdmin)}

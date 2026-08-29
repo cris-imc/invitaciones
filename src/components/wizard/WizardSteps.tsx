@@ -21,8 +21,10 @@ export function WizardSteps() {
     // Si viene de editar una invitación existente, "volver" debe llevar de
     // nuevo al panel de Administrar de esa tarjeta (de donde salió el
     // usuario), no al listado general -- solo al crear una nueva (sin slug
-    // todavía) cae al listado.
-    const backHref = isEditing && data.slug ? `/dashboard/invitaciones/${data.slug}/guests` : "/dashboard";
+    // todavía) cae al listado. Sin sesión (visitante del wizard público sin cuenta,
+    // ver esa página), "volver" no puede ser /dashboard -- redirigiría a
+    // /login -- así que cae a la landing.
+    const backHref = isEditing && data.slug ? `/dashboard/invitaciones/${data.slug}/guests` : (session ? "/dashboard" : "/");
 
     const CurrentComponent = steps[currentStep].component;
     const progress = ((currentStep + 1) / steps.length) * 100;

@@ -1,3 +1,15 @@
+// Errores puntuales de /api/invitations que la UI necesita distinguir de un
+// error genérico (ej. mostrar el selector de plan en vez de un toast plano
+// cuando se llegó al límite del plan Gratis, ver StepInfoAdicional.tsx).
+export class SaveInvitationError extends Error {
+    code?: string;
+    constructor(message: string, code?: string) {
+        super(message);
+        this.name = "SaveInvitationError";
+        this.code = code;
+    }
+}
+
 export async function saveInvitationFromWizard(data: any, themeConfig: any, usePremiumCredit: boolean = false, useDiamondCredit: boolean = false) {
     const payload = {
         ...data,
@@ -37,7 +49,7 @@ export async function saveInvitationFromWizard(data: any, themeConfig: any, useP
 
     if (!response.ok) {
         const errMsg = responseData.details || responseData.error || 'Error al guardar la invitación';
-        throw new Error(errMsg);
+        throw new SaveInvitationError(errMsg, responseData.code);
     }
 
     return responseData;
