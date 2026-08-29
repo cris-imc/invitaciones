@@ -38,6 +38,7 @@ export const useWizardStore = create<WizardState>((set) => ({
         fontBody: "space-grotesk",
         countdownStyle: "clasico",
         albumStyle: "carrusel",
+        galeriaPrincipalHabilitada: true,
 
         // Initial values for new fields
         sugerenciaMusicaHabilitada: true,
@@ -161,6 +162,7 @@ export const useWizardStore = create<WizardState>((set) => ({
             fontBody: "space-grotesk",
             countdownStyle: "clasico",
             albumStyle: "carrusel",
+            galeriaPrincipalHabilitada: true,
             cronogramaEventos: JSON.stringify([]),
             rsvpDaysBeforeEvent: 7,
             
