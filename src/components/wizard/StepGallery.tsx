@@ -20,11 +20,12 @@ import { PLAN_LIMITS, type PlanTier } from "@/lib/plan-limits";
 import { useSession } from "next-auth/react";
 
 export function StepGallery() {
-    const { data, setData, usePremiumCredit, useDiamondCredit } = useWizardStore();
+    const { data, setData, usePremiumCredit, useDiamondCredit, nextStep } = useWizardStore();
     const { data: session } = useSession();
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
     const [showLimitModal, setShowLimitModal] = useState(false);
+    const [showNoPhotosError, setShowNoPhotosError] = useState(false);
 
     const galeriaPrincipal = data.galeriaPrincipalFotos
         ? (typeof data.galeriaPrincipalFotos === 'string'
@@ -62,11 +63,22 @@ export function StepGallery() {
         }
         const updatedPhotos = [...galeriaPrincipal, userId];
         setData({ galeriaPrincipalFotos: updatedPhotos as any });
+        setShowNoPhotosError(false);
     };
 
     const removePhoto = (index: number) => {
         const updatedPhotos = galeriaPrincipal.filter((_: any, i: number) => i !== index);
         setData({ galeriaPrincipalFotos: updatedPhotos as any });
+    };
+
+    // Con la galería habilitada no tiene sentido avanzar sin al menos una
+    // foto -- quedaría un carrusel vacío en la tarjeta final.
+    const handleNext = () => {
+        if (data.galeriaPrincipalHabilitada && galeriaPrincipal.length === 0) {
+            setShowNoPhotosError(true);
+            return;
+        }
+        nextStep();
     };
 
     return (
@@ -106,9 +118,10 @@ export function StepGallery() {
                     <Checkbox
                         id="galeriaPrincipalHabilitada"
                         checked={data.galeriaPrincipalHabilitada}
-                        onCheckedChange={(checked) =>
-                            setData({ galeriaPrincipalHabilitada: Boolean(checked) })
-                        }
+                        onCheckedChange={(checked) => {
+                            setData({ galeriaPrincipalHabilitada: Boolean(checked) });
+                            setShowNoPhotosError(false);
+                        }}
                     />
                     <Label htmlFor="galeriaPrincipalHabilitada" className="text-sm font-semibold cursor-pointer">
                         Mostrar galería de fotos en la tarjeta
@@ -163,6 +176,11 @@ export function StepGallery() {
                                     aspectRatio={1}
                                 />
                             )}
+                            {showNoPhotosError && (
+                                <p className="text-sm text-destructive font-medium">
+                                    Subí al menos una foto o destildá &quot;Mostrar galería de fotos&quot; para continuar.
+                                </p>
+                            )}
                         </div>
 
                         {galeriaPrincipal.length > 0 && (
@@ -200,7 +218,7 @@ export function StepGallery() {
                 )}
             </div>
 
-            <SaveStepButtons />
+            <SaveStepButtons onNext={handleNext} />
 
             <Dialog open={showLimitModal} onOpenChange={setShowLimitModal}>
                 <DialogContent>

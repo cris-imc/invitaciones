@@ -496,7 +496,7 @@ export async function PUT(request: NextRequest) {
 
         const existingInvitation = await prisma.invitation.findUnique({
             where: { id },
-            select: { userId: true, regaloMonto: true, fechaEvento: true }
+            select: { userId: true, regaloMonto: true, fechaEvento: true, planTier: true }
         });
 
         if (!existingInvitation) {
@@ -506,6 +506,14 @@ export async function PUT(request: NextRequest) {
         if (existingInvitation.userId !== session.user.id && !isAdmin) {
             return NextResponse.json({ error: 'Sin permiso' }, { status: 403 });
         }
+
+        // A diferencia del POST de creación, este PUT no volvía a aplicar el
+        // candado de features premium (musica, trivia, regalo, pago de
+        // tarjeta) para una invitación FREE -- un cliente podía llamar este
+        // endpoint directo (ej. desde la consola del navegador) y habilitar
+        // cobro de tarjetas con sus propios datos bancarios sin haber pagado
+        // nunca Premium/Diamond. Se vuelve a forzar acá, igual que en POST.
+        const isFreeTier = existingInvitation.planTier === 'FREE' && !isAdmin;
 
         if (existingInvitation && fechaEvento && fechaEvento.getTime() !== new Date(existingInvitation.fechaEvento).getTime()) {
             if (!isAdmin && isEventDateLocked(existingInvitation.fechaEvento)) {
@@ -585,9 +593,19 @@ export async function PUT(request: NextRequest) {
 
                 // 8. GALERÍA PRINCIPAL
                 galeriaPrincipalHabilitada: body.galeriaPrincipalHabilitada,
-                galeriaPrincipalFotos: (() => { const g = body.galeriaPrincipalFotos; if (!g) return undefined; if (typeof g === 'string') return g; return JSON.stringify(g); })(),
+                galeriaPrincipalFotos: (() => {
+                    const g = body.galeriaPrincipalFotos;
+                    if (!g) return undefined;
+                    let fotos: unknown[];
+                    if (typeof g === 'string') { try { fotos = JSON.parse(g); } catch { return g; } }
+                    else fotos = g;
+                    if (isFreeTier && Array.isArray(fotos) && PLAN_LIMITS.FREE.maxPhotos !== null) {
+                        fotos = fotos.slice(0, PLAN_LIMITS.FREE.maxPhotos);
+                    }
+                    return JSON.stringify(fotos);
+                })(),
 
-                sugerenciaMusicaHabilitada: body.sugerenciaMusicaHabilitada,
+                sugerenciaMusicaHabilitada: isFreeTier ? false : body.sugerenciaMusicaHabilitada,
 
                 // 9. FRASE PERSONALIZADA
                 frasePersonalizadaHabilitada: body.frasePersonalizadaHabilitada,
@@ -598,7 +616,7 @@ export async function PUT(request: NextRequest) {
                 galeriaSecundariaFotos: body.galeriaSecundariaFotos ? JSON.stringify(body.galeriaSecundariaFotos) : undefined,
 
                 // 11. REGALO Y PAGO DE TARJETAS
-                regaloHabilitado: body.regaloHabilitado,
+                regaloHabilitado: isFreeTier ? false : body.regaloHabilitado,
                 regaloTitulo: body.regaloTitulo,
                 regaloMensaje: body.regaloMensaje,
                 regaloMostrarDatos: body.regaloMostrarDatos,
@@ -609,7 +627,7 @@ export async function PUT(request: NextRequest) {
                 regaloMonto: newRegaloMonto,
                 ...(regaloMontoUpdatedAt && { regaloMontoUpdatedAt }),
 
-                pagoTarjetaHabilitado: body.pagoTarjetaHabilitado,
+                pagoTarjetaHabilitado: isFreeTier ? false : body.pagoTarjetaHabilitado,
                 pagoTarjetaTitulo: body.pagoTarjetaTitulo,
                 pagoTarjetaMensaje: body.pagoTarjetaMensaje,
                 pagoTarjetaMostrarDatos: body.pagoTarjetaMostrarDatos,
@@ -625,12 +643,12 @@ export async function PUT(request: NextRequest) {
 
 
                 // 2. MÚSICA
-                musicaHabilitada: body.musicaHabilitada,
+                musicaHabilitada: isFreeTier ? false : body.musicaHabilitada,
                 musicaAutoplay: body.musicaAutoplay,
                 musicaLoop: body.musicaLoop,
 
                 // 3. TRIVIA
-                triviaHabilitada: body.triviaHabilitada,
+                triviaHabilitada: isFreeTier ? false : body.triviaHabilitada,
                 triviaIcono: body.triviaIcono,
                 triviaTitulo: body.triviaTitulo,
                 triviaSubtitulo: body.triviaSubtitulo,
