@@ -98,8 +98,13 @@ export async function POST(
             const toAdd = body.expectedCount || 1;
             
             if (totalCurrent + toAdd > maxGuests) {
+                // Si el tope viene del plan Gratis (no de un override manual
+                // del admin), pasarse a Premium/Diamond lo resuelve -- el
+                // front usa este flag para ofrecer el selector de plan en
+                // vez de un error sin salida (ver GuestManager.tsx).
+                const upgradable = invitation.planTier === "FREE" && invitation.maxGuestsOverride === null;
                 return NextResponse.json(
-                    { error: `Límite de invitados superado (Máximo: ${maxGuests})` },
+                    { error: `Límite de invitados superado (Máximo: ${maxGuests})`, code: "GUEST_LIMIT_REACHED", upgradable },
                     { status: 400 }
                 );
             }

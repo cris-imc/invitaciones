@@ -162,6 +162,28 @@ export const DIAMOND_DISCOUNT_PRICE = 40000; // antes $90.000
 export const PREMIUM_DISCOUNT_PERCENTAGE = Math.round((1 - PREMIUM_DISCOUNT_PRICE / PLAN_LIMITS.PREMIUM.price) * 100);
 export const DIAMOND_DISCOUNT_PERCENTAGE = Math.round((1 - DIAMOND_DISCOUNT_PRICE / PLAN_LIMITS.DIAMOND.price) * 100);
 
+// Resumen corto de diferencias entre planes -- para los selectores dentro de
+// la app (NewInvitationButton, WizardPlanLimitDialog) que solo mostraban
+// "X créditos disponibles" sin recordarle al cliente qué incluye cada uno.
+// La versión completa (con "sin X") vive en la lista de /register, esta es
+// la compacta para un diálogo chico.
+export const PLAN_FEATURE_HIGHLIGHTS: Record<"FREE" | "PREMIUM" | "DIAMOND", string[]> = {
+  FREE: [
+    `Hasta ${PLAN_LIMITS.FREE.maxGuests} invitados`,
+    `Álbum de hasta ${PLAN_LIMITS.FREE.maxPhotos} fotos`,
+    "Sin música, trivia ni gestión de pagos",
+  ],
+  PREMIUM: [
+    "Invitados ilimitados",
+    `Álbum de hasta ${PLAN_LIMITS.PREMIUM.maxPhotos} fotos, música, trivia y sugerencias DJ`,
+    "Gestión de pagos (regalos y tarjetas)",
+  ],
+  DIAMOND: [
+    "Todo lo de Premium",
+    "Modo LIVE: fotos y mensajes en vivo durante la fiesta",
+  ],
+};
+
 export interface PlanValidationError {
   field: string;
   message: string;

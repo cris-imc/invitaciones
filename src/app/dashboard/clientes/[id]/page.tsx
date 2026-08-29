@@ -57,9 +57,9 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
                 <div className="stat">
                     <p className="kicker">Cuenta creada</p>
                     <b className="text-lg">
-                        {new Date(client.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })}
+                        {new Date(client.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric", timeZone: "America/Argentina/Buenos_Aires" })}
                     </b>
-                    <small>{new Date(client.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })} hs</small>
+                    <small>{new Date(client.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Argentina/Buenos_Aires" })} hs</small>
                 </div>
                 <div className="stat">
                     <p className="kicker">Tarjetas creadas</p>
@@ -82,10 +82,10 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
                         {last3Logins.map((login) => (
                             <div key={login.id} className="flex items-center justify-between text-sm border-b border-white/5 last:border-0 py-1.5">
                                 <span className="opacity-70">
-                                    {new Date(login.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })}
+                                    {new Date(login.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric", timeZone: "America/Argentina/Buenos_Aires" })}
                                 </span>
                                 <span className="font-mono text-xs opacity-50">
-                                    {new Date(login.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })} hs
+                                    {new Date(login.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Argentina/Buenos_Aires" })} hs
                                 </span>
                             </div>
                         ))}
@@ -118,7 +118,7 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
                                         <td className="py-2.5 px-4">{PLAN_LABEL[inv.planTier] || inv.planTier}</td>
                                         <td className="py-2.5 px-4">{inv.estado === "ACTIVA" ? "Activa" : inv.estado === "BORRADOR" ? "Borrador" : "Finalizada"}</td>
                                         <td className="py-2.5 px-4 font-mono text-xs opacity-70 whitespace-nowrap">
-                                            {new Date(inv.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" })}
+                                            {new Date(inv.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric", timeZone: "America/Argentina/Buenos_Aires" })}
                                         </td>
                                     </tr>
                                 ))}

@@ -59,6 +59,8 @@ import {
 import { useToast } from "@/components/ui/Toast";
 import { getInvitePhrase } from "@/lib/invitation-copy";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
+import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
+import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
 
 // Burbuja animada del primer invitado (y su halo en "Copiar Link"). Se
 // descartó como causa del bug de scroll extra en Chrome-iOS (persistía con
@@ -159,6 +161,7 @@ interface GuestManagerProps {
 }
 
 export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino, tipo, initialMostrarNombreInvitadoEnSaludo = true }: GuestManagerProps) {
+  const router = useRouter();
   const [guests, setGuests] = useState<Guest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
@@ -173,6 +176,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [hintMounted, setHintMounted] = useState(false);
   const [mostrarNombreInvitadoEnSaludo, setMostrarNombreInvitadoEnSaludo] = useState(initialMostrarNombreInvitadoEnSaludo);
   const [isSavingSaludo, setIsSavingSaludo] = useState(false);
+
+  // Si el plan Gratis (20 personas) bloquea el alta de un invitado, en vez
+  // de un error sin salida ofrecemos pasar a Premium/Diamond ahí mismo --
+  // guardamos el payload que chocó con el límite para reintentarlo solo si
+  // la conversión se resuelve con un crédito ya disponible (sin redirección).
+  const [showGuestLimitUpgrade, setShowGuestLimitUpgrade] = useState(false);
+  const [pendingGuestPayload, setPendingGuestPayload] = useState<Record<string, unknown> | null>(null);
 
   // Edit Form States
   const [editGuestNombre, setEditGuestNombre] = useState("");
@@ -387,6 +397,45 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     }
   };
 
+  // Extraído de handleAddGuest para poder reintentar el mismo alta sin
+  // duplicar el manejo de éxito/error, una vez resuelto el límite del plan
+  // Gratis con un crédito ya disponible (ver upgradeAndRetryAddGuest).
+  const submitNewGuest = async (payload: Record<string, unknown>) => {
+    const res = await fetch(`/api/invitations/${slug}/guests`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      const newGuest = await res.json();
+      setGuests((prev) => [newGuest, ...prev]);
+      setNewGuestNombre("");
+      setNewGuestApellido("");
+      setNewGuestAdultCount(2);
+      setNewGuestTeenCount(0);
+      setNewGuestChildCount(0);
+      setNewGuestIsExempt(false);
+      setNewIndividualCategory('adult');
+      setNewGuestType(null);
+      setAddGuestOpen(false);
+      showToast("Invitado agregado exitosamente", "success");
+      return;
+    }
+
+    const data = await res.json().catch(() => ({} as { error?: string; code?: string; upgradable?: boolean }));
+    if (data.code === "GUEST_LIMIT_REACHED" && data.upgradable) {
+      // El tope de 20 personas es del plan Gratis (no un override manual) --
+      // ofrecemos pasar a Premium/Diamond ahí mismo en vez de un error sin
+      // salida, guardando este alta para reintentarla si se resuelve con un
+      // crédito ya disponible.
+      setPendingGuestPayload(payload);
+      setShowGuestLimitUpgrade(true);
+    } else {
+      showToast(data.error || "Error al agregar invitado", "error");
+    }
+  };
+
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGuestType) return;
@@ -397,45 +446,70 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     const effectiveTeens  = newTeensEnabled  ? newGuestTeenCount  : 0;
     const effectiveChildren = newChildrenEnabled ? newGuestChildCount : 0;
 
-    try {
-      const res = await fetch(`/api/invitations/${slug}/guests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: buildGuestName(guestType, newGuestNombre, newGuestApellido),
-          type: guestType,
-          expectedCount:
-            guestType === "FAMILY"
-              ? Math.max(1, effectiveAdults + effectiveTeens + effectiveChildren)
-              : 1,
-          expectedAdults: guestType === "FAMILY" ? effectiveAdults : (newIndividualCategory === 'adult' ? 1 : 0),
-          expectedTeens:  guestType === "FAMILY" ? effectiveTeens  : (newIndividualCategory === 'teen'  ? 1 : 0),
-          expectedChildren: guestType === "FAMILY" ? effectiveChildren : 0,
-          isExempt: newGuestIsExempt,
-        }),
-      });
+    const payload = {
+      name: buildGuestName(guestType, newGuestNombre, newGuestApellido),
+      type: guestType,
+      expectedCount:
+        guestType === "FAMILY"
+          ? Math.max(1, effectiveAdults + effectiveTeens + effectiveChildren)
+          : 1,
+      expectedAdults: guestType === "FAMILY" ? effectiveAdults : (newIndividualCategory === 'adult' ? 1 : 0),
+      expectedTeens:  guestType === "FAMILY" ? effectiveTeens  : (newIndividualCategory === 'teen'  ? 1 : 0),
+      expectedChildren: guestType === "FAMILY" ? effectiveChildren : 0,
+      isExempt: newGuestIsExempt,
+    };
 
-      if (res.ok) {
-        const newGuest = await res.json();
-        setGuests([newGuest, ...guests]);
-        setNewGuestNombre("");
-        setNewGuestApellido("");
-        setNewGuestAdultCount(2);
-        setNewGuestTeenCount(0);
-        setNewGuestChildCount(0);
-        setNewGuestIsExempt(false);
-        setNewIndividualCategory('adult');
-        setNewGuestType(null);
-        setAddGuestOpen(false);
-        showToast("Invitado agregado exitosamente", "success");
-      } else {
-        showToast("Error al agregar invitado", "error");
-      }
+    try {
+      await submitNewGuest(payload);
     } catch (error) {
       console.error(error);
       showToast("Error de conexión", "error");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // El cliente ya tiene crédito de ese tier -- convierte la invitación y
+  // reintenta el alta que había chocado con el límite, sin que tenga que
+  // volver a completar el formulario.
+  const upgradeAndRetryAddGuest = async (tier: "PREMIUM" | "DIAMOND") => {
+    try {
+      const res = await fetch(`/api/invitations/${slug}/upgrade-plan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planTier: tier }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Error al actualizar el plan");
+      showToast(`¡Listo! Tu invitación ya es ${tier === "DIAMOND" ? "Diamond" : "Premium"}.`, "success");
+      setShowGuestLimitUpgrade(false);
+      router.refresh();
+      if (pendingGuestPayload) {
+        const payload = pendingGuestPayload;
+        setPendingGuestPayload(null);
+        await submitNewGuest(payload);
+      }
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Error al actualizar el plan", "error");
+    }
+  };
+
+  // Sin crédito -- redirección dura a Mercado Pago (se pierde el estado en
+  // memoria, incluido pendingGuestPayload): al volver, PendingInvitationUpgradeBridge
+  // termina la conversión, y el cliente solo necesita reintentar el alta a mano.
+  const payMercadoPagoForGuestLimitUpgrade = async (tier: "PREMIUM" | "DIAMOND") => {
+    try {
+      savePendingInvitationUpgrade({ slug, desiredCredit: tier });
+      const res = await fetch("/api/user/buy-credit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planTier: tier }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.checkoutUrl) throw new Error(data.error || "Error al iniciar el pago");
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
     }
   };
 
@@ -1275,6 +1349,18 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <WizardPlanLimitDialog
+        open={showGuestLimitUpgrade}
+        onOpenChange={(open) => {
+          setShowGuestLimitUpgrade(open);
+          if (!open) setPendingGuestPayload(null);
+        }}
+        onUseCredit={upgradeAndRetryAddGuest}
+        onPayMercadoPago={payMercadoPagoForGuestLimitUpgrade}
+        title="Llegaste al límite de invitados del plan Gratis"
+        description="El plan Gratis admite hasta 20 personas -- pasate a Premium o Diamond para seguir agregando invitados sin perder los que ya cargaste."
+      />
     </div>
   );
 }

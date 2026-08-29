@@ -6,8 +6,15 @@ import { isAdmin } from "@/lib/roles";
 
 const DAYS = 14;
 
+// Argentina no tiene horario de verano desde 2009 -- UTC-3 fijo todo el año,
+// así que alcanza con este offset constante en vez de Intl/timezone DB para
+// ubicar cada fecha en el día calendario que corresponde en Argentina (el
+// server corre en UTC en producción, por eso "hoy" ahí no coincide con "hoy"
+// en Argentina cerca de la medianoche).
+const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
+
 function dayKey(d: Date) {
-    return d.toISOString().split("T")[0];
+    return new Date(d.getTime() - AR_OFFSET_MS).toISOString().split("T")[0];
 }
 
 function countByDay(records: { createdAt: Date }[], days: string[]) {
@@ -29,9 +36,12 @@ export default async function RegistrosPage() {
         redirect("/dashboard");
     }
 
-    const since = new Date();
-    since.setDate(since.getDate() - (DAYS - 1));
-    since.setHours(0, 0, 0, 0);
+    // Medianoche de Argentina (hoy - (DAYS-1)), como instante UTC real -- ver
+    // AR_OFFSET_MS más arriba sobre por qué no alcanza con Date local.
+    const todayArKey = dayKey(new Date());
+    const [arY, arM, arD] = todayArKey.split("-").map(Number);
+    const since = new Date(Date.UTC(arY, arM - 1, arD, 3, 0, 0));
+    since.setUTCDate(since.getUTCDate() - (DAYS - 1));
 
     const [
         recentUsers, recentInvitations, recentLogins,
@@ -56,7 +66,7 @@ export default async function RegistrosPage() {
     const days: string[] = [];
     for (let i = 0; i < DAYS; i++) {
         const d = new Date(since);
-        d.setDate(since.getDate() + i);
+        d.setUTCDate(since.getUTCDate() + i);
         days.push(dayKey(d));
     }
 
@@ -139,7 +149,7 @@ export default async function RegistrosPage() {
                                 </td>
                                 <td className="py-2.5 px-4 opacity-70">{ROLE_LABEL[login.user.role] || login.user.role}</td>
                                 <td className="py-2.5 px-4 font-mono text-xs opacity-70 whitespace-nowrap">
-                                    {new Date(login.createdAt).toLocaleString("es-AR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                    {new Date(login.createdAt).toLocaleString("es-AR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/Argentina/Buenos_Aires" })}
                                 </td>
                             </tr>
                         ))}

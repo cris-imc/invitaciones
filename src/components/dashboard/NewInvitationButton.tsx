@@ -14,6 +14,7 @@ import {
 import { Gift, Sparkles, Diamond, ChevronRight } from "lucide-react";
 import { NoCreditsDialog } from "./NoCreditsDialog";
 import { useToast } from "@/components/ui/Toast";
+import { PLAN_FEATURE_HIGHLIGHTS } from "@/lib/plan-limits";
 
 export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalInvitations, planTier, hasFreeInvitation = false, autoOpen = false, renderTrigger }: { premiumCredits: number, diamondCredits?: number, totalInvitations: number, planTier?: string, hasFreeInvitation?: boolean, autoOpen?: boolean, renderTrigger?: (onClick: () => void) => React.ReactNode }) {
     const [open, setOpen] = useState(autoOpen);
@@ -116,7 +117,11 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-semibold text-sm">Crear Gratis</p>
-                                    <p className="text-xs text-muted-foreground">Sin costo, funciones básicas</p>
+                                    <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                                        {PLAN_FEATURE_HIGHLIGHTS.FREE.map((f) => (
+                                            <li key={f}>• {f}</li>
+                                        ))}
+                                    </ul>
                                 </div>
                                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                             </button>
@@ -132,7 +137,12 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="font-semibold text-sm text-yellow-500">Usar Crédito Premium</p>
-                                <p className="text-xs text-muted-foreground">
+                                <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                                    {PLAN_FEATURE_HIGHLIGHTS.PREMIUM.map((f) => (
+                                        <li key={f}>• {f}</li>
+                                    ))}
+                                </ul>
+                                <p className="text-xs text-yellow-500/80 font-medium mt-1">
                                     {hasUnlimitedPremium
                                         ? "Invitaciones premium ilimitadas por tu plan"
                                         : `${premiumCredits} ${premiumCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}`}
@@ -151,7 +161,12 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="font-semibold text-sm text-[#67e8f9]">Usar Crédito Diamond</p>
-                                <p className="text-xs text-muted-foreground">
+                                <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                                    {PLAN_FEATURE_HIGHLIGHTS.DIAMOND.map((f) => (
+                                        <li key={f}>• {f}</li>
+                                    ))}
+                                </ul>
+                                <p className="text-xs text-[#67e8f9]/80 font-medium mt-1">
                                     {hasUnlimitedPremium
                                         ? "Invitaciones premium ilimitadas por tu plan"
                                         : `${diamondCredits} ${diamondCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}`}

@@ -1,9 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Eye, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, Eye, Pencil, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
+import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
+import { useToast } from "@/components/ui/Toast";
 
 function TypewriterText() {
   const text = "Previsualizá tu diseño o editá los detalles...";
@@ -31,9 +35,47 @@ interface EventShareCardProps {
   slug: string;
   eventName: string;
   invitationId?: string;
+  planTier?: string;
 }
 
-export function EventShareCard({ slug, eventName, invitationId }: EventShareCardProps) {
+export function EventShareCard({ slug, eventName, invitationId, planTier }: EventShareCardProps) {
+  const router = useRouter();
+  const { showToast } = useToast();
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+
+  const upgradeWithCredit = async (tier: "PREMIUM" | "DIAMOND") => {
+    try {
+      const res = await fetch(`/api/invitations/${slug}/upgrade-plan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planTier: tier }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Error al actualizar el plan");
+      showToast(`¡Listo! Tu invitación ya es ${tier === "DIAMOND" ? "Diamond" : "Premium"}.`, "success");
+      router.refresh();
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Error al actualizar el plan", "error");
+    }
+  };
+
+  const payMercadoPagoForUpgrade = async (tier: "PREMIUM" | "DIAMOND") => {
+    try {
+      // Redirección dura a Mercado Pago -- se guarda qué invitación convertir
+      // para cuando vuelva (ver PendingInvitationUpgradeBridge).
+      savePendingInvitationUpgrade({ slug, desiredCredit: tier });
+      const res = await fetch("/api/user/buy-credit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planTier: tier }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.checkoutUrl) throw new Error(data.error || "Error al iniciar el pago");
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
+    }
+  };
 
   return (
     <div className="w-full mb-4">
@@ -96,6 +138,37 @@ export function EventShareCard({ slug, eventName, invitationId }: EventShareCard
           </div>
         </div>
       </div>
+
+      {/* Banner aparte (no metido en la burbuja de arriba, que ya viene
+          justa de espacio y le cortaba el texto animado) -- solo para
+          invitaciones en plan Gratis. */}
+      {planTier === "FREE" && (
+        <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-yellow-500/10 to-[#67e8f9]/10 border border-yellow-500/30">
+          <div className="flex items-start gap-2.5 min-w-0">
+            <Sparkles className="w-4.5 h-4.5 text-yellow-500 shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold">Esta invitación está en plan Gratis</p>
+              <p className="text-xs text-muted-foreground">Convertila a Premium o Diamond para sumar música, trivia, gestión de pagos y el Modo LIVE.</p>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => setShowUpgradeDialog(true)}
+            className="w-full sm:w-auto shrink-0 h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm bg-gradient-to-r from-yellow-500 to-[#67e8f9] hover:opacity-90 text-black border-0"
+          >
+            Habilitar Premium/Diamond
+          </Button>
+        </div>
+      )}
+
+      <WizardPlanLimitDialog
+        open={showUpgradeDialog}
+        onOpenChange={setShowUpgradeDialog}
+        onUseCredit={upgradeWithCredit}
+        onPayMercadoPago={payMercadoPagoForUpgrade}
+        title="Habilitar funciones Premium/Diamond"
+        description="Convertí esta invitación de Gratis a Premium o Diamond sin perder nada de lo que ya cargaste."
+      />
     </div>
   );
 }

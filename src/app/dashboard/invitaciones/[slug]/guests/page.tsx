@@ -89,7 +89,7 @@ export default async function GuestManagementPage({ params }: { params: Promise<
       <GuestStatsBar invitationId={invitation.id} pagoTarjetaHabilitado={!!invitation.pagoTarjetaHabilitado} />
 
       {/* ── Share card ── */}
-      <EventShareCard slug={slug} eventName={invitation.nombreEvento} invitationId={invitation.id} />
+      <EventShareCard slug={slug} eventName={invitation.nombreEvento} invitationId={invitation.id} planTier={invitation.planTier} />
 
       {/* ── Tabs (with all original props) ── */}
       <GuestPageTabs

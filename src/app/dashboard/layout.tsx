@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { PhoneReminderModal } from "@/components/dashboard/PhoneReminderModal";
 import { PendingWizardInvitationBridge } from "@/components/dashboard/PendingWizardInvitationBridge";
+import { PendingInvitationUpgradeBridge } from "@/components/dashboard/PendingInvitationUpgradeBridge";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -26,6 +27,7 @@ export default async function DashboardLayout({
             </div>
             <PhoneReminderModal />
             <PendingWizardInvitationBridge />
+            <PendingInvitationUpgradeBridge />
         </div>
     );
 }

@@ -2102,6 +2102,38 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 @media (max-width: 767px) {
   .adm-mobile-nav { display: none; }
   .adm-cols { grid-template-columns: 1fr; }
+
+  /* Las pestañas (Gestionar invitados/pagos/etc) se pierden contra lo que
+     hay arriba en mobile -- separación propia, más altura y una pill de
+     fondo en la activa en vez de solo el subrayado (que se ve muy sutil
+     en esta pantalla angosta). El fondo/padding va en .adm-tabs (no en
+     .adm-tabs-container): las flechitas de scroll son absolute con
+     top/right/bottom:0 contra .adm-tabs-container -- si ese contenedor
+     tuviera su propio padding quedan desalineadas contra la fila real.
+     .adm-tab también fuerza height:100% porque .adm-tabs (flex, stretch
+     por default) puede estirar el wrapper <div class="relative"> de cada
+     tab más que el alto natural del <button>, y sin esto el fondo de la
+     pestaña activa quedaba más bajo que el resto de la fila. */
+  .adm-tabs-container {
+    margin-top: 14px;
+  }
+  .adm-tabs {
+    border-bottom: none;
+    padding: 4px 40px 4px 4px;
+    background: rgba(246,243,236,.04);
+    border-radius: var(--r-s);
+    align-items: stretch;
+  }
+  .adm-tab {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    border-bottom: none;
+    height: 100%;
+  }
+  .adm-tab.active {
+    background: rgba(199,154,75,.14);
+  }
 }
 
 @media (min-width: 768px) {
