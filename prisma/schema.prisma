@@ -34,6 +34,7 @@ model User {
   payments              Payment[]
   sessions              Session[]
   loginEvents           LoginEvent[]
+  passwordResetTokens   PasswordResetToken[]
 }
 
 model LoginEvent {
@@ -77,6 +78,22 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  // Nunca se guarda el token en texto plano -- si se filtra la base, un
+  // token robado no alcanza para resetear ninguna contraseña sin también
+  // conocer el valor original (el mismo criterio que ya se usa con
+  // User.password vía bcrypt).
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Payment {

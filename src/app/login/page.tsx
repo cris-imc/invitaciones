@@ -112,6 +112,11 @@ export default function LoginPage() {
                 required
                 className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
               />
+              <div className="text-right mt-2">
+                <Link href="/forgot-password" className="text-sm opacity-70 hover:opacity-100 hover:underline">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
             </div>
 
             <Button
