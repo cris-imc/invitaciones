@@ -554,23 +554,35 @@ export function CoronaEscarlataTemplate({ invitation, guest, isPersonalized = fa
     let touchPanFactor = 0;
     const onTouchStart = (e: TouchEvent) => {
       touchIsHorizontal = false;
-      touchPanFactor = panFactorFor(e.target as HTMLElement);
-      if (!touchPanFactor) return;
+      touchPanFactor = 0;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (!touchPanFactor) return;
-      const dx = touchStartX - e.touches[0].clientX;
-      const dy = touchStartY - e.touches[0].clientY;
+      const t = e.touches[0];
+      const dx = touchStartX - t.clientX;
+      const dy = touchStartY - t.clientY;
       if (!touchIsHorizontal) {
         if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+        // El gesto ya es claramente horizontal -- recién ACÁ nos fijamos si
+        // hay un panel pineado debajo, usando dónde está el dedo AHORA
+        // (elementFromPoint), no dónde arrancó el touch. Los eventos
+        // touchmove "capturan" el elemento del touchstart y lo mantienen
+        // fijo para todo el gesto (target original), así que si el toque
+        // arrancó justo en el borde -- todavía en el contenido de ANTES del
+        // panel -- decidir solo con e.target dejaba el gesto lateral
+        // inhabilitado para todo ese arrastre, aunque el dedo ya estuviera
+        // visualmente sobre el panel. Por eso justo en ese primer punto de
+        // entrada a un panel se sentía que "no respondía".
+        const el = document.elementFromPoint(t.clientX, t.clientY) as HTMLElement | null;
+        touchPanFactor = panFactorFor(el);
+        if (!touchPanFactor) return;
         touchIsHorizontal = true;
       }
       e.preventDefault();
       if (scrollerRef.current) scrollerRef.current.scrollTop += dx * touchPanFactor;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
     };
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) <= 2) return;
