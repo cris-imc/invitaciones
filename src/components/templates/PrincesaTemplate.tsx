@@ -531,17 +531,36 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
     // dirección intuitiva: arrastrar hacia la izquierda avanza (como bajar),
     // arrastrar hacia la derecha retrocede (como subir). Fuera de un panel
     // pineado no hace nada -- el scroll normal sigue su flujo de siempre.
+    // Un arrastre/wheel de 1px no puede mover 1px de scrollTop -- el pan
+    // puede medir varias pantallas de alto (260-340vh) repartidas entre
+    // pocos paneles, así que 1px de dedo apenas movía una fracción mínima
+    // (había que arrastrar muchas veces para avanzar un poco). En cambio,
+    // se escala para que un arrastre de TODO el ancho de pantalla mueva
+    // exactamente un panel -- se siente como pasar de foto a fotos, no como
+    // empujar centímetro a centímetro.
+    const panFactorFor = (target: HTMLElement | null): number => {
+      const pan = target?.closest<HTMLElement>("[data-pan]");
+      const sc = scrollerRef.current;
+      if (!pan || !sc || sc.clientWidth <= 0) return 0;
+      const strip = pan.querySelector<HTMLElement>("[data-strip]");
+      const n = strip ? strip.children.length : 1;
+      if (n <= 1) return 0;
+      const span = pan.offsetHeight - sc.clientHeight;
+      return (span / (n - 1)) / sc.clientWidth;
+    };
     let touchStartX = 0;
     let touchStartY = 0;
     let touchIsHorizontal = false;
+    let touchPanFactor = 0;
     const onTouchStart = (e: TouchEvent) => {
       touchIsHorizontal = false;
-      if (!(e.target as HTMLElement)?.closest?.("[data-pan]")) return;
+      touchPanFactor = panFactorFor(e.target as HTMLElement);
+      if (!touchPanFactor) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (!(e.target as HTMLElement)?.closest?.("[data-pan]")) return;
+      if (!touchPanFactor) return;
       const dx = touchStartX - e.touches[0].clientX;
       const dy = touchStartY - e.touches[0].clientY;
       if (!touchIsHorizontal) {
@@ -549,14 +568,15 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
         touchIsHorizontal = true;
       }
       e.preventDefault();
-      if (scrollerRef.current) scrollerRef.current.scrollTop += dx;
+      if (scrollerRef.current) scrollerRef.current.scrollTop += dx * touchPanFactor;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     };
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) <= 2) return;
-      if (!(e.target as HTMLElement)?.closest?.("[data-pan]")) return;
-      if (scrollerRef.current) scrollerRef.current.scrollTop += e.deltaX;
+      const factor = panFactorFor(e.target as HTMLElement);
+      if (!factor || !scrollerRef.current) return;
+      scrollerRef.current.scrollTop += e.deltaX * factor;
     };
     root.addEventListener("touchstart", onTouchStart, { passive: true });
     root.addEventListener("touchmove", onTouchMove, { passive: false });
