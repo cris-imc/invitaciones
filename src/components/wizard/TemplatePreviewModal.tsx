@@ -36,6 +36,7 @@ import {
   INFANTIL_COLORS,
   GUESTPASSVIP_COLORS,
   PRINCESA_COLORS,
+  CORONAESCARLATA_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
@@ -47,6 +48,7 @@ export {
   CORPORATE_COLORS, GARDENPARTY_COLORS, LOFTINDUSTRIAL_COLORS, INFANTIL_COLORS,
   GUESTPASSVIP_COLORS,
   PRINCESA_COLORS,
+  CORONAESCARLATA_COLORS,
   type TemplateTipo,
 };
 
@@ -78,6 +80,7 @@ export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
   INFANTIL: "#FF5C8A",
   GUESTPASSVIP: "#C8A45C",
   PRINCESA: "#B48CC9",
+  CORONAESCARLATA: "#D9A441",
 };
 
 const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
@@ -105,6 +108,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
   { tipo: "INFANTIL", label: "Infantil" },
   { tipo: "GUESTPASSVIP", label: "Guest Pass VIP" },
   { tipo: "PRINCESA", label: "Princesa" },
+  { tipo: "CORONAESCARLATA", label: "Corona Escarlata" },
 ];
 
 // Neon ("Doodle Disco 15") solo se ofrece para 15 años y Evento (CUMPLEANOS),
@@ -113,7 +117,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
 // docs/INVENTARIO_IMPLE_MASIVA.md sigue el mismo patrón de gating por tipo
 // de evento -- ver esa tabla para el detalle de cada una.
 function getAvailableTabs(eventType: string | undefined, collection: "FLAT" | "STORYTELLING"): { tipo: TemplateTipo; label: string }[] {
-  const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D", "PRINCESA"]);
+  const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D", "PRINCESA", "CORONAESCARLATA"]);
   const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP"]);
   const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL"]);
@@ -154,6 +158,7 @@ const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
   INFANTIL: INFANTIL_COLORS,
   GUESTPASSVIP: GUESTPASSVIP_COLORS,
   PRINCESA: PRINCESA_COLORS,
+  CORONAESCARLATA: CORONAESCARLATA_COLORS,
 };
 
 function getColorsForTipo(tipo: TemplateTipo) {

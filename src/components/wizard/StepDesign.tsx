@@ -34,6 +34,7 @@ import {
     INFANTIL_COLORS,
     GUESTPASSVIP_COLORS,
     PRINCESA_COLORS,
+    CORONAESCARLATA_COLORS,
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
@@ -65,6 +66,7 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     INFANTIL: "Infantil",
     GUESTPASSVIP: "Guest Pass VIP",
     PRINCESA: "Princesa",
+    CORONAESCARLATA: "Corona Escarlata",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
@@ -91,6 +93,7 @@ const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     INFANTIL: INFANTIL_COLORS,
     GUESTPASSVIP: GUESTPASSVIP_COLORS,
     PRINCESA: PRINCESA_COLORS,
+    CORONAESCARLATA: CORONAESCARLATA_COLORS,
 };
 const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
     (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [

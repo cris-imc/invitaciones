@@ -27,7 +27,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Bodoni_Moda, IBM_Plex_Mono } from "next/font/google";
-import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
@@ -173,11 +173,17 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
-  // wizard) -- mosaico propio, paginado de a 5 fotos por hoja.
+  // wizard) -- mosaico propio, de hasta 5 fotos por hoja. Reparte parejo en
+  // vez de llenar cada hoja al máximo y dejar el resto en la última: con,
+  // por ejemplo, 6 fotos, 5+1 dejaba una sola foto huérfana en toda una hoja
+  // -- calculando cuántas hojas hacen falta primero y repartiendo el total
+  // entre esas hojas por igual, da 3+3 en vez de eso.
   const PHOTOS_PER_PAGE = 5;
+  const photoPageCount = Math.max(1, Math.ceil(allPhotos.length / PHOTOS_PER_PAGE));
+  const photosPerPageBalanced = Math.ceil(allPhotos.length / photoPageCount) || PHOTOS_PER_PAGE;
   const photoPages: string[][] = [];
-  for (let i = 0; i < allPhotos.length; i += PHOTOS_PER_PAGE) {
-    photoPages.push(allPhotos.slice(i, i + PHOTOS_PER_PAGE));
+  for (let i = 0; i < allPhotos.length; i += photosPerPageBalanced) {
+    photoPages.push(allPhotos.slice(i, i + photosPerPageBalanced));
   }
   if (photoPages.length === 0) photoPages.push([]);
 
@@ -267,6 +273,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
   const statusRef = useRef<HTMLSpanElement | null>(null);
 
   const [confirmed, setConfirmed] = useState(guestStatus === "CONFIRMED");
+  const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null);
 
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusic, audioElement: musicAudioElement } = useMusicPlayer({
     musicaUrl: String(invitation.musicaUrl ?? ""),
@@ -547,10 +554,51 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
     const onResize = () => {};
     window.addEventListener("resize", onResize);
 
+    // Gesto lateral manual dentro de los paneles "pineados" (El lugar /
+    // Álbum): el scroll de siempre (vertical, dedo o rueda) ya mueve el
+    // carrusel horizontal -- esto suma que un arrastre CLARAMENTE horizontal
+    // (o el wheel horizontal de un trackpad) también lo mueva, en la
+    // dirección intuitiva: arrastrar hacia la izquierda avanza (como bajar),
+    // arrastrar hacia la derecha retrocede (como subir). Fuera de un panel
+    // pineado no hace nada -- el scroll normal sigue su flujo de siempre.
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchIsHorizontal = false;
+    const onTouchStart = (e: TouchEvent) => {
+      touchIsHorizontal = false;
+      if (!(e.target as HTMLElement)?.closest?.("[data-pan]")) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!(e.target as HTMLElement)?.closest?.("[data-pan]")) return;
+      const dx = touchStartX - e.touches[0].clientX;
+      const dy = touchStartY - e.touches[0].clientY;
+      if (!touchIsHorizontal) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+        touchIsHorizontal = true;
+      }
+      e.preventDefault();
+      if (scrollerRef.current) scrollerRef.current.scrollTop += dx;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) <= 2) return;
+      if (!(e.target as HTMLElement)?.closest?.("[data-pan]")) return;
+      if (scrollerRef.current) scrollerRef.current.scrollTop += e.deltaX;
+    };
+    root.addEventListener("touchstart", onTouchStart, { passive: true });
+    root.addEventListener("touchmove", onTouchMove, { passive: false });
+    root.addEventListener("wheel", onWheel, { passive: true });
+
     return () => {
       window.clearInterval(tickTimer);
       cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);
+      root.removeEventListener("touchstart", onTouchStart);
+      root.removeEventListener("touchmove", onTouchMove);
+      root.removeEventListener("wheel", onWheel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -563,7 +611,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
         position: "fixed",
         inset: 0,
         width: "100%",
-        height: "100vh",
+        height: "calc(var(--vh, 1vh) * 100)",
         overflow: "hidden",
         background: "#08080B",
         fontFamily: "var(--gp-mono), monospace",
@@ -766,17 +814,19 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
                   </div>
                   {pageIndex === 0 && <h2 className="gpv-panel-title-md">Álbum <span className="gpv-accent-serif">de fotos</span></h2>}
                   <div className="gpv-mosaic">
-                    {page.length > 0 ? Array.from({ length: Math.ceil(page.length / 3) * 3 }).map((_, i) => (
-                      i < page.length ? (
-                        <div key={i} className="gpv-mosaic-cell">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={page[i]} alt="" className="gpv-mosaic-img" />
-                        </div>
-                      ) : (
-                        <div key={i} className="gpv-mosaic-cell gpv-mosaic-cell--filler">
-                          <span className="gpv-mosaic-filler-symbol">&amp;</span>
-                        </div>
-                      )
+                    {page.length > 0 ? page.map((url, i) => (
+                      <div
+                        key={i}
+                        className={`gpv-mosaic-cell${i === 0 ? " gpv-mosaic-cell--featured" : ""}`}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setExpandedPhoto(url)}
+                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
+                        aria-label={`Ampliar foto ${i + 1}`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="" className="gpv-mosaic-img" />
+                      </div>
                     )) : (
                       <span className="gpv-photo-placeholder">Sin fotos todavía</span>
                     )}
@@ -793,7 +843,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
                 <h2 className="gpv-panel-title">Todo lo que<br /><span className="gpv-accent-serif">vamos a recordar</span></h2>
                 <div className="gpv-album-embed">
                   {livePhotos.length > 0 ? (
-                    <AlbumCarousel photos={livePhotos} hideHeader dark />
+                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#8C6F35" />
                   ) : (
                     <div className="gpv-live-placeholder">
                       <span className="gpv-mini-label">
@@ -961,6 +1011,34 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
       </div>
 
       <div ref={hintRef} className="gpv-hint">DESLIZÁ ↓</div>
+
+      {expandedPhoto && (
+        <div
+          className="gpv-lightbox"
+          onClick={() => setExpandedPhoto(null)}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <button
+            type="button"
+            className="gpv-lightbox-close"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpandedPhoto(null);
+            }}
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={expandedPhoto}
+            alt="Foto ampliada"
+            className="gpv-lightbox-img"
+            draggable={false}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       {musicaHabilitada && musicAudioElement}
       {mounted && musicaHabilitada && isCoverOpen && createPortal(
@@ -1612,7 +1690,7 @@ const GP_CSS = `
   @keyframes gpSide { 0%,100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
   @media (prefers-reduced-motion: reduce) { .gpv-scroller * { animation: none !important; } }
 
-  .gpv-section { min-height: 100vh; position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
+  .gpv-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .gpv-section--between { justify-content: space-between; }
 
   .gpv-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
@@ -1664,7 +1742,7 @@ const GP_CSS = `
   .gpv-h2 { margin: 0; font-family: var(--gp-bodoni), serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96; }
 
   .gpv-pan { height: 260vh; position: relative; }
-  .gpv-pan-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  .gpv-pan-sticky { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
   .gpv-strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform; }
   .gpv-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; gap: 22px; }
   .gpv-panel--between { justify-content: space-between; }
@@ -1742,16 +1820,15 @@ const GP_CSS = `
      estiraban en vez de quedar cuadradas. Con auto, cada fila mide justo lo
      que necesita (cuadrado, según el ancho de columna) y el resto del panel
      queda en blanco en vez de deformar las fotos. */
-  .gpv-mosaic { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: auto; align-content: start; gap: 10px; }
-  .gpv-mosaic-cell { position: relative; min-height: 0; aspect-ratio: 1; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); overflow: hidden; }
+  .gpv-mosaic { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: auto; grid-auto-flow: dense; align-content: start; gap: 10px; }
+  .gpv-mosaic-cell--featured { grid-column: span 2; grid-row: span 2; cursor: pointer; }
+  .gpv-mosaic-cell { position: relative; height: 0; padding-top: 100%; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); overflow: hidden; cursor: pointer; }
   .gpv-mosaic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   /* Celdas de relleno: cuando la cantidad de fotos no completa una fila
      entera, en vez de dejar el hueco vacío (o una fila con 1-2 fotos
      aisladas) se completa hasta el próximo múltiplo de 3 con este símbolo
      decorativo -- así todas las filas quedan parejas y alineadas entre sí,
      página a página. */
-  .gpv-mosaic-cell--filler { display: flex; align-items: center; justify-content: center; }
-  .gpv-mosaic-filler-symbol { font-family: var(--gp-bodoni), serif; font-style: italic; font-size: clamp(20px, 6vw, 30px); color: #C8A45C; opacity: 0.5; }
 
   .gpv-bank-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 420px; margin: 0; }
   .gpv-bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(200,164,92,0.18); }
@@ -1831,4 +1908,8 @@ const GP_CSS = `
   .gpv-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .gpv-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }
+
+  .gpv-lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(8,8,11,0.96); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .gpv-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #C8A45C; background: rgba(0,0,0,0.4); color: #F4F1EA; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .gpv-lightbox-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; }
 `;

@@ -1,16 +1,16 @@
 "use client";
 
 /**
- * PrincesaTemplate.tsx
+ * CoronaEscarlataTemplate.tsx
  *
- * Portado 1:1 desde el diseño "Princesa" (Colección Storytelling, mis quince
- * años: fondo ciruela oscuro, acento lavanda/malva, Cormorant Garamond +
- * IBM Plex Mono, tiara en vez de medallón VIP, tarjeta-tiara perforada,
- * scroll horizontal "pineado" para Cuándo y dónde / Álbum, riel lateral de
- * progreso y portada que se abre en dos mitades). Misma arquitectura que
- * GuestPassVipTemplate.tsx (ver ese archivo para el detalle del motor de
- * motion) -- todo el motion es CSS + SVG + un loop de scroll propio, cero
- * PNGs.
+ * Portado 1:1 desde el diseño "Corona Escarlata" (Colección Storytelling,
+ * mis quince años: fondo bordó/granate oscuro, acento dorado, Playfair
+ * Display + IBM Plex Mono, corona en vez de medallón VIP, tarjeta-corona
+ * perforada, scroll horizontal "pineado" para Cuándo y dónde / Álbum, riel
+ * lateral de progreso y portada que se abre en dos mitades). Misma
+ * arquitectura que GuestPassVipTemplate.tsx (ver ese archivo para el detalle
+ * del motor de motion) -- todo el motion es CSS + SVG + un loop de scroll
+ * propio, cero PNGs.
  *
  * Secciones fijas del producto (Save the Date, Countdown, Frase, Cuándo y
  * dónde, RSVP, Álbum, Música, Footer) reinterpretadas visualmente, conectadas
@@ -21,7 +21,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
+import { Playfair_Display, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { toEmbedMapUrl } from "@/lib/google-maps";
@@ -32,18 +32,18 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 
-const prcCormorant = Cormorant_Garamond({
+const cnePlayfair = Playfair_Display({
   subsets: ["latin"],
   style: ["normal", "italic"],
-  weight: ["300", "400", "600"],
-  variable: "--prc-cormorant",
+  weight: ["400", "700"],
+  variable: "--cne-playfair",
   display: "swap",
 });
 
-const prcMono = IBM_Plex_Mono({
+const cneMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["300", "400", "500"],
-  variable: "--prc-mono",
+  variable: "--cne-mono",
   display: "swap",
 });
 
@@ -67,7 +67,7 @@ interface CronoItem {
   icon?: string;
 }
 
-interface PrcQuizQuestion {
+interface CneQuizQuestion {
   pregunta: string;
   opciones: string[];
   respuestaCorrecta?: number;
@@ -94,20 +94,20 @@ interface GuestRecord {
   orderNumber?: number;
 }
 
-interface PrincesaTemplateProps {
+interface CoronaEscarlataTemplateProps {
   invitation: Record<string, unknown>;
   guest?: GuestRecord | null;
   isPersonalized?: boolean;
 }
 
-// El backend no reserva mesas/sectores -- la tiara muestra el orden real del
+// El backend no reserva mesas/sectores -- la corona muestra el orden real del
 // invitado (001, 002...) en vez de un número inventado.
 function passNumberFrom(orderNumber: number | undefined): string {
   if (!orderNumber) return "---";
   return String(orderNumber).padStart(3, "0");
 }
 
-export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: PrincesaTemplateProps) {
+export function CoronaEscarlataTemplate({ invitation, guest, isPersonalized = false }: CoronaEscarlataTemplateProps) {
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
   const namesTitle = nombreQuinceanera || "Mis quince";
 
@@ -115,7 +115,7 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UN CUENTO DE HADAS PARA" : "UN CUENTO DE HADAS PARA MIS 15 DE";
+  const coverKickerText = showGuestNameInCover ? "INVITACIÓN REAL PARA" : "INVITACIÓN REAL PARA LOS 15 DE";
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -136,7 +136,7 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. Vos sos la protagonista."
+    invitation.portadaMensaje || "Bloqueá la noche entera. Esta corona es por una vez."
   );
 
   // Cronograma real (no inventado) -- se muestra tal cual lo cargó el
@@ -184,7 +184,7 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
   const musicaHabilitada = Boolean(invitation.musicaHabilitada) && Boolean(invitation.musicaUrl);
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
-  const triviaPreguntas: PrcQuizQuestion[] = safeJson<PrcQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
+  const triviaPreguntas: CneQuizQuestion[] = safeJson<CneQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
@@ -193,10 +193,10 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
   const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
   const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
     ? String(invitation.frasePersonalizadaTexto)
-    : "El castillo se abre una vez.";
+    : "El salón se abre una vez.";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del diseño: primera mitad de la frase en color
-  // plano, segunda mitad en lavanda itálico, partiendo por la mitad de la
+  // plano, segunda mitad en dorado itálico, partiendo por la mitad de la
   // cantidad real de palabras.
   const fraseAccentStart = Math.ceil(fraseWords.length / 2);
   const fraseFontSize = fraseWords.length > 14
@@ -342,11 +342,11 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
     window.setTimeout(() => {
       if (statusRef.current) {
         statusRef.current.textContent = "ACCESO CONFIRMADO";
-        statusRef.current.style.color = "#F7E9F0";
+        statusRef.current.style.color = "#F6EFDD";
       }
       if (stubRef.current) {
-        stubRef.current.style.borderColor = "#B48CC9";
-        stubRef.current.style.boxShadow = "0 0 0 1px rgba(180,140,201,.35), 0 18px 50px -30px #B48CC9";
+        stubRef.current.style.borderColor = "#D9A441";
+        stubRef.current.style.boxShadow = "0 0 0 1px rgba(217,164,65,.35), 0 18px 50px -30px #D9A441";
       }
       if (sealRef.current) {
         sealRef.current.style.opacity = "1";
@@ -472,7 +472,7 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
           const dots = pan.querySelectorAll<HTMLElement>("[data-dot]");
           const active = Math.min(n - 1, Math.round(eased * (n - 1)));
           dots.forEach((dot, i) => {
-            dot.style.background = i === active ? "#7A4A6E" : "rgba(20,20,27,0.18)";
+            dot.style.background = i === active ? "#7A1620" : "rgba(20,20,27,0.18)";
           });
         });
 
@@ -510,10 +510,10 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
             }
           }
           const light = tone === "light";
-          if (railRef.current) railRef.current.style.borderLeftColor = light ? "rgba(20,20,27,0.14)" : "rgba(180,140,201,0.14)";
-          if (railLineRef.current) railLineRef.current.style.background = light ? "rgba(20,20,27,0.14)" : "rgba(180,140,201,0.16)";
+          if (railRef.current) railRef.current.style.borderLeftColor = light ? "rgba(20,20,27,0.14)" : "rgba(217,164,65,0.14)";
+          if (railLineRef.current) railLineRef.current.style.background = light ? "rgba(20,20,27,0.14)" : "rgba(217,164,65,0.16)";
           if (railTopRef.current) railTopRef.current.style.color = light ? "#7C7768" : "#8A8577";
-          if (railLabelRef.current) railLabelRef.current.style.color = light ? "#7A4A6E" : "#B48CC9";
+          if (railLabelRef.current) railLabelRef.current.style.color = light ? "#7A1620" : "#D9A441";
         }
         if (hintRef.current && sc.scrollTop > 40) hintRef.current.style.opacity = "0";
       }
@@ -576,172 +576,172 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
   return (
     <div
       ref={rootRef}
-      className={`${prcCormorant.variable} ${prcMono.variable}`}
+      className={`${cnePlayfair.variable} ${cneMono.variable}`}
       style={{
         position: "fixed",
         inset: 0,
         width: "100%",
         height: "calc(var(--vh, 1vh) * 100)",
         overflow: "hidden",
-        background: "#22111F",
-        fontFamily: "var(--prc-mono), monospace",
+        background: "#220709",
+        fontFamily: "var(--cne-mono), monospace",
         color: "#F4F1EA",
       }}
     >
-      <style>{PRC_CSS}</style>
+      <style>{CNE_CSS}</style>
 
-      <div ref={scrollerRef} data-scroller="1" className="prc-scroller">
-        <section data-tone="dark" data-screen-label="Save the Date" className="prc-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #2A1628 55%, #22111F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="prc-kicker">01 — GUARDÁ LA FECHA</span>
-          <div className="prc-date-stack">
-            <span data-xin="1" data-delay="60" data-dist="-110" className="prc-date-num">{dayNum}</span>
-            <span data-xin="1" data-delay="170" data-dist="140" className="prc-date-month">{monthAbbr}</span>
-            <span data-xin="1" data-delay="280" data-dist="220" className="prc-date-num prc-date-num--right">
+      <div ref={scrollerRef} data-scroller="1" className="cne-scroller">
+        <section data-tone="dark" data-screen-label="Save the Date" className="cne-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #2A0A0E 55%, #220709 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="cne-kicker">01 — GUARDÁ LA FECHA</span>
+          <div className="cne-date-stack">
+            <span data-xin="1" data-delay="60" data-dist="-110" className="cne-date-num">{dayNum}</span>
+            <span data-xin="1" data-delay="170" data-dist="140" className="cne-date-month">{monthAbbr}</span>
+            <span data-xin="1" data-delay="280" data-dist="220" className="cne-date-num cne-date-num--right">
               {String(fechaEvento.getFullYear()).slice(-2)}
             </span>
           </div>
-          <div data-xin="1" data-delay="380" data-dist="-80" className="prc-divider">
-            <span className="prc-divider-line" /><span>{weekday} · {hora} H</span>
+          <div data-xin="1" data-delay="380" data-dist="-80" className="cne-divider">
+            <span className="cne-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
-          <p data-xin="1" data-delay="460" className="prc-lead">{portadaMensaje}</p>
+          <p data-xin="1" data-delay="460" className="cne-lead">{portadaMensaje}</p>
 
-          <div data-drift="-70" className="prc-medallion prc-medallion--corner">
-            <TiaraMedallion sub="ACCESO" arcId="prcArc1" arcText="MIS QUINCE · CUENTO DE HADAS · " spin="normal" />
+          <div data-drift="-70" className="cne-medallion cne-medallion--corner">
+            <CoronaMedallion sub="ACCESO" arcId="cneArc1" arcText="MIS QUINCE · REALEZA POR UNA NOCHE · " spin="normal" />
           </div>
         </section>
 
-        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="prc-section prc-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #3E2440 0%, #26131F 55%, #22111F 100%)" }}>
-          <div className="prc-scan-grid" />
-          <div className="prc-scanline" />
-          <span data-xin="1" data-dist="-60" className="prc-kicker" style={{ position: "relative" }}>02 — LA MAGIA EMPIEZA EN</span>
-          <div className="prc-cd-grid">
-            <PrcCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <PrcCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <PrcCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <PrcCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="cne-section cne-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #3A0E12 0%, #26131F 55%, #220709 100%)" }}>
+          <div className="cne-scan-grid" />
+          <div className="cne-scanline" />
+          <span data-xin="1" data-dist="-60" className="cne-kicker" style={{ position: "relative" }}>02 — LA CORONACIÓN ES EN</span>
+          <div className="cne-cd-grid">
+            <CneCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
+            <CneCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
+            <CneCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
+            <CneCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
           </div>
-          <div className="prc-perf-strip" />
+          <div className="cne-perf-strip" />
         </section>
 
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="prc-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #22111F 100%)" }}>
-          <div data-drift="-130" className="prc-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="prc-kicker" style={{ position: "relative" }}>03 — UN MENSAJE PARA VOS</span>
-          <h2 ref={phraseRef} className="prc-phrase" style={{ fontSize: fraseFontSize }}>
+        <section id="quote" data-tone="dark" data-screen-label="Frase" className="cne-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #220709 100%)" }}>
+          <div data-drift="-130" className="cne-glow-blob" />
+          <span data-xin="1" data-dist="-60" className="cne-kicker" style={{ position: "relative" }}>03 — UN MENSAJE PARA VOS</span>
+          <h2 ref={phraseRef} className="cne-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
               // `display:inline-block` en cada [data-w], y un espacio de fin
               // de línea DENTRO de un inline-block se colapsa a 0 -- como
               // texto suelto entre spans, en cambio, se renderiza normal.
               <span key={i}>
-                <span data-w="1" className={i >= fraseAccentStart ? "prc-accent-italic" : undefined}>
+                <span data-w="1" className={i >= fraseAccentStart ? "cne-accent-italic" : undefined}>
                   {w}
                 </span>{" "}
               </span>
             ))}
           </h2>
-          <div data-xin="1" data-delay="120" data-dist="90" className="prc-divider" style={{ position: "relative" }}>
-            <span className="prc-divider-line prc-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
+          <div data-xin="1" data-delay="120" data-dist="90" className="cne-divider" style={{ position: "relative" }}>
+            <span className="cne-divider-line cne-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
 
-        <div data-pan="1" data-screen-label="El lugar" className="prc-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
-          <div className="prc-pan-sticky">
-            <div data-strip="1" className="prc-strip">
+        <div data-pan="1" data-screen-label="El lugar" className="cne-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+          <div className="cne-pan-sticky">
+            <div data-strip="1" className="cne-strip">
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="light" className="prc-panel prc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
-                  <div className="prc-hair-bg" />
-                  <div className="prc-panel-top">
+                <div id="ceremonia" data-tone="light" className="cne-panel cne-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
+                  <div className="cne-hair-bg" />
+                  <div className="cne-panel-top">
                     <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
-                  <h2 className="prc-panel-title">
+                  <h2 className="cne-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
-                    {ceremoniaDireccion && <><br /><span className="prc-accent-serif">{ceremoniaDireccion}</span></>}
+                    {ceremoniaDireccion && <><br /><span className="cne-accent-serif">{ceremoniaDireccion}</span></>}
                   </h2>
-                  <div className="prc-facts">
+                  <div className="cne-facts">
                     {ceremoniaHora && (
-                      <div className="prc-facts-row prc-facts-row--last">
+                      <div className="cne-facts-row cne-facts-row--last">
                         <span>HORARIO</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
-                    <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="prc-link-cta">
+                    <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="cne-link-cta">
                       ABRIR EN MAPAS →
                     </a>
                   )}
-                  <div className="prc-seguir">SEGUÍ BAJANDO <span className="prc-side-hint">→</span></div>
+                  <div className="cne-seguir">SEGUÍ BAJANDO <span className="cne-side-hint">→</span></div>
                 </div>
               )}
 
-              <div id="details" data-tone="light" className="prc-panel prc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
-                <div className="prc-hair-bg" />
-                <div className="prc-panel-top">
+              <div id="details" data-tone="light" className="cne-panel cne-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
+                <div className="cne-hair-bg" />
+                <div className="cne-panel-top">
                   <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
-                <h2 className="prc-panel-title">
+                <h2 className="cne-panel-title">
                   {lugarNombre || "El salón"}
-                  {direccion && <><br /><span className="prc-accent-serif">{direccion}</span></>}
+                  {direccion && <><br /><span className="cne-accent-serif">{direccion}</span></>}
                 </h2>
-                <div className="prc-facts">
-                  <div className="prc-facts-row">
+                <div className="cne-facts">
+                  <div className="cne-facts-row">
                     <span>HORARIO</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
-                    <div className="prc-facts-row prc-facts-row--last">
-                      <span>CÓDIGO</span><span className="prc-accent-serif-2">{dressCode.toUpperCase()}</span>
+                    <div className="cne-facts-row cne-facts-row--last">
+                      <span>CÓDIGO</span><span className="cne-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
                 {cronograma.length > 0 && (
-                  <div className="prc-crono">
+                  <div className="cne-crono">
                     {cronograma.map((item, i) => (
-                      <div key={i} className="prc-crono-row">
-                        <span className="prc-crono-time">{item.time || ""}</span>
-                        <span className="prc-crono-title">{item.title}</span>
+                      <div key={i} className="cne-crono-row">
+                        <span className="cne-crono-time">{item.time || ""}</span>
+                        <span className="cne-crono-title">{item.title}</span>
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="prc-seguir">SEGUÍ BAJANDO <span className="prc-side-hint">→</span></div>
+                <div className="cne-seguir">SEGUÍ BAJANDO <span className="cne-side-hint">→</span></div>
               </div>
 
-              <div data-tone="light" className="prc-panel prc-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
-                <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="prc-route-svg">
-                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#7A4A6E" strokeWidth={1.6} />
-                  <circle cx={282} cy={40} r={5} fill="#7A4A6E" />
+              <div data-tone="light" className="cne-panel cne-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
+                <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="cne-route-svg">
+                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#7A1620" strokeWidth={1.6} />
+                  <circle cx={282} cy={40} r={5} fill="#7A1620" />
                 </svg>
-                <div className="prc-panel-block">
-                  <span className="prc-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                  <span className="prc-panel-title-sm">Cómo llegar</span>
-                  {direccion && <span className="prc-mini-label">{direccion}</span>}
+                <div className="cne-panel-block">
+                  <span className="cne-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
+                  <span className="cne-panel-title-sm">Cómo llegar</span>
+                  {direccion && <span className="cne-mini-label">{direccion}</span>}
                   {mapUrl && (
-                    <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="prc-link-cta">
+                    <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cne-link-cta">
                       ABRIR EN MAPAS →
                     </a>
                   )}
                 </div>
               </div>
 
-              <div data-tone="dark" className="prc-panel prc-panel--center" style={{ background: "#2A1628", color: "#F4F1EA" }}>
-                <div className="prc-medallion prc-medallion--lg">
-                  <TiaraMedallion sub={`TIARA Nº ${passNumber}`} arcId="prcArc2" arcText={`ACCESO VIP · TIARA Nº ${passNumber} · `} spin="reverse" />
+              <div data-tone="dark" className="cne-panel cne-panel--center" style={{ background: "#2A0A0E", color: "#F4F1EA" }}>
+                <div className="cne-medallion cne-medallion--lg">
+                  <CoronaMedallion sub={`CORONA Nº ${passNumber}`} arcId="cneArc2" arcText={`ACCESO VIP · CORONA Nº ${passNumber} · `} spin="reverse" />
                 </div>
-                <span className="prc-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="cne-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
               </div>
             </div>
-            <PrcDots count={LUGAR_PANEL_COUNT} />
+            <CneDots count={LUGAR_PANEL_COUNT} />
           </div>
         </div>
 
-        <section data-tone="dark" data-screen-label="Check-in" className="prc-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #2A1628 60%, #22111F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="prc-kicker">05 — CHECK-IN</span>
-          <h2 data-xin="1" data-delay="80" data-dist="130" className="prc-h2">
-            Confirmá<br /><span className="prc-accent-italic">tu asistencia</span>
+        <section data-tone="dark" data-screen-label="Check-in" className="cne-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #2A0A0E 60%, #220709 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="cne-kicker">05 — CHECK-IN</span>
+          <h2 data-xin="1" data-delay="80" data-dist="130" className="cne-h2">
+            Confirmá<br /><span className="cne-accent-italic">tu asistencia</span>
           </h2>
 
           {rsvpEnabled ? (
-            <div data-xin="1" data-delay="170" data-dist="-90" className="prc-rsvp">
-              <PrcRsvpCard
+            <div data-xin="1" data-delay="170" data-dist="-90" className="cne-rsvp">
+              <CneRsvpCard
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
                 guestName={guestName}
@@ -768,25 +768,25 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
               />
             </div>
           ) : (
-            <p className="prc-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="cne-lead">La confirmación de asistencia está cerrada por el momento.</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="prc-pan">
-          <div className="prc-pan-sticky">
-            <div data-strip="1" className="prc-strip">
+        <div id="album" data-pan="1" data-screen-label="Álbum" className="cne-pan">
+          <div className="cne-pan-sticky">
+            <div data-strip="1" className="cne-strip">
               {photoPages.map((page, pageIndex) => (
-                <div key={pageIndex} data-tone="light" className="prc-panel prc-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
-                  <div className="prc-hair-bg" />
-                  <div className="prc-panel-top">
+                <div key={pageIndex} data-tone="light" className="cne-panel cne-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
+                  <div className="cne-hair-bg" />
+                  <div className="cne-panel-top">
                     <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="prc-panel-title-md">Álbum <span className="prc-accent-serif">de fotos</span></h2>}
-                  <div className="prc-mosaic">
+                  {pageIndex === 0 && <h2 className="cne-panel-title-md">Álbum <span className="cne-accent-serif">de fotos</span></h2>}
+                  <div className="cne-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
                         key={i}
-                        className={`prc-mosaic-cell${i === 0 ? " prc-mosaic-cell--featured" : ""}`}
+                        className={`cne-mosaic-cell${i === 0 ? " cne-mosaic-cell--featured" : ""}`}
                         role="button"
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
@@ -794,28 +794,28 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
                         aria-label={`Ampliar foto ${i + 1}`}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt="" className="prc-mosaic-img" />
+                        <img src={url} alt="" className="cne-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="prc-photo-placeholder">Sin fotos todavía</span>
+                      <span className="cne-photo-placeholder">Sin fotos todavía</span>
                     )}
                   </div>
-                  <div className="prc-seguir prc-seguir--split">
+                  <div className="cne-seguir cne-seguir--split">
                     <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="prc-accent-serif-2">SEGUÍ →</span>
+                    <span className="cne-accent-serif-2">SEGUÍ →</span>
                   </div>
                 </div>
               ))}
 
-              <div data-tone="light" className="prc-panel prc-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="prc-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="prc-panel-title">Todo lo que<br /><span className="prc-accent-serif">vamos a recordar</span></h2>
-                <div className="prc-album-embed">
+              <div data-tone="light" className="cne-panel cne-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
+                <span className="cne-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
+                <h2 className="cne-panel-title">Todo lo que<br /><span className="cne-accent-serif">vamos a recordar</span></h2>
+                <div className="cne-album-embed">
                   {livePhotos.length > 0 ? (
-                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#7A4A6E" />
+                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#7A1620" />
                   ) : (
-                    <div className="prc-live-placeholder">
-                      <span className="prc-mini-label">
+                    <div className="cne-live-placeholder">
+                      <span className="cne-mini-label">
                         {eventHasStarted
                           ? "Todavía no se subió nada en vivo."
                           : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
@@ -825,21 +825,21 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
                 </div>
               </div>
             </div>
-            <PrcDots count={photoPages.length + 1} />
+            <CneDots count={photoPages.length + 1} />
           </div>
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="prc-section" style={{ background: "#2A1628" }}>
-            <span data-xin="1" data-dist="-60" className="prc-kicker">07 — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="prc-h2">¿Qué vals<br /><span className="prc-accent-italic">abre el baile?</span></h2>
-            <div data-xin="1" data-delay="160" data-dist="-80" className="prc-eq">
+          <section id="music" data-tone="dark" data-screen-label="Música" className="cne-section" style={{ background: "#2A0A0E" }}>
+            <span data-xin="1" data-dist="-60" className="cne-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="cne-h2">¿Qué vals<br /><span className="cne-accent-italic">abre la noche?</span></h2>
+            <div data-xin="1" data-delay="160" data-dist="-80" className="cne-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
-                <span key={i} className="prc-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F7E9F0" : "#B48CC9" }} />
+                <span key={i} className="cne-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F6EFDD" : "#D9A441" }} />
               ))}
             </div>
-            <div data-xin="1" data-delay="240" data-dist="110" className="prc-song-wrap">
-              <PrcSongSuggestion
+            <div data-xin="1" data-delay="240" data-dist="110" className="cne-song-wrap">
+              <CneSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
                 guestName={guestName || "Invitado"}
@@ -849,12 +849,12 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="prc-section" style={{ background: "#2A1628" }}>
-            <span data-xin="1" data-dist="-60" className="prc-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="prc-h2">
-              Si querés<br /><span className="prc-accent-italic">sumarte</span>
+          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cne-section" style={{ background: "#2A0A0E" }}>
+            <span data-xin="1" data-dist="-60" className="cne-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="cne-h2">
+              Si querés<br /><span className="cne-accent-italic">sumarte</span>
             </h2>
-            <div data-xin="1" data-delay="160" data-dist="-80" className="prc-bank-wrap">
+            <div data-xin="1" data-delay="160" data-dist="-80" className="cne-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
@@ -866,13 +866,13 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
                     alias: String(invitation.pagoTarjetaAlias || ""),
                     titular: String(invitation.pagoTarjetaTitular || ""),
                   }}
-                  accentColor="#B48CC9"
+                  accentColor="#D9A441"
                   cardBg="rgba(20,20,27,0.72)"
                   cardBorder="#2A2417"
                   textPrimary="#F4F1EA"
                   textSecondary="#A8A292"
-                  InfoRow={PrcInfoRow}
-                  CopyField={PrcCopyField}
+                  InfoRow={CneInfoRow}
+                  CopyField={CneCopyField}
                 />
               )}
               {regaloHabilitado && (
@@ -886,13 +886,13 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
                     alias: String(invitation.regaloAlias || ""),
                     titular: String(invitation.regaloTitular || ""),
                   }}
-                  accentColor="#B48CC9"
+                  accentColor="#D9A441"
                   cardBg="rgba(20,20,27,0.72)"
                   cardBorder="#2A2417"
                   textPrimary="#F4F1EA"
                   textSecondary="#A8A292"
-                  InfoRow={PrcInfoRow}
-                  CopyField={PrcCopyField}
+                  InfoRow={CneInfoRow}
+                  CopyField={CneCopyField}
                 />
               )}
             </div>
@@ -900,13 +900,13 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
         )}
 
         {quizEnabled && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="prc-section" style={{ background: "#2A1628" }}>
-            <span data-xin="1" data-dist="-60" className="prc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="prc-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
+          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cne-section" style={{ background: "#2A0A0E" }}>
+            <span data-xin="1" data-dist="-60" className="cne-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="cne-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80">
-              <PrcQuiz
+              <CneQuiz
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
@@ -916,40 +916,40 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu tiara" className="prc-section prc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #2A1628 55%, #22111F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="prc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU TIARA</span>
-          <div data-xin="1" data-delay="100" data-dist="130" className="prc-final-card">
-            <div className="prc-medallion prc-medallion--final">
-              <TiaraMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="prcArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+        <section data-tone="dark" data-screen-label="Tu corona" className="cne-section cne-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #2A0A0E 55%, #220709 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="cne-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU CORONA</span>
+          <div data-xin="1" data-delay="100" data-dist="130" className="cne-final-card">
+            <div className="cne-medallion cne-medallion--final">
+              <CoronaMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cneArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
             </div>
-            <span className="prc-mini-label prc-accent-serif-2">TIARA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
-            <span className="prc-final-names">{namesTitle}</span>
-            <span className="prc-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
-            <div className="prc-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
+            <span className="cne-mini-label cne-accent-serif-2">CORONA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="cne-final-names">{namesTitle}</span>
+            <span className="cne-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
+            <div className="cne-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
-          <div className="prc-final-footer">
+          <div className="cne-final-footer">
             <span>NO TRANSFERIBLE</span>
-            <span className="prc-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span className="cne-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
-          <div className="prc-footer-credit">
+          <div className="cne-footer-credit">
             <LogoFooterCredit bgColor="transparent" />
           </div>
         </section>
       </div>
 
-      <div ref={railRef} className="prc-rail">
-        <span ref={railTopRef} className="prc-rail-top">TIARA Nº {passNumber}</span>
-        <div ref={railLineRef} className="prc-rail-line">
-          <span ref={railBarRef} className="prc-rail-bar" />
+      <div ref={railRef} className="cne-rail">
+        <span ref={railTopRef} className="cne-rail-top">CORONA Nº {passNumber}</span>
+        <div ref={railLineRef} className="cne-rail-line">
+          <span ref={railBarRef} className="cne-rail-bar" />
         </div>
-        <span ref={railLabelRef} className="prc-rail-label">SAVE THE DATE</span>
+        <span ref={railLabelRef} className="cne-rail-label">SAVE THE DATE</span>
       </div>
 
-      <div ref={coverRef} className="prc-cover">
-        <div ref={topRef} className="prc-cover-half prc-cover-half--top">
-          <PrcCoverHalf
+      <div ref={coverRef} className="cne-cover">
+        <div ref={topRef} className="cne-cover-half cne-cover-half--top">
+          <CneCoverHalf
             namesRef={namesRef}
             kickerRef={kickerRef}
             perfRef={perfRef}
@@ -960,11 +960,11 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
             dressCode={dressCode}
             hora={hora}
           >
-            <div className="prc-cover-cta">ABRIR INVITACIÓN</div>
-          </PrcCoverHalf>
+            <div className="cne-cover-cta">ABRIR INVITACIÓN</div>
+          </CneCoverHalf>
         </div>
-        <div ref={bottomRef} className="prc-cover-half prc-cover-half--bottom">
-          <PrcCoverHalf
+        <div ref={bottomRef} className="cne-cover-half cne-cover-half--bottom">
+          <CneCoverHalf
             kickerText={coverKickerText}
             namesTitle={coverNamesTitle}
             fechaCorta={fechaCorta}
@@ -972,22 +972,22 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
             dressCode={dressCode}
             hora={hora}
           >
-            <button onClick={open} className="prc-cover-cta prc-cover-cta--btn">ABRIR INVITACIÓN</button>
-          </PrcCoverHalf>
+            <button onClick={open} className="cne-cover-cta cne-cover-cta--btn">ABRIR INVITACIÓN</button>
+          </CneCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="prc-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="cne-hint">DESLIZÁ ↓</div>
 
       {expandedPhoto && (
         <div
-          className="prc-lightbox"
+          className="cne-lightbox"
           onClick={() => setExpandedPhoto(null)}
           onContextMenu={(e) => e.preventDefault()}
         >
           <button
             type="button"
-            className="prc-lightbox-close"
+            className="cne-lightbox-close"
             onClick={(e) => {
               e.stopPropagation();
               setExpandedPhoto(null);
@@ -1000,7 +1000,7 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
           <img
             src={expandedPhoto}
             alt="Foto ampliada"
-            className="prc-lightbox-img"
+            className="cne-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
           />
@@ -1024,28 +1024,28 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
 // Subcomponentes de presentación
 // ---------------------------------------------------------------------
 
-function PrcCdBox({ refEl, delay, dist, label }: { refEl: React.RefObject<HTMLSpanElement | null>; delay: number; dist: number; label: string }) {
+function CneCdBox({ refEl, delay, dist, label }: { refEl: React.RefObject<HTMLSpanElement | null>; delay: number; dist: number; label: string }) {
   return (
-    <div data-xin="1" data-delay={delay} data-dist={dist} className="prc-cd-box">
-      <span ref={refEl} className="prc-cd-num">—</span>
-      <span className="prc-cd-label">{label}</span>
+    <div data-xin="1" data-delay={delay} data-dist={dist} className="cne-cd-box">
+      <span ref={refEl} className="cne-cd-num">—</span>
+      <span className="cne-cd-label">{label}</span>
     </div>
   );
 }
 
-function PrcDots({ count = 3 }: { count?: number }) {
+function CneDots({ count = 3 }: { count?: number }) {
   return (
-    <div data-dots="1" className="prc-dots">
+    <div data-dots="1" className="cne-dots">
       {Array.from({ length: count }).map((_, i) => (
-        <span key={i} data-dot={i} className="prc-dot" />
+        <span key={i} data-dot={i} className="cne-dot" />
       ))}
     </div>
   );
 }
 
-// Medallón con una tiara dibujada en SVG en el centro (en vez de una etiqueta
-// de texto tipo "VIP") -- ver [data-tiara] en el mockup original.
-function TiaraMedallion({
+// Medallón con una corona dibujada en SVG en el centro (en vez de una etiqueta
+// de texto tipo "VIP") -- ver [data-crown] en el mockup original.
+function CoronaMedallion({
   sub,
   arcId,
   arcText,
@@ -1063,19 +1063,19 @@ function TiaraMedallion({
   const [ringDuration] = useState(() => 18 + Math.random() * 4);
   return (
     <>
-      <div className="prc-medallion-ring" style={{ animation: spin === "none" ? "none" : `gpRing ${ringDuration}s linear infinite` }} />
-      <div className="prc-medallion-core">
-        <svg viewBox="0 0 60 34" className={compact ? "prc-tiara-svg-sm" : "prc-tiara-svg"}>
-          <path d="M4 30 L4 16 L16 24 L30 6 L44 24 L56 16 L56 30 Z" fill="none" stroke="#F7E9F0" strokeWidth={2.2} />
+      <div className="cne-medallion-ring" style={{ animation: spin === "none" ? "none" : `gpRing ${ringDuration}s linear infinite` }} />
+      <div className="cne-medallion-core">
+        <svg viewBox="0 0 60 34" className={compact ? "cne-tiara-svg-sm" : "cne-tiara-svg"}>
+          <path d="M4 30 L4 16 L16 24 L30 6 L44 24 L56 16 L56 30 Z" fill="none" stroke="#F6EFDD" strokeWidth={2.2} />
         </svg>
-        {sub && <span className="prc-medallion-sub prc-medallion-sub--accent">{sub}</span>}
+        {sub && <span className="cne-medallion-sub cne-medallion-sub--accent">{sub}</span>}
       </div>
       {arcId && (
-        <svg viewBox="0 0 100 100" className="prc-medallion-arc" style={{ animation: spin === "reverse" ? "gpRingRev 32s linear infinite" : "gpRingRev 34s linear infinite" }}>
+        <svg viewBox="0 0 100 100" className="cne-medallion-arc" style={{ animation: spin === "reverse" ? "gpRingRev 32s linear infinite" : "gpRingRev 34s linear infinite" }}>
           <defs>
             <path id={arcId} d="M50 50 m -38 0 a 38 38 0 1 1 76 0 a 38 38 0 1 1 -76 0" fill="none" />
           </defs>
-          <text className="prc-medallion-arc-text">
+          <text className="cne-medallion-arc-text">
             <textPath href={`#${arcId}`}>{arcText}{arcText}</textPath>
           </text>
         </svg>
@@ -1084,7 +1084,7 @@ function TiaraMedallion({
   );
 }
 
-function PrcCopyField({ label, value }: { label: string; value: string }) {
+function CneCopyField({ label, value }: { label: string; value: string }) {
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1093,12 +1093,12 @@ function PrcCopyField({ label, value }: { label: string; value: string }) {
     });
   };
   return (
-    <div className="prc-bank-row">
+    <div className="cne-bank-row">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="prc-bank-row-label">{label}</span>
-        <span className="prc-bank-row-value">{value}</span>
+        <span className="cne-bank-row-label">{label}</span>
+        <span className="cne-bank-row-value">{value}</span>
       </div>
-      <button type="button" className="prc-bank-copy" onClick={handle}>
+      <button type="button" className="cne-bank-copy" onClick={handle}>
         {copied ? "✓ Copiado" : "Copiar"}
       </button>
     </div>
@@ -1109,7 +1109,7 @@ function PrcCopyField({ label, value }: { label: string; value: string }) {
 // existente en la plantilla. Habla con el mismo endpoint/payload que
 // <RSVPWizardV2> (/api/guests/[token]/confirm o /api/rsvp), así que no
 // cambia ningún dato que pida el backend, solo cómo se ve.
-function PrcRsvpCard({
+function CneRsvpCard({
   invitationId,
   guestToken,
   guestName,
@@ -1219,9 +1219,9 @@ function PrcRsvpCard({
 
   if (status === "DECLINED") {
     return (
-      <div className="prc-rsvp-declined">
-        <p className="prc-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
-        <button type="button" className="prc-rsvp-btn prc-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
+      <div className="cne-rsvp-declined">
+        <p className="cne-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <button type="button" className="cne-rsvp-btn cne-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
           CAMBIÉ DE IDEA
         </button>
       </div>
@@ -1230,16 +1230,16 @@ function PrcRsvpCard({
 
   return (
     <>
-      <div className="prc-rsvp-rows">
-        <div className="prc-rsvp-row">
+      <div className="cne-rsvp-rows">
+        <div className="cne-rsvp-row">
           <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
-          <div className="prc-rsvp-row">
+          <div className="cne-rsvp-row">
             <span>ADULTOS</span>
-            <div className="prc-rsvp-stepper">
+            <div className="cne-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
               <button type="button" onClick={() => setAdultCount((v) => Math.min(maxAdults, v + 1))} disabled={adultCount >= maxAdults}>+</button>
@@ -1247,9 +1247,9 @@ function PrcRsvpCard({
           </div>
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
-          <div className="prc-rsvp-row">
+          <div className="cne-rsvp-row">
             <span>ADOLESCENTES</span>
-            <div className="prc-rsvp-stepper">
+            <div className="cne-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
               <button type="button" onClick={() => setTeenCount((v) => Math.min(maxTeens, v + 1))} disabled={teenCount >= maxTeens}>+</button>
@@ -1257,9 +1257,9 @@ function PrcRsvpCard({
           </div>
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
-          <div className="prc-rsvp-row">
+          <div className="cne-rsvp-row">
             <span>NIÑOS</span>
-            <div className="prc-rsvp-stepper">
+            <div className="cne-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
               <button type="button" onClick={() => setChildCount((v) => Math.min(maxChildren, v + 1))} disabled={childCount >= maxChildren}>+</button>
@@ -1268,36 +1268,36 @@ function PrcRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="prc-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="prc-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="prc-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="cne-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="cne-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="cne-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
-          <div className="prc-rsvp-row">
+          <div className="cne-rsvp-row">
             <span>RESTRICCIONES</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
               placeholder="—"
-              className="prc-rsvp-input"
+              className="cne-rsvp-input"
             />
           </div>
         ) : (
-          <div className="prc-rsvp-row">
+          <div className="cne-rsvp-row">
             <span>RESTRICCIONES</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
 
         {hasPayment && paymentAmount != null && !isExempt && (
-          <div className="prc-rsvp-row prc-rsvp-row--payment">
+          <div className="cne-rsvp-row cne-rsvp-row--payment">
             <span>VALOR</span>
-            <div className="prc-rsvp-payment-value">
-              <span className="prc-rsvp-payment-total">{formatARS(totalPayment)}</span>
+            <div className="cne-rsvp-payment-value">
+              <span className="cne-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
-                <div className="prc-rsvp-payment-detail">
+                <div className="cne-rsvp-payment-detail">
                   {adultCount > 0 && (
                     <span>{adultCount} {adultCount === 1 ? "adulto" : "adultos"} × {formatARS(adultPrice)}</span>
                   )}
@@ -1314,33 +1314,33 @@ function PrcRsvpCard({
         )}
       </div>
 
-      <div ref={stubRef} className="prc-stub">
-        <div className="prc-stub-top">
-          <span>TIARA Nº {passNumber}</span>
-          <span ref={statusRef} className="prc-stub-status">
+      <div ref={stubRef} className="cne-stub">
+        <div className="cne-stub-top">
+          <span>CORONA Nº {passNumber}</span>
+          <span ref={statusRef} className="cne-stub-status">
             {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
           </span>
         </div>
-        <div ref={sealRef} className="prc-seal">
-          <TiaraMedallion sub="" arcId="" arcText="" spin="none" compact />
+        <div ref={sealRef} className="cne-seal">
+          <CoronaMedallion sub="" arcId="" arcText="" spin="none" compact />
         </div>
-        <div ref={beamRef} className="prc-beam" />
-        <div className="prc-barcode" style={{ width: "70%", opacity: confirmed ? 0.7 : 0.2 }} />
+        <div ref={beamRef} className="cne-beam" />
+        <div className="cne-barcode" style={{ width: "70%", opacity: confirmed ? 0.7 : 0.2 }} />
       </div>
 
-      {error && <p className="prc-rsvp-error">{error}</p>}
+      {error && <p className="cne-rsvp-error">{error}</p>}
 
       {status !== "CONFIRMED" ? (
         <>
-          <button type="button" className="prc-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
+          <button type="button" className="cne-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
             {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
           </button>
-          <button type="button" className="prc-rsvp-btn prc-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
+          <button type="button" className="cne-rsvp-btn cne-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
             NO VOY A PODER ASISTIR
           </button>
         </>
       ) : (
-        <button type="button" className="prc-rsvp-btn prc-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
+        <button type="button" className="cne-rsvp-btn cne-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
           MODIFICAR ASISTENCIA
         </button>
       )}
@@ -1348,7 +1348,7 @@ function PrcRsvpCard({
   );
 }
 
-interface PrcSongItem {
+interface CneSongItem {
   id: string;
   title: string;
   artist: string;
@@ -1356,8 +1356,8 @@ interface PrcSongItem {
 }
 
 // Misma API que <SongSuggestion> (/api/songs), look propio de la plantilla.
-function PrcSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
-  const [songs, setSongs] = useState<PrcSongItem[]>([]);
+function CneSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const [songs, setSongs] = useState<CneSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1407,22 +1407,22 @@ function PrcSongSuggestion({ invitationId, guestToken, guestName }: { invitation
   };
 
   return (
-    <div className="prc-song">
-      <form onSubmit={handleSubmit} className="prc-song-row">
-        <div className="prc-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="prc-song-input" />
-          <span className="prc-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="prc-song-input" />
+    <div className="cne-song">
+      <form onSubmit={handleSubmit} className="cne-song-row">
+        <div className="cne-song-inputs">
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="cne-song-input" />
+          <span className="cne-song-sep">—</span>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="cne-song-input" />
         </div>
-        <button type="submit" disabled={isSubmitting} className="prc-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
+        <button type="submit" disabled={isSubmitting} className="cne-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
-      {error && <p className="prc-song-error">{error}</p>}
+      {error && <p className="cne-song-error">{error}</p>}
       {songs.length > 0 && (
-        <div className="prc-song-list">
+        <div className="cne-song-list">
           {songs.slice(0, 12).map((s, i) => (
-            <div key={s.id} className="prc-song-item">
-              <span className="prc-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="prc-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+            <div key={s.id} className="cne-song-item">
+              <span className="cne-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
+              <span className="cne-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
             </div>
           ))}
         </div>
@@ -1433,7 +1433,7 @@ function PrcSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 
 // Todas las preguntas se muestran juntas en la misma página -- misma API
 // /api/quiz que usa el resto de las plantillas.
-function PrcQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: PrcQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+function CneQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: CneQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1511,29 +1511,29 @@ function PrcQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
   const score = preguntas.reduce((acc, q, i) => acc + (picks[i] === (q.respuestaCorrecta ?? q.correcta) ? 1 : 0), 0);
 
   return (
-    <div className="prc-quiz">
+    <div className="cne-quiz">
       {preguntas.map((q, qi) => {
         const correctIdx = q.respuestaCorrecta ?? q.correcta;
         return (
-          <div key={qi} className="prc-quiz-q">
-            <span className="prc-quiz-q-num">{String(qi + 1).padStart(2, "0")}</span>
-            <p className="prc-quiz-q-text">{q.pregunta}</p>
-            <div className="prc-quiz-opts">
+          <div key={qi} className="cne-quiz-q">
+            <span className="cne-quiz-q-num">{String(qi + 1).padStart(2, "0")}</span>
+            <p className="cne-quiz-q-text">{q.pregunta}</p>
+            <div className="cne-quiz-opts">
               {q.opciones.map((opt, oi) => {
                 const chosen = picks[qi] === oi;
                 const revealed = picks[qi] !== undefined && correctIdx !== undefined;
                 let stateClass = "";
                 if (revealed) {
-                  if (oi === correctIdx) stateClass = " prc-quiz-opt--correct";
-                  else if (chosen) stateClass = " prc-quiz-opt--wrong";
+                  if (oi === correctIdx) stateClass = " cne-quiz-opt--correct";
+                  else if (chosen) stateClass = " cne-quiz-opt--wrong";
                 } else if (chosen) {
-                  stateClass = " prc-quiz-opt--picked";
+                  stateClass = " cne-quiz-opt--picked";
                 }
                 return (
                   <button
                     key={oi}
                     type="button"
-                    className={`prc-quiz-opt${stateClass}`}
+                    className={`cne-quiz-opt${stateClass}`}
                     disabled={picks[qi] !== undefined}
                     onClick={() => pick(qi, oi)}
                   >
@@ -1546,12 +1546,12 @@ function PrcQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         );
       })}
       {finished && (
-        <div className="prc-quiz-result">
-          <p className="prc-quiz-result-score">
+        <div className="cne-quiz-result">
+          <p className="cne-quiz-result-score">
             {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
           </p>
           {!isSaving && stats && stats.count > 0 && (
-            <p className="prc-quiz-result-stat">
+            <p className="cne-quiz-result-stat">
               El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
             </p>
           )}
@@ -1561,18 +1561,18 @@ function PrcQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
   );
 }
 
-function PrcInfoRow({ label, value }: { label: string; value: string }) {
+function CneInfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="prc-bank-row">
+    <div className="cne-bank-row">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="prc-bank-row-label">{label}</span>
-        <span className="prc-bank-row-value">{value}</span>
+        <span className="cne-bank-row-label">{label}</span>
+        <span className="cne-bank-row-value">{value}</span>
       </div>
     </div>
   );
 }
 
-function PrcCoverHalf({
+function CneCoverHalf({
   namesRef,
   kickerRef,
   perfRef,
@@ -1596,30 +1596,29 @@ function PrcCoverHalf({
   children: React.ReactNode;
 }) {
   return (
-    <div className="prc-cover-inner">
-      <div className="prc-cover-glow" />
-      <div className="prc-sparkle" style={{ left: "20%", top: "22%", width: 5, height: 5 }} />
-      <div className="prc-sparkle" style={{ left: "76%", top: "32%", width: 4, height: 4, animationDelay: ".8s" }} />
-      <div className="prc-cover-content">
-        <div className="prc-cover-top-row">
-          <span>TIARA Nº {passNumber}</span><span className="prc-accent-serif-2">ADMIT ONE</span>
+    <div className="cne-cover-inner">
+      <div className="cne-cover-glow" />
+      <div className="cne-cover-lattice" />
+      <div className="cne-cover-content">
+        <div className="cne-cover-top-row">
+          <span>CORONA Nº {passNumber}</span><span className="cne-accent-serif-2">ADMIT ONE</span>
         </div>
-        <div className="prc-cover-center">
-          <span ref={kickerRef} className="prc-cover-kicker">{kickerText}</span>
-          <h1 ref={namesRef} className="prc-cover-names">{namesTitle}</h1>
-          <span className="prc-cover-rule" />
-          <span className="prc-cover-date">{fechaCorta}</span>
+        <div className="cne-cover-center">
+          <span ref={kickerRef} className="cne-cover-kicker">{kickerText}</span>
+          <h1 ref={namesRef} className="cne-cover-names">{namesTitle}</h1>
+          <span className="cne-cover-rule" />
+          <span className="cne-cover-date">{fechaCorta}</span>
         </div>
-        <div className="prc-cover-bottom">
-          <div ref={perfRef} className="prc-perf-strip prc-perf-strip--reveal" />
-          <div className="prc-cover-facts">
+        <div className="cne-cover-bottom">
+          <div ref={perfRef} className="cne-perf-strip cne-perf-strip--reveal" />
+          <div className="cne-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
-          <div className="prc-barcode-wrap">
-            <div className="prc-barcode" style={{ width: "62%" }} />
-            <span className="prc-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+          <div className="cne-barcode-wrap">
+            <div className="cne-barcode" style={{ width: "62%" }} />
+            <span className="cne-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1630,12 +1629,12 @@ function PrcCoverHalf({
 // ---------------------------------------------------------------------
 // Hoja de estilos (traslada 1:1 los tokens visuales del diseño aprobado)
 // ---------------------------------------------------------------------
-const PRC_CSS = `
-  .prc-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; transition: opacity 900ms ease 260ms; scrollbar-width: none; }
-  .prc-scroller::-webkit-scrollbar { width: 0; height: 0; }
+const CNE_CSS = `
+  .cne-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; transition: opacity 900ms ease 260ms; scrollbar-width: none; }
+  .cne-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  a { color: #B48CC9; text-decoration: none; }
-  a:hover { color: #F7E9F0; }
+  a { color: #D9A441; text-decoration: none; }
+  a:hover { color: #F6EFDD; }
 
   @keyframes gpFoil { to { transform: rotate(360deg); } }
   @keyframes gpRing { to { transform: rotate(360deg); } }
@@ -1644,208 +1643,207 @@ const PRC_CSS = `
   @keyframes gpEq { 0%,100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
   @keyframes gpHint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
   @keyframes gpSide { 0%,100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
-  @media (prefers-reduced-motion: reduce) { .prc-scroller * { animation: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .cne-scroller * { animation: none !important; } }
 
-  .prc-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
-  .prc-section--between { justify-content: space-between; }
+  .cne-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
+  .cne-section--between { justify-content: space-between; }
 
-  .prc-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
+  .cne-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 
-  .prc-date-stack { display: flex; flex-direction: column; gap: 2px; }
-  .prc-date-num { font-family: var(--prc-cormorant), serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.82; letter-spacing: -0.04em; }
-  .prc-date-num--right { text-align: right; line-height: 0.86; }
-  .prc-date-month { font-family: var(--prc-cormorant), serif; font-style: italic; font-size: clamp(50px, 18vw, 104px); line-height: 0.9; color: #B48CC9; padding-left: 12%; }
+  .cne-date-stack { display: flex; flex-direction: column; gap: 2px; }
+  .cne-date-num { font-family: var(--cne-playfair), serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.82; letter-spacing: -0.04em; }
+  .cne-date-num--right { text-align: right; line-height: 0.86; }
+  .cne-date-month { font-family: var(--cne-playfair), serif; font-style: italic; font-size: clamp(50px, 18vw, 104px); line-height: 0.9; color: #D9A441; padding-left: 12%; }
 
-  .prc-divider { display: flex; align-items: center; gap: 16px; font-size: 10px; letter-spacing: 0.26em; color: #8A8577; }
-  .prc-divider-line { width: 52px; height: 1px; background: #B48CC9; display: inline-block; }
-  .prc-divider-line--long { width: 64px; }
+  .cne-divider { display: flex; align-items: center; gap: 16px; font-size: 10px; letter-spacing: 0.26em; color: #8A8577; }
+  .cne-divider-line { width: 52px; height: 1px; background: #D9A441; display: inline-block; }
+  .cne-divider-line--long { width: 64px; }
 
-  .prc-lead { margin: 0; font-family: var(--prc-cormorant), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .cne-lead { margin: 0; font-family: var(--cne-playfair), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
 
-  .prc-medallion { position: relative; }
-  .prc-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }
-  .prc-medallion--lg { width: clamp(130px, 34vw, 178px); aspect-ratio: 1; margin: 0 auto; }
-  .prc-medallion--final { width: clamp(104px, 26vw, 132px); aspect-ratio: 1; margin: -12px auto 0; }
-  .prc-medallion-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #7A4A6E, #4A2A48, #B48CC9, #F7E9F0, #7A4A6E); filter: saturate(.75); }
-  .prc-medallion-core { position: absolute; inset: 3px; border-radius: 50%; background: #0C0C11; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-align: center; padding: 6px; }
-  .prc-tiara-svg { width: 30px; }
-  .prc-tiara-svg-sm { width: 22px; }
-  .prc-medallion-sub { font-size: 6.5px; letter-spacing: 0.24em; color: #8A8577; }
-  .prc-medallion-sub--accent { color: #B48CC9; }
-  .prc-medallion-arc { position: absolute; inset: -14%; }
-  .prc-medallion-arc-text { font-size: 7px; letter-spacing: 1.6px; fill: #B48CC9; opacity: 0.4; font-family: var(--prc-mono), monospace; }
+  .cne-medallion { position: relative; }
+  .cne-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }
+  .cne-medallion--lg { width: clamp(130px, 34vw, 178px); aspect-ratio: 1; margin: 0 auto; }
+  .cne-medallion--final { width: clamp(104px, 26vw, 132px); aspect-ratio: 1; margin: -12px auto 0; }
+  .cne-medallion-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #7A1620, #4A2A48, #D9A441, #F6EFDD, #7A1620); filter: saturate(.75); }
+  .cne-medallion-core { position: absolute; inset: 3px; border-radius: 50%; background: #0C0C11; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-align: center; padding: 6px; }
+  .cne-tiara-svg { width: 30px; }
+  .cne-tiara-svg-sm { width: 22px; }
+  .cne-medallion-sub { font-size: 6.5px; letter-spacing: 0.24em; color: #8A8577; }
+  .cne-medallion-sub--accent { color: #D9A441; }
+  .cne-medallion-arc { position: absolute; inset: -14%; }
+  .cne-medallion-arc-text { font-size: 7px; letter-spacing: 1.6px; fill: #D9A441; opacity: 0.4; font-family: var(--cne-mono), monospace; }
 
-  .prc-scan-grid { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(180,140,201,0.06) 0 1px, transparent 1px 5px); pointer-events: none; }
-  .prc-scanline { position: absolute; left: 0; right: 0; top: 30%; height: 2px; background: linear-gradient(90deg, transparent, #F7E9F0, transparent); animation: gpScan 6s linear infinite; pointer-events: none; }
+  .cne-scan-grid { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(217,164,65,0.06) 0 1px, transparent 1px 5px); pointer-events: none; }
+  .cne-scanline { position: absolute; left: 0; right: 0; top: 30%; height: 2px; background: linear-gradient(90deg, transparent, #F6EFDD, transparent); animation: gpScan 6s linear infinite; pointer-events: none; }
 
-  .prc-cd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; }
-  .prc-cd-box { border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
-  .prc-cd-num { font-family: var(--prc-cormorant), serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #F6EFDD; display: inline-block; }
-  .prc-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #B48CC9; }
-  .prc-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #22111F 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
-  .prc-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .cne-cd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; }
+  .cne-cd-box { border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+  .cne-cd-num { font-family: var(--cne-playfair), serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #F6EFDD; display: inline-block; }
+  .cne-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #D9A441; }
+  .cne-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #220709 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
+  .cne-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
 
-  .prc-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(180,140,201,0.3), rgba(217,165,197,0.24), rgba(180,140,201,0.34), rgba(180,140,201,0.3)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
-  .prc-phrase { margin: 0; position: relative; font-family: var(--prc-cormorant), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
-  .prc-accent-italic { font-style: italic; color: #B48CC9; }
-  .prc-accent-serif { font-style: italic; color: #7A4A6E; font-family: var(--prc-cormorant), serif; }
-  .prc-accent-serif-2 { color: #7A4A6E; }
-  .prc-h2 { margin: 0; font-family: var(--prc-cormorant), serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96; }
+  .cne-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(217,164,65,0.3), rgba(74,14,20,0.24), rgba(217,164,65,0.34), rgba(217,164,65,0.3)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
+  .cne-phrase { margin: 0; position: relative; font-family: var(--cne-playfair), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
+  .cne-accent-italic { font-style: italic; color: #D9A441; }
+  .cne-accent-serif { font-style: italic; color: #7A1620; font-family: var(--cne-playfair), serif; }
+  .cne-accent-serif-2 { color: #7A1620; }
+  .cne-h2 { margin: 0; font-family: var(--cne-playfair), serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96; }
 
-  .prc-pan { height: 260vh; position: relative; }
-  .prc-pan-sticky { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
-  .prc-strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform; }
-  .prc-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; gap: 22px; }
-  .prc-panel--between { justify-content: space-between; }
-  .prc-panel--end { justify-content: flex-end; }
-  .prc-panel--center { align-items: center; justify-content: center; text-align: center; }
-  .prc-panel--gap { gap: clamp(14px, 2.4vh, 22px); padding: clamp(52px, 9vh, 84px) max(24px, calc((100vw - 600px) / 2)) clamp(62px, 11vh, 100px); }
-  .prc-hair-bg { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(20,20,27,0.05) 0 1px, transparent 1px 26px); pointer-events: none; }
-  .prc-panel-top { position: relative; display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.32em; color: #7C7768; }
-  .prc-panel-title { margin: 0; position: relative; font-family: var(--prc-cormorant), serif; font-weight: 400; font-size: clamp(46px, 13.5vw, 76px); line-height: 0.92; }
-  .prc-panel-title-md { margin: 0; position: relative; font-family: var(--prc-cormorant), serif; font-weight: 400; font-size: clamp(42px, 12.5vw, 64px); line-height: 0.94; }
-  .prc-panel-title-sm { margin: 0; font-family: var(--prc-cormorant), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
-  .prc-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
-  .prc-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
-  .prc-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
-  .prc-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
-  .prc-facts-row--last { border-bottom: none; padding-bottom: 0; }
-  .prc-seguir { position: relative; display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: 0.26em; color: #7A4A6E; margin-top: auto; }
-  .prc-seguir--split { justify-content: space-between; }
-  .prc-side-hint { display: inline-block; animation: gpSide 2.2s ease-in-out infinite; }
-  .prc-route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .prc-link-cta { font-size: 10px; letter-spacing: 0.24em; color: #7A4A6E; }
+  .cne-pan { height: 260vh; position: relative; }
+  .cne-pan-sticky { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
+  .cne-strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform; }
+  .cne-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; gap: 22px; }
+  .cne-panel--between { justify-content: space-between; }
+  .cne-panel--end { justify-content: flex-end; }
+  .cne-panel--center { align-items: center; justify-content: center; text-align: center; }
+  .cne-panel--gap { gap: clamp(14px, 2.4vh, 22px); padding: clamp(52px, 9vh, 84px) max(24px, calc((100vw - 600px) / 2)) clamp(62px, 11vh, 100px); }
+  .cne-hair-bg { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(20,20,27,0.05) 0 1px, transparent 1px 26px); pointer-events: none; }
+  .cne-panel-top { position: relative; display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.32em; color: #7C7768; }
+  .cne-panel-title { margin: 0; position: relative; font-family: var(--cne-playfair), serif; font-weight: 400; font-size: clamp(46px, 13.5vw, 76px); line-height: 0.92; }
+  .cne-panel-title-md { margin: 0; position: relative; font-family: var(--cne-playfair), serif; font-weight: 400; font-size: clamp(42px, 12.5vw, 64px); line-height: 0.94; }
+  .cne-panel-title-sm { margin: 0; font-family: var(--cne-playfair), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
+  .cne-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
+  .cne-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .cne-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
+  .cne-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
+  .cne-facts-row--last { border-bottom: none; padding-bottom: 0; }
+  .cne-seguir { position: relative; display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: 0.26em; color: #7A1620; margin-top: auto; }
+  .cne-seguir--split { justify-content: space-between; }
+  .cne-side-hint { display: inline-block; animation: gpSide 2.2s ease-in-out infinite; }
+  .cne-route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cne-link-cta { font-size: 10px; letter-spacing: 0.24em; color: #7A1620; }
 
-  .prc-crono { position: relative; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-  .prc-crono-row { display: flex; align-items: baseline; gap: 14px; font-size: 11px; letter-spacing: 0.1em; color: #4A473F; border-bottom: 1px solid #D6D1C4; padding-bottom: 8px; }
-  .prc-crono-time { font-family: var(--prc-mono), monospace; color: #7A4A6E; min-width: 42px; }
-  .prc-crono-title { flex: 1; }
+  .cne-crono { position: relative; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .cne-crono-row { display: flex; align-items: baseline; gap: 14px; font-size: 11px; letter-spacing: 0.1em; color: #4A473F; border-bottom: 1px solid #D6D1C4; padding-bottom: 8px; }
+  .cne-crono-time { font-family: var(--cne-mono), monospace; color: #7A1620; min-width: 42px; }
+  .cne-crono-title { flex: 1; }
 
-  .prc-dots { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
-  .prc-dot { width: 22px; height: 2px; background: rgba(20,20,27,0.18); transition: background 400ms ease; display: inline-block; }
+  .cne-dots { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
+  .cne-dot { width: 22px; height: 2px; background: rgba(20,20,27,0.18); transition: background 400ms ease; display: inline-block; }
 
-  .prc-stub { position: relative; overflow: hidden; border: 1px solid #2A2417; background: rgba(20,20,27,0.7); padding: 20px; display: flex; flex-direction: column; gap: 16px; transition: border-color 600ms ease, box-shadow 600ms ease; }
-  .prc-stub-top { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.24em; color: #8A8577; }
-  .prc-stub-status { color: #6E6A5D; transition: color 400ms ease; }
-  .prc-seal { width: 62px; aspect-ratio: 1; position: relative; opacity: .25; transform: scale(.86); transition: opacity 700ms ease, transform 700ms cubic-bezier(.16,1,.3,1); align-self: center; }
-  .prc-beam { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #F7E9F0, transparent); opacity: 0; transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
+  .cne-stub { position: relative; overflow: hidden; border: 1px solid #2A2417; background: rgba(20,20,27,0.7); padding: 20px; display: flex; flex-direction: column; gap: 16px; transition: border-color 600ms ease, box-shadow 600ms ease; }
+  .cne-stub-top { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.24em; color: #8A8577; }
+  .cne-stub-status { color: #6E6A5D; transition: color 400ms ease; }
+  .cne-seal { width: 62px; aspect-ratio: 1; position: relative; opacity: .25; transform: scale(.86); transition: opacity 700ms ease, transform 700ms cubic-bezier(.16,1,.3,1); align-self: center; }
+  .cne-beam { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #F6EFDD, transparent); opacity: 0; transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
 
-  .prc-rsvp { display: flex; flex-direction: column; gap: 22px; width: 100%; max-width: 420px; font-family: var(--prc-mono), monospace; }
-  .prc-rsvp-rows { display: flex; flex-direction: column; }
-  .prc-rsvp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(180,140,201,0.18); font-size: 10.5px; letter-spacing: 0.18em; color: #8A8577; }
-  .prc-rsvp-row > span:first-child { flex-shrink: 0; }
-  .prc-rsvp-row > span:last-child { color: #F4F1EA; letter-spacing: 0.02em; text-align: right; }
-  .prc-rsvp-row--payment { align-items: flex-start; }
-  .prc-rsvp-payment-value { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .prc-rsvp-payment-total { color: #F7E9F0; font-size: 13px; letter-spacing: 0.02em; font-weight: 600; }
-  .prc-rsvp-payment-detail { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 9px; letter-spacing: 0.05em; color: #8A8577; }
-  .prc-rsvp-stepper { display: flex; align-items: center; gap: 12px; }
-  .prc-rsvp-stepper button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #B48CC9; background: transparent; color: #B48CC9; font-size: 14px; line-height: 1; cursor: pointer; }
-  .prc-rsvp-stepper button:disabled { opacity: 0.3; cursor: default; }
-  .prc-rsvp-stepper span { font-family: var(--prc-mono), monospace; color: #F4F1EA; min-width: 20px; text-align: center; }
-  .prc-rsvp-input { background: transparent; border: none; border-bottom: 1px solid rgba(180,140,201,0.3); color: #F4F1EA; font-family: var(--prc-mono), monospace; font-size: 11px; letter-spacing: 0.02em; padding: 4px 2px; text-align: right; max-width: 55%; }
-  .prc-rsvp-input::placeholder { color: #6E6A5D; }
-  .prc-rsvp-input:focus { outline: none; border-bottom-color: #B48CC9; }
-  .prc-rsvp-btn { width: 100%; padding: 16px; font-family: var(--prc-mono), monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; background: linear-gradient(180deg, #B48CC9, #7A4A6E); border: 1px solid #B48CC9; color: #0B0B10; cursor: pointer; }
-  .prc-rsvp-btn:disabled { opacity: 0.6; cursor: default; }
-  .prc-rsvp-btn--ghost { background: transparent; color: #B48CC9; }
-  .prc-rsvp-error { font-size: 10px; letter-spacing: 0.06em; color: #B48CC9; margin: 0; }
-  .prc-rsvp-declined { display: flex; flex-direction: column; gap: 18px; align-items: center; text-align: center; max-width: 380px; }
-  .prc-rsvp-declined-text { margin: 0; font-family: var(--prc-cormorant), serif; font-style: italic; font-size: 18px; line-height: 1.4; color: #A8A292; }
+  .cne-rsvp { display: flex; flex-direction: column; gap: 22px; width: 100%; max-width: 420px; font-family: var(--cne-mono), monospace; }
+  .cne-rsvp-rows { display: flex; flex-direction: column; }
+  .cne-rsvp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(217,164,65,0.18); font-size: 10.5px; letter-spacing: 0.18em; color: #8A8577; }
+  .cne-rsvp-row > span:first-child { flex-shrink: 0; }
+  .cne-rsvp-row > span:last-child { color: #F4F1EA; letter-spacing: 0.02em; text-align: right; }
+  .cne-rsvp-row--payment { align-items: flex-start; }
+  .cne-rsvp-payment-value { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .cne-rsvp-payment-total { color: #F6EFDD; font-size: 13px; letter-spacing: 0.02em; font-weight: 600; }
+  .cne-rsvp-payment-detail { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 9px; letter-spacing: 0.05em; color: #8A8577; }
+  .cne-rsvp-stepper { display: flex; align-items: center; gap: 12px; }
+  .cne-rsvp-stepper button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #D9A441; background: transparent; color: #D9A441; font-size: 14px; line-height: 1; cursor: pointer; }
+  .cne-rsvp-stepper button:disabled { opacity: 0.3; cursor: default; }
+  .cne-rsvp-stepper span { font-family: var(--cne-mono), monospace; color: #F4F1EA; min-width: 20px; text-align: center; }
+  .cne-rsvp-input { background: transparent; border: none; border-bottom: 1px solid rgba(217,164,65,0.3); color: #F4F1EA; font-family: var(--cne-mono), monospace; font-size: 11px; letter-spacing: 0.02em; padding: 4px 2px; text-align: right; max-width: 55%; }
+  .cne-rsvp-input::placeholder { color: #6E6A5D; }
+  .cne-rsvp-input:focus { outline: none; border-bottom-color: #D9A441; }
+  .cne-rsvp-btn { width: 100%; padding: 16px; font-family: var(--cne-mono), monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; background: linear-gradient(180deg, #D9A441, #7A1620); border: 1px solid #D9A441; color: #0B0B10; cursor: pointer; }
+  .cne-rsvp-btn:disabled { opacity: 0.6; cursor: default; }
+  .cne-rsvp-btn--ghost { background: transparent; color: #D9A441; }
+  .cne-rsvp-error { font-size: 10px; letter-spacing: 0.06em; color: #D9A441; margin: 0; }
+  .cne-rsvp-declined { display: flex; flex-direction: column; gap: 18px; align-items: center; text-align: center; max-width: 380px; }
+  .cne-rsvp-declined-text { margin: 0; font-family: var(--cne-playfair), serif; font-style: italic; font-size: 18px; line-height: 1.4; color: #A8A292; }
 
-  .prc-upload-wrap { flex: 1; min-height: 0; overflow-y: auto; }
-  .prc-album-embed { flex: 1; min-height: 0; overflow-y: auto; }
-  .prc-live-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; border: 1px dashed rgba(20,20,27,0.2); }
-  .prc-photo-placeholder { position: relative; font-size: 8.5px; letter-spacing: 0.16em; color: #6E6A5D; }
+  .cne-upload-wrap { flex: 1; min-height: 0; overflow-y: auto; }
+  .cne-album-embed { flex: 1; min-height: 0; overflow-y: auto; }
+  .cne-live-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; border: 1px dashed rgba(20,20,27,0.2); }
+  .cne-photo-placeholder { position: relative; font-size: 8.5px; letter-spacing: 0.16em; color: #6E6A5D; }
 
-  .prc-mosaic { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: auto; grid-auto-flow: dense; align-content: start; gap: 10px; }
-  .prc-mosaic-cell--featured { grid-column: span 2; grid-row: span 2; cursor: pointer; }
-  .prc-mosaic-cell { position: relative; height: 0; padding-top: 100%; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); overflow: hidden; cursor: pointer; }
-  .prc-mosaic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cne-mosaic { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: auto; grid-auto-flow: dense; align-content: start; gap: 10px; }
+  .cne-mosaic-cell--featured { grid-column: span 2; grid-row: span 2; cursor: pointer; }
+  .cne-mosaic-cell { position: relative; height: 0; padding-top: 100%; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); overflow: hidden; cursor: pointer; }
+  .cne-mosaic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
-  .prc-bank-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 420px; margin: 0; }
-  .prc-bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(180,140,201,0.18); }
-  .prc-bank-row:last-child { border-bottom: none; }
-  .prc-bank-row-label { display: block; font-size: 9px; letter-spacing: 0.2em; color: #8A8577; margin-bottom: 3px; }
-  .prc-bank-row-value { font-size: 12px; color: #F4F1EA; word-break: break-all; }
-  .prc-bank-copy { flex-shrink: 0; font-family: var(--prc-mono), monospace; font-size: 10px; letter-spacing: 0.1em; padding: 7px 12px; border: 1px solid #B48CC9; background: transparent; color: #B48CC9; cursor: pointer; }
-  .prc-bank-copy:hover { background: rgba(180,140,201,0.12); }
+  .cne-bank-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 420px; margin: 0; }
+  .cne-bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(217,164,65,0.18); }
+  .cne-bank-row:last-child { border-bottom: none; }
+  .cne-bank-row-label { display: block; font-size: 9px; letter-spacing: 0.2em; color: #8A8577; margin-bottom: 3px; }
+  .cne-bank-row-value { font-size: 12px; color: #F4F1EA; word-break: break-all; }
+  .cne-bank-copy { flex-shrink: 0; font-family: var(--cne-mono), monospace; font-size: 10px; letter-spacing: 0.1em; padding: 7px 12px; border: 1px solid #D9A441; background: transparent; color: #D9A441; cursor: pointer; }
+  .cne-bank-copy:hover { background: rgba(217,164,65,0.12); }
 
-  .prc-eq { display: flex; align-items: flex-end; gap: 5px; height: 52px; }
-  .prc-eq-bar { width: 4px; height: 100%; transform-origin: bottom; animation: gpEq 1.1s ease-in-out infinite; display: inline-block; }
-  .prc-song-wrap { font-family: var(--prc-mono), monospace; }
+  .cne-eq { display: flex; align-items: flex-end; gap: 5px; height: 52px; }
+  .cne-eq-bar { width: 4px; height: 100%; transform-origin: bottom; animation: gpEq 1.1s ease-in-out infinite; display: inline-block; }
+  .cne-song-wrap { font-family: var(--cne-mono), monospace; }
 
-  .prc-song { position: relative; width: 100%; max-width: 420px; margin: 0 auto; }
-  .prc-song-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(180,140,201,0.3); padding-bottom: 12px; }
-  .prc-song-inputs { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; text-transform: uppercase; }
-  .prc-song-input { background: transparent; border: none; border-bottom: 1px solid rgba(180,140,201,0.3); color: #F4F1EA; font-family: var(--prc-mono), monospace; font-size: 12px; padding: 6px 2px; min-width: 0; flex: 1; }
-  .prc-song-input::placeholder { color: #6E6A5D; }
-  .prc-song-input:focus { outline: none; border-bottom-color: #B48CC9; }
-  .prc-song-sep { color: #8A8577; flex-shrink: 0; }
-  .prc-song-submit { flex-shrink: 0; background: none; border: none; color: #B48CC9; font-family: var(--prc-mono), monospace; font-size: 10px; letter-spacing: 0.2em; cursor: pointer; }
-  .prc-song-submit:hover { color: #F7E9F0; }
-  .prc-song-submit:disabled { color: #6E6A5D; cursor: default; }
-  .prc-song-error { font-size: 10px; color: #B48CC9; margin-top: 6px; }
-  .prc-song-list { display: flex; flex-direction: column; margin-top: 14px; }
-  .prc-song-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-family: var(--prc-mono), monospace; }
-  .prc-song-item-title { font-size: 11.5px; letter-spacing: 0.04em; color: #F4F1EA; }
-  .prc-song-item-by { font-size: 9.5px; letter-spacing: 0.1em; color: #6E6A5D; }
+  .cne-song { position: relative; width: 100%; max-width: 420px; margin: 0 auto; }
+  .cne-song-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(217,164,65,0.3); padding-bottom: 12px; }
+  .cne-song-inputs { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; text-transform: uppercase; }
+  .cne-song-input { background: transparent; border: none; border-bottom: 1px solid rgba(217,164,65,0.3); color: #F4F1EA; font-family: var(--cne-mono), monospace; font-size: 12px; padding: 6px 2px; min-width: 0; flex: 1; }
+  .cne-song-input::placeholder { color: #6E6A5D; }
+  .cne-song-input:focus { outline: none; border-bottom-color: #D9A441; }
+  .cne-song-sep { color: #8A8577; flex-shrink: 0; }
+  .cne-song-submit { flex-shrink: 0; background: none; border: none; color: #D9A441; font-family: var(--cne-mono), monospace; font-size: 10px; letter-spacing: 0.2em; cursor: pointer; }
+  .cne-song-submit:hover { color: #F6EFDD; }
+  .cne-song-submit:disabled { color: #6E6A5D; cursor: default; }
+  .cne-song-error { font-size: 10px; color: #D9A441; margin-top: 6px; }
+  .cne-song-list { display: flex; flex-direction: column; margin-top: 14px; }
+  .cne-song-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-family: var(--cne-mono), monospace; }
+  .cne-song-item-title { font-size: 11.5px; letter-spacing: 0.04em; color: #F4F1EA; }
+  .cne-song-item-by { font-size: 9.5px; letter-spacing: 0.1em; color: #6E6A5D; }
 
-  .prc-quiz { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 460px; }
-  .prc-quiz-q { display: flex; flex-direction: column; gap: 14px; }
-  .prc-quiz-q-num { font-family: var(--prc-mono), monospace; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; }
-  .prc-quiz-q-text { margin: 0; font-family: var(--prc-cormorant), serif; font-size: clamp(18px, 4vw, 22px); line-height: 1.3; color: #F4F1EA; }
-  .prc-quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
-  .prc-quiz-opt { font-family: var(--prc-mono), monospace; font-size: 11px; letter-spacing: 0.06em; padding: 10px 16px; border: 1px solid rgba(180,140,201,0.4); background: transparent; color: #B48CC9; cursor: pointer; transition: background 160ms ease, color 160ms ease, border-color 160ms ease; }
-  .prc-quiz-opt:disabled { cursor: default; }
-  .prc-quiz-opt--picked { background: #B48CC9; border-color: #B48CC9; color: #0B0B10; }
-  .prc-quiz-opt--correct { background: #B48CC9; border-color: #B48CC9; color: #0B0B10; }
-  .prc-quiz-opt--wrong { border-color: #8A6A6A; color: #C99; opacity: 0.6; }
-  .prc-quiz-result { padding-top: 18px; border-top: 1px solid rgba(180,140,201,0.2); }
-  .prc-quiz-result-score { margin: 0 0 6px; font-family: var(--prc-mono), monospace; font-size: 11px; letter-spacing: 0.16em; color: #F7E9F0; }
-  .prc-quiz-result-stat { margin: 0; font-size: 11.5px; line-height: 1.5; color: #A8A292; }
+  .cne-quiz { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 460px; }
+  .cne-quiz-q { display: flex; flex-direction: column; gap: 14px; }
+  .cne-quiz-q-num { font-family: var(--cne-mono), monospace; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; }
+  .cne-quiz-q-text { margin: 0; font-family: var(--cne-playfair), serif; font-size: clamp(18px, 4vw, 22px); line-height: 1.3; color: #F4F1EA; }
+  .cne-quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cne-quiz-opt { font-family: var(--cne-mono), monospace; font-size: 11px; letter-spacing: 0.06em; padding: 10px 16px; border: 1px solid rgba(217,164,65,0.4); background: transparent; color: #D9A441; cursor: pointer; transition: background 160ms ease, color 160ms ease, border-color 160ms ease; }
+  .cne-quiz-opt:disabled { cursor: default; }
+  .cne-quiz-opt--picked { background: #D9A441; border-color: #D9A441; color: #0B0B10; }
+  .cne-quiz-opt--correct { background: #D9A441; border-color: #D9A441; color: #0B0B10; }
+  .cne-quiz-opt--wrong { border-color: #8A6A6A; color: #C99; opacity: 0.6; }
+  .cne-quiz-result { padding-top: 18px; border-top: 1px solid rgba(217,164,65,0.2); }
+  .cne-quiz-result-score { margin: 0 0 6px; font-family: var(--cne-mono), monospace; font-size: 11px; letter-spacing: 0.16em; color: #F6EFDD; }
+  .cne-quiz-result-stat { margin: 0; font-size: 11.5px; line-height: 1.5; color: #A8A292; }
 
-  .prc-final-card { border: 1px solid #B48CC9; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative; }
-  .prc-final-names { font-family: var(--prc-cormorant), serif; font-size: clamp(34px, 10vw, 46px); line-height: .9; color: #F7E9F0; }
-  .prc-barcode { height: 26px; background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); }
-  .prc-final-footer { display: flex; justify-content: space-between; align-items: center; font-size: 9px; letter-spacing: 0.24em; color: #56534A; }
-  .prc-replay { cursor: pointer; color: #B48CC9; }
-  .prc-footer-credit { display: flex; justify-content: center; padding-top: 8px; opacity: 0.7; }
+  .cne-final-card { border: 1px solid #D9A441; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative; }
+  .cne-final-names { font-family: var(--cne-playfair), serif; font-size: clamp(34px, 10vw, 46px); line-height: .9; color: #F6EFDD; }
+  .cne-barcode { height: 26px; background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); }
+  .cne-final-footer { display: flex; justify-content: space-between; align-items: center; font-size: 9px; letter-spacing: 0.24em; color: #56534A; }
+  .cne-replay { cursor: pointer; color: #D9A441; }
+  .cne-footer-credit { display: flex; justify-content: center; padding-top: 8px; opacity: 0.7; }
 
-  .prc-rail { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(180,140,201,0.14); }
-  .prc-rail-top { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #8A8577; transition: color 500ms ease; }
-  .prc-rail-line { flex: 1; width: 1px; margin: 16px 0; background: rgba(180,140,201,0.16); position: relative; }
-  .prc-rail-bar { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: linear-gradient(#F7E9F0, #B48CC9); transition: height 260ms linear; display: block; }
-  .prc-rail-label { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #B48CC9; transition: color 500ms ease; }
+  .cne-rail { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(217,164,65,0.14); }
+  .cne-rail-top { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #8A8577; transition: color 500ms ease; }
+  .cne-rail-line { flex: 1; width: 1px; margin: 16px 0; background: rgba(217,164,65,0.16); position: relative; }
+  .cne-rail-bar { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: linear-gradient(#F6EFDD, #D9A441); transition: height 260ms linear; display: block; }
+  .cne-rail-label { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #D9A441; transition: color 500ms ease; }
 
-  .prc-cover { position: absolute; inset: 0; z-index: 5; }
-  .prc-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
-  .prc-cover-half--top { top: 0; }
-  .prc-cover-half--bottom { bottom: 0; }
-  .prc-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #3A1F38 0%, #2A1628 46%, #22111F 100%); }
-  .prc-cover-half--bottom .prc-cover-inner { top: auto; bottom: 0; }
-  .prc-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(180,140,201,0.5), rgba(217,165,197,0.4), rgba(180,140,201,0.55), rgba(180,140,201,0.5)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite; }
-  /* Destellos (ver mockup original) -- distintos del abanico ("sunburst") de
-     Guest Pass VIP/Corona Escarlata, más acorde al tono de cuento de hadas. */
-  @keyframes prcSparkle { 0%, 100% { opacity: 0; transform: scale(.6); } 50% { opacity: 1; transform: scale(1); } }
-  .prc-sparkle { position: absolute; border-radius: 50%; background: #fff; box-shadow: 0 0 8px #fff; animation: prcSparkle 2.6s ease-in-out infinite; }
-  .prc-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
-  .prc-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
-  .prc-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
-  .prc-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
-  .prc-cover-names { margin: 0; font-family: var(--prc-cormorant), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F7E9F0; }
-  .prc-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#B48CC9, transparent); display: block; }
-  .prc-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
-  .prc-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
-  .prc-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .prc-cover-cta { border: 1px solid #B48CC9; background: linear-gradient(100deg, rgba(180,140,201,0.08), rgba(247,233,240,0.2), rgba(180,140,201,0.08)); color: #F6EFDD; font-family: var(--prc-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
-  .prc-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .prc-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(217,165,197,0.34), rgba(246,239,221,0.5), rgba(217,165,197,0.34)); color: #0B0B0F; }
-  .prc-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .cne-cover { position: absolute; inset: 0; z-index: 5; }
+  .cne-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
+  .cne-cover-half--top { top: 0; }
+  .cne-cover-half--bottom { bottom: 0; }
+  .cne-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #380A0F 0%, #2A0A0E 46%, #220709 100%); }
+  .cne-cover-half--bottom .cne-cover-inner { top: auto; bottom: 0; }
+  .cne-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(217,164,65,0.5), rgba(74,14,20,0.4), rgba(217,164,65,0.55), rgba(217,164,65,0.5)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite; }
+  /* Trama cruzada dorada (ver mockup original) -- distinta de la portada de
+     Guest Pass VIP/Princesa, que usan un destello tipo abanico ("sunburst"). */
+  .cne-cover-lattice { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(217,164,65,.14) 0 1px, transparent 1px 24px), repeating-linear-gradient(-45deg, rgba(217,164,65,.14) 0 1px, transparent 1px 24px); }
+  .cne-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
+  .cne-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
+  .cne-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
+  .cne-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
+  .cne-cover-names { margin: 0; font-family: var(--cne-playfair), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F6EFDD; }
+  .cne-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#D9A441, transparent); display: block; }
+  .cne-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
+  .cne-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
+  .cne-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
+  .cne-cover-cta { border: 1px solid #D9A441; background: linear-gradient(100deg, rgba(217,164,65,0.08), rgba(247,233,240,0.2), rgba(217,164,65,0.08)); color: #F6EFDD; font-family: var(--cne-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  .cne-cover-cta--btn { cursor: pointer; border-radius: 0; }
+  .cne-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(74,14,20,0.34), rgba(246,239,221,0.5), rgba(74,14,20,0.34)); color: #0B0B0F; }
+  .cne-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
-  .prc-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }
+  .cne-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }
 
-  .prc-lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(8,8,11,0.96); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .prc-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #B48CC9; background: rgba(0,0,0,0.4); color: #F4F1EA; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .prc-lightbox-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; }
+  .cne-lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(8,8,11,0.96); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .cne-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #D9A441; background: rgba(0,0,0,0.4); color: #F4F1EA; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .cne-lightbox-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; }
 `;

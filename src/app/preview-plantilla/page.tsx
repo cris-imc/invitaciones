@@ -27,6 +27,7 @@ import {
   INFANTIL_COMPONENTS,
   GUESTPASSVIP_COMPONENTS,
   PRINCESA_COMPONENTS,
+  CORONAESCARLATA_COMPONENTS,
   PreviewLoading,
   type TemplateTipo,
 } from "@/components/wizard/template-preview-registry";
@@ -57,19 +58,23 @@ const COMPONENTS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COMPONENTS> = {
   INFANTIL: INFANTIL_COMPONENTS,
   GUESTPASSVIP: GUESTPASSVIP_COMPONENTS,
   PRINCESA: PRINCESA_COMPONENTS,
+  CORONAESCARLATA: CORONAESCARLATA_COMPONENTS,
 };
 
 const DESIGN_TEMPLATE_TIPOS = new Set<string>(Object.keys(COMPONENTS_BY_TIPO));
 
-// Las plantillas "storytelling" (Guest Pass VIP y las que se sumen) no
-// scrollean la ventana/body como el resto -- tienen su propio contenedor
-// interno con overflow-y (.gpv-scroller, portada fija encima). El scroll-to
-// que dispara el wizard al cambiar de paso (ver wizard-scroll-to más abajo)
-// tiene que apuntar ahí en vez de a `window` cuando ese contenedor existe;
-// para el resto de las plantillas (sin ese contenedor) el comportamiento de
-// siempre (scrollear la ventana) sigue igual.
+// Las plantillas "storytelling" (Guest Pass VIP, Princesa, Corona Escarlata y
+// las que se sumen) no scrollean la ventana/body como el resto -- tienen su
+// propio contenedor interno con overflow-y (portada fija encima), marcado con
+// el atributo data-scroller="1" (cada una con su propio prefijo de clase --
+// .gpv-scroller, .prc-scroller, .cne-scroller -- para no chocar entre sí, por
+// eso NO hay que buscar por clase acá). El scroll-to que dispara el wizard al
+// cambiar de paso (ver wizard-scroll-to más abajo) tiene que apuntar ahí en
+// vez de a `window` cuando ese contenedor existe; para el resto de las
+// plantillas (sin ese contenedor) el comportamiento de siempre (scrollear la
+// ventana) sigue igual.
 function getStorytellingScroller(): HTMLElement | null {
-  return document.querySelector<HTMLElement>(".gpv-scroller");
+  return document.querySelector<HTMLElement>("[data-scroller]");
 }
 
 function scrollToTopWithinPreview() {

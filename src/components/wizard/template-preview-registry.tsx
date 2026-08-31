@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA";
 
 export interface ColorOption {
   id: string;
@@ -291,6 +291,10 @@ export const PRINCESA_COLORS: ColorOption[] = [
   { id: "default", name: "Lavanda Real", color: "#B48CC9" },
 ];
 
+export const CORONAESCARLATA_COLORS: ColorOption[] = [
+  { id: "default", name: "Escarlata y Oro", color: "#D9A441" },
+];
+
 export const ELEGANT_COLORS: ColorOption[] = [
   { id: "default", name: "Dorados (Original)", color: "#C79A4B" },
   { id: "Green", name: "Verdes", color: "#5C8A7A" },
@@ -559,6 +563,10 @@ export const GUESTPASSVIP_COMPONENTS: Record<string, PreviewComponent> = {
 
 export const PRINCESA_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/PrincesaTemplate").then((m) => m.PrincesaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CORONAESCARLATA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CoronaEscarlataTemplate").then((m) => m.CoronaEscarlataTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {

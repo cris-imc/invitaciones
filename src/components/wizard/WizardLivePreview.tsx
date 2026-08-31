@@ -122,7 +122,7 @@ export function WizardLivePreview() {
         "CINE", "NORDICO", "RIVIERA", "GOLDENDUSK",
         "SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE",
         "CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL",
-        "GUESTPASSVIP", "PRINCESA",
+        "GUESTPASSVIP", "PRINCESA", "CORONAESCARLATA",
     ]);
     const tipo = data.templateTipo && DESIGN_TEMPLATE_TIPOS.has(data.templateTipo) ? data.templateTipo : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
