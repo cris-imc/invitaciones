@@ -108,13 +108,6 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: PrincesaTemplateProps) {
-  // Vista previa (wizard/modal/showcase, ver preview-plantilla/page.tsx): ver
-  // comentario largo en GuestPassVipTemplate.tsx -- en preview se salta la
-  // animación de entrada (necesita un "segundo pintado" que a veces Chrome no
-  // agenda para un iframe transformado mientras la pestaña no está visible) y
-  // se muestra el estado final de una sola vez. La invitación real
-  // (isPreviewMode ausente) sigue con la animación completa.
-  const isPreviewMode = Boolean(invitation.isPreviewMode);
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
   const namesTitle = nombreQuinceanera || "Mis quince";
 
@@ -263,19 +256,11 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const [isCoverOpen, setIsCoverOpen] = useState(false);
-  const hasOpenedRef = useRef(false);
 
   // -- intro / apertura de portada -----------------------------------
   const intro = useCallback(() => {
     [kickerRef.current, namesRef.current].forEach((el, i) => {
       if (!el) return;
-      if (isPreviewMode) {
-        el.style.transition = "none";
-        el.style.opacity = "1";
-        el.style.transform = "none";
-        el.style.filter = "none";
-        return;
-      }
       el.style.opacity = "0";
       el.style.transform = "translateY(26px)";
       el.style.filter = "blur(10px)";
@@ -288,41 +273,29 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
       }, 90);
     });
     if (perfRef.current) {
-      if (isPreviewMode) {
-        perfRef.current.style.clipPath = "inset(0 0 0 0)";
-      } else {
-        window.setTimeout(() => {
-          if (perfRef.current) perfRef.current.style.clipPath = "inset(0 0 0 0)";
-        }, 90);
-      }
+      window.setTimeout(() => {
+        if (perfRef.current) perfRef.current.style.clipPath = "inset(0 0 0 0)";
+      }, 90);
     }
-  }, [isPreviewMode]);
+  }, []);
 
   const open = useCallback(() => {
     if (topRef.current) topRef.current.style.transform = "translateY(-100%)";
     if (bottomRef.current) bottomRef.current.style.transform = "translateY(100%)";
     if (scrollerRef.current) scrollerRef.current.style.opacity = "1";
-    if (isPreviewMode) {
+    window.setTimeout(() => {
       if (hintRef.current) hintRef.current.style.opacity = "1";
       if (railRef.current) railRef.current.style.opacity = "1";
+    }, 1200);
+    window.setTimeout(() => {
       if (coverRef.current) coverRef.current.style.pointerEvents = "none";
-    } else {
-      window.setTimeout(() => {
-        if (hintRef.current) hintRef.current.style.opacity = "1";
-        if (railRef.current) railRef.current.style.opacity = "1";
-      }, 1200);
-      window.setTimeout(() => {
-        if (coverRef.current) coverRef.current.style.pointerEvents = "none";
-      }, 1100);
-    }
+    }, 1100);
     setIsCoverOpen(true);
-    hasOpenedRef.current = true;
     drawRoute();
-  }, [isPreviewMode]);
+  }, []);
 
   const reset = useCallback(() => {
     setIsCoverOpen(false);
-    hasOpenedRef.current = false;
     if (scrollerRef.current) {
       scrollerRef.current.scrollTop = 0;
       scrollerRef.current.style.opacity = "0";
@@ -381,50 +354,6 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
     if (!root) return;
 
     intro();
-
-    // Ver comentario largo en GuestPassVipTemplate.tsx: la transición CSS de
-    // la tapa (y de la apertura) puede quedar pisada a mitad de camino --
-    // esta función se llama sola, repetidas veces, después de montar y
-    // además ante visibilitychange, por si hace falta corregirla.
-    const forceRevealIfStuck = () => {
-      [kickerRef.current, namesRef.current].forEach((el) => {
-        if (!el) return;
-        if (parseFloat(getComputedStyle(el).opacity) < 1) {
-          el.style.transition = "none";
-          el.style.opacity = "1";
-          el.style.transform = "none";
-          el.style.filter = "none";
-        }
-      });
-      if (perfRef.current && getComputedStyle(perfRef.current).clipPath !== "inset(0px 0px 0px 0px)") {
-        perfRef.current.style.clipPath = "inset(0 0 0 0)";
-      }
-      if (hasOpenedRef.current) {
-        if (scrollerRef.current && getComputedStyle(scrollerRef.current).opacity !== "1") {
-          scrollerRef.current.style.transition = "none";
-          scrollerRef.current.style.opacity = "1";
-        }
-        if (topRef.current && getComputedStyle(topRef.current).transform === "none") {
-          topRef.current.style.transition = "none";
-          topRef.current.style.transform = "translateY(-100%)";
-        }
-        if (bottomRef.current && getComputedStyle(bottomRef.current).transform === "none") {
-          bottomRef.current.style.transition = "none";
-          bottomRef.current.style.transform = "translateY(100%)";
-        }
-        if (hintRef.current && getComputedStyle(hintRef.current).opacity !== "1") {
-          hintRef.current.style.transition = "none";
-          hintRef.current.style.opacity = "1";
-        }
-        if (railRef.current && getComputedStyle(railRef.current).opacity !== "1") {
-          railRef.current.style.transition = "none";
-          railRef.current.style.opacity = "1";
-        }
-        if (coverRef.current) coverRef.current.style.pointerEvents = "none";
-      }
-    };
-    document.addEventListener("visibilitychange", forceRevealIfStuck);
-    const revealCheckTimers = [300, 800, 1500, 3000].map((delay) => window.setTimeout(forceRevealIfStuck, delay));
 
     const tick = () => {
       const ms = Math.max(0, eventDateTime.getTime() - Date.now());
@@ -592,8 +521,6 @@ export function PrincesaTemplate({ invitation, guest, isPersonalized = false }: 
       window.clearInterval(tickTimer);
       cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);
-      document.removeEventListener("visibilitychange", forceRevealIfStuck);
-      revealCheckTimers.forEach((t) => window.clearTimeout(t));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

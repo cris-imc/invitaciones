@@ -285,17 +285,6 @@ function TemplatePreviewModalBody({
     return () => observer.disconnect();
   }, []);
 
-  // El bug real (ver comentario largo en WizardLivePreview.tsx): si el
-  // iframe termina de cargar con la pestaña oculta, Chromium a veces nunca
-  // pinta esa carga -- el contenido de adentro queda perfecto pero la capa
-  // transformada que lo envuelve queda vieja/vacía para siempre. Confirmado
-  // que ni esperar ni un simple nudge de estilo alcanzan de forma confiable
-  // -- lo único que funciona siempre es una recarga real. Se hace SOLO
-  // cuando de verdad se dio esa condición sospechosa, recién al volver a
-  // estar visible (recargar sin necesidad genera un parpadeo visible).
-  const loadedWhileHiddenRef = useRef(false);
-  const [reloadNonce, setReloadNonce] = useState(0);
-
   // La página en el iframe abre la portada de bienvenida sola y recién ahí
   // avisa que está lista (ver preview-plantilla/page.tsx) — así el spinner
   // no desaparece antes de tiempo mostrando un flash roto.
@@ -320,46 +309,17 @@ function TemplatePreviewModalBody({
                   window.location.origin
               );
           }
-          if (document.hidden) {
-              loadedWhileHiddenRef.current = true;
-          } else {
-              // Nudge liviano: si cargó con la pestaña visible, alcanza con
-              // esto para los casos más chicos de recomposición.
-              setScale((s) => s + 0.0001);
-              requestAnimationFrame(() => {
-                  setScale((s) => s - 0.0001);
-              });
-          }
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, [currentData, activeTab, previewColor]);
 
-  useEffect(() => {
-    const onVisibilityChange = () => {
-      if (!document.hidden && loadedWhileHiddenRef.current) {
-        loadedWhileHiddenRef.current = false;
-        setReloadNonce((n) => n + 1);
-      }
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, []);
-
   const colors = getColorsForTipo(activeTab);
-  const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(eventType ?? "CASAMIENTO")}&tipo=${activeTab}&color=${encodeURIComponent(previewColor)}&rn=${reloadNonce}`;
+  const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(eventType ?? "CASAMIENTO")}&tipo=${activeTab}&color=${encodeURIComponent(previewColor)}`;
 
-  // Red de seguridad: si por lo que sea el "ya está listo" del iframe nunca
-  // llega (se pierde el postMessage, remonta antes de tiempo, etc.), el
-  // spinner quedaba girando para siempre aunque el iframe de adentro haya
-  // renderizado bien. Después de unos segundos se apaga solo -- si en ese
-  // momento el iframe todavía no cargó de verdad, se va a seguir viendo en
-  // cuanto termine (no hay contenido que tapar).
   useEffect(() => {
     setPreviewLoading(true);
-    const t = window.setTimeout(() => setPreviewLoading(false), 4000);
-    return () => window.clearTimeout(t);
   }, [previewSrc]);
 
   const availableTabs = getAvailableTabs(eventType, collection);
