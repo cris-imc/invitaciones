@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isStorytellingTemplate } from "./wizard-steps-config";
 import {
   MODERNO_COLORS,
   ELEGANT_COLORS,
@@ -33,6 +34,7 @@ import {
   GARDENPARTY_COLORS,
   LOFTINDUSTRIAL_COLORS,
   INFANTIL_COLORS,
+  GUESTPASSVIP_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
@@ -42,6 +44,7 @@ export {
   CINE_COLORS, NORDICO_COLORS, RIVIERA_COLORS, GOLDENDUSK_COLORS,
   SEDA_COLORS, PETALOS_COLORS, LUZLUNA_COLORS, BONVOYAGE_COLORS,
   CORPORATE_COLORS, GARDENPARTY_COLORS, LOFTINDUSTRIAL_COLORS, INFANTIL_COLORS,
+  GUESTPASSVIP_COLORS,
   type TemplateTipo,
 };
 
@@ -71,6 +74,7 @@ export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
   GARDENPARTY: "#D97757",
   LOFTINDUSTRIAL: "#E0B84B",
   INFANTIL: "#FF5C8A",
+  GUESTPASSVIP: "#C8A45C",
 };
 
 const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
@@ -96,6 +100,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
   { tipo: "GARDENPARTY", label: "Garden Party" },
   { tipo: "LOFTINDUSTRIAL", label: "Loft Industrial" },
   { tipo: "INFANTIL", label: "Infantil" },
+  { tipo: "GUESTPASSVIP", label: "Guest Pass VIP" },
 ];
 
 // Neon ("Doodle Disco 15") solo se ofrece para 15 años y Evento (CUMPLEANOS),
@@ -103,12 +108,13 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
 // docs/PLAN_TEMPLATES_NEON_CHIC.md. El pack de 18 plantillas nuevas de
 // docs/INVENTARIO_IMPLE_MASIVA.md sigue el mismo patrón de gating por tipo
 // de evento -- ver esa tabla para el detalle de cada una.
-function getAvailableTabs(eventType: string | undefined): { tipo: TemplateTipo; label: string }[] {
+function getAvailableTabs(eventType: string | undefined, collection: "FLAT" | "STORYTELLING"): { tipo: TemplateTipo; label: string }[] {
   const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D"]);
-  const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK"]);
+  const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP"]);
   const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
+    if (isStorytellingTemplate(tipo) !== (collection === "STORYTELLING")) return false;
     if (tipo === "NEON") return eventType === "QUINCE_ANOS" || eventType === "CUMPLEANOS";
     if (tipo === "CHIC") return eventType === "CASAMIENTO";
     if (soloQuince.has(tipo)) return eventType === "QUINCE_ANOS";
@@ -142,6 +148,7 @@ const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
   GARDENPARTY: GARDENPARTY_COLORS,
   LOFTINDUSTRIAL: LOFTINDUSTRIAL_COLORS,
   INFANTIL: INFANTIL_COLORS,
+  GUESTPASSVIP: GUESTPASSVIP_COLORS,
 };
 
 function getColorsForTipo(tipo: TemplateTipo) {
@@ -159,6 +166,11 @@ interface TemplatePreviewModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   eventType: string | undefined;
+  // Colección Flat (plantillas de siempre) vs Storytelling (Guest Pass VIP y
+  // las que se sumen) -- filtra qué tabs de familia se ofrecen acá. Default
+  // "FLAT" para no romper otros callers de este modal (showcase, etc.) que
+  // todavía no pasan esta prop.
+  collection?: "FLAT" | "STORYTELLING";
   initialTemplateTipo: TemplateTipo;
   initialColor: string;
   currentData?: Record<string, any>;
@@ -169,6 +181,7 @@ export function TemplatePreviewModal({
   open,
   onOpenChange,
   eventType,
+  collection = "FLAT",
   initialTemplateTipo,
   initialColor,
   currentData,
@@ -185,6 +198,7 @@ export function TemplatePreviewModal({
           <TemplatePreviewModalBody
             key={`${initialTemplateTipo}:${initialColor}`}
             eventType={eventType}
+            collection={collection}
             initialTemplateTipo={initialTemplateTipo}
             initialColor={initialColor}
             currentData={currentData}
@@ -199,6 +213,7 @@ export function TemplatePreviewModal({
 
 interface TemplatePreviewModalBodyProps {
   eventType: string | undefined;
+  collection: "FLAT" | "STORYTELLING";
   initialTemplateTipo: TemplateTipo;
   initialColor: string;
   currentData?: Record<string, any>;
@@ -208,6 +223,7 @@ interface TemplatePreviewModalBodyProps {
 
 function TemplatePreviewModalBody({
   eventType,
+  collection,
   initialTemplateTipo,
   initialColor,
   currentData,
@@ -290,7 +306,7 @@ function TemplatePreviewModalBody({
 
   const colors = getColorsForTipo(activeTab);
   const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(eventType ?? "CASAMIENTO")}&tipo=${activeTab}&color=${encodeURIComponent(previewColor)}`;
-  const availableTabs = getAvailableTabs(eventType);
+  const availableTabs = getAvailableTabs(eventType, collection);
 
   return (
     <>

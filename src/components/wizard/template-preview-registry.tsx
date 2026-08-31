@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP";
 
 export interface ColorOption {
   id: string;
@@ -278,6 +278,13 @@ export const INFANTIL_COLORS: ColorOption[] = [
   { id: "Menta", name: "Menta", color: "#29B38A" },
 ];
 
+// Por ahora una sola variante de color (dorado champagne sobre negro, la
+// aprobada en el diseño original) -- futuras variantes de acento seguirían
+// el mismo patrón que el resto de las familias.
+export const GUESTPASSVIP_COLORS: ColorOption[] = [
+  { id: "default", name: "Dorado Champagne", color: "#C8A45C" },
+];
+
 export const ELEGANT_COLORS: ColorOption[] = [
   { id: "default", name: "Dorados (Original)", color: "#C79A4B" },
   { id: "Green", name: "Verdes", color: "#5C8A7A" },
@@ -538,6 +545,10 @@ export const INFANTIL_COMPONENTS: Record<string, PreviewComponent> = {
   Celeste: dynamic(() => import("@/components/templates/InfantilTemplateCeleste").then((m) => m.InfantilTemplateCeleste), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Lavanda: dynamic(() => import("@/components/templates/InfantilTemplateLavanda").then((m) => m.InfantilTemplateLavanda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Menta: dynamic(() => import("@/components/templates/InfantilTemplateMenta").then((m) => m.InfantilTemplateMenta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const GUESTPASSVIP_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/GuestPassVipTemplate").then((m) => m.GuestPassVipTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {

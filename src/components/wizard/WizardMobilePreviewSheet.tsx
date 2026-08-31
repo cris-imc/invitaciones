@@ -81,7 +81,7 @@ export function WizardMobilePreviewSheet() {
         if (userInteractedRef.current || midpointHintFiredRef.current) return;
         const isEditing = Boolean(data.id);
         const isCasamiento = data.type === "CASAMIENTO";
-        const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false });
+        const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false, templateTipo: data.templateTipo });
         const midpoint = Math.floor(steps.length / 2);
         if (currentStep >= midpoint) {
             midpointHintFiredRef.current = true;

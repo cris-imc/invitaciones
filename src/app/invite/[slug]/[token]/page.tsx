@@ -10,6 +10,7 @@ import { ElegantTemplateViolet } from "@/components/templates/ElegantTemplateVio
 import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray";
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
+import { GuestPassVipTemplate } from "@/components/templates/GuestPassVipTemplate";
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
 import { NeonTemplateBlackout } from "@/components/templates/NeonTemplateBlackout";
 import { NeonTemplateTropical } from "@/components/templates/NeonTemplateTropical";
@@ -395,12 +396,21 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 expectedTeens: true,
                 expectedChildren: true,
                 attendingTeens: true,
+                createdAt: true,
             },
         }),
     ]);
 
     const validInvitation = await checkAndCleanupIfExpired(invitation as any);
     if (!validInvitation) return notFound();
+
+    // Orden real del invitado dentro de la invitación (1, 2, 3...) -- el
+    // backend no reserva mesas/sectores, así que algunas plantillas (ver
+    // GuestPassVipTemplate) usan este número de orden en vez de inventar una
+    // ubicación que no existe.
+    const guestOrderNumber = guest
+        ? (await prisma.guest.count({ where: { invitationId: guest.invitationId, createdAt: { lt: guest.createdAt } } })) + 1
+        : undefined;
 
     const vInv = validInvitation as unknown as { liveSession?: { id?: string } | null; fechaEvento?: string | Date | null };
     if (vInv.liveSession?.id && vInv.fechaEvento) {
@@ -435,7 +445,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         if (validInvitation.tipo === 'CASAMIENTO' || validInvitation.tipo === 'QUINCE_ANOS' || validInvitation.tipo === 'CUMPLEANOS') {
             const color = temaColoresObj.colorPrincipal || 'default';
             const invRecord = validInvitation as Record<string, unknown>;
-            const guestRecord = guest as any;
+            const guestRecord = { ...guest, orderNumber: guestOrderNumber } as any;
 
             if (validInvitation.templateTipo === 'NEON') {
                 switch (color) {
@@ -465,6 +475,8 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Gris': return <ChicTemplateGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <ChicTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
+            } else if (validInvitation.templateTipo === 'GUESTPASSVIP') {
+                return <GuestPassVipTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
             } else if (validInvitation.templateTipo === 'MODERNO') {
                 switch (color) {
                     case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;

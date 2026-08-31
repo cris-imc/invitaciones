@@ -21,6 +21,19 @@ export interface WizardStepDef {
     label: string;
 }
 
+// Plantillas de la "Colección Storytelling" (Guest Pass VIP y las que se
+// vayan sumando): diseño de componentes prediseñado y fijo -- no eligen
+// portada de bienvenida/interior, tipografía, estilo de countdown ni estilo
+// de álbum desde el wizard (ver comentario de cabecera de
+// GuestPassVipTemplate.tsx). El resto de los pasos (datos reales: salón,
+// ceremonia, cronograma, galería, música, banco, trivia, info adicional)
+// se comparten igual que con la Colección Flat.
+export const STORYTELLING_TEMPLATE_TIPOS = new Set(["GUESTPASSVIP"]);
+
+export function isStorytellingTemplate(templateTipo: string | null | undefined): boolean {
+    return Boolean(templateTipo && STORYTELLING_TEMPLATE_TIPOS.has(templateTipo));
+}
+
 // Fuente única del orden de pasos del wizard, usada tanto por WizardSteps.tsx
 // (para renderizar) como por EditWizardContainer.tsx (para saltar a un paso
 // puntual por label, ej. "?step=design") -- así el índice nunca puede
@@ -30,6 +43,7 @@ export function getWizardSteps({
     isCasamiento,
     hasGallery = true,
     isAdmin = false,
+    templateTipo,
 }: {
     isEditing: boolean;
     isCasamiento: boolean;
@@ -46,23 +60,37 @@ export function getWizardSteps({
     // para admin en edición (el tipo de evento en sí queda bloqueado
     // igual, ver StepEventType.tsx).
     isAdmin?: boolean;
+    // Plantilla elegida hasta ahora (data.templateTipo) -- define si esta
+    // invitación pertenece a la Colección Storytelling (ver arriba). Antes
+    // de elegir plantilla no hay valor todavía, así que por defecto se
+    // asume Colección Flat (comportamiento de siempre).
+    templateTipo?: string | null;
 }): WizardStepDef[] {
+    const storytelling = isStorytellingTemplate(templateTipo);
     return [
         ...(!isEditing || isAdmin ? [{ component: StepEventType, label: "Tipo de Evento" }] : []),
-        // Pedido del usuario: la Portada va antes de elegir Plantilla, así la
-        // preview real de la plantilla ya refleja la foto de portada real
-        // del cliente en vez de una de muestra.
-        { component: StepHeroImages, label: "Portada" },
+        // La Plantilla se elige primero: además de que la Colección
+        // Storytelling se salta portada/tipografía por completo, así la
+        // preview ya sabe desde el arranque qué flujo seguir.
         { component: StepDesign, label: "Plantilla" },
-        { component: StepTypography, label: "Tipografía" },
+        ...(!storytelling ? [{ component: StepHeroImages, label: "Portada" }] : []),
+        ...(!storytelling ? [{ component: StepTypography, label: "Tipografía" }] : []),
         { component: StepBasicInfo, label: "Información Básica" },
-        { component: StepCountdownStyle, label: "Countdown" },
+        ...(!storytelling ? [{ component: StepCountdownStyle, label: "Countdown" }] : []),
         { component: StepPhrase, label: "Frase" },
+        // Orden Salón/Ceremonia: en las plantillas Flat el salón se pregunta
+        // primero. En Guest Pass VIP (y el resto de Storytelling) el panel
+        // "El lugar" muestra la Ceremonia ANTES que el Salón cuando está
+        // habilitada (ver GuestPassVipTemplate.tsx) -- si el wizard preguntara
+        // en el orden de siempre, se cargarían los datos en el orden
+        // contrario al que después se ven en la tarjeta. Para Storytelling se
+        // invierte el orden de estos dos pasos para que coincidan.
+        ...(isCasamiento && storytelling ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
         { component: StepDetails, label: "Detalles del Salón" },
-        ...(isCasamiento ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
+        ...(isCasamiento && !storytelling ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
         { component: StepCronograma, label: "Cronograma" },
         { component: StepGallery, label: "Galería" },
-        ...(hasGallery ? [{ component: StepAlbumStyle, label: "Álbum" }] : []),
+        ...(hasGallery && !storytelling ? [{ component: StepAlbumStyle, label: "Álbum" }] : []),
         { component: StepMusic, label: "Música" },
         { component: StepBankDetails, label: "Regalo (CBU)" },
         { component: StepTrivia, label: "Trivia" },

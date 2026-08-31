@@ -25,6 +25,7 @@ import {
   GARDENPARTY_COMPONENTS,
   LOFTINDUSTRIAL_COMPONENTS,
   INFANTIL_COMPONENTS,
+  GUESTPASSVIP_COMPONENTS,
   PreviewLoading,
   type TemplateTipo,
 } from "@/components/wizard/template-preview-registry";
@@ -53,9 +54,74 @@ const COMPONENTS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COMPONENTS> = {
   GARDENPARTY: GARDENPARTY_COMPONENTS,
   LOFTINDUSTRIAL: LOFTINDUSTRIAL_COMPONENTS,
   INFANTIL: INFANTIL_COMPONENTS,
+  GUESTPASSVIP: GUESTPASSVIP_COMPONENTS,
 };
 
 const DESIGN_TEMPLATE_TIPOS = new Set<string>(Object.keys(COMPONENTS_BY_TIPO));
+
+// Las plantillas "storytelling" (Guest Pass VIP y las que se sumen) no
+// scrollean la ventana/body como el resto -- tienen su propio contenedor
+// interno con overflow-y (.gpv-scroller, portada fija encima). El scroll-to
+// que dispara el wizard al cambiar de paso (ver wizard-scroll-to más abajo)
+// tiene que apuntar ahí en vez de a `window` cuando ese contenedor existe;
+// para el resto de las plantillas (sin ese contenedor) el comportamiento de
+// siempre (scrollear la ventana) sigue igual.
+function getStorytellingScroller(): HTMLElement | null {
+  return document.querySelector<HTMLElement>(".gpv-scroller");
+}
+
+function scrollToTopWithinPreview() {
+  const scroller = getStorytellingScroller();
+  if (scroller) {
+    scroller.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function scrollToElementWithinPreview(element: HTMLElement) {
+  const scroller = getStorytellingScroller();
+  if (scroller) {
+    // Paneles dentro de un carrusel horizontal pineado (ver [data-pan] en
+    // GuestPassVipTemplate.tsx, ej. Ceremonia/Salón dentro de "El lugar"):
+    // todos comparten la MISMA posición vertical (solo cambia su X según
+    // cuánto se scrollea DENTRO del alto del pan) -- alinear por
+    // getBoundingClientRect().top como con una sección normal siempre da el
+    // mismo resultado sin importar cuál de los paneles sea el destino, y el
+    // preview queda "pegado" en el primero. Hay que calcular el scrollTop
+    // que le corresponde a la posición horizontal de ESE panel puntual.
+    const pan = element.closest<HTMLElement>("[data-pan]");
+    const strip = pan?.querySelector<HTMLElement>("[data-strip]");
+    if (pan && strip) {
+      const panels = Array.from(strip.children) as HTMLElement[];
+      const index = panels.findIndex((p) => p === element || p.contains(element));
+      if (index !== -1) {
+        const n = panels.length;
+        const span = pan.offsetHeight - scroller.clientHeight;
+        const progress = n > 1 ? index / (n - 1) : 0;
+        const target = pan.offsetTop + Math.max(0, span) * progress;
+        scroller.scrollTo({ top: target > 0 ? target : 0, behavior: "smooth" });
+        return;
+      }
+    }
+    const scRect = scroller.getBoundingClientRect();
+    const elRect = element.getBoundingClientRect();
+    const target = scroller.scrollTop + (elRect.top - scRect.top) - scroller.clientHeight / 4;
+    scroller.scrollTo({ top: target > 0 ? target : 0, behavior: "smooth" });
+    return;
+  }
+  const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
+  window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
+}
+
+function scrollToBottomWithinPreview() {
+  const scroller = getStorytellingScroller();
+  if (scroller) {
+    scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
+    return;
+  }
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
 
 // Página standalone, sin layout de dashboard/auth: se carga dentro de un
 // <iframe> desde el wizard para que las media queries de la plantilla
@@ -118,12 +184,7 @@ function PreviewPlantillaContent() {
     // faltan datos para esa sección puntual. En vez de eso, se busca la
     // PRÓXIMA sección real que sí exista, siguiendo el orden del wizard, y
     // recién si no queda ninguna más adelante se cae al final de la página.
-    const SECTION_ORDER = ["hero", "countdown", "quote", "details", "schedule", "album", "music", "banco", "quiz", "info-adicional"];
-
-    const scrollToElement = (element: HTMLElement) => {
-        const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
-        window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
-    };
+    const SECTION_ORDER = ["hero", "countdown", "quote", "ceremonia", "details", "schedule", "album", "music", "banco", "quiz", "info-adicional"];
 
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window.parent) return;
@@ -137,14 +198,14 @@ function PreviewPlantillaContent() {
           if (!sectionId) return;
 
           if (sectionId === 'hero') {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              scrollToTopWithinPreview();
               setPendingScrollId(null);
               scrollFallbackToken.current += 1;
               return;
           }
           const element = document.getElementById(sectionId);
           if (element) {
-              scrollToElement(element);
+              scrollToElementWithinPreview(element);
               setPendingScrollId(null);
               scrollFallbackToken.current += 1;
           } else {
@@ -178,9 +239,9 @@ function PreviewPlantillaContent() {
                       }
                   }
                   if (nextElement) {
-                      scrollToElement(nextElement);
+                      scrollToElementWithinPreview(nextElement);
                   } else {
-                      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+                      scrollToBottomWithinPreview();
                   }
               }, 700);
           }
@@ -196,8 +257,7 @@ function PreviewPlantillaContent() {
     if (pendingScrollId) {
       const element = document.getElementById(pendingScrollId);
       if (element) {
-        const top = element.getBoundingClientRect().top + window.pageYOffset - window.innerHeight / 4;
-        window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
+        scrollToElementWithinPreview(element);
         setPendingScrollId(null);
       }
     }

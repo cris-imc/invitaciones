@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
-import { getWizardSteps } from "./wizard-steps-config";
+import { getWizardSteps, isStorytellingTemplate } from "./wizard-steps-config";
 import { isAdmin as isAdminRole } from "@/lib/roles";
 
 // Corrección 1 (docs/correcciones.md): preview del wizard con fidelidad
@@ -40,7 +40,7 @@ export function WizardLivePreview() {
     const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
     const isEditing = Boolean(data.id);
     const isCasamiento = data.type === "CASAMIENTO";
-    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false, isAdmin });
+    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false, isAdmin, templateTipo: data.templateTipo });
     const stepLabel = steps[currentStep]?.label || "";
     const showCoverOnly = stepLabel === "Portada";
 
@@ -111,6 +111,7 @@ export function WizardLivePreview() {
         "CINE", "NORDICO", "RIVIERA", "GOLDENDUSK",
         "SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE",
         "CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL",
+        "GUESTPASSVIP",
     ]);
     const tipo = data.templateTipo && DESIGN_TEMPLATE_TIPOS.has(data.templateTipo) ? data.templateTipo : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
@@ -153,7 +154,15 @@ export function WizardLivePreview() {
         if (stepLabel === "Portada" || stepLabel === "Plantilla" || stepLabel === "Tipografía") section = "hero";
         if (stepLabel === "Countdown" || stepLabel === "Información Básica") section = "countdown";
         if (stepLabel === "Frase") section = "quote";
-        if (stepLabel === "Detalles del Salón" || stepLabel === "Ceremonia / Civil") section = "details";
+        // Storytelling (Guest Pass VIP): Ceremonia y Salón son dos paneles
+        // DISTINTOS de un mismo carrusel horizontal, no dos partes de la
+        // misma sección -- si ambos pasos apuntaran al mismo id, el preview
+        // queda "pegado" mostrando siempre el mismo panel (el primero) sin
+        // importar a cuál de los dos pasos se avance. Las plantillas Flat sí
+        // muestran Ceremonia dentro de la misma sección que el Salón, así
+        // que ahí los dos pasos siguen yendo al mismo lugar.
+        if (stepLabel === "Ceremonia / Civil") section = isStorytellingTemplate(data.templateTipo) ? "ceremonia" : "details";
+        if (stepLabel === "Detalles del Salón") section = "details";
         if (stepLabel === "Cronograma") section = "schedule";
         if (stepLabel === "Galería" || stepLabel === "Álbum") section = "album";
         if (stepLabel === "Música") section = "music";

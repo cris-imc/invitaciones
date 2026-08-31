@@ -16,7 +16,7 @@ export function WizardSteps() {
     const isCasamiento = data.type === "CASAMIENTO";
     const isEditing = Boolean(data.id);
 
-    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false, isAdmin });
+    const steps = getWizardSteps({ isEditing, isCasamiento, hasGallery: data.galeriaPrincipalHabilitada !== false, isAdmin, templateTipo: data.templateTipo });
 
     // Si viene de editar una invitación existente, "volver" debe llevar de
     // nuevo al panel de Administrar de esa tarjeta (de donde salió el

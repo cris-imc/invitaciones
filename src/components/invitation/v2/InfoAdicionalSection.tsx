@@ -205,7 +205,11 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <p className="ia-item-title" style={{ fontSize: "14px", fontWeight: 700, margin: "0 0 4px" }}>{item.title}</p>
-                      <p className="ia-item-text" style={{ fontSize: "13.5px", lineHeight: 1.55, margin: 0, whiteSpace: "pre-wrap" }}>
+                      {/* overflowWrap: sin esto, un texto sin espacios (ej.
+                          una URL larga o un dato pegado sin separar) no
+                          rompe línea y desborda el modal hacia la derecha,
+                          arrastrando todo el contenido con scroll horizontal. */}
+                      <p className="ia-item-text" style={{ fontSize: "13.5px", lineHeight: 1.55, margin: 0, whiteSpace: "pre-wrap", overflowWrap: "break-word", wordBreak: "break-word" }}>
                         {item.text}
                       </p>
                     </div>
