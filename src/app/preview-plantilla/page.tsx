@@ -26,6 +26,7 @@ import {
   LOFTINDUSTRIAL_COMPONENTS,
   INFANTIL_COMPONENTS,
   GUESTPASSVIP_COMPONENTS,
+  PRINCESA_COMPONENTS,
   PreviewLoading,
   type TemplateTipo,
 } from "@/components/wizard/template-preview-registry";
@@ -55,6 +56,7 @@ const COMPONENTS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COMPONENTS> = {
   LOFTINDUSTRIAL: LOFTINDUSTRIAL_COMPONENTS,
   INFANTIL: INFANTIL_COMPONENTS,
   GUESTPASSVIP: GUESTPASSVIP_COMPONENTS,
+  PRINCESA: PRINCESA_COMPONENTS,
 };
 
 const DESIGN_TEMPLATE_TIPOS = new Set<string>(Object.keys(COMPONENTS_BY_TIPO));
@@ -189,7 +191,6 @@ function PreviewPlantillaContent() {
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window.parent) return;
       if (event.data?.type === "wizard-live-data") {
-          (window as any).__debugLastReceived = event.data.invitation;
           setLiveInvitation(event.data.invitation ?? {});
           setShowCoverOnly(Boolean(event.data.showCoverOnly));
           setHasFirstContact(true);
@@ -266,7 +267,6 @@ function PreviewPlantillaContent() {
   // Solo pisa los campos que ya llegaron con un valor real -- así, por
   // ejemplo, antes de llegar al paso "Información Básica" la fecha sigue
   // siendo la de la muestra en vez de quedar vacía.
-  if (typeof window !== "undefined") (window as any).__debugLiveInvitationState = liveInvitation;
   const displayInvitation = liveInvitation
     ? {
         ...sample,

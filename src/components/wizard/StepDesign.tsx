@@ -33,6 +33,7 @@ import {
     LOFTINDUSTRIAL_COLORS,
     INFANTIL_COLORS,
     GUESTPASSVIP_COLORS,
+    PRINCESA_COLORS,
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
@@ -63,6 +64,7 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     LOFTINDUSTRIAL: "Loft Industrial",
     INFANTIL: "Infantil",
     GUESTPASSVIP: "Guest Pass VIP",
+    PRINCESA: "Princesa",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
@@ -88,6 +90,7 @@ const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     LOFTINDUSTRIAL: LOFTINDUSTRIAL_COLORS,
     INFANTIL: INFANTIL_COLORS,
     GUESTPASSVIP: GUESTPASSVIP_COLORS,
+    PRINCESA: PRINCESA_COLORS,
 };
 const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
     (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [
@@ -129,7 +132,7 @@ export function StepDesign() {
     );
     const activeTemplateTipo: TemplateTipo = templateTipoMatchesCollection
         ? (data.templateTipo as TemplateTipo)
-        : (collection === "STORYTELLING" ? "GUESTPASSVIP" : "ELEGANT");
+        : (collection === "STORYTELLING" ? (data.type === "QUINCE_ANOS" ? "PRINCESA" : "GUESTPASSVIP") : "ELEGANT");
     const activeColorId = themeConfig?.colorPrincipal || 'default';
     const activeColorList = TEMPLATE_TIPO_COLORS[activeTemplateTipo];
     const activeColorOption = activeColorList.find(c => c.id === activeColorId) ?? activeColorList[0];
@@ -172,10 +175,10 @@ export function StepDesign() {
                             </p>
                         </button>
 
-                        {/* Guest Pass VIP hoy solo aplica a Casamiento -- cuando se sumen
-                            plantillas storytelling para otros tipos de evento, generalizar
+                        {/* Guest Pass VIP (Casamiento) y Princesa (Quince Años) -- cuando se
+                            sumen plantillas storytelling para otros tipos de evento, generalizar
                             esta condición (ver STORYTELLING_TEMPLATE_TIPOS en wizard-steps-config.ts). */}
-                        {data.type === "CASAMIENTO" && (
+                        {(data.type === "CASAMIENTO" || data.type === "QUINCE_ANOS") && (
                             <button
                                 type="button"
                                 onClick={() => setCollection("STORYTELLING")}

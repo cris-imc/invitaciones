@@ -12,6 +12,7 @@ import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray"
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { GuestPassVipTemplate } from "@/components/templates/GuestPassVipTemplate";
+import { PrincesaTemplate } from "@/components/templates/PrincesaTemplate";
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
 import { NeonTemplateBlackout } from "@/components/templates/NeonTemplateBlackout";
 import { NeonTemplateTropical } from "@/components/templates/NeonTemplateTropical";
@@ -330,6 +331,8 @@ export default async function InvitationPage({
             }
         } else if (invitation!.templateTipo === 'GUESTPASSVIP') {
             return <GuestPassVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+        } else if (invitation!.templateTipo === 'PRINCESA') {
+            return <PrincesaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
         } else if (invitation!.templateTipo === 'MODERNO') {
             switch (color) {
                 case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;

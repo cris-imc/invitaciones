@@ -35,6 +35,7 @@ import {
   LOFTINDUSTRIAL_COLORS,
   INFANTIL_COLORS,
   GUESTPASSVIP_COLORS,
+  PRINCESA_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
@@ -45,6 +46,7 @@ export {
   SEDA_COLORS, PETALOS_COLORS, LUZLUNA_COLORS, BONVOYAGE_COLORS,
   CORPORATE_COLORS, GARDENPARTY_COLORS, LOFTINDUSTRIAL_COLORS, INFANTIL_COLORS,
   GUESTPASSVIP_COLORS,
+  PRINCESA_COLORS,
   type TemplateTipo,
 };
 
@@ -75,6 +77,7 @@ export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
   LOFTINDUSTRIAL: "#E0B84B",
   INFANTIL: "#FF5C8A",
   GUESTPASSVIP: "#C8A45C",
+  PRINCESA: "#B48CC9",
 };
 
 const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
@@ -101,6 +104,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
   { tipo: "LOFTINDUSTRIAL", label: "Loft Industrial" },
   { tipo: "INFANTIL", label: "Infantil" },
   { tipo: "GUESTPASSVIP", label: "Guest Pass VIP" },
+  { tipo: "PRINCESA", label: "Princesa" },
 ];
 
 // Neon ("Doodle Disco 15") solo se ofrece para 15 años y Evento (CUMPLEANOS),
@@ -109,7 +113,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
 // docs/INVENTARIO_IMPLE_MASIVA.md sigue el mismo patrón de gating por tipo
 // de evento -- ver esa tabla para el detalle de cada una.
 function getAvailableTabs(eventType: string | undefined, collection: "FLAT" | "STORYTELLING"): { tipo: TemplateTipo; label: string }[] {
-  const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D"]);
+  const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D", "PRINCESA"]);
   const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP"]);
   const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL"]);
@@ -149,6 +153,7 @@ const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
   LOFTINDUSTRIAL: LOFTINDUSTRIAL_COLORS,
   INFANTIL: INFANTIL_COLORS,
   GUESTPASSVIP: GUESTPASSVIP_COLORS,
+  PRINCESA: PRINCESA_COLORS,
 };
 
 function getColorsForTipo(tipo: TemplateTipo) {
@@ -267,12 +272,29 @@ function TemplatePreviewModalBody({
   useEffect(() => {
     const box = frameBoxRef.current;
     if (!box) return;
-    const update = () => setScale(box.clientWidth / MOBILE_VIEWPORT_WIDTH);
+    // Ignorar mediciones de 0px (ver mismo comentario en WizardLivePreview.tsx)
+    // -- si se acepta un 0 como ancho real, scale queda en 0 (iframe
+    // colapsado a un punto, invisible) y sin otro resize que lo corrija.
+    const update = () => {
+      if (box.clientWidth === 0) return;
+      setScale(box.clientWidth / MOBILE_VIEWPORT_WIDTH);
+    };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(box);
     return () => observer.disconnect();
   }, []);
+
+  // El bug real (ver comentario largo en WizardLivePreview.tsx): si el
+  // iframe termina de cargar con la pestaña oculta, Chromium a veces nunca
+  // pinta esa carga -- el contenido de adentro queda perfecto pero la capa
+  // transformada que lo envuelve queda vieja/vacía para siempre. Confirmado
+  // que ni esperar ni un simple nudge de estilo alcanzan de forma confiable
+  // -- lo único que funciona siempre es una recarga real. Se hace SOLO
+  // cuando de verdad se dio esa condición sospechosa, recién al volver a
+  // estar visible (recargar sin necesidad genera un parpadeo visible).
+  const loadedWhileHiddenRef = useRef(false);
+  const [reloadNonce, setReloadNonce] = useState(0);
 
   // La página en el iframe abre la portada de bienvenida sola y recién ahí
   // avisa que está lista (ver preview-plantilla/page.tsx) — así el spinner
@@ -298,14 +320,48 @@ function TemplatePreviewModalBody({
                   window.location.origin
               );
           }
+          if (document.hidden) {
+              loadedWhileHiddenRef.current = true;
+          } else {
+              // Nudge liviano: si cargó con la pestaña visible, alcanza con
+              // esto para los casos más chicos de recomposición.
+              setScale((s) => s + 0.0001);
+              requestAnimationFrame(() => {
+                  setScale((s) => s - 0.0001);
+              });
+          }
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
+  }, [currentData, activeTab, previewColor]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (!document.hidden && loadedWhileHiddenRef.current) {
+        loadedWhileHiddenRef.current = false;
+        setReloadNonce((n) => n + 1);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, []);
 
   const colors = getColorsForTipo(activeTab);
-  const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(eventType ?? "CASAMIENTO")}&tipo=${activeTab}&color=${encodeURIComponent(previewColor)}`;
+  const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(eventType ?? "CASAMIENTO")}&tipo=${activeTab}&color=${encodeURIComponent(previewColor)}&rn=${reloadNonce}`;
+
+  // Red de seguridad: si por lo que sea el "ya está listo" del iframe nunca
+  // llega (se pierde el postMessage, remonta antes de tiempo, etc.), el
+  // spinner quedaba girando para siempre aunque el iframe de adentro haya
+  // renderizado bien. Después de unos segundos se apaga solo -- si en ese
+  // momento el iframe todavía no cargó de verdad, se va a seguir viendo en
+  // cuanto termine (no hay contenido que tapar).
+  useEffect(() => {
+    setPreviewLoading(true);
+    const t = window.setTimeout(() => setPreviewLoading(false), 4000);
+    return () => window.clearTimeout(t);
+  }, [previewSrc]);
+
   const availableTabs = getAvailableTabs(eventType, collection);
 
   return (

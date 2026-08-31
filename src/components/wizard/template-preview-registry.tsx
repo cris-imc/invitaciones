@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA";
 
 export interface ColorOption {
   id: string;
@@ -285,6 +285,12 @@ export const GUESTPASSVIP_COLORS: ColorOption[] = [
   { id: "default", name: "Dorado Champagne", color: "#C8A45C" },
 ];
 
+// Por ahora una sola variante de color (lavanda sobre ciruela oscuro, la
+// aprobada en el diseño original) -- misma lógica que GUESTPASSVIP_COLORS.
+export const PRINCESA_COLORS: ColorOption[] = [
+  { id: "default", name: "Lavanda Real", color: "#B48CC9" },
+];
+
 export const ELEGANT_COLORS: ColorOption[] = [
   { id: "default", name: "Dorados (Original)", color: "#C79A4B" },
   { id: "Green", name: "Verdes", color: "#5C8A7A" },
@@ -549,6 +555,10 @@ export const INFANTIL_COMPONENTS: Record<string, PreviewComponent> = {
 
 export const GUESTPASSVIP_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/GuestPassVipTemplate").then((m) => m.GuestPassVipTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const PRINCESA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/PrincesaTemplate").then((m) => m.PrincesaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {

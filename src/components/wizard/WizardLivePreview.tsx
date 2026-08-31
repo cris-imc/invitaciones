@@ -24,7 +24,6 @@ const LIVE_DATA_DEBOUNCE_MS = 200;
 
 export function WizardLivePreview() {
     const { data, themeConfig, currentStep } = useWizardStore();
-    if (typeof window !== "undefined") (window as any).__debugRenderPortada = data.portadaImagenFondo;
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const frameBoxRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
@@ -74,19 +73,46 @@ export function WizardLivePreview() {
             musicaUrl: "",
         };
 
-        (window as any).__debugLastPosted = invitation;
         win.postMessage({ type: "wizard-live-data", invitation, showCoverOnly }, window.location.origin);
     };
 
     useEffect(() => {
         const box = frameBoxRef.current;
         if (!box) return;
-        const update = () => setScale(box.clientWidth / MOBILE_VIEWPORT_WIDTH);
+        // Ignorar mediciones de 0px: la Colección Storytelling tiene una
+        // forma de panel distinta a la de siempre (tarjetas de colección en
+        // vez del resumen de plantilla elegida), así que cambiar hacia/desde
+        // ella reacomoda el panel izquierdo -- durante ese reacomodo el
+        // ResizeObserver puede disparar con clientWidth en 0 por un frame.
+        // Si aceptáramos ese 0, scale quedaría en 0 (iframe visualmente
+        // colapsado a un punto) y como después el contenedor no vuelve a
+        // cambiar de tamaño, no hay ningún resize futuro que lo corrija --
+        // queda "pegado" invisible hasta que algo fuerza un recálculo (ej.
+        // cambiar de pestaña). Ignorando el 0 nunca se llega a ese estado.
+        const update = () => {
+            if (box.clientWidth === 0) return;
+            setScale(box.clientWidth / MOBILE_VIEWPORT_WIDTH);
+        };
         update();
         const observer = new ResizeObserver(update);
         observer.observe(box);
         return () => observer.disconnect();
     }, []);
+
+    // El bug real (confirmado en vivo con Guest Pass VIP): si el iframe
+    // termina de cargar mientras la pestaña está oculta (document.hidden),
+    // Chromium a veces nunca pinta esa carga -- el DOM/estilos de adentro
+    // quedan perfectos (verificado: opacity:1, tamaño correcto), pero la capa
+    // transformada que lo envuelve queda con el frame viejo/vacío para
+    // siempre, porque no hay ningún resize/cambio posterior que la obligue a
+    // recomponerse. Confirmado que ni esperar varios segundos quieto ni un
+    // simple "nudge" de estilo alcanzan de forma confiable -- lo que sí
+    // funciona siempre es una recarga real (F5) del iframe. Como recargar
+    // sin necesidad genera un parpadeo visible, se hace SOLO cuando de verdad
+    // se dio la condición sospechosa (cargó estando oculta), y recién cuando
+    // la pestaña vuelve a estar visible -- ahí una recarga real sí pinta bien.
+    const loadedWhileHiddenRef = useRef(false);
+    const [reloadNonce, setReloadNonce] = useState(0);
 
     useEffect(() => {
         const onMessage = (event: MessageEvent) => {
@@ -96,11 +122,32 @@ export function WizardLivePreview() {
                 // El iframe acaba de cargar/recargar: enviar los datos actuales
                 // para que no quede con la muestra fija.
                 sendLiveData();
+                if (document.hidden) {
+                    loadedWhileHiddenRef.current = true;
+                } else {
+                    // Nudge liviano: si cargó con la pestaña visible, alcanza
+                    // con esto para los casos más chicos de recomposición.
+                    setScale((s) => s + 0.0001);
+                    requestAnimationFrame(() => {
+                        setScale((s) => s - 0.0001);
+                    });
+                }
             }
         };
         window.addEventListener("message", onMessage);
         return () => window.removeEventListener("message", onMessage);
     }, [data, themeConfig, showCoverOnly]); // Necesita dependencias porque sendLiveData lee de data, themeConfig y showCoverOnly
+
+    useEffect(() => {
+        const onVisibilityChange = () => {
+            if (!document.hidden && loadedWhileHiddenRef.current) {
+                loadedWhileHiddenRef.current = false;
+                setReloadNonce((n) => n + 1);
+            }
+        };
+        document.addEventListener("visibilitychange", onVisibilityChange);
+        return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+    }, []);
 
     // El src del iframe (fuerza recarga completa) solo depende de tipo de
     // evento / plantilla / color
@@ -111,7 +158,7 @@ export function WizardLivePreview() {
         "CINE", "NORDICO", "RIVIERA", "GOLDENDUSK",
         "SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE",
         "CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL",
-        "GUESTPASSVIP",
+        "GUESTPASSVIP", "PRINCESA",
     ]);
     const tipo = data.templateTipo && DESIGN_TEMPLATE_TIPOS.has(data.templateTipo) ? data.templateTipo : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
@@ -133,10 +180,15 @@ export function WizardLivePreview() {
         prevShowCoverOnlyRef.current = showCoverOnly;
     }, [showCoverOnly]);
 
-    const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(evento)}&tipo=${tipo}&color=${encodeURIComponent(color)}&ce=${coverEpoch}`;
+    const previewSrc = `/preview-plantilla?evento=${encodeURIComponent(evento)}&tipo=${tipo}&color=${encodeURIComponent(color)}&ce=${coverEpoch}&rn=${reloadNonce}`;
 
     useEffect(() => {
         setLoading(true);
+        // Red de seguridad: si el "ya está listo" del iframe se pierde (ver
+        // mismo comentario en TemplatePreviewModal.tsx), el spinner no debe
+        // quedar girando para siempre -- a los pocos segundos se apaga solo.
+        const t = window.setTimeout(() => setLoading(false), 4000);
+        return () => window.clearTimeout(t);
     }, [previewSrc]);
 
     // Enviar datos debounced ante cambios

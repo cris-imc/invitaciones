@@ -118,6 +118,18 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false }: GuestPassVipTemplateProps) {
+  // Vista previa (wizard/modal/showcase, ver preview-plantilla/page.tsx): la
+  // portada vive adentro de un iframe metido en un contenedor con
+  // transform:scale. La apertura de tapa (intro/open) necesita, en el uso
+  // real, un "segundo pintado" unos milisegundos/segundos después del
+  // primero (arranca desenfocada/corrida y un setTimeout la revela) -- y ese
+  // segundo pintado es justo el que Chrome a veces no agenda para un iframe
+  // así mientras la pestaña no está visible, dejando la vista previa pegada
+  // en blanco. En vista previa no hace falta la animación de entrada -- alcanza
+  // con mostrar el estado final de una sola vez, sin depender de ningún
+  // repintado posterior. La invitación real (isPreviewMode ausente) sigue
+  // con la animación completa, sin ningún cambio.
+  const isPreviewMode = Boolean(invitation.isPreviewMode);
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
   const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
@@ -287,6 +299,16 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
   const intro = useCallback(() => {
     [kickerRef.current, namesRef.current].forEach((el, i) => {
       if (!el) return;
+      if (isPreviewMode) {
+        // Ver comentario junto a isPreviewMode más arriba: en preview se
+        // salta la entrada difuminada/corrida -- se muestra el estado final
+        // de una sola vez, sin depender de un segundo pintado posterior.
+        el.style.transition = "none";
+        el.style.opacity = "1";
+        el.style.transform = "none";
+        el.style.filter = "none";
+        return;
+      }
       el.style.opacity = "0";
       el.style.transform = "translateY(26px)";
       el.style.filter = "blur(10px)";
@@ -299,27 +321,39 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
       }, 90);
     });
     if (perfRef.current) {
-      window.setTimeout(() => {
-        if (perfRef.current) perfRef.current.style.clipPath = "inset(0 0 0 0)";
-      }, 90);
+      if (isPreviewMode) {
+        perfRef.current.style.clipPath = "inset(0 0 0 0)";
+      } else {
+        window.setTimeout(() => {
+          if (perfRef.current) perfRef.current.style.clipPath = "inset(0 0 0 0)";
+        }, 90);
+      }
     }
-  }, []);
+  }, [isPreviewMode]);
 
   const open = useCallback(() => {
     if (topRef.current) topRef.current.style.transform = "translateY(-100%)";
     if (bottomRef.current) bottomRef.current.style.transform = "translateY(100%)";
     if (scrollerRef.current) scrollerRef.current.style.opacity = "1";
-    window.setTimeout(() => {
+    if (isPreviewMode) {
+      // Ver comentario junto a isPreviewMode más arriba: se salta la espera
+      // de 1.1s/1.2s -- el estado final se aplica ya, en el mismo pintado.
       if (hintRef.current) hintRef.current.style.opacity = "1";
       if (railRef.current) railRef.current.style.opacity = "1";
-    }, 1200);
-    window.setTimeout(() => {
       if (coverRef.current) coverRef.current.style.pointerEvents = "none";
-    }, 1100);
+    } else {
+      window.setTimeout(() => {
+        if (hintRef.current) hintRef.current.style.opacity = "1";
+        if (railRef.current) railRef.current.style.opacity = "1";
+      }, 1200);
+      window.setTimeout(() => {
+        if (coverRef.current) coverRef.current.style.pointerEvents = "none";
+      }, 1100);
+    }
     setIsCoverOpen(true);
     hasOpenedRef.current = true;
     drawRoute();
-  }, []);
+  }, [isPreviewMode]);
 
   const reset = useCallback(() => {
     setIsCoverOpen(false);
@@ -383,16 +417,19 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
 
     intro();
 
-    // Si la pestaña/iframe estaba oculta (background) justo cuando el
-    // setTimeout de intro() disparó, el navegador no le da frames a la
-    // transición CSS -- el estilo inline ya quedó en "revelado" (opacity:1)
-    // pero nunca se pintó, así que la tapa se ve vacía hasta que algo fuerce
-    // un repaint (ej. cambiar de pestaña y volver). Este listener detecta esa
-    // apertura tardía y, si el kicker/nombres quedaron pisados en su estado
-    // inicial (opacity < 1) pese a que el inline style ya pide 1, los fuerza
-    // sin transición -- no hace nada si ya se revelaron normalmente.
+    // La transición CSS de la tapa (y de la apertura) puede quedar pisada a
+    // mitad de camino -- el estilo inline ya pide el valor final (opacity:1,
+    // transform:none) pero nunca se llegó a pintar, así que se ve vacía hasta
+    // que algo fuerce un repaint. Pasa sobre todo dentro del iframe angosto
+    // del live preview del wizard (no hace falta ni ocultar la pestaña: un
+    // cambio de pestaña y vuelta alcanza para destrabarlo, lo cual apunta a
+    // una carrera de timing con el postMessage de datos reales más que a un
+    // problema de visibilidad puro). Por eso esta función no depende de
+    // ningún evento externo -- se llama sola, repetidas veces, después de
+    // montar (ver setTimeouts más abajo) y además ante visibilitychange por
+    // si el caso SÍ es de pestaña oculta. Verificar y corregir es barato y
+    // no hace nada si ya se reveló bien.
     const forceRevealIfStuck = () => {
-      if (document.visibilityState !== "visible") return;
       [kickerRef.current, namesRef.current].forEach((el) => {
         if (!el) return;
         if (parseFloat(getComputedStyle(el).opacity) < 1) {
@@ -436,6 +473,10 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
       }
     };
     document.addEventListener("visibilitychange", forceRevealIfStuck);
+    // Red de seguridad activa (no depende de que se dispare un evento):
+    // reintenta sola varias veces mientras el iframe del wizard termina de
+    // recibir los datos reales -- barato, e inofensivo si ya se reveló bien.
+    const revealCheckTimers = [300, 800, 1500, 3000].map((delay) => window.setTimeout(forceRevealIfStuck, delay));
 
     const tick = () => {
       const ms = Math.max(0, eventDateTime.getTime() - Date.now());
@@ -612,6 +653,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
       cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", forceRevealIfStuck);
+      revealCheckTimers.forEach((t) => window.clearTimeout(t));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
