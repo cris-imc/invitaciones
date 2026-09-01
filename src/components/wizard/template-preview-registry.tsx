@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE";
 
 export interface ColorOption {
   id: string;
@@ -287,6 +287,14 @@ export const GUESTPASSVIP_COLORS: ColorOption[] = [
   { id: "Esmeralda", name: "Esmeralda", color: "#4FA983" },
   { id: "Plata", name: "Plata", color: "#B6C4CF" },
   { id: "Zafiro", name: "Zafiro", color: "#6D93C9" },
+];
+
+// Negativo es la inversión clara/oscura de la misma familia (mismo layout,
+// copy y motion) -- no un acento de color como en el resto de familias, así
+// que su swatch usa el tono de fondo claro para distinguirse de un vistazo.
+export const BLACKANDWHITE_COLORS: ColorOption[] = [
+  { id: "default", name: "Grafito", color: "#B9B9BC" },
+  { id: "Negativo", name: "Negativo", color: "#EDEAE0" },
 ];
 
 // Por ahora una sola variante de color (lavanda sobre ciruela oscuro, la
@@ -711,6 +719,11 @@ export const GUESTPASSVIP_COMPONENTS: Record<string, PreviewComponent> = {
   Esmeralda: dynamic(() => import("@/components/templates/GuestPassVipTemplateEsmeralda").then((m) => m.GuestPassVipTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Plata: dynamic(() => import("@/components/templates/GuestPassVipTemplatePlata").then((m) => m.GuestPassVipTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Zafiro: dynamic(() => import("@/components/templates/GuestPassVipTemplateZafiro").then((m) => m.GuestPassVipTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const BLACKANDWHITE_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/BlackAndWhiteTemplate").then((m) => m.BlackAndWhiteTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Negativo: dynamic(() => import("@/components/templates/BlackAndWhiteTemplateNegativo").then((m) => m.BlackAndWhiteTemplateNegativo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const PRINCESA_COMPONENTS: Record<string, PreviewComponent> = {

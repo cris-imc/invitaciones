@@ -54,6 +54,7 @@ import {
   BOTANICAEDITORIAL_COLORS,
   ENCAJECONTEMPORANEO_COLORS,
   LIQUIDGLASS_COLORS,
+  BLACKANDWHITE_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
@@ -83,6 +84,7 @@ export {
   BOTANICAEDITORIAL_COLORS,
   ENCAJECONTEMPORANEO_COLORS,
   LIQUIDGLASS_COLORS,
+  BLACKANDWHITE_COLORS,
   type TemplateTipo,
 };
 
@@ -132,6 +134,7 @@ export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
   BOTANICAEDITORIAL: "#5A6E4E",
   ENCAJECONTEMPORANEO: "#A6491F",
   LIQUIDGLASS: "#6FA8C9",
+  BLACKANDWHITE: "#B9B9BC",
 };
 
 const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
@@ -177,6 +180,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
   { tipo: "BOTANICAEDITORIAL", label: "Botánica Editorial" },
   { tipo: "ENCAJECONTEMPORANEO", label: "Encaje Contemporáneo" },
   { tipo: "LIQUIDGLASS", label: "Liquid Glass" },
+  { tipo: "BLACKANDWHITE", label: "Black y White" },
 ];
 
 // Neon ("Doodle Disco 15") solo se ofrece para 15 años y Evento (CUMPLEANOS),
@@ -187,7 +191,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
 function getAvailableTabs(eventType: string | undefined, collection: "FLAT" | "STORYTELLING"): { tipo: TemplateTipo; label: string }[] {
   const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D", "PRINCESA", "CORONAESCARLATA", "JEWELRYBOX", "PASEVIP", "CINEABSTRACTOXV", "ACRYLICPOP", "BOLADEDISCOTECA", "CRYSTAL3D", "FASHIONTAG", "FASHIONLOOKBOOK"]);
   const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "MARMOLYORO", "ATELIERDEPAPEL", "BOTANICAEDITORIAL", "ENCAJECONTEMPORANEO", "LIQUIDGLASS"]);
-  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE"]);
+  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE", "BLACKANDWHITE"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
     if (isStorytellingTemplate(tipo) !== (collection === "STORYTELLING")) return false;
@@ -244,6 +248,7 @@ const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
   BOTANICAEDITORIAL: BOTANICAEDITORIAL_COLORS,
   ENCAJECONTEMPORANEO: ENCAJECONTEMPORANEO_COLORS,
   LIQUIDGLASS: LIQUIDGLASS_COLORS,
+  BLACKANDWHITE: BLACKANDWHITE_COLORS,
 };
 
 function getColorsForTipo(tipo: TemplateTipo) {

@@ -16,6 +16,8 @@ import { GuestPassVipTemplateBorgona } from "@/components/templates/GuestPassVip
 import { GuestPassVipTemplateEsmeralda } from "@/components/templates/GuestPassVipTemplateEsmeralda";
 import { GuestPassVipTemplatePlata } from "@/components/templates/GuestPassVipTemplatePlata";
 import { GuestPassVipTemplateZafiro } from "@/components/templates/GuestPassVipTemplateZafiro";
+import { BlackAndWhiteTemplate } from "@/components/templates/BlackAndWhiteTemplate";
+import { BlackAndWhiteTemplateNegativo } from "@/components/templates/BlackAndWhiteTemplateNegativo";
 import { PrincesaTemplate } from "@/components/templates/PrincesaTemplate";
 import { PrincesaTemplateAzulMedianoche } from "@/components/templates/PrincesaTemplateAzulMedianoche";
 import { PrincesaTemplateBorgona } from "@/components/templates/PrincesaTemplateBorgona";
@@ -434,6 +436,11 @@ export default async function InvitationPage({
                 case 'Plata': return <GuestPassVipTemplatePlata invitation={invRecord} guest={null} isPersonalized={false} />;
                 case 'Zafiro': return <GuestPassVipTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
                 default: return <GuestPassVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
+        } else if (invitation!.templateTipo === 'BLACKANDWHITE') {
+            switch (color) {
+                case 'Negativo': return <BlackAndWhiteTemplateNegativo invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <BlackAndWhiteTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'PRINCESA') {
             switch (color) {

@@ -1651,7 +1651,7 @@ function FlbCoverHalf({
 }) {
   return (
     <div className="flb-cover-inner">
-      <span className="flb-cover-numeral">1</span>
+      <span className="flb-cover-numeral">15</span>
       <div className="flb-cover-grid" />
       <div className="flb-cover-content">
         <div className="flb-cover-top-row">

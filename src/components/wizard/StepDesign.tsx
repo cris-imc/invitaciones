@@ -52,6 +52,7 @@ import {
     BOTANICAEDITORIAL_COLORS,
     ENCAJECONTEMPORANEO_COLORS,
     LIQUIDGLASS_COLORS,
+    BLACKANDWHITE_COLORS,
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
@@ -101,6 +102,7 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     BOTANICAEDITORIAL: "Botánica Editorial",
     ENCAJECONTEMPORANEO: "Encaje Contemporáneo",
     LIQUIDGLASS: "Liquid Glass",
+    BLACKANDWHITE: "Black y White",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
@@ -145,6 +147,7 @@ const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     BOTANICAEDITORIAL: BOTANICAEDITORIAL_COLORS,
     ENCAJECONTEMPORANEO: ENCAJECONTEMPORANEO_COLORS,
     LIQUIDGLASS: LIQUIDGLASS_COLORS,
+    BLACKANDWHITE: BLACKANDWHITE_COLORS,
 };
 const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
     (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [
