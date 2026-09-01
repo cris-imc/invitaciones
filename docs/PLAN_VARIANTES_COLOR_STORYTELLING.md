@@ -30,9 +30,9 @@ entradas a cada uno) y en las dos páginas de invitación real
 - [x] Corona Escarlata (CORONAESCARLATA) — XV — 5/5 wireado
 - [x] Jewelry Box (JEWELRYBOX) — XV — 5/5 wireado
 - [x] Pase VIP (PASEVIP) — XV — 5/5 wireado
-- [ ] Cine Abstracto XV (CINEABSTRACTOXV) — XV
-- [ ] Acrylic Pop (ACRYLICPOP) — XV
-- [ ] Bola de Discoteca (BOLADEDISCOTECA) — XV
+- [x] Cine Abstracto XV (CINEABSTRACTOXV) — XV — 5/5 wireado
+- [x] Acrylic Pop (ACRYLICPOP) — XV — 5/5 wireado
+- [x] Bola de Discoteca (BOLADEDISCOTECA) — XV — 5/5 wireado
 - [ ] Crystal 3D (CRYSTAL3D) — XV
 - [ ] Fashion Lookbook (FASHIONLOOKBOOK) — XV
 - [ ] Fashion Tag (FASHIONTAG) — XV

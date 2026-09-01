@@ -325,14 +325,26 @@ export const PASEVIP_COLORS: ColorOption[] = [
 
 export const CINEABSTRACTOXV_COLORS: ColorOption[] = [
   { id: "default", name: "Marquesina Roja", color: "#E8123A" },
+  { id: "Noir", name: "Noir", color: "#9FA8B0" },
+  { id: "SciFi", name: "Sci-Fi", color: "#E01AA0" },
+  { id: "Tecnicolor", name: "Tecnicolor", color: "#FF6A1F" },
+  { id: "Western", name: "Western", color: "#8C2333" },
 ];
 
 export const ACRYLICPOP_COLORS: ColorOption[] = [
   { id: "default", name: "Fucsia Ácido", color: "#FF3D8B" },
+  { id: "Bubblegum", name: "Bubblegum", color: "#FF4FC3" },
+  { id: "Scarlet", name: "Escarlata", color: "#FF3355" },
+  { id: "Sunset", name: "Atardecer", color: "#FF7A29" },
+  { id: "UltraViolet", name: "Ultravioleta", color: "#C13DFF" },
 ];
 
 export const BOLADEDISCOTECA_COLORS: ColorOption[] = [
   { id: "default", name: "Neón Disco", color: "#FF2E9A" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#00E58A" },
+  { id: "FucsiaElectrico", name: "Fucsia Eléctrico", color: "#FF17B0" },
+  { id: "Turquesa", name: "Turquesa", color: "#00E5C7" },
+  { id: "Violeta", name: "Violeta", color: "#B026FF" },
 ];
 
 export const CRYSTAL3D_COLORS: ColorOption[] = [
@@ -687,14 +699,26 @@ export const PASEVIP_COMPONENTS: Record<string, PreviewComponent> = {
 
 export const CINEABSTRACTOXV_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/CineAbstractoXvTemplate").then((m) => m.CineAbstractoXvTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Noir: dynamic(() => import("@/components/templates/CineAbstractoXvTemplateNoir").then((m) => m.CineAbstractoXvTemplateNoir), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  SciFi: dynamic(() => import("@/components/templates/CineAbstractoXvTemplateSciFi").then((m) => m.CineAbstractoXvTemplateSciFi), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Tecnicolor: dynamic(() => import("@/components/templates/CineAbstractoXvTemplateTecnicolor").then((m) => m.CineAbstractoXvTemplateTecnicolor), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Western: dynamic(() => import("@/components/templates/CineAbstractoXvTemplateWestern").then((m) => m.CineAbstractoXvTemplateWestern), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ACRYLICPOP_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/AcrylicPopTemplate").then((m) => m.AcrylicPopTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Bubblegum: dynamic(() => import("@/components/templates/AcrylicPopTemplateBubblegum").then((m) => m.AcrylicPopTemplateBubblegum), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Scarlet: dynamic(() => import("@/components/templates/AcrylicPopTemplateScarlet").then((m) => m.AcrylicPopTemplateScarlet), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Sunset: dynamic(() => import("@/components/templates/AcrylicPopTemplateSunset").then((m) => m.AcrylicPopTemplateSunset), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  UltraViolet: dynamic(() => import("@/components/templates/AcrylicPopTemplateUltraViolet").then((m) => m.AcrylicPopTemplateUltraViolet), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const BOLADEDISCOTECA_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/BolaDeDiscotecaTemplate").then((m) => m.BolaDeDiscotecaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/BolaDeDiscotecaTemplateEsmeralda").then((m) => m.BolaDeDiscotecaTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  FucsiaElectrico: dynamic(() => import("@/components/templates/BolaDeDiscotecaTemplateFucsiaElectrico").then((m) => m.BolaDeDiscotecaTemplateFucsiaElectrico), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Turquesa: dynamic(() => import("@/components/templates/BolaDeDiscotecaTemplateTurquesa").then((m) => m.BolaDeDiscotecaTemplateTurquesa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violeta: dynamic(() => import("@/components/templates/BolaDeDiscotecaTemplateVioleta").then((m) => m.BolaDeDiscotecaTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CRYSTAL3D_COMPONENTS: Record<string, PreviewComponent> = {

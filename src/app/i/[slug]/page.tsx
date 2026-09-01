@@ -37,8 +37,20 @@ import { PaseVipTemplatePlatino } from "@/components/templates/PaseVipTemplatePl
 import { PaseVipTemplateRubi } from "@/components/templates/PaseVipTemplateRubi";
 import { PaseVipTemplateVioleta } from "@/components/templates/PaseVipTemplateVioleta";
 import { CineAbstractoXvTemplate } from "@/components/templates/CineAbstractoXvTemplate";
+import { CineAbstractoXvTemplateNoir } from "@/components/templates/CineAbstractoXvTemplateNoir";
+import { CineAbstractoXvTemplateSciFi } from "@/components/templates/CineAbstractoXvTemplateSciFi";
+import { CineAbstractoXvTemplateTecnicolor } from "@/components/templates/CineAbstractoXvTemplateTecnicolor";
+import { CineAbstractoXvTemplateWestern } from "@/components/templates/CineAbstractoXvTemplateWestern";
 import { AcrylicPopTemplate } from "@/components/templates/AcrylicPopTemplate";
+import { AcrylicPopTemplateBubblegum } from "@/components/templates/AcrylicPopTemplateBubblegum";
+import { AcrylicPopTemplateScarlet } from "@/components/templates/AcrylicPopTemplateScarlet";
+import { AcrylicPopTemplateSunset } from "@/components/templates/AcrylicPopTemplateSunset";
+import { AcrylicPopTemplateUltraViolet } from "@/components/templates/AcrylicPopTemplateUltraViolet";
 import { BolaDeDiscotecaTemplate } from "@/components/templates/BolaDeDiscotecaTemplate";
+import { BolaDeDiscotecaTemplateEsmeralda } from "@/components/templates/BolaDeDiscotecaTemplateEsmeralda";
+import { BolaDeDiscotecaTemplateFucsiaElectrico } from "@/components/templates/BolaDeDiscotecaTemplateFucsiaElectrico";
+import { BolaDeDiscotecaTemplateTurquesa } from "@/components/templates/BolaDeDiscotecaTemplateTurquesa";
+import { BolaDeDiscotecaTemplateVioleta } from "@/components/templates/BolaDeDiscotecaTemplateVioleta";
 import { Crystal3dTemplate } from "@/components/templates/Crystal3dTemplate";
 import { FashionTagTemplate } from "@/components/templates/FashionTagTemplate";
 import { CeramicaEditorialTemplate } from "@/components/templates/CeramicaEditorialTemplate";
@@ -408,11 +420,29 @@ export default async function InvitationPage({
                 default: return <PaseVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CINEABSTRACTOXV') {
-            return <CineAbstractoXvTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'Noir': return <CineAbstractoXvTemplateNoir invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'SciFi': return <CineAbstractoXvTemplateSciFi invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Tecnicolor': return <CineAbstractoXvTemplateTecnicolor invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Western': return <CineAbstractoXvTemplateWestern invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <CineAbstractoXvTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'ACRYLICPOP') {
-            return <AcrylicPopTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'Bubblegum': return <AcrylicPopTemplateBubblegum invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Scarlet': return <AcrylicPopTemplateScarlet invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Sunset': return <AcrylicPopTemplateSunset invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'UltraViolet': return <AcrylicPopTemplateUltraViolet invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <AcrylicPopTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'BOLADEDISCOTECA') {
-            return <BolaDeDiscotecaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'Esmeralda': return <BolaDeDiscotecaTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'FucsiaElectrico': return <BolaDeDiscotecaTemplateFucsiaElectrico invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Turquesa': return <BolaDeDiscotecaTemplateTurquesa invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <BolaDeDiscotecaTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <BolaDeDiscotecaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'CRYSTAL3D') {
             return <Crystal3dTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
         } else if (invitation!.templateTipo === 'FASHIONTAG') {

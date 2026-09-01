@@ -94,7 +94,7 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
             </>
           ) : (
             <>
-              <Link href={registerUrl} onClick={() => setOpen(false)}>
+              <Link href="/register" onClick={() => setOpen(false)}>
                 <button className="l-cta">Registrarse</button>
               </Link>
               <Link href="/login" onClick={() => setOpen(false)}>
@@ -127,6 +127,16 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
           </Link>
         ))}
       </div>
+
+      {isLoggedIn && (
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="hidden md:block rounded-full border border-white/25 text-paper text-sm font-semibold py-2 px-4 transition-all hover:bg-white/10 hover:border-white/40"
+        >
+          Cerrar sesión
+        </button>
+      )}
 
       <Link href={registerUrl} className="hidden md:block">
         <button className="l-cta">Crear invitación</button>

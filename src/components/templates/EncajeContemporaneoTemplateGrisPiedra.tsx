@@ -1706,7 +1706,6 @@ function CoverHalf({
 }) {
   return (
     <div className="enc-cover-inner">
-      <div className="enc-cover-glow" />
       <div data-weave="1" className="enc-cover-weave" />
       <div className="enc-cover-content">
         <div className="enc-cover-top-row">
@@ -1719,7 +1718,7 @@ function CoverHalf({
           <span className="enc-cover-date">{fechaCorta}</span>
         </div>
         <div className="enc-cover-bottom">
-          <div ref={perfRef} className="enc-perf-strip enc-perf-strip--reveal" />
+          <div ref={perfRef} className="enc-perf-strip enc-perf-strip--reveal enc-perf-strip--light" />
           <div className="enc-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
@@ -1954,25 +1953,25 @@ const ENC_CSS = `
   .enc-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .enc-cover-half--top { top: 0; }
   .enc-cover-half--bottom { bottom: 0; }
-  .enc-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #1B1917 0%, #0E0D0C 46%, #0B0A09 100%); }
+  .enc-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: #F7F3ED; }
   .enc-cover-half--bottom .enc-cover-inner { top: auto; bottom: 0; }
-  .enc-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(28,26,24,0.5), rgba(140,133,119,0.3), rgba(110,102,86,0.55), rgba(28,26,24,0.5)); filter: blur(64px); opacity: .62; animation: encFoil 26s linear infinite; }
   /* Motivo de "trama tejida" (encaje): crosshatch de rombos a 45°/-45°,
      propio de este mockup -- nunca reutilizado de otras plantillas. La
      animación lo va "tejiendo" al abrir la tapa en vez de aparecer de golpe. */
-  .enc-cover-weave { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(247,243,237,.16) 0 1px, transparent 1px 8px), repeating-linear-gradient(-45deg, rgba(247,243,237,.16) 0 1px, transparent 1px 8px); animation: encWeaveIn 1.4s steps(20) 200ms both; }
+  .enc-cover-weave { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(28,26,24,.07) 0 1px, transparent 1px 8px), repeating-linear-gradient(-45deg, rgba(28,26,24,.07) 0 1px, transparent 1px 8px); animation: encWeaveIn 1.4s steps(20) 200ms both; }
   .enc-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
-  .enc-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
+  .enc-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #6E6A5D; }
   .enc-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
-  .enc-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
-  .enc-cover-names { margin: 0; font-family: var(--enc-playfair), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F7F3ED; }
+  .enc-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #6E6A5D; }
+  .enc-cover-names { margin: 0; font-family: var(--enc-playfair), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #1C1A18; }
   .enc-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#6E6656, transparent); display: block; }
-  .enc-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
+  .enc-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #55524B; white-space: nowrap; }
   .enc-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .enc-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .enc-cover-cta { border: 1px solid #6E6656; background: linear-gradient(100deg, rgba(200,192,178,0.08), rgba(225,218,206,0.2), rgba(200,192,178,0.08)); color: #F6EFDD; font-family: var(--enc-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  .enc-cover-cta { border: 1px solid #1C1A18; background: #1C1A18; color: #F7F3ED; font-family: var(--enc-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .enc-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .enc-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(225,218,206,0.34), rgba(246,239,221,0.5), rgba(225,218,206,0.34)); color: #0B0B0F; }
+  .enc-cover-cta--btn:hover { background: #6E6656; border-color: #6E6656; }
+  .enc-perf-strip--light { background: radial-gradient(circle at 6px 50%, #F7F3ED 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; }
   .enc-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .enc-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: encHint 2.4s ease-in-out infinite; }

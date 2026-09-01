@@ -1704,6 +1704,7 @@ function CoverHalf({
           tiene un rectángulo redondeado con sombra, girado -2deg, detrás del
           contenido. */}
       <div className="adp-cover-paper" />
+      <div className="adp-cover-paper adp-cover-paper--2" />
       <div className="adp-cover-content">
         <div className="adp-cover-top-row">
           <span>LÁMINA Nº {laminaNumber}</span><span className="adp-accent-serif-2">ADMIT TWO</span>
@@ -1715,7 +1716,7 @@ function CoverHalf({
           <span className="adp-cover-date">{fechaCorta}</span>
         </div>
         <div className="adp-cover-bottom">
-          <div ref={perfRef} className="adp-perf-strip adp-perf-strip--reveal" />
+          <div ref={perfRef} className="adp-perf-strip adp-perf-strip--reveal adp-perf-strip--light" />
           <div className="adp-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
@@ -1793,6 +1794,7 @@ const ADP_CSS = `
   .adp-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #7A6852; }
   .adp-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #14120E 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .adp-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .adp-perf-strip--light { background: radial-gradient(circle at 6px 50%, #F4EEE3 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; }
 
   .adp-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(122,104,82,0.3), rgba(199,178,153,0.2), rgba(122,104,82,0.32), rgba(122,104,82,0.3)); filter: blur(80px); opacity: .4; animation: adpFoil 30s linear infinite; }
   .adp-phrase { margin: 0; position: relative; font-family: var(--adp-serif), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1946,25 +1948,25 @@ const ADP_CSS = `
   .adp-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .adp-cover-half--top { top: 0; }
   .adp-cover-half--bottom { bottom: 0; }
-  .adp-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #22201B 0%, #181611 46%, #14120E 100%); }
+  .adp-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: #F4EEE3; }
   .adp-cover-half--bottom .adp-cover-inner { top: auto; bottom: 0; }
-  .adp-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(122,104,82,0.4), rgba(199,178,153,0.32), rgba(122,104,82,0.5), rgba(122,104,82,0.4)); filter: blur(64px); opacity: .62; animation: adpFoil 26s linear infinite; }
-  /* Hoja de papel rotada -- motivo decorativo propio de esta tapa (ver
-     mockup: rectángulo con sombra suave girado -2deg detrás del contenido),
+  /* Textura de papel rayado -- motivo decorativo propio de esta tapa,
      nunca el sunburst radial de Guest Pass VIP. */
-  .adp-cover-paper { position: absolute; width: 66%; height: 50%; left: 17%; top: 22%; background: rgba(199,178,153,.14); border-radius: 6px; box-shadow: 0 20px 40px rgba(0,0,0,.25); transform: rotate(-2deg); }
+  .adp-cover-glow { position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, rgba(122,104,82,.16) 0 1px, transparent 1px 5px), repeating-linear-gradient(90deg, rgba(122,104,82,.12) 0 1.5px, transparent 1.5px 46px); }
+  .adp-cover-paper { position: absolute; width: 66%; height: 50%; left: 17%; top: 22%; background: #E3D5C0; border-radius: 8px; box-shadow: 0 20px 40px rgba(43,38,32,.18); transform: rotate(-3deg); }
+  .adp-cover-paper--2 { width: 62%; height: 46%; left: 19%; top: 24%; background: #C7B299; box-shadow: 0 14px 28px rgba(43,38,32,.14); transform: rotate(2deg); }
   .adp-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
-  .adp-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
+  .adp-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #7A6852; }
   .adp-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
-  .adp-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
-  .adp-cover-names { margin: 0; font-family: var(--adp-serif), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F4EEE3; }
+  .adp-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #7A6852; }
+  .adp-cover-names { margin: 0; font-family: var(--adp-serif), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #2B2620; }
   .adp-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#7A6852, transparent); display: block; }
-  .adp-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
+  .adp-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #55524B; white-space: nowrap; }
   .adp-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .adp-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .adp-cover-cta { border: 1px solid #7A6852; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: var(--adp-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  .adp-cover-cta { border: 1px solid #2B2620; background: #2B2620; color: #F4EEE3; font-family: var(--adp-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .adp-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .adp-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0B0B0F; }
+  .adp-cover-cta--btn:hover { background: #7A6852; border-color: #7A6852; }
   .adp-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .adp-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: adpHint 2.4s ease-in-out infinite; }

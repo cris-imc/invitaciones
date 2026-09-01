@@ -1651,11 +1651,11 @@ function FlbCoverHalf({
 }) {
   return (
     <div className="flb-cover-inner">
-      <div className="flb-cover-glow" />
+      <span className="flb-cover-numeral">1</span>
       <div className="flb-cover-grid" />
       <div className="flb-cover-content">
         <div className="flb-cover-top-row">
-          <span>LOOK Nº {passNumber}</span><span className="flb-accent-red">ADMIT ONE</span>
+          <span>LOOKBOOK SS27 · Nº {passNumber}</span><span className="flb-accent-red">EDICIÓN ÚNICA</span>
         </div>
         <div className="flb-cover-center">
           <span ref={kickerRef} className="flb-cover-kicker">{kickerText}</span>
@@ -1664,7 +1664,7 @@ function FlbCoverHalf({
           <span className="flb-cover-date">{fechaCorta}</span>
         </div>
         <div className="flb-cover-bottom">
-          <div ref={perfRef} className="flb-perf-strip flb-perf-strip--reveal" />
+          <div ref={perfRef} className="flb-perf-strip flb-perf-strip--reveal flb-perf-strip--light" />
           <div className="flb-cover-facts">
             <span>SECTOR — PASARELA</span>
             <span>{hora} H</span>
@@ -1889,23 +1889,24 @@ const FLB_CSS = `
   .flb-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .flb-cover-half--top { top: 0; }
   .flb-cover-half--bottom { bottom: 0; }
-  .flb-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #10182C 0%, #0B0D16 46%, #07080D 100%); }
+  .flb-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: #F5F2ED; }
   .flb-cover-half--bottom .flb-cover-inner { top: auto; bottom: 0; }
-  .flb-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(47,85,217,0.35), rgba(11,13,22,0.5), rgba(47,85,217,0.5), rgba(47,85,217,0.35)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite; }
-  .flb-cover-grid { position: absolute; inset: 0; background-image: linear-gradient(90deg, rgba(245,242,237,.08) 1px, transparent 1px); background-size: 48px 100%; }
+  .flb-cover-numeral { position: absolute; right: -10px; top: 4%; font-family: var(--flb-archivo), sans-serif; font-size: min(46vw, 300px); line-height: .8; color: rgba(11,11,11,.06); z-index: 0; }
+  .flb-cover-grid { position: absolute; inset: 0; background-image: linear-gradient(90deg, rgba(11,11,11,.06) 1px, transparent 1px); background-size: 48px 100%; }
   .flb-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
-  .flb-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
+  .flb-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #6A6A66; }
   .flb-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
-  .flb-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
-  .flb-cover-names { margin: 0; font-family: var(--flb-archivo), sans-serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F5F2ED; }
-  .flb-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#2F55D9, transparent); display: block; }
-  .flb-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
+  .flb-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #6A6A66; }
+  .flb-cover-names { margin: 0; font-family: var(--flb-archivo), sans-serif; font-weight: 400; font-size: min(clamp(40px, 13vw, 78px), 10.5vh); line-height: 1.05; letter-spacing: -0.03em; color: #0B0B0B; }
+  .flb-cover-rule { width: 74px; height: 3px; background: #0B0B0B; display: block; }
+  .flb-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #6A6A66; white-space: nowrap; }
   .flb-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .flb-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .flb-cover-facts--dress { justify-content: center; color: #8A8577; }
-  .flb-cover-cta { border: 1px solid #2F55D9; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: var(--flb-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  .flb-cover-facts--dress { justify-content: center; color: #6A6A66; }
+  .flb-cover-cta { border: 1px solid #0B0B0B; background: #0B0B0B; color: #F5F2ED; font-family: var(--flb-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .flb-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .flb-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0B0B0F; }
+  .flb-cover-cta--btn:hover { background: #2F55D9; border-color: #2F55D9; }
+  .flb-perf-strip--light { background: radial-gradient(circle at 6px 50%, #F5F2ED 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; }
   .flb-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .flb-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }
