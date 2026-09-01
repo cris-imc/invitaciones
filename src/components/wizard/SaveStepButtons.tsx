@@ -165,9 +165,9 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                                 </Button>
                             )
                         ) : (
-                            <Button 
-                                type={form ? "submit" : "button"} 
-                                className="flex-1 sm:flex-none"
+                            <Button
+                                type={form ? "submit" : "button"}
+                                className={isEditing ? "flex-1 sm:flex-none" : undefined}
                                 onClick={onNext ? onNext : (!form ? nextStep : undefined)}
                             >
                                 <span className="sm:hidden">Siguiente</span>

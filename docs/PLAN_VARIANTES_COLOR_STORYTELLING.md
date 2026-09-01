@@ -33,18 +33,18 @@ entradas a cada uno) y en las dos páginas de invitación real
 - [x] Cine Abstracto XV (CINEABSTRACTOXV) — XV — 5/5 wireado
 - [x] Acrylic Pop (ACRYLICPOP) — XV — 5/5 wireado
 - [x] Bola de Discoteca (BOLADEDISCOTECA) — XV — 5/5 wireado
-- [ ] Crystal 3D (CRYSTAL3D) — XV
-- [ ] Fashion Lookbook (FASHIONLOOKBOOK) — XV
-- [ ] Fashion Tag (FASHIONTAG) — XV
-- [ ] Atelier de Papel (ATELIERDEPAPEL) — Casamiento
-- [ ] Botánica Editorial (BOTANICAEDITORIAL) — Casamiento
-- [ ] Cerámica Editorial (CERAMICAEDITORIAL) — Casamiento
-- [ ] Cine Abstracto (CINEABSTRACTO) — Casamiento
-- [ ] Encaje Contemporáneo (ENCAJECONTEMPORANEO) — Casamiento
-- [ ] Liquid Glass (LIQUIDGLASS) — Casamiento
-- [ ] Mármol y Oro (MARMOLYORO) — Casamiento
-- [ ] Papelería de Hotel de Lujo (PAPELERIADEHOTELDELUJO) — Casamiento
-- [ ] Vintage Editorial (VINTAGEEDITORIAL) — Casamiento
+- [x] Crystal 3D (CRYSTAL3D) — XV — 5/5 wireado
+- [x] Fashion Lookbook (FASHIONLOOKBOOK) — XV — 5/5 wireado
+- [x] Fashion Tag (FASHIONTAG) — XV — 5/5 wireado
+- [x] Atelier de Papel (ATELIERDEPAPEL) — Casamiento — 5/5 wireado
+- [x] Botánica Editorial (BOTANICAEDITORIAL) — Casamiento — 5/5 wireado
+- [x] Cerámica Editorial (CERAMICAEDITORIAL) — Casamiento — 5/5 wireado
+- [x] Cine Abstracto (CINEABSTRACTO) — Casamiento — 5/5 wireado
+- [x] Encaje Contemporáneo (ENCAJECONTEMPORANEO) — Casamiento — 5/5 wireado
+- [x] Liquid Glass (LIQUIDGLASS) — Casamiento — 5/5 wireado
+- [x] Mármol y Oro (MARMOLYORO) — Casamiento — 5/5 wireado (se generaron Ónix y Rosa, faltaban; se corrigió Esmeralda que había quedado con el acento dorado sin cambiar)
+- [x] Papelería de Hotel de Lujo (PAPELERIADEHOTELDELUJO) — Casamiento — 5/5 wireado
+- [x] Vintage Editorial (VINTAGEEDITORIAL) — Casamiento — 5/5 wireado
 
 ## Nota de bug corregido antes de este plan
 

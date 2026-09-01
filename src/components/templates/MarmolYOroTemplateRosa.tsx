@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * MarmolYOroTemplateEsmeralda.tsx
+ * MarmolYOroTemplateRosa.tsx
  *
  * Portado 1:1 desde el diseño "Mármol y Oro - Panorámica" aprobado en Claude
  * Design (colección Storytelling para boda: fondo casi negro con vetas de
- * mármol y dorado #3F9C74, Italiana + Cormorant Garamond + IBM Plex Mono,
+ * mármol y dorado #D98FA0, Italiana + Cormorant Garamond + IBM Plex Mono,
  * ticket perforado tipo "pieza" numerada, medallón circular con iniciales de
  * la pareja y texto en arco, scroll horizontal "pineado" para Cuándo y dónde
  * / Álbum, riel lateral de progreso y portada que se abre en dos mitades con
@@ -114,7 +114,7 @@ interface GuestRecord {
   orderNumber?: number;
 }
 
-interface MarmolYOroTemplateEsmeraldaProps {
+interface MarmolYOroTemplateRosaProps {
   invitation: Record<string, unknown>;
   guest?: GuestRecord | null;
   isPersonalized?: boolean;
@@ -139,7 +139,7 @@ function coupleInitialsFrom(novia: string, novio: string): string {
   return initials || "MO";
 }
 
-export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized = false }: MarmolYOroTemplateEsmeraldaProps) {
+export function MarmolYOroTemplateRosa({ invitation, guest, isPersonalized = false }: MarmolYOroTemplateRosaProps) {
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
   const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
@@ -387,11 +387,11 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
     window.setTimeout(() => {
       if (statusRef.current) {
         statusRef.current.textContent = "ACCESO CONFIRMADO";
-        statusRef.current.style.color = "#A9E0C6";
+        statusRef.current.style.color = "#F5D9E0";
       }
       if (stubRef.current) {
-        stubRef.current.style.borderColor = "#3F9C74";
-        stubRef.current.style.boxShadow = "0 0 0 1px rgba(200,164,92,.35), 0 18px 50px -30px #3F9C74";
+        stubRef.current.style.borderColor = "#D98FA0";
+        stubRef.current.style.boxShadow = "0 0 0 1px rgba(217,143,160,.35), 0 18px 50px -30px #D98FA0";
       }
       if (sealRef.current) {
         sealRef.current.style.opacity = "1";
@@ -524,7 +524,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           const dots = pan.querySelectorAll<HTMLElement>("[data-dot]");
           const active = Math.min(n - 1, Math.round(eased * (n - 1)));
           dots.forEach((dot, i) => {
-            dot.style.background = i === active ? "#2A6B4C" : "rgba(20,20,27,0.18)";
+            dot.style.background = i === active ? "#A85A6E" : "rgba(20,20,27,0.18)";
           });
         });
 
@@ -563,10 +563,10 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
             }
           }
           const light = tone === "light";
-          if (railRef.current) railRef.current.style.borderLeftColor = light ? "rgba(20,20,27,0.14)" : "rgba(200,164,92,0.14)";
-          if (railLineRef.current) railLineRef.current.style.background = light ? "rgba(20,20,27,0.14)" : "rgba(200,164,92,0.16)";
+          if (railRef.current) railRef.current.style.borderLeftColor = light ? "rgba(20,20,27,0.14)" : "rgba(217,143,160,0.14)";
+          if (railLineRef.current) railLineRef.current.style.background = light ? "rgba(20,20,27,0.14)" : "rgba(217,143,160,0.16)";
           if (railTopRef.current) railTopRef.current.style.color = light ? "#7C7768" : "#8A8577";
-          if (railLabelRef.current) railLabelRef.current.style.color = light ? "#2A6B4C" : "#3F9C74";
+          if (railLabelRef.current) railLabelRef.current.style.color = light ? "#A85A6E" : "#D98FA0";
         }
         if (hintRef.current && sc.scrollTop > 40) hintRef.current.style.opacity = "0";
       }
@@ -668,7 +668,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
         width: "100%",
         height: "calc(var(--vh, 1vh) * 100)",
         overflow: "hidden",
-        background: "#070B09",
+        background: "#0A0708",
         fontFamily: "var(--myo-mono), monospace",
         color: "#F4F1EA",
       }}
@@ -676,7 +676,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
       <style>{MYO_CSS}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="myo-scroller">
-        <section data-tone="dark" data-screen-label="Save the Date" className="myo-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #142019 0%, #0F1512 55%, #070B09 100%)" }}>
+        <section data-tone="dark" data-screen-label="Save the Date" className="myo-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #231318 0%, #1A1214 55%, #0A0708 100%)" }}>
           <span data-xin="1" data-dist="-60" className="myo-kicker">01 — GUARDÁ LA FECHA</span>
           <div className="myo-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="myo-date-num">{dayNum}</span>
@@ -695,7 +695,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           </div>
         </section>
 
-        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="myo-section myo-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1B2A1E 0%, #0D130F 55%, #070B09 100%)" }}>
+        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="myo-section myo-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #2E1820 0%, #160E11 55%, #0A0708 100%)" }}>
           <div className="myo-scan-grid" />
           <div className="myo-scanline" />
           <span data-xin="1" data-dist="-60" className="myo-kicker" style={{ position: "relative" }}>02 — SE ABRE EN</span>
@@ -708,7 +708,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           <div className="myo-perf-strip" />
         </section>
 
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="myo-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #122A22 0%, #070F0A 52%, #070B09 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label="Frase" className="myo-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #201217 0%, #130C0E 52%, #0A0708 100%)" }}>
           <div data-drift="-130" className="myo-glow-blob" />
           <span data-xin="1" data-dist="-60" className="myo-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="myo-phrase" style={{ fontSize: fraseFontSize }}>
@@ -793,8 +793,8 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
 
               <div data-tone="light" className="myo-panel myo-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
                 <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="myo-route-svg">
-                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#2A6B4C" strokeWidth={1.6} />
-                  <circle cx={282} cy={40} r={5} fill="#2A6B4C" />
+                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#A85A6E" strokeWidth={1.6} />
+                  <circle cx={282} cy={40} r={5} fill="#A85A6E" />
                 </svg>
                 <div className="myo-panel-block">
                   <span className="myo-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
@@ -808,7 +808,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
                 </div>
               </div>
 
-              <div data-tone="dark" className="myo-panel myo-panel--center" style={{ background: "#0F1512", color: "#F4F1EA" }}>
+              <div data-tone="dark" className="myo-panel myo-panel--center" style={{ background: "#1A1214", color: "#F4F1EA" }}>
                 <div className="myo-medallion myo-medallion--lg">
                   <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PIEZA Nº ${pieceNumber}`} arcId="myoArc2" arcText={`ACCESO VIP · PIEZA Nº ${pieceNumber} · `} spin="reverse" title="Reservado" />
                 </div>
@@ -819,7 +819,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           </div>
         </div>
 
-        <section data-tone="dark" data-screen-label="Check-in" className="myo-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #142019 0%, #0F1512 60%, #070B09 100%)" }}>
+        <section data-tone="dark" data-screen-label="Check-in" className="myo-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #231318 0%, #1A1214 60%, #0A0708 100%)" }}>
           <span data-xin="1" data-dist="-60" className="myo-kicker">05 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="myo-h2">
             Confirmá<br /><span className="myo-accent-italic">tu acceso</span>
@@ -899,7 +899,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
                 <h2 className="myo-panel-title">Todo lo que<br /><span className="myo-accent-serif">vamos a recordar</span></h2>
                 <div className="myo-album-embed">
                   {livePhotos.length > 0 ? (
-                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#2A6B4C" />
+                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#A85A6E" />
                   ) : (
                     <div className="myo-live-placeholder">
                       <span className="myo-mini-label">
@@ -917,12 +917,12 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="myo-section" style={{ background: "#0F1512" }}>
+          <section id="music" data-tone="dark" data-screen-label="Música" className="myo-section" style={{ background: "#1A1214" }}>
             <span data-xin="1" data-dist="-60" className="myo-kicker">07 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="myo-h2">¿Qué tema<br /><span className="myo-accent-italic">merece la pista?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="myo-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
-                <span key={i} className="myo-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#A9E0C6" : "#3F9C74" }} />
+                <span key={i} className="myo-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F5D9E0" : "#D98FA0" }} />
               ))}
             </div>
             <div data-xin="1" data-delay="240" data-dist="110" className="myo-song-wrap">
@@ -936,7 +936,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="myo-section" style={{ background: "#0F1512" }}>
+          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="myo-section" style={{ background: "#1A1214" }}>
             <span data-xin="1" data-dist="-60" className="myo-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="myo-h2">
               Si querés<br /><span className="myo-accent-italic">sumarte</span>
@@ -953,7 +953,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
                     alias: String(invitation.pagoTarjetaAlias || ""),
                     titular: String(invitation.pagoTarjetaTitular || ""),
                   }}
-                  accentColor="#3F9C74"
+                  accentColor="#D98FA0"
                   cardBg="rgba(20,20,27,0.72)"
                   cardBorder="#2A2417"
                   textPrimary="#F4F1EA"
@@ -973,7 +973,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
                     alias: String(invitation.regaloAlias || ""),
                     titular: String(invitation.regaloTitular || ""),
                   }}
-                  accentColor="#3F9C74"
+                  accentColor="#D98FA0"
                   cardBg="rgba(20,20,27,0.72)"
                   cardBorder="#2A2417"
                   textPrimary="#F4F1EA"
@@ -987,7 +987,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
         )}
 
         {quizEnabled && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="myo-section" style={{ background: "#0F1512" }}>
+          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="myo-section" style={{ background: "#1A1214" }}>
             <span data-xin="1" data-dist="-60" className="myo-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="myo-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
@@ -1003,7 +1003,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pieza" className="myo-section myo-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #142019 0%, #0F1512 55%, #070B09 100%)" }}>
+        <section data-tone="dark" data-screen-label="Tu pieza" className="myo-section myo-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #231318 0%, #1A1214 55%, #0A0708 100%)" }}>
           <span data-xin="1" data-dist="-60" className="myo-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="myo-final-card">
             <div className="myo-medallion myo-medallion--final">
@@ -1731,15 +1731,15 @@ function CoverHalf({
 
 // ---------------------------------------------------------------------
 // Hoja de estilos (traslada 1:1 los tokens visuales del mockup aprobado --
-// mármol blanco/gris + dorado #3F9C74, nunca el dorado #C8A45C ni el
+// mármol blanco/gris + dorado #D98FA0, nunca el dorado #C8A45C ni el
 // sunburst de Guest Pass VIP)
 // ---------------------------------------------------------------------
 const MYO_CSS = `
   .myo-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .myo-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  a { color: #3F9C74; text-decoration: none; }
-  a:hover { color: #A9E0C6; }
+  a { color: #D98FA0; text-decoration: none; }
+  a:hover { color: #F5D9E0; }
 
   @keyframes gpFoil { to { transform: rotate(360deg); } }
   @keyframes gpRing { to { transform: rotate(360deg); } }
@@ -1762,10 +1762,10 @@ const MYO_CSS = `
   .myo-date-stack { display: flex; flex-direction: column; gap: 2px; }
   .myo-date-num { font-family: var(--myo-italiana), serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.82; letter-spacing: -0.04em; }
   .myo-date-num--right { text-align: right; line-height: 0.86; }
-  .myo-date-month { font-family: var(--myo-cormorant), serif; font-style: italic; font-size: clamp(50px, 18vw, 104px); line-height: 0.9; color: #3F9C74; padding-left: 12%; }
+  .myo-date-month { font-family: var(--myo-cormorant), serif; font-style: italic; font-size: clamp(50px, 18vw, 104px); line-height: 0.9; color: #D98FA0; padding-left: 12%; }
 
   .myo-divider { display: flex; align-items: center; gap: 16px; font-size: 10px; letter-spacing: 0.26em; color: #8A8577; }
-  .myo-divider-line { width: 52px; height: 1px; background: #3F9C74; display: inline-block; }
+  .myo-divider-line { width: 52px; height: 1px; background: #D98FA0; display: inline-block; }
   .myo-divider-line--long { width: 64px; }
 
   .myo-lead { margin: 0; font-family: var(--myo-cormorant), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
@@ -1774,35 +1774,35 @@ const MYO_CSS = `
   .myo-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }
   .myo-medallion--lg { width: clamp(130px, 34vw, 178px); aspect-ratio: 1; margin: 0 auto; }
   .myo-medallion--final { width: clamp(104px, 26vw, 132px); aspect-ratio: 1; margin: -12px auto 0; }
-  .myo-medallion-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #6E9484, #1A1A1C, #3F9C74, #A9E0C6, #6E9484); filter: saturate(.75); }
-  .myo-medallion-core { position: absolute; inset: 3px; border-radius: 50%; background: #081209; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-align: center; padding: 6px; }
-  .myo-medallion-label { font-family: var(--myo-italiana), serif; font-size: 26px; line-height: 1; color: #A9E0C6; }
-  .myo-medallion-label-sm { font-family: var(--myo-italiana), serif; font-size: 16px; color: #A9E0C6; }
+  .myo-medallion-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #8A6470, #1A1A1C, #D98FA0, #F5D9E0, #8A6470); filter: saturate(.75); }
+  .myo-medallion-core { position: absolute; inset: 3px; border-radius: 50%; background: #0D0709; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-align: center; padding: 6px; }
+  .myo-medallion-label { font-family: var(--myo-italiana), serif; font-size: 26px; line-height: 1; color: #F5D9E0; }
+  .myo-medallion-label-sm { font-family: var(--myo-italiana), serif; font-size: 16px; color: #F5D9E0; }
   .myo-medallion-sub { font-size: 6.5px; letter-spacing: 0.24em; color: #8A8577; }
-  .myo-medallion-sub--accent { color: #3F9C74; }
+  .myo-medallion-sub--accent { color: #D98FA0; }
   .myo-medallion-arc { position: absolute; inset: -14%; }
   /* Opacity baja a propósito: el anillo gira sin parar, así que en algún
      momento de su vuelta una letra del texto en arco queda justo al lado de
      la etiqueta central (ej. "ACCESO") y, al ser el mismo color/fuente, se
      leen como una sola palabra pegada. Atenuado no compite con el texto del
      centro y se lee como textura decorativa del anillo. */
-  .myo-medallion-arc-text { font-size: 7px; letter-spacing: 1.6px; fill: #3F9C74; opacity: 0.4; font-family: var(--myo-mono), monospace; }
+  .myo-medallion-arc-text { font-size: 7px; letter-spacing: 1.6px; fill: #D98FA0; opacity: 0.4; font-family: var(--myo-mono), monospace; }
 
-  .myo-scan-grid { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(200,164,92,0.06) 0 1px, transparent 1px 5px); pointer-events: none; }
-  .myo-scanline { position: absolute; left: 0; right: 0; top: 30%; height: 2px; background: linear-gradient(90deg, transparent, #A9E0C6, transparent); animation: gpScan 6s linear infinite; pointer-events: none; }
+  .myo-scan-grid { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(217,143,160,0.06) 0 1px, transparent 1px 5px); pointer-events: none; }
+  .myo-scanline { position: absolute; left: 0; right: 0; top: 30%; height: 2px; background: linear-gradient(90deg, transparent, #F5D9E0, transparent); animation: gpScan 6s linear infinite; pointer-events: none; }
 
   .myo-cd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; }
   .myo-cd-box { border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
-  .myo-cd-num { font-family: var(--myo-italiana), serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #E3F5EB; display: inline-block; }
-  .myo-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #3F9C74; }
-  .myo-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #070B09 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
+  .myo-cd-num { font-family: var(--myo-italiana), serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #F7E5EA; display: inline-block; }
+  .myo-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #D98FA0; }
+  .myo-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #0A0708 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .myo-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
 
-  .myo-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(160,156,148,0.3), rgba(26,26,28,0.26), rgba(201,164,92,0.4), rgba(160,156,148,0.3)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
+  .myo-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(150,120,128,0.3), rgba(26,26,28,0.26), rgba(217,143,160,0.4), rgba(150,120,128,0.3)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
   .myo-phrase { margin: 0; position: relative; font-family: var(--myo-italiana), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
-  .myo-accent-italic { font-family: var(--myo-cormorant), serif; font-style: italic; color: #3F9C74; }
-  .myo-accent-serif { font-style: italic; color: #2A6B4C; font-family: var(--myo-cormorant), serif; }
-  .myo-accent-serif-2 { color: #2A6B4C; }
+  .myo-accent-italic { font-family: var(--myo-cormorant), serif; font-style: italic; color: #D98FA0; }
+  .myo-accent-serif { font-style: italic; color: #A85A6E; font-family: var(--myo-cormorant), serif; }
+  .myo-accent-serif-2 { color: #A85A6E; }
   .myo-h2 { margin: 0; font-family: var(--myo-italiana), serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96; }
 
   .myo-pan { height: 260vh; position: relative; }
@@ -1823,15 +1823,15 @@ const MYO_CSS = `
   .myo-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .myo-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .myo-facts-row--last { border-bottom: none; padding-bottom: 0; }
-  .myo-seguir { position: relative; display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: 0.26em; color: #2A6B4C; margin-top: auto; }
+  .myo-seguir { position: relative; display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: 0.26em; color: #A85A6E; margin-top: auto; }
   .myo-seguir--split { justify-content: space-between; }
   .myo-side-hint { display: inline-block; animation: gpSide 2.2s ease-in-out infinite; }
   .myo-route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .myo-link-cta { font-size: 10px; letter-spacing: 0.24em; color: #2A6B4C; }
+  .myo-link-cta { font-size: 10px; letter-spacing: 0.24em; color: #A85A6E; }
 
   .myo-crono { position: relative; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
   .myo-crono-row { display: flex; align-items: baseline; gap: 14px; font-size: 11px; letter-spacing: 0.1em; color: #4A473F; border-bottom: 1px solid #D6D1C4; padding-bottom: 8px; }
-  .myo-crono-time { font-family: var(--myo-mono), monospace; color: #2A6B4C; min-width: 42px; }
+  .myo-crono-time { font-family: var(--myo-mono), monospace; color: #A85A6E; min-width: 42px; }
   .myo-crono-title { flex: 1; }
 
   .myo-dots { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
@@ -1841,28 +1841,28 @@ const MYO_CSS = `
   .myo-stub-top { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.24em; color: #8A8577; }
   .myo-stub-status { color: #6E6A5D; transition: color 400ms ease; }
   .myo-seal { width: 62px; aspect-ratio: 1; position: relative; opacity: .25; transform: scale(.86); transition: opacity 700ms ease, transform 700ms cubic-bezier(.16,1,.3,1); align-self: center; }
-  .myo-beam { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #A9E0C6, transparent); opacity: 0; transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
+  .myo-beam { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #F5D9E0, transparent); opacity: 0; transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
 
   .myo-rsvp { display: flex; flex-direction: column; gap: 22px; width: 100%; max-width: 420px; font-family: var(--myo-mono), monospace; }
   .myo-rsvp-rows { display: flex; flex-direction: column; }
-  .myo-rsvp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(200,164,92,0.18); font-size: 10.5px; letter-spacing: 0.18em; color: #8A8577; }
+  .myo-rsvp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(217,143,160,0.18); font-size: 10.5px; letter-spacing: 0.18em; color: #8A8577; }
   .myo-rsvp-row > span:first-child { flex-shrink: 0; }
   .myo-rsvp-row > span:last-child { color: #F4F1EA; letter-spacing: 0.02em; text-align: right; }
   .myo-rsvp-row--payment { align-items: flex-start; }
   .myo-rsvp-payment-value { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .myo-rsvp-payment-total { color: #A9E0C6; font-size: 13px; letter-spacing: 0.02em; font-weight: 600; }
+  .myo-rsvp-payment-total { color: #F5D9E0; font-size: 13px; letter-spacing: 0.02em; font-weight: 600; }
   .myo-rsvp-payment-detail { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 9px; letter-spacing: 0.05em; color: #8A8577; }
   .myo-rsvp-stepper { display: flex; align-items: center; gap: 12px; }
-  .myo-rsvp-stepper button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #3F9C74; background: transparent; color: #3F9C74; font-size: 14px; line-height: 1; cursor: pointer; }
+  .myo-rsvp-stepper button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #D98FA0; background: transparent; color: #D98FA0; font-size: 14px; line-height: 1; cursor: pointer; }
   .myo-rsvp-stepper button:disabled { opacity: 0.3; cursor: default; }
   .myo-rsvp-stepper span { font-family: var(--myo-mono), monospace; color: #F4F1EA; min-width: 20px; text-align: center; }
-  .myo-rsvp-input { background: transparent; border: none; border-bottom: 1px solid rgba(200,164,92,0.3); color: #F4F1EA; font-family: var(--myo-mono), monospace; font-size: 11px; letter-spacing: 0.02em; padding: 4px 2px; text-align: right; max-width: 55%; }
+  .myo-rsvp-input { background: transparent; border: none; border-bottom: 1px solid rgba(217,143,160,0.3); color: #F4F1EA; font-family: var(--myo-mono), monospace; font-size: 11px; letter-spacing: 0.02em; padding: 4px 2px; text-align: right; max-width: 55%; }
   .myo-rsvp-input::placeholder { color: #6E6A5D; }
-  .myo-rsvp-input:focus { outline: none; border-bottom-color: #3F9C74; }
-  .myo-rsvp-btn { width: 100%; padding: 16px; font-family: var(--myo-mono), monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; background: linear-gradient(180deg, #3F9C74, #2A6B4C); border: 1px solid #3F9C74; color: #0B0B10; cursor: pointer; }
+  .myo-rsvp-input:focus { outline: none; border-bottom-color: #D98FA0; }
+  .myo-rsvp-btn { width: 100%; padding: 16px; font-family: var(--myo-mono), monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; background: linear-gradient(180deg, #D98FA0, #A85A6E); border: 1px solid #D98FA0; color: #0B0B10; cursor: pointer; }
   .myo-rsvp-btn:disabled { opacity: 0.6; cursor: default; }
-  .myo-rsvp-btn--ghost { background: transparent; color: #3F9C74; }
-  .myo-rsvp-error { font-size: 10px; letter-spacing: 0.06em; color: #3F9C74; margin: 0; }
+  .myo-rsvp-btn--ghost { background: transparent; color: #D98FA0; }
+  .myo-rsvp-error { font-size: 10px; letter-spacing: 0.06em; color: #D98FA0; margin: 0; }
   .myo-rsvp-declined { display: flex; flex-direction: column; gap: 18px; align-items: center; text-align: center; max-width: 380px; }
   .myo-rsvp-declined-text { margin: 0; font-family: var(--myo-cormorant), serif; font-style: italic; font-size: 18px; line-height: 1.4; color: #A8A292; }
 
@@ -1890,28 +1890,28 @@ const MYO_CSS = `
   .myo-mosaic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
   .myo-bank-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 420px; margin: 0; }
-  .myo-bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(200,164,92,0.18); }
+  .myo-bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(217,143,160,0.18); }
   .myo-bank-row:last-child { border-bottom: none; }
   .myo-bank-row-label { display: block; font-size: 9px; letter-spacing: 0.2em; color: #8A8577; margin-bottom: 3px; }
   .myo-bank-row-value { font-size: 12px; color: #F4F1EA; word-break: break-all; }
-  .myo-bank-copy { flex-shrink: 0; font-family: var(--myo-mono), monospace; font-size: 10px; letter-spacing: 0.1em; padding: 7px 12px; border: 1px solid #3F9C74; background: transparent; color: #3F9C74; cursor: pointer; }
-  .myo-bank-copy:hover { background: rgba(200,164,92,0.12); }
+  .myo-bank-copy { flex-shrink: 0; font-family: var(--myo-mono), monospace; font-size: 10px; letter-spacing: 0.1em; padding: 7px 12px; border: 1px solid #D98FA0; background: transparent; color: #D98FA0; cursor: pointer; }
+  .myo-bank-copy:hover { background: rgba(217,143,160,0.12); }
 
   .myo-eq { display: flex; align-items: flex-end; gap: 5px; height: 52px; }
   .myo-eq-bar { width: 4px; height: 100%; transform-origin: bottom; animation: gpEq 1.1s ease-in-out infinite; display: inline-block; }
   .myo-song-wrap { font-family: var(--myo-mono), monospace; }
 
   .myo-song { position: relative; width: 100%; max-width: 420px; margin: 0 auto; }
-  .myo-song-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(200,164,92,0.3); padding-bottom: 12px; }
+  .myo-song-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(217,143,160,0.3); padding-bottom: 12px; }
   .myo-song-inputs { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; text-transform: uppercase; }
-  .myo-song-input { background: transparent; border: none; border-bottom: 1px solid rgba(200,164,92,0.3); color: #F4F1EA; font-family: var(--myo-mono), monospace; font-size: 12px; padding: 6px 2px; min-width: 0; flex: 1; }
+  .myo-song-input { background: transparent; border: none; border-bottom: 1px solid rgba(217,143,160,0.3); color: #F4F1EA; font-family: var(--myo-mono), monospace; font-size: 12px; padding: 6px 2px; min-width: 0; flex: 1; }
   .myo-song-input::placeholder { color: #6E6A5D; }
-  .myo-song-input:focus { outline: none; border-bottom-color: #3F9C74; }
+  .myo-song-input:focus { outline: none; border-bottom-color: #D98FA0; }
   .myo-song-sep { color: #8A8577; flex-shrink: 0; }
-  .myo-song-submit { flex-shrink: 0; background: none; border: none; color: #3F9C74; font-family: var(--myo-mono), monospace; font-size: 10px; letter-spacing: 0.2em; cursor: pointer; }
-  .myo-song-submit:hover { color: #A9E0C6; }
+  .myo-song-submit { flex-shrink: 0; background: none; border: none; color: #D98FA0; font-family: var(--myo-mono), monospace; font-size: 10px; letter-spacing: 0.2em; cursor: pointer; }
+  .myo-song-submit:hover { color: #F5D9E0; }
   .myo-song-submit:disabled { color: #6E6A5D; cursor: default; }
-  .myo-song-error { font-size: 10px; color: #3F9C74; margin-top: 6px; }
+  .myo-song-error { font-size: 10px; color: #D98FA0; margin-top: 6px; }
   .myo-song-list { display: flex; flex-direction: column; margin-top: 14px; max-height: 180px; overflow-y: auto; }
   .myo-song-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-family: var(--myo-mono), monospace; }
   .myo-song-item-title { font-size: 11.5px; letter-spacing: 0.04em; color: #F4F1EA; }
@@ -1922,57 +1922,57 @@ const MYO_CSS = `
   .myo-quiz-q-num { font-family: var(--myo-mono), monospace; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; }
   .myo-quiz-q-text { margin: 0; font-family: var(--myo-italiana), serif; font-size: clamp(18px, 4vw, 22px); line-height: 1.3; color: #F4F1EA; }
   .myo-quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
-  .myo-quiz-opt { font-family: var(--myo-mono), monospace; font-size: 11px; letter-spacing: 0.06em; padding: 10px 16px; border: 1px solid rgba(200,164,92,0.4); background: transparent; color: #3F9C74; cursor: pointer; transition: background 160ms ease, color 160ms ease, border-color 160ms ease; }
+  .myo-quiz-opt { font-family: var(--myo-mono), monospace; font-size: 11px; letter-spacing: 0.06em; padding: 10px 16px; border: 1px solid rgba(217,143,160,0.4); background: transparent; color: #D98FA0; cursor: pointer; transition: background 160ms ease, color 160ms ease, border-color 160ms ease; }
   .myo-quiz-opt:disabled { cursor: default; }
-  .myo-quiz-opt--picked { background: #3F9C74; border-color: #3F9C74; color: #0B0B10; }
-  .myo-quiz-opt--correct { background: #3F9C74; border-color: #3F9C74; color: #0B0B10; }
+  .myo-quiz-opt--picked { background: #D98FA0; border-color: #D98FA0; color: #0B0B10; }
+  .myo-quiz-opt--correct { background: #D98FA0; border-color: #D98FA0; color: #0B0B10; }
   .myo-quiz-opt--wrong { border-color: #8A6A6A; color: #C99; opacity: 0.6; }
-  .myo-quiz-result { padding-top: 18px; border-top: 1px solid rgba(200,164,92,0.2); }
-  .myo-quiz-result-score { margin: 0 0 6px; font-family: var(--myo-mono), monospace; font-size: 11px; letter-spacing: 0.16em; color: #A9E0C6; }
+  .myo-quiz-result { padding-top: 18px; border-top: 1px solid rgba(217,143,160,0.2); }
+  .myo-quiz-result-score { margin: 0 0 6px; font-family: var(--myo-mono), monospace; font-size: 11px; letter-spacing: 0.16em; color: #F5D9E0; }
   .myo-quiz-result-stat { margin: 0; font-size: 11.5px; line-height: 1.5; color: #A8A292; }
 
-  .myo-final-card { border: 1px solid #3F9C74; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative; }
-  .myo-final-names { font-family: var(--myo-italiana), serif; font-size: clamp(34px, 10vw, 46px); line-height: .9; color: #A9E0C6; }
+  .myo-final-card { border: 1px solid #D98FA0; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative; }
+  .myo-final-names { font-family: var(--myo-italiana), serif; font-size: clamp(34px, 10vw, 46px); line-height: .9; color: #F5D9E0; }
   .myo-barcode { height: 26px; background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); }
   .myo-final-footer { display: flex; justify-content: space-between; align-items: center; font-size: 9px; letter-spacing: 0.24em; color: #56534A; }
-  .myo-replay { cursor: pointer; color: #3F9C74; }
+  .myo-replay { cursor: pointer; color: #D98FA0; }
   .myo-footer-credit { display: flex; justify-content: center; padding-top: 8px; opacity: 0.7; }
 
-  .myo-rail { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(200,164,92,0.14); }
+  .myo-rail { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(217,143,160,0.14); }
   .myo-rail-top { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #8A8577; transition: color 500ms ease; }
-  .myo-rail-line { flex: 1; width: 1px; margin: 16px 0; background: rgba(200,164,92,0.16); position: relative; }
-  .myo-rail-bar { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: linear-gradient(#A9E0C6, #3F9C74); transition: height 260ms linear; display: block; }
-  .myo-rail-label { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #3F9C74; transition: color 500ms ease; }
+  .myo-rail-line { flex: 1; width: 1px; margin: 16px 0; background: rgba(217,143,160,0.16); position: relative; }
+  .myo-rail-bar { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: linear-gradient(#F5D9E0, #D98FA0); transition: height 260ms linear; display: block; }
+  .myo-rail-label { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #D98FA0; transition: color 500ms ease; }
 
   .myo-cover { position: absolute; inset: 0; z-index: 5; }
   .myo-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .myo-cover-half--top { top: 0; }
   .myo-cover-half--bottom { bottom: 0; }
-  .myo-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #151417 0%, #0F1512 46%, #070B09 100%); }
+  .myo-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #1D1114 0%, #1A1214 46%, #0A0708 100%); }
   .myo-cover-half--bottom .myo-cover-inner { top: auto; bottom: 0; }
-  .myo-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(120,140,130,0.35), rgba(26,28,26,0.3), rgba(63,156,116,0.55), rgba(120,140,130,0.35)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite; }
+  .myo-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(150,120,128,0.35), rgba(26,26,28,0.3), rgba(217,143,160,0.55), rgba(150,120,128,0.35)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite; }
   /* Veta de mármol + dorado -- motivo decorativo propio de esta tapa (ver
      mockup "Marmol y Oro - Panoramica"), NUNCA el sunburst de Guest Pass
      VIP: tres vetas repetidas en ángulos distintos, derivando lento sobre la
      piedra en vez de girar. */
-  .myo-cover-marble { position: absolute; inset: 0; background-image: repeating-linear-gradient(12deg, rgba(201,164,92,.18) 0 1px, transparent 1px 60px), repeating-linear-gradient(-68deg, rgba(232,214,168,.1) 0 1px, transparent 1px 90px), repeating-linear-gradient(40deg, rgba(201,164,92,.14) 0 1px, transparent 1px 130px); animation: myoMarbleDrift 22s ease-in-out infinite alternate; }
+  .myo-cover-marble { position: absolute; inset: 0; background-image: repeating-linear-gradient(12deg, rgba(217,143,160,.18) 0 1px, transparent 1px 60px), repeating-linear-gradient(-68deg, rgba(232,185,140,.1) 0 1px, transparent 1px 90px), repeating-linear-gradient(40deg, rgba(217,143,160,.14) 0 1px, transparent 1px 130px); animation: myoMarbleDrift 22s ease-in-out infinite alternate; }
   .myo-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
   .myo-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
   .myo-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
   .myo-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
   .myo-cover-names { margin: 0; font-family: var(--myo-italiana), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F7F5F1; }
-  .myo-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#3F9C74, transparent); display: block; }
+  .myo-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#D98FA0, transparent); display: block; }
   .myo-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
   .myo-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .myo-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .myo-cover-cta { border: 1px solid #3F9C74; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #E3F5EB; font-family: var(--myo-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  .myo-cover-cta { border: 1px solid #D98FA0; background: linear-gradient(100deg, rgba(217,143,160,0.08), rgba(232,185,140,0.2), rgba(217,143,160,0.08)); color: #F7E5EA; font-family: var(--myo-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .myo-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .myo-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0B0B0F; }
+  .myo-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,185,140,0.34), rgba(240,223,200,0.5), rgba(232,185,140,0.34)); color: #0B0B0F; }
   .myo-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .myo-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }
 
   .myo-lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(12,12,14,0.96); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .myo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3F9C74; background: rgba(0,0,0,0.4); color: #F4F1EA; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .myo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #D98FA0; background: rgba(0,0,0,0.4); color: #F4F1EA; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .myo-lightbox-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; }
 `;

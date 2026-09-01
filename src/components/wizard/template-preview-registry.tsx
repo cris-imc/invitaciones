@@ -349,50 +349,98 @@ export const BOLADEDISCOTECA_COLORS: ColorOption[] = [
 
 export const CRYSTAL3D_COLORS: ColorOption[] = [
   { id: "default", name: "Cristal Celeste", color: "#7FD1E0" },
+  { id: "AmbarBronce", name: "Ámbar Bronce", color: "#E8A94C" },
+  { id: "CuarzoRosa", name: "Cuarzo Rosa", color: "#E8A9C4" },
+  { id: "EsmeraldaPlata", name: "Esmeralda Plata", color: "#6FCB9F" },
+  { id: "ZafiroBlanco", name: "Zafiro Blanco", color: "#6E93E8" },
 ];
 
 export const FASHIONTAG_COLORS: ColorOption[] = [
   { id: "default", name: "Óxido Boutique", color: "#B0562E" },
+  { id: "BottleGreen", name: "Verde Botella", color: "#2F6A4D" },
+  { id: "Burgundy", name: "Borgoña", color: "#9C2F49" },
+  { id: "GoldenMustard", name: "Mostaza Dorado", color: "#C2903A" },
+  { id: "MidnightNavy", name: "Azul Medianoche", color: "#35547E" },
 ];
 
 export const CERAMICAEDITORIAL_COLORS: ColorOption[] = [
   { id: "default", name: "Bronce Cerámico", color: "#B98B5E" },
+  { id: "Celadon", name: "Celadón", color: "#7FA98A" },
+  { id: "Cobalto", name: "Cobalto", color: "#5E8BB9" },
+  { id: "GrisPiedra", name: "Gris Piedra", color: "#9AA3A6" },
+  { id: "Terracota", name: "Terracota", color: "#C1704A" },
 ];
 
 export const CINEABSTRACTO_COLORS: ColorOption[] = [
   { id: "default", name: "Cobre Cine", color: "#C6743A" },
+  { id: "BlancoNegroPlata", name: "Blanco y Negro Plata", color: "#B9C0C6" },
+  { id: "NoirEsmeralda", name: "Noir Esmeralda", color: "#3F9C74" },
+  { id: "SepiaClasico", name: "Sepia Clásico", color: "#B98A3E" },
+  { id: "TecnicolorAzulNaranja", name: "Tecnicolor Azul y Naranja", color: "#E0692E" },
 ];
 
 export const PAPELERIADEHOTELDELUJO_COLORS: ColorOption[] = [
   { id: "default", name: "Verde Hotel", color: "#1C4A3F" },
+  { id: "AzulMarinoPlata", name: "Azul Marino y Plata", color: "#B8C9DE" },
+  { id: "BorgonaOroRosa", name: "Borgoña y Oro Rosa", color: "#E3A99A" },
+  { id: "GrisCarbonOroBlanco", name: "Gris Carbón y Oro Blanco", color: "#C9C2AA" },
+  { id: "NegroYBronce", name: "Negro y Bronce", color: "#C1793E" },
 ];
 
 export const VINTAGEEDITORIAL_COLORS: ColorOption[] = [
   { id: "default", name: "Dorado Vintage", color: "#C9A66B" },
+  { id: "AzulPetroleo", name: "Azul Petróleo", color: "#67A3B3" },
+  { id: "BorgonaVino", name: "Borgoña Vino", color: "#B66A7E" },
+  { id: "OlivaVintage", name: "Oliva Vintage", color: "#9CAA5E" },
+  { id: "PlataAntigua", name: "Plata Antigua", color: "#AAB1BB" },
 ];
 
 export const FASHIONLOOKBOOK_COLORS: ColorOption[] = [
   { id: "default", name: "Rojo Editorial", color: "#D93A2B" },
+  { id: "Cobalto", name: "Cobalto", color: "#2F55D9" },
+  { id: "Magenta", name: "Magenta", color: "#D93A93" },
+  { id: "Militar", name: "Militar", color: "#6B8F3B" },
+  { id: "Mostaza", name: "Mostaza", color: "#D9A430" },
 ];
 
 export const MARMOLYORO_COLORS: ColorOption[] = [
   { id: "default", name: "Mármol y Oro", color: "#C9A45C" },
+  { id: "Bronce", name: "Bronce", color: "#B87333" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#3F9C74" },
+  { id: "Onix", name: "Ónix", color: "#C9CDD1" },
+  { id: "Rosa", name: "Rosa", color: "#D98FA0" },
 ];
 
 export const ATELIERDEPAPEL_COLORS: ColorOption[] = [
   { id: "default", name: "Bronce y Papel", color: "#7A6852" },
+  { id: "AzulTinta", name: "Azul Tinta", color: "#3F638D" },
+  { id: "BorgonaVino", name: "Borgoña Vino", color: "#9B3B4B" },
+  { id: "GrisGrafito", name: "Gris Grafito", color: "#606976" },
+  { id: "VerdeSalvia", name: "Verde Salvia", color: "#5F7A52" },
 ];
 
 export const BOTANICAEDITORIAL_COLORS: ColorOption[] = [
   { id: "default", name: "Oliva y Salvia", color: "#5A6E4E" },
+  { id: "Borgona", name: "Borgoña", color: "#A9727C" },
+  { id: "Indigo", name: "Índigo", color: "#7CA8C2" },
+  { id: "Lavanda", name: "Lavanda", color: "#9A87B8" },
+  { id: "Terracota", name: "Terracota", color: "#C08A6A" },
 ];
 
 export const ENCAJECONTEMPORANEO_COLORS: ColorOption[] = [
   { id: "default", name: "Terracota y Encaje", color: "#A6491F" },
+  { id: "AzulMedianoche", name: "Azul Medianoche", color: "#3E70B5" },
+  { id: "Borgona", name: "Borgoña", color: "#A83A5A" },
+  { id: "GrisPiedra", name: "Gris Piedra", color: "#6E6656" },
+  { id: "VerdeBosque", name: "Verde Bosque", color: "#3F8A55" },
 ];
 
 export const LIQUIDGLASS_COLORS: ColorOption[] = [
   { id: "default", name: "Azul Vidrio", color: "#6FA8C9" },
+  { id: "Amatista", name: "Amatista", color: "#A86FC9" },
+  { id: "Ambar", name: "Ámbar", color: "#C9A86F" },
+  { id: "Cuarzo", name: "Cuarzo", color: "#C96FA8" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#6FC9A8" },
 ];
 
 export const ELEGANT_COLORS: ColorOption[] = [
@@ -723,50 +771,98 @@ export const BOLADEDISCOTECA_COMPONENTS: Record<string, PreviewComponent> = {
 
 export const CRYSTAL3D_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/Crystal3dTemplate").then((m) => m.Crystal3dTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AmbarBronce: dynamic(() => import("@/components/templates/Crystal3dTemplateAmbarBronce").then((m) => m.Crystal3dTemplateAmbarBronce), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  CuarzoRosa: dynamic(() => import("@/components/templates/Crystal3dTemplateCuarzoRosa").then((m) => m.Crystal3dTemplateCuarzoRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  EsmeraldaPlata: dynamic(() => import("@/components/templates/Crystal3dTemplateEsmeraldaPlata").then((m) => m.Crystal3dTemplateEsmeraldaPlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  ZafiroBlanco: dynamic(() => import("@/components/templates/Crystal3dTemplateZafiroBlanco").then((m) => m.Crystal3dTemplateZafiroBlanco), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const FASHIONTAG_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/FashionTagTemplate").then((m) => m.FashionTagTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BottleGreen: dynamic(() => import("@/components/templates/FashionTagTemplateBottleGreen").then((m) => m.FashionTagTemplateBottleGreen), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Burgundy: dynamic(() => import("@/components/templates/FashionTagTemplateBurgundy").then((m) => m.FashionTagTemplateBurgundy), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  GoldenMustard: dynamic(() => import("@/components/templates/FashionTagTemplateGoldenMustard").then((m) => m.FashionTagTemplateGoldenMustard), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  MidnightNavy: dynamic(() => import("@/components/templates/FashionTagTemplateMidnightNavy").then((m) => m.FashionTagTemplateMidnightNavy), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CERAMICAEDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/CeramicaEditorialTemplate").then((m) => m.CeramicaEditorialTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Celadon: dynamic(() => import("@/components/templates/CeramicaEditorialTemplateCeladon").then((m) => m.CeramicaEditorialTemplateCeladon), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cobalto: dynamic(() => import("@/components/templates/CeramicaEditorialTemplateCobalto").then((m) => m.CeramicaEditorialTemplateCobalto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  GrisPiedra: dynamic(() => import("@/components/templates/CeramicaEditorialTemplateGrisPiedra").then((m) => m.CeramicaEditorialTemplateGrisPiedra), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/CeramicaEditorialTemplateTerracota").then((m) => m.CeramicaEditorialTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CINEABSTRACTO_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/CineAbstractoTemplate").then((m) => m.CineAbstractoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BlancoNegroPlata: dynamic(() => import("@/components/templates/CineAbstractoTemplateBlancoNegroPlata").then((m) => m.CineAbstractoTemplateBlancoNegroPlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  NoirEsmeralda: dynamic(() => import("@/components/templates/CineAbstractoTemplateNoirEsmeralda").then((m) => m.CineAbstractoTemplateNoirEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  SepiaClasico: dynamic(() => import("@/components/templates/CineAbstractoTemplateSepiaClasico").then((m) => m.CineAbstractoTemplateSepiaClasico), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  TecnicolorAzulNaranja: dynamic(() => import("@/components/templates/CineAbstractoTemplateTecnicolorAzulNaranja").then((m) => m.CineAbstractoTemplateTecnicolorAzulNaranja), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const PAPELERIADEHOTELDELUJO_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/PapeleriaDeHotelDeLujoTemplate").then((m) => m.PapeleriaDeHotelDeLujoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AzulMarinoPlata: dynamic(() => import("@/components/templates/PapeleriaDeHotelDeLujoTemplateAzulMarinoPlata").then((m) => m.PapeleriaDeHotelDeLujoTemplateAzulMarinoPlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BorgonaOroRosa: dynamic(() => import("@/components/templates/PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa").then((m) => m.PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  GrisCarbonOroBlanco: dynamic(() => import("@/components/templates/PapeleriaDeHotelDeLujoTemplateGrisCarbonOroBlanco").then((m) => m.PapeleriaDeHotelDeLujoTemplateGrisCarbonOroBlanco), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  NegroYBronce: dynamic(() => import("@/components/templates/PapeleriaDeHotelDeLujoTemplateNegroYBronce").then((m) => m.PapeleriaDeHotelDeLujoTemplateNegroYBronce), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const VINTAGEEDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/VintageEditorialTemplate").then((m) => m.VintageEditorialTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AzulPetroleo: dynamic(() => import("@/components/templates/VintageEditorialTemplateAzulPetroleo").then((m) => m.VintageEditorialTemplateAzulPetroleo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BorgonaVino: dynamic(() => import("@/components/templates/VintageEditorialTemplateBorgonaVino").then((m) => m.VintageEditorialTemplateBorgonaVino), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  OlivaVintage: dynamic(() => import("@/components/templates/VintageEditorialTemplateOlivaVintage").then((m) => m.VintageEditorialTemplateOlivaVintage), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  PlataAntigua: dynamic(() => import("@/components/templates/VintageEditorialTemplatePlataAntigua").then((m) => m.VintageEditorialTemplatePlataAntigua), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const FASHIONLOOKBOOK_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/FashionLookbookTemplate").then((m) => m.FashionLookbookTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cobalto: dynamic(() => import("@/components/templates/FashionLookbookTemplateCobalto").then((m) => m.FashionLookbookTemplateCobalto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Magenta: dynamic(() => import("@/components/templates/FashionLookbookTemplateMagenta").then((m) => m.FashionLookbookTemplateMagenta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Militar: dynamic(() => import("@/components/templates/FashionLookbookTemplateMilitar").then((m) => m.FashionLookbookTemplateMilitar), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Mostaza: dynamic(() => import("@/components/templates/FashionLookbookTemplateMostaza").then((m) => m.FashionLookbookTemplateMostaza), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const MARMOLYORO_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/MarmolYOroTemplate").then((m) => m.MarmolYOroTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Bronce: dynamic(() => import("@/components/templates/MarmolYOroTemplateBronce").then((m) => m.MarmolYOroTemplateBronce), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/MarmolYOroTemplateEsmeralda").then((m) => m.MarmolYOroTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Onix: dynamic(() => import("@/components/templates/MarmolYOroTemplateOnix").then((m) => m.MarmolYOroTemplateOnix), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rosa: dynamic(() => import("@/components/templates/MarmolYOroTemplateRosa").then((m) => m.MarmolYOroTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ATELIERDEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/AtelierDePapelTemplate").then((m) => m.AtelierDePapelTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AzulTinta: dynamic(() => import("@/components/templates/AtelierDePapelTemplateAzulTinta").then((m) => m.AtelierDePapelTemplateAzulTinta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BorgonaVino: dynamic(() => import("@/components/templates/AtelierDePapelTemplateBorgonaVino").then((m) => m.AtelierDePapelTemplateBorgonaVino), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  GrisGrafito: dynamic(() => import("@/components/templates/AtelierDePapelTemplateGrisGrafito").then((m) => m.AtelierDePapelTemplateGrisGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  VerdeSalvia: dynamic(() => import("@/components/templates/AtelierDePapelTemplateVerdeSalvia").then((m) => m.AtelierDePapelTemplateVerdeSalvia), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const BOTANICAEDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/BotanicaEditorialTemplate").then((m) => m.BotanicaEditorialTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/BotanicaEditorialTemplateBorgona").then((m) => m.BotanicaEditorialTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Indigo: dynamic(() => import("@/components/templates/BotanicaEditorialTemplateIndigo").then((m) => m.BotanicaEditorialTemplateIndigo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lavanda: dynamic(() => import("@/components/templates/BotanicaEditorialTemplateLavanda").then((m) => m.BotanicaEditorialTemplateLavanda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/BotanicaEditorialTemplateTerracota").then((m) => m.BotanicaEditorialTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ENCAJECONTEMPORANEO_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/EncajeContemporaneoTemplate").then((m) => m.EncajeContemporaneoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AzulMedianoche: dynamic(() => import("@/components/templates/EncajeContemporaneoTemplateAzulMedianoche").then((m) => m.EncajeContemporaneoTemplateAzulMedianoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/EncajeContemporaneoTemplateBorgona").then((m) => m.EncajeContemporaneoTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  GrisPiedra: dynamic(() => import("@/components/templates/EncajeContemporaneoTemplateGrisPiedra").then((m) => m.EncajeContemporaneoTemplateGrisPiedra), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  VerdeBosque: dynamic(() => import("@/components/templates/EncajeContemporaneoTemplateVerdeBosque").then((m) => m.EncajeContemporaneoTemplateVerdeBosque), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const LIQUIDGLASS_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/LiquidGlassTemplate").then((m) => m.LiquidGlassTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Amatista: dynamic(() => import("@/components/templates/LiquidGlassTemplateAmatista").then((m) => m.LiquidGlassTemplateAmatista), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ambar: dynamic(() => import("@/components/templates/LiquidGlassTemplateAmbar").then((m) => m.LiquidGlassTemplateAmbar), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cuarzo: dynamic(() => import("@/components/templates/LiquidGlassTemplateCuarzo").then((m) => m.LiquidGlassTemplateCuarzo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/LiquidGlassTemplateEsmeralda").then((m) => m.LiquidGlassTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {
