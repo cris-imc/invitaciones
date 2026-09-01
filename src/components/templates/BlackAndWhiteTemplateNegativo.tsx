@@ -655,7 +655,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
       <style>{GP_CSS}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="bcw-scroller">
-        <section data-tone="dark" data-screen-label="Save the Date" className="bcw-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #FFFFFF 55%, #F4F1EA 100%)" }}>
+        <section data-tone="dark" data-screen-label="Save the Date" className="bcw-section" style={{ background: "#FFFFFF" }}>
           <span data-xin="1" data-dist="-60" className="bcw-kicker">01 — GUARDÁ LA FECHA</span>
           <div className="bcw-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="bcw-date-num">{dayNum}</span>
@@ -674,7 +674,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
           </div>
         </section>
 
-        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="bcw-section bcw-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1C1C1C 0%, #FFFFFF 55%, #F4F1EA 100%)" }}>
+        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="bcw-section bcw-section--between" style={{ background: "#FFFFFF" }}>
           <div className="bcw-scan-grid" />
           <div className="bcw-scanline" />
           <span data-xin="1" data-dist="-60" className="bcw-kicker" style={{ position: "relative" }}>02 — EL PASE SE ACTIVA EN</span>
@@ -687,7 +687,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
           <div className="bcw-perf-strip" />
         </section>
 
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="bcw-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #F4F1EA 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label="Frase" className="bcw-section" style={{ background: "#FFFFFF" }}>
           <div data-drift="-130" className="bcw-glow-blob" />
           <span data-xin="1" data-dist="-60" className="bcw-kicker" style={{ position: "relative" }}>03 — UN MENSAJE PARA VOS</span>
           <h2 ref={phraseRef} className="bcw-phrase" style={{ fontSize: fraseFontSize }}>
@@ -798,7 +798,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
           </div>
         </div>
 
-        <section data-tone="dark" data-screen-label="Check-in" className="bcw-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #FFFFFF 60%, #F4F1EA 100%)" }}>
+        <section data-tone="dark" data-screen-label="Check-in" className="bcw-section" style={{ background: "#FFFFFF" }}>
           <span data-xin="1" data-dist="-60" className="bcw-kicker">05 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bcw-h2">
             Confirmá<br /><span className="bcw-accent-italic">tu acceso</span>
@@ -981,7 +981,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="bcw-section bcw-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #FFFFFF 55%, #F4F1EA 100%)" }}>
+        <section data-tone="dark" data-screen-label="Tu pase" className="bcw-section bcw-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "#FFFFFF" }}>
           <span data-xin="1" data-dist="-60" className="bcw-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bcw-final-card">
             <div className="bcw-medallion bcw-medallion--final">
@@ -1771,7 +1771,7 @@ const GP_CSS = `
   .bcw-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
 
   .bcw-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(255,255,255,0.2), rgba(185,185,188,0.2), rgba(255,255,255,0.26), rgba(255,255,255,0.2)); filter: blur(80px); opacity: .4; animation: bcwFoil 30s linear infinite; }
-  .bcw-phrase { margin: 0; position: relative; font-family: var(--bcw-bodoni), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; color: #F4F1EA; }
+  .bcw-phrase { margin: 0; position: relative; font-family: var(--bcw-bodoni), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
   .bcw-accent-italic { font-style: italic; color: #B9B9BC; }
   .bcw-accent-serif { font-style: italic; color: #4A4A4A; font-family: var(--bcw-bodoni), serif; }
   .bcw-accent-serif-2 { color: #4A4A4A; }
@@ -1925,7 +1925,7 @@ const GP_CSS = `
   .bcw-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .bcw-cover-half--top { top: 0; }
   .bcw-cover-half--bottom { bottom: 0; }
-  .bcw-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #EDEAE0 0%, #FFFFFF 46%, #F4F1EA 100%); }
+  .bcw-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: #FFFFFF; }
   .bcw-cover-half--bottom .bcw-cover-inner { top: auto; bottom: 0; }
   .bcw-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(255,255,255,0.3), rgba(185,185,188,0.3), rgba(255,255,255,0.4), rgba(255,255,255,0.3)); filter: blur(64px); opacity: .62; animation: bcwFoil 26s linear infinite; }
   .bcw-cover-sunburst { position: absolute; inset: 0; background: repeating-conic-gradient(from 0deg at 50% 44%, rgba(255,255,255,0.75) 0deg 0.4deg, transparent 0.4deg 3.2deg); opacity: .3; -webkit-mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); }
