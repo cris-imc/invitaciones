@@ -1001,7 +1001,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
           <div className="bcw-footer-credit">
-            <LogoFooterCredit bgColor="transparent" />
+            <LogoFooterCredit bgColor="transparent" textColor="#0A0A0A" />
           </div>
         </section>
       </div>
