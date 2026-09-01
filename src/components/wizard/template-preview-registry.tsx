@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO";
 
 export interface ColorOption {
   id: string;
@@ -295,6 +295,58 @@ export const CORONAESCARLATA_COLORS: ColorOption[] = [
   { id: "default", name: "Escarlata y Oro", color: "#D9A441" },
 ];
 
+export const JEWELRYBOX_COLORS: ColorOption[] = [
+  { id: "default", name: "Ciruela y Dorado", color: "#D9B063" },
+];
+
+export const PASEVIP_COLORS: ColorOption[] = [
+  { id: "default", name: "Dorado y Negro", color: "#C8A45C" },
+];
+
+export const CINEABSTRACTOXV_COLORS: ColorOption[] = [
+  { id: "default", name: "Marquesina Roja", color: "#E8123A" },
+];
+
+export const ACRYLICPOP_COLORS: ColorOption[] = [
+  { id: "default", name: "Fucsia Ácido", color: "#FF3D8B" },
+];
+
+export const BOLADEDISCOTECA_COLORS: ColorOption[] = [
+  { id: "default", name: "Neón Disco", color: "#FF2E9A" },
+];
+
+export const CRYSTAL3D_COLORS: ColorOption[] = [
+  { id: "default", name: "Cristal Celeste", color: "#7FD1E0" },
+];
+
+export const FASHIONTAG_COLORS: ColorOption[] = [
+  { id: "default", name: "Óxido Boutique", color: "#B0562E" },
+];
+
+export const CERAMICAEDITORIAL_COLORS: ColorOption[] = [
+  { id: "default", name: "Bronce Cerámico", color: "#B98B5E" },
+];
+
+export const CINEABSTRACTO_COLORS: ColorOption[] = [
+  { id: "default", name: "Cobre Cine", color: "#C6743A" },
+];
+
+export const PAPELERIADEHOTELDELUJO_COLORS: ColorOption[] = [
+  { id: "default", name: "Verde Hotel", color: "#1C4A3F" },
+];
+
+export const VINTAGEEDITORIAL_COLORS: ColorOption[] = [
+  { id: "default", name: "Dorado Vintage", color: "#C9A66B" },
+];
+
+export const FASHIONLOOKBOOK_COLORS: ColorOption[] = [
+  { id: "default", name: "Rojo Editorial", color: "#D93A2B" },
+];
+
+export const MARMOLYORO_COLORS: ColorOption[] = [
+  { id: "default", name: "Mármol y Oro", color: "#C9A45C" },
+];
+
 export const ELEGANT_COLORS: ColorOption[] = [
   { id: "default", name: "Dorados (Original)", color: "#C79A4B" },
   { id: "Green", name: "Verdes", color: "#5C8A7A" },
@@ -567,6 +619,58 @@ export const PRINCESA_COMPONENTS: Record<string, PreviewComponent> = {
 
 export const CORONAESCARLATA_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/CoronaEscarlataTemplate").then((m) => m.CoronaEscarlataTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const JEWELRYBOX_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/JewelryBoxTemplate").then((m) => m.JewelryBoxTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const PASEVIP_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/PaseVipTemplate").then((m) => m.PaseVipTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CINEABSTRACTOXV_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CineAbstractoXvTemplate").then((m) => m.CineAbstractoXvTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const ACRYLICPOP_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/AcrylicPopTemplate").then((m) => m.AcrylicPopTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const BOLADEDISCOTECA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/BolaDeDiscotecaTemplate").then((m) => m.BolaDeDiscotecaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CRYSTAL3D_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/Crystal3dTemplate").then((m) => m.Crystal3dTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const FASHIONTAG_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/FashionTagTemplate").then((m) => m.FashionTagTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CERAMICAEDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CeramicaEditorialTemplate").then((m) => m.CeramicaEditorialTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CINEABSTRACTO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CineAbstractoTemplate").then((m) => m.CineAbstractoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const PAPELERIADEHOTELDELUJO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/PapeleriaDeHotelDeLujoTemplate").then((m) => m.PapeleriaDeHotelDeLujoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const VINTAGEEDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/VintageEditorialTemplate").then((m) => m.VintageEditorialTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const FASHIONLOOKBOOK_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/FashionLookbookTemplate").then((m) => m.FashionLookbookTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const MARMOLYORO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/MarmolYOroTemplate").then((m) => m.MarmolYOroTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {

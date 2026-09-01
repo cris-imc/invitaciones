@@ -13,6 +13,19 @@ import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink"
 import { GuestPassVipTemplate } from "@/components/templates/GuestPassVipTemplate";
 import { PrincesaTemplate } from "@/components/templates/PrincesaTemplate";
 import { CoronaEscarlataTemplate } from "@/components/templates/CoronaEscarlataTemplate";
+import { JewelryBoxTemplate } from "@/components/templates/JewelryBoxTemplate";
+import { PaseVipTemplate } from "@/components/templates/PaseVipTemplate";
+import { CineAbstractoXvTemplate } from "@/components/templates/CineAbstractoXvTemplate";
+import { AcrylicPopTemplate } from "@/components/templates/AcrylicPopTemplate";
+import { BolaDeDiscotecaTemplate } from "@/components/templates/BolaDeDiscotecaTemplate";
+import { Crystal3dTemplate } from "@/components/templates/Crystal3dTemplate";
+import { FashionTagTemplate } from "@/components/templates/FashionTagTemplate";
+import { CeramicaEditorialTemplate } from "@/components/templates/CeramicaEditorialTemplate";
+import { CineAbstractoTemplate } from "@/components/templates/CineAbstractoTemplate";
+import { PapeleriaDeHotelDeLujoTemplate } from "@/components/templates/PapeleriaDeHotelDeLujoTemplate";
+import { VintageEditorialTemplate } from "@/components/templates/VintageEditorialTemplate";
+import { FashionLookbookTemplate } from "@/components/templates/FashionLookbookTemplate";
+import { MarmolYOroTemplate } from "@/components/templates/MarmolYOroTemplate";
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
 import { NeonTemplateBlackout } from "@/components/templates/NeonTemplateBlackout";
 import { NeonTemplateTropical } from "@/components/templates/NeonTemplateTropical";
@@ -483,6 +496,32 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 return <PrincesaTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
             } else if (validInvitation.templateTipo === 'CORONAESCARLATA') {
                 return <CoronaEscarlataTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'JEWELRYBOX') {
+                return <JewelryBoxTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'PASEVIP') {
+                return <PaseVipTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'CINEABSTRACTOXV') {
+                return <CineAbstractoXvTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'ACRYLICPOP') {
+                return <AcrylicPopTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'BOLADEDISCOTECA') {
+                return <BolaDeDiscotecaTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'CRYSTAL3D') {
+                return <Crystal3dTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'FASHIONTAG') {
+                return <FashionTagTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'CERAMICAEDITORIAL') {
+                return <CeramicaEditorialTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'CINEABSTRACTO') {
+                return <CineAbstractoTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'PAPELERIADEHOTELDELUJO') {
+                return <PapeleriaDeHotelDeLujoTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'VINTAGEEDITORIAL') {
+                return <VintageEditorialTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'FASHIONLOOKBOOK') {
+                return <FashionLookbookTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+            } else if (validInvitation.templateTipo === 'MARMOLYORO') {
+                return <MarmolYOroTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
             } else if (validInvitation.templateTipo === 'MODERNO') {
                 switch (color) {
                     case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;

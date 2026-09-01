@@ -35,6 +35,19 @@ import {
     GUESTPASSVIP_COLORS,
     PRINCESA_COLORS,
     CORONAESCARLATA_COLORS,
+    JEWELRYBOX_COLORS,
+    PASEVIP_COLORS,
+    CINEABSTRACTOXV_COLORS,
+    ACRYLICPOP_COLORS,
+    BOLADEDISCOTECA_COLORS,
+    CRYSTAL3D_COLORS,
+    FASHIONTAG_COLORS,
+    CERAMICAEDITORIAL_COLORS,
+    CINEABSTRACTO_COLORS,
+    PAPELERIADEHOTELDELUJO_COLORS,
+    VINTAGEEDITORIAL_COLORS,
+    FASHIONLOOKBOOK_COLORS,
+    MARMOLYORO_COLORS,
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
@@ -67,6 +80,19 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     GUESTPASSVIP: "Guest Pass VIP",
     PRINCESA: "Princesa",
     CORONAESCARLATA: "Corona Escarlata",
+    JEWELRYBOX: "Jewelry Box",
+    PASEVIP: "Pase VIP",
+    CINEABSTRACTOXV: "Cine Abstracto XV",
+    ACRYLICPOP: "Acrylic Pop",
+    BOLADEDISCOTECA: "Bola de Discoteca",
+    CRYSTAL3D: "Crystal 3D",
+    FASHIONTAG: "Fashion Tag",
+    CERAMICAEDITORIAL: "Cerámica Editorial",
+    CINEABSTRACTO: "Cine Abstracto",
+    PAPELERIADEHOTELDELUJO: "Papelería de Hotel de Lujo",
+    VINTAGEEDITORIAL: "Vintage Editorial",
+    FASHIONLOOKBOOK: "Fashion Lookbook",
+    MARMOLYORO: "Mármol y Oro",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
@@ -94,6 +120,19 @@ const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     GUESTPASSVIP: GUESTPASSVIP_COLORS,
     PRINCESA: PRINCESA_COLORS,
     CORONAESCARLATA: CORONAESCARLATA_COLORS,
+    JEWELRYBOX: JEWELRYBOX_COLORS,
+    PASEVIP: PASEVIP_COLORS,
+    CINEABSTRACTOXV: CINEABSTRACTOXV_COLORS,
+    ACRYLICPOP: ACRYLICPOP_COLORS,
+    BOLADEDISCOTECA: BOLADEDISCOTECA_COLORS,
+    CRYSTAL3D: CRYSTAL3D_COLORS,
+    FASHIONTAG: FASHIONTAG_COLORS,
+    CERAMICAEDITORIAL: CERAMICAEDITORIAL_COLORS,
+    CINEABSTRACTO: CINEABSTRACTO_COLORS,
+    PAPELERIADEHOTELDELUJO: PAPELERIADEHOTELDELUJO_COLORS,
+    VINTAGEEDITORIAL: VINTAGEEDITORIAL_COLORS,
+    FASHIONLOOKBOOK: FASHIONLOOKBOOK_COLORS,
+    MARMOLYORO: MARMOLYORO_COLORS,
 };
 const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
     (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [
@@ -114,11 +153,15 @@ export function StepDesign() {
 
     // Colección Flat (las 22 plantillas de siempre: Elegant, Moderno, etc.)
     // vs. Colección Storytelling (Guest Pass VIP y las que se sumen -- diseño
-    // de componentes fijo, sin elegir portada/tipografía/álbum). Si ya hay
-    // una plantilla elegida, la colección se deduce de ella; si no, se
-    // arranca sin elegir (null) para mostrar el selector de colección.
-    const [collection, setCollection] = useState<Collection | null>(() => {
-        if (!data.templateTipo) return null;
+    // de componentes fijo, sin elegir portada/tipografía/álbum). Antes esto
+    // vivía en dos pantallas separadas (elegir colección, después elegir
+    // plantilla, con un link "← Cambiar de colección" para volver) -- ahora
+    // los botones de colección y "Cambiar plantilla" conviven en la misma
+    // pantalla, así el flujo no se corta en dos pasos. Si ya hay una
+    // plantilla elegida, la colección se deduce de ella; si no, arranca en
+    // Flat (comportamiento de siempre).
+    const [collection, setCollection] = useState<Collection>(() => {
+        if (!data.templateTipo) return "FLAT";
         return isStorytellingTemplate(data.templateTipo) ? "STORYTELLING" : "FLAT";
     });
 
@@ -164,18 +207,22 @@ export function StepDesign() {
             </div>
 
             {isDesignEvent ? (
-                collection === null ? (
-                    <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                    {/* Botones de colección compactos (sin descripción, para
+                        ganar espacio) -- conviven en la misma pantalla que
+                        "Cambiar plantilla" de abajo, ya no son un paso aparte. */}
+                    <div className="grid sm:grid-cols-2 gap-3">
                         <button
                             type="button"
                             onClick={() => setCollection("FLAT")}
-                            className="text-left rounded-xl border-2 border-border hover:border-primary/50 transition-colors p-6 space-y-2"
+                            className={`flex items-center justify-center gap-2 rounded-xl border-2 transition-colors py-3 px-4 font-semibold text-sm ${
+                                collection === "FLAT"
+                                    ? "border-primary bg-primary/10"
+                                    : "border-border hover:border-primary/50"
+                            }`}
                         >
-                            <LayoutGrid className="w-6 h-6 text-muted-foreground" />
-                            <p className="font-semibold">Colección Flat</p>
-                            <p className="text-sm text-muted-foreground">
-                                Diseño tradicional y elegante: vos elegís cada detalle -- portada, tipografía, estilo de álbum y colores -- para una invitación prolija y a tu gusto.
-                            </p>
+                            <LayoutGrid className="w-4 h-4 text-muted-foreground" />
+                            Colección Flat
                         </button>
 
                         {/* Guest Pass VIP (Casamiento) y Princesa (Quince Años) -- cuando se
@@ -185,70 +232,61 @@ export function StepDesign() {
                             <button
                                 type="button"
                                 onClick={() => setCollection("STORYTELLING")}
-                                className="relative text-left rounded-xl border-2 border-border hover:border-primary/50 transition-colors p-6 space-y-2"
+                                className={`relative flex items-center justify-center gap-2 rounded-xl border-2 transition-colors py-3 px-4 font-semibold text-sm ${
+                                    collection === "STORYTELLING"
+                                        ? "border-primary bg-primary/10"
+                                        : "border-border hover:border-primary/50"
+                                }`}
                             >
-                                <span className="absolute top-3 right-3 text-[10px] font-bold tracking-wider uppercase bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                                <span className="absolute top-1.5 right-2 text-[9px] font-bold tracking-wider uppercase bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
                                     Nuevas
                                 </span>
-                                <Sparkles className="w-6 h-6 text-muted-foreground" />
-                                <p className="font-semibold">Colección Storytelling</p>
-                                <p className="text-sm text-muted-foreground">
-                                    Diseño disruptivo, pensado para una invitación memorable: la experiencia viene armada de punta a punta, vos solo cargás los datos reales de tu evento.
-                                </p>
+                                <Sparkles className="w-4 h-4 text-muted-foreground" />
+                                Colección Storytelling
                             </button>
                         )}
                     </div>
-                ) : (
-                    <div className="space-y-4">
-                        <button
-                            type="button"
-                            onClick={() => setCollection(null)}
-                            className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2"
-                        >
-                            ← Cambiar de colección
-                        </button>
 
-                        <div className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border p-8">
-                            {data.templateTipo ? (
-                                <div className="flex items-center gap-3">
-                                    <span
-                                        className="h-10 w-10 rounded-full shadow-sm shrink-0"
-                                        style={{
-                                            backgroundColor: activeColorOption?.color,
-                                            border: TEMPLATE_TIPO_BORDER[activeTemplateTipo],
-                                        }}
-                                    />
-                                    <div className="text-left">
-                                        <p className="font-semibold">{TEMPLATE_TIPO_LABEL[activeTemplateTipo]}</p>
-                                        <p className="text-sm text-muted-foreground">{activeColorOption?.name}</p>
-                                    </div>
+                    <div className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border p-8">
+                        {data.templateTipo ? (
+                            <div className="flex items-center gap-3">
+                                <span
+                                    className="h-10 w-10 rounded-full shadow-sm shrink-0"
+                                    style={{
+                                        backgroundColor: activeColorOption?.color,
+                                        border: TEMPLATE_TIPO_BORDER[activeTemplateTipo],
+                                    }}
+                                />
+                                <div className="text-left">
+                                    <p className="font-semibold">{TEMPLATE_TIPO_LABEL[activeTemplateTipo]}</p>
+                                    <p className="text-sm text-muted-foreground">{activeColorOption?.name}</p>
                                 </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">Todavía no elegiste una plantilla</p>
-                            )}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">Todavía no elegiste una plantilla</p>
+                        )}
 
-                            <Button type="button" size="lg" className="gap-2" onClick={() => setPreviewOpen(true)}>
-                                <Wand2 className="w-4 h-4" />
-                                {data.templateTipo ? 'Cambiar plantilla' : 'Elegir plantilla'}
-                            </Button>
+                        <Button type="button" size="lg" className="gap-2" onClick={() => setPreviewOpen(true)}>
+                            <Wand2 className="w-4 h-4" />
+                            {data.templateTipo ? 'Cambiar plantilla' : 'Elegir plantilla'}
+                        </Button>
 
-                            <TemplatePreviewModal
-                                open={previewOpen}
-                                onOpenChange={setPreviewOpen}
-                                eventType={data.type}
-                                collection={collection}
-                                initialTemplateTipo={activeTemplateTipo}
-                                initialColor={activeColorId}
-                                currentData={data}
-                                onConfirm={(templateTipo, colorId) => {
-                                    setData({ templateTipo });
-                                    setThemeConfig({ colorPrincipal: colorId });
-                                    setPreviewOpen(false);
-                                }}
-                            />
-                        </div>
+                        <TemplatePreviewModal
+                            open={previewOpen}
+                            onOpenChange={setPreviewOpen}
+                            eventType={data.type}
+                            collection={collection}
+                            initialTemplateTipo={activeTemplateTipo}
+                            initialColor={activeColorId}
+                            currentData={data}
+                            onConfirm={(templateTipo, colorId) => {
+                                setData({ templateTipo });
+                                setThemeConfig({ colorPrincipal: colorId });
+                                setPreviewOpen(false);
+                            }}
+                        />
                     </div>
-                )
+                </div>
             ) : (
                 <>
                     <TemplateSelector 
