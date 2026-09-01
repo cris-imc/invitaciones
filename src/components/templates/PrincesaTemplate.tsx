@@ -1818,7 +1818,7 @@ const PRC_CSS = `
   .prc-song-submit:hover { color: #F7E9F0; }
   .prc-song-submit:disabled { color: #6E6A5D; cursor: default; }
   .prc-song-error { font-size: 10px; color: #B48CC9; margin-top: 6px; }
-  .prc-song-list { display: flex; flex-direction: column; margin-top: 14px; }
+  .prc-song-list { display: flex; flex-direction: column; margin-top: 14px; max-height: 180px; overflow-y: auto; }
   .prc-song-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-family: var(--prc-mono), monospace; }
   .prc-song-item-title { font-size: 11.5px; letter-spacing: 0.04em; color: #F4F1EA; }
   .prc-song-item-by { font-size: 9.5px; letter-spacing: 0.1em; color: #6E6A5D; }

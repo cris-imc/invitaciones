@@ -1817,7 +1817,7 @@ const CNE_CSS = `
   .cne-song-submit:hover { color: #F6EFDD; }
   .cne-song-submit:disabled { color: #6E6A5D; cursor: default; }
   .cne-song-error { font-size: 10px; color: #D9A441; margin-top: 6px; }
-  .cne-song-list { display: flex; flex-direction: column; margin-top: 14px; }
+  .cne-song-list { display: flex; flex-direction: column; margin-top: 14px; max-height: 180px; overflow-y: auto; }
   .cne-song-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-family: var(--cne-mono), monospace; }
   .cne-song-item-title { font-size: 11.5px; letter-spacing: 0.04em; color: #F4F1EA; }
   .cne-song-item-by { font-size: 9.5px; letter-spacing: 0.1em; color: #6E6A5D; }

@@ -1885,7 +1885,7 @@ const GP_CSS = `
   .gpv-song-submit:hover { color: #E8D6A8; }
   .gpv-song-submit:disabled { color: #6E6A5D; cursor: default; }
   .gpv-song-error { font-size: 10px; color: #C8A45C; margin-top: 6px; }
-  .gpv-song-list { display: flex; flex-direction: column; margin-top: 14px; }
+  .gpv-song-list { display: flex; flex-direction: column; margin-top: 14px; max-height: 180px; overflow-y: auto; }
   .gpv-song-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-family: var(--gp-mono), monospace; }
   .gpv-song-item-title { font-size: 11.5px; letter-spacing: 0.04em; color: #F4F1EA; }
   .gpv-song-item-by { font-size: 9.5px; letter-spacing: 0.1em; color: #6E6A5D; }
