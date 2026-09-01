@@ -48,6 +48,10 @@ import {
     VINTAGEEDITORIAL_COLORS,
     FASHIONLOOKBOOK_COLORS,
     MARMOLYORO_COLORS,
+    ATELIERDEPAPEL_COLORS,
+    BOTANICAEDITORIAL_COLORS,
+    ENCAJECONTEMPORANEO_COLORS,
+    LIQUIDGLASS_COLORS,
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
@@ -93,6 +97,10 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     VINTAGEEDITORIAL: "Vintage Editorial",
     FASHIONLOOKBOOK: "Fashion Lookbook",
     MARMOLYORO: "Mármol y Oro",
+    ATELIERDEPAPEL: "Atelier de Papel",
+    BOTANICAEDITORIAL: "Botánica Editorial",
+    ENCAJECONTEMPORANEO: "Encaje Contemporáneo",
+    LIQUIDGLASS: "Liquid Glass",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
@@ -133,6 +141,10 @@ const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     VINTAGEEDITORIAL: VINTAGEEDITORIAL_COLORS,
     FASHIONLOOKBOOK: FASHIONLOOKBOOK_COLORS,
     MARMOLYORO: MARMOLYORO_COLORS,
+    ATELIERDEPAPEL: ATELIERDEPAPEL_COLORS,
+    BOTANICAEDITORIAL: BOTANICAEDITORIAL_COLORS,
+    ENCAJECONTEMPORANEO: ENCAJECONTEMPORANEO_COLORS,
+    LIQUIDGLASS: LIQUIDGLASS_COLORS,
 };
 const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
     (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [
@@ -182,6 +194,18 @@ export function StepDesign() {
     const activeColorId = themeConfig?.colorPrincipal || 'default';
     const activeColorList = TEMPLATE_TIPO_COLORS[activeTemplateTipo];
     const activeColorOption = activeColorList.find(c => c.id === activeColorId) ?? activeColorList[0];
+
+    // Plantilla realmente guardada -- a diferencia de activeTemplateTipo (que
+    // depende de qué botón de colección está tildado, solo para saber qué
+    // mostrarle de entrada al modal), esto NO cambia al tocar Flat/Storytelling,
+    // así la tarjeta de "plantilla actual" no da la falsa impresión de que ya
+    // se seleccionó algo nuevo con solo tocar el botón de colección.
+    const currentTemplateTipo: TemplateTipo | null =
+        data.templateTipo && (data.templateTipo as string) in TEMPLATE_TIPO_LABEL
+            ? (data.templateTipo as TemplateTipo)
+            : null;
+    const currentColorList = currentTemplateTipo ? TEMPLATE_TIPO_COLORS[currentTemplateTipo] : null;
+    const currentColorOption = currentColorList ? (currentColorList.find(c => c.id === activeColorId) ?? currentColorList[0]) : null;
 
     const handleTemplateSelect = (templateId: string) => {
         setData({ templateTipo: templateId });
@@ -238,28 +262,29 @@ export function StepDesign() {
                                         : "border-border hover:border-primary/50"
                                 }`}
                             >
-                                <span className="absolute top-1.5 right-2 text-[9px] font-bold tracking-wider uppercase bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
+                                <span className="absolute -top-2 -right-2 text-[9px] font-bold tracking-wider uppercase bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full shadow-sm">
                                     Nuevas
                                 </span>
-                                <Sparkles className="w-4 h-4 text-muted-foreground" />
-                                Colección Storytelling
+                                <Sparkles className="w-4 h-4 text-muted-foreground shrink-0" />
+                                <span>Colección Storytelling</span>
                             </button>
                         )}
                     </div>
 
                     <div className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border p-8">
-                        {data.templateTipo ? (
+                        {currentTemplateTipo ? (
                             <div className="flex items-center gap-3">
                                 <span
                                     className="h-10 w-10 rounded-full shadow-sm shrink-0"
                                     style={{
-                                        backgroundColor: activeColorOption?.color,
-                                        border: TEMPLATE_TIPO_BORDER[activeTemplateTipo],
+                                        backgroundColor: currentColorOption?.color,
+                                        border: TEMPLATE_TIPO_BORDER[currentTemplateTipo],
                                     }}
                                 />
                                 <div className="text-left">
-                                    <p className="font-semibold">{TEMPLATE_TIPO_LABEL[activeTemplateTipo]}</p>
-                                    <p className="text-sm text-muted-foreground">{activeColorOption?.name}</p>
+                                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Plantilla actual</p>
+                                    <p className="font-semibold">{TEMPLATE_TIPO_LABEL[currentTemplateTipo]}</p>
+                                    <p className="text-sm text-muted-foreground">{currentColorOption?.name}</p>
                                 </div>
                             </div>
                         ) : (
@@ -268,7 +293,7 @@ export function StepDesign() {
 
                         <Button type="button" size="lg" className="gap-2" onClick={() => setPreviewOpen(true)}>
                             <Wand2 className="w-4 h-4" />
-                            {data.templateTipo ? 'Cambiar plantilla' : 'Elegir plantilla'}
+                            {collection === "STORYTELLING" ? "Ver Modelos Storytelling" : "Ver Modelos Flat"}
                         </Button>
 
                         <TemplatePreviewModal

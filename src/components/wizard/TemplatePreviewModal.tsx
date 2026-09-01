@@ -50,6 +50,10 @@ import {
   VINTAGEEDITORIAL_COLORS,
   FASHIONLOOKBOOK_COLORS,
   MARMOLYORO_COLORS,
+  ATELIERDEPAPEL_COLORS,
+  BOTANICAEDITORIAL_COLORS,
+  ENCAJECONTEMPORANEO_COLORS,
+  LIQUIDGLASS_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
@@ -75,6 +79,10 @@ export {
   VINTAGEEDITORIAL_COLORS,
   FASHIONLOOKBOOK_COLORS,
   MARMOLYORO_COLORS,
+  ATELIERDEPAPEL_COLORS,
+  BOTANICAEDITORIAL_COLORS,
+  ENCAJECONTEMPORANEO_COLORS,
+  LIQUIDGLASS_COLORS,
   type TemplateTipo,
 };
 
@@ -120,6 +128,10 @@ export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
   VINTAGEEDITORIAL: "#C9A66B",
   FASHIONLOOKBOOK: "#D93A2B",
   MARMOLYORO: "#C9A45C",
+  ATELIERDEPAPEL: "#7A6852",
+  BOTANICAEDITORIAL: "#5A6E4E",
+  ENCAJECONTEMPORANEO: "#A6491F",
+  LIQUIDGLASS: "#6FA8C9",
 };
 
 const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
@@ -161,6 +173,10 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
   { tipo: "VINTAGEEDITORIAL", label: "Vintage Editorial" },
   { tipo: "FASHIONLOOKBOOK", label: "Fashion Lookbook" },
   { tipo: "MARMOLYORO", label: "Mármol y Oro" },
+  { tipo: "ATELIERDEPAPEL", label: "Atelier de Papel" },
+  { tipo: "BOTANICAEDITORIAL", label: "Botánica Editorial" },
+  { tipo: "ENCAJECONTEMPORANEO", label: "Encaje Contemporáneo" },
+  { tipo: "LIQUIDGLASS", label: "Liquid Glass" },
 ];
 
 // Neon ("Doodle Disco 15") solo se ofrece para 15 años y Evento (CUMPLEANOS),
@@ -170,7 +186,7 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] = [
 // de evento -- ver esa tabla para el detalle de cada una.
 function getAvailableTabs(eventType: string | undefined, collection: "FLAT" | "STORYTELLING"): { tipo: TemplateTipo; label: string }[] {
   const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D", "PRINCESA", "CORONAESCARLATA", "JEWELRYBOX", "PASEVIP", "CINEABSTRACTOXV", "ACRYLICPOP", "BOLADEDISCOTECA", "CRYSTAL3D", "FASHIONTAG", "FASHIONLOOKBOOK"]);
-  const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "MARMOLYORO"]);
+  const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "MARMOLYORO", "ATELIERDEPAPEL", "BOTANICAEDITORIAL", "ENCAJECONTEMPORANEO", "LIQUIDGLASS"]);
   const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
@@ -224,6 +240,10 @@ const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
   VINTAGEEDITORIAL: VINTAGEEDITORIAL_COLORS,
   FASHIONLOOKBOOK: FASHIONLOOKBOOK_COLORS,
   MARMOLYORO: MARMOLYORO_COLORS,
+  ATELIERDEPAPEL: ATELIERDEPAPEL_COLORS,
+  BOTANICAEDITORIAL: BOTANICAEDITORIAL_COLORS,
+  ENCAJECONTEMPORANEO: ENCAJECONTEMPORANEO_COLORS,
+  LIQUIDGLASS: LIQUIDGLASS_COLORS,
 };
 
 function getColorsForTipo(tipo: TemplateTipo) {

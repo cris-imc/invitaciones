@@ -28,7 +28,7 @@ export interface WizardStepDef {
 // GuestPassVipTemplate.tsx). El resto de los pasos (datos reales: salón,
 // ceremonia, cronograma, galería, música, banco, trivia, info adicional)
 // se comparten igual que con la Colección Flat.
-export const STORYTELLING_TEMPLATE_TIPOS = new Set(["GUESTPASSVIP", "PRINCESA", "CORONAESCARLATA", "JEWELRYBOX", "PASEVIP", "CINEABSTRACTOXV", "ACRYLICPOP", "BOLADEDISCOTECA", "CRYSTAL3D", "FASHIONTAG", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "FASHIONLOOKBOOK", "MARMOLYORO"]);
+export const STORYTELLING_TEMPLATE_TIPOS = new Set(["GUESTPASSVIP", "PRINCESA", "CORONAESCARLATA", "JEWELRYBOX", "PASEVIP", "CINEABSTRACTOXV", "ACRYLICPOP", "BOLADEDISCOTECA", "CRYSTAL3D", "FASHIONTAG", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "FASHIONLOOKBOOK", "MARMOLYORO", "ATELIERDEPAPEL", "BOTANICAEDITORIAL", "ENCAJECONTEMPORANEO", "LIQUIDGLASS"]);
 
 export function isStorytellingTemplate(templateTipo: string | null | undefined): boolean {
     return Boolean(templateTipo && STORYTELLING_TEMPLATE_TIPOS.has(templateTipo));

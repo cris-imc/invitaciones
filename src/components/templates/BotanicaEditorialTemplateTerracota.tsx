@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * BotanicaEditorialTemplate.tsx
+ * BotanicaEditorialTemplateTerracota.tsx
  *
  * Portado 1:1 desde el mockup "Botanica Editorial - Panoramica" (Colección
- * Storytelling, evento Casamiento): fondo verde-negro casi opaco (#0A0D08),
- * acentos verde oliva/salvia (#5A6E4E / #A8B79A) con un toque de foil dorado
+ * Storytelling, evento Casamiento): fondo verde-negro casi opaco (#120D08),
+ * acentos verde oliva/salvia (#8A5A3E / #C2A05A) con un toque de foil dorado
  * reservado a los CTA y al riel lateral, Cormorant Garamond + IBM Plex Mono,
  * medallón circular con texto en arco (iniciales de la pareja), ticket/lámina
  * perforada, portada con textura de lino diagonal (motivo de herbario de
@@ -95,7 +95,7 @@ interface GuestRecord {
   orderNumber?: number;
 }
 
-interface BotanicaEditorialTemplateProps {
+interface BotanicaEditorialTemplateTerracotaProps {
   invitation: Record<string, unknown>;
   guest?: GuestRecord | null;
   isPersonalized?: boolean;
@@ -110,7 +110,7 @@ function passNumberFrom(orderNumber: number | undefined): string {
   return String(orderNumber).padStart(3, "0");
 }
 
-export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = false }: BotanicaEditorialTemplateProps) {
+export function BotanicaEditorialTemplateTerracota({ invitation, guest, isPersonalized = false }: BotanicaEditorialTemplateTerracotaProps) {
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
   const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
@@ -362,11 +362,11 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
     window.setTimeout(() => {
       if (statusRef.current) {
         statusRef.current.textContent = "ACCESO CONFIRMADO";
-        statusRef.current.style.color = "#A8B79A";
+        statusRef.current.style.color = "#C2A05A";
       }
       if (stubRef.current) {
-        stubRef.current.style.borderColor = "#5A6E4E";
-        stubRef.current.style.boxShadow = "0 0 0 1px rgba(200,164,92,.35), 0 18px 50px -30px #5A6E4E";
+        stubRef.current.style.borderColor = "#8A5A3E";
+        stubRef.current.style.boxShadow = "0 0 0 1px rgba(200,164,92,.35), 0 18px 50px -30px #8A5A3E";
       }
       if (sealRef.current) {
         sealRef.current.style.opacity = "1";
@@ -505,7 +505,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           const dots = pan.querySelectorAll<HTMLElement>("[data-dot]");
           const active = Math.min(n - 1, Math.round(eased * (n - 1)));
           dots.forEach((dot, i) => {
-            dot.style.background = i === active ? "#3E4E36" : "rgba(20,20,27,0.18)";
+            dot.style.background = i === active ? "#63381F" : "rgba(20,20,27,0.18)";
           });
         });
 
@@ -547,7 +547,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           if (railRef.current) railRef.current.style.borderLeftColor = light ? "rgba(20,20,27,0.14)" : "rgba(200,164,92,0.14)";
           if (railLineRef.current) railLineRef.current.style.background = light ? "rgba(20,20,27,0.14)" : "rgba(200,164,92,0.16)";
           if (railTopRef.current) railTopRef.current.style.color = light ? "#7C7768" : "#8A8577";
-          if (railLabelRef.current) railLabelRef.current.style.color = light ? "#3E4E36" : "#5A6E4E";
+          if (railLabelRef.current) railLabelRef.current.style.color = light ? "#63381F" : "#8A5A3E";
         }
         if (hintRef.current && sc.scrollTop > 40) hintRef.current.style.opacity = "0";
       }
@@ -650,7 +650,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
         width: "100%",
         height: "calc(var(--vh, 1vh) * 100)",
         overflow: "hidden",
-        background: "#0A0D08",
+        background: "#120D08",
         fontFamily: "var(--bte-mono), monospace",
         color: "#F4F1EA",
       }}
@@ -658,7 +658,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
       <style>{BTE_CSS}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="bte-scroller">
-        <section data-tone="dark" data-screen-label="Save the Date" className="bte-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0E120C 55%, #0A0D08 100%)" }}>
+        <section data-tone="dark" data-screen-label="Save the Date" className="bte-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #26180A 0%, #180F08 55%, #120D08 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bte-kicker">01 — GUARDÁ LA FECHA</span>
           <div className="bte-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="bte-date-num">{dayNum}</span>
@@ -673,8 +673,8 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           <p data-xin="1" data-delay="460" className="bte-lead">{portadaMensaje}</p>
 
           <svg data-leaf="1" viewBox="0 0 200 400" className="bte-leaf-deco" aria-hidden="true">
-            <path d="M100 398 C92 340 108 300 92 250 C78 205 100 175 84 130 C70 90 92 70 66 30" fill="none" stroke="#8DA07C" strokeWidth={1.4} />
-            <g fill="none" stroke="#8DA07C" strokeWidth={1.1}>
+            <path d="M100 398 C92 340 108 300 92 250 C78 205 100 175 84 130 C70 90 92 70 66 30" fill="none" stroke="#C08A6A" strokeWidth={1.4} />
+            <g fill="none" stroke="#C08A6A" strokeWidth={1.1}>
               <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(96,375) rotate(200) scale(0.8)" />
               <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(90,345) rotate(-20) scale(0.85)" />
               <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(84,315) rotate(195) scale(0.9)" />
@@ -692,7 +692,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           </div>
         </section>
 
-        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="bte-section bte-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1B2114 0%, #0F130C 55%, #0A0D08 100%)" }}>
+        <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="bte-section bte-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #2C1A0C 0%, #1A0F08 55%, #120D08 100%)" }}>
           <div className="bte-scan-grid" />
           <div className="bte-scanline" />
           <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>02 — FLORECE EN</span>
@@ -705,7 +705,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           <div className="bte-perf-strip" />
         </section>
 
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="bte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #0A0D08 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label="Frase" className="bte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #301C10 0%, #170D0A 52%, #120D08 100%)" }}>
           <div data-drift="-130" className="bte-glow-blob" />
           <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="bte-phrase" style={{ fontSize: fraseFontSize }}>
@@ -790,8 +790,8 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
 
               <div data-tone="light" className="bte-panel bte-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
                 <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="bte-route-svg">
-                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#3E4E36" strokeWidth={1.6} />
-                  <circle cx={282} cy={40} r={5} fill="#3E4E36" />
+                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#63381F" strokeWidth={1.6} />
+                  <circle cx={282} cy={40} r={5} fill="#63381F" />
                 </svg>
                 <div className="bte-panel-block">
                   <span className="bte-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
@@ -805,7 +805,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
                 </div>
               </div>
 
-              <div data-tone="dark" className="bte-panel bte-panel--center" style={{ background: "#0E120C", color: "#F4F1EA" }}>
+              <div data-tone="dark" className="bte-panel bte-panel--center" style={{ background: "#180F08", color: "#F4F1EA" }}>
                 <div className="bte-medallion bte-medallion--lg">
                   <BteMedallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`LÁMINA Nº ${passNumber}`} arcId="bteArc2" arcText={`ACCESO VIP · LÁMINA Nº ${passNumber} · `} spin="reverse" title="Reservado" />
                 </div>
@@ -816,7 +816,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           </div>
         </div>
 
-        <section data-tone="dark" data-screen-label="Check-in" className="bte-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #0E120C 60%, #0A0D08 100%)" }}>
+        <section data-tone="dark" data-screen-label="Check-in" className="bte-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #26180A 0%, #180F08 60%, #120D08 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bte-kicker">05 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bte-h2">
             Confirmá<br /><span className="bte-accent-italic">tu acceso</span>
@@ -895,7 +895,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
                 <h2 className="bte-panel-title">Todo lo que<br /><span className="bte-accent-serif">vamos a recordar</span></h2>
                 <div className="bte-album-embed">
                   {livePhotos.length > 0 ? (
-                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#3E4E36" />
+                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#63381F" />
                   ) : (
                     <div className="bte-live-placeholder">
                       <span className="bte-mini-label">
@@ -913,12 +913,12 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="bte-section" style={{ background: "#0E120C" }}>
+          <section id="music" data-tone="dark" data-screen-label="Música" className="bte-section" style={{ background: "#180F08" }}>
             <span data-xin="1" data-dist="-60" className="bte-kicker">07 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2">¿Qué flor<br /><span className="bte-accent-italic">nos representa?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bte-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
-                <span key={i} className="bte-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#A8B79A" : "#5A6E4E" }} />
+                <span key={i} className="bte-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#C2A05A" : "#8A5A3E" }} />
               ))}
             </div>
             <div data-xin="1" data-delay="240" data-dist="110" className="bte-song-wrap">
@@ -932,7 +932,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bte-section" style={{ background: "#0E120C" }}>
+          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bte-section" style={{ background: "#180F08" }}>
             <span data-xin="1" data-dist="-60" className="bte-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2">
               Si querés<br /><span className="bte-accent-italic">sumarte</span>
@@ -949,7 +949,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
                     alias: String(invitation.pagoTarjetaAlias || ""),
                     titular: String(invitation.pagoTarjetaTitular || ""),
                   }}
-                  accentColor="#5A6E4E"
+                  accentColor="#8A5A3E"
                   cardBg="rgba(20,20,27,0.72)"
                   cardBorder="#2A2417"
                   textPrimary="#F4F1EA"
@@ -969,7 +969,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
                     alias: String(invitation.regaloAlias || ""),
                     titular: String(invitation.regaloTitular || ""),
                   }}
-                  accentColor="#5A6E4E"
+                  accentColor="#8A5A3E"
                   cardBg="rgba(20,20,27,0.72)"
                   cardBorder="#2A2417"
                   textPrimary="#F4F1EA"
@@ -983,7 +983,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
         )}
 
         {quizEnabled && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bte-section" style={{ background: "#0E120C" }}>
+          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bte-section" style={{ background: "#180F08" }}>
             <span data-xin="1" data-dist="-60" className="bte-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
@@ -999,7 +999,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu lámina" className="bte-section bte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0E120C 55%, #0A0D08 100%)" }}>
+        <section data-tone="dark" data-screen-label="Tu lámina" className="bte-section bte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #26180A 0%, #180F08 55%, #120D08 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bte-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bte-final-card">
             <div className="bte-medallion bte-medallion--final">
@@ -1731,8 +1731,8 @@ const BTE_CSS = `
   .bte-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .bte-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  a { color: #5A6E4E; text-decoration: none; }
-  a:hover { color: #A8B79A; }
+  a { color: #8A5A3E; text-decoration: none; }
+  a:hover { color: #C2A05A; }
 
   @keyframes bteFoil { to { transform: rotate(360deg); } }
   @keyframes bteRing { to { transform: rotate(360deg); } }
@@ -1754,10 +1754,10 @@ const BTE_CSS = `
   .bte-date-stack { display: flex; flex-direction: column; gap: 2px; }
   .bte-date-num { font-family: var(--bte-serif), serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.82; letter-spacing: -0.04em; }
   .bte-date-num--right { text-align: right; line-height: 0.86; }
-  .bte-date-month { font-family: var(--bte-serif), serif; font-style: italic; font-size: clamp(50px, 18vw, 104px); line-height: 0.9; color: #5A6E4E; padding-left: 12%; }
+  .bte-date-month { font-family: var(--bte-serif), serif; font-style: italic; font-size: clamp(50px, 18vw, 104px); line-height: 0.9; color: #8A5A3E; padding-left: 12%; }
 
   .bte-divider { display: flex; align-items: center; gap: 16px; font-size: 10px; letter-spacing: 0.26em; color: #8A8577; }
-  .bte-divider-line { width: 52px; height: 1px; background: #5A6E4E; display: inline-block; }
+  .bte-divider-line { width: 52px; height: 1px; background: #8A5A3E; display: inline-block; }
   .bte-divider-line--long { width: 64px; }
 
   .bte-lead { margin: 0; font-family: var(--bte-serif), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
@@ -1768,38 +1768,38 @@ const BTE_CSS = `
   .bte-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }
   .bte-medallion--lg { width: clamp(130px, 34vw, 178px); aspect-ratio: 1; margin: 0 auto; }
   .bte-medallion--final { width: clamp(104px, 26vw, 132px); aspect-ratio: 1; margin: -12px auto 0; }
-  .bte-medallion-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #3E4E36, #8C6F35, #5A6E4E, #A8B79A, #3E4E36); filter: saturate(.75); }
+  .bte-medallion-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #63381F, #8C6F35, #8A5A3E, #C2A05A, #63381F); filter: saturate(.75); }
   .bte-medallion-core { position: absolute; inset: 3px; border-radius: 50%; background: #0C0C11; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-align: center; padding: 6px; }
-  .bte-medallion-label { font-family: var(--bte-serif), serif; font-size: 26px; line-height: 1; color: #A8B79A; }
-  .bte-medallion-label-sm { font-family: var(--bte-serif), serif; font-size: 16px; color: #A8B79A; }
+  .bte-medallion-label { font-family: var(--bte-serif), serif; font-size: 26px; line-height: 1; color: #C2A05A; }
+  .bte-medallion-label-sm { font-family: var(--bte-serif), serif; font-size: 16px; color: #C2A05A; }
   .bte-medallion-sub { font-size: 6.5px; letter-spacing: 0.24em; color: #8A8577; }
-  .bte-medallion-sub--accent { color: #5A6E4E; }
+  .bte-medallion-sub--accent { color: #8A5A3E; }
   .bte-medallion-arc { position: absolute; inset: -14%; }
   /* Opacity baja a propósito: el anillo gira sin parar, así que en algún
      momento de su vuelta una letra del texto del arco queda justo al lado de
      la etiqueta central y, al ser el mismo color/fuente, se leen como una
      sola palabra pegada. Atenuado no compite con el texto del centro y se
      lee como textura decorativa del anillo. */
-  .bte-medallion-arc-text { font-size: 7px; letter-spacing: 1.6px; fill: #5A6E4E; opacity: 0.4; font-family: var(--bte-mono), monospace; }
+  .bte-medallion-arc-text { font-size: 7px; letter-spacing: 1.6px; fill: #8A5A3E; opacity: 0.4; font-family: var(--bte-mono), monospace; }
 
   .bte-scan-grid { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(200,164,92,0.06) 0 1px, transparent 1px 5px); pointer-events: none; }
-  .bte-scanline { position: absolute; left: 0; right: 0; top: 30%; height: 2px; background: linear-gradient(90deg, transparent, #A8B79A, transparent); animation: bteScan 6s linear infinite; pointer-events: none; }
+  .bte-scanline { position: absolute; left: 0; right: 0; top: 30%; height: 2px; background: linear-gradient(90deg, transparent, #C2A05A, transparent); animation: bteScan 6s linear infinite; pointer-events: none; }
 
   .bte-cd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; }
   .bte-cd-box { border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
   .bte-cd-num { font-family: var(--bte-serif), serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #F6EFDD; display: inline-block; }
-  .bte-cd-num--accent { color: #A8B79A; }
-  .bte-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #5A6E4E; }
-  .bte-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #0A0D08 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
+  .bte-cd-num--accent { color: #C2A05A; }
+  .bte-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #8A5A3E; }
+  .bte-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #120D08 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .bte-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
 
-  .bte-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(90,110,78,0.36), rgba(192,138,91,0.24), rgba(141,160,124,0.4), rgba(90,110,78,0.36)); filter: blur(80px); opacity: .4; animation: bteFoil 30s linear infinite; }
+  .bte-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(138,90,62,0.36), rgba(192,138,91,0.24), rgba(192,138,106,0.4), rgba(138,90,62,0.36)); filter: blur(80px); opacity: .4; animation: bteFoil 30s linear infinite; }
   .bte-phrase { margin: 0; position: relative; font-family: var(--bte-serif), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
-  .bte-accent-italic { font-style: italic; color: #5A6E4E; }
-  .bte-accent-phrase { font-style: italic; color: #8DA07C; }
-  .bte-accent-serif { font-style: italic; color: #3E4E36; font-family: var(--bte-serif), serif; }
-  .bte-accent-serif-2 { color: #3E4E36; }
-  .bte-accent-dark-2 { color: #5A6E4E; }
+  .bte-accent-italic { font-style: italic; color: #8A5A3E; }
+  .bte-accent-phrase { font-style: italic; color: #C08A6A; }
+  .bte-accent-serif { font-style: italic; color: #63381F; font-family: var(--bte-serif), serif; }
+  .bte-accent-serif-2 { color: #63381F; }
+  .bte-accent-dark-2 { color: #8A5A3E; }
   .bte-h2 { margin: 0; font-family: var(--bte-serif), serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96; }
 
   .bte-pan { height: 260vh; position: relative; }
@@ -1820,15 +1820,15 @@ const BTE_CSS = `
   .bte-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .bte-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .bte-facts-row--last { border-bottom: none; padding-bottom: 0; }
-  .bte-seguir { position: relative; display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: 0.26em; color: #3E4E36; margin-top: auto; }
+  .bte-seguir { position: relative; display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: 0.26em; color: #63381F; margin-top: auto; }
   .bte-seguir--split { justify-content: space-between; }
   .bte-side-hint { display: inline-block; animation: bteSide 2.2s ease-in-out infinite; }
   .bte-route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .bte-link-cta { font-size: 10px; letter-spacing: 0.24em; color: #3E4E36; }
+  .bte-link-cta { font-size: 10px; letter-spacing: 0.24em; color: #63381F; }
 
   .bte-crono { position: relative; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
   .bte-crono-row { display: flex; align-items: baseline; gap: 14px; font-size: 11px; letter-spacing: 0.1em; color: #4A473F; border-bottom: 1px solid #D6D1C4; padding-bottom: 8px; }
-  .bte-crono-time { font-family: var(--bte-mono), monospace; color: #3E4E36; min-width: 42px; }
+  .bte-crono-time { font-family: var(--bte-mono), monospace; color: #63381F; min-width: 42px; }
   .bte-crono-title { flex: 1; }
 
   .bte-dots { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
@@ -1838,30 +1838,30 @@ const BTE_CSS = `
   .bte-stub-top { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.24em; color: #8A8577; }
   .bte-stub-status { color: #6E6A5D; transition: color 400ms ease; }
   .bte-seal { width: 62px; aspect-ratio: 1; position: relative; opacity: .25; transform: scale(.86); transition: opacity 700ms ease, transform 700ms cubic-bezier(.16,1,.3,1); align-self: center; }
-  .bte-beam { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #A8B79A, transparent); opacity: 0; transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
+  .bte-beam { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #C2A05A, transparent); opacity: 0; transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
 
   .bte-rsvp { display: flex; flex-direction: column; gap: 22px; width: 100%; max-width: 420px; font-family: var(--bte-mono), monospace; }
   .bte-rsvp-rows { display: flex; flex-direction: column; }
-  .bte-rsvp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(90,110,78,0.18); font-size: 10.5px; letter-spacing: 0.18em; color: #8A8577; }
+  .bte-rsvp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(138,90,62,0.18); font-size: 10.5px; letter-spacing: 0.18em; color: #8A8577; }
   .bte-rsvp-row > span:first-child { flex-shrink: 0; }
   .bte-rsvp-row > span:last-child { color: #F4F1EA; letter-spacing: 0.02em; text-align: right; }
   .bte-rsvp-row--payment { align-items: flex-start; }
   .bte-rsvp-payment-value { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .bte-rsvp-payment-total { color: #A8B79A; font-size: 13px; letter-spacing: 0.02em; font-weight: 600; }
+  .bte-rsvp-payment-total { color: #C2A05A; font-size: 13px; letter-spacing: 0.02em; font-weight: 600; }
   .bte-rsvp-payment-detail { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 9px; letter-spacing: 0.05em; color: #8A8577; }
   .bte-rsvp-stepper { display: flex; align-items: center; gap: 12px; }
-  .bte-rsvp-stepper button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #5A6E4E; background: transparent; color: #5A6E4E; font-size: 14px; line-height: 1; cursor: pointer; }
+  .bte-rsvp-stepper button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #8A5A3E; background: transparent; color: #8A5A3E; font-size: 14px; line-height: 1; cursor: pointer; }
   .bte-rsvp-stepper button:disabled { opacity: 0.3; cursor: default; }
   .bte-rsvp-stepper span { font-family: var(--bte-mono), monospace; color: #F4F1EA; min-width: 20px; text-align: center; }
-  .bte-rsvp-input { background: transparent; border: none; border-bottom: 1px solid rgba(90,110,78,0.3); color: #F4F1EA; font-family: var(--bte-mono), monospace; font-size: 11px; letter-spacing: 0.02em; padding: 4px 2px; text-align: right; max-width: 55%; }
+  .bte-rsvp-input { background: transparent; border: none; border-bottom: 1px solid rgba(138,90,62,0.3); color: #F4F1EA; font-family: var(--bte-mono), monospace; font-size: 11px; letter-spacing: 0.02em; padding: 4px 2px; text-align: right; max-width: 55%; }
   .bte-rsvp-input::placeholder { color: #6E6A5D; }
-  .bte-rsvp-input:focus { outline: none; border-bottom-color: #5A6E4E; }
-  .bte-rsvp-btn { width: 100%; padding: 16px; font-family: var(--bte-mono), monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; border: 1px solid #5A6E4E; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
+  .bte-rsvp-input:focus { outline: none; border-bottom-color: #8A5A3E; }
+  .bte-rsvp-btn { width: 100%; padding: 16px; font-family: var(--bte-mono), monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; border: 1px solid #8A5A3E; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
   .bte-rsvp-btn:hover:not(:disabled) { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0B0B0F; }
   .bte-rsvp-btn:disabled { opacity: 0.6; cursor: default; }
-  .bte-rsvp-btn--ghost { background: transparent; color: #5A6E4E; }
-  .bte-rsvp-btn--ghost:hover:not(:disabled) { background: rgba(90,110,78,0.12); color: #5A6E4E; }
-  .bte-rsvp-error { font-size: 10px; letter-spacing: 0.06em; color: #5A6E4E; margin: 0; }
+  .bte-rsvp-btn--ghost { background: transparent; color: #8A5A3E; }
+  .bte-rsvp-btn--ghost:hover:not(:disabled) { background: rgba(138,90,62,0.12); color: #8A5A3E; }
+  .bte-rsvp-error { font-size: 10px; letter-spacing: 0.06em; color: #8A5A3E; margin: 0; }
   .bte-rsvp-declined { display: flex; flex-direction: column; gap: 18px; align-items: center; text-align: center; max-width: 380px; }
   .bte-rsvp-declined-text { margin: 0; font-family: var(--bte-serif), serif; font-style: italic; font-size: 18px; line-height: 1.4; color: #A8A292; }
 
@@ -1884,28 +1884,28 @@ const BTE_CSS = `
   .bte-mosaic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
   .bte-bank-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 420px; margin: 0; }
-  .bte-bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(90,110,78,0.18); }
+  .bte-bank-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(138,90,62,0.18); }
   .bte-bank-row:last-child { border-bottom: none; }
   .bte-bank-row-label { display: block; font-size: 9px; letter-spacing: 0.2em; color: #8A8577; margin-bottom: 3px; }
   .bte-bank-row-value { font-size: 12px; color: #F4F1EA; word-break: break-all; }
-  .bte-bank-copy { flex-shrink: 0; font-family: var(--bte-mono), monospace; font-size: 10px; letter-spacing: 0.1em; padding: 7px 12px; border: 1px solid #5A6E4E; background: transparent; color: #5A6E4E; cursor: pointer; }
-  .bte-bank-copy:hover { background: rgba(90,110,78,0.12); }
+  .bte-bank-copy { flex-shrink: 0; font-family: var(--bte-mono), monospace; font-size: 10px; letter-spacing: 0.1em; padding: 7px 12px; border: 1px solid #8A5A3E; background: transparent; color: #8A5A3E; cursor: pointer; }
+  .bte-bank-copy:hover { background: rgba(138,90,62,0.12); }
 
   .bte-eq { display: flex; align-items: flex-end; gap: 5px; height: 52px; }
   .bte-eq-bar { width: 4px; height: 100%; transform-origin: bottom; animation: bteEq 1.1s ease-in-out infinite; display: inline-block; }
   .bte-song-wrap { font-family: var(--bte-mono), monospace; }
 
   .bte-song { position: relative; width: 100%; max-width: 420px; margin: 0 auto; }
-  .bte-song-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(90,110,78,0.3); padding-bottom: 12px; }
+  .bte-song-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(138,90,62,0.3); padding-bottom: 12px; }
   .bte-song-inputs { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; text-transform: uppercase; }
-  .bte-song-input { background: transparent; border: none; border-bottom: 1px solid rgba(90,110,78,0.3); color: #F4F1EA; font-family: var(--bte-mono), monospace; font-size: 12px; padding: 6px 2px; min-width: 0; flex: 1; }
+  .bte-song-input { background: transparent; border: none; border-bottom: 1px solid rgba(138,90,62,0.3); color: #F4F1EA; font-family: var(--bte-mono), monospace; font-size: 12px; padding: 6px 2px; min-width: 0; flex: 1; }
   .bte-song-input::placeholder { color: #6E6A5D; }
-  .bte-song-input:focus { outline: none; border-bottom-color: #5A6E4E; }
+  .bte-song-input:focus { outline: none; border-bottom-color: #8A5A3E; }
   .bte-song-sep { color: #8A8577; flex-shrink: 0; }
-  .bte-song-submit { flex-shrink: 0; background: none; border: none; color: #5A6E4E; font-family: var(--bte-mono), monospace; font-size: 10px; letter-spacing: 0.2em; cursor: pointer; }
-  .bte-song-submit:hover { color: #A8B79A; }
+  .bte-song-submit { flex-shrink: 0; background: none; border: none; color: #8A5A3E; font-family: var(--bte-mono), monospace; font-size: 10px; letter-spacing: 0.2em; cursor: pointer; }
+  .bte-song-submit:hover { color: #C2A05A; }
   .bte-song-submit:disabled { color: #6E6A5D; cursor: default; }
-  .bte-song-error { font-size: 10px; color: #5A6E4E; margin-top: 6px; }
+  .bte-song-error { font-size: 10px; color: #8A5A3E; margin-top: 6px; }
   .bte-song-list { display: flex; flex-direction: column; margin-top: 14px; max-height: 180px; overflow-y: auto; }
   .bte-song-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-family: var(--bte-mono), monospace; }
   .bte-song-item-title { font-size: 11.5px; letter-spacing: 0.04em; color: #F4F1EA; }
@@ -1916,56 +1916,56 @@ const BTE_CSS = `
   .bte-quiz-q-num { font-family: var(--bte-mono), monospace; font-size: 10px; letter-spacing: 0.24em; color: #8A8577; }
   .bte-quiz-q-text { margin: 0; font-family: var(--bte-serif), serif; font-size: clamp(18px, 4vw, 22px); line-height: 1.3; color: #F4F1EA; }
   .bte-quiz-opts { display: flex; flex-wrap: wrap; gap: 10px; }
-  .bte-quiz-opt { font-family: var(--bte-mono), monospace; font-size: 11px; letter-spacing: 0.06em; padding: 10px 16px; border: 1px solid rgba(90,110,78,0.4); background: transparent; color: #5A6E4E; cursor: pointer; transition: background 160ms ease, color 160ms ease, border-color 160ms ease; }
+  .bte-quiz-opt { font-family: var(--bte-mono), monospace; font-size: 11px; letter-spacing: 0.06em; padding: 10px 16px; border: 1px solid rgba(138,90,62,0.4); background: transparent; color: #8A5A3E; cursor: pointer; transition: background 160ms ease, color 160ms ease, border-color 160ms ease; }
   .bte-quiz-opt:disabled { cursor: default; }
-  .bte-quiz-opt--picked { background: #5A6E4E; border-color: #5A6E4E; color: #0B0B10; }
-  .bte-quiz-opt--correct { background: #5A6E4E; border-color: #5A6E4E; color: #0B0B10; }
+  .bte-quiz-opt--picked { background: #8A5A3E; border-color: #8A5A3E; color: #0B0B10; }
+  .bte-quiz-opt--correct { background: #8A5A3E; border-color: #8A5A3E; color: #0B0B10; }
   .bte-quiz-opt--wrong { border-color: #8A6A6A; color: #C99; opacity: 0.6; }
-  .bte-quiz-result { padding-top: 18px; border-top: 1px solid rgba(90,110,78,0.2); }
-  .bte-quiz-result-score { margin: 0 0 6px; font-family: var(--bte-mono), monospace; font-size: 11px; letter-spacing: 0.16em; color: #A8B79A; }
+  .bte-quiz-result { padding-top: 18px; border-top: 1px solid rgba(138,90,62,0.2); }
+  .bte-quiz-result-score { margin: 0 0 6px; font-family: var(--bte-mono), monospace; font-size: 11px; letter-spacing: 0.16em; color: #C2A05A; }
   .bte-quiz-result-stat { margin: 0; font-size: 11.5px; line-height: 1.5; color: #A8A292; }
 
-  .bte-final-card { border: 1px solid #5A6E4E; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative; }
+  .bte-final-card { border: 1px solid #8A5A3E; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative; }
   .bte-final-names { font-family: var(--bte-serif), serif; font-size: clamp(34px, 10vw, 46px); line-height: .9; color: #F4F1EA; }
   .bte-barcode { height: 26px; background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); }
   .bte-final-footer { display: flex; justify-content: space-between; align-items: center; font-size: 9px; letter-spacing: 0.24em; color: #56534A; }
-  .bte-replay { cursor: pointer; color: #5A6E4E; }
+  .bte-replay { cursor: pointer; color: #8A5A3E; }
   .bte-footer-credit { display: flex; justify-content: center; padding-top: 8px; opacity: 0.7; }
 
   .bte-rail { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(200,164,92,0.14); }
   .bte-rail-top { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #8A8577; transition: color 500ms ease; }
   .bte-rail-line { flex: 1; width: 1px; margin: 16px 0; background: rgba(200,164,92,0.16); position: relative; }
-  .bte-rail-bar { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: linear-gradient(#A8B79A, #5A6E4E); transition: height 260ms linear; display: block; }
-  .bte-rail-label { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #5A6E4E; transition: color 500ms ease; }
+  .bte-rail-bar { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: linear-gradient(#C2A05A, #8A5A3E); transition: height 260ms linear; display: block; }
+  .bte-rail-label { writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #8A5A3E; transition: color 500ms ease; }
 
   .bte-cover { position: absolute; inset: 0; z-index: 5; }
   .bte-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .bte-cover-half--top { top: 0; }
   .bte-cover-half--bottom { bottom: 0; }
-  .bte-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #161C13 0%, #0E120C 46%, #0A0D08 100%); }
+  .bte-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #241708 0%, #180F08 46%, #120D08 100%); }
   .bte-cover-half--bottom .bte-cover-inner { top: auto; bottom: 0; }
-  .bte-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(90,110,78,0.5), rgba(192,138,91,0.35), rgba(141,160,124,0.6), rgba(90,110,78,0.5)); filter: blur(64px); opacity: .62; animation: bteFoil 26s linear infinite; }
+  .bte-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(138,90,62,0.5), rgba(192,138,91,0.35), rgba(192,138,106,0.6), rgba(138,90,62,0.5)); filter: blur(64px); opacity: .62; animation: bteFoil 26s linear infinite; }
   /* Textura de lino diagonal (motivo de herbario de autor): dos capas de
      rayado repetido cruzado en vez del sunburst radial de otras familias --
      evoca el papel de una lámina de herbario prensada, no un sello VIP. */
-  .bte-cover-linen { position: absolute; inset: 0; background-image: repeating-linear-gradient(78deg, rgba(168,183,154,.16) 0 1px, transparent 1px 40px), repeating-linear-gradient(-32deg, rgba(168,183,154,.1) 0 1px, transparent 1px 64px); }
+  .bte-cover-linen { position: absolute; inset: 0; background-image: repeating-linear-gradient(78deg, rgba(194,160,90,.16) 0 1px, transparent 1px 40px), repeating-linear-gradient(-32deg, rgba(194,160,90,.1) 0 1px, transparent 1px 64px); }
   .bte-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
   .bte-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
   .bte-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
   .bte-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
   .bte-cover-names { margin: 0; font-family: var(--bte-serif), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F4F1EA; }
-  .bte-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#5A6E4E, transparent); display: block; }
+  .bte-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#8A5A3E, transparent); display: block; }
   .bte-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
   .bte-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .bte-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .bte-cover-cta { border: 1px solid #5A6E4E; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: var(--bte-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  .bte-cover-cta { border: 1px solid #8A5A3E; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: var(--bte-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .bte-cover-cta--btn { cursor: pointer; border-radius: 0; }
   .bte-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0B0B0F; }
   .bte-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .bte-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: bteHint 2.4s ease-in-out infinite; }
 
-  .bte-lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(10,13,8,0.96); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .bte-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #5A6E4E; background: rgba(0,0,0,0.4); color: #F4F1EA; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .bte-lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(18,13,8,0.96); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .bte-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #8A5A3E; background: rgba(0,0,0,0.4); color: #F4F1EA; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .bte-lightbox-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; }
 `;

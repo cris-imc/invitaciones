@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,400;1,600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #0A0D08; overflow: hidden; }
+  a { color: #5A6E4E; text-decoration: none; }
+  a:hover { color: #A8B79A; }
+  @keyframes gpFoil { to { transform: rotate(360deg); } }
+  @keyframes gpRing { to { transform: rotate(360deg); } }
+  @keyframes gpRingRev { to { transform: rotate(-360deg); } }
+  @keyframes gpScan { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: .85; } 88% { opacity: .85; } 100% { transform: translateY(320px); opacity: 0; } }
+  @keyframes gpEq { 0%,100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+  @keyframes gpHint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+  @keyframes gpSide { 0%,100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
+  @keyframes leafDraw { to { stroke-dashoffset: 0; } }
+  [data-leaf] path { stroke-dasharray: 500; stroke-dashoffset: 500; }
+  [data-leaf].in-view path { animation: leafDraw 1.4s cubic-bezier(.4,0,.2,1) forwards; }
+  @keyframes sproutGrow { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
+  [data-sprout] { transform-origin: bottom; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</helmet>
+
+<div style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: #0A0D08; font-family: 'IBM Plex Mono', monospace; color: #F4F1EA;">
+
+  <div ref="{{ setScroller }}" data-scroller="1" style="position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; transition: opacity 900ms ease 260ms;">
+
+    <section data-tone="dark" data-screen-label="Save the Date" style="min-height: 100vh; position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); background: radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0E120C 55%, #0A0D08 100%);">
+      <span data-xin="1" data-dist="-60" style="font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577;">01 — GUARDÁ LA FECHA</span>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span data-xin="1" data-delay="60" data-dist="-110" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.82; letter-spacing: -0.04em;">07</span>
+        <span data-xin="1" data-delay="170" data-dist="140" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(50px, 18vw, 104px); line-height: 0.9; color: #5A6E4E; padding-left: 12%;">nov</span>
+        <span data-xin="1" data-delay="280" data-dist="220" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.86; letter-spacing: -0.04em; text-align: right;">26</span>
+      </div>
+      <div data-xin="1" data-delay="380" data-dist="-80" style="display: flex; align-items: center; gap: 16px; font-size: 10px; letter-spacing: 0.26em; color: #8A8577;">
+        <span style="width: 52px; height: 1px; background: #5A6E4E;"></span><span>SÁBADO · 19:30 H</span>
+      </div>
+      <p data-xin="1" data-delay="460" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px;">Guardá la fecha. El jardín hace el resto.</p>
+
+      <svg data-leaf="1" viewBox="0 0 200 400" style="position: absolute; left: -30px; bottom: -20px; width: 190px; opacity: .55; z-index: 1; pointer-events: none;">
+        <path d="M100 398 C92 340 108 300 92 250 C78 205 100 175 84 130 C70 90 92 70 66 30" fill="none" stroke="#8DA07C" stroke-width="1.4"></path>
+        <g fill="none" stroke="#8DA07C" stroke-width="1.1">
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(96,375) rotate(200) scale(0.8)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(90,345) rotate(-20) scale(0.85)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(84,315) rotate(195) scale(0.9)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(96,285) rotate(-15) scale(0.95)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(80,250) rotate(205) scale(1)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(94,215) rotate(-10) scale(1)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(76,180) rotate(200) scale(0.9)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(88,145) rotate(-15) scale(0.85)"></path>
+          <path d="M0 0 Q10 -7 24 0 Q10 7 0 0 Z" transform="translate(66,55) rotate(-80) scale(0.7)"></path>
+        </g>
+      </svg>
+      <div data-drift="-70" style="position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1;">
+        <div style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #3E4E36, #8C6F35, #5A6E4E, #A8B79A, #3E4E36); filter: saturate(.75); animation: gpRing 18s linear infinite;"></div>
+        <div style="position: absolute; inset: 3px; border-radius: 50%; background: #0C0C11; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 26px; line-height: 1; color: #A8B79A;">LM</span>
+          <span style="font-size: 6.5px; letter-spacing: 0.24em; color: #8A8577;">ACCESO</span>
+        </div>
+        <svg viewBox="0 0 100 100" style="position: absolute; inset: -14%; animation: gpRingRev 34s linear infinite;">
+          <defs><path id="gpPArc1" d="M50 50 m -38 0 a 38 38 0 1 1 76 0 a 38 38 0 1 1 -76 0" fill="none"></path></defs>
+          <text style="font-size: 7px; letter-spacing: 1.6px; fill: #5A6E4E; font-family: 'IBM Plex Mono', monospace;"><textPath href="#gpPArc1">HERBARIO · LÁMINA VII · HERBARIO · LÁMINA VII · </textPath></text>
+        </svg>
+      </div>
+    </section>
+
+    <section data-tone="dark" data-screen-label="Countdown" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 76px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); background: radial-gradient(100% 60% at 50% 100%, #1B2114 0%, #0F130C 55%, #0A0D08 100%);">
+      <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(200,164,92,0.06) 0 1px, transparent 1px 5px); pointer-events: none;"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 30%; height: 2px; background: linear-gradient(90deg, transparent, #A8B79A, transparent); animation: gpScan 6s linear infinite; pointer-events: none;"></div>
+      <span data-xin="1" data-dist="-60" style="font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; position: relative;">02 — FLORECE EN</span>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative;">
+        <div data-xin="1" data-delay="40" data-dist="-90" style="border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px;">
+          <span ref="{{ setD }}" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #F6EFDD;">—</span>
+          <span style="font-size: 9px; letter-spacing: 0.3em; color: #5A6E4E;">DÍAS</span>
+        </div>
+        <div data-xin="1" data-delay="120" data-dist="110" style="border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px;">
+          <span ref="{{ setH }}" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #F6EFDD;">—</span>
+          <span style="font-size: 9px; letter-spacing: 0.3em; color: #5A6E4E;">HORAS</span>
+        </div>
+        <div data-xin="1" data-delay="200" data-dist="-140" style="border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px;">
+          <span ref="{{ setM }}" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #F6EFDD;">—</span>
+          <span style="font-size: 9px; letter-spacing: 0.3em; color: #5A6E4E;">MIN</span>
+        </div>
+        <div data-xin="1" data-delay="280" data-dist="170" style="border: 1px solid #2A2417; background: rgba(20,20,27,0.72); padding: 18px 15px; display: flex; flex-direction: column; gap: 6px; overflow: hidden;">
+          <span ref="{{ setS }}" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 14vw, 80px); line-height: 0.82; color: #A8B79A; display: inline-block;">—</span>
+          <span style="font-size: 9px; letter-spacing: 0.3em; color: #5A6E4E;">SEG</span>
+        </div>
+      </div>
+      <div style="height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #0A0D08 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85;"></div>
+    </section>
+
+    <section data-tone="dark" data-screen-label="Frase" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 44px; padding: 110px max(24px, calc((100% - 620px) / 2)); background: radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #0A0D08 100%);">
+      <div data-drift="-130" style="position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(90,110,78,0.36), rgba(192,138,91,0.24), rgba(141,160,124,0.4), rgba(90,110,78,0.36)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite;"></div>
+      <span data-xin="1" data-dist="-60" style="position: relative; font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577;">03 — CUANDO LLEGUE A CERO</span>
+      <h2 ref="{{ setPhrase }}" style="margin: 0; position: relative; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em;">
+        <span data-w="1">El</span> <span data-w="1">jardín</span> <span data-w="1">se</span> <span data-w="1" style="font-style: italic; color: #8DA07C;">abre</span> <span data-w="1" style="font-style: italic; color: #8DA07C;">una</span> <span data-w="1" style="font-style: italic; color: #8DA07C;">sola</span> <span data-w="1" style="font-style: italic; color: #8DA07C;">vez.</span>
+      </h2>
+      <div data-xin="1" data-delay="120" data-dist="90" style="position: relative; display: flex; align-items: center; gap: 16px; font-size: 10px; letter-spacing: 0.28em; color: #8A8577;">
+        <span style="width: 64px; height: 1px; background: #5A6E4E;"></span><span>07 · 11 · 2026 — 19:30 H</span>
+      </div>
+    </section>
+
+    <div data-pan="1" data-screen-label="Cuándo y dónde" style="height: 260vh; position: relative;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform;">
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; background: #EFEBE1; color: #14141B;">
+            <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(20,20,27,0.05) 0 1px, transparent 1px 26px); pointer-events: none;"></div>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.32em; color: #7C7768;"><span>04 — CUÁNDO Y DÓNDE</span><span>01 / 03</span></div>
+            <h2 style="margin: 0; position: relative; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(46px, 13.5vw, 76px); line-height: 0.92;">Estancia<br><span style="font-style: italic; color: #5A6E4E;">La Paz</span></h2>
+            <div style="position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px;"><span>CEREMONIA</span><span>19:30 H</span></div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px;"><span>RECEPCIÓN</span><span>21:00 H</span></div>
+              <div style="display: flex; justify-content: space-between;"><span>CÓDIGO</span><span style="color: #3E4E36;">JARDÍN FORMAL</span></div>
+            </div>
+            <div style="position: relative; display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: 0.26em; color: #3E4E36;">SEGUÍ BAJANDO <span style="display: inline-block; animation: gpSide 2.2s ease-in-out infinite;">→</span></div>
+          </div>
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; background: #E4DFD3; color: #14141B;">
+            <svg viewBox="0 0 300 500" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;"><path ref="{{ setRoute }}" d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#3E4E36" stroke-width="1.6"></path><circle cx="282" cy="40" r="5" fill="#3E4E36"></circle></svg>
+            <div style="position: relative; display: flex; flex-direction: column; gap: 12px;">
+              <span style="font-size: 9px; letter-spacing: 0.3em; color: #7C7768;">02 / 03</span>
+              <span style="font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 10.5vw, 52px); line-height: 1;">Cómo llegar</span>
+              <span style="font-size: 9px; letter-spacing: 0.2em; color: #7C7768;">35 MIN DESDE EL CENTRO · ESTACIONAMIENTO EN EL PREDIO</span>
+              <span style="font-size: 10px; letter-spacing: 0.24em; color: #3E4E36;">ABRIR EN MAPAS →</span>
+            </div>
+          </div>
+
+          <div data-tone="dark" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; text-align: center; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; background: #0E120C; color: #F4F1EA;">
+            <div style="width: clamp(130px, 34vw, 178px); aspect-ratio: 1; position: relative;">
+              <div style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 90deg, #5A6E4E, #A8B79A, #3E4E36, #8C6F35, #5A6E4E); filter: saturate(.75); animation: gpRing 22s linear infinite;"></div>
+              <div style="position: absolute; inset: 4px; border-radius: 50%; background: #0E120C; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                <span style="font-size: 6.5px; letter-spacing: 0.28em; color: #8A8577;">SECTOR</span>
+                <span style="font-family: 'Cormorant Garamond', serif; font-size: 32px; line-height: 1; color: #A8B79A;">Invernadero</span>
+                <span style="font-size: 6.5px; letter-spacing: 0.28em; color: #5A6E4E;">MESA 04</span>
+              </div>
+              <svg viewBox="0 0 100 100" style="position: absolute; inset: -13%; animation: gpRingRev 30s linear infinite;">
+                <defs><path id="gpPArc2" d="M50 50 m -38 0 a 38 38 0 1 1 76 0 a 38 38 0 1 1 -76 0" fill="none"></path></defs>
+                <text style="font-size: 6.6px; letter-spacing: 1.5px; fill: #5A6E4E; font-family: 'IBM Plex Mono', monospace;"><textPath href="#gpPArc2">ACCESO VIP · LÁMINA Nº 07 · ACCESO VIP · LÁMINA Nº 07 · </textPath></text>
+              </svg>
+            </div>
+            <span style="font-size: 9px; letter-spacing: 0.3em; color: #8A8577;">03 / 03 — TU UBICACIÓN</span>
+          </div>
+        </div>
+
+        <div data-dots="1" style="position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2;">
+          <span data-dot="0" style="width: 22px; height: 2px; background: #3E4E36; transition: background 400ms ease;"></span>
+          <span data-dot="1" style="width: 22px; height: 2px; background: rgba(20,20,27,0.18); transition: background 400ms ease;"></span>
+          <span data-dot="2" style="width: 22px; height: 2px; background: rgba(20,20,27,0.18); transition: background 400ms ease;"></span>
+        </div>
+      </div>
+    </div>
+
+    <section data-tone="dark" data-screen-label="Check-in" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 24px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); background: radial-gradient(110% 70% at 50% 100%, #17141F 0%, #0E120C 60%, #0A0D08 100%);">
+      <span data-xin="1" data-dist="-60" style="font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577;">05 — CHECK-IN</span>
+      <h2 data-xin="1" data-delay="80" data-dist="130" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96;">Confirmá<br><span style="font-style: italic; color: #5A6E4E;">tu acceso</span></h2>
+      <div data-xin="1" data-delay="170" data-dist="-90" style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="border-bottom: 1px solid #2A2A33; padding-bottom: 10px; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.16em; color: #6E6A5D;"><span>NOMBRE Y APELLIDO</span><span>—</span></div>
+        <div style="border-bottom: 1px solid #2A2A33; padding-bottom: 10px; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.16em; color: #6E6A5D;"><span>ACOMPAÑANTE</span><span>01</span></div>
+        <div style="border-bottom: 1px solid #2A2A33; padding-bottom: 10px; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.16em; color: #6E6A5D;"><span>RESTRICCIONES</span><span>—</span></div>
+      </div>
+      <div ref="{{ setStub }}" data-xin="1" data-delay="240" data-dist="120" style="position: relative; overflow: hidden; border: 1px solid #2A2417; background: rgba(20,20,27,0.7); padding: 20px; display: flex; align-items: center; gap: 16px; transition: border-color 600ms ease, box-shadow 600ms ease;">
+        <div ref="{{ setSeal }}" style="width: 62px; flex: 0 0 62px; aspect-ratio: 1; position: relative; opacity: .25; transform: scale(.86); transition: opacity 700ms ease, transform 700ms cubic-bezier(.16,1,.3,1);">
+          <div style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, #3E4E36, #5A6E4E, #A8B79A, #3E4E36); filter: saturate(.75); animation: gpRing 16s linear infinite;"></div>
+          <div style="position: absolute; inset: 2px; border-radius: 50%; background: #0C0C11; display: flex; align-items: center; justify-content: center;"><span style="font-family: 'Cormorant Garamond', serif; font-size: 16px; color: #A8B79A;">LM</span></div>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.24em; color: #8A8577;"><span>LÁMINA Nº 07</span><span ref="{{ setStatus }}" style="color: #6E6A5D; transition: color 400ms ease;">PENDIENTE</span></div>
+          <div style="height: 28px; background: repeating-linear-gradient(90deg, #A8A292 0 2px, transparent 2px 4px, #A8A292 4px 5px, transparent 5px 9px, #A8A292 9px 11px, transparent 11px 14px); opacity: .55;"></div>
+        </div>
+        <div ref="{{ setBeam }}" style="position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #A8B79A, transparent); opacity: 0; transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 300ms ease;"></div>
+      </div>
+      <button onClick="{{ confirm }}" data-xin="1" data-delay="320" style="border: 1px solid #5A6E4E; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.26em; padding: 17px 0; cursor: pointer;" style-hover="background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0B0B0F;">CONFIRMAR ASISTENCIA</button>
+    </section>
+
+    <div data-pan="1" data-screen-label="Álbum" style="height: 280vh; position: relative;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform;">
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: clamp(14px, 2.4vh, 22px); padding: clamp(52px, 9vh, 84px) max(24px, calc((100vw - 600px) / 2)) clamp(62px, 11vh, 100px); background: #F6F3EC; color: #14141B;">
+            <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(20,20,27,0.045) 0 1px, transparent 1px 26px); pointer-events: none;"></div>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.32em; color: #7C7768;"><span>06 — ARCHIVO / 018</span><span>HOJA 01</span></div>
+            <h2 style="margin: 0; position: relative; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(42px, 12.5vw, 64px); line-height: 0.94;">Álbum <span style="font-style: italic; color: #3E4E36;">de fotos</span></h2>
+            <div style="position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px;">
+              <div style="height: 100%; min-height: 0; aspect-ratio: 4/5; max-width: 100%; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box;"><span style="font-size: 8.5px; letter-spacing: 0.16em; color: #6E6A5D;">FOTO · 4:5</span></div>
+              <div style="height: 100%; min-height: 0; aspect-ratio: 4/5; max-width: 100%; margin-top: 18px; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box;"><span style="font-size: 8.5px; letter-spacing: 0.16em; color: #6E6A5D;">FOTO · 4:5</span></div>
+              <div style="height: 100%; min-height: 0; aspect-ratio: 4/5; max-width: 100%; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box;"><span style="font-size: 8.5px; letter-spacing: 0.16em; color: #6E6A5D;">FOTO · 4:5</span></div>
+              <div style="height: 100%; min-height: 0; aspect-ratio: 4/5; max-width: 100%; margin-top: 18px; background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px); display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box;"><span style="font-size: 8.5px; letter-spacing: 0.16em; color: #6E6A5D;">FOTO · 4:5</span></div>
+            </div>
+            <div style="position: relative; margin-top: auto; display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.2em; color: #7C7768;"><span>SUBIR MIS FOTOS</span><span style="color: #3E4E36;">SEGUÍ →</span></div>
+          </div>
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: clamp(14px, 2.4vh, 22px); padding: clamp(52px, 9vh, 84px) max(24px, calc((100vw - 600px) / 2)) clamp(62px, 11vh, 100px); background: #F1EDE3; color: #14141B;">
+            <div style="display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.32em; color: #7C7768;"><span>HOJA 02 — MÁS FOTOS</span><span>014 LIBRES</span></div>
+            <h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(34px, 10vw, 52px); line-height: 0.96;">Espacio <span style="font-style: italic; color: #3E4E36;">reservado</span></h2>
+            <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px;">
+              <div style="background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px);"></div>
+              <div style="background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px);"></div>
+              <div style="background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px);"></div>
+              <div style="background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px);"></div>
+              <div style="border: 1px dashed #C3BDAC; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #3E4E36;">+</div>
+              <div style="background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px);"></div>
+              <div style="background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px);"></div>
+              <div style="background: repeating-linear-gradient(135deg, #DCD7CB 0 6px, #E9E5DC 6px 12px);"></div>
+              <div style="border: 1px dashed #C3BDAC; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #3E4E36;">+</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.2em; color: #7C7768;"><span>ARRASTRÁ TUS FOTOS ACÁ</span><span style="color: #3E4E36;">SEGUÍ →</span></div>
+          </div>
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 26px; padding: 84px max(24px, calc((100vw - 600px) / 2)) 100px; background: #EDE8DE; color: #14141B;">
+            <span style="font-size: 9.5px; letter-spacing: 0.32em; color: #7C7768;">HOJA 03 — EL DÍA DESPUÉS</span>
+            <h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(44px, 13vw, 72px); line-height: 0.92;">Todo lo que<br><span style="font-style: italic; color: #3E4E36;">vamos a recordar</span></h2>
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px;"><span>SUBIDAS</span><span>018</span></div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px;"><span>INVITADOS</span><span>092</span></div>
+              <div style="display: flex; justify-content: space-between;"><span>ÁLBUM COMPARTIDO</span><span style="color: #3E4E36;">VER LAS 18 →</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-dots="1" style="position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2;">
+          <span data-dot="0" style="width: 22px; height: 2px; background: #3E4E36; transition: background 400ms ease;"></span>
+          <span data-dot="1" style="width: 22px; height: 2px; background: rgba(20,20,27,0.18); transition: background 400ms ease;"></span>
+          <span data-dot="2" style="width: 22px; height: 2px; background: rgba(20,20,27,0.18); transition: background 400ms ease;"></span>
+        </div>
+      </div>
+    </div>
+
+    <section data-tone="dark" data-screen-label="Música" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 26px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); background: #0E120C;">
+      <span data-xin="1" data-dist="-60" style="font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577;">07 — SUGERENCIA DE MÚSICA</span>
+      <h2 data-xin="1" data-delay="80" data-dist="140" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96;">¿Qué flor<br><span style="font-style: italic; color: #5A6E4E;">nos representa?</span></h2>
+      <div data-xin="1" data-delay="160" data-dist="-80" style="display: flex; align-items: flex-end; gap: 5px; height: 52px;">
+        <span style="width: 4px; height: 100%; background: #5A6E4E; transform-origin: bottom; animation: gpEq 1.1s ease-in-out infinite;"></span>
+        <span style="width: 4px; height: 100%; background: #5A6E4E; transform-origin: bottom; animation: gpEq 1.1s ease-in-out .18s infinite;"></span>
+        <span style="width: 4px; height: 100%; background: #A8B79A; transform-origin: bottom; animation: gpEq 1.1s ease-in-out .36s infinite;"></span>
+        <span style="width: 4px; height: 100%; background: #5A6E4E; transform-origin: bottom; animation: gpEq 1.1s ease-in-out .54s infinite;"></span>
+        <span style="width: 4px; height: 100%; background: #5A6E4E; transform-origin: bottom; animation: gpEq 1.1s ease-in-out .72s infinite;"></span>
+      </div>
+      <div data-xin="1" data-delay="240" data-dist="110" style="border-bottom: 1px solid #2A2A33; padding-bottom: 12px; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.16em; color: #6E6A5D;"><span>ARTISTA — TEMA</span><span style="color: #5A6E4E;">+ SUMAR</span></div>
+      <div data-xin="1" data-delay="320" data-dist="-90" style="display: flex; flex-direction: column; gap: 10px; font-size: 11px; letter-spacing: 0.1em; color: #8A8577;">
+        <div style="display: flex; justify-content: space-between;"><span>01 · Sumado por Ana</span><span>—</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>02 · Sumado por Diego</span><span>—</span></div>
+      </div>
+    </section>
+
+    <section data-tone="dark" data-screen-label="Tu lámina" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2)); background: radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0E120C 55%, #0A0D08 100%);">
+      <span data-xin="1" data-dist="-60" style="font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577;">08 — GUARDÁ TU LÁMINA</span>
+      <div data-xin="1" data-delay="100" data-dist="130" style="border: 1px solid #5A6E4E; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative;">
+        <div style="width: clamp(104px, 26vw, 132px); aspect-ratio: 1; position: relative; margin-top: -12px;">
+          <div style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 140deg, #3E4E36, #8C6F35, #5A6E4E, #A8B79A, #3E4E36); filter: saturate(.75); animation: gpRing 20s linear infinite;"></div>
+          <div style="position: absolute; inset: 3px; border-radius: 50%; background: #0E120C; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 30px; line-height: 1; color: #A8B79A;">LM</span>
+            <span style="font-size: 6.5px; letter-spacing: 0.24em; color: #8A8577;">CONFIRMADO</span>
+          </div>
+          <svg viewBox="0 0 100 100" style="position: absolute; inset: -13%; animation: gpRingRev 36s linear infinite;">
+            <defs><path id="gpPArc3" d="M50 50 m -38 0 a 38 38 0 1 1 76 0 a 38 38 0 1 1 -76 0" fill="none"></path></defs>
+            <text style="font-size: 6.8px; letter-spacing: 1.5px; fill: #5A6E4E; font-family: 'IBM Plex Mono', monospace;"><textPath href="#gpPArc3">LUCÍA &amp; MATEO · 07.11.26 · LUCÍA &amp; MATEO · 07.11.26 · </textPath></text>
+          </svg>
+        </div>
+        <span style="font-size: 9px; letter-spacing: 0.3em; color: #5A6E4E;">LÁMINA Nº 07 · ADMIT TWO</span>
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: clamp(34px, 10vw, 46px); line-height: .9; color: #F4F1EA;">Lucía <span style="font-style: italic;">&amp;</span> Mateo</span>
+        <span style="font-size: 10px; letter-spacing: 0.26em; color: #A8A292;">07 · 11 · 2026 — 19:30 H</span>
+        <div style="width: 60%; height: 26px; background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); opacity: .6;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 9px; letter-spacing: 0.24em; color: #56534A;">
+        <span>NO TRANSFERIBLE</span>
+        <span onClick="{{ replay }}" style="cursor: pointer; color: #5A6E4E;">VER LA APERTURA OTRA VEZ ↺</span>
+      </div>
+    </section>
+  </div>
+
+  <div ref="{{ setRail }}" style="position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(200,164,92,0.14);">
+    <span ref="{{ setRailTop }}" style="writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #8A8577; transition: color 500ms ease;">LÁMINA Nº 07</span>
+    <div ref="{{ setRailLine }}" style="flex: 1; width: 1px; margin: 16px 0; background: rgba(200,164,92,0.16); position: relative;">
+      <span ref="{{ setRailBar }}" style="position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: linear-gradient(#A8B79A, #5A6E4E); transition: height 260ms linear;"></span>
+    </div>
+    <span ref="{{ setRailLabel }}" style="writing-mode: vertical-rl; font-size: 8px; letter-spacing: 0.34em; color: #5A6E4E; transition: color 500ms ease;">SAVE THE DATE</span>
+  </div>
+
+  <div ref="{{ setCover }}" style="position: absolute; inset: 0; z-index: 5;">
+    <div ref="{{ setTop }}" style="position: absolute; left: 0; right: 0; top: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1);">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #161C13 0%, #0E120C 46%, #0A0D08 100%);">
+        <div style="position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(90,110,78,0.5), rgba(192,138,91,0.35), rgba(141,160,124,0.6), rgba(90,110,78,0.5)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite;"></div>
+        <div style="position: absolute; inset: 0; background-image: repeating-linear-gradient(78deg, rgba(168,183,154,.16) 0 1px, transparent 1px 40px), repeating-linear-gradient(-32deg, rgba(168,183,154,.1) 0 1px, transparent 1px 64px);"></div>
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px;">
+          <div style="display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577;"><span>LÁMINA Nº 07</span><span style="color: #5A6E4E;">ADMIT TWO</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center;">
+            <span ref="{{ setK }}" style="font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577;">UN HERBARIO PARA LA BODA DE</span>
+            <h1 ref="{{ setNames }}" style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F4F1EA;">Lucía<br><span style="font-style: italic; font-size: 0.54em;">&amp;</span><br>Mateo</h1>
+            <span style="width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#5A6E4E, transparent);"></span>
+            <span style="font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap;">07 · 11 · 2026</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px);">
+            <div ref="{{ setPerf }}" style="height: 12px; background: radial-gradient(circle at 6px 50%, #0A0D08 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .9; clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms;"></div>
+            <div style="display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D;"><span>SECTOR — INVERNADERO</span><span>19:30 H</span><span>ROSA CANINA</span></div>
+            <div style="border: 1px solid #5A6E4E; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center;">ABRIR INVITACIÓN</div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <div style="width: 62%; height: clamp(15px, 3vh, 26px); background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); opacity: .6;"></div>
+              <span style="font-size: 8.5px; letter-spacing: 0.3em; color: #56534A;">NO TRANSFERIBLE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ref="{{ setBottom }}" style="position: absolute; left: 0; right: 0; bottom: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1);">
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #161C13 0%, #0E120C 46%, #0A0D08 100%);">
+        <div style="position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(90,110,78,0.5), rgba(192,138,91,0.35), rgba(141,160,124,0.6), rgba(90,110,78,0.5)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite;"></div>
+        <div style="position: absolute; inset: 0; background-image: repeating-linear-gradient(78deg, rgba(168,183,154,.16) 0 1px, transparent 1px 40px), repeating-linear-gradient(-32deg, rgba(168,183,154,.1) 0 1px, transparent 1px 64px);"></div>
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px;">
+          <div style="display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577;"><span>LÁMINA Nº 07</span><span style="color: #5A6E4E;">ADMIT TWO</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center;">
+            <span style="font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577;">UN HERBARIO PARA LA BODA DE</span>
+            <span style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #F4F1EA;">Lucía<br><span style="font-style: italic; font-size: 0.54em;">&amp;</span><br>Mateo</span>
+            <span style="width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#5A6E4E, transparent);"></span>
+            <span style="font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap;">07 · 11 · 2026</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px);">
+            <div style="height: 12px; background: radial-gradient(circle at 6px 50%, #0A0D08 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .9;"></div>
+            <div style="display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D;"><span>SECTOR — INVERNADERO</span><span>19:30 H</span><span>ROSA CANINA</span></div>
+            <button onClick="{{ open }}" style="border: 1px solid #5A6E4E; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; cursor: pointer;" style-hover="background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0B0B0F;">ABRIR INVITACIÓN</button>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+              <div style="width: 62%; height: clamp(15px, 3vh, 26px); background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); opacity: .6;"></div>
+              <span style="font-size: 8.5px; letter-spacing: 0.3em; color: #56534A;">NO TRANSFERIBLE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ref="{{ setHint }}" style="position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite;">DESLIZÁ ↓</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932}}">
+class Component extends DCLogic {
+  refs = {};
+  set(k) { return (el) => { this.refs[k] = el; }; }
+
+  renderVals() {
+    return {
+      setScroller: this.set('scroller'), setCover: this.set('cover'),
+      setTop: this.set('top'), setBottom: this.set('bottom'),
+      setPerf: this.set('perf'), setNames: this.set('names'), setK: this.set('kicker'),
+      setD: this.set('d'), setH: this.set('h'), setM: this.set('m'), setS: this.set('s'),
+      setRoute: this.set('route'), setStub: this.set('stub'), setStatus: this.set('status'),
+      setBeam: this.set('beam'), setSeal: this.set('seal'), setHint: this.set('hint'),
+      setPhrase: this.set('phrase'),
+      setRail: this.set('rail'), setRailTop: this.set('railTop'), setRailLabel: this.set('railLabel'),
+      setRailBar: this.set('railBar'), setRailLine: this.set('railLine'),
+      open: () => this.open(),
+      replay: () => this.reset(),
+      confirm: () => this.confirm(),
+    };
+  }
+
+  componentDidMount() {
+    this.intro();
+    this.tick();
+    this.timer = setInterval(() => this.tick(), 1000);
+    this.prepareReveals();
+    this.preparePhrase();
+    this.prepareLeaf();
+    this.ticker = setInterval(() => this.frame(), 16);
+    this.frame();
+  }
+
+  attach(sc) {
+    if (this.attached === sc) return;
+    this.attached = sc;
+    if (this.onScroll) sc.removeEventListener('scroll', this.onScroll);
+    this.onScroll = () => this.frame();
+    sc.addEventListener('scroll', this.onScroll, { passive: true });
+    window.addEventListener('resize', this.onScroll);
+    this.pans = Array.from(sc.querySelectorAll('[data-pan]'));
+    this.drifts = Array.from(sc.querySelectorAll('[data-drift]'));
+    if (!this.reveals || !this.reveals.length) this.prepareReveals();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+    clearInterval(this.ticker);
+    if (this.attached && this.onScroll) this.attached.removeEventListener('scroll', this.onScroll);
+    if (this.onScroll) window.removeEventListener('resize', this.onScroll);
+  }
+
+  /* ---------- scroll-driven: horizontal pans + parallax + rail ---------- */
+
+  frame() {
+    window.__gpFrames = (window.__gpFrames || 0) + 1;
+    try { this.frameBody(); } catch (err) {
+      if (!this.errLogged) { this.errLogged = 1; console.error('frame error', err); }
+    }
+  }
+
+  frameBody() {
+    const sc = this.refs.scroller || document.querySelector('[data-scroller]');
+    if (!sc) return;
+    this.attach(sc);
+    const vh = sc.clientHeight, vw = sc.clientWidth, y = sc.scrollTop;
+    this.checkReveals(vh);
+
+    if (!this.panPos) this.panPos = [];
+    (this.pans || []).forEach((pan, pi) => {
+      const strip = pan.querySelector('[data-strip]');
+      if (!strip) return;
+      const n = strip.children.length;
+      const span = pan.offsetHeight - vh;
+      const p = span > 0 ? Math.min(1, Math.max(0, (y - pan.offsetTop) / span)) : 0;
+      const prev = this.panPos[pi];
+      const eased = prev == null ? p : prev + (p - prev) * 0.14;
+      this.panPos[pi] = Math.abs(p - eased) < 0.0004 ? p : eased;
+      strip.style.transform = 'translate3d(' + (-eased * (n - 1) * vw) + 'px,0,0)';
+      const dots = pan.querySelectorAll('[data-dot]');
+      const active = Math.min(n - 1, Math.round(eased * (n - 1)));
+      dots.forEach((d, i) => { d.style.background = i === Number(d.dataset.dot) && i === active ? '#3E4E36' : 'rgba(20,20,27,0.18)'; });
+    });
+
+    (this.drifts || []).forEach((el) => {
+      const amt = parseFloat(el.dataset.drift) || 0;
+      const r = el.getBoundingClientRect();
+      const rel = (r.top + r.height / 2 - vh / 2) / vh;
+      el.style.transform = 'translate3d(0,' + (rel * amt) + 'px,0)';
+    });
+
+    this.updateRail();
+  }
+
+  panels() {
+    const sc = this.refs.scroller;
+    return sc ? Array.from(sc.children) : [];
+  }
+
+  updateRail() {
+    const sc = this.refs.scroller;
+    if (!sc) return;
+    const max = sc.scrollHeight - sc.clientHeight;
+    const p = max > 0 ? Math.min(1, sc.scrollTop / max) : 0;
+    if (this.refs.railBar) this.refs.railBar.style.height = (p * 100) + '%';
+
+    const secs = this.panels();
+    const mid = sc.scrollTop + sc.clientHeight / 2;
+    let cur = secs[0];
+    secs.forEach((s) => { if (s.offsetTop <= mid) cur = s; });
+    if (!cur) return;
+    const label = (cur.dataset.screenLabel || '').toUpperCase();
+    if (this.refs.railLabel && this.refs.railLabel.textContent !== label) this.refs.railLabel.textContent = label;
+
+    let tone = cur.dataset.tone;
+    if (!tone) {
+      const strip = cur.querySelector('[data-strip]');
+      if (strip) {
+        const vw = sc.clientWidth;
+        const idx = Math.min(strip.children.length - 1, Math.round(Math.abs(parseFloat(strip.style.transform.replace(/[^-\d.]/g, '')) || 0) / (vw || 1)));
+        tone = strip.children[idx] ? strip.children[idx].dataset.tone : 'dark';
+      }
+    }
+    const light = tone === 'light';
+    if (this.refs.rail) this.refs.rail.style.borderLeftColor = light ? 'rgba(20,20,27,0.14)' : 'rgba(200,164,92,0.14)';
+    if (this.refs.railLine) this.refs.railLine.style.background = light ? 'rgba(20,20,27,0.14)' : 'rgba(200,164,92,0.16)';
+    if (this.refs.railTop) this.refs.railTop.style.color = light ? '#7C7768' : '#8A8577';
+    if (this.refs.railLabel) this.refs.railLabel.style.color = light ? '#3E4E36' : '#5A6E4E';
+    if (this.refs.hint && sc.scrollTop > 40) this.refs.hint.style.opacity = 0;
+  }
+
+  /* ---------- reveals ---------- */
+
+  prepareLeaf() {
+    const leaf = document.querySelector('[data-leaf]');
+    if (!leaf) return;
+    setTimeout(() => leaf.classList.add('in-view'), 500);
+  }
+
+  prepareReveals() {
+    this.reveals = Array.from(document.querySelectorAll('[data-xin]'));
+    this.reveals.forEach((el) => {
+      const d = el.dataset.dist ? parseFloat(el.dataset.dist) : 90;
+      el.style.opacity = 0;
+      el.style.transform = 'translate3d(' + d + 'px,0,0)';
+      el.style.filter = 'blur(6px)';
+      el.style.transition = 'opacity 900ms cubic-bezier(.16,1,.3,1), transform 1000ms cubic-bezier(.16,1,.3,1), filter 800ms ease';
+      el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+    });
+  }
+
+  preparePhrase() {
+    const ph = this.refs.phrase;
+    if (!ph) return;
+    this.words = Array.from(ph.querySelectorAll('[data-w]'));
+    this.words.forEach((w) => {
+      w.style.display = 'inline-block';
+      w.style.opacity = 0;
+      w.style.transform = 'translate3d(64px,0,0) rotate(3deg)';
+      w.style.filter = 'blur(10px)';
+      w.style.transition = 'opacity 900ms cubic-bezier(.16,1,.3,1), transform 1100ms cubic-bezier(.16,1,.3,1), filter 900ms ease';
+    });
+  }
+
+  revealPhrase() {
+    (this.words || []).forEach((w, i) => {
+      w.style.transitionDelay = (i * 120) + 'ms';
+      w.style.opacity = 1;
+      w.style.transform = 'none';
+      w.style.filter = 'none';
+    });
+  }
+
+  checkReveals(vh) {
+    const pending = this.reveals || [];
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const el = pending[i];
+      if (!el.isConnected) { pending.splice(i, 1); continue; }
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0) {
+        el.style.opacity = 1;
+        el.style.transform = 'none';
+        el.style.filter = 'none';
+        pending.splice(i, 1);
+      }
+    }
+    const ph = this.refs.phrase;
+    if (ph && !this.phraseDone) {
+      const r = ph.getBoundingClientRect();
+      if (r.top < vh * 0.8 && r.bottom > 0) { this.phraseDone = 1; this.revealPhrase(); }
+    }
+    const rt = this.refs.route;
+    if (rt && this.routeReveal && !this.routeDone) {
+      const r = rt.getBoundingClientRect();
+      if (r.left < window.innerWidth * 0.9 && r.right > 0) { this.routeDone = 1; this.routeReveal(); }
+    }
+  }
+
+  observeUnused() {
+    const sc = this.refs.scroller;
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const t = e.target;
+        this.io.unobserve(t);
+        if (t === this.refs.phrase) { this.revealPhrase(); return; }
+        t.style.opacity = 1;
+        t.style.transform = 'none';
+        t.style.filter = 'none';
+        if (this.routeReveal && t.contains && t.contains(this.refs.route)) this.routeReveal();
+      });
+    }, { root: sc, threshold: 0.18 });
+    (this.reveals || []).forEach((el) => this.io.observe(el));
+    if (this.refs.phrase) this.io.observe(this.refs.phrase);
+    if (this.refs.route) {
+      this.rio = new IntersectionObserver((es) => {
+        es.forEach((e) => { if (e.isIntersecting && this.routeReveal) { this.routeReveal(); this.rio.disconnect(); } });
+      }, { root: sc, threshold: 0.3 });
+      this.rio.observe(this.refs.route.closest('div'));
+    }
+  }
+
+  /* ---------- cover ---------- */
+
+  intro() {
+    const { names, kicker, perf } = this.refs;
+    [kicker, names].forEach((el, i) => {
+      if (!el) return;
+      el.style.opacity = 0;
+      el.style.transform = 'translateY(26px)';
+      el.style.filter = 'blur(10px)';
+      el.style.transition = 'opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1), filter 1s ease';
+      el.style.transitionDelay = (180 + i * 220) + 'ms';
+      setTimeout(() => { el.style.opacity = 1; el.style.transform = 'none'; el.style.filter = 'none'; }, 90);
+    });
+    if (perf) setTimeout(() => { perf.style.clipPath = 'inset(0 0 0 0)'; }, 90);
+  }
+
+  open() {
+    const { top, bottom, scroller, cover, hint, rail } = this.refs;
+    if (top) top.style.transform = 'translateY(-100%)';
+    if (bottom) bottom.style.transform = 'translateY(100%)';
+    if (scroller) scroller.style.opacity = 1;
+    setTimeout(() => {
+      if (hint) hint.style.opacity = 1;
+      if (rail) rail.style.opacity = 1;
+    }, 1200);
+    setTimeout(() => { if (cover) cover.style.pointerEvents = 'none'; }, 1100);
+    this.drawRoute();
+    this.frame();
+  }
+
+  reset() {
+    const { top, bottom, scroller, cover, hint, rail } = this.refs;
+    if (scroller) { scroller.scrollTop = 0; scroller.style.opacity = 0; }
+    if (cover) cover.style.pointerEvents = 'auto';
+    if (hint) hint.style.opacity = 0;
+    if (rail) rail.style.opacity = 0;
+    if (top) top.style.transform = 'none';
+    if (bottom) bottom.style.transform = 'none';
+    setTimeout(() => this.intro(), 600);
+  }
+
+  tick() {
+    const target = new Date('2026-11-07T19:30:00');
+    let ms = Math.max(0, target - new Date());
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24,
+          m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
+    const p = (n) => String(n).padStart(2, '0');
+    if (this.refs.d) this.refs.d.textContent = d;
+    if (this.refs.h) this.refs.h.textContent = p(h);
+    if (this.refs.m) this.refs.m.textContent = p(m);
+    const sEl = this.refs.s;
+    if (sEl) {
+      sEl.textContent = p(s);
+      sEl.style.transition = 'none';
+      sEl.style.transform = 'translateY(18%)';
+      sEl.style.opacity = '0.4';
+      requestAnimationFrame(() => {
+        sEl.style.transition = 'transform 300ms cubic-bezier(.16,1,.3,1), opacity 300ms ease';
+        sEl.style.transform = 'translateY(0)';
+        sEl.style.opacity = '1';
+      });
+    }
+  }
+
+  drawRoute() {
+    const r = this.refs.route;
+    if (!r || r.dataset.drawn) return;
+    const len = r.getTotalLength();
+    r.style.strokeDasharray = len;
+    r.style.strokeDashoffset = len;
+    r.style.transition = 'stroke-dashoffset 1600ms cubic-bezier(.16,1,.3,1)';
+    r.dataset.drawn = '1';
+    this.routeReveal = () => { r.style.strokeDashoffset = 0; };
+  }
+
+  confirm() {
+    const { beam, status, stub, seal } = this.refs;
+    if (beam) {
+      beam.style.transition = 'none';
+      beam.style.transform = 'translateY(0)';
+      beam.style.opacity = 1;
+      requestAnimationFrame(() => {
+        beam.style.transition = 'transform 900ms cubic-bezier(.16,1,.3,1), opacity 400ms ease 700ms';
+        beam.style.transform = 'translateY(110px)';
+        beam.style.opacity = 0;
+      });
+    }
+    setTimeout(() => {
+      if (status) { status.textContent = 'ACCESO CONFIRMADO'; status.style.color = '#A8B79A'; }
+      if (stub) { stub.style.borderColor = '#5A6E4E'; stub.style.boxShadow = '0 0 0 1px rgba(200,164,92,.35), 0 18px 50px -30px #5A6E4E'; }
+      if (seal) { seal.style.opacity = 1; seal.style.transform = 'scale(1) rotate(-6deg)'; }
+    }, 900);
+  }
+}
+
+</script>
+</body>
+</html>

@@ -12,10 +12,30 @@ import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray"
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { GuestPassVipTemplate } from "@/components/templates/GuestPassVipTemplate";
+import { GuestPassVipTemplateBorgona } from "@/components/templates/GuestPassVipTemplateBorgona";
+import { GuestPassVipTemplateEsmeralda } from "@/components/templates/GuestPassVipTemplateEsmeralda";
+import { GuestPassVipTemplatePlata } from "@/components/templates/GuestPassVipTemplatePlata";
+import { GuestPassVipTemplateZafiro } from "@/components/templates/GuestPassVipTemplateZafiro";
 import { PrincesaTemplate } from "@/components/templates/PrincesaTemplate";
+import { PrincesaTemplateAzulMedianoche } from "@/components/templates/PrincesaTemplateAzulMedianoche";
+import { PrincesaTemplateBorgona } from "@/components/templates/PrincesaTemplateBorgona";
+import { PrincesaTemplateBosqueEncantado } from "@/components/templates/PrincesaTemplateBosqueEncantado";
+import { PrincesaTemplateRosaAntiguo } from "@/components/templates/PrincesaTemplateRosaAntiguo";
 import { CoronaEscarlataTemplate } from "@/components/templates/CoronaEscarlataTemplate";
+import { CoronaEscarlataTemplateEsmeralda } from "@/components/templates/CoronaEscarlataTemplateEsmeralda";
+import { CoronaEscarlataTemplateImperial } from "@/components/templates/CoronaEscarlataTemplateImperial";
+import { CoronaEscarlataTemplateMedianoche } from "@/components/templates/CoronaEscarlataTemplateMedianoche";
+import { CoronaEscarlataTemplateZafiro } from "@/components/templates/CoronaEscarlataTemplateZafiro";
 import { JewelryBoxTemplate } from "@/components/templates/JewelryBoxTemplate";
+import { JewelryBoxTemplateEsmeralda } from "@/components/templates/JewelryBoxTemplateEsmeralda";
+import { JewelryBoxTemplatePerla } from "@/components/templates/JewelryBoxTemplatePerla";
+import { JewelryBoxTemplateRubi } from "@/components/templates/JewelryBoxTemplateRubi";
+import { JewelryBoxTemplateZafiro } from "@/components/templates/JewelryBoxTemplateZafiro";
 import { PaseVipTemplate } from "@/components/templates/PaseVipTemplate";
+import { PaseVipTemplateCobre } from "@/components/templates/PaseVipTemplateCobre";
+import { PaseVipTemplatePlatino } from "@/components/templates/PaseVipTemplatePlatino";
+import { PaseVipTemplateRubi } from "@/components/templates/PaseVipTemplateRubi";
+import { PaseVipTemplateVioleta } from "@/components/templates/PaseVipTemplateVioleta";
 import { CineAbstractoXvTemplate } from "@/components/templates/CineAbstractoXvTemplate";
 import { AcrylicPopTemplate } from "@/components/templates/AcrylicPopTemplate";
 import { BolaDeDiscotecaTemplate } from "@/components/templates/BolaDeDiscotecaTemplate";
@@ -27,6 +47,10 @@ import { PapeleriaDeHotelDeLujoTemplate } from "@/components/templates/Papeleria
 import { VintageEditorialTemplate } from "@/components/templates/VintageEditorialTemplate";
 import { FashionLookbookTemplate } from "@/components/templates/FashionLookbookTemplate";
 import { MarmolYOroTemplate } from "@/components/templates/MarmolYOroTemplate";
+import { AtelierDePapelTemplate } from "@/components/templates/AtelierDePapelTemplate";
+import { BotanicaEditorialTemplate } from "@/components/templates/BotanicaEditorialTemplate";
+import { EncajeContemporaneoTemplate } from "@/components/templates/EncajeContemporaneoTemplate";
+import { LiquidGlassTemplate } from "@/components/templates/LiquidGlassTemplate";
 import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
 import { NeonTemplateBlackout } from "@/components/templates/NeonTemplateBlackout";
 import { NeonTemplateTropical } from "@/components/templates/NeonTemplateTropical";
@@ -344,15 +368,45 @@ export default async function InvitationPage({
                 default: return <ChicTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'GUESTPASSVIP') {
-            return <GuestPassVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'Borgona': return <GuestPassVipTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <GuestPassVipTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Plata': return <GuestPassVipTemplatePlata invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Zafiro': return <GuestPassVipTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <GuestPassVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'PRINCESA') {
-            return <PrincesaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'AzulMedianoche': return <PrincesaTemplateAzulMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Borgona': return <PrincesaTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BosqueEncantado': return <PrincesaTemplateBosqueEncantado invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'RosaAntiguo': return <PrincesaTemplateRosaAntiguo invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PrincesaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'CORONAESCARLATA') {
-            return <CoronaEscarlataTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'Esmeralda': return <CoronaEscarlataTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Imperial': return <CoronaEscarlataTemplateImperial invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Medianoche': return <CoronaEscarlataTemplateMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Zafiro': return <CoronaEscarlataTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <CoronaEscarlataTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'JEWELRYBOX') {
-            return <JewelryBoxTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'Esmeralda': return <JewelryBoxTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Perla': return <JewelryBoxTemplatePerla invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rubi': return <JewelryBoxTemplateRubi invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Zafiro': return <JewelryBoxTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <JewelryBoxTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'PASEVIP') {
-            return <PaseVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            switch (color) {
+                case 'Cobre': return <PaseVipTemplateCobre invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Platino': return <PaseVipTemplatePlatino invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rubi': return <PaseVipTemplateRubi invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PaseVipTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PaseVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'CINEABSTRACTOXV') {
             return <CineAbstractoXvTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
         } else if (invitation!.templateTipo === 'ACRYLICPOP') {
@@ -375,6 +429,14 @@ export default async function InvitationPage({
             return <FashionLookbookTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
         } else if (invitation!.templateTipo === 'MARMOLYORO') {
             return <MarmolYOroTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+        } else if (invitation!.templateTipo === 'ATELIERDEPAPEL') {
+            return <AtelierDePapelTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+        } else if (invitation!.templateTipo === 'BOTANICAEDITORIAL') {
+            return <BotanicaEditorialTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+        } else if (invitation!.templateTipo === 'ENCAJECONTEMPORANEO') {
+            return <EncajeContemporaneoTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+        } else if (invitation!.templateTipo === 'LIQUIDGLASS') {
+            return <LiquidGlassTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
         } else if (invitation!.templateTipo === 'MODERNO') {
             switch (color) {
                 case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;

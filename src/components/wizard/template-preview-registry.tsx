@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS";
 
 export interface ColorOption {
   id: string;
@@ -283,24 +283,44 @@ export const INFANTIL_COLORS: ColorOption[] = [
 // el mismo patrón que el resto de las familias.
 export const GUESTPASSVIP_COLORS: ColorOption[] = [
   { id: "default", name: "Dorado Champagne", color: "#C8A45C" },
+  { id: "Borgona", name: "Borgoña", color: "#BE6774" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#4FA983" },
+  { id: "Plata", name: "Plata", color: "#B6C4CF" },
+  { id: "Zafiro", name: "Zafiro", color: "#6D93C9" },
 ];
 
 // Por ahora una sola variante de color (lavanda sobre ciruela oscuro, la
 // aprobada en el diseño original) -- misma lógica que GUESTPASSVIP_COLORS.
 export const PRINCESA_COLORS: ColorOption[] = [
   { id: "default", name: "Lavanda Real", color: "#B48CC9" },
+  { id: "AzulMedianoche", name: "Azul Medianoche", color: "#2F4E85" },
+  { id: "Borgona", name: "Borgoña", color: "#7A2438" },
+  { id: "BosqueEncantado", name: "Bosque Encantado", color: "#2C5C3C" },
+  { id: "RosaAntiguo", name: "Rosa Antiguo", color: "#8C5A64" },
 ];
 
 export const CORONAESCARLATA_COLORS: ColorOption[] = [
   { id: "default", name: "Escarlata y Oro", color: "#D9A441" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#2F6E45" },
+  { id: "Imperial", name: "Imperial", color: "#7A3F8C" },
+  { id: "Medianoche", name: "Medianoche", color: "#2B2B33" },
+  { id: "Zafiro", name: "Zafiro", color: "#2E6FB8" },
 ];
 
 export const JEWELRYBOX_COLORS: ColorOption[] = [
   { id: "default", name: "Ciruela y Dorado", color: "#D9B063" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#5FC38A" },
+  { id: "Perla", name: "Perla", color: "#BDB4CC" },
+  { id: "Rubi", name: "Rubí", color: "#E0748F" },
+  { id: "Zafiro", name: "Zafiro", color: "#7FA8DB" },
 ];
 
 export const PASEVIP_COLORS: ColorOption[] = [
   { id: "default", name: "Dorado y Negro", color: "#C8A45C" },
+  { id: "Cobre", name: "Cobre", color: "#C9784A" },
+  { id: "Platino", name: "Platino", color: "#8FB4D9" },
+  { id: "Rubi", name: "Rubí", color: "#C23B4E" },
+  { id: "Violeta", name: "Violeta", color: "#9B7FC4" },
 ];
 
 export const CINEABSTRACTOXV_COLORS: ColorOption[] = [
@@ -345,6 +365,22 @@ export const FASHIONLOOKBOOK_COLORS: ColorOption[] = [
 
 export const MARMOLYORO_COLORS: ColorOption[] = [
   { id: "default", name: "Mármol y Oro", color: "#C9A45C" },
+];
+
+export const ATELIERDEPAPEL_COLORS: ColorOption[] = [
+  { id: "default", name: "Bronce y Papel", color: "#7A6852" },
+];
+
+export const BOTANICAEDITORIAL_COLORS: ColorOption[] = [
+  { id: "default", name: "Oliva y Salvia", color: "#5A6E4E" },
+];
+
+export const ENCAJECONTEMPORANEO_COLORS: ColorOption[] = [
+  { id: "default", name: "Terracota y Encaje", color: "#A6491F" },
+];
+
+export const LIQUIDGLASS_COLORS: ColorOption[] = [
+  { id: "default", name: "Azul Vidrio", color: "#6FA8C9" },
 ];
 
 export const ELEGANT_COLORS: ColorOption[] = [
@@ -611,22 +647,42 @@ export const INFANTIL_COMPONENTS: Record<string, PreviewComponent> = {
 
 export const GUESTPASSVIP_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/GuestPassVipTemplate").then((m) => m.GuestPassVipTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/GuestPassVipTemplateBorgona").then((m) => m.GuestPassVipTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/GuestPassVipTemplateEsmeralda").then((m) => m.GuestPassVipTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Plata: dynamic(() => import("@/components/templates/GuestPassVipTemplatePlata").then((m) => m.GuestPassVipTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Zafiro: dynamic(() => import("@/components/templates/GuestPassVipTemplateZafiro").then((m) => m.GuestPassVipTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const PRINCESA_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/PrincesaTemplate").then((m) => m.PrincesaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  AzulMedianoche: dynamic(() => import("@/components/templates/PrincesaTemplateAzulMedianoche").then((m) => m.PrincesaTemplateAzulMedianoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/PrincesaTemplateBorgona").then((m) => m.PrincesaTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  BosqueEncantado: dynamic(() => import("@/components/templates/PrincesaTemplateBosqueEncantado").then((m) => m.PrincesaTemplateBosqueEncantado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  RosaAntiguo: dynamic(() => import("@/components/templates/PrincesaTemplateRosaAntiguo").then((m) => m.PrincesaTemplateRosaAntiguo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CORONAESCARLATA_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/CoronaEscarlataTemplate").then((m) => m.CoronaEscarlataTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/CoronaEscarlataTemplateEsmeralda").then((m) => m.CoronaEscarlataTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Imperial: dynamic(() => import("@/components/templates/CoronaEscarlataTemplateImperial").then((m) => m.CoronaEscarlataTemplateImperial), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Medianoche: dynamic(() => import("@/components/templates/CoronaEscarlataTemplateMedianoche").then((m) => m.CoronaEscarlataTemplateMedianoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Zafiro: dynamic(() => import("@/components/templates/CoronaEscarlataTemplateZafiro").then((m) => m.CoronaEscarlataTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const JEWELRYBOX_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/JewelryBoxTemplate").then((m) => m.JewelryBoxTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/JewelryBoxTemplateEsmeralda").then((m) => m.JewelryBoxTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Perla: dynamic(() => import("@/components/templates/JewelryBoxTemplatePerla").then((m) => m.JewelryBoxTemplatePerla), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rubi: dynamic(() => import("@/components/templates/JewelryBoxTemplateRubi").then((m) => m.JewelryBoxTemplateRubi), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Zafiro: dynamic(() => import("@/components/templates/JewelryBoxTemplateZafiro").then((m) => m.JewelryBoxTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const PASEVIP_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/PaseVipTemplate").then((m) => m.PaseVipTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cobre: dynamic(() => import("@/components/templates/PaseVipTemplateCobre").then((m) => m.PaseVipTemplateCobre), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Platino: dynamic(() => import("@/components/templates/PaseVipTemplatePlatino").then((m) => m.PaseVipTemplatePlatino), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rubi: dynamic(() => import("@/components/templates/PaseVipTemplateRubi").then((m) => m.PaseVipTemplateRubi), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violeta: dynamic(() => import("@/components/templates/PaseVipTemplateVioleta").then((m) => m.PaseVipTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const CINEABSTRACTOXV_COMPONENTS: Record<string, PreviewComponent> = {
@@ -671,6 +727,22 @@ export const FASHIONLOOKBOOK_COMPONENTS: Record<string, PreviewComponent> = {
 
 export const MARMOLYORO_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/MarmolYOroTemplate").then((m) => m.MarmolYOroTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const ATELIERDEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/AtelierDePapelTemplate").then((m) => m.AtelierDePapelTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const BOTANICAEDITORIAL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/BotanicaEditorialTemplate").then((m) => m.BotanicaEditorialTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const ENCAJECONTEMPORANEO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/EncajeContemporaneoTemplate").then((m) => m.EncajeContemporaneoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const LIQUIDGLASS_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/LiquidGlassTemplate").then((m) => m.LiquidGlassTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
 
 export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {
