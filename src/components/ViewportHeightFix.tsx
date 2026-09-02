@@ -27,6 +27,24 @@ export function ViewportHeightFix() {
         ? window.visualViewport.height
         : window.innerHeight;
 
+    // Mientras el usuario está escribiendo (input/textarea/contentEditable
+    // con foco), el teclado virtual encoge visualViewport.height -- si eso
+    // dispara un recalculo de --vh, cualquier sección con
+    // `justify-content: center` (todas las de Storytelling) se recentra
+    // dentro de la nueva altura más chica, y el campo recién tocado
+    // "salta" de lugar debajo del dedo del usuario (reportado en RSVP al
+    // tocar "Restricciones" y al sumar una canción). No es un problema de
+    // layout de esas secciones puntuales: es este mismo listener
+    // reaccionando al teclado. Se lo ignora puntualmente mientras hay foco
+    // en un campo de texto -- el resto de los casos (rotar el dispositivo,
+    // volver de background, mostrar/ocultar la barra de direcciones) siguen
+    // actualizando igual apenas se saca el foco del campo.
+    const isTypingInField = () => {
+      const active = document.activeElement as HTMLElement | null;
+      if (!active) return false;
+      return active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable;
+    };
+
     let lastApplied = -1;
     const setVh = () => {
       const h = getHeight();
@@ -36,12 +54,16 @@ export function ViewportHeightFix() {
       }
       return h;
     };
+    const setVhUnlessTyping = () => {
+      if (!isTypingInField()) setVh();
+    };
 
     setVh();
 
     // Sondeo de fondo, independiente de cualquier evento -- la red de
-    // seguridad real para navegadores que no avisan nada.
-    const backgroundPoll = setInterval(setVh, 1500);
+    // seguridad real para navegadores que no avisan nada. Se salta mientras
+    // se está escribiendo, por el mismo motivo de arriba.
+    const backgroundPoll = setInterval(setVhUnlessTyping, 1500);
 
     // Listeners "normales", para reaccionar mas rapido donde sí funcionan.
     const handleVisibilityChange = () => {
@@ -52,8 +74,10 @@ export function ViewportHeightFix() {
     window.addEventListener("pageshow", setVh);
     window.addEventListener("focus", setVh);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.visualViewport?.addEventListener("resize", setVh);
-    window.visualViewport?.addEventListener("scroll", setVh);
+    // Estos dos SÍ disparan con la apertura/cierre del teclado (por eso
+    // usan la variante que lo ignora mientras hay foco en un campo).
+    window.visualViewport?.addEventListener("resize", setVhUnlessTyping);
+    window.visualViewport?.addEventListener("scroll", setVhUnlessTyping);
 
     return () => {
       clearInterval(backgroundPoll);
@@ -62,8 +86,8 @@ export function ViewportHeightFix() {
       window.removeEventListener("pageshow", setVh);
       window.removeEventListener("focus", setVh);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.visualViewport?.removeEventListener("resize", setVh);
-      window.visualViewport?.removeEventListener("scroll", setVh);
+      window.visualViewport?.removeEventListener("resize", setVhUnlessTyping);
+      window.visualViewport?.removeEventListener("scroll", setVhUnlessTyping);
     };
   }, []);
 

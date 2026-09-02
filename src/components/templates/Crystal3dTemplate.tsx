@@ -25,6 +25,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Poppins, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -638,6 +639,13 @@ export function Crystal3dTemplate({ invitation, guest, isPersonalized = false }:
             <span className="c3d-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="c3d-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="c3d-cal-link"
+          />
 
           <div data-drift="-70" className="c3d-medallion c3d-medallion--corner">
             <C3dFacetGem arcId="c3dArc0" arcText="MIS 15 · ADMIT ONE · " />
@@ -1359,7 +1367,7 @@ function C3dRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="c3d-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1369,7 +1377,7 @@ function C3dRsvpCard({
           </div>
         ) : (
           <div className="c3d-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1744,6 +1752,8 @@ const C3D_CSS = `
   .c3d-divider-line--long { width: 64px; }
 
   .c3d-lead { margin: 0; font-family: var(--c3d-poppins), sans-serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .c3d-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--c3d-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .c3d-cal-link:hover { color: #7FD1E0; }
 
   .c3d-medallion { position: relative; }
   .c3d-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; perspective: 600px; }

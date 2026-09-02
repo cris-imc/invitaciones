@@ -1372,7 +1372,7 @@ function GpRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="bcw-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1382,7 +1382,7 @@ function GpRsvpCard({
           </div>
         ) : (
           <div className="bcw-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}

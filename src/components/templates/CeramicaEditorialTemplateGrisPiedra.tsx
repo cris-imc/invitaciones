@@ -31,6 +31,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
@@ -672,6 +673,13 @@ export function CeramicaEditorialTemplateGrisPiedra({ invitation, guest, isPerso
             <span className="cme-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="cme-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="cme-cal-link"
+          />
 
           <div data-drift="-70" className="cme-medallion cme-medallion--corner">
             <CmeMedallion label={monograma} sub="ACCESO" arcId="cmeArc1" arcText={`TALLER DE CERÁMICA · PIEZA Nº ${passNumber} · `} spin="normal" />
@@ -1356,7 +1364,7 @@ function CmeRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="cme-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1366,7 +1374,7 @@ function CmeRsvpCard({
           </div>
         ) : (
           <div className="cme-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1747,6 +1755,8 @@ const CME_CSS = `
   .cme-divider-line--long { width: 64px; }
 
   .cme-lead { margin: 0; font-family: var(--cme-serif), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .cme-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--cme-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .cme-cal-link:hover { color: #9AA3A6; }
 
   .cme-medallion { position: relative; }
   .cme-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

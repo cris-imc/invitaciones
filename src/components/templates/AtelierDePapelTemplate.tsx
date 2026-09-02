@@ -33,6 +33,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -682,6 +683,13 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
             <span className="adp-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="adp-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="adp-cal-link"
+          />
 
           <div data-drift="-70" className="adp-medallion adp-medallion--corner">
             <Medallion label={initials} sub="ACCESO" arcId="adpArc1" arcText="ATELIER DE PAPEL · LÁMINA VII · " spin="normal" />
@@ -1370,7 +1378,7 @@ function AdpRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="adp-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1380,7 +1388,7 @@ function AdpRsvpCard({
           </div>
         ) : (
           <div className="adp-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1766,6 +1774,8 @@ const ADP_CSS = `
   .adp-divider-line--long { width: 64px; }
 
   .adp-lead { margin: 0; font-family: var(--adp-serif), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .adp-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--adp-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .adp-cal-link:hover { color: #7A6852; }
 
   .adp-medallion { position: relative; }
   .adp-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

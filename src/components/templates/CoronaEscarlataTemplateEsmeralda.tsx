@@ -24,6 +24,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Playfair_Display, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -636,6 +637,13 @@ export function CoronaEscarlataTemplateEsmeralda({ invitation, guest, isPersonal
             <span className="cne-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="cne-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="cne-cal-link"
+          />
 
           <div data-drift="-70" className="cne-medallion cne-medallion--corner">
             <CoronaMedallion sub="ACCESO" arcId="cneArc1" arcText="MIS QUINCE · REALEZA POR UNA NOCHE · " spin="normal" />
@@ -1308,7 +1316,7 @@ function CneRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="cne-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1318,7 +1326,7 @@ function CneRsvpCard({
           </div>
         ) : (
           <div className="cne-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1692,6 +1700,8 @@ const CNE_CSS = `
   .cne-divider-line--long { width: 64px; }
 
   .cne-lead { margin: 0; font-family: var(--cne-playfair), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .cne-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--cne-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .cne-cal-link:hover { color: #C97B45; }
 
   .cne-medallion { position: relative; }
   .cne-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

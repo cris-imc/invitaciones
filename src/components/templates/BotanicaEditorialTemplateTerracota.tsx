@@ -22,6 +22,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -671,6 +672,13 @@ export function BotanicaEditorialTemplateTerracota({ invitation, guest, isPerson
             <span className="bte-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="bte-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="bte-cal-link"
+          />
 
           <svg data-leaf="1" viewBox="0 0 200 400" className="bte-leaf-deco" aria-hidden="true">
             <path d="M100 398 C92 340 108 300 92 250 C78 205 100 175 84 130 C70 90 92 70 66 30" fill="none" stroke="#C08A6A" strokeWidth={1.4} />
@@ -1367,7 +1375,7 @@ function BteRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="bte-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1377,7 +1385,7 @@ function BteRsvpCard({
           </div>
         ) : (
           <div className="bte-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1761,6 +1769,8 @@ const BTE_CSS = `
   .bte-divider-line--long { width: 64px; }
 
   .bte-lead { margin: 0; font-family: var(--bte-serif), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .bte-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--bte-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .bte-cal-link:hover { color: #8A5A3E; }
 
   .bte-leaf-deco { position: absolute; left: -30px; bottom: -20px; width: 190px; opacity: .55; z-index: 1; pointer-events: none; }
 

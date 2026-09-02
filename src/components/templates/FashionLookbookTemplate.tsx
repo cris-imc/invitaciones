@@ -24,6 +24,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Archivo_Black, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -645,6 +646,13 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
             <span className="flb-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="flb-lead" style={{ position: "relative" }}>{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="flb-cal-link"
+          />
 
           <div data-drift="-70" className="flb-medallion flb-medallion--corner">
             <FlbMedallion main="15" sub="ACCESO" arcId="flbArc1" arcText="LOOKBOOK SS27 · EDICIÓN ÚNICA · " spin="normal" />
@@ -1326,7 +1334,7 @@ function FlbRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="flb-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1336,7 +1344,7 @@ function FlbRsvpCard({
           </div>
         ) : (
           <div className="flb-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1721,6 +1729,8 @@ const FLB_CSS = `
   .flb-divider-line--long { width: 64px; }
 
   .flb-lead { margin: 0; font-family: var(--flb-archivo), sans-serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .flb-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--flb-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .flb-cal-link:hover { color: #D93A2B; }
 
   .flb-medallion { position: relative; }
   .flb-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

@@ -25,6 +25,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -637,6 +638,13 @@ export function JewelryBoxTemplatePerla({ invitation, guest, isPersonalized = fa
             <span className="jwb-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="jwb-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="jwb-cal-link"
+          />
 
           <div data-drift="-70" className="jwb-medallion jwb-medallion--corner">
             <div data-gem="1" className="jwb-gem" />
@@ -1312,7 +1320,7 @@ function JwbRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="jwb-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1322,7 +1330,7 @@ function JwbRsvpCard({
           </div>
         ) : (
           <div className="jwb-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1698,6 +1706,8 @@ const JWB_CSS = `
   .jwb-divider-line--long { width: 64px; }
 
   .jwb-lead { margin: 0; font-family: var(--jwb-cormorant), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .jwb-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--jwb-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .jwb-cal-link:hover { color: #BDB4CC; }
 
   .jwb-medallion { position: relative; }
   .jwb-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

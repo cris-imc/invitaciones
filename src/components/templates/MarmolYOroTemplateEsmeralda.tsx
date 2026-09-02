@@ -34,6 +34,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Italiana, Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -689,6 +690,13 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
             <span className="myo-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="myo-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="myo-cal-link"
+          />
 
           <div data-drift="-70" className="myo-medallion myo-medallion--corner">
             <Medallion label={initials} sub="ACCESO" arcId="myoArc1" arcText="ADMIT TWO · MÁRMOL &amp; ORO · " spin="normal" />
@@ -1373,7 +1381,7 @@ function MyoRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="myo-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1383,7 +1391,7 @@ function MyoRsvpCard({
           </div>
         ) : (
           <div className="myo-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1769,6 +1777,8 @@ const MYO_CSS = `
   .myo-divider-line--long { width: 64px; }
 
   .myo-lead { margin: 0; font-family: var(--myo-cormorant), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .myo-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--myo-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .myo-cal-link:hover { color: #3F9C74; }
 
   .myo-medallion { position: relative; }
   .myo-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

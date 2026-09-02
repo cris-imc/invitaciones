@@ -30,6 +30,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Playfair_Display, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
@@ -670,6 +671,13 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
             <span className="vte-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="vte-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="vte-cal-link"
+          />
 
           <div data-drift="-70" className="vte-medallion vte-medallion--corner">
             <Medallion label={coupleInitials} sub="ACCESO" arcId="vteArc1" arcText={`EDICIÓN DE BODAS · Nº ${edicionNumero} · `} spin="normal" />
@@ -1353,7 +1361,7 @@ function VteRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="vte-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1363,7 +1371,7 @@ function VteRsvpCard({
           </div>
         ) : (
           <div className="vte-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1746,6 +1754,8 @@ const VTE_CSS = `
   .vte-divider-line--long { width: 64px; }
 
   .vte-lead { margin: 0; font-family: var(--vte-playfair), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .vte-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--vte-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .vte-cal-link:hover { color: #B66A7E; }
 
   .vte-medallion { position: relative; }
   .vte-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

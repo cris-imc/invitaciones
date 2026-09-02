@@ -46,6 +46,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Playfair_Display, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -692,6 +693,13 @@ export function EncajeContemporaneoTemplateBorgona({ invitation, guest, isPerson
             <span className="enc-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="enc-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="enc-cal-link"
+          />
 
           <div data-drift="-70" className="enc-medallion enc-medallion--corner">
             <Medallion label={initials} sub="ACCESO" arcId="encArc1" arcText="NOS CASAMOS · EDICIÓN ÚNICA · " spin="normal" />
@@ -1379,7 +1387,7 @@ function EncRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="enc-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1389,7 +1397,7 @@ function EncRsvpCard({
           </div>
         ) : (
           <div className="enc-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1769,6 +1777,8 @@ const ENC_CSS = `
   .enc-divider-line--long { width: 64px; }
 
   .enc-lead { margin: 0; font-family: var(--enc-playfair), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .enc-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--enc-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .enc-cal-link:hover { color: #A83A5A; }
 
   .enc-medallion { position: relative; }
   .enc-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

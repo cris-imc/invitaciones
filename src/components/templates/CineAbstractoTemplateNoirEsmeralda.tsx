@@ -29,6 +29,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Frank_Ruhl_Libre, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
@@ -695,6 +696,13 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
             <span className="cab-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="cab-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="cab-cal-link"
+          />
 
           <div data-drift="-70" className="cab-medallion cab-medallion--corner">
             <CabMedallion label="35mm" sub="ACCESO" arcId="cabArc1" arcText="ADMIT TWO · CINE ABSTRACTO · " spin="normal" />
@@ -1384,7 +1392,7 @@ function CabRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="cab-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1394,7 +1402,7 @@ function CabRsvpCard({
           </div>
         ) : (
           <div className="cab-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1788,6 +1796,8 @@ const CAB_CSS = `
   .cab-divider-line--long { width: 64px; }
 
   .cab-lead { margin: 0; font-family: var(--cab-serif), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .cab-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--cab-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .cab-cal-link:hover { color: #3F9C74; }
 
   .cab-medallion { position: relative; }
   .cab-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }

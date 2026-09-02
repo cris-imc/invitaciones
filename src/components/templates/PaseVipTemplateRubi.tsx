@@ -45,6 +45,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Bodoni_Moda, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
@@ -655,6 +656,13 @@ export function PaseVipTemplateRubi({ invitation, guest, isPersonalized = false 
             <span className="pvp-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="pvp-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="pvp-cal-link"
+          />
 
           <div data-drift="-70" className="pvp-medallion pvp-medallion--corner">
             <PvpMedallion label="VIP" sub="ACCESO" arcId="pvpArc1" arcText="ADMIT ONE · MIS QUINCE · " spin="normal" />
@@ -1331,7 +1339,7 @@ function PvpRsvpCard({
 
         {status !== "CONFIRMED" ? (
           <div className="pvp-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1341,7 +1349,7 @@ function PvpRsvpCard({
           </div>
         ) : (
           <div className="pvp-rsvp-row">
-            <span>RESTRICCIONES</span>
+            <span>RESTRICCIÓN ALIMENTARIA</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1715,6 +1723,8 @@ const PVP_CSS = `
   .pvp-divider-line--long { width: 64px; }
 
   .pvp-lead { margin: 0; font-family: var(--pvp-bodoni), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .pvp-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--pvp-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .pvp-cal-link:hover { color: #C23B4E; }
 
   .pvp-medallion { position: relative; }
   .pvp-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }
