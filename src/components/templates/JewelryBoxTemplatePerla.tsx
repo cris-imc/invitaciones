@@ -118,7 +118,7 @@ export function JewelryBoxTemplatePerla({ invitation, guest, isPersonalized = fa
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA PIEZA ÚNICA PARA" : "UNA PIEZA ÚNICA PARA MIS QUINCE DE";
+  const coverKickerText = showGuestNameInCover ? "UNA PIEZA ÚNICA PARA" : "UNA PIEZA ÚNICA PARA LOS QUINCE DE";
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();

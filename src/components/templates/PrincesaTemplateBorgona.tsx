@@ -117,7 +117,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UN CUENTO DE HADAS PARA" : "UN CUENTO DE HADAS PARA MIS 15 DE";
+  const coverKickerText = showGuestNameInCover ? "UN CUENTO DE HADAS PARA" : "UN CUENTO DE HADAS PARA LOS 15 DE";
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();

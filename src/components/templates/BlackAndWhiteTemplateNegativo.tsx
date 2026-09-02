@@ -142,7 +142,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
   const coverKickerText = isCasamiento
     ? (showGuestNameInCover ? "ACCESO EXCLUSIVO A LA BODA" : "ACCESO EXCLUSIVO A LA BODA DE")
-    : (showGuestNameInCover ? "ACCESO EXCLUSIVO PARA" : "ACCESO EXCLUSIVO A MIS QUINCE DE");
+    : (showGuestNameInCover ? "ACCESO EXCLUSIVO PARA" : "ACCESO EXCLUSIVO A LOS QUINCE DE");
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : isCasamiento

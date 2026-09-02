@@ -124,7 +124,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "LA PISTA SE PRENDE PARA" : "LA PISTA SE PRENDE PARA MIS 15 DE";
+  const coverKickerText = showGuestNameInCover ? "LA PISTA SE PRENDE PARA" : "LA PISTA SE PRENDE PARA LOS 15 DE";
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
