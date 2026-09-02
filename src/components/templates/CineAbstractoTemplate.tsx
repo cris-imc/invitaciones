@@ -1986,7 +1986,9 @@ const CAB_CSS = `
   .cab-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .cab-cover-cta { border: 1px solid #C6743A; background: linear-gradient(100deg, rgba(198,116,58,0.08), rgba(244,224,196,0.2), rgba(198,116,58,0.08)); color: #F4EEE6; font-family: var(--cab-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .cab-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .cab-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(244,224,196,0.34), rgba(244,224,196,0.55), rgba(244,224,196,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .cab-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(244,224,196,0.34), rgba(244,224,196,0.55), rgba(244,224,196,0.34)); color: #0B0B0F; }
+  }
   .cab-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .cab-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: cabHint 2.4s ease-in-out infinite; }

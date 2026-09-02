@@ -1978,7 +1978,9 @@ const ADP_CSS = `
   .adp-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .adp-cover-cta { border: 1px solid #2B2620; background: #2B2620; color: #F4E6E8; font-family: var(--adp-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .adp-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .adp-cover-cta--btn:hover { background: #9B3B4B; border-color: #9B3B4B; }
+  @media (hover: hover) {
+    .adp-cover-cta--btn:hover { background: #9B3B4B; border-color: #9B3B4B; }
+  }
   .adp-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .adp-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: adpHint 2.4s ease-in-out infinite; }

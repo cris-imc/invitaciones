@@ -1915,7 +1915,9 @@ const FLB_CSS = `
   .flb-cover-facts--dress { justify-content: center; color: #6A6A66; }
   .flb-cover-cta { border: 1px solid #0B0B0B; background: #0B0B0B; color: #F5F2ED; font-family: var(--flb-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .flb-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .flb-cover-cta--btn:hover { background: #6B8F3B; border-color: #6B8F3B; }
+  @media (hover: hover) {
+    .flb-cover-cta--btn:hover { background: #6B8F3B; border-color: #6B8F3B; }
+  }
   .flb-perf-strip--light { background: radial-gradient(circle at 6px 50%, #F5F2ED 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; }
   .flb-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 

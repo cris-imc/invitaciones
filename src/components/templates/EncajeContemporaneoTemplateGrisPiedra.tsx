@@ -1980,7 +1980,9 @@ const ENC_CSS = `
   .enc-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .enc-cover-cta { border: 1px solid #1C1A18; background: #1C1A18; color: #F7F3ED; font-family: var(--enc-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .enc-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .enc-cover-cta--btn:hover { background: #6E6656; border-color: #6E6656; }
+  @media (hover: hover) {
+    .enc-cover-cta--btn:hover { background: #6E6656; border-color: #6E6656; }
+  }
   .enc-perf-strip--light { background: radial-gradient(circle at 6px 50%, #F7F3ED 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; }
   .enc-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 

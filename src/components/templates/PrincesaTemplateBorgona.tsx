@@ -1882,7 +1882,9 @@ const PRC_CSS = `
   .prc-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .prc-cover-cta { border: 1px solid #8FC4D9; background: linear-gradient(100deg, rgba(143,196,217,0.08), rgba(234,246,251,0.2), rgba(143,196,217,0.08)); color: #E3F1F6; font-family: var(--prc-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .prc-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .prc-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(163,214,230,0.34), rgba(227,241,246,0.5), rgba(163,214,230,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .prc-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(163,214,230,0.34), rgba(227,241,246,0.5), rgba(163,214,230,0.34)); color: #0B0B0F; }
+  }
   .prc-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .prc-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }

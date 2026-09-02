@@ -1905,7 +1905,9 @@ const PVP_CSS = `
   .pvp-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .pvp-cover-cta { border: 1px solid #C23B4E; background: linear-gradient(100deg, rgba(194,59,78,0.08), rgba(217,213,210,0.2), rgba(194,59,78,0.08)); color: #F2EDEA; font-family: var(--pvp-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .pvp-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .pvp-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(217,213,210,0.34), rgba(242,237,234,0.5), rgba(217,213,210,0.34)); color: #0C0708; }
+  @media (hover: hover) {
+    .pvp-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(217,213,210,0.34), rgba(242,237,234,0.5), rgba(217,213,210,0.34)); color: #0C0708; }
+  }
   .pvp-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .pvp-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }

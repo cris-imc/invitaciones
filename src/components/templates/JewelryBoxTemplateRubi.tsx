@@ -1888,7 +1888,9 @@ const JWB_CSS = `
   .jwb-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .jwb-cover-cta { border: 1px solid #E0748F; background: linear-gradient(100deg, rgba(196,140,70,0.08), rgba(232,196,150,0.2), rgba(196,140,70,0.08)); color: #F2E2BE; font-family: var(--jwb-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .jwb-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .jwb-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,196,150,0.34), rgba(242,226,190,0.5), rgba(232,196,150,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .jwb-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,196,150,0.34), rgba(242,226,190,0.5), rgba(232,196,150,0.34)); color: #0B0B0F; }
+  }
   .jwb-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .jwb-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }

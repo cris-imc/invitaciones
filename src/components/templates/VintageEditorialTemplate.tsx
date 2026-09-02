@@ -1946,7 +1946,9 @@ const VTE_CSS = `
   .vte-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .vte-cover-cta { border: 1px solid #C9A66B; background: linear-gradient(100deg, rgba(201,166,107,0.08), rgba(239,227,200,0.2), rgba(201,166,107,0.08)); color: #F6EFDD; font-family: var(--vte-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .vte-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .vte-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(239,227,200,0.34), rgba(246,239,221,0.5), rgba(239,227,200,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .vte-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(239,227,200,0.34), rgba(246,239,221,0.5), rgba(239,227,200,0.34)); color: #0B0B0F; }
+  }
   .vte-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .vte-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: vteHint 2.4s ease-in-out infinite; }

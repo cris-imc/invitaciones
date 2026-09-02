@@ -1944,7 +1944,9 @@ const PHL_CSS = `
   .phl-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .phl-cover-cta { border: 1px solid #C9C2AA; background: linear-gradient(100deg, rgba(201,194,170,0.08), rgba(237,232,216,0.2), rgba(201,194,170,0.08)); color: #F5F1E6; font-family: var(--phl-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .phl-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .phl-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(237,232,216,0.34), rgba(246,239,221,0.5), rgba(237,232,216,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .phl-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(237,232,216,0.34), rgba(246,239,221,0.5), rgba(237,232,216,0.34)); color: #0B0B0F; }
+  }
   .phl-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .phl-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: phlHint 2.4s ease-in-out infinite; }

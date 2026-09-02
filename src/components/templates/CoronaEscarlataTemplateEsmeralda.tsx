@@ -1880,7 +1880,9 @@ const CNE_CSS = `
   .cne-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .cne-cover-cta { border: 1px solid #C97B45; background: linear-gradient(100deg, rgba(201,123,69,0.08), rgba(246,231,216,0.2), rgba(201,123,69,0.08)); color: #F6E7D8; font-family: var(--cne-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .cne-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .cne-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(47,110,69,0.34), rgba(246,231,216,0.5), rgba(47,110,69,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .cne-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(47,110,69,0.34), rgba(246,231,216,0.5), rgba(47,110,69,0.34)); color: #0B0B0F; }
+  }
   .cne-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .cne-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }

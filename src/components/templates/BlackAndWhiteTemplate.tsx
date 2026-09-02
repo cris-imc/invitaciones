@@ -1970,7 +1970,9 @@ const GP_CSS = `
   .bcw-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .bcw-cover-cta { border: 1px solid #B9B9BC; background: linear-gradient(100deg, rgba(185,185,188,0.08), rgba(255,255,255,0.2), rgba(185,185,188,0.08)); color: #FFFFFF; font-family: var(--bcw-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .bcw-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .bcw-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(255,255,255,0.34), rgba(255,255,255,0.5), rgba(255,255,255,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .bcw-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(255,255,255,0.34), rgba(255,255,255,0.5), rgba(255,255,255,0.34)); color: #0B0B0F; }
+  }
   .bcw-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .bcw-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: bcwHint 2.4s ease-in-out infinite; }

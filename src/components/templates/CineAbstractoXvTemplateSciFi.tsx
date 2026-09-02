@@ -1891,7 +1891,9 @@ const CXV_CSS = `
   .cxv-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .cxv-cover-cta { border: 1px solid #18D2E0; background: linear-gradient(100deg, rgba(90,170,180,0.08), rgba(190,240,250,0.2), rgba(90,170,180,0.08)); color: #DFFBFF; font-family: var(--cxv-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .cxv-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .cxv-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(190,240,250,0.34), rgba(246,239,221,0.5), rgba(190,240,250,0.34)); color: #0B0B0F; }
+  @media (hover: hover) {
+    .cxv-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(190,240,250,0.34), rgba(246,239,221,0.5), rgba(190,240,250,0.34)); color: #0B0B0F; }
+  }
   .cxv-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .cxv-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }

@@ -1946,7 +1946,9 @@ const GP_CSS = `
   .gpv-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
   .gpv-cover-cta { border: 1px solid #6D93C9; background: linear-gradient(100deg, rgba(109,147,201,0.08), rgba(191,215,240,0.2), rgba(109,147,201,0.08)); color: #E9F2FC; font-family: var(--gp-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .gpv-cover-cta--btn { cursor: pointer; border-radius: 0; }
-  .gpv-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(191,215,240,0.34), rgba(233,242,252,0.5), rgba(191,215,240,0.34)); color: #0A0E14; }
+  @media (hover: hover) {
+    .gpv-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(191,215,240,0.34), rgba(233,242,252,0.5), rgba(191,215,240,0.34)); color: #0A0E14; }
+  }
   .gpv-barcode-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   .gpv-hint { position: absolute; left: 0; right: 34px; bottom: 18px; z-index: 6; text-align: center; font-size: 9px; letter-spacing: 0.28em; color: #8A8577; opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: gpHint 2.4s ease-in-out infinite; }
