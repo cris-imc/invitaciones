@@ -1853,7 +1853,7 @@ function CabCoverHalf({
           <span className="cab-cover-date">{fechaCorta}</span>
         </div>
         <div className="cab-cover-bottom">
-          <div ref={perfRef} className="cab-perf-strip cab-perf-strip--reveal" />
+          <div ref={perfRef} className="cab-perf-strip cab-perf-strip--reveal cab-perf-strip--cover" />
           <div className="cab-cover-facts">
             <span>{dressCode ? dressCode.toUpperCase() : "SECTOR — SALA"}</span>
             <span>{hora} H</span>
@@ -1861,8 +1861,8 @@ function CabCoverHalf({
           </div>
           {children}
           <div className="cab-barcode-wrap">
-            <div className="cab-barcode" style={{ width: "62%" }} />
-            <span className="cab-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="cab-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="cab-mini-label cab-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1955,6 +1955,7 @@ const CAB_CSS = `
   .cab-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #B9C0C6; }
   .cab-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #08080B 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .cab-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .cab-perf-strip--cover { opacity: .9; }
 
   .cab-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(150,155,160,0.5), rgba(40,42,45,0.36), rgba(185,192,198,0.46), rgba(150,155,160,0.5)); filter: blur(80px); opacity: .4; animation: cabFoil 30s linear infinite; }
   .cab-phrase { margin: 0; position: relative; font-family: var(--cab-serif), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1978,6 +1979,7 @@ const CAB_CSS = `
   .cab-panel-title-sm { margin: 0; font-family: var(--cab-serif), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .cab-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .cab-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .cab-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .cab-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .cab-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .cab-facts-row--last { border-bottom: none; padding-bottom: 0; }

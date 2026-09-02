@@ -1841,15 +1841,15 @@ function CoverHalf({
           <span className="lqg-cover-date">{fechaCorta}</span>
         </div>
         <div className="lqg-cover-bottom">
-          <div ref={perfRef} className="lqg-perf-strip lqg-perf-strip--reveal" />
+          <div ref={perfRef} className="lqg-perf-strip lqg-perf-strip--reveal lqg-perf-strip--cover" />
           <div className="lqg-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="lqg-barcode-wrap">
-            <div className="lqg-barcode" style={{ width: "62%" }} />
-            <span className="lqg-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="lqg-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="lqg-mini-label lqg-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1933,6 +1933,7 @@ const LQG_CSS = `
   .lqg-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #C9A86F; }
   .lqg-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #0D0A08 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .lqg-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .lqg-perf-strip--cover { opacity: .9; }
 
   .lqg-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(201,168,111,0.3), rgba(242,240,232,0.2), rgba(201,168,111,0.34), rgba(201,168,111,0.3)); filter: blur(80px); opacity: .4; animation: lqgFoil 30s linear infinite; }
   .lqg-phrase { margin: 0; position: relative; font-family: var(--lqg-cormorant), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1957,6 +1958,7 @@ const LQG_CSS = `
   .lqg-panel-title-sm { margin: 0; font-family: var(--lqg-cormorant), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .lqg-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .lqg-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .lqg-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .lqg-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .lqg-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .lqg-facts-row--last { border-bottom: none; padding-bottom: 0; }

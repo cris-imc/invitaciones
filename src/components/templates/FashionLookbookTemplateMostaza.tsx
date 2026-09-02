@@ -1766,7 +1766,7 @@ function FlbCoverHalf({
           <span className="flb-cover-date">{fechaCorta}</span>
         </div>
         <div className="flb-cover-bottom">
-          <div ref={perfRef} className="flb-perf-strip flb-perf-strip--reveal flb-perf-strip--light" />
+          <div ref={perfRef} className="flb-perf-strip flb-perf-strip--reveal flb-perf-strip--light flb-perf-strip--cover" />
           <div className="flb-cover-facts">
             <span>SECTOR — PASARELA</span>
             <span>{hora} H</span>
@@ -1775,8 +1775,8 @@ function FlbCoverHalf({
           {dressCode && <div className="flb-cover-facts flb-cover-facts--dress"><span>{dressCode.toUpperCase()}</span></div>}
           {children}
           <div className="flb-barcode-wrap">
-            <div className="flb-barcode" style={{ width: "62%" }} />
-            <span className="flb-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="flb-barcode flb-barcode--cover" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="flb-mini-label flb-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1863,6 +1863,7 @@ const FLB_CSS = `
   .flb-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #D9A430; }
   .flb-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #0A0806 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .flb-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .flb-perf-strip--cover { opacity: .9; }
 
   .flb-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(217,164,48,0.24), rgba(16,13,8,0.3), rgba(217,164,48,0.36), rgba(217,164,48,0.24)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
   .flb-phrase { margin: 0; position: relative; font-family: var(--flb-archivo), sans-serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1888,6 +1889,7 @@ const FLB_CSS = `
   .flb-panel-title-sm { margin: 0; font-family: var(--flb-archivo), sans-serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .flb-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .flb-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .flb-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .flb-mini-label--dark { color: #8A8577; }
   .flb-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .flb-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
@@ -1993,6 +1995,7 @@ const FLB_CSS = `
   .flb-final-card { border: 1px solid #D9A430; padding: 30px 24px; display: flex; flex-direction: column; gap: 22px; align-items: center; text-align: center; position: relative; }
   .flb-final-names { font-family: var(--flb-archivo), sans-serif; font-size: clamp(34px, 10vw, 46px); line-height: .9; color: #F5F2ED; }
   .flb-barcode { height: 26px; background: repeating-linear-gradient(90deg, #6E6A5D 0 2px, transparent 2px 4px, #6E6A5D 4px 5px, transparent 5px 9px, #6E6A5D 9px 11px, transparent 11px 14px); }
+  .flb-barcode--cover { background: repeating-linear-gradient(90deg, #6A6A66 0 2px, transparent 2px 4px, #6A6A66 4px 5px, transparent 5px 9px, #6A6A66 9px 11px, transparent 11px 14px); }
   .flb-barcode--stub { width: 100%; height: 28px; background: repeating-linear-gradient(90deg, #A8A292 0 2px, transparent 2px 4px, #A8A292 4px 5px, transparent 5px 9px, #A8A292 9px 11px, transparent 11px 14px); opacity: .55; }
   .flb-final-footer { display: flex; justify-content: space-between; align-items: center; font-size: 9px; letter-spacing: 0.24em; color: #56534A; }
   .flb-replay { cursor: pointer; color: #D9A430; }
@@ -2020,7 +2023,7 @@ const FLB_CSS = `
   .flb-cover-rule { width: 74px; height: 3px; background: #0B0B0B; display: block; }
   .flb-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #6A6A66; white-space: nowrap; }
   .flb-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
-  .flb-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
+  .flb-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6A6A66; }
   .flb-cover-facts--dress { justify-content: center; color: #6A6A66; }
   .flb-cover-cta { border: 1px solid #0B0B0B; background: #0B0B0B; color: #F5F2ED; font-family: var(--flb-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .flb-cover-cta--btn { cursor: pointer; border-radius: 0; }

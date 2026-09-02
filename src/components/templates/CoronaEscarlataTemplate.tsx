@@ -1761,15 +1761,15 @@ function CneCoverHalf({
           <span className="cne-cover-date">{fechaCorta}</span>
         </div>
         <div className="cne-cover-bottom">
-          <div ref={perfRef} className="cne-perf-strip cne-perf-strip--reveal" />
+          <div ref={perfRef} className="cne-perf-strip cne-perf-strip--reveal cne-perf-strip--cover" />
           <div className="cne-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="cne-barcode-wrap">
-            <div className="cne-barcode" style={{ width: "62%" }} />
-            <span className="cne-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="cne-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="cne-mini-label cne-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1848,6 +1848,7 @@ const CNE_CSS = `
   .cne-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #D9A441; }
   .cne-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #220709 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .cne-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .cne-perf-strip--cover { opacity: .9; }
 
   .cne-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(217,164,65,0.3), rgba(74,14,20,0.24), rgba(217,164,65,0.34), rgba(217,164,65,0.3)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
   .cne-phrase { margin: 0; position: relative; font-family: var(--cne-playfair), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1871,6 +1872,7 @@ const CNE_CSS = `
   .cne-panel-title-sm { margin: 0; font-family: var(--cne-playfair), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .cne-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .cne-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .cne-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .cne-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .cne-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .cne-facts-row--last { border-bottom: none; padding-bottom: 0; }
@@ -1988,7 +1990,7 @@ const CNE_CSS = `
   .cne-cover-half--bottom { bottom: 0; }
   .cne-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #380A0F 0%, #2A0A0E 46%, #220709 100%); }
   .cne-cover-half--bottom .cne-cover-inner { top: auto; bottom: 0; }
-  .cne-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(217,164,65,0.5), rgba(74,14,20,0.4), rgba(217,164,65,0.55), rgba(217,164,65,0.5)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite; }
+  .cne-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(122,22,32,0.6), rgba(74,14,20,0.5), rgba(217,164,65,0.55), rgba(122,22,32,0.6)); filter: blur(64px); opacity: .62; animation: gpFoil 26s linear infinite; }
   /* Trama cruzada dorada (ver mockup original) -- distinta de la portada de
      Guest Pass VIP/Princesa, que usan un destello tipo abanico ("sunburst"). */
   .cne-cover-lattice { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(217,164,65,.14) 0 1px, transparent 1px 24px), repeating-linear-gradient(-45deg, rgba(217,164,65,.14) 0 1px, transparent 1px 24px); }

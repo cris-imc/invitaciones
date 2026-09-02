@@ -1769,15 +1769,15 @@ function CxvCoverHalf({
           <span className="cxv-cover-date">{fechaCorta}</span>
         </div>
         <div className="cxv-cover-bottom">
-          <div ref={perfRef} className="cxv-perf-strip cxv-perf-strip--reveal" />
+          <div ref={perfRef} className="cxv-perf-strip cxv-perf-strip--reveal cxv-perf-strip--cover" />
           <div className="cxv-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="cxv-barcode-wrap">
-            <div className="cxv-barcode" style={{ width: "62%" }} />
-            <span className="cxv-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="cxv-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="cxv-mini-label cxv-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1859,6 +1859,7 @@ const CXV_CSS = `
   .cxv-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #1E88F5; }
   .cxv-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #05070F 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .cxv-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .cxv-perf-strip--cover { opacity: .9; }
 
   .cxv-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(255,106,31,0.3), rgba(30,136,245,0.2), rgba(30,136,245,0.32), rgba(255,106,31,0.3)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
   .cxv-phrase { margin: 0; position: relative; font-family: var(--cxv-archivo), sans-serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1882,6 +1883,7 @@ const CXV_CSS = `
   .cxv-panel-title-sm { margin: 0; font-family: var(--cxv-archivo), sans-serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .cxv-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .cxv-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .cxv-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .cxv-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .cxv-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .cxv-facts-row--last { border-bottom: none; padding-bottom: 0; }

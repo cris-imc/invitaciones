@@ -1833,15 +1833,15 @@ function CoverHalf({
           <span className="myo-cover-date">{fechaCorta}</span>
         </div>
         <div className="myo-cover-bottom">
-          <div ref={perfRef} className="myo-perf-strip myo-perf-strip--reveal" />
+          <div ref={perfRef} className="myo-perf-strip myo-perf-strip--reveal myo-perf-strip--cover" />
           <div className="myo-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="myo-barcode-wrap">
-            <div className="myo-barcode" style={{ width: "62%" }} />
-            <span className="myo-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="myo-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="myo-mini-label myo-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1934,6 +1934,7 @@ const MYO_CSS = `
   .myo-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #C9CDD1; }
   .myo-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #060607 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .myo-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .myo-perf-strip--cover { opacity: .9; }
 
   .myo-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(130,132,134,0.3), rgba(26,26,28,0.26), rgba(201,205,209,0.4), rgba(130,132,134,0.3)); filter: blur(80px); opacity: .4; animation: gpFoil 30s linear infinite; }
   .myo-phrase { margin: 0; position: relative; font-family: var(--myo-italiana), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1957,6 +1958,7 @@ const MYO_CSS = `
   .myo-panel-title-sm { margin: 0; font-family: var(--myo-italiana), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .myo-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .myo-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .myo-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .myo-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .myo-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .myo-facts-row--last { border-bottom: none; padding-bottom: 0; }

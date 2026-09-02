@@ -1843,15 +1843,15 @@ function CoverHalf({
           <span className="enc-cover-date">{fechaCorta}</span>
         </div>
         <div className="enc-cover-bottom">
-          <div ref={perfRef} className="enc-perf-strip enc-perf-strip--reveal enc-perf-strip--light" />
+          <div ref={perfRef} className="enc-perf-strip enc-perf-strip--reveal enc-perf-strip--light enc-perf-strip--cover" />
           <div className="enc-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="enc-barcode-wrap">
-            <div className="enc-barcode" style={{ width: "62%" }} />
-            <span className="enc-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="enc-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="enc-mini-label enc-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1935,6 +1935,7 @@ const ENC_CSS = `
   .enc-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #3F8A55; }
   .enc-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #0A0D0A 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .enc-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .enc-perf-strip--cover { opacity: .9; }
 
   .enc-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(28,26,24,0.34), rgba(140,133,119,0.2), rgba(63,138,85,0.36), rgba(28,26,24,0.34)); filter: blur(80px); opacity: .4; animation: encFoil 30s linear infinite; }
   .enc-phrase { margin: 0; position: relative; font-family: var(--enc-playfair), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1967,6 +1968,7 @@ const ENC_CSS = `
   .enc-panel-title-sm { margin: 0; font-family: var(--enc-playfair), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .enc-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .enc-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .enc-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .enc-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .enc-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .enc-facts-row--last { border-bottom: none; padding-bottom: 0; }
