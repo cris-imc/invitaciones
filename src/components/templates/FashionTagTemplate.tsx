@@ -119,7 +119,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA ETIQUETA DE COLECCIÓN PARA" : "ETIQUETA DE COLECCIÓN PARA LOS 15 DE";
+  const coverKickerText = showGuestNameInCover ? "UNA ETIQUETA DE COLECCIÓN PARA" : "UNA ETIQUETA DE COLECCIÓN PARA LOS 15 DE";
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
