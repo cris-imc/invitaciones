@@ -162,9 +162,15 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
   // Portada de bienvenida y foto principal con foto real (ver rama
   // experimento-foto-storytelling). 100% opcionales: sin cargarlas, todo
   // se ve exactamente igual que antes.
-  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
-  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
-  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  // Recorte celular (mobile) y Recorte PC (desktop): mismos 2 campos que
+  // carga StepHeroImages.tsx, cada uno 100% opcional e independiente --
+  // ver rama experimento-foto-storytelling. Cada uno controla SU propio
+  // breakpoint tanto en la tapa (CoverHalf) como en "Nuestra foto" más
+  // abajo: si solo se cargó uno de los dos, ese breakpoint muestra la
+  // foto y el otro se ve tal cual la plantilla original (sin foto, sin
+  // fallback cruzado ni fallback a la galería principal).
+  const photoMobile = String(invitation.portadaImagenFondo || "");
+  const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -665,17 +671,20 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
             ocupa toda la pantalla en mobile, se enmarca en desktop. */}
         <section data-tone="dark" data-screen-label="Nuestra foto" className="ftg-hero-photo-section">
           <div className="ftg-hero-photo-frame">
-            {heroPhotoMobile && (
-              <div className="acp-mobile-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="16,12,10" />
-              </div>
-            )}
-            {heroPhotoDesktop && (
-              <div className="acp-desktop-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="16,12,10" />
-              </div>
-            )}
-            {!heroPhotoMobile && !heroPhotoDesktop && <div className="ftg-hero-photo-placeholder" />}
+            <div className="acp-mobile-only">
+              {photoMobile ? (
+                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="16,12,10" />
+              ) : (
+                <div className="ftg-hero-photo-placeholder" />
+              )}
+            </div>
+            <div className="acp-desktop-only">
+              {photoDesktop ? (
+                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="16,12,10" />
+              ) : (
+                <div className="ftg-hero-photo-placeholder" />
+              )}
+            </div>
           </div>
           <span data-xin="1" data-dist="-60" className="ftg-kicker ftg-hero-photo-kicker">02 — LA ETIQUETA CUENTA UNA HISTORIA</span>
         </section>
@@ -1029,7 +1038,8 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <div className="ftg-cover-cta">ABRIR INVITACIÓN</div>
           </FtgCoverHalf>
@@ -1042,7 +1052,8 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <button onClick={open} className="ftg-cover-cta ftg-cover-cta--btn">ABRIR INVITACIÓN</button>
           </FtgCoverHalf>
@@ -1653,7 +1664,8 @@ function FtgCoverHalf({
   passNumber,
   dressCode,
   hora,
-  photoSrc,
+  photoMobile,
+  photoDesktop,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1665,14 +1677,20 @@ function FtgCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
-  photoSrc?: string;
+  photoMobile?: string;
+  photoDesktop?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="ftg-cover-inner">
-      {photoSrc && (
+      {photoMobile && (
         <div className="acp-mobile-only">
-          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#B0562E" tintColor2="#100C0A" effect="enfoque" scrimColorRgb="16,12,10" />
+          <AnimatedCoverPhoto photoSrc={photoMobile} tint tintColor1="#B0562E" tintColor2="#100C0A" effect="enfoque" scrimColorRgb="16,12,10" />
+        </div>
+      )}
+      {photoDesktop && (
+        <div className="acp-desktop-only">
+          <AnimatedCoverPhoto photoSrc={photoDesktop} tint tintColor1="#B0562E" tintColor2="#100C0A" effect="enfoque" scrimColorRgb="16,12,10" />
         </div>
       )}
       <div className="ftg-cover-glow" />

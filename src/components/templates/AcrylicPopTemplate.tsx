@@ -163,9 +163,15 @@ export function AcrylicPopTemplate({ invitation, guest, isPersonalized = false }
   // Portada de bienvenida y foto principal con foto real (ver
   // GuestPassVipTemplate.tsx / rama experimento-foto-storytelling). Ambas
   // opcionales: sin cargarlas, todo se ve exactamente igual que antes.
-  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
-  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
-  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  // Recorte celular (mobile) y Recorte PC (desktop): mismos 2 campos que
+  // carga StepHeroImages.tsx, cada uno 100% opcional e independiente --
+  // ver rama experimento-foto-storytelling. Cada uno controla SU propio
+  // breakpoint tanto en la tapa (CoverHalf) como en "Nuestra foto" más
+  // abajo: si solo se cargó uno de los dos, ese breakpoint muestra la
+  // foto y el otro se ve tal cual la plantilla original (sin foto, sin
+  // fallback cruzado ni fallback a la galería principal).
+  const photoMobile = String(invitation.portadaImagenFondo || "");
+  const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -667,17 +673,20 @@ export function AcrylicPopTemplate({ invitation, guest, isPersonalized = false }
             propio en vez de estirarse edge-to-edge. */}
         <section data-tone="dark" data-screen-label="Nuestra foto" className="acp-hero-photo-section">
           <div className="acp-hero-photo-frame">
-            {heroPhotoMobile && (
-              <div className="acp-mobile-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="14,14,20" />
-              </div>
-            )}
-            {heroPhotoDesktop && (
-              <div className="acp-desktop-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="14,14,20" />
-              </div>
-            )}
-            {!heroPhotoMobile && !heroPhotoDesktop && <div className="acp-hero-photo-placeholder" />}
+            <div className="acp-mobile-only">
+              {photoMobile ? (
+                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="14,14,20" />
+              ) : (
+                <div className="acp-hero-photo-placeholder" />
+              )}
+            </div>
+            <div className="acp-desktop-only">
+              {photoDesktop ? (
+                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="14,14,20" />
+              ) : (
+                <div className="acp-hero-photo-placeholder" />
+              )}
+            </div>
           </div>
           <span data-xin="1" data-dist="-60" className="acp-kicker acp-hero-photo-kicker">02 — LA PISTA YA ARRANCÓ</span>
         </section>
@@ -1035,7 +1044,8 @@ export function AcrylicPopTemplate({ invitation, guest, isPersonalized = false }
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <div className="acp-cover-cta">ABRIR INVITACIÓN</div>
           </AcpCoverHalf>
@@ -1048,7 +1058,8 @@ export function AcrylicPopTemplate({ invitation, guest, isPersonalized = false }
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <button onClick={open} className="acp-cover-cta acp-cover-cta--btn">ABRIR INVITACIÓN</button>
           </AcpCoverHalf>
@@ -1660,7 +1671,8 @@ function AcpCoverHalf({
   passNumber,
   dressCode,
   hora,
-  photoSrc,
+  photoMobile,
+  photoDesktop,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1672,7 +1684,8 @@ function AcpCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
-  photoSrc?: string;
+  photoMobile?: string;
+  photoDesktop?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -1680,10 +1693,22 @@ function AcpCoverHalf({
       {/* Con foto cargada, reemplaza el degradé de fondo -- SOLO en mobile
           (mismo criterio que la Colección Flat). En desktop el degradé/
           textura original se ve siempre. */}
-      {photoSrc && (
+      {photoMobile && (
         <div className="acp-mobile-only">
           <AnimatedCoverPhoto
-            photoSrc={photoSrc}
+            photoSrc={photoMobile}
+            tint
+            tintColor1="#FF3D8B"
+            tintColor2="#0E0E14"
+            effect="enfoque"
+            scrimColorRgb="14,14,20"
+          />
+        </div>
+      )}
+      {photoDesktop && (
+        <div className="acp-desktop-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoDesktop}
             tint
             tintColor1="#FF3D8B"
             tintColor2="#0E0E14"

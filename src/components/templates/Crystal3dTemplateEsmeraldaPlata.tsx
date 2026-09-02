@@ -157,9 +157,15 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
-  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
-  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
-  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  // Recorte celular (mobile) y Recorte PC (desktop): mismos 2 campos que
+  // carga StepHeroImages.tsx, cada uno 100% opcional e independiente --
+  // ver rama experimento-foto-storytelling. Cada uno controla SU propio
+  // breakpoint tanto en la tapa (CoverHalf) como en "Nuestra foto" más
+  // abajo: si solo se cargó uno de los dos, ese breakpoint muestra la
+  // foto y el otro se ve tal cual la plantilla original (sin foto, sin
+  // fallback cruzado ni fallback a la galería principal).
+  const photoMobile = String(invitation.portadaImagenFondo || "");
+  const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -659,17 +665,20 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         <section data-tone="dark" data-screen-label="Nuestra foto" className="c3d-hero-photo-section">
           <div className="c3d-hero-photo-frame">
-            {heroPhotoMobile && (
-              <div className="acp-mobile-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
-              </div>
-            )}
-            {heroPhotoDesktop && (
-              <div className="acp-desktop-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
-              </div>
-            )}
-            {!heroPhotoMobile && !heroPhotoDesktop && <div className="c3d-hero-photo-placeholder" />}
+            <div className="acp-mobile-only">
+              {photoMobile ? (
+                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
+              ) : (
+                <div className="c3d-hero-photo-placeholder" />
+              )}
+            </div>
+            <div className="acp-desktop-only">
+              {photoDesktop ? (
+                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
+              ) : (
+                <div className="c3d-hero-photo-placeholder" />
+              )}
+            </div>
           </div>
           <span data-xin="1" data-dist="-60" className="c3d-kicker c3d-hero-photo-kicker">02 — EL CRISTAL YA BRILLA</span>
         </section>
@@ -1041,7 +1050,8 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <div className="c3d-cover-cta">ABRIR INVITACIÓN</div>
           </C3dCoverHalf>
@@ -1054,7 +1064,8 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <button onClick={open} className="c3d-cover-cta c3d-cover-cta--btn">ABRIR INVITACIÓN</button>
           </C3dCoverHalf>
@@ -1697,7 +1708,8 @@ function C3dCoverHalf({
   passNumber,
   dressCode,
   hora,
-  photoSrc,
+  photoMobile,
+  photoDesktop,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1709,14 +1721,20 @@ function C3dCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
-  photoSrc?: string;
+  photoMobile?: string;
+  photoDesktop?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="c3d-cover-inner">
-      {photoSrc && (
+      {photoMobile && (
         <div className="acp-mobile-only">
-          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#6FCB9F" tintColor2="#080B10" effect="enfoque" scrimColorRgb="7,15,13" />
+          <AnimatedCoverPhoto photoSrc={photoMobile} tint tintColor1="#6FCB9F" tintColor2="#080B10" effect="enfoque" scrimColorRgb="7,15,13" />
+        </div>
+      )}
+      {photoDesktop && (
+        <div className="acp-desktop-only">
+          <AnimatedCoverPhoto photoSrc={photoDesktop} tint tintColor1="#6FCB9F" tintColor2="#080B10" effect="enfoque" scrimColorRgb="7,15,13" />
         </div>
       )}
       <div className="c3d-cover-glow" />

@@ -162,9 +162,15 @@ export function CoronaEscarlataTemplate({ invitation, guest, isPersonalized = fa
   // los campos que ya carga StepHeroImages.tsx) -- ver rama
   // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
   // todo se ve exactamente igual que antes (cero regresión).
-  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
-  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
-  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  // Recorte celular (mobile) y Recorte PC (desktop): mismos 2 campos que
+  // carga StepHeroImages.tsx, cada uno 100% opcional e independiente --
+  // ver rama experimento-foto-storytelling. Cada uno controla SU propio
+  // breakpoint tanto en la tapa (CoverHalf) como en "Nuestra foto" más
+  // abajo: si solo se cargó uno de los dos, ese breakpoint muestra la
+  // foto y el otro se ve tal cual la plantilla original (sin foto, sin
+  // fallback cruzado ni fallback a la galería principal).
+  const photoMobile = String(invitation.portadaImagenFondo || "");
+  const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -666,17 +672,20 @@ export function CoronaEscarlataTemplate({ invitation, guest, isPersonalized = fa
             borde propio en vez de estirarse edge-to-edge. */}
         <section data-tone="dark" data-screen-label="Nuestra foto" className="cne-hero-photo-section">
           <div className="cne-hero-photo-frame">
-            {heroPhotoMobile && (
-              <div className="acp-mobile-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="34,7,9" />
-              </div>
-            )}
-            {heroPhotoDesktop && (
-              <div className="acp-desktop-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="34,7,9" />
-              </div>
-            )}
-            {!heroPhotoMobile && !heroPhotoDesktop && <div className="cne-hero-photo-placeholder" />}
+            <div className="acp-mobile-only">
+              {photoMobile ? (
+                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="34,7,9" />
+              ) : (
+                <div className="cne-hero-photo-placeholder" />
+              )}
+            </div>
+            <div className="acp-desktop-only">
+              {photoDesktop ? (
+                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="34,7,9" />
+              ) : (
+                <div className="cne-hero-photo-placeholder" />
+              )}
+            </div>
           </div>
           <span data-xin="1" data-dist="-60" className="cne-kicker cne-hero-photo-kicker">02 — LA REALEZA EMPIEZA ACÁ</span>
         </section>
@@ -1030,7 +1039,8 @@ export function CoronaEscarlataTemplate({ invitation, guest, isPersonalized = fa
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <div className="cne-cover-cta">ABRIR INVITACIÓN</div>
           </CneCoverHalf>
@@ -1043,7 +1053,8 @@ export function CoronaEscarlataTemplate({ invitation, guest, isPersonalized = fa
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <button onClick={open} className="cne-cover-cta cne-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CneCoverHalf>
@@ -1655,7 +1666,8 @@ function CneCoverHalf({
   passNumber,
   dressCode,
   hora,
-  photoSrc,
+  photoMobile,
+  photoDesktop,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1667,15 +1679,28 @@ function CneCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
-  photoSrc?: string;
+  photoMobile?: string;
+  photoDesktop?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="cne-cover-inner">
-      {photoSrc && (
+      {photoMobile && (
         <div className="acp-mobile-only">
           <AnimatedCoverPhoto
-            photoSrc={photoSrc}
+            photoSrc={photoMobile}
+            tint
+            tintColor1="#D9A441"
+            tintColor2="#220709"
+            effect="enfoque"
+            scrimColorRgb="34,7,9"
+          />
+        </div>
+      )}
+      {photoDesktop && (
+        <div className="acp-desktop-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoDesktop}
             tint
             tintColor1="#D9A441"
             tintColor2="#220709"
