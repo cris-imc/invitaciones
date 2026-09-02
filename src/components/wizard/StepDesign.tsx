@@ -238,7 +238,9 @@ export function StepDesign() {
     );
     const activeTemplateTipo: TemplateTipo = templateTipoMatchesCollection
         ? (data.templateTipo as TemplateTipo)
-        : (collection === "STORYTELLING" ? (data.type === "QUINCE_ANOS" ? "PRINCESA" : "GUESTPASSVIP") : "ELEGANT");
+        : (collection === "STORYTELLING"
+            ? (data.type === "QUINCE_ANOS" ? "PRINCESA" : data.type === "CUMPLEANOS" ? "CUMPLEANOSTERRAZA" : "GUESTPASSVIP")
+            : "ELEGANT");
     const activeColorId = themeConfig?.colorPrincipal || 'default';
     const activeColorList = TEMPLATE_TIPO_COLORS[activeTemplateTipo];
     const activeColorOption = activeColorList.find(c => c.id === activeColorId) ?? activeColorList[0];
@@ -297,10 +299,10 @@ export function StepDesign() {
                             Colección Flat
                         </button>
 
-                        {/* Guest Pass VIP (Casamiento) y Princesa (Quince Años) -- cuando se
-                            sumen plantillas storytelling para otros tipos de evento, generalizar
-                            esta condición (ver STORYTELLING_TEMPLATE_TIPOS en wizard-steps-config.ts). */}
-                        {(data.type === "CASAMIENTO" || data.type === "QUINCE_ANOS") && (
+                        {/* Guest Pass VIP (Casamiento), Princesa (Quince Años) y Baby Shower y
+                            demás familias de "Evento" (CUMPLEANOS, ver soloCumpleanos en
+                            TemplatePreviewModal.tsx) -- los 3 tipos de evento ya tienen storytelling. */}
+                        {(data.type === "CASAMIENTO" || data.type === "QUINCE_ANOS" || data.type === "CUMPLEANOS") && (
                             <button
                                 type="button"
                                 onClick={() => setCollection("STORYTELLING")}
