@@ -210,8 +210,26 @@ function buildQuinceSample(templateTipo: TemplateTipo, colorId: string): Record<
   };
 }
 
+// Las 15 familias nuevas de mockup/Eventos (Baby Shower, Bautismo, etc.)
+// tienen la tapa 100% gráfica/tipográfica en su mockup original -- sin foto
+// de fondo. Igual que en casamiento/XV, la tapa soporta una foto opcional
+// (2 recortes, mobile/desktop) subida por el usuario real, pero si le
+// forzamos una foto de stock de ejemplo acá, la vista previa deja de
+// parecerse al mockup (una plantilla que en el mockup es solo texto sobre
+// degradé pasa a verse como una foto de "fiesta" genérica tapando todo).
+// Por eso estas 15 no reciben portadaImagenFondo/Desktop de ejemplo: se
+// previsualizan tal cual el mockup (sin foto), que es el estado real de
+// cualquier invitación nueva hasta que el usuario suba la suya.
+const EVENTO_TIPOS_SIN_FOTO_DE_TAPA = new Set([
+  "BABYSHOWER", "BAUTISMO", "CORPORATIVOANIVERSARIO", "CORPORATIVOENCUENTRO",
+  "CUMPLEANOSCOCKTAIL", "CUMPLEANOSJARDIN", "CUMPLEANOSTERRAZA",
+  "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION",
+  "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO",
+]);
+
 function buildEventoSample(templateTipo: TemplateTipo, colorId: string): Record<string, unknown> {
   const fotos = getEventoFotos(templateTipo, colorId);
+  const sinFotoDeTapa = EVENTO_TIPOS_SIN_FOTO_DE_TAPA.has(templateTipo);
   return {
     tipo: "CUMPLEANOS",
     nombreEvento: "Mi Fiesta",
@@ -223,8 +241,8 @@ function buildEventoSample(templateTipo: TemplateTipo, colorId: string): Record<
     portadaKicker: "Te esperamos en",
     portadaMensaje: "Vení a celebrar con nosotros este día tan especial",
     portadaTextoBoton: "Abrir invitación",
-    portadaImagenFondo: fotos[0],
-    portadaImagenFondoDesktop: fotos[0],
+    portadaImagenFondo: sinFotoDeTapa ? "" : fotos[0],
+    portadaImagenFondoDesktop: sinFotoDeTapa ? "" : fotos[0],
     galeriaPrincipalFotos: JSON.stringify(fotos),
     cronogramaEventos: JSON.stringify([
       { time: "20:00", title: "Recepción", icon: "Heart" },
