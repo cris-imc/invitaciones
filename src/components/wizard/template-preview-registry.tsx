@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO";
 
 export interface ColorOption {
   id: string;
@@ -288,6 +288,131 @@ export const GUESTPASSVIP_COLORS: ColorOption[] = [
   { id: "Plata", name: "Plata", color: "#B6C4CF" },
   { id: "Zafiro", name: "Zafiro", color: "#6D93C9" },
 ];
+
+// Primera familia de la Colección Storytelling exclusiva del tipo de evento
+// genérico "Evento" (CUMPLEANOS) -- ver soloCumpleanos en
+// TemplatePreviewModal.tsx. "Nube y Estrella" (lavanda sobre noche) es la
+// base; el resto son variantes de acento sobre el mismo layout/copy/motion.
+export const BABYSHOWER_COLORS: ColorOption[] = [
+  { id: "default", name: "Nube y Estrella", color: "#C9A8D4" },
+  { id: "Menta", name: "Menta", color: "#8FBFA3" },
+  { id: "Durazno", name: "Durazno", color: "#E8A87C" },
+  { id: "Celeste", name: "Celeste", color: "#8AAED0" },
+  { id: "Dorado", name: "Dorado Suave", color: "#D4B483" },
+];
+
+export const BAUTISMO_COLORS: ColorOption[] = [
+  { id: "default", name: "Luz y Lino", color: "#B7A97E" },
+  { id: "Celeste", name: "Celeste", color: "#A9C4D9" },
+  { id: "Marfil", name: "Marfil", color: "#D9CBAE" },
+  { id: "Rosa", name: "Rosa", color: "#D9A9B7" },
+  { id: "VerdeSalvia", name: "Verde Salvia", color: "#A9C4A0" },
+];
+
+export const CORPORATIVOANIVERSARIO_COLORS: ColorOption[] = [
+  { id: "default", name: "Dorado Ejecutivo", color: "#C9A25C" },
+  { id: "Borgona", name: "Borgoña", color: "#B8707A" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#6FA98A" },
+  { id: "Grafito", name: "Grafito", color: "#A8A8AC" },
+  { id: "Plata", name: "Plata", color: "#B8C0C9" },
+];
+
+export const CORPORATIVOENCUENTRO_COLORS: ColorOption[] = [
+  { id: "default", name: "Cobre", color: "#B8895A" },
+  { id: "Azul", name: "Azul", color: "#6E93B8" },
+  { id: "Gris", name: "Gris", color: "#A0A0A0" },
+  { id: "Verde", name: "Verde", color: "#7AA377" },
+  { id: "Vino", name: "Vino", color: "#A5677A" },
+];
+
+export const CUMPLEANOSCOCKTAIL_COLORS: ColorOption[] = [
+  { id: "default", name: "Dorado Champagne", color: "#C8A45C" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#4FA983" },
+  { id: "Plata", name: "Plata", color: "#B6C4CF" },
+  { id: "Rubi", name: "Rubí", color: "#C9556F" },
+  { id: "Zafiro", name: "Zafiro", color: "#6D93C9" },
+];
+
+export const CUMPLEANOSJARDIN_COLORS: ColorOption[] = [
+  { id: "default", name: "Jardín", color: "#9FB98A" },
+  { id: "Azulado", name: "Azulado", color: "#7FA8C9" },
+  { id: "Coral", name: "Coral", color: "#E08A6F" },
+  { id: "Dorado", name: "Dorado", color: "#D4B483" },
+  { id: "Lavanda", name: "Lavanda", color: "#B48CC9" },
+];
+
+export const CUMPLEANOSTERRAZA_COLORS: ColorOption[] = [
+  { id: "default", name: "Terracota", color: "#D99A5B" },
+  { id: "Azul", name: "Azul", color: "#6D93C9" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#5FA97C" },
+  { id: "Malva", name: "Malva", color: "#B48CA0" },
+  { id: "Rojo", name: "Rojo", color: "#C9556F" },
+];
+
+export const DESPEDIDASOLTERA_COLORS: ColorOption[] = [
+  { id: "default", name: "Rosa", color: "#E08FA8" },
+  { id: "Coral", name: "Coral", color: "#E8A07C" },
+  { id: "Dorado", name: "Dorado", color: "#D4B483" },
+  { id: "Turquesa", name: "Turquesa", color: "#6FC5C0" },
+  { id: "Violeta", name: "Violeta", color: "#B48CC9" },
+];
+
+export const DESPEDIDASOLTERO_COLORS: ColorOption[] = [
+  { id: "default", name: "Azul", color: "#4A9BC9" },
+  { id: "Dorado", name: "Dorado", color: "#C8A45C" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#4FA983" },
+  { id: "Grafito", name: "Grafito", color: "#A8A8AE" },
+  { id: "Vino", name: "Vino", color: "#BE6774" },
+];
+
+export const GRADUACION_COLORS: ColorOption[] = [
+  { id: "default", name: "Dorado Académico", color: "#C6A860" },
+  { id: "Azul", name: "Azul", color: "#6D93C9" },
+  { id: "Borgona", name: "Borgoña", color: "#BE6774" },
+  { id: "Plata", name: "Plata", color: "#B6C4CF" },
+  { id: "Verde", name: "Verde", color: "#5FA97A" },
+];
+
+export const INAUGURACION_COLORS: ColorOption[] = [
+  { id: "default", name: "Dorado", color: "#C8A45C" },
+  { id: "Azul", name: "Azul", color: "#6D93C9" },
+  { id: "Cobre", name: "Cobre", color: "#C97B4A" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#4FA983" },
+  { id: "Grafito", name: "Grafito", color: "#B9B9BC" },
+];
+
+export const INFANTILESPACIO_COLORS: ColorOption[] = [
+  { id: "default", name: "Espacial", color: "#5FC9E8" },
+  { id: "Dorado", name: "Dorado", color: "#E8C05F" },
+  { id: "Rosa", name: "Rosa", color: "#E87EC0" },
+  { id: "Verde", name: "Verde", color: "#5FE8A0" },
+  { id: "Violeta", name: "Violeta", color: "#9B7EE8" },
+];
+
+export const INFANTILJURASICO_COLORS: ColorOption[] = [
+  { id: "default", name: "Jurásico", color: "#7EA84A" },
+  { id: "Amarillo", name: "Amarillo", color: "#D4B23C" },
+  { id: "Marron", name: "Marrón", color: "#A87D4A" },
+  { id: "Naranja", name: "Naranja", color: "#E08A3C" },
+  { id: "Rojo", name: "Rojo", color: "#C9584A" },
+];
+
+export const INFANTILSAFARI_COLORS: ColorOption[] = [
+  { id: "default", name: "Safari", color: "#D98A3C" },
+  { id: "Amarillo", name: "Amarillo", color: "#D9B23C" },
+  { id: "Coral", name: "Coral", color: "#E0704A" },
+  { id: "Turquesa", name: "Turquesa", color: "#4EA3A8" },
+  { id: "Verde", name: "Verde", color: "#6B8E4E" },
+];
+
+export const ANIVERSARIO_COLORS: ColorOption[] = [
+  { id: "default", name: "Terracota", color: "#C48A6E" },
+  { id: "Azul", name: "Azul", color: "#5C7EA8" },
+  { id: "Borgona", name: "Borgoña", color: "#8C4A54" },
+  { id: "Dorado", name: "Dorado", color: "#C9A45C" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#4E8C6E" },
+];
+
 
 // Negativo es la inversión clara/oscura de la misma familia (mismo layout,
 // copy y motion) -- no un acento de color como en el resto de familias, así
@@ -720,6 +845,127 @@ export const GUESTPASSVIP_COMPONENTS: Record<string, PreviewComponent> = {
   Plata: dynamic(() => import("@/components/templates/GuestPassVipTemplatePlata").then((m) => m.GuestPassVipTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Zafiro: dynamic(() => import("@/components/templates/GuestPassVipTemplateZafiro").then((m) => m.GuestPassVipTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };
+
+export const BABYSHOWER_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/BabyShowerTemplate").then((m) => m.BabyShowerTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Menta: dynamic(() => import("@/components/templates/BabyShowerTemplateMenta").then((m) => m.BabyShowerTemplateMenta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Durazno: dynamic(() => import("@/components/templates/BabyShowerTemplateDurazno").then((m) => m.BabyShowerTemplateDurazno), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Celeste: dynamic(() => import("@/components/templates/BabyShowerTemplateCeleste").then((m) => m.BabyShowerTemplateCeleste), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/BabyShowerTemplateDorado").then((m) => m.BabyShowerTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const BAUTISMO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/BautismoTemplate").then((m) => m.BautismoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Celeste: dynamic(() => import("@/components/templates/BautismoTemplateCeleste").then((m) => m.BautismoTemplateCeleste), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Marfil: dynamic(() => import("@/components/templates/BautismoTemplateMarfil").then((m) => m.BautismoTemplateMarfil), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rosa: dynamic(() => import("@/components/templates/BautismoTemplateRosa").then((m) => m.BautismoTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  VerdeSalvia: dynamic(() => import("@/components/templates/BautismoTemplateVerdeSalvia").then((m) => m.BautismoTemplateVerdeSalvia), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CORPORATIVOANIVERSARIO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CorporativoAniversarioTemplate").then((m) => m.CorporativoAniversarioTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/CorporativoAniversarioTemplateBorgona").then((m) => m.CorporativoAniversarioTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/CorporativoAniversarioTemplateEsmeralda").then((m) => m.CorporativoAniversarioTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Grafito: dynamic(() => import("@/components/templates/CorporativoAniversarioTemplateGrafito").then((m) => m.CorporativoAniversarioTemplateGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Plata: dynamic(() => import("@/components/templates/CorporativoAniversarioTemplatePlata").then((m) => m.CorporativoAniversarioTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CORPORATIVOENCUENTRO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CorporativoEncuentroTemplate").then((m) => m.CorporativoEncuentroTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/CorporativoEncuentroTemplateAzul").then((m) => m.CorporativoEncuentroTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Gris: dynamic(() => import("@/components/templates/CorporativoEncuentroTemplateGris").then((m) => m.CorporativoEncuentroTemplateGris), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Verde: dynamic(() => import("@/components/templates/CorporativoEncuentroTemplateVerde").then((m) => m.CorporativoEncuentroTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Vino: dynamic(() => import("@/components/templates/CorporativoEncuentroTemplateVino").then((m) => m.CorporativoEncuentroTemplateVino), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CUMPLEANOSCOCKTAIL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CumpleanosCocktailTemplate").then((m) => m.CumpleanosCocktailTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/CumpleanosCocktailTemplateEsmeralda").then((m) => m.CumpleanosCocktailTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Plata: dynamic(() => import("@/components/templates/CumpleanosCocktailTemplatePlata").then((m) => m.CumpleanosCocktailTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rubi: dynamic(() => import("@/components/templates/CumpleanosCocktailTemplateRubi").then((m) => m.CumpleanosCocktailTemplateRubi), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Zafiro: dynamic(() => import("@/components/templates/CumpleanosCocktailTemplateZafiro").then((m) => m.CumpleanosCocktailTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CUMPLEANOSJARDIN_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CumpleanosJardinTemplate").then((m) => m.CumpleanosJardinTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azulado: dynamic(() => import("@/components/templates/CumpleanosJardinTemplateAzulado").then((m) => m.CumpleanosJardinTemplateAzulado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Coral: dynamic(() => import("@/components/templates/CumpleanosJardinTemplateCoral").then((m) => m.CumpleanosJardinTemplateCoral), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/CumpleanosJardinTemplateDorado").then((m) => m.CumpleanosJardinTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lavanda: dynamic(() => import("@/components/templates/CumpleanosJardinTemplateLavanda").then((m) => m.CumpleanosJardinTemplateLavanda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CUMPLEANOSTERRAZA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CumpleanosTerrazaTemplate").then((m) => m.CumpleanosTerrazaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/CumpleanosTerrazaTemplateAzul").then((m) => m.CumpleanosTerrazaTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/CumpleanosTerrazaTemplateEsmeralda").then((m) => m.CumpleanosTerrazaTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Malva: dynamic(() => import("@/components/templates/CumpleanosTerrazaTemplateMalva").then((m) => m.CumpleanosTerrazaTemplateMalva), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rojo: dynamic(() => import("@/components/templates/CumpleanosTerrazaTemplateRojo").then((m) => m.CumpleanosTerrazaTemplateRojo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const DESPEDIDASOLTERA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/DespedidaSolteraTemplate").then((m) => m.DespedidaSolteraTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Coral: dynamic(() => import("@/components/templates/DespedidaSolteraTemplateCoral").then((m) => m.DespedidaSolteraTemplateCoral), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/DespedidaSolteraTemplateDorado").then((m) => m.DespedidaSolteraTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Turquesa: dynamic(() => import("@/components/templates/DespedidaSolteraTemplateTurquesa").then((m) => m.DespedidaSolteraTemplateTurquesa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violeta: dynamic(() => import("@/components/templates/DespedidaSolteraTemplateVioleta").then((m) => m.DespedidaSolteraTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const DESPEDIDASOLTERO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/DespedidaSolteroTemplate").then((m) => m.DespedidaSolteroTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/DespedidaSolteroTemplateDorado").then((m) => m.DespedidaSolteroTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/DespedidaSolteroTemplateEsmeralda").then((m) => m.DespedidaSolteroTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Grafito: dynamic(() => import("@/components/templates/DespedidaSolteroTemplateGrafito").then((m) => m.DespedidaSolteroTemplateGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Vino: dynamic(() => import("@/components/templates/DespedidaSolteroTemplateVino").then((m) => m.DespedidaSolteroTemplateVino), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const GRADUACION_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/GraduacionTemplate").then((m) => m.GraduacionTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/GraduacionTemplateAzul").then((m) => m.GraduacionTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/GraduacionTemplateBorgona").then((m) => m.GraduacionTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Plata: dynamic(() => import("@/components/templates/GraduacionTemplatePlata").then((m) => m.GraduacionTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Verde: dynamic(() => import("@/components/templates/GraduacionTemplateVerde").then((m) => m.GraduacionTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const INAUGURACION_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/InauguracionTemplate").then((m) => m.InauguracionTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/InauguracionTemplateAzul").then((m) => m.InauguracionTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cobre: dynamic(() => import("@/components/templates/InauguracionTemplateCobre").then((m) => m.InauguracionTemplateCobre), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/InauguracionTemplateEsmeralda").then((m) => m.InauguracionTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Grafito: dynamic(() => import("@/components/templates/InauguracionTemplateGrafito").then((m) => m.InauguracionTemplateGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const INFANTILESPACIO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/InfantilEspacioTemplate").then((m) => m.InfantilEspacioTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/InfantilEspacioTemplateDorado").then((m) => m.InfantilEspacioTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rosa: dynamic(() => import("@/components/templates/InfantilEspacioTemplateRosa").then((m) => m.InfantilEspacioTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Verde: dynamic(() => import("@/components/templates/InfantilEspacioTemplateVerde").then((m) => m.InfantilEspacioTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violeta: dynamic(() => import("@/components/templates/InfantilEspacioTemplateVioleta").then((m) => m.InfantilEspacioTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const INFANTILJURASICO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/InfantilJurasicoTemplate").then((m) => m.InfantilJurasicoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Amarillo: dynamic(() => import("@/components/templates/InfantilJurasicoTemplateAmarillo").then((m) => m.InfantilJurasicoTemplateAmarillo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Marron: dynamic(() => import("@/components/templates/InfantilJurasicoTemplateMarron").then((m) => m.InfantilJurasicoTemplateMarron), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Naranja: dynamic(() => import("@/components/templates/InfantilJurasicoTemplateNaranja").then((m) => m.InfantilJurasicoTemplateNaranja), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rojo: dynamic(() => import("@/components/templates/InfantilJurasicoTemplateRojo").then((m) => m.InfantilJurasicoTemplateRojo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const INFANTILSAFARI_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/InfantilSafariTemplate").then((m) => m.InfantilSafariTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Amarillo: dynamic(() => import("@/components/templates/InfantilSafariTemplateAmarillo").then((m) => m.InfantilSafariTemplateAmarillo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Coral: dynamic(() => import("@/components/templates/InfantilSafariTemplateCoral").then((m) => m.InfantilSafariTemplateCoral), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Turquesa: dynamic(() => import("@/components/templates/InfantilSafariTemplateTurquesa").then((m) => m.InfantilSafariTemplateTurquesa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Verde: dynamic(() => import("@/components/templates/InfantilSafariTemplateVerde").then((m) => m.InfantilSafariTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const ANIVERSARIO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/AniversarioTemplate").then((m) => m.AniversarioTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/AniversarioTemplateAzul").then((m) => m.AniversarioTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/AniversarioTemplateBorgona").then((m) => m.AniversarioTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/AniversarioTemplateDorado").then((m) => m.AniversarioTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/AniversarioTemplateEsmeralda").then((m) => m.AniversarioTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
 
 export const BLACKANDWHITE_COMPONENTS: Record<string, PreviewComponent> = {
   default: dynamic(() => import("@/components/templates/BlackAndWhiteTemplate").then((m) => m.BlackAndWhiteTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
