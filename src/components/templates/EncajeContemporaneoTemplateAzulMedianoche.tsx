@@ -214,22 +214,42 @@ export function EncajeContemporaneoTemplateAzulMedianoche({ invitation, guest, i
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
-  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
-  // secciones que pueden no existir -- si no hay foto cargada, o si la
-  // frase está deshabilitada/sin texto, esas secciones no se renderizan
-  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
-  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
-  // de las dos existan, para no saltar números en el medio de la secuencia.
-  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
-  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
-  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las únicas
+  // secciones que pueden no existir. La frase es la misma para mobile y
+  // desktop, pero la foto NO -- cada breakpoint tiene su propio recorte
+  // independiente (ver arriba), así que un mismo kicker puede necesitar
+  // mostrar un número distinto en mobile que en desktop (ej. si solo hay
+  // recorte mobile, la tapa Y la numeración de ahí en más avanzan un lugar
+  // en mobile pero no en desktop). kn()/knPre() devuelven AMBOS números a
+  // la vez, envueltos en acp-mobile-only/acp-desktop-only (mismas clases
+  // que ya deciden qué foto se ve en cada breakpoint), para que cada uno
+  // muestre el que le corresponde. knPre() es para Countdown y la Frase
+  // misma (solo les afecta la Foto, que va ANTES en la secuencia); kn() es
+  // para todo lo que sigue después de la Frase (les afecta la Foto Y/O la
   // Frase).
-  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
   const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
-  const kOffsetPre = hasHeroPhoto ? 1 : 0;
-  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
-  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
-  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
+  const kOffsetMobilePre = photoMobile ? 1 : 0;
+  const kOffsetDesktopPre = photoDesktop ? 1 : 0;
+  const kOffsetMobile = kOffsetMobilePre + (hasFrase ? 1 : 0);
+  const kOffsetDesktop = kOffsetDesktopPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => (
+    <>
+      <span className="acp-mobile-only">{String(base + kOffsetMobile).padStart(2, "0")}</span>
+      <span className="acp-desktop-only">{String(base + kOffsetDesktop).padStart(2, "0")}</span>
+    </>
+  );
+  const knPre = (base: number) => (
+    <>
+      <span className="acp-mobile-only">{String(base + kOffsetMobilePre).padStart(2, "0")}</span>
+      <span className="acp-desktop-only">{String(base + kOffsetDesktopPre).padStart(2, "0")}</span>
+    </>
+  );
+  const knAcc = (count: number) => (
+    <>
+      <span className="acp-mobile-only">{count + kOffsetMobile}</span>
+      <span className="acp-desktop-only">{count + kOffsetDesktop}</span>
+    </>
+  );
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -1062,7 +1082,7 @@ export function EncajeContemporaneoTemplateAzulMedianoche({ invitation, guest, i
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="enc-section" style={{ background: "#0D121C" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1078,7 +1098,7 @@ export function EncajeContemporaneoTemplateAzulMedianoche({ invitation, guest, i
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="enc-section enc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #151F30 0%, #0D121C 55%, #0A0C11 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="enc-final-card">
             <div className="enc-medallion enc-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="encArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaArc} · `} spin="reverse" />
