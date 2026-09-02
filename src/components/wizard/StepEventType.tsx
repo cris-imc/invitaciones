@@ -68,7 +68,7 @@ export function StepEventType() {
     const form = useForm<z.infer<typeof eventTypeSchema>>({
         resolver: zodResolver(eventTypeSchemaForType),
         defaultValues: {
-            type: data.type as any,
+            type: (data.type as any) ?? "",
             nombreEvento: data.nombreEvento || "",
             nombreNovio: data.nombreNovio || "",
             nombreNovia: data.nombreNovia || "",

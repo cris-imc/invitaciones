@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useWizardStore } from "@/store/wizard-store";
-import { detailsSchema } from "@/lib/schemas/invitation";
+import { detailsSchema, LUGAR_NOMBRE_MAX_LENGTH, DIRECCION_MAX_LENGTH } from "@/lib/schemas/invitation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -39,6 +39,10 @@ export function StepDetails() {
     }, [form, setData]);
 
     const currentDressCode = form.watch("portadaDressCode");
+    const lugarNombreValue = form.watch("lugarNombre") || "";
+    const direccionValue = form.watch("direccion") || "";
+    const lugarNombreOverLimit = lugarNombreValue.length > LUGAR_NOMBRE_MAX_LENGTH;
+    const direccionOverLimit = direccionValue.length > DIRECCION_MAX_LENGTH;
     const predefinedOptions = ["Elegante", "Elegante Sport", "Casual", "Formal", "De Gala"];
     
     const [isCustomMode, setIsCustomMode] = useState(() => {
@@ -88,10 +92,28 @@ export function StepDetails() {
                         name="lugarNombre"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Nombre del Lugar / Salón</FormLabel>
+                                <div className="flex justify-between items-center h-5">
+                                    <FormLabel>Nombre del Lugar / Salón</FormLabel>
+                                    <span className={`text-[10px] font-mono ${lugarNombreOverLimit ? "text-red-400 font-bold" : "text-muted-foreground"}`}>
+                                        {lugarNombreValue.length}/{LUGAR_NOMBRE_MAX_LENGTH}
+                                    </span>
+                                </div>
                                 <FormControl>
-                                    <Input placeholder="Ej: Salón Los Olivos" {...field} />
+                                    {/* Sin maxLength a propósito -- ver mismo criterio en
+                                        StepInfoAdicional.tsx: dejamos escribir/pegar de más,
+                                        marcamos en rojo el contador y bloqueamos "Siguiente"
+                                        (validación de detailsSchema) hasta que lo acorten. */}
+                                    <Input
+                                        placeholder="Ej: Salón Los Olivos"
+                                        className={lugarNombreOverLimit ? "border-red-500 focus-visible:ring-red-500" : undefined}
+                                        {...field}
+                                    />
                                 </FormControl>
+                                {lugarNombreOverLimit && (
+                                    <p className="text-xs text-red-400">
+                                        Te pasaste por {lugarNombreValue.length - LUGAR_NOMBRE_MAX_LENGTH} caracteres -- acortá el nombre para poder continuar.
+                                    </p>
+                                )}
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -102,13 +124,27 @@ export function StepDetails() {
                         name="direccion"
                         render={({ field }) => (
                             <FormItem className="flex flex-col justify-end">
-                                <FormLabel>Dirección Completa</FormLabel>
+                                <div className="flex justify-between items-center h-5">
+                                    <FormLabel>Dirección Completa</FormLabel>
+                                    <span className={`text-[10px] font-mono ${direccionOverLimit ? "text-red-400 font-bold" : "text-muted-foreground"}`}>
+                                        {direccionValue.length}/{DIRECCION_MAX_LENGTH}
+                                    </span>
+                                </div>
                                 <FormControl>
                                     <div className="relative">
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input className="pl-9" placeholder="Calle 123, Ciudad" {...field} />
+                                        <Input
+                                            className={`pl-9 ${direccionOverLimit ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                            placeholder="Calle 123, Ciudad"
+                                            {...field}
+                                        />
                                     </div>
                                 </FormControl>
+                                {direccionOverLimit && (
+                                    <p className="text-xs text-red-400">
+                                        Te pasaste por {direccionValue.length - DIRECCION_MAX_LENGTH} caracteres -- acortá la dirección para poder continuar.
+                                    </p>
+                                )}
                                 <FormMessage />
                             </FormItem>
                         )}

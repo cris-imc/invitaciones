@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const eventTypeSchema = z.object({
-    type: z.string().min(1, "Debes seleccionar un tipo de evento"),
+    // error explícito: si `type` llega undefined (nunca se tocó la
+    // selección) zod valida el tipo ANTES que el .min(), y sin este mensaje
+    // propio cae al default en inglés ("Invalid input") en vez del .min() de acá.
+    type: z.string({ error: "Debes seleccionar un tipo de evento" }).min(1, "Debes seleccionar un tipo de evento"),
     nombreEvento: z.string().min(1, "El título de la invitación es obligatorio"),
     nombreNovio: z.string().optional(),
     nombreNovia: z.string().optional(),
@@ -14,9 +17,12 @@ export const basicInfoSchema = z.object({
     rsvpDaysBeforeEvent: z.number().min(1).max(90).optional(),
 });
 
+export const LUGAR_NOMBRE_MAX_LENGTH = 30;
+export const DIRECCION_MAX_LENGTH = 45;
+
 export const detailsSchema = z.object({
-    lugarNombre: z.string().min(3, "El nombre del lugar es requerido"),
-    direccion: z.string().min(5, "La dirección es requerida"),
+    lugarNombre: z.string().min(3, "El nombre del lugar es requerido").max(LUGAR_NOMBRE_MAX_LENGTH, `El nombre del lugar no puede superar los ${LUGAR_NOMBRE_MAX_LENGTH} caracteres`),
+    direccion: z.string().min(5, "La dirección es requerida").max(DIRECCION_MAX_LENGTH, `La dirección no puede superar los ${DIRECCION_MAX_LENGTH} caracteres`),
     hora: z.string().min(1, "La hora es requerida"),
     mapUrl: z.string().optional(),
     portadaDressCode: z.string().optional(),
