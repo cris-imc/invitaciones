@@ -30,6 +30,7 @@ import { Bodoni_Moda, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -171,6 +172,14 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // --- EXPERIMENTAL: portada de bienvenida y foto principal con foto real,
+  // misma infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos portadaImagenFondoDesktop/galeriaPrincipalFotos que ya carga
+  // el wizard) -- ver rama experimento-foto-storytelling. Sin foto cargada,
+  // todo se ve exactamente igual que antes (cero regresión).
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoUrl = galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -680,10 +689,25 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
           </div>
         </section>
 
+        {/* EXPERIMENTAL: foto principal con efecto cinemático, sin tinte de
+            color (identidad de la familia queda solo en el marco/kicker, no
+            en la foto en sí). Ocupa toda la pantalla en mobile; en desktop
+            se enmarca con un borde propio en vez de estirarse edge-to-edge. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="gpv-hero-photo-section">
+          <div className="gpv-hero-photo-frame">
+            {heroPhotoUrl ? (
+              <AnimatedCoverPhoto photoSrc={heroPhotoUrl} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+            ) : (
+              <div className="gpv-hero-photo-placeholder" />
+            )}
+          </div>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker gpv-hero-photo-kicker">02 — ASÍ EMPEZÓ TODO</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="gpv-section gpv-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #241D0F 0%, #0D0B10 55%, #08080B 100%)" }}>
           <div className="gpv-scan-grid" />
           <div className="gpv-scanline" />
-          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>02 — EL PASE SE ACTIVA EN</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>03 — EL PASE SE ACTIVA EN</span>
           <div className="gpv-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -695,7 +719,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="gpv-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #08080B 100%)" }}>
           <div data-drift="-130" className="gpv-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>03 — UN MENSAJE PARA VOS</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>04 — UN MENSAJE PARA VOS</span>
           <h2 ref={phraseRef} className="gpv-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -805,7 +829,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="gpv-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #0B0B10 60%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="gpv-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="gpv-h2">
             Confirmá<br /><span className="gpv-accent-italic">tu acceso</span>
           </h2>
@@ -902,7 +926,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="gpv-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="gpv-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="gpv-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="gpv-h2">¿Qué tema<br /><span className="gpv-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="gpv-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -921,7 +945,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="gpv-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="gpv-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="gpv-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="gpv-h2">
               Si querés<br /><span className="gpv-accent-italic">sumarte</span>
             </h2>
@@ -972,7 +996,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="gpv-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="gpv-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -988,7 +1012,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="gpv-section gpv-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0B0B10 55%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="gpv-final-card">
             <div className="gpv-medallion gpv-medallion--final">
               <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="gpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1032,6 +1056,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="gpv-cover-cta">ABRIR INVITACIÓN</div>
           </CoverHalf>
@@ -1044,6 +1069,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="gpv-cover-cta gpv-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CoverHalf>
@@ -1667,6 +1693,7 @@ function CoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1678,10 +1705,26 @@ function CoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="gpv-cover-inner">
+      {/* EXPERIMENTAL: con foto cargada, la foto reemplaza visualmente el
+          degradé de fondo (que sigue ahí debajo, sin efecto, por si la foto
+          tarda en decodificar) -- el resto de la ornamentación (glow,
+          sunburst, medallón, nombres, CTA) se mantiene arriba sin cambios,
+          así la identidad de la familia sigue siendo reconocible. */}
+      {photoSrc && (
+        <AnimatedCoverPhoto
+          photoSrc={photoSrc}
+          tint
+          tintColor1="#C8A45C"
+          tintColor2="#0B0B10"
+          effect="enfoque"
+          scrimColorRgb="8,8,11"
+        />
+      )}
       <div className="gpv-cover-glow" />
       <div className="gpv-cover-sunburst" />
       <div className="gpv-cover-content">
@@ -1732,6 +1775,20 @@ const GP_CSS = `
 
   .gpv-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .gpv-section--between { justify-content: space-between; }
+
+  /* EXPERIMENTAL: foto principal (ver rama experimento-foto-storytelling).
+     Mobile: la foto ocupa toda la sección, borde a borde, como el resto de
+     la colección Flat. Desktop: se enmarca con un borde dorado propio de la
+     familia en vez de estirarse -- "bien compuesta y proporcionada" en
+     pantallas anchas en lugar de recortada/deformada. */
+  .gpv-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #08080B; }
+  .gpv-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .gpv-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #1C1727 0%, #0B0B10 60%, #08080B 100%); }
+  .gpv-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .gpv-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(200,164,92,.3); }
+    .gpv-hero-photo-kicker { bottom: 40px; }
+  }
 
   .gpv-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 
