@@ -73,7 +73,13 @@ export function getWizardSteps({
         // Storytelling se salta portada/tipografía por completo, así la
         // preview ya sabe desde el arranque qué flujo seguir.
         { component: StepDesign, label: "Plantilla" },
-        ...(!storytelling ? [{ component: StepHeroImages, label: "Portada" }] : []),
+        // Antes se saltaba por completo para Storytelling (esa colección no
+        // elige tipografía/countdown/álbum desde el wizard) -- pero SÍ puede
+        // usar fotos reales (portada de bienvenida + foto principal
+        // narrativa, ver AnimatedCoverPhoto.tsx), así que el paso ahora se
+        // muestra para las dos colecciones. StepHeroImages.tsx decide
+        // internamente qué campos pedir según isStorytellingTemplate.
+        { component: StepHeroImages, label: "Portada" },
         ...(!storytelling ? [{ component: StepTypography, label: "Tipografía" }] : []),
         { component: StepBasicInfo, label: "Información Básica" },
         ...(!storytelling ? [{ component: StepCountdownStyle, label: "Countdown" }] : []),

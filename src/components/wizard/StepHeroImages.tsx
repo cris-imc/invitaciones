@@ -5,8 +5,9 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { useToast } from "@/components/ui/Toast";
-import { Info, ChevronDown, ChevronUp, AlertTriangle, X } from "lucide-react";
+import { Info, ChevronDown, ChevronUp, AlertTriangle, X, Film } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { isStorytellingTemplate } from "./wizard-steps-config";
 
 const CINEMATICO_TIP = "Probá los dos: con foto (efecto cinemático) y sin foto (fondo decorativo propio de la plantilla).";
 
@@ -17,6 +18,15 @@ export function StepHeroImages() {
     const [showMissingImageError, setShowMissingImageError] = useState(false);
     const [showCinematicoTip, setShowCinematicoTip] = useState(false);
     const cinematicoTipTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // La Colección Storytelling no usa fondo/tipografía elegible como la
+    // Flat, pero SÍ puede llevar fotos reales (ver AnimatedCoverPhoto.tsx en
+    // cada plantilla de esa colección) -- a diferencia de Flat, ahí la
+    // "Portada Invitación" queda OPCIONAL (cada plantilla ya tiene su propio
+    // fondo decorativo si no se carga nada) y aparece un bloque extra para
+    // la foto principal que se ve dentro de la invitación, después de
+    // "Guardá la fecha".
+    const storytelling = isStorytellingTemplate(data.templateTipo);
 
     const triggerCinematicoTip = () => {
         setShowCinematicoTip(true);
@@ -37,7 +47,7 @@ export function StepHeroImages() {
     }, []);
 
     const handleNext = () => {
-        if (!data.portadaImagenFondo) {
+        if (!storytelling && !data.portadaImagenFondo) {
             setShowMissingImageError(true);
             showToast("Cargá la imagen de portada mobile antes de continuar.", "error");
             return;
@@ -128,14 +138,16 @@ export function StepHeroImages() {
 
                 {/* Hero Background Image Mobile */}
                 <div className={`space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border ${showMissingImageError && !data.portadaImagenFondo ? 'border-red-500/60' : 'border-white/10'}`}>
-                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm block min-h-[2.5rem]">Portada Invitación *</Label>
+                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm block min-h-[2.5rem]">Portada Invitación{storytelling ? "" : " *"}</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondo}
                         onImageUploaded={(url: string) => { setData({ portadaImagenFondo: url }); setShowMissingImageError(false); }}
                         aspectRatio={4 / 5}
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
-                        Se verá como foto de portada de la invitación. Obligatoria: todos los templates la usan como imagen principal.
+                        {storytelling
+                            ? "Si cargás una foto acá, reemplaza el fondo decorativo original de la tapa por esta foto."
+                            : "Se verá como foto de portada de la invitación. Obligatoria: todos los templates la usan como imagen principal."}
                     </p>
                     {showMissingImageError && !data.portadaImagenFondo && (
                         <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
@@ -145,6 +157,38 @@ export function StepHeroImages() {
                     )}
                 </div>
             </div>
+
+            {storytelling && (
+                <div className="max-w-4xl mx-auto space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
+                    <div className="flex items-center gap-2">
+                        <Film className="w-4 h-4 text-primary" />
+                        <Label className="font-semibold text-sm">Foto principal (dentro de la invitación)</Label>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-normal">
+                        Opcional. Se muestra en una sección propia después de &quot;Guardá la fecha&quot;, con un efecto cinemático acorde a la plantilla (sin teñir de color, se ve la foto tal cual). Sin cargarla, se usa una foto de tu galería principal; si tampoco cargaste galería, esa sección se ve con un fondo decorativo.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="fotoPrincipalNarrativa" className="text-xs text-muted-foreground block min-h-[1.5rem]">Recorte mobile (vertical)</Label>
+                            <ImageUploader
+                                currentImage={data.fotoPrincipalNarrativa}
+                                onImageUploaded={(url: string) => setData({ fotoPrincipalNarrativa: url })}
+                                onRemove={() => setData({ fotoPrincipalNarrativa: "" })}
+                                aspectRatio={4 / 5}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="fotoPrincipalNarrativaDesktop" className="text-xs text-muted-foreground block min-h-[1.5rem]">Recorte desktop (panorámico)</Label>
+                            <ImageUploader
+                                currentImage={data.fotoPrincipalNarrativaDesktop}
+                                onImageUploaded={(url: string) => setData({ fotoPrincipalNarrativaDesktop: url })}
+                                onRemove={() => setData({ fotoPrincipalNarrativaDesktop: "" })}
+                                aspectRatio={3 / 2}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <SaveStepButtons onNext={handleNext} />
         </div>

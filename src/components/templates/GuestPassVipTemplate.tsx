@@ -30,7 +30,7 @@ import { Bodoni_Moda, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
-import { AnimatedCoverPhoto } from "@/components/invitation/v2/AnimatedCoverPhoto";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -173,13 +173,19 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
 
-  // --- EXPERIMENTAL: portada de bienvenida y foto principal con foto real,
-  // misma infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
-  // los campos portadaImagenFondoDesktop/galeriaPrincipalFotos que ya carga
-  // el wizard) -- ver rama experimento-foto-storytelling. Sin foto cargada,
-  // todo se ve exactamente igual que antes (cero regresión).
+  // Portada de bienvenida y foto principal con foto real, misma
+  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos que ya carga StepHeroImages.tsx) -- ver rama
+  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
+  // todo se ve exactamente igual que antes (cero regresión, mismo criterio
+  // que Flat: "si no se carga foto, fondo original de la plantilla").
+  // portadaImagenFondoDesktop es, igual que en Flat, el "disparador" de la
+  // portada animada (ver comentario en StepHeroImages.tsx) -- con fallback
+  // a portadaImagenFondo si no se cargó. Se muestra SOLO en mobile (ver
+  // nota en CoverHalf), aunque el nombre del campo diga "Desktop".
   const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
-  const heroPhotoUrl = galeria[1] || galeria[0] || "";
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -661,6 +667,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
       }}
     >
       <style>{GP_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="gpv-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="gpv-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0B0B10 55%, #08080B 100%)" }}>
@@ -695,11 +702,17 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
             se enmarca con un borde propio en vez de estirarse edge-to-edge. */}
         <section data-tone="dark" data-screen-label="Nuestra foto" className="gpv-hero-photo-section">
           <div className="gpv-hero-photo-frame">
-            {heroPhotoUrl ? (
-              <AnimatedCoverPhoto photoSrc={heroPhotoUrl} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
-            ) : (
-              <div className="gpv-hero-photo-placeholder" />
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              </div>
             )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="gpv-hero-photo-placeholder" />}
           </div>
           <span data-xin="1" data-dist="-60" className="gpv-kicker gpv-hero-photo-kicker">02 — ASÍ EMPEZÓ TODO</span>
         </section>
@@ -1710,20 +1723,25 @@ function CoverHalf({
 }) {
   return (
     <div className="gpv-cover-inner">
-      {/* EXPERIMENTAL: con foto cargada, la foto reemplaza visualmente el
-          degradé de fondo (que sigue ahí debajo, sin efecto, por si la foto
-          tarda en decodificar) -- el resto de la ornamentación (glow,
-          sunburst, medallón, nombres, CTA) se mantiene arriba sin cambios,
-          así la identidad de la familia sigue siendo reconocible. */}
+      {/* Con foto cargada, la foto reemplaza el degradé de fondo -- el
+          resto de la ornamentación (glow, sunburst, medallón, nombres, CTA)
+          se mantiene arriba sin cambios, así la identidad de la familia
+          sigue siendo reconocible. Misma lógica que la Colección Flat:
+          SOLO en mobile (el efecto está pensado para el recorte vertical de
+          una foto de celular); en desktop el degradé de fondo original de
+          la plantilla (que sigue debajo sin tocar) se ve igual que siempre,
+          con o sin foto cargada. */}
       {photoSrc && (
-        <AnimatedCoverPhoto
-          photoSrc={photoSrc}
-          tint
-          tintColor1="#C8A45C"
-          tintColor2="#0B0B10"
-          effect="enfoque"
-          scrimColorRgb="8,8,11"
-        />
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoSrc}
+            tint
+            tintColor1="#C8A45C"
+            tintColor2="#0B0B10"
+            effect="enfoque"
+            scrimColorRgb="8,8,11"
+          />
+        </div>
       )}
       <div className="gpv-cover-glow" />
       <div className="gpv-cover-sunburst" />

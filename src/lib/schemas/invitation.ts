@@ -38,6 +38,15 @@ export const coverPageSchema = z.object({
     portadaTextoBoton: z.string().optional(),
     portadaImagenFondo: z.string().optional(),
     portadaImagenFondoDesktop: z.string().optional(),
+    // Foto principal DENTRO de la invitación (después de Guardá la fecha),
+    // exclusiva de la Colección Storytelling -- ver AnimatedCoverPhoto.tsx
+    // y su uso en cada plantilla de esa colección. Recorte propio (no el
+    // 4/5 de portada): mobile más vertical para pantalla completa, desktop
+    // panorámico porque ahí la foto se enmarca en vez de ir a pantalla
+    // completa. Opcional: sin cargarla, cada plantilla cae a su galería
+    // principal y, si tampoco hay fotos, a su fondo decorativo original.
+    fotoPrincipalNarrativa: z.string().optional(),
+    fotoPrincipalNarrativaDesktop: z.string().optional(),
 });
 
 export const gallerySchema = z.object({
