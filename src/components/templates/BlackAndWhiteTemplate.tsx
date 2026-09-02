@@ -750,7 +750,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                 </div>
               )}
             </div>
-            <span data-xin="1" data-dist="-60" className="bcw-kicker bcw-hero-photo-kicker">02 — NUESTRA HISTORIA</span>
+            <span data-xin="1" data-dist="-60" className="bcw-kicker bcw-hero-photo-kicker">02 — {isCasamiento ? "NUESTRA HISTORIA" : "MI HISTORIA"}</span>
           </section>
         )}
 
