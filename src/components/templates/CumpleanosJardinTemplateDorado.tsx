@@ -2066,7 +2066,7 @@ const GP_CSS = `
      no de los 3 items fijos del mockup: con un solo item, space-between lo
      pega al borde izquierdo y se lee como un bug. Centrado en ese caso. */
   .cpj-cover-facts:has(> span:only-child) { justify-content: center; }
-  .cpj-cover-cta { border: 1px solid #D4B483; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F5EBD4; font-family: var(--cpj-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  .cpj-cover-cta { border: 1px solid #D4B483; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: var(--cpj-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .cpj-cover-cta--btn { cursor: pointer; border-radius: 0; }
   @media (hover: hover) {
     .cpj-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #0E140C; }
