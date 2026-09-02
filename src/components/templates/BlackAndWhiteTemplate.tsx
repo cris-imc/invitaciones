@@ -31,6 +31,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Bodoni_Moda, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
+import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -679,6 +680,13 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
             <span className="bcw-divider-line" /><span>{weekday} · {hora} H</span>
           </div>
           <p data-xin="1" data-delay="460" className="bcw-lead">{portadaMensaje}</p>
+          <AddToCalendarLink
+            eventName={namesTitle}
+            targetDate={eventDateTime}
+            location={lugarNombre || direccion}
+            description={portadaMensaje}
+            className="bcw-cal-link"
+          />
 
           <div data-drift="-70" className="bcw-medallion bcw-medallion--corner">
             <Medallion label="VIP" sub="ACCESO" arcId="bcwArc1" arcText={isCasamiento ? "NOS CASAMOS · EDICIÓN ÚNICA · " : "ADMIT ONE · MIS QUINCE · "} spin="normal" />
@@ -1758,6 +1766,8 @@ const GP_CSS = `
   .bcw-divider-line--long { width: 64px; }
 
   .bcw-lead { margin: 0; font-family: var(--bcw-bodoni), serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #A8A292; max-width: 330px; }
+  .bcw-cal-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 4px; font-family: var(--bcw-mono), monospace; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #8A8577; text-decoration: none; transition: color 200ms ease; }
+  .bcw-cal-link:hover { color: #B9B9BC; }
 
   .bcw-medallion { position: relative; }
   .bcw-medallion--corner { position: absolute; right: max(32px, calc((100% - 560px) / 2)); top: 12%; width: clamp(86px, 22vw, 116px); aspect-ratio: 1; }
