@@ -1778,7 +1778,7 @@ function BtsCoverHalf({
         </div>
       )}
       <div className="bts-cover-glow" />
-      <div className="bts-cover-sunburst" />
+      <div className="bts-cover-texture" />
       <div className="bts-cover-content">
         <div className="bts-cover-top-row">
           <span>PASE Nº {passNumber}</span><span className="bts-accent-serif-2">ADMIT ONE</span>
@@ -1790,15 +1790,15 @@ function BtsCoverHalf({
           <span className="bts-cover-date">{fechaCorta}</span>
         </div>
         <div className="bts-cover-bottom">
-          <div ref={perfRef} className="bts-perf-strip bts-perf-strip--reveal" />
+          <div ref={perfRef} className="bts-perf-strip bts-perf-strip--reveal bts-perf-strip--cover" />
           <div className="bts-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="bts-barcode-wrap">
-            <div className="bts-barcode" style={{ width: "62%" }} />
-            <span className="bts-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="bts-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="bts-mini-label bts-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1891,6 +1891,7 @@ const GP_CSS = `
   .bts-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #D9A9B7; }
   .bts-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #11120E 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .bts-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .bts-perf-strip--cover { opacity: .9; }
 
   .bts-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(110,90,168,0.5), rgba(78,127,134,0.32), rgba(200,164,92,0.46), rgba(110,90,168,0.5)); filter: blur(80px); opacity: .4; animation: bbsFoil 30s linear infinite; }
   .bts-phrase { margin: 0; position: relative; font-family: var(--bts-display), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1914,6 +1915,7 @@ const GP_CSS = `
   .bts-panel-title-sm { margin: 0; font-family: var(--bts-display), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .bts-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .bts-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .bts-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .bts-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .bts-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .bts-facts-row--last { border-bottom: none; padding-bottom: 0; }
@@ -2047,10 +2049,10 @@ const GP_CSS = `
   .bts-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .bts-cover-half--top { top: 0; }
   .bts-cover-half--bottom { bottom: 0; }
-  .bts-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #1A1726 0%, #161712 46%, #11120E 100%); }
+  .bts-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #20221C 0%, #161712 46%, #11120E 100%); }
   .bts-cover-half--bottom .bts-cover-inner { top: auto; bottom: 0; }
-  .bts-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(110,90,168,0.7), rgba(78,127,134,0.45), rgba(200,164,92,0.65), rgba(110,90,168,0.7)); filter: blur(64px); opacity: .62; animation: bbsFoil 26s linear infinite; }
-  .bts-cover-sunburst { position: absolute; inset: 0; background: repeating-conic-gradient(from 0deg at 50% 44%, rgba(232,214,168,0.75) 0deg 0.4deg, transparent 0.4deg 3.2deg); opacity: .3; -webkit-mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); }
+  .bts-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(124,142,122,0.4), rgba(217,169,183,0.3), rgba(217,169,183,0.5), rgba(124,142,122,0.4)); filter: blur(64px); opacity: .62; animation: bbsFoil 26s linear infinite; }
+  .bts-cover-texture { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(250,240,242,.06) 0 1px, transparent 1px 16px), repeating-linear-gradient(-45deg, rgba(250,240,242,.05) 0 1px, transparent 1px 16px); }
   .bts-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
   .bts-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
   .bts-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
@@ -2060,6 +2062,10 @@ const GP_CSS = `
   .bts-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
   .bts-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .bts-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
+  /* La fila de datos de la tapa nace de datos reales (dress code + hora),
+     no de los 3 items fijos del mockup: con un solo item, space-between lo
+     pega al borde izquierdo y se lee como un bug. Centrado en ese caso. */
+  .bts-cover-facts:has(> span:only-child) { justify-content: center; }
   .bts-cover-cta { border: 1px solid #D9A9B7; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #FAF0F2; font-family: var(--bts-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .bts-cover-cta--btn { cursor: pointer; border-radius: 0; }
   @media (hover: hover) {
