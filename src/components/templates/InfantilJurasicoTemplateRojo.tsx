@@ -1778,7 +1778,7 @@ function IfjCoverHalf({
         </div>
       )}
       <div className="ifj-cover-glow" />
-      <div className="ifj-cover-sunburst" />
+      <div className="ifj-cover-texture" />
       <div className="ifj-cover-content">
         <div className="ifj-cover-top-row">
           <span>PASE Nº {passNumber}</span><span className="ifj-accent-serif-2">ADMIT ONE</span>
@@ -1790,15 +1790,15 @@ function IfjCoverHalf({
           <span className="ifj-cover-date">{fechaCorta}</span>
         </div>
         <div className="ifj-cover-bottom">
-          <div ref={perfRef} className="ifj-perf-strip ifj-perf-strip--reveal" />
+          <div ref={perfRef} className="ifj-perf-strip ifj-perf-strip--reveal ifj-perf-strip--cover" />
           <div className="ifj-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="ifj-barcode-wrap">
-            <div className="ifj-barcode" style={{ width: "62%" }} />
-            <span className="ifj-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="ifj-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="ifj-mini-label ifj-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1891,6 +1891,7 @@ const GP_CSS = `
   .ifj-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #C9584A; }
   .ifj-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #101408 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .ifj-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .ifj-perf-strip--cover { opacity: .9; }
 
   .ifj-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(110,90,168,0.5), rgba(78,127,134,0.32), rgba(200,164,92,0.46), rgba(110,90,168,0.5)); filter: blur(80px); opacity: .4; animation: bbsFoil 30s linear infinite; }
   .ifj-phrase { margin: 0; position: relative; font-family: var(--ifj-display), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1914,6 +1915,7 @@ const GP_CSS = `
   .ifj-panel-title-sm { margin: 0; font-family: var(--ifj-display), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .ifj-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .ifj-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .ifj-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .ifj-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .ifj-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .ifj-facts-row--last { border-bottom: none; padding-bottom: 0; }
@@ -2047,10 +2049,10 @@ const GP_CSS = `
   .ifj-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .ifj-cover-half--top { top: 0; }
   .ifj-cover-half--bottom { bottom: 0; }
-  .ifj-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #1A1726 0%, #141A0C 46%, #101408 100%); }
+  .ifj-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #1C2412 0%, #141A0C 46%, #101408 100%); }
   .ifj-cover-half--bottom .ifj-cover-inner { top: auto; bottom: 0; }
-  .ifj-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(110,90,168,0.7), rgba(78,127,134,0.45), rgba(200,164,92,0.65), rgba(110,90,168,0.7)); filter: blur(64px); opacity: .62; animation: bbsFoil 26s linear infinite; }
-  .ifj-cover-sunburst { position: absolute; inset: 0; background: repeating-conic-gradient(from 0deg at 50% 44%, rgba(232,214,168,0.75) 0deg 0.4deg, transparent 0.4deg 3.2deg); opacity: .3; -webkit-mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); }
+  .ifj-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(90,58,34,0.45), rgba(201,88,74,0.32), rgba(201,88,74,0.55), rgba(90,58,34,0.45)); filter: blur(64px); opacity: .62; animation: bbsFoil 26s linear infinite; }
+  .ifj-cover-texture { position: absolute; inset: 0; background-image: repeating-linear-gradient(60deg, rgba(248,226,222,.06) 0 3px, transparent 3px 34px), repeating-linear-gradient(-60deg, rgba(248,226,222,.05) 0 3px, transparent 3px 34px); }
   .ifj-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
   .ifj-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
   .ifj-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
@@ -2060,7 +2062,11 @@ const GP_CSS = `
   .ifj-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
   .ifj-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .ifj-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .ifj-cover-cta { border: 1px solid #C9584A; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F8E2DE; font-family: var(--ifj-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  /* La fila de datos de la tapa nace de datos reales (dress code + hora),
+     no de los 3 items fijos del mockup: con un solo item, space-between lo
+     pega al borde izquierdo y se lee como un bug. Centrado en ese caso. */
+  .ifj-cover-facts:has(> span:only-child) { justify-content: center; }
+  .ifj-cover-cta { border: 1px solid #C9584A; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: var(--ifj-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .ifj-cover-cta--btn { cursor: pointer; border-radius: 0; }
   @media (hover: hover) {
     .ifj-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #141A0C; }

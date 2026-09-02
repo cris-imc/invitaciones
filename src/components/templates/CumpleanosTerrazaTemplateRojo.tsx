@@ -1778,7 +1778,7 @@ function CPTCoverHalf({
         </div>
       )}
       <div className="cpt-cover-glow" />
-      <div className="cpt-cover-sunburst" />
+      <div className="cpt-cover-texture" />
       <div className="cpt-cover-content">
         <div className="cpt-cover-top-row">
           <span>PASE Nº {passNumber}</span><span className="cpt-accent-serif-2">ADMIT ONE</span>
@@ -1790,15 +1790,15 @@ function CPTCoverHalf({
           <span className="cpt-cover-date">{fechaCorta}</span>
         </div>
         <div className="cpt-cover-bottom">
-          <div ref={perfRef} className="cpt-perf-strip cpt-perf-strip--reveal" />
+          <div ref={perfRef} className="cpt-perf-strip cpt-perf-strip--reveal cpt-perf-strip--cover" />
           <div className="cpt-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
           </div>
           {children}
           <div className="cpt-barcode-wrap">
-            <div className="cpt-barcode" style={{ width: "62%" }} />
-            <span className="cpt-mini-label" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <div className="cpt-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
+            <span className="cpt-mini-label cpt-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
           </div>
         </div>
       </div>
@@ -1891,6 +1891,7 @@ const GP_CSS = `
   .cpt-cd-label { font-size: 9px; letter-spacing: 0.3em; color: #C9556F; }
   .cpt-perf-strip { height: 12px; position: relative; background: radial-gradient(circle at 6px 50%, #170C09 3.4px, transparent 3.8px) 0 0/12px 12px repeat-x; opacity: .85; }
   .cpt-perf-strip--reveal { clip-path: inset(0 100% 0 0); transition: clip-path 900ms cubic-bezier(.16,1,.3,1) 500ms; }
+  .cpt-perf-strip--cover { opacity: .9; }
 
   .cpt-glow-blob { position: absolute; right: -26%; top: 4%; width: 82vw; max-width: 540px; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, rgba(110,90,168,0.5), rgba(78,127,134,0.32), rgba(200,164,92,0.46), rgba(110,90,168,0.5)); filter: blur(80px); opacity: .4; animation: bbsFoil 30s linear infinite; }
   .cpt-phrase { margin: 0; position: relative; font-family: var(--cpt-display), serif; font-weight: 400; font-size: clamp(50px, 15vw, 96px); line-height: 0.92; letter-spacing: -0.03em; }
@@ -1914,6 +1915,7 @@ const GP_CSS = `
   .cpt-panel-title-sm { margin: 0; font-family: var(--cpt-display), serif; font-size: clamp(34px, 10vw, 52px); line-height: 1; }
   .cpt-panel-block { position: relative; display: flex; flex-direction: column; gap: 12px; }
   .cpt-mini-label { font-size: 9px; letter-spacing: 0.26em; color: #7C7768; }
+  .cpt-mini-label--cover { font-size: 8.5px; letter-spacing: 0.3em; }
   .cpt-facts { position: relative; display: flex; flex-direction: column; gap: 12px; font-size: 11px; letter-spacing: 0.14em; color: #4A473F; }
   .cpt-facts-row { display: flex; justify-content: space-between; border-bottom: 1px solid #D6D1C4; padding-bottom: 10px; }
   .cpt-facts-row--last { border-bottom: none; padding-bottom: 0; }
@@ -2047,10 +2049,10 @@ const GP_CSS = `
   .cpt-cover-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; transition: transform 1100ms cubic-bezier(.7,0,.2,1); }
   .cpt-cover-half--top { top: 0; }
   .cpt-cover-half--bottom { bottom: 0; }
-  .cpt-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #1A1726 0%, #1C0F0C 46%, #170C09 100%); }
+  .cpt-cover-inner { position: absolute; left: 0; right: 0; top: 0; height: 200%; overflow: hidden; background: radial-gradient(120% 70% at 50% 8%, #2A1712 0%, #1C0F0C 46%, #170C09 100%); }
   .cpt-cover-half--bottom .cpt-cover-inner { top: auto; bottom: 0; }
-  .cpt-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(110,90,168,0.7), rgba(78,127,134,0.45), rgba(200,164,92,0.65), rgba(110,90,168,0.7)); filter: blur(64px); opacity: .62; animation: bbsFoil 26s linear infinite; }
-  .cpt-cover-sunburst { position: absolute; inset: 0; background: repeating-conic-gradient(from 0deg at 50% 44%, rgba(232,214,168,0.75) 0deg 0.4deg, transparent 0.4deg 3.2deg); opacity: .3; -webkit-mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); mask-image: radial-gradient(closest-side at 50% 44%, #000 14%, rgba(0,0,0,0.5) 46%, transparent 82%); }
+  .cpt-cover-glow { position: absolute; left: 50%; top: 6%; width: 190%; aspect-ratio: 1; transform: translate(-50%, -14%); border-radius: 50%; background: conic-gradient(from 200deg, rgba(122,59,68,0.4), rgba(201,85,111,0.32), rgba(201,85,111,0.55), rgba(122,59,68,0.4)); filter: blur(64px); opacity: .62; animation: bbsFoil 26s linear infinite; }
+  .cpt-cover-texture { position: absolute; inset: 0; background-image: radial-gradient(circle at 30% 30%, rgba(245,217,223,.14), transparent 45%); }
   .cpt-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px max(24px, calc((100% - 440px) / 2)) 26px; }
   .cpt-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
   .cpt-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
@@ -2060,7 +2062,11 @@ const GP_CSS = `
   .cpt-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
   .cpt-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
   .cpt-cover-facts { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: 0.2em; color: #6E6A5D; }
-  .cpt-cover-cta { border: 1px solid #C9556F; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F5D9DF; font-family: var(--cpt-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
+  /* La fila de datos de la tapa nace de datos reales (dress code + hora),
+     no de los 3 items fijos del mockup: con un solo item, space-between lo
+     pega al borde izquierdo y se lee como un bug. Centrado en ese caso. */
+  .cpt-cover-facts:has(> span:only-child) { justify-content: center; }
+  .cpt-cover-cta { border: 1px solid #C9556F; background: linear-gradient(100deg, rgba(200,164,92,0.08), rgba(232,214,168,0.2), rgba(200,164,92,0.08)); color: #F6EFDD; font-family: var(--cpt-mono), monospace; font-size: 12px; letter-spacing: 0.26em; padding: clamp(13px, 2.1vh, 19px) 0; text-align: center; width: 100%; }
   .cpt-cover-cta--btn { cursor: pointer; border-radius: 0; }
   @media (hover: hover) {
     .cpt-cover-cta--btn:hover { background: linear-gradient(100deg, rgba(232,214,168,0.34), rgba(246,239,221,0.5), rgba(232,214,168,0.34)); color: #1C0F0C; }
