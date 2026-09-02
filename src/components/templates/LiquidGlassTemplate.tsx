@@ -776,7 +776,7 @@ export function LiquidGlassTemplate({ invitation, guest, isPersonalized = false 
                 <div id="ceremonia" data-tone="light" className="lqg-panel lqg-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="lqg-hair-bg" />
                   <div className="lqg-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="lqg-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -801,7 +801,7 @@ export function LiquidGlassTemplate({ invitation, guest, isPersonalized = false 
               <div id="details" data-tone="light" className="lqg-panel lqg-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="lqg-hair-bg" />
                 <div className="lqg-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="lqg-panel-title">
                   {lugarNombre || "El lugar"}
@@ -905,7 +905,7 @@ export function LiquidGlassTemplate({ invitation, guest, isPersonalized = false 
                 <div key={pageIndex} data-tone="light" className="lqg-panel lqg-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="lqg-hair-bg" />
                   <div className="lqg-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="lqg-panel-title-md">Álbum <span className="lqg-accent-navy">de fotos</span></h2>}
                   <div className="lqg-mosaic">

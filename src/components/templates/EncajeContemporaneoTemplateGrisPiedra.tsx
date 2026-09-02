@@ -780,7 +780,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
                 <div id="ceremonia" data-tone="light" className="enc-panel enc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="enc-hair-bg" />
                   <div className="enc-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="enc-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -805,7 +805,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
               <div id="details" data-tone="light" className="enc-panel enc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="enc-hair-bg" />
                 <div className="enc-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="enc-panel-title">
                   {lugarNombre || "El lugar"}
@@ -912,7 +912,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
                 <div key={pageIndex} data-tone="light" className="enc-panel enc-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="enc-hair-bg" />
                   <div className="enc-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="enc-panel-title-md">Álbum <span className="enc-accent-serif-dark">de fotos</span></h2>}
                   <div className="enc-mosaic">

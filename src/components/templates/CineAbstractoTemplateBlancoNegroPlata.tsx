@@ -783,7 +783,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
                 <div id="ceremonia" data-tone="light" data-camshake="1" className="cab-panel cab-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="cab-hair-bg" />
                   <div className="cab-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="cab-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -808,7 +808,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
               <div id="details" data-tone="light" data-camshake={ceremoniaHabilitada ? undefined : "1"} className="cab-panel cab-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="cab-hair-bg" />
                 <div className="cab-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="cab-panel-title">
                   {lugarNombre || "El lugar"}
@@ -911,7 +911,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
                 <div key={pageIndex} data-tone="light" className="cab-panel cab-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cab-hair-bg" />
                   <div className="cab-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="cab-panel-title-md">Álbum <span className="cab-accent-serif">de fotos</span></h2>}
                   <div className="cab-mosaic">
