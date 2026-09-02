@@ -32,6 +32,7 @@ import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 
 const cnePlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -155,6 +156,9 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -622,6 +626,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
       }}
     >
       <style>{CNE_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="cne-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="cne-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #131315 0%, #18181B 55%, #0A0A0C 100%)" }}>
@@ -650,10 +655,27 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
           </div>
         </section>
 
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="cne-hero-photo-section">
+          <div className="cne-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="10,10,12" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="10,10,12" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="cne-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="cne-kicker cne-hero-photo-kicker">02 — LA REALEZA EMPIEZA ACÁ</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="cne-section cne-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #232326 0%, #1C1C1F 55%, #0A0A0C 100%)" }}>
           <div className="cne-scan-grid" />
           <div className="cne-scanline" />
-          <span data-xin="1" data-dist="-60" className="cne-kicker" style={{ position: "relative" }}>02 — LA CORONACIÓN ES EN</span>
+          <span data-xin="1" data-dist="-60" className="cne-kicker" style={{ position: "relative" }}>03 — LA CORONACIÓN ES EN</span>
           <div className="cne-cd-grid">
             <CneCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CneCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -665,7 +687,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="cne-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #151517 0%, #0C0C0D 52%, #0A0A0C 100%)" }}>
           <div data-drift="-130" className="cne-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="cne-kicker" style={{ position: "relative" }}>03 — UN MENSAJE PARA VOS</span>
+          <span data-xin="1" data-dist="-60" className="cne-kicker" style={{ position: "relative" }}>04 — UN MENSAJE PARA VOS</span>
           <h2 ref={phraseRef} className="cne-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -691,7 +713,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
                 <div id="ceremonia" data-tone="light" className="cne-panel cne-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="cne-hair-bg" />
                   <div className="cne-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="cne-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -716,7 +738,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
               <div id="details" data-tone="light" className="cne-panel cne-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="cne-hair-bg" />
                 <div className="cne-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="cne-panel-title">
                   {lugarNombre || "El salón"}
@@ -774,7 +796,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="cne-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #131315 0%, #18181B 60%, #0A0A0C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cne-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="cne-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cne-h2">
             Confirmá<br /><span className="cne-accent-italic">tu asistencia</span>
           </h2>
@@ -819,7 +841,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
                 <div key={pageIndex} data-tone="light" className="cne-panel cne-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cne-hair-bg" />
                   <div className="cne-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="cne-panel-title-md">Álbum <span className="cne-accent-serif">de fotos</span></h2>}
                   <div className="cne-mosaic">
@@ -871,7 +893,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="cne-section" style={{ background: "#18181B" }}>
-            <span data-xin="1" data-dist="-60" className="cne-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="cne-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cne-h2">¿Qué vals<br /><span className="cne-accent-italic">abre la noche?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cne-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -890,7 +912,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cne-section" style={{ background: "#18181B" }}>
-            <span data-xin="1" data-dist="-60" className="cne-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="cne-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cne-h2">
               Si querés<br /><span className="cne-accent-italic">sumarte</span>
             </h2>
@@ -957,7 +979,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
         )}
 
         <section data-tone="dark" data-screen-label="Tu corona" className="cne-section cne-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #131315 0%, #18181B 55%, #0A0A0C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cne-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU CORONA</span>
+          <span data-xin="1" data-dist="-60" className="cne-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU CORONA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cne-final-card">
             <div className="cne-medallion cne-medallion--final">
               <CoronaMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cneArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -999,6 +1021,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="cne-cover-cta">ABRIR INVITACIÓN</div>
           </CneCoverHalf>
@@ -1011,6 +1034,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="cne-cover-cta cne-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CneCoverHalf>
@@ -1622,6 +1646,7 @@ function CneCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1633,10 +1658,16 @@ function CneCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="cne-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#3FAE7D" tintColor2="#0A0A0C" effect="enfoque" scrimColorRgb="10,10,12" />
+        </div>
+      )}
       <div className="cne-cover-glow" />
       <div className="cne-cover-lattice" />
       <div className="cne-cover-content">
@@ -1687,6 +1718,15 @@ const CNE_CSS = `
 
   .cne-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .cne-section--between { justify-content: space-between; }
+
+  .cne-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0A0A0C; }
+  .cne-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .cne-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #232326 0%, #1C1C1F 60%, #0A0A0C 100%); }
+  .cne-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .cne-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(63,174,125,.3); }
+    .cne-hero-photo-kicker { bottom: 40px; }
+  }
 
   .cne-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

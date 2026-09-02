@@ -25,6 +25,7 @@ import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -155,6 +156,15 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real, misma
+  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos que ya carga StepHeroImages.tsx) -- ver rama
+  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
+  // todo se ve exactamente igual que antes (cero regresión).
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -622,6 +632,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
       }}
     >
       <style>{PRC_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="prc-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="prc-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #170609 0%, #3A0F1C 55%, #23090F 100%)" }}>
@@ -650,10 +661,30 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color --
+            ocupa toda la pantalla en mobile; en desktop se enmarca con un
+            borde propio en vez de estirarse edge-to-edge. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="prc-hero-photo-section">
+          <div className="prc-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="35,9,15" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="35,9,15" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="prc-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="prc-kicker prc-hero-photo-kicker">02 — HABÍA UNA VEZ</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="prc-section prc-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #5C1B2C 0%, #29090F 55%, #23090F 100%)" }}>
           <div className="prc-scan-grid" />
           <div className="prc-scanline" />
-          <span data-xin="1" data-dist="-60" className="prc-kicker" style={{ position: "relative" }}>02 — LA MAGIA EMPIEZA EN</span>
+          <span data-xin="1" data-dist="-60" className="prc-kicker" style={{ position: "relative" }}>03 — LA MAGIA EMPIEZA EN</span>
           <div className="prc-cd-grid">
             <PrcCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <PrcCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -665,7 +696,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="prc-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #200A10 0%, #0F0508 52%, #23090F 100%)" }}>
           <div data-drift="-130" className="prc-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="prc-kicker" style={{ position: "relative" }}>03 — UN MENSAJE PARA VOS</span>
+          <span data-xin="1" data-dist="-60" className="prc-kicker" style={{ position: "relative" }}>04 — UN MENSAJE PARA VOS</span>
           <h2 ref={phraseRef} className="prc-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -691,7 +722,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
                 <div id="ceremonia" data-tone="light" className="prc-panel prc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="prc-hair-bg" />
                   <div className="prc-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="prc-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -716,7 +747,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
               <div id="details" data-tone="light" className="prc-panel prc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="prc-hair-bg" />
                 <div className="prc-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="prc-panel-title">
                   {lugarNombre || "El salón"}
@@ -774,7 +805,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="prc-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #170609 0%, #3A0F1C 60%, #23090F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="prc-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="prc-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="prc-h2">
             Confirmá<br /><span className="prc-accent-italic">tu asistencia</span>
           </h2>
@@ -819,7 +850,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
                 <div key={pageIndex} data-tone="light" className="prc-panel prc-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="prc-hair-bg" />
                   <div className="prc-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="prc-panel-title-md">Álbum <span className="prc-accent-serif">de fotos</span></h2>}
                   <div className="prc-mosaic">
@@ -871,7 +902,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="prc-section" style={{ background: "#3A0F1C" }}>
-            <span data-xin="1" data-dist="-60" className="prc-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="prc-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="prc-h2">¿Qué vals<br /><span className="prc-accent-italic">abre el baile?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="prc-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -890,7 +921,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="prc-section" style={{ background: "#3A0F1C" }}>
-            <span data-xin="1" data-dist="-60" className="prc-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="prc-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="prc-h2">
               Si querés<br /><span className="prc-accent-italic">sumarte</span>
             </h2>
@@ -941,7 +972,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="prc-section" style={{ background: "#3A0F1C" }}>
-            <span data-xin="1" data-dist="-60" className="prc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="prc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="prc-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -957,7 +988,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
         )}
 
         <section data-tone="dark" data-screen-label="Tu tiara" className="prc-section prc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #170609 0%, #3A0F1C 55%, #23090F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="prc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU TIARA</span>
+          <span data-xin="1" data-dist="-60" className="prc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU TIARA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="prc-final-card">
             <div className="prc-medallion prc-medallion--final">
               <TiaraMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="prcArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -999,6 +1030,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="prc-cover-cta">ABRIR INVITACIÓN</div>
           </PrcCoverHalf>
@@ -1011,6 +1043,7 @@ export function PrincesaTemplateBorgona({ invitation, guest, isPersonalized = fa
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="prc-cover-cta prc-cover-cta--btn">ABRIR INVITACIÓN</button>
           </PrcCoverHalf>
@@ -1622,6 +1655,7 @@ function PrcCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1633,10 +1667,23 @@ function PrcCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="prc-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoSrc}
+            tint
+            tintColor1="#8FC4D9"
+            tintColor2="#23090F"
+            effect="enfoque"
+            scrimColorRgb="35,9,15"
+          />
+        </div>
+      )}
       <div className="prc-cover-glow" />
       <div className="prc-sparkle" style={{ left: "20%", top: "22%", width: 5, height: 5 }} />
       <div className="prc-sparkle" style={{ left: "76%", top: "32%", width: 4, height: 4, animationDelay: ".8s" }} />
@@ -1688,6 +1735,15 @@ const PRC_CSS = `
 
   .prc-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .prc-section--between { justify-content: space-between; }
+
+  .prc-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #23090F; }
+  .prc-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .prc-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #5C1B2C 0%, #29090F 60%, #23090F 100%); }
+  .prc-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .prc-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(143,196,217,.3); }
+    .prc-hero-photo-kicker { bottom: 40px; }
+  }
 
   .prc-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

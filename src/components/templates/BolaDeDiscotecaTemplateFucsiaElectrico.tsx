@@ -31,6 +31,7 @@ import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 
@@ -162,6 +163,9 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -631,6 +635,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
       }}
     >
       <style>{BDD_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="bdd-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="bdd-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #161233 0%, #0A0A22 55%, #08081A 100%)" }}>
@@ -659,10 +664,27 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
           </div>
         </section>
 
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="bdd-hero-photo-section">
+          <div className="bdd-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,26" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,26" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="bdd-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker bdd-hero-photo-kicker">02 — LA PISTA YA ARRANCÓ</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="bdd-section bdd-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #140F2E 0%, #0E0C24 55%, #08081A 100%)" }}>
           <div className="bdd-scan-grid" />
           <div className="bdd-scanline" />
-          <span data-xin="1" data-dist="-60" className="bdd-kicker" style={{ position: "relative" }}>02 — LA PISTA SE ENCIENDE EN</span>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker" style={{ position: "relative" }}>03 — LA PISTA SE ENCIENDE EN</span>
           <div className="bdd-cd-grid">
             <BddCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <BddCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -674,7 +696,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="bdd-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1D1338 0%, #120A22 52%, #08081A 100%)" }}>
           <div data-drift="-130" className="bdd-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="bdd-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="bdd-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -704,7 +726,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                 <div id="ceremonia" data-tone="light" className="bdd-panel bdd-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="bdd-hair-bg" />
                   <div className="bdd-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="bdd-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -729,7 +751,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
               <div id="details" data-tone="light" className="bdd-panel bdd-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="bdd-hair-bg" />
                 <div className="bdd-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="bdd-panel-title">
                   {lugarNombre || "Club Nocturno"}
@@ -787,7 +809,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="bdd-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #161233 0%, #0A0A22 60%, #08081A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bdd-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bdd-h2">
             Confirmá<br /><span className="bdd-accent-italic">tu acceso</span>
           </h2>
@@ -832,7 +854,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                 <div key={pageIndex} data-tone="light" className="bdd-panel bdd-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="bdd-hair-bg" />
                   <div className="bdd-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="bdd-panel-title-md">Álbum <span className="bdd-accent-pink-italic">de fotos</span></h2>}
                   <div className="bdd-mosaic">
@@ -884,7 +906,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="bdd-section" style={{ background: "#0A0A22" }}>
-            <span data-xin="1" data-dist="-60" className="bdd-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="bdd-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bdd-h2">¿Qué tema<br /><span className="bdd-accent-pink-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bdd-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -903,7 +925,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bdd-section" style={{ background: "#0A0A22" }}>
-            <span data-xin="1" data-dist="-60" className="bdd-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="bdd-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bdd-h2">
               Si querés<br /><span className="bdd-accent-italic">sumarte</span>
             </h2>
@@ -954,7 +976,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bdd-section" style={{ background: "#0A0A22" }}>
-            <span data-xin="1" data-dist="-60" className="bdd-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="bdd-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bdd-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -970,7 +992,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="bdd-section bdd-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #161233 0%, #0A0A22 55%, #08081A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bdd-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bdd-final-card">
             <div className="bdd-medallion bdd-medallion--final">
               <BddMedallion mainText="15" subLabel={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bddArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1012,6 +1034,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="bdd-cover-cta">ABRIR INVITACIÓN</div>
           </BddCoverHalf>
@@ -1024,6 +1047,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="bdd-cover-cta bdd-cover-cta--btn">ABRIR INVITACIÓN</button>
           </BddCoverHalf>
@@ -1641,6 +1665,7 @@ function BddCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1652,10 +1677,16 @@ function BddCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="bdd-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#2E6BFF" tintColor2="#08080E" effect="enfoque" scrimColorRgb="8,8,26" />
+        </div>
+      )}
       <div className="bdd-cover-glow" />
       <div className="bdd-discolight" />
       <div className="bdd-cover-content">
@@ -1709,6 +1740,12 @@ const BDD_CSS = `
   .bdd-section--between { justify-content: space-between; }
 
   .bdd-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
+
+  .bdd-hero-photo-section { position: relative; min-height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
+  .bdd-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  @media (min-width: 768px) { .bdd-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(46,107,255,.3); } }
+  .bdd-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #161233 0%, #0A0A22 55%, #08081A 100%); }
+  .bdd-hero-photo-kicker { position: absolute; left: max(30px, calc((100% - 560px) / 2)); bottom: 40px; z-index: 2; }
 
   .bdd-date-stack { display: flex; flex-direction: column; gap: 2px; }
   .bdd-date-num { font-family: var(--bdd-archivo), sans-serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.82; letter-spacing: -0.04em; }

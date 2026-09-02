@@ -25,6 +25,7 @@ import { Archivo_Black, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -157,6 +158,13 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real (ver rama
+  // experimento-foto-storytelling). 100% opcionales: sin cargarlas, todo
+  // se ve exactamente igual que antes.
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -629,6 +637,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
       }}
     >
       <style>{FLB_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="flb-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="flb-section">
@@ -659,10 +668,29 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color --
+            ocupa toda la pantalla en mobile, se enmarca en desktop. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="flb-hero-photo-section">
+          <div className="flb-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="flb-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="flb-kicker flb-hero-photo-kicker">02 — DETRÁS DE CÁMARA</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="flb-section flb-section--between">
           <div className="flb-scan-grid" />
           <div className="flb-scanline" />
-          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>02 — LA CAMPAÑA SALE EN</span>
+          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>03 — LA CAMPAÑA SALE EN</span>
           <div className="flb-cd-grid">
             <FlbCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <FlbCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -674,7 +702,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="flb-section">
           <div data-drift="-130" className="flb-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="flb-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -700,7 +728,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
                 <div id="ceremonia" data-tone="light" className="flb-panel flb-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="flb-hair-bg" />
                   <div className="flb-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="flb-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -725,7 +753,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
               <div id="details" data-tone="light" className="flb-panel flb-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="flb-hair-bg" />
                 <div className="flb-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="flb-panel-title">
                   {lugarNombre || "El salón"}
@@ -783,7 +811,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="flb-section">
-          <span data-xin="1" data-dist="-60" className="flb-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="flb-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="flb-h2">
             Confirmá<br /><span className="flb-accent-italic">tu acceso</span>
           </h2>
@@ -828,7 +856,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
                 <div key={pageIndex} data-tone="light" className="flb-panel flb-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="flb-hair-bg" />
                   <div className="flb-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="flb-panel-title-md">Álbum <span className="flb-accent-mono">de fotos</span></h2>}
                   <div className="flb-mosaic">
@@ -880,7 +908,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="flb-section" style={{ background: "#0B0B0B" }}>
-            <span data-xin="1" data-dist="-60" className="flb-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="flb-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="flb-h2">¿Qué look<br /><span className="flb-accent-italic">no puede faltar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="flb-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -899,7 +927,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="flb-section" style={{ background: "#0B0B0B" }}>
-            <span data-xin="1" data-dist="-60" className="flb-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="flb-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="flb-h2">
               Si querés<br /><span className="flb-accent-italic">sumarte</span>
             </h2>
@@ -950,7 +978,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="flb-section" style={{ background: "#0B0B0B" }}>
-            <span data-xin="1" data-dist="-60" className="flb-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="flb-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="flb-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -966,7 +994,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
         )}
 
         <section data-tone="dark" data-screen-label="Tu look" className="flb-section flb-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))" }}>
-          <span data-xin="1" data-dist="-60" className="flb-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU LOOK</span>
+          <span data-xin="1" data-dist="-60" className="flb-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU LOOK</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="flb-final-card">
             <div className="flb-medallion flb-medallion--final">
               <FlbMedallion main="15" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="flbArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCompacta} · `} spin="reverse" />
@@ -1009,6 +1037,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
             dressCode={dressCode}
             hora={hora}
             lookCode={lookCode}
+            photoSrc={coverPhotoUrl}
           >
             <div className="flb-cover-cta">ABRIR INVITACIÓN</div>
           </FlbCoverHalf>
@@ -1022,6 +1051,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
             dressCode={dressCode}
             hora={hora}
             lookCode={lookCode}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="flb-cover-cta flb-cover-cta--btn">ABRIR INVITACIÓN</button>
           </FlbCoverHalf>
@@ -1643,6 +1673,7 @@ function FlbCoverHalf({
   dressCode,
   hora,
   lookCode,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1655,10 +1686,22 @@ function FlbCoverHalf({
   dressCode: string;
   hora: string;
   lookCode: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="flb-cover-inner">
+      {/* Con foto cargada, la foto reemplaza el fondo -- el resto de la
+          ornamentación (numeral, grilla, nombres, CTA) queda arriba sin
+          cambios. Solo mobile (igual que Flat). La tapa de esta familia es
+          de paleta clara (#F5F2ED, tinta oscura), así que sin tinte de
+          color y con scrim en su propio tono claro -- no un scrim oscuro
+          genérico -- para no perder contraste con el texto. */}
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint={false} effect="enfoque" scrimColorRgb="245,242,237" />
+        </div>
+      )}
       <span className="flb-cover-numeral">15</span>
       <div className="flb-cover-grid" />
       <div className="flb-cover-content">
@@ -1711,6 +1754,18 @@ const FLB_CSS = `
 
   .flb-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; background: radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0B0B0B 55%, #080808 100%); }
   .flb-section--between { justify-content: space-between; }
+
+  /* Foto principal (ver rama experimento-foto-storytelling). Mobile: la
+     foto ocupa toda la sección, borde a borde. Desktop: se enmarca con un
+     borde rojo propio de la familia en vez de estirarse. */
+  .flb-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #080808; }
+  .flb-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .flb-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0B0B0B 60%, #080808 100%); }
+  .flb-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .flb-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(217,58,43,.3); }
+    .flb-hero-photo-kicker { bottom: 40px; }
+  }
   .flb-section:nth-of-type(2) { background: radial-gradient(100% 60% at 50% 100%, #1A1414 0%, #0E0B0B 55%, #080808 100%); }
   .flb-section:nth-of-type(3) { background: radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #080808 100%); }
 

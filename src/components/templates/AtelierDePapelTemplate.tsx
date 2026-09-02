@@ -34,6 +34,7 @@ import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -187,6 +188,13 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real (ver rama
+  // experimento-foto-storytelling). 100% opcionales: sin cargarlas, todo
+  // se ve exactamente igual que antes.
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -668,6 +676,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
       }}
     >
       <style>{ADP_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="adp-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="adp-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #181611 55%, #14120E 100%)" }}>
@@ -696,10 +705,29 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color --
+            ocupa toda la pantalla en mobile, se enmarca en desktop. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="adp-hero-photo-section">
+          <div className="adp-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,18,14" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,18,14" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="adp-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="adp-kicker adp-hero-photo-kicker">02 — EL PAPEL GUARDA MEMORIA</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="adp-section adp-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #2A2820 0%, #1A1712 55%, #14120E 100%)" }}>
           <div className="adp-scan-grid" />
           <div className="adp-scanline" />
-          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>02 — LA PRÓXIMA LÁMINA LLEGA EN</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>03 — LA PRÓXIMA LÁMINA LLEGA EN</span>
           <div className="adp-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -711,7 +739,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="adp-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #14120E 100%)" }}>
           <div data-drift="-130" className="adp-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="adp-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -738,7 +766,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
                 <div id="ceremonia" data-tone="light" className="adp-panel adp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="adp-hair-bg" />
                   <div className="adp-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="adp-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -763,7 +791,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
               <div id="details" data-tone="light" className="adp-panel adp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="adp-hair-bg" />
                 <div className="adp-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="adp-panel-title">
                   {lugarNombre || "El lugar"}
@@ -821,7 +849,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="adp-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #181611 60%, #14120E 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="adp-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="adp-h2">
             Confirmá<br /><span className="adp-accent-italic">tu acceso</span>
           </h2>
@@ -867,7 +895,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
                 <div key={pageIndex} data-tone="light" className="adp-panel adp-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="adp-hair-bg" />
                   <div className="adp-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="adp-panel-title-md">Álbum <span className="adp-accent-serif">de fotos</span></h2>}
                   <div className="adp-mosaic">
@@ -919,7 +947,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="adp-section" style={{ background: "#181611" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2">¿Qué tema<br /><span className="adp-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="adp-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -938,7 +966,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="adp-section" style={{ background: "#181611" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2">
               Si querés<br /><span className="adp-accent-italic">sumarte</span>
             </h2>
@@ -989,7 +1017,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="adp-section" style={{ background: "#181611" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1005,7 +1033,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
         )}
 
         <section data-tone="dark" data-screen-label="Tu lámina" className="adp-section adp-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #181611 55%, #14120E 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU LÁMINA</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="adp-final-card">
             <div className="adp-medallion adp-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="adpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1049,6 +1077,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
             laminaNumber={laminaNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="adp-cover-cta">ABRIR INVITACIÓN</div>
           </CoverHalf>
@@ -1061,6 +1090,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
             laminaNumber={laminaNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="adp-cover-cta adp-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CoverHalf>
@@ -1690,6 +1720,7 @@ function CoverHalf({
   laminaNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1701,10 +1732,19 @@ function CoverHalf({
   laminaNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="adp-cover-inner">
+      {/* Familia de paleta clara (papel #F4EEE3, tinta oscura) -- sin tinte
+          de color y con scrim en su propio tono claro, no uno oscuro
+          genérico, para no perder contraste con el texto. Solo mobile. */}
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint={false} effect="enfoque" scrimColorRgb="244,238,227" />
+        </div>
+      )}
       <div className="adp-cover-glow" />
       {/* Motivo de tapa propio de Atelier de Papel: una hoja/lámina de papel
           apenas rotada, en vez del "sunburst" de Guest Pass VIP -- ver
@@ -1761,6 +1801,18 @@ const ADP_CSS = `
 
   .adp-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .adp-section--between { justify-content: space-between; }
+
+  /* Foto principal (ver rama experimento-foto-storytelling). Mobile: la
+     foto ocupa toda la sección, borde a borde. Desktop: se enmarca con un
+     borde propio de la familia en vez de estirarse. */
+  .adp-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #14120E; }
+  .adp-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .adp-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #17141F 0%, #181611 60%, #14120E 100%); }
+  .adp-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .adp-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(122,104,82,.3); }
+    .adp-hero-photo-kicker { bottom: 40px; }
+  }
 
   .adp-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

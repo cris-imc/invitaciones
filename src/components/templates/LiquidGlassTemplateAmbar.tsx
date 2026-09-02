@@ -52,6 +52,7 @@ import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -199,6 +200,15 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real, misma
+  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos que ya carga StepHeroImages.tsx) -- ver rama
+  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
+  // todo se ve exactamente igual que antes (cero regresión).
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -680,6 +690,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
       }}
     >
       <style>{LQG_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="lqg-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="lqg-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #1F1417 0%, #110D0A 55%, #0D0A08 100%)" }}>
@@ -708,10 +719,31 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color
+            (identidad de la familia queda en el marco/kicker, no en la foto
+            en sí). Ocupa toda la pantalla en mobile; en desktop se enmarca
+            con un borde propio en vez de estirarse edge-to-edge. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="lqg-hero-photo-section">
+          <div className="lqg-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="13,10,8" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="13,10,8" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="lqg-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker lqg-hero-photo-kicker">02 — EL PRIMER REFLEJO</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="lqg-section lqg-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #221B14 0%, #120E0B 55%, #0D0A08 100%)" }}>
           <div className="lqg-scan-grid" />
           <div className="lqg-scanline" />
-          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>02 — EL VIDRIO SE ACLARA EN</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>03 — EL VIDRIO SE ACLARA EN</span>
           <div className="lqg-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -723,7 +755,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="lqg-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #27171C 0%, #110B0C 52%, #0D0A08 100%)" }}>
           <div data-drift="-130" className="lqg-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="lqg-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -833,7 +865,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="lqg-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #1F1417 0%, #110D0A 60%, #0D0A08 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="lqg-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="lqg-h2">
             Confirmá<br /><span className="lqg-accent-italic">tu acceso</span>
           </h2>
@@ -931,7 +963,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="lqg-section" style={{ background: "#110D0A" }}>
-            <span data-xin="1" data-dist="-60" className="lqg-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="lqg-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="lqg-h2">¿Qué tema<br /><span className="lqg-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="lqg-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -1001,7 +1033,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="lqg-section" style={{ background: "#110D0A" }}>
-            <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="lqg-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1017,7 +1049,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
         )}
 
         <section data-tone="dark" data-screen-label="Tu panel" className="lqg-section lqg-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1F1417 0%, #110D0A 55%, #0D0A08 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PANEL</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PANEL</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="lqg-final-card">
             <div className="lqg-medallion lqg-medallion--final">
               <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="lqgArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" size={30} />
@@ -1061,6 +1093,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
             panelNumber={panelNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="lqg-cover-cta">ABRIR INVITACIÓN</div>
           </CoverHalf>
@@ -1073,6 +1106,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
             panelNumber={panelNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="lqg-cover-cta lqg-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CoverHalf>
@@ -1701,6 +1735,7 @@ function CoverHalf({
   panelNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1712,10 +1747,23 @@ function CoverHalf({
   panelNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="lqg-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoSrc}
+            tint
+            tintColor1="#C9A86F"
+            tintColor2="#0D0A08"
+            effect="enfoque"
+            scrimColorRgb="13,10,8"
+          />
+        </div>
+      )}
       <div className="lqg-cover-glow" />
       <div className="lqg-cover-glasspane" />
       <div className="lqg-cover-content">
@@ -1768,6 +1816,14 @@ const LQG_CSS = `
 
   .lqg-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .lqg-section--between { justify-content: space-between; }
+  .lqg-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0D0A08; }
+  .lqg-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .lqg-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #2C2216 0%, #1A140D 60%, #0D0A08 100%); }
+  .lqg-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .lqg-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(201,168,111,.3); }
+    .lqg-hero-photo-kicker { bottom: 40px; }
+  }
 
   .lqg-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

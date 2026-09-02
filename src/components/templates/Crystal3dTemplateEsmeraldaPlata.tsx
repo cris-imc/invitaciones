@@ -31,6 +31,7 @@ import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 
@@ -156,6 +157,9 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -624,6 +628,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
       }}
     >
       <style>{C3D_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="c3d-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="c3d-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #142019 0%, #0B1512 55%, #070F0D 100%)" }}>
@@ -652,10 +657,27 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
           </div>
         </section>
 
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="c3d-hero-photo-section">
+          <div className="c3d-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="c3d-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker c3d-hero-photo-kicker">02 — EL CRISTAL YA BRILLA</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="c3d-section c3d-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #16281E 0%, #0C1712 55%, #070F0D 100%)" }}>
           <div className="c3d-scan-grid" />
           <div className="c3d-scanline" />
-          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>02 — EL CRISTAL SE ILUMINA EN</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>03 — EL CRISTAL SE ILUMINA EN</span>
           <div className="c3d-cd-grid">
             <C3dCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <C3dCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -667,7 +689,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="c3d-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #142720 0%, #0B1613 52%, #070F0D 100%)" }}>
           <div data-drift="-130" className="c3d-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="c3d-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => {
               const accented = i >= fraseAccentStart;
@@ -698,7 +720,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
                 <div id="ceremonia" data-tone="light" className="c3d-panel c3d-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="c3d-hair-bg" />
                   <div className="c3d-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="c3d-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -723,7 +745,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
               <div id="details" data-tone="light" className="c3d-panel c3d-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="c3d-hair-bg" />
                 <div className="c3d-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="c3d-panel-title">
                   {lugarNombre || "Studio"}
@@ -788,7 +810,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="c3d-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #142019 0%, #0B1512 60%, #070F0D 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="c3d-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="c3d-h2">
             Confirmá<br /><span className="c3d-accent-italic-cyan">tu acceso</span>
           </h2>
@@ -833,7 +855,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
                 <div key={pageIndex} data-tone="light" className="c3d-panel c3d-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="c3d-hair-bg" />
                   <div className="c3d-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="c3d-panel-title-md">Álbum <span className="c3d-accent-italic-lavender">de fotos</span></h2>}
                   <div className="c3d-mosaic">
@@ -885,7 +907,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="c3d-section" style={{ background: "#0B1512" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2">¿Qué tema<br /><span className="c3d-accent-italic-lavender">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="c3d-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -904,7 +926,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="c3d-section" style={{ background: "#0B1512" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2">
               Si querés<br /><span className="c3d-accent-italic-cyan">sumarte</span>
             </h2>
@@ -955,7 +977,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="c3d-section" style={{ background: "#0B1512" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -971,7 +993,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="c3d-section c3d-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #142019 0%, #0B1512 55%, #070F0D 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="c3d-final-card">
             <div className="c3d-medallion c3d-medallion--final">
               <C3dMedallion
@@ -1019,6 +1041,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="c3d-cover-cta">ABRIR INVITACIÓN</div>
           </C3dCoverHalf>
@@ -1031,6 +1054,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="c3d-cover-cta c3d-cover-cta--btn">ABRIR INVITACIÓN</button>
           </C3dCoverHalf>
@@ -1673,6 +1697,7 @@ function C3dCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1684,10 +1709,16 @@ function C3dCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="c3d-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#6FCB9F" tintColor2="#080B10" effect="enfoque" scrimColorRgb="7,15,13" />
+        </div>
+      )}
       <div className="c3d-cover-glow" />
       <div className="c3d-cover-facets" />
       <div className="c3d-cover-content">
@@ -1741,6 +1772,12 @@ const C3D_CSS = `
   .c3d-section--between { justify-content: space-between; }
 
   .c3d-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
+
+  .c3d-hero-photo-section { position: relative; min-height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
+  .c3d-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  @media (min-width: 768px) { .c3d-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(111,203,159,.3); } }
+  .c3d-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #142019 0%, #0B1512 55%, #070F0D 100%); }
+  .c3d-hero-photo-kicker { position: absolute; left: max(30px, calc((100% - 560px) / 2)); bottom: 40px; z-index: 2; }
 
   .c3d-date-stack { display: flex; flex-direction: column; gap: 2px; }
   .c3d-date-num { font-family: var(--c3d-poppins), sans-serif; font-size: clamp(66px, 23vw, 140px); line-height: 0.82; letter-spacing: -0.04em; }

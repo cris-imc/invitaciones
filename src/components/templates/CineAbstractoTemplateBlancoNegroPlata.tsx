@@ -30,6 +30,7 @@ import { Frank_Ruhl_Libre, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
@@ -177,6 +178,15 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real, misma
+  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos que ya carga StepHeroImages.tsx) -- ver rama
+  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
+  // todo se ve exactamente igual que antes (cero regresión).
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -681,6 +691,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
       }}
     >
       <style>{CAB_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="cab-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="cab-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17171A 0%, #0B0B10 55%, #08080B 100%)" }}>
@@ -709,10 +720,31 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color
+            (identidad de la familia queda en el marco/kicker, no en la foto
+            en sí). Ocupa toda la pantalla en mobile; en desktop se enmarca
+            con un borde propio en vez de estirarse edge-to-edge. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="cab-hero-photo-section">
+          <div className="cab-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="cab-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="cab-kicker cab-hero-photo-kicker">02 — LA ESCENA UNO</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="cab-section cab-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #17171A 0%, #0D0B10 55%, #08080B 100%)" }}>
           <div className="cab-scan-grid" />
           <div className="cab-scanline" />
-          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>02 — LA FUNCIÓN EMPIEZA EN</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>03 — LA FUNCIÓN EMPIEZA EN</span>
           <div className="cab-cd-grid">
             <CabCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CabCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -724,7 +756,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="cab-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #181819 0%, #0C0B11 52%, #08080B 100%)" }}>
           <div data-drift="-130" className="cab-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="cab-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -834,7 +866,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="cab-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17171A 0%, #0B0B10 60%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cab-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cab-h2">
             Confirmá<br /><span className="cab-accent-italic">tu acceso</span>
           </h2>
@@ -931,7 +963,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2">¿Qué banda sonora<br /><span className="cab-accent-italic">no puede faltar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cab-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -950,7 +982,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2">
               Si querés<br /><span className="cab-accent-italic">sumarte</span>
             </h2>
@@ -1001,7 +1033,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1017,7 +1049,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
         )}
 
         <section data-tone="dark" data-screen-label="Tu entrada" className="cab-section cab-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17171A 0%, #0B0B10 55%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU ENTRADA</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cab-final-card">
             <div className="cab-medallion cab-medallion--final">
               <CabMedallion label="35mm" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cabArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1062,6 +1094,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
             dressCode={dressCode}
             hora={hora}
             eventCode={eventCode}
+            photoSrc={coverPhotoUrl}
           >
             <div className="cab-cover-cta">ABRIR INVITACIÓN</div>
           </CabCoverHalf>
@@ -1075,6 +1108,7 @@ export function CineAbstractoTemplateBlancoNegroPlata({ invitation, guest, isPer
             dressCode={dressCode}
             hora={hora}
             eventCode={eventCode}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="cab-cover-cta cab-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CabCoverHalf>
@@ -1705,6 +1739,7 @@ function CabCoverHalf({
   dressCode,
   hora,
   eventCode,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1717,10 +1752,23 @@ function CabCoverHalf({
   dressCode: string;
   hora: string;
   eventCode: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="cab-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoSrc}
+            tint
+            tintColor1="#B9C0C6"
+            tintColor2="#08080B"
+            effect="enfoque"
+            scrimColorRgb="8,8,11"
+          />
+        </div>
+      )}
       <div className="cab-cover-glow" />
       {/* Grano de película + tiras de perforación + barras de letterbox --
           motivo propio de "película muda" (nunca el sunburst dorado de
@@ -1783,6 +1831,18 @@ const CAB_CSS = `
 
   .cab-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .cab-section--between { justify-content: space-between; }
+
+  /* Foto principal (ver rama experimento-foto-storytelling). Mobile: la
+     foto ocupa toda la sección, borde a borde. Desktop: se enmarca con un
+     borde propio de la familia en vez de estirarse. */
+  .cab-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #08080B; }
+  .cab-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .cab-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #241D0F 0%, #0D0B10 60%, #08080B 100%); }
+  .cab-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .cab-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(185,192,198,.3); }
+    .cab-hero-photo-kicker { bottom: 40px; }
+  }
 
   .cab-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

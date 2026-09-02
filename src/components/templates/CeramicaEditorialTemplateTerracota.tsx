@@ -32,6 +32,7 @@ import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
@@ -178,6 +179,15 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real, misma
+  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos que ya carga StepHeroImages.tsx) -- ver rama
+  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
+  // todo se ve exactamente igual que antes (cero regresión).
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -658,6 +668,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
       }}
     >
       <style>{CME_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="cme-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="cme-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #241209 0%, #2A160D 55%, #1C100B 100%)" }}>
@@ -686,10 +697,31 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color
+            (identidad de la familia queda en el marco/kicker, no en la foto
+            en sí). Ocupa toda la pantalla en mobile; en desktop se enmarca
+            con un borde propio en vez de estirarse edge-to-edge. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="cme-hero-photo-section">
+          <div className="cme-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="28,16,11" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="28,16,11" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="cme-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="cme-kicker cme-hero-photo-kicker">02 — LA PRIMERA PIEZA</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="cme-section cme-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #4A2C1C 0%, #331B0E 55%, #1C100B 100%)" }}>
           <div className="cme-scan-grid" />
           <div className="cme-scanline" />
-          <span data-xin="1" data-dist="-60" className="cme-kicker" style={{ position: "relative" }}>02 — SALE DEL HORNO EN</span>
+          <span data-xin="1" data-dist="-60" className="cme-kicker" style={{ position: "relative" }}>03 — SALE DEL HORNO EN</span>
           <div className="cme-cd-grid">
             <CmeCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CmeCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -701,7 +733,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="cme-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #2A140D 0%, #150B08 52%, #1C100B 100%)" }}>
           <div data-drift="-130" className="cme-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="cme-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="cme-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="cme-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -811,7 +843,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="cme-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #241209 0%, #2A160D 60%, #1C100B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cme-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="cme-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cme-h2">
             Confirmá<br /><span className="cme-accent-italic">tu acceso</span>
           </h2>
@@ -909,7 +941,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="cme-section" style={{ background: "#2A160D" }}>
-            <span data-xin="1" data-dist="-60" className="cme-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="cme-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cme-h2">¿Qué tema<br /><span className="cme-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cme-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -928,7 +960,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cme-section" style={{ background: "#2A160D" }}>
-            <span data-xin="1" data-dist="-60" className="cme-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="cme-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cme-h2">
               Si querés<br /><span className="cme-accent-italic">sumarte</span>
             </h2>
@@ -979,7 +1011,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cme-section" style={{ background: "#2A160D" }}>
-            <span data-xin="1" data-dist="-60" className="cme-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="cme-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cme-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -995,7 +1027,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
         )}
 
         <section data-tone="dark" data-screen-label="Tu pieza" className="cme-section cme-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #241209 0%, #2A160D 55%, #1C100B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cme-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PIEZA</span>
+          <span data-xin="1" data-dist="-60" className="cme-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cme-final-card">
             <div className="cme-medallion cme-medallion--final">
               <CmeMedallion label={monograma} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cmeArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1039,6 +1071,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="cme-cover-cta">ABRIR INVITACIÓN</div>
           </CmeCoverHalf>
@@ -1051,6 +1084,7 @@ export function CeramicaEditorialTemplateTerracota({ invitation, guest, isPerson
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="cme-cover-cta cme-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CmeCoverHalf>
@@ -1676,6 +1710,7 @@ function CmeCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1687,10 +1722,23 @@ function CmeCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="cme-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoSrc}
+            tint
+            tintColor1="#C1704A"
+            tintColor2="#1C100B"
+            effect="enfoque"
+            scrimColorRgb="28,16,11"
+          />
+        </div>
+      )}
       <div className="cme-cover-glow" />
       <div className="cme-cover-glaze" />
       <div className="cme-cover-content">
@@ -1742,6 +1790,18 @@ const CME_CSS = `
 
   .cme-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .cme-section--between { justify-content: space-between; }
+
+  /* Foto principal (ver rama experimento-foto-storytelling). Mobile: la
+     foto ocupa toda la sección, borde a borde. Desktop: se enmarca con un
+     borde propio de la familia en vez de estirarse. */
+  .cme-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #1C100B; }
+  .cme-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .cme-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #4A2C1C 0%, #331B0E 60%, #1C100B 100%); }
+  .cme-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .cme-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(193,112,74,.3); }
+    .cme-hero-photo-kicker { bottom: 40px; }
+  }
 
   .cme-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

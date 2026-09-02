@@ -23,6 +23,7 @@ import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -170,6 +171,13 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real (ver rama
+  // experimento-foto-storytelling). 100% opcionales: sin cargarlas, todo
+  // se ve exactamente igual que antes.
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -657,6 +665,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
       }}
     >
       <style>{BTE_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="bte-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="bte-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0E120C 55%, #0A0D08 100%)" }}>
@@ -700,10 +709,29 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color --
+            ocupa toda la pantalla en mobile, se enmarca en desktop. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="bte-hero-photo-section">
+          <div className="bte-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="10,13,8" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="10,13,8" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="bte-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="bte-kicker bte-hero-photo-kicker">02 — LO QUE FLORECIÓ ENTRE NOSOTROS</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="bte-section bte-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1B2114 0%, #0F130C 55%, #0A0D08 100%)" }}>
           <div className="bte-scan-grid" />
           <div className="bte-scanline" />
-          <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>02 — FLORECE EN</span>
+          <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>03 — FLORECE EN</span>
           <div className="bte-cd-grid">
             <BteCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <BteCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -715,7 +743,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="bte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #0A0D08 100%)" }}>
           <div data-drift="-130" className="bte-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="bte-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -742,7 +770,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
                 <div id="ceremonia" data-tone="light" className="bte-panel bte-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="bte-hair-bg" />
                   <div className="bte-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="bte-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -767,7 +795,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
               <div id="details" data-tone="light" className="bte-panel bte-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="bte-hair-bg" />
                 <div className="bte-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="bte-panel-title">
                   {lugarNombre || "El lugar"}
@@ -825,7 +853,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="bte-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #0E120C 60%, #0A0D08 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bte-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="bte-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bte-h2">
             Confirmá<br /><span className="bte-accent-italic">tu acceso</span>
           </h2>
@@ -870,7 +898,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
                 <div key={pageIndex} data-tone="light" className="bte-panel bte-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="bte-hair-bg" />
                   <div className="bte-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="bte-panel-title-md">Álbum <span className="bte-accent-serif">de fotos</span></h2>}
                   <div className="bte-mosaic">
@@ -922,7 +950,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="bte-section" style={{ background: "#0E120C" }}>
-            <span data-xin="1" data-dist="-60" className="bte-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="bte-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2">¿Qué flor<br /><span className="bte-accent-italic">nos representa?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bte-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -941,7 +969,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bte-section" style={{ background: "#0E120C" }}>
-            <span data-xin="1" data-dist="-60" className="bte-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="bte-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2">
               Si querés<br /><span className="bte-accent-italic">sumarte</span>
             </h2>
@@ -992,7 +1020,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bte-section" style={{ background: "#0E120C" }}>
-            <span data-xin="1" data-dist="-60" className="bte-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="bte-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1008,7 +1036,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
         )}
 
         <section data-tone="dark" data-screen-label="Tu lámina" className="bte-section bte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0E120C 55%, #0A0D08 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bte-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU LÁMINA</span>
+          <span data-xin="1" data-dist="-60" className="bte-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bte-final-card">
             <div className="bte-medallion bte-medallion--final">
               <BteMedallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bteArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1052,6 +1080,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="bte-cover-cta">ABRIR INVITACIÓN</div>
           </BteCoverHalf>
@@ -1064,6 +1093,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="bte-cover-cta bte-cover-cta--btn">ABRIR INVITACIÓN</button>
           </BteCoverHalf>
@@ -1688,6 +1718,7 @@ function BteCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1699,10 +1730,16 @@ function BteCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="bte-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#5A6E4E" tintColor2="#0A0D08" effect="enfoque" scrimColorRgb="10,13,8" />
+        </div>
+      )}
       <div className="bte-cover-glow" />
       <div className="bte-cover-linen" />
       <div className="bte-cover-content">
@@ -1756,6 +1793,18 @@ const BTE_CSS = `
 
   .bte-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .bte-section--between { justify-content: space-between; }
+
+  /* Foto principal (ver rama experimento-foto-storytelling). Mobile: la
+     foto ocupa toda la sección, borde a borde. Desktop: se enmarca con un
+     borde verde propio de la familia en vez de estirarse. */
+  .bte-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0A0D08; }
+  .bte-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .bte-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0E120C 60%, #0A0D08 100%); }
+  .bte-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .bte-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(90,110,78,.3); }
+    .bte-hero-photo-kicker { bottom: 40px; }
+  }
 
   .bte-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

@@ -51,6 +51,7 @@ import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/Music
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { CreditCard, Gift } from "lucide-react";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { createPortal } from "react-dom";
 
 const pvpBodoni = Bodoni_Moda({
@@ -174,6 +175,9 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -641,6 +645,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
       }}
     >
       <style>{PVP_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="pvp-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="pvp-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #1E1430 0%, #0E0A14 55%, #0C0810 100%)" }}>
@@ -669,10 +674,27 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
           </div>
         </section>
 
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="pvp-hero-photo-section">
+          <div className="pvp-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="12,8,16" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="12,8,16" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="pvp-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker pvp-hero-photo-kicker">02 — LA NOCHE EMPIEZA ACÁ</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="pvp-section pvp-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #2B1730 0%, #0E0A14 55%, #0C0810 100%)" }}>
           <div className="pvp-scan-grid" />
           <div className="pvp-scanline" />
-          <span data-xin="1" data-dist="-60" className="pvp-kicker" style={{ position: "relative" }}>02 — EL PASE SE ACTIVA EN</span>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker" style={{ position: "relative" }}>03 — EL PASE SE ACTIVA EN</span>
           <div className="pvp-cd-grid">
             <PvpCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <PvpCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -684,7 +706,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="pvp-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #241432 0%, #0E0A14 52%, #0C0810 100%)" }}>
           <div data-drift="-130" className="pvp-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="pvp-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="pvp-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -710,7 +732,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
                 <div id="ceremonia" data-tone="light" className="pvp-panel pvp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="pvp-hair-bg" />
                   <div className="pvp-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="pvp-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -735,7 +757,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
               <div id="details" data-tone="light" className="pvp-panel pvp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="pvp-hair-bg" />
                 <div className="pvp-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="pvp-panel-title">
                   {lugarNombre || "El salón"}
@@ -793,7 +815,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="pvp-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #1E1430 0%, #0E0A14 60%, #0C0810 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="pvp-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="pvp-h2">
             Confirmá<br /><span className="pvp-accent-italic">tu acceso</span>
           </h2>
@@ -838,7 +860,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
                 <div key={pageIndex} data-tone="light" className="pvp-panel pvp-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="pvp-hair-bg" />
                   <div className="pvp-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="pvp-panel-title-md">Álbum <span className="pvp-accent-serif">de fotos</span></h2>}
                   <div className="pvp-mosaic">
@@ -890,7 +912,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="pvp-section" style={{ background: "#0E0A14" }}>
-            <span data-xin="1" data-dist="-60" className="pvp-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="pvp-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="pvp-h2">¿Qué tema<br /><span className="pvp-accent-italic">no puede faltar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="pvp-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -909,7 +931,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="pvp-section" style={{ background: "#0E0A14" }}>
-            <span data-xin="1" data-dist="-60" className="pvp-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="pvp-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="pvp-h2">
               Si querés<br /><span className="pvp-accent-italic">sumarte</span>
             </h2>
@@ -976,7 +998,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase VIP" className="pvp-section pvp-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1E1430 0%, #0E0A14 55%, #0C0810 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="pvp-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="pvp-final-card">
             <div className="pvp-medallion pvp-medallion--final">
               <PvpMedallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="pvpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1018,6 +1040,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="pvp-cover-cta">ABRIR INVITACIÓN</div>
           </PvpCoverHalf>
@@ -1030,6 +1053,7 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="pvp-cover-cta pvp-cover-cta--btn">ABRIR INVITACIÓN</button>
           </PvpCoverHalf>
@@ -1645,6 +1669,7 @@ function PvpCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1656,10 +1681,16 @@ function PvpCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="pvp-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#9B7FC4" tintColor2="#0C0810" effect="enfoque" scrimColorRgb="12,8,16" />
+        </div>
+      )}
       <div className="pvp-cover-glow" />
       <div className="pvp-cover-grid" />
       <div className="pvp-cover-content">
@@ -1710,6 +1741,15 @@ const PVP_CSS = `
 
   .pvp-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .pvp-section--between { justify-content: space-between; }
+
+  .pvp-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0C0810; }
+  .pvp-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .pvp-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #2B1730 0%, #0E0A14 60%, #0C0810 100%); }
+  .pvp-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .pvp-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(155,127,196,.3); }
+    .pvp-hero-photo-kicker { bottom: 40px; }
+  }
 
   .pvp-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

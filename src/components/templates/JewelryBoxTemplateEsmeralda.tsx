@@ -32,6 +32,7 @@ import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/Music
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { CreditCard, Gift } from "lucide-react";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { createPortal } from "react-dom";
 
 const jwbCormorant = Cormorant_Garamond({
@@ -156,6 +157,9 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -623,6 +627,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
       }}
     >
       <style>{JWB_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="jwb-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="jwb-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #0A1A11 0%, #143D28 55%, #0D2318 100%)" }}>
@@ -652,10 +657,27 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
           </div>
         </section>
 
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="jwb-hero-photo-section">
+          <div className="jwb-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="13,35,24" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="13,35,24" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="jwb-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="jwb-kicker jwb-hero-photo-kicker">02 — UNA HISTORIA PARA GUARDAR</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="jwb-section jwb-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1F5C3B 0%, #123321 55%, #0D2318 100%)" }}>
           <div className="jwb-scan-grid" />
           <div className="jwb-scanline" />
-          <span data-xin="1" data-dist="-60" className="jwb-kicker" style={{ position: "relative" }}>02 — EL COFRE SE ABRE EN</span>
+          <span data-xin="1" data-dist="-60" className="jwb-kicker" style={{ position: "relative" }}>03 — EL COFRE SE ABRE EN</span>
           <div className="jwb-cd-grid">
             <JwbCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <JwbCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -667,7 +689,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="jwb-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #0E2016 0%, #08130D 52%, #0D2318 100%)" }}>
           <div data-drift="-130" className="jwb-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="jwb-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="jwb-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="jwb-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -693,7 +715,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
                 <div id="ceremonia" data-tone="light" className="jwb-panel jwb-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="jwb-hair-bg" />
                   <div className="jwb-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="jwb-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -718,7 +740,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
               <div id="details" data-tone="light" className="jwb-panel jwb-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="jwb-hair-bg" />
                 <div className="jwb-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="jwb-panel-title">
                   {lugarNombre || "El salón"}
@@ -776,7 +798,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="jwb-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #0A1A11 0%, #143D28 60%, #0D2318 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="jwb-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="jwb-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="jwb-h2">
             Confirmá<br /><span className="jwb-accent-italic">tu acceso</span>
           </h2>
@@ -821,7 +843,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
                 <div key={pageIndex} data-tone="light" className="jwb-panel jwb-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="jwb-hair-bg" />
                   <div className="jwb-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="jwb-panel-title-md">Álbum <span className="jwb-accent-serif">de fotos</span></h2>}
                   <div className="jwb-mosaic">
@@ -873,7 +895,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="jwb-section" style={{ background: "#143D28" }}>
-            <span data-xin="1" data-dist="-60" className="jwb-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="jwb-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="jwb-h2">¿Qué joya<br /><span className="jwb-accent-italic">brilla esta noche?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="jwb-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -892,7 +914,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="jwb-section" style={{ background: "#143D28" }}>
-            <span data-xin="1" data-dist="-60" className="jwb-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="jwb-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="jwb-h2">
               Si querés<br /><span className="jwb-accent-italic">sumarte</span>
             </h2>
@@ -959,7 +981,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
         )}
 
         <section data-tone="dark" data-screen-label="Tu pieza" className="jwb-section jwb-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #0A1A11 0%, #143D28 55%, #0D2318 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="jwb-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PIEZA</span>
+          <span data-xin="1" data-dist="-60" className="jwb-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="jwb-final-card">
             <div className="jwb-medallion jwb-medallion--final">
               <JwbMedallion label="15" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="jwbArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1001,6 +1023,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="jwb-cover-cta">ABRIR INVITACIÓN</div>
           </JwbCoverHalf>
@@ -1013,6 +1036,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="jwb-cover-cta jwb-cover-cta--btn">ABRIR INVITACIÓN</button>
           </JwbCoverHalf>
@@ -1626,6 +1650,7 @@ function JwbCoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1637,10 +1662,16 @@ function JwbCoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="jwb-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto photoSrc={photoSrc} tint tintColor1="#5FC38A" tintColor2="#0D2318" effect="enfoque" scrimColorRgb="13,35,24" />
+        </div>
+      )}
       <div className="jwb-cover-glow" />
       <div className="jwb-sparkle" style={{ left: "20%", top: "22%", width: 5, height: 5 }} />
       <div className="jwb-sparkle" style={{ left: "76%", top: "32%", width: 4, height: 4, animationDelay: ".8s" }} />
@@ -1693,6 +1724,15 @@ const JWB_CSS = `
 
   .jwb-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .jwb-section--between { justify-content: space-between; }
+
+  .jwb-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0D2318; }
+  .jwb-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .jwb-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #1F5C3B 0%, #123321 60%, #0D2318 100%); }
+  .jwb-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .jwb-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(95,195,138,.3); }
+    .jwb-hero-photo-kicker { bottom: 40px; }
+  }
 
   .jwb-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

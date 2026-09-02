@@ -47,6 +47,7 @@ import { Playfair_Display, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -198,6 +199,15 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real, misma
+  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos que ya carga StepHeroImages.tsx) -- ver rama
+  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
+  // todo se ve exactamente igual que antes (cero regresión).
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -678,6 +688,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
       }}
     >
       <style>{ENC_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="enc-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="enc-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #182517 0%, #0D120D 55%, #0A0D0A 100%)" }}>
@@ -706,10 +717,31 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color
+            (identidad de la familia queda en el marco/kicker, no en la foto
+            en sí). Ocupa toda la pantalla en mobile; en desktop se enmarca
+            con un borde propio en vez de estirarse edge-to-edge. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="enc-hero-photo-section">
+          <div className="enc-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="10,13,10" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="10,13,10" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="enc-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="enc-kicker enc-hero-photo-kicker">02 — EL PRIMER HILO</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="enc-section enc-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1C2C19 0%, #0E140E 55%, #0A0D0A 100%)" }}>
           <div className="enc-scan-grid" />
           <div className="enc-scanline" />
-          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>02 — LA RETÍCULA SE COMPLETA EN</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>03 — LA RETÍCULA SE COMPLETA EN</span>
           <div className="enc-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -721,7 +753,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="enc-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1A2818 0%, #0B0F0B 52%, #0A0D0A 100%)" }}>
           <div data-drift="-130" className="enc-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="enc-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -834,7 +866,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="enc-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #182517 0%, #0D120D 60%, #0A0D0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="enc-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="enc-h2">
             Confirmá<br /><span className="enc-accent-italic">tu acceso</span>
           </h2>
@@ -932,7 +964,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="enc-section" style={{ background: "#0D120D" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2">¿Qué tema<br /><span className="enc-accent-italic">merece la pista?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="enc-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -1002,7 +1034,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="enc-section" style={{ background: "#0D120D" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1018,7 +1050,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="enc-section enc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #182517 0%, #0D120D 55%, #0A0D0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="enc-final-card">
             <div className="enc-medallion enc-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="encArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaArc} · `} spin="reverse" />
@@ -1062,6 +1094,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="enc-cover-cta">ABRIR INVITACIÓN</div>
           </CoverHalf>
@@ -1074,6 +1107,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="enc-cover-cta enc-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CoverHalf>
@@ -1699,6 +1733,7 @@ function CoverHalf({
   passNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1710,10 +1745,28 @@ function CoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="enc-cover-inner">
+      {/* A diferencia del resto de la colección, la tapa de esta familia es
+          de tema CLARO (fondo crema, tinta oscura) -- por eso el tinte usa
+          crema en vez de negro, y el scrim (que en las demás familias
+          oscurece hacia abajo para texto claro) acá va hacia crema, para no
+          romper el contraste de la tinta oscura de nombres/kicker. */}
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoSrc}
+            tint
+            tintColor1="#3F8A55"
+            tintColor2="#F7F3ED"
+            effect="enfoque"
+            scrimColorRgb="247,243,237"
+          />
+        </div>
+      )}
       <div data-weave="1" className="enc-cover-weave" />
       <div className="enc-cover-content">
         <div className="enc-cover-top-row">
@@ -1764,6 +1817,14 @@ const ENC_CSS = `
 
   .enc-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .enc-section--between { justify-content: space-between; }
+  .enc-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0A0D0A; }
+  .enc-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .enc-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #1C3020 0%, #121C14 60%, #0A0D0A 100%); }
+  .enc-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .enc-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(63,138,85,.3); }
+    .enc-hero-photo-kicker { bottom: 40px; }
+  }
 
   .enc-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 

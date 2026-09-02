@@ -35,6 +35,7 @@ import { Italiana, Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
+import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
@@ -194,6 +195,15 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
   const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
+
+  // Portada de bienvenida y foto principal con foto real, misma
+  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
+  // los campos que ya carga StepHeroImages.tsx) -- ver rama
+  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
+  // todo se ve exactamente igual que antes (cero regresión).
+  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
+  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -675,6 +685,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
       }}
     >
       <style>{MYO_CSS}</style>
+      <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="myo-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="myo-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #142019 0%, #0F1512 55%, #070B09 100%)" }}>
@@ -703,10 +714,31 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           </div>
         </section>
 
+        {/* Foto principal con efecto cinemático, sin tinte de color
+            (identidad de la familia queda solo en el marco/kicker, no en la
+            foto en sí). Ocupa toda la pantalla en mobile; en desktop se
+            enmarca con un borde propio en vez de estirarse edge-to-edge. */}
+        <section data-tone="dark" data-screen-label="Nuestra foto" className="myo-hero-photo-section">
+          <div className="myo-hero-photo-frame">
+            {heroPhotoMobile && (
+              <div className="acp-mobile-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="7,11,9" />
+              </div>
+            )}
+            {heroPhotoDesktop && (
+              <div className="acp-desktop-only">
+                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="7,11,9" />
+              </div>
+            )}
+            {!heroPhotoMobile && !heroPhotoDesktop && <div className="myo-hero-photo-placeholder" />}
+          </div>
+          <span data-xin="1" data-dist="-60" className="myo-kicker myo-hero-photo-kicker">02 — LA PIEZA QUE NOS UNE</span>
+        </section>
+
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="myo-section myo-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1B2A1E 0%, #0D130F 55%, #070B09 100%)" }}>
           <div className="myo-scan-grid" />
           <div className="myo-scanline" />
-          <span data-xin="1" data-dist="-60" className="myo-kicker" style={{ position: "relative" }}>02 — SE ABRE EN</span>
+          <span data-xin="1" data-dist="-60" className="myo-kicker" style={{ position: "relative" }}>03 — SE ABRE EN</span>
           <div className="myo-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -718,7 +750,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
 
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="myo-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #122A22 0%, #070F0A 52%, #070B09 100%)" }}>
           <div data-drift="-130" className="myo-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="myo-kicker" style={{ position: "relative" }}>03 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="myo-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="myo-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -745,7 +777,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
                 <div id="ceremonia" data-tone="light" className="myo-panel myo-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="myo-hair-bg" />
                   <div className="myo-panel-top">
-                    <span>04 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="myo-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -770,7 +802,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
               <div id="details" data-tone="light" className="myo-panel myo-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="myo-hair-bg" />
                 <div className="myo-panel-top">
-                  <span>04 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="myo-panel-title">
                   {lugarNombre || "El lugar"}
@@ -828,7 +860,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="myo-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #142019 0%, #0F1512 60%, #070B09 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="myo-kicker">05 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="myo-kicker">06 — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="myo-h2">
             Confirmá<br /><span className="myo-accent-italic">tu acceso</span>
           </h2>
@@ -874,7 +906,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
                 <div key={pageIndex} data-tone="light" className="myo-panel myo-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="myo-hair-bg" />
                   <div className="myo-panel-top">
-                    <span>06 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="myo-panel-title-md">Álbum <span className="myo-accent-serif">de fotos</span></h2>}
                   <div className="myo-mosaic">
@@ -926,7 +958,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="myo-section" style={{ background: "#0F1512" }}>
-            <span data-xin="1" data-dist="-60" className="myo-kicker">07 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="myo-kicker">08 — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="myo-h2">¿Qué tema<br /><span className="myo-accent-italic">merece la pista?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="myo-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -945,7 +977,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="myo-section" style={{ background: "#0F1512" }}>
-            <span data-xin="1" data-dist="-60" className="myo-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="myo-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="myo-h2">
               Si querés<br /><span className="myo-accent-italic">sumarte</span>
             </h2>
@@ -996,7 +1028,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="myo-section" style={{ background: "#0F1512" }}>
-            <span data-xin="1" data-dist="-60" className="myo-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 7} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="myo-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="myo-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1012,7 +1044,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
         )}
 
         <section data-tone="dark" data-screen-label="Tu pieza" className="myo-section myo-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #142019 0%, #0F1512 55%, #070B09 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="myo-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 7} — GUARDÁ TU PIEZA</span>
+          <span data-xin="1" data-dist="-60" className="myo-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="myo-final-card">
             <div className="myo-medallion myo-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="myoArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1056,6 +1088,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
             pieceNumber={pieceNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <div className="myo-cover-cta">ABRIR INVITACIÓN</div>
           </CoverHalf>
@@ -1068,6 +1101,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
             pieceNumber={pieceNumber}
             dressCode={dressCode}
             hora={hora}
+            photoSrc={coverPhotoUrl}
           >
             <button onClick={open} className="myo-cover-cta myo-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CoverHalf>
@@ -1693,6 +1727,7 @@ function CoverHalf({
   pieceNumber,
   dressCode,
   hora,
+  photoSrc,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1704,10 +1739,23 @@ function CoverHalf({
   pieceNumber: string;
   dressCode: string;
   hora: string;
+  photoSrc?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="myo-cover-inner">
+      {photoSrc && (
+        <div className="acp-mobile-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoSrc}
+            tint
+            tintColor1="#3F9C74"
+            tintColor2="#070B09"
+            effect="enfoque"
+            scrimColorRgb="7,11,9"
+          />
+        </div>
+      )}
       <div className="myo-cover-glow" />
       <div className="myo-cover-marble" />
       <div className="myo-cover-content">
@@ -1764,6 +1812,18 @@ const MYO_CSS = `
 
   .myo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 96px max(30px, calc((100% - 560px) / 2)) 110px max(24px, calc((100% - 560px) / 2)); overflow: hidden; }
   .myo-section--between { justify-content: space-between; }
+
+  /* Foto principal (ver rama experimento-foto-storytelling). Mobile: la
+     foto ocupa toda la sección, borde a borde. Desktop: se enmarca con un
+     borde propio en vez de estirarse. */
+  .myo-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #070B09; }
+  .myo-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
+  .myo-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #1B2A1E 0%, #0D130F 60%, #070B09 100%); }
+  .myo-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (min-width: 768px) {
+    .myo-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(63,156,116,.3); }
+    .myo-hero-photo-kicker { bottom: 40px; }
+  }
 
   .myo-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
 
