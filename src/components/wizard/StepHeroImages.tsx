@@ -5,7 +5,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { useToast } from "@/components/ui/Toast";
-import { Info, ChevronDown, ChevronUp, AlertTriangle, X, Film } from "lucide-react";
+import { Info, ChevronDown, ChevronUp, AlertTriangle, X } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { isStorytellingTemplate } from "./wizard-steps-config";
 
@@ -21,11 +21,12 @@ export function StepHeroImages() {
 
     // La Colección Storytelling no usa fondo/tipografía elegible como la
     // Flat, pero SÍ puede llevar fotos reales (ver AnimatedCoverPhoto.tsx en
-    // cada plantilla de esa colección) -- a diferencia de Flat, ahí la
-    // "Portada Invitación" queda OPCIONAL (cada plantilla ya tiene su propio
-    // fondo decorativo si no se carga nada) y aparece un bloque extra para
-    // la foto principal que se ve dentro de la invitación, después de
-    // "Guardá la fecha".
+    // cada plantilla de esa colección) -- con una diferencia importante:
+    // en Flat estos 2 recortes solo visten la tapa; en Storytelling son
+    // los MISMOS 2 recortes (celular + PC) los que reemplazan el fondo
+    // decorativo TANTO en la tapa como en la foto principal de adentro de
+    // la invitación (debajo de "Guardá la fecha") -- un solo par de fotos
+    // para los dos usos, ambos 100% opcionales, sin fallback a la galería.
     const storytelling = isStorytellingTemplate(data.templateTipo);
 
     const triggerCinematicoTip = () => {
@@ -36,8 +37,12 @@ export function StepHeroImages() {
 
     // Se muestra sola apenas se entra al paso si todavía no hay foto cargada
     // -- así el usuario ve la sugerencia ANTES de decidir, no solo después.
+    // Solo aplica a Flat: en Storytelling ambos recortes son igual de
+    // opcionales y no hay nada que "probar con las dos" (no existe versión
+    // sin foto vs. con foto de la portada animada -- acá directamente no
+    // hay portada animada sin foto).
     useEffect(() => {
-        if (!data.portadaImagenFondoDesktop) {
+        if (!storytelling && !data.portadaImagenFondoDesktop) {
             triggerCinematicoTip();
         }
         return () => {
@@ -83,7 +88,9 @@ export function StepHeroImages() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        La Portada Invitación es la que se ve como foto de portada de la invitación (obligatoria, todas las plantillas la usan). La Portada de bienvenida es opcional: si cargás una foto ahí, reemplaza el fondo original de la portada de bienvenida por esa foto. Si la dejás vacía, la portada se ve tal cual la plantilla que elegiste, sin cambios.
+                        {storytelling
+                            ? "El Recorte celular y el Recorte PC son opcionales. Si cargás alguno, reemplaza el fondo decorativo original -- tanto en la tapa como en la foto principal que se ve dentro de la invitación, debajo de \"Guardá la fecha\" (son las mismas 2 fotos en los dos lugares). Si no cargás ninguno, no aparece foto de fondo en ningún lado: la invitación se ve tal cual la plantilla que elegiste, sin cambios."
+                            : "La Portada Invitación es la que se ve como foto de portada de la invitación (obligatoria, todas las plantillas la usan). La Portada de bienvenida es opcional: si cargás una foto ahí, reemplaza el fondo original de la portada de bienvenida por esa foto. Si la dejás vacía, la portada se ve tal cual la plantilla que elegiste, sin cambios."}
                     </div>
                 )}
             </div>
@@ -99,7 +106,7 @@ export function StepHeroImages() {
                     portada, así los dos recortes quedan a la misma altura
                     en esta grilla en vez de desalineados. */}
                 <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
-                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm block min-h-[2.5rem]">Portada de bienvenida</Label>
+                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm block min-h-[2.5rem]">{storytelling ? "Recorte PC" : "Portada de bienvenida"}</Label>
                     <div className="relative">
                         <ImageUploader
                             currentImage={data.portadaImagenFondoDesktop}
@@ -111,9 +118,9 @@ export function StepHeroImages() {
                                 setData({ portadaImagenFondoDesktop: "" });
                                 triggerCinematicoTip();
                             }}
-                            aspectRatio={4 / 5}
+                            aspectRatio={storytelling ? 16 / 9 : 4 / 5}
                         />
-                        {showCinematicoTip && (
+                        {!storytelling && showCinematicoTip && (
                             <div className="absolute left-0 top-full mt-2.5 z-20 w-72 max-w-[85vw] animate-in fade-in slide-in-from-top-1 duration-300">
                                 <div className="absolute -top-1.5 left-6 w-3 h-3 bg-amber-950 border-l border-t border-amber-500/50 rotate-45" />
                                 <div className="relative flex items-start gap-1.5 rounded-lg border border-amber-500/50 bg-amber-950 text-amber-100 shadow-xl px-3 py-2.5 text-xs leading-relaxed">
@@ -132,21 +139,24 @@ export function StepHeroImages() {
                         )}
                     </div>
                     <p className="text-xs text-muted-foreground leading-normal">
-                        Si cargás una foto acá, reemplaza el fondo original de la portada de bienvenida por esta foto.
+                        {storytelling
+                            ? "Opcional. Si la cargás, reemplaza el fondo decorativo original en pantallas anchas -- tanto en la tapa como en la foto principal de adentro de la invitación."
+                            : "Si cargás una foto acá, reemplaza el fondo original de la portada de bienvenida por esta foto."}
                     </p>
                 </div>
 
                 {/* Hero Background Image Mobile */}
                 <div className={`space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border ${showMissingImageError && !data.portadaImagenFondo ? 'border-red-500/60' : 'border-white/10'}`}>
-                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm block min-h-[2.5rem]">Portada Invitación{storytelling ? "" : " *"}</Label>
+                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm block min-h-[2.5rem]">{storytelling ? "Recorte celular" : "Portada Invitación *"}</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondo}
                         onImageUploaded={(url: string) => { setData({ portadaImagenFondo: url }); setShowMissingImageError(false); }}
+                        onRemove={() => setData({ portadaImagenFondo: "" })}
                         aspectRatio={4 / 5}
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
                         {storytelling
-                            ? "Si cargás una foto acá, reemplaza el fondo decorativo original de la tapa por esta foto."
+                            ? "Opcional. Si la cargás, reemplaza el fondo decorativo original en mobile -- tanto en la tapa como en la foto principal de adentro de la invitación, debajo de \"Guardá la fecha\"."
                             : "Se verá como foto de portada de la invitación. Obligatoria: todos los templates la usan como imagen principal."}
                     </p>
                     {showMissingImageError && !data.portadaImagenFondo && (
@@ -157,38 +167,6 @@ export function StepHeroImages() {
                     )}
                 </div>
             </div>
-
-            {storytelling && (
-                <div className="max-w-4xl mx-auto space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
-                    <div className="flex items-center gap-2">
-                        <Film className="w-4 h-4 text-primary" />
-                        <Label className="font-semibold text-sm">Foto principal (dentro de la invitación)</Label>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-normal">
-                        Opcional. Se muestra en una sección propia después de &quot;Guardá la fecha&quot;, con un efecto cinemático acorde a la plantilla (sin teñir de color, se ve la foto tal cual). Sin cargarla, se usa una foto de tu galería principal; si tampoco cargaste galería, esa sección se ve con un fondo decorativo.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="fotoPrincipalNarrativa" className="text-xs text-muted-foreground block min-h-[1.5rem]">Recorte mobile (vertical)</Label>
-                            <ImageUploader
-                                currentImage={data.fotoPrincipalNarrativa}
-                                onImageUploaded={(url: string) => setData({ fotoPrincipalNarrativa: url })}
-                                onRemove={() => setData({ fotoPrincipalNarrativa: "" })}
-                                aspectRatio={4 / 5}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="fotoPrincipalNarrativaDesktop" className="text-xs text-muted-foreground block min-h-[1.5rem]">Recorte desktop (panorámico)</Label>
-                            <ImageUploader
-                                currentImage={data.fotoPrincipalNarrativaDesktop}
-                                onImageUploaded={(url: string) => setData({ fotoPrincipalNarrativaDesktop: url })}
-                                onRemove={() => setData({ fotoPrincipalNarrativaDesktop: "" })}
-                                aspectRatio={3 / 2}
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <SaveStepButtons onNext={handleNext} />
         </div>

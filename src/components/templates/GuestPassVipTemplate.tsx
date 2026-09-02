@@ -173,19 +173,15 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
 
-  // Portada de bienvenida y foto principal con foto real, misma
-  // infraestructura que ya usa la Colección Flat (AnimatedCoverPhoto +
-  // los campos que ya carga StepHeroImages.tsx) -- ver rama
-  // experimento-foto-storytelling. Ambas 100% opcionales: sin cargarlas,
-  // todo se ve exactamente igual que antes (cero regresión, mismo criterio
-  // que Flat: "si no se carga foto, fondo original de la plantilla").
-  // portadaImagenFondoDesktop es, igual que en Flat, el "disparador" de la
-  // portada animada (ver comentario en StepHeroImages.tsx) -- con fallback
-  // a portadaImagenFondo si no se cargó. Se muestra SOLO en mobile (ver
-  // nota en CoverHalf), aunque el nombre del campo diga "Desktop".
-  const coverPhotoUrl = String(invitation.portadaImagenFondoDesktop || invitation.portadaImagenFondo || "");
-  const heroPhotoMobile = String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
-  const heroPhotoDesktop = String(invitation.fotoPrincipalNarrativaDesktop || "") || String(invitation.fotoPrincipalNarrativa || "") || galeria[1] || galeria[0] || "";
+  // Recorte celular (mobile) y Recorte PC (desktop): mismos 2 campos que
+  // carga StepHeroImages.tsx, cada uno 100% opcional e independiente --
+  // ver rama experimento-foto-storytelling. Cada uno controla SU propio
+  // breakpoint tanto en la tapa (CoverHalf) como en "Nuestra foto" más
+  // abajo: si solo se cargó uno de los dos, ese breakpoint muestra la
+  // foto y el otro se ve tal cual la plantilla original (sin foto, sin
+  // fallback cruzado ni fallback a la galería principal).
+  const photoMobile = String(invitation.portadaImagenFondo || "");
+  const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -696,23 +692,27 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
           </div>
         </section>
 
-        {/* EXPERIMENTAL: foto principal con efecto cinemático, sin tinte de
-            color (identidad de la familia queda solo en el marco/kicker, no
-            en la foto en sí). Ocupa toda la pantalla en mobile; en desktop
-            se enmarca con un borde propio en vez de estirarse edge-to-edge. */}
+        {/* Foto principal con efecto cinemático, sin tinte de color
+            (identidad de la familia queda solo en el marco/kicker, no en la
+            foto en sí). Mobile y desktop se resuelven cada uno con SU
+            propio recorte -- si ese breakpoint no tiene recorte cargado, se
+            ve el placeholder decorativo (no la foto del otro breakpoint). */}
         <section data-tone="dark" data-screen-label="Nuestra foto" className="gpv-hero-photo-section">
           <div className="gpv-hero-photo-frame">
-            {heroPhotoMobile && (
-              <div className="acp-mobile-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
-              </div>
-            )}
-            {heroPhotoDesktop && (
-              <div className="acp-desktop-only">
-                <AnimatedCoverPhoto photoSrc={heroPhotoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
-              </div>
-            )}
-            {!heroPhotoMobile && !heroPhotoDesktop && <div className="gpv-hero-photo-placeholder" />}
+            <div className="acp-mobile-only">
+              {photoMobile ? (
+                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              ) : (
+                <div className="gpv-hero-photo-placeholder" />
+              )}
+            </div>
+            <div className="acp-desktop-only">
+              {photoDesktop ? (
+                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+              ) : (
+                <div className="gpv-hero-photo-placeholder" />
+              )}
+            </div>
           </div>
           <span data-xin="1" data-dist="-60" className="gpv-kicker gpv-hero-photo-kicker">02 — ASÍ EMPEZÓ TODO</span>
         </section>
@@ -1069,7 +1069,8 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <div className="gpv-cover-cta">ABRIR INVITACIÓN</div>
           </CoverHalf>
@@ -1082,7 +1083,8 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
-            photoSrc={coverPhotoUrl}
+            photoMobile={photoMobile}
+            photoDesktop={photoDesktop}
           >
             <button onClick={open} className="gpv-cover-cta gpv-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CoverHalf>
@@ -1706,7 +1708,8 @@ function CoverHalf({
   passNumber,
   dressCode,
   hora,
-  photoSrc,
+  photoMobile,
+  photoDesktop,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1718,23 +1721,35 @@ function CoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
-  photoSrc?: string;
+  photoMobile?: string;
+  photoDesktop?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="gpv-cover-inner">
-      {/* Con foto cargada, la foto reemplaza el degradé de fondo -- el
-          resto de la ornamentación (glow, sunburst, medallón, nombres, CTA)
-          se mantiene arriba sin cambios, así la identidad de la familia
-          sigue siendo reconocible. Misma lógica que la Colección Flat:
-          SOLO en mobile (el efecto está pensado para el recorte vertical de
-          una foto de celular); en desktop el degradé de fondo original de
-          la plantilla (que sigue debajo sin tocar) se ve igual que siempre,
-          con o sin foto cargada. */}
-      {photoSrc && (
+      {/* Cada recorte reemplaza el degradé de fondo SOLO en su propio
+          breakpoint -- el resto de la ornamentación (glow, sunburst,
+          medallón, nombres, CTA) se mantiene arriba sin cambios, así la
+          identidad de la familia sigue siendo reconocible. Si un
+          breakpoint no tiene recorte cargado, ese div simplemente no se
+          renderiza y el degradé de fondo original de la plantilla (que
+          sigue debajo sin tocar) se ve igual que siempre para ese tamaño. */}
+      {photoMobile && (
         <div className="acp-mobile-only">
           <AnimatedCoverPhoto
-            photoSrc={photoSrc}
+            photoSrc={photoMobile}
+            tint
+            tintColor1="#C8A45C"
+            tintColor2="#0B0B10"
+            effect="enfoque"
+            scrimColorRgb="8,8,11"
+          />
+        </div>
+      )}
+      {photoDesktop && (
+        <div className="acp-desktop-only">
+          <AnimatedCoverPhoto
+            photoSrc={photoDesktop}
             tint
             tintColor1="#C8A45C"
             tintColor2="#0B0B10"

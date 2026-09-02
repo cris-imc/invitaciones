@@ -166,7 +166,17 @@ export function WizardLivePreview() {
 
         let section = "hero";
         if (stepLabel === "Portada" || stepLabel === "Plantilla" || stepLabel === "Tipografía") section = "hero";
-        if (stepLabel === "Countdown" || stepLabel === "Información Básica") section = "countdown";
+        // Storytelling salta el paso "Tipografía" (que en Flat ya deja
+        // parado el preview en "hero" antes de llegar acá) -- si
+        // "Información Básica" mandara igual a "countdown", el salto
+        // Portada -> Información Básica pasaría de la tapa cerrada
+        // directo a Countdown sin pasar por Guardá la fecha/Nuestra foto
+        // (la tapa sigue cerrada cuando se manda el scroll-to, así que se
+        // reposiciona en silencio detrás y se nota recién al auto-abrirse).
+        // Para Storytelling se queda en "hero" (default de arriba); Flat sí
+        // tiene ese paso intermedio, así que ahí "Información Básica"
+        // sigue yendo a "countdown" como siempre.
+        if (stepLabel === "Countdown" || (stepLabel === "Información Básica" && !isStorytellingTemplate(data.templateTipo))) section = "countdown";
         if (stepLabel === "Frase") section = "quote";
         // Storytelling (Guest Pass VIP): Ceremonia y Salón son dos paneles
         // DISTINTOS de un mismo carrusel horizontal, no dos partes de la

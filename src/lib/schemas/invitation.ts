@@ -36,17 +36,18 @@ export const coverPageSchema = z.object({
     dresscodeHabilitado: z.boolean().default(true),
     portadaMensaje: z.string().optional(),
     portadaTextoBoton: z.string().optional(),
+    // En Flat: "Portada Invitación" (mobile, obligatoria) y "Portada de
+    // bienvenida" (el "disparador" de la portada animada, ver
+    // AnimatedCoverPhoto.tsx). En Storytelling (ver StepHeroImages.tsx):
+    // los mismos dos campos se llaman "Recorte celular" y "Recorte PC",
+    // son 100% opcionales, y si se cargan reemplazan el fondo decorativo
+    // original TANTO en la tapa como en la foto principal de adentro de la
+    // invitación (debajo de "Guardá la fecha") -- un solo par de fotos para
+    // los dos usos, no cuatro campos separados. Sin cargar ninguno, no
+    // aparece ninguna foto de fondo en ningún lado (sin fallback a la
+    // galería principal).
     portadaImagenFondo: z.string().optional(),
     portadaImagenFondoDesktop: z.string().optional(),
-    // Foto principal DENTRO de la invitación (después de Guardá la fecha),
-    // exclusiva de la Colección Storytelling -- ver AnimatedCoverPhoto.tsx
-    // y su uso en cada plantilla de esa colección. Recorte propio (no el
-    // 4/5 de portada): mobile más vertical para pantalla completa, desktop
-    // panorámico porque ahí la foto se enmarca en vez de ir a pantalla
-    // completa. Opcional: sin cargarla, cada plantilla cae a su galería
-    // principal y, si tampoco hay fotos, a su fondo decorativo original.
-    fotoPrincipalNarrativa: z.string().optional(),
-    fotoPrincipalNarrativaDesktop: z.string().optional(),
 });
 
 export const gallerySchema = z.object({
