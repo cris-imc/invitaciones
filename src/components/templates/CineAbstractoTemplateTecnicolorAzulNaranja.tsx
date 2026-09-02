@@ -193,6 +193,22 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -227,12 +243,11 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "Las luces se apagan una sola vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del diseño original: primera mitad de la frase en
   // color plano, segunda mitad en cobre itálico (ver mockup, sección
@@ -730,30 +745,32 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
             (identidad de la familia queda en el marco/kicker, no en la foto
             en sí). Ocupa toda la pantalla en mobile; en desktop se enmarca
             con un borde propio en vez de estirarse edge-to-edge. */}
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="cab-hero-photo-section">
-          <div className="cab-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
-              ) : (
-                <div className="cab-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`cab-hero-photo-section${!photoMobile ? " cab-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " cab-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="cab-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
-              ) : (
-                <div className="cab-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="cab-kicker cab-hero-photo-kicker">02 — LA ESCENA UNO</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="cab-kicker cab-hero-photo-kicker">02 — LA ESCENA UNO</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="cab-section cab-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #122530 0%, #0D0B10 55%, #08080B 100%)" }}>
           <div className="cab-scan-grid" />
           <div className="cab-scanline" />
-          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>03 — LA FUNCIÓN EMPIEZA EN</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>{knPre(2)} — LA FUNCIÓN EMPIEZA EN</span>
           <div className="cab-cd-grid">
             <CabCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CabCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -763,9 +780,10 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
           <div className="cab-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="cab-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #0F212C 0%, #0C0B11 52%, #08080B 100%)" }}>
           <div data-drift="-130" className="cab-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="cab-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -784,6 +802,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
             <span className="cab-divider-line cab-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="Cuándo y dónde" className="cab-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="cab-pan-sticky">
@@ -792,7 +811,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
                 <div id="ceremonia" data-tone="light" data-camshake="1" className="cab-panel cab-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="cab-hair-bg" />
                   <div className="cab-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="cab-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -817,7 +836,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
               <div id="details" data-tone="light" data-camshake={ceremoniaHabilitada ? undefined : "1"} className="cab-panel cab-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="cab-hair-bg" />
                 <div className="cab-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="cab-panel-title">
                   {lugarNombre || "El lugar"}
@@ -875,7 +894,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="cab-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #0E1F2A 0%, #0B0B10 60%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cab-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cab-h2">
             Confirmá<br /><span className="cab-accent-italic">tu acceso</span>
           </h2>
@@ -920,7 +939,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
                 <div key={pageIndex} data-tone="light" className="cab-panel cab-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cab-hair-bg" />
                   <div className="cab-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="cab-panel-title-md">Álbum <span className="cab-accent-serif">de fotos</span></h2>}
                   <div className="cab-mosaic">
@@ -972,7 +991,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2">¿Qué banda sonora<br /><span className="cab-accent-italic">no puede faltar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cab-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -991,7 +1010,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2">
               Si querés<br /><span className="cab-accent-italic">sumarte</span>
             </h2>
@@ -1042,7 +1061,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1058,7 +1077,7 @@ export function CineAbstractoTemplateTecnicolorAzulNaranja({ invitation, guest, 
         )}
 
         <section data-tone="dark" data-screen-label="Tu entrada" className="cab-section cab-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #0E1F2A 0%, #0B0B10 55%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU ENTRADA</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cab-final-card">
             <div className="cab-medallion cab-medallion--final">
               <CabMedallion label="35mm" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cabArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1862,11 +1881,14 @@ const CAB_CSS = `
      borde propio de la familia en vez de estirarse. */
   .cab-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #08080B; }
   .cab-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
-  .cab-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #241D0F 0%, #0D0B10 60%, #08080B 100%); }
   .cab-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (max-width: 767px) {
+    .cab-hero-photo-section--no-mobile { min-height: 0; height: 0; }
+  }
   @media (min-width: 768px) {
     .cab-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(224,105,46,.3); }
     .cab-hero-photo-kicker { bottom: 40px; }
+    .cab-hero-photo-section--no-desktop { min-height: 0; height: 0; }
   }
 
   .cab-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }

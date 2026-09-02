@@ -192,6 +192,22 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -226,12 +242,11 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "El álbum se abre una sola vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del diseño original (ver mockup "Vintage Editorial
   // - Panorámica"): primera mitad de la frase en color plano, segunda mitad
@@ -705,30 +720,32 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
             (identidad de la familia queda solo en el marco/kicker, no en la
             foto en sí). Ocupa toda la pantalla en mobile; en desktop se
             enmarca con un borde propio en vez de estirarse edge-to-edge. */}
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="vte-hero-photo-section">
-          <div className="vte-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="21,15,10" />
-              ) : (
-                <div className="vte-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`vte-hero-photo-section${!photoMobile ? " vte-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " vte-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="vte-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="21,15,10" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="21,15,10" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="21,15,10" />
-              ) : (
-                <div className="vte-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="vte-kicker vte-hero-photo-kicker">02 — NUESTRA HISTORIA</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="vte-kicker vte-hero-photo-kicker">02 — NUESTRA HISTORIA</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="vte-section vte-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #2A1E14 0%, #18120C 55%, #150F0A 100%)" }}>
           <div className="vte-scan-grid" />
           <div className="vte-scanline" />
-          <span data-xin="1" data-dist="-60" className="vte-kicker" style={{ position: "relative" }}>03 — LA EDICIÓN SALE EN</span>
+          <span data-xin="1" data-dist="-60" className="vte-kicker" style={{ position: "relative" }}>{knPre(2)} — LA EDICIÓN SALE EN</span>
           <div className="vte-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -738,9 +755,10 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
           <div className="vte-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="vte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #150F0A 100%)" }}>
           <div data-drift="-130" className="vte-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="vte-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="vte-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="vte-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -759,6 +777,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
             <span className="vte-divider-line vte-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="Cuándo y dónde" className="vte-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="vte-pan-sticky">
@@ -767,7 +786,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
                 <div id="ceremonia" data-tone="light" className="vte-panel vte-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="vte-hair-bg" />
                   <div className="vte-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="vte-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -792,7 +811,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
               <div id="details" data-tone="light" className="vte-panel vte-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="vte-hair-bg" />
                 <div className="vte-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="vte-panel-title">
                   {lugarNombre || "El lugar"}
@@ -850,7 +869,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="vte-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #1B140D 60%, #150F0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="vte-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="vte-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="vte-h2">
             Confirmá<br /><span className="vte-accent-italic">tu acceso</span>
           </h2>
@@ -895,7 +914,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
                 <div key={pageIndex} data-tone="light" className="vte-panel vte-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="vte-hair-bg" />
                   <div className="vte-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="vte-panel-title-md">Álbum <span className="vte-accent-serif">de fotos</span></h2>}
                   <div className="vte-mosaic">
@@ -947,7 +966,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="vte-section" style={{ background: "#1B140D" }}>
-            <span data-xin="1" data-dist="-60" className="vte-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="vte-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="vte-h2">¿Qué tema<br /><span className="vte-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="vte-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -966,7 +985,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="vte-section" style={{ background: "#1B140D" }}>
-            <span data-xin="1" data-dist="-60" className="vte-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="vte-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="vte-h2">
               Si querés<br /><span className="vte-accent-italic">sumarte</span>
             </h2>
@@ -1017,7 +1036,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="vte-section" style={{ background: "#1B140D" }}>
-            <span data-xin="1" data-dist="-60" className="vte-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="vte-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="vte-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1033,7 +1052,7 @@ export function VintageEditorialTemplate({ invitation, guest, isPersonalized = f
         )}
 
         <section data-tone="dark" data-screen-label="Tu edición" className="vte-section vte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #1B140D 55%, #150F0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="vte-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU EDICIÓN</span>
+          <span data-xin="1" data-dist="-60" className="vte-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU EDICIÓN</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="vte-final-card">
             <div className="vte-medallion vte-medallion--final">
               <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="vteArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1817,11 +1836,14 @@ const VTE_CSS = `
 
   .vte-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #150F0A; }
   .vte-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
-  .vte-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #2A1E14 0%, #18120C 60%, #150F0A 100%); }
   .vte-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (max-width: 767px) {
+    .vte-hero-photo-section--no-mobile { min-height: 0; height: 0; }
+  }
   @media (min-width: 768px) {
     .vte-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(201,166,107,.3); }
     .vte-hero-photo-kicker { bottom: 40px; }
+    .vte-hero-photo-section--no-desktop { min-height: 0; height: 0; }
   }
 
   .vte-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }

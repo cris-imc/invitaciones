@@ -215,6 +215,22 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -249,12 +265,11 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "El vidrio se aclara una sola vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del mockup (ver mockup/Liquid Glass - Panoramica.dc.html):
   // primera mitad de la frase en color plano, segunda mitad en celeste
@@ -729,30 +744,32 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
             (identidad de la familia queda en el marco/kicker, no en la foto
             en sí). Ocupa toda la pantalla en mobile; en desktop se enmarca
             con un borde propio en vez de estirarse edge-to-edge. */}
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="lqg-hero-photo-section">
-          <div className="lqg-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="8,13,10" />
-              ) : (
-                <div className="lqg-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`lqg-hero-photo-section${!photoMobile ? " lqg-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " lqg-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="lqg-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="8,13,10" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,13,10" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,13,10" />
-              ) : (
-                <div className="lqg-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="lqg-kicker lqg-hero-photo-kicker">02 — EL PRIMER REFLEJO</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="lqg-kicker lqg-hero-photo-kicker">02 — EL PRIMER REFLEJO</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="lqg-section lqg-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #14221B 0%, #0B120E 55%, #080D0A 100%)" }}>
           <div className="lqg-scan-grid" />
           <div className="lqg-scanline" />
-          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>03 — EL VIDRIO SE ACLARA EN</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>{knPre(2)} — EL VIDRIO SE ACLARA EN</span>
           <div className="lqg-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -762,9 +779,10 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
           <div className="lqg-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="lqg-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C2717 0%, #0C110B 52%, #080D0A 100%)" }}>
           <div data-drift="-130" className="lqg-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="lqg-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -783,6 +801,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
             <span className="lqg-divider-line lqg-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="Cuándo y dónde" className="lqg-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="lqg-pan-sticky">
@@ -791,7 +810,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
                 <div id="ceremonia" data-tone="light" className="lqg-panel lqg-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="lqg-hair-bg" />
                   <div className="lqg-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="lqg-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -816,7 +835,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
               <div id="details" data-tone="light" className="lqg-panel lqg-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="lqg-hair-bg" />
                 <div className="lqg-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="lqg-panel-title">
                   {lugarNombre || "El lugar"}
@@ -874,7 +893,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="lqg-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #171F14 0%, #0A110D 60%, #080D0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="lqg-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="lqg-h2">
             Confirmá<br /><span className="lqg-accent-italic">tu acceso</span>
           </h2>
@@ -920,7 +939,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
                 <div key={pageIndex} data-tone="light" className="lqg-panel lqg-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="lqg-hair-bg" />
                   <div className="lqg-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="lqg-panel-title-md">Álbum <span className="lqg-accent-navy">de fotos</span></h2>}
                   <div className="lqg-mosaic">
@@ -972,7 +991,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="lqg-section" style={{ background: "#0A110D" }}>
-            <span data-xin="1" data-dist="-60" className="lqg-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="lqg-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="lqg-h2">¿Qué tema<br /><span className="lqg-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="lqg-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -991,7 +1010,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="lqg-section" style={{ background: "#0A110D" }}>
-            <span data-xin="1" data-dist="-60" className="lqg-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="lqg-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="lqg-h2">
               Si querés<br /><span className="lqg-accent-italic">sumarte</span>
             </h2>
@@ -1042,7 +1061,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="lqg-section" style={{ background: "#0A110D" }}>
-            <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="lqg-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1058,7 +1077,7 @@ export function LiquidGlassTemplateEsmeralda({ invitation, guest, isPersonalized
         )}
 
         <section data-tone="dark" data-screen-label="Tu panel" className="lqg-section lqg-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #171F14 0%, #0A110D 55%, #080D0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PANEL</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU PANEL</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="lqg-final-card">
             <div className="lqg-medallion lqg-medallion--final">
               <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="lqgArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" size={30} />
@@ -1843,11 +1862,14 @@ const LQG_CSS = `
   .lqg-section--between { justify-content: space-between; }
   .lqg-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #080D0A; }
   .lqg-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
-  .lqg-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #162C1E 0%, #0D1A13 60%, #080D0A 100%); }
   .lqg-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (max-width: 767px) {
+    .lqg-hero-photo-section--no-mobile { min-height: 0; height: 0; }
+  }
   @media (min-width: 768px) {
     .lqg-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(111,201,168,.3); }
     .lqg-hero-photo-kicker { bottom: 40px; }
+    .lqg-hero-photo-section--no-desktop { min-height: 0; height: 0; }
   }
 
   .lqg-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }

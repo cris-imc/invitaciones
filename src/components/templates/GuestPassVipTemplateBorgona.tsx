@@ -182,6 +182,22 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -216,12 +232,11 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "La puerta se abre una vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del diseño original (ver img/frase.jpg): primera
   // mitad de la frase en color plano, segunda mitad en dorado itálico. Antes
@@ -696,30 +711,32 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
             (identidad de la familia queda solo en el marco/kicker, no en
             la foto en sí). Ocupa toda la pantalla en mobile; en desktop
             se enmarca con un borde propio en vez de estirarse edge-to-edge. */}
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="gpv-hero-photo-section">
-          <div className="gpv-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
-              ) : (
-                <div className="gpv-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`gpv-hero-photo-section${!photoMobile ? " gpv-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " gpv-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="gpv-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="8,8,11" />
-              ) : (
-                <div className="gpv-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="gpv-kicker gpv-hero-photo-kicker">02 — ASÍ EMPEZÓ TODO</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="gpv-kicker gpv-hero-photo-kicker">02 — ASÍ EMPEZÓ TODO</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="gpv-section gpv-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #2E141A 0%, #120B0C 55%, #0A0708 100%)" }}>
           <div className="gpv-scan-grid" />
           <div className="gpv-scanline" />
-          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>03 — EL PASE SE ACTIVA EN</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>{knPre(2)} — EL PASE SE ACTIVA EN</span>
           <div className="gpv-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -729,9 +746,10 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
           <div className="gpv-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="gpv-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #251119 0%, #100B0D 52%, #0A0708 100%)" }}>
           <div data-drift="-130" className="gpv-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>04 — UN MENSAJE PARA VOS</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker" style={{ position: "relative" }}>{knPre(3)} — UN MENSAJE PARA VOS</span>
           <h2 ref={phraseRef} className="gpv-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -750,6 +768,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
             <span className="gpv-divider-line gpv-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="El lugar" className="gpv-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="gpv-pan-sticky">
@@ -758,7 +777,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
                 <div id="ceremonia" data-tone="light" className="gpv-panel gpv-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="gpv-hair-bg" />
                   <div className="gpv-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="gpv-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -783,7 +802,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
               <div id="details" data-tone="light" className="gpv-panel gpv-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="gpv-hair-bg" />
                 <div className="gpv-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="gpv-panel-title">
                   {lugarNombre || "El lugar"}
@@ -841,7 +860,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="gpv-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #211116 0%, #0F0A0B 60%, #0A0708 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="gpv-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="gpv-h2">
             Confirmá<br /><span className="gpv-accent-italic">tu acceso</span>
           </h2>
@@ -886,7 +905,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
                 <div key={pageIndex} data-tone="light" className="gpv-panel gpv-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="gpv-hair-bg" />
                   <div className="gpv-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="gpv-panel-title-md">Álbum <span className="gpv-accent-serif">de fotos</span></h2>}
                   <div className="gpv-mosaic">
@@ -938,7 +957,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="gpv-section" style={{ background: "#0F0A0B" }}>
-            <span data-xin="1" data-dist="-60" className="gpv-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="gpv-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="gpv-h2">¿Qué tema<br /><span className="gpv-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="gpv-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -957,7 +976,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="gpv-section" style={{ background: "#0F0A0B" }}>
-            <span data-xin="1" data-dist="-60" className="gpv-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="gpv-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="gpv-h2">
               Si querés<br /><span className="gpv-accent-italic">sumarte</span>
             </h2>
@@ -1008,7 +1027,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="gpv-section" style={{ background: "#0F0A0B" }}>
-            <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="gpv-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1024,7 +1043,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="gpv-section gpv-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #211116 0%, #0F0A0B 55%, #0A0708 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="gpv-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="gpv-final-card">
             <div className="gpv-medallion gpv-medallion--final">
               <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="gpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1803,11 +1822,14 @@ const GP_CSS = `
 
   .gpv-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0A0708; }
   .gpv-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
-  .gpv-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #251119 0%, #0F0A0B 60%, #0A0708 100%); }
   .gpv-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (max-width: 767px) {
+    .gpv-hero-photo-section--no-mobile { min-height: 0; height: 0; }
+  }
   @media (min-width: 768px) {
     .gpv-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(190,103,116,.3); }
     .gpv-hero-photo-kicker { bottom: 40px; }
+    .gpv-hero-photo-section--no-desktop { min-height: 0; height: 0; }
   }
 
   .gpv-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }

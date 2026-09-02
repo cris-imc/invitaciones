@@ -171,6 +171,22 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -205,12 +221,11 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "La boutique se abre una sola vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del diseño: primera mitad de la frase en color
   // plano, segunda mitad en óxido itálico, partiendo por la mitad de la
@@ -669,30 +684,32 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
 
         {/* Foto principal con efecto cinemático, sin tinte de color --
             ocupa toda la pantalla en mobile, se enmarca en desktop. */}
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="ftg-hero-photo-section">
-          <div className="ftg-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="10,13,18" />
-              ) : (
-                <div className="ftg-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`ftg-hero-photo-section${!photoMobile ? " ftg-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " ftg-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="ftg-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="10,13,18" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="10,13,18" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="10,13,18" />
-              ) : (
-                <div className="ftg-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="ftg-kicker ftg-hero-photo-kicker">02 — LA ETIQUETA CUENTA UNA HISTORIA</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="ftg-kicker ftg-hero-photo-kicker">02 — LA ETIQUETA CUENTA UNA HISTORIA</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="ftg-section ftg-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #1C2A38 0%, #101823 55%, #0A0D12 100%)" }}>
           <div className="ftg-scan-grid" />
           <div className="ftg-scanline" />
-          <span data-xin="1" data-dist="-60" className="ftg-kicker" style={{ position: "relative" }}>03 — LA ETIQUETA CUELGA EN</span>
+          <span data-xin="1" data-dist="-60" className="ftg-kicker" style={{ position: "relative" }}>{knPre(2)} — LA ETIQUETA CUELGA EN</span>
           <div className="ftg-cd-grid">
             <FtgCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <FtgCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -702,9 +719,10 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
           <div className="ftg-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="ftg-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #16233A 0%, #0A121C 52%, #0A0D12 100%)" }}>
           <div data-drift="-130" className="ftg-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="ftg-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="ftg-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="ftg-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -722,6 +740,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
             <span className="ftg-divider-line ftg-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="El lugar" className="ftg-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="ftg-pan-sticky">
@@ -730,7 +749,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
                 <div id="ceremonia" data-tone="light" className="ftg-panel ftg-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="ftg-hair-bg" />
                   <div className="ftg-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="ftg-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -755,7 +774,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
               <div id="details" data-tone="light" className="ftg-panel ftg-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="ftg-hair-bg" />
                 <div className="ftg-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="ftg-panel-title">
                   {lugarNombre || "El salón"}
@@ -813,7 +832,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="ftg-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #151B27 0%, #0E141C 60%, #0A0D12 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="ftg-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="ftg-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="ftg-h2">
             Confirmá<br /><span className="ftg-accent-italic">tu acceso</span>
           </h2>
@@ -858,7 +877,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
                 <div key={pageIndex} data-tone="light" className="ftg-panel ftg-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="ftg-hair-bg" />
                   <div className="ftg-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="ftg-panel-title-md">Álbum <span className="ftg-accent-dark-serif">de fotos</span></h2>}
                   <div className="ftg-mosaic">
@@ -910,7 +929,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="ftg-section" style={{ background: "#0E141C" }}>
-            <span data-xin="1" data-dist="-60" className="ftg-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="ftg-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="ftg-h2">¿Qué outfit<br /><span className="ftg-accent-italic">no puede faltar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="ftg-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -929,7 +948,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="ftg-section" style={{ background: "#0E141C" }}>
-            <span data-xin="1" data-dist="-60" className="ftg-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="ftg-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="ftg-h2">
               Si querés<br /><span className="ftg-accent-italic">sumarte</span>
             </h2>
@@ -980,7 +999,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="ftg-section" style={{ background: "#0E141C" }}>
-            <span data-xin="1" data-dist="-60" className="ftg-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="ftg-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="ftg-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -996,7 +1015,7 @@ export function FashionTagTemplateMidnightNavy({ invitation, guest, isPersonaliz
         )}
 
         <section data-tone="dark" data-screen-label="Tu etiqueta" className="ftg-section ftg-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #151B27 0%, #0E141C 55%, #0A0D12 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="ftg-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU ETIQUETA</span>
+          <span data-xin="1" data-dist="-60" className="ftg-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU ETIQUETA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="ftg-final-card">
             <div className="ftg-medallion ftg-medallion--final">
               <FtgMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="ftgArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1750,11 +1769,14 @@ const FTG_CSS = `
      borde propio de la familia en vez de estirarse. */
   .ftg-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0A0D12; }
   .ftg-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
-  .ftg-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0A0D12 60%, #0A0D12 100%); }
   .ftg-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (max-width: 767px) {
+    .ftg-hero-photo-section--no-mobile { min-height: 0; height: 0; }
+  }
   @media (min-width: 768px) {
     .ftg-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(53,84,126,.3); }
     .ftg-hero-photo-kicker { bottom: 40px; }
+    .ftg-hero-photo-section--no-desktop { min-height: 0; height: 0; }
   }
 
   .ftg-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }

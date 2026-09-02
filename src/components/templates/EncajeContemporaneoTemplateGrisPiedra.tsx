@@ -214,6 +214,22 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -248,12 +264,11 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "La trama se teje una sola vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del mockup real: primera mitad de la frase en
   // color plano, segunda mitad en terracota itálico. Antes esto se perdía
@@ -727,30 +742,32 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
             (identidad de la familia queda en el marco/kicker, no en la foto
             en sí). Ocupa toda la pantalla en mobile; en desktop se enmarca
             con un borde propio en vez de estirarse edge-to-edge. */}
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="enc-hero-photo-section">
-          <div className="enc-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="11,10,9" />
-              ) : (
-                <div className="enc-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`enc-hero-photo-section${!photoMobile ? " enc-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " enc-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="enc-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="11,10,9" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="11,10,9" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="11,10,9" />
-              ) : (
-                <div className="enc-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="enc-kicker enc-hero-photo-kicker">02 — EL PRIMER HILO</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="enc-kicker enc-hero-photo-kicker">02 — EL PRIMER HILO</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="enc-section enc-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #23211D 0%, #100F0D 55%, #0B0A09 100%)" }}>
           <div className="enc-scan-grid" />
           <div className="enc-scanline" />
-          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>03 — LA RETÍCULA SE COMPLETA EN</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>{knPre(2)} — LA RETÍCULA SE COMPLETA EN</span>
           <div className="enc-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -760,9 +777,10 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
           <div className="enc-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="enc-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #201E1A 0%, #0C0B0A 52%, #0B0A09 100%)" }}>
           <div data-drift="-130" className="enc-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="enc-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -781,6 +799,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
             <span className="enc-divider-line enc-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="El lugar" className="enc-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="enc-pan-sticky">
@@ -789,7 +808,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
                 <div id="ceremonia" data-tone="light" className="enc-panel enc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="enc-hair-bg" />
                   <div className="enc-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="enc-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -814,7 +833,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
               <div id="details" data-tone="light" className="enc-panel enc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="enc-hair-bg" />
                 <div className="enc-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="enc-panel-title">
                   {lugarNombre || "El lugar"}
@@ -875,7 +894,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="enc-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #1D1B18 0%, #0E0D0C 60%, #0B0A09 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="enc-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="enc-h2">
             Confirmá<br /><span className="enc-accent-italic">tu acceso</span>
           </h2>
@@ -921,7 +940,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
                 <div key={pageIndex} data-tone="light" className="enc-panel enc-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="enc-hair-bg" />
                   <div className="enc-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="enc-panel-title-md">Álbum <span className="enc-accent-serif-dark">de fotos</span></h2>}
                   <div className="enc-mosaic">
@@ -973,7 +992,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="enc-section" style={{ background: "#0E0D0C" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2">¿Qué tema<br /><span className="enc-accent-italic">merece la pista?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="enc-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -992,7 +1011,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="enc-section" style={{ background: "#0E0D0C" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">{sugerenciaMusicaHabilitada ? "08" : "07"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2">
               Si querés<br /><span className="enc-accent-italic">sumarte</span>
             </h2>
@@ -1043,7 +1062,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="enc-section" style={{ background: "#0E0D0C" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1059,7 +1078,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="enc-section enc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1D1B18 0%, #0E0D0C 55%, #0B0A09 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="enc-final-card">
             <div className="enc-medallion enc-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="encArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaArc} · `} spin="reverse" />
@@ -1844,11 +1863,14 @@ const ENC_CSS = `
   .enc-section--between { justify-content: space-between; }
   .enc-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #0B0A09; }
   .enc-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
-  .enc-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 30%, #26221C 0%, #171410 60%, #0B0A09 100%); }
   .enc-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (max-width: 767px) {
+    .enc-hero-photo-section--no-mobile { min-height: 0; height: 0; }
+  }
   @media (min-width: 768px) {
     .enc-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(110,102,86,.3); }
     .enc-hero-photo-kicker { bottom: 40px; }
+    .enc-hero-photo-section--no-desktop { min-height: 0; height: 0; }
   }
 
   .enc-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }

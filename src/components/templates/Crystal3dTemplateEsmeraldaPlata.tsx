@@ -166,6 +166,22 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -200,12 +216,11 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "El cristal se refracta una sola vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del diseño: primera mitad de la frase en color
   // plano, segunda mitad alterna itálica cian/lavanda palabra a palabra
@@ -663,30 +678,32 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
           </div>
         </section>
 
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="c3d-hero-photo-section">
-          <div className="c3d-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
-              ) : (
-                <div className="c3d-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`c3d-hero-photo-section${!photoMobile ? " c3d-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " c3d-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="c3d-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="7,15,13" />
-              ) : (
-                <div className="c3d-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="c3d-kicker c3d-hero-photo-kicker">02 — EL CRISTAL YA BRILLA</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker c3d-hero-photo-kicker">02 — EL CRISTAL YA BRILLA</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="c3d-section c3d-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #16281E 0%, #0C1712 55%, #070F0D 100%)" }}>
           <div className="c3d-scan-grid" />
           <div className="c3d-scanline" />
-          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>03 — EL CRISTAL SE ILUMINA EN</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>{knPre(2)} — EL CRISTAL SE ILUMINA EN</span>
           <div className="c3d-cd-grid">
             <C3dCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <C3dCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -696,9 +713,10 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
           <div className="c3d-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="c3d-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #142720 0%, #0B1613 52%, #070F0D 100%)" }}>
           <div data-drift="-130" className="c3d-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="c3d-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => {
               const accented = i >= fraseAccentStart;
@@ -721,6 +739,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
             <span className="c3d-divider-line c3d-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="Cuándo y dónde" className="c3d-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="c3d-pan-sticky">
@@ -729,7 +748,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
                 <div id="ceremonia" data-tone="light" className="c3d-panel c3d-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="c3d-hair-bg" />
                   <div className="c3d-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="c3d-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -754,7 +773,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
               <div id="details" data-tone="light" className="c3d-panel c3d-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="c3d-hair-bg" />
                 <div className="c3d-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="c3d-panel-title">
                   {lugarNombre || "Studio"}
@@ -819,7 +838,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="c3d-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #142019 0%, #0B1512 60%, #070F0D 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="c3d-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="c3d-h2">
             Confirmá<br /><span className="c3d-accent-italic-cyan">tu acceso</span>
           </h2>
@@ -864,7 +883,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
                 <div key={pageIndex} data-tone="light" className="c3d-panel c3d-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="c3d-hair-bg" />
                   <div className="c3d-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="c3d-panel-title-md">Álbum <span className="c3d-accent-italic-lavender">de fotos</span></h2>}
                   <div className="c3d-mosaic">
@@ -916,7 +935,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="c3d-section" style={{ background: "#0B1512" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2">¿Qué tema<br /><span className="c3d-accent-italic-lavender">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="c3d-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -935,7 +954,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="c3d-section" style={{ background: "#0B1512" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2">
               Si querés<br /><span className="c3d-accent-italic-cyan">sumarte</span>
             </h2>
@@ -986,7 +1005,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="c3d-section" style={{ background: "#0B1512" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1002,7 +1021,7 @@ export function Crystal3dTemplateEsmeraldaPlata({ invitation, guest, isPersonali
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase" className="c3d-section c3d-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #142019 0%, #0B1512 55%, #070F0D 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="c3d-final-card">
             <div className="c3d-medallion c3d-medallion--final">
               <C3dMedallion
@@ -1794,7 +1813,6 @@ const C3D_CSS = `
   .c3d-hero-photo-section { position: relative; min-height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
   .c3d-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
   @media (min-width: 768px) { .c3d-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(111,203,159,.3); } }
-  .c3d-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #142019 0%, #0B1512 55%, #070F0D 100%); }
   .c3d-hero-photo-kicker { position: absolute; left: max(30px, calc((100% - 560px) / 2)); bottom: 40px; z-index: 2; }
 
   .c3d-date-stack { display: flex; flex-direction: column; gap: 2px; }

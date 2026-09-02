@@ -201,6 +201,22 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
   // fallback cruzado ni fallback a la galería principal).
   const photoMobile = String(invitation.portadaImagenFondo || "");
   const photoDesktop = String(invitation.portadaImagenFondoDesktop || "");
+  // "Nuestra foto" (02) y "Un mensaje para vos" (frase) son las dos únicas
+  // secciones que pueden no existir -- si no hay foto cargada, o si la
+  // frase está deshabilitada/sin texto, esas secciones no se renderizan
+  // (ver más abajo), y el resto de los kickers no puede seguir asumiendo
+  // que ambas ocupan un lugar: knPre()/kn() corren el número según cuáles
+  // de las dos existan, para no saltar números en el medio de la secuencia.
+  // knPre() es para Countdown y la Frase misma (solo les afecta si existe
+  // Nuestra foto, que va ANTES en la secuencia); kn() es para todo lo que
+  // sigue después de la Frase (les afecta si existen Nuestra foto Y/O la
+  // Frase).
+  const hasHeroPhoto = Boolean(photoMobile || photoDesktop);
+  const hasFrase = Boolean(invitation.frasePersonalizadaHabilitada) && Boolean(invitation.frasePersonalizadaTexto);
+  const kOffsetPre = hasHeroPhoto ? 1 : 0;
+  const kOffset = kOffsetPre + (hasFrase ? 1 : 0);
+  const kn = (base: number) => String(base + kOffset).padStart(2, "0");
+  const knPre = (base: number) => String(base + kOffsetPre).padStart(2, "0");
   const albumFotos = ((invitation.album as { fotos?: { url: string }[] } | null)?.fotos ?? []).map((f) => f.url);
   const allPhotos = Array.from(new Set([...galeria, ...albumFotos].filter(Boolean)));
   // El diseño del álbum es fijo de esta plantilla (no elegible desde el
@@ -235,12 +251,11 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
   const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
-  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- nunca
-  // hardcodeada. Frase larga -> tipografía más chica para que entre bien.
-  const frasePersonalizadaHabilitada = Boolean(invitation.frasePersonalizadaHabilitada);
-  const frase = frasePersonalizadaHabilitada && invitation.frasePersonalizadaTexto
-    ? String(invitation.frasePersonalizadaTexto)
-    : "El atelier se abre una sola vez.";
+  // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
+  // deshabilitada o no se cargó texto, la sección entera no se muestra (ver
+  // hasFrase más arriba): no hay frase default hardcodeada como fallback,
+  // si no se quiere frase no debe aparecer ninguna.
+  const frase = hasFrase ? String(invitation.frasePersonalizadaTexto) : "";
   const fraseWords = frase.split(/\s+/).filter(Boolean);
   // Combinación de colores del diseño original (ver mockup): primera mitad
   // de la frase en color plano, segunda mitad en beige itálico. Antes esto
@@ -713,30 +728,32 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         {/* Foto principal con efecto cinemático, sin tinte de color --
             ocupa toda la pantalla en mobile, se enmarca en desktop. */}
-        <section data-tone="dark" data-screen-label="Nuestra foto" className="adp-hero-photo-section">
-          <div className="adp-hero-photo-frame">
-            <div className="acp-mobile-only">
-              {photoMobile ? (
-                <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="20,18,14" />
-              ) : (
-                <div className="adp-hero-photo-placeholder" />
+        {(photoMobile || photoDesktop) && (
+          <section
+            data-tone="dark"
+            data-screen-label="Nuestra foto"
+            className={`adp-hero-photo-section${!photoMobile ? " adp-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " adp-hero-photo-section--no-desktop" : ""}`}
+          >
+            <div className="adp-hero-photo-frame">
+              {photoMobile && (
+                <div className="acp-mobile-only">
+                  <AnimatedCoverPhoto photoSrc={photoMobile} tint={false} effect="enfoque" scrimColorRgb="20,18,14" />
+                </div>
+              )}
+              {photoDesktop && (
+                <div className="acp-desktop-only">
+                  <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,18,14" />
+                </div>
               )}
             </div>
-            <div className="acp-desktop-only">
-              {photoDesktop ? (
-                <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,18,14" />
-              ) : (
-                <div className="adp-hero-photo-placeholder" />
-              )}
-            </div>
-          </div>
-          <span data-xin="1" data-dist="-60" className="adp-kicker adp-hero-photo-kicker">02 — EL PAPEL GUARDA MEMORIA</span>
-        </section>
+            <span data-xin="1" data-dist="-60" className="adp-kicker adp-hero-photo-kicker">02 — EL PAPEL GUARDA MEMORIA</span>
+          </section>
+        )}
 
         <section id="countdown" data-tone="dark" data-screen-label="Countdown" className="adp-section adp-section--between" style={{ background: "radial-gradient(100% 60% at 50% 100%, #2A2820 0%, #1A1712 55%, #14120E 100%)" }}>
           <div className="adp-scan-grid" />
           <div className="adp-scanline" />
-          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>03 — LA PRÓXIMA LÁMINA LLEGA EN</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>{knPre(2)} — LA PRÓXIMA LÁMINA LLEGA EN</span>
           <div className="adp-cd-grid">
             <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
             <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
@@ -746,9 +763,10 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
           <div className="adp-perf-strip" />
         </section>
 
+        {hasFrase && (
         <section id="quote" data-tone="dark" data-screen-label="Frase" className="adp-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #14120E 100%)" }}>
           <div data-drift="-130" className="adp-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>04 — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
           <h2 ref={phraseRef} className="adp-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -767,6 +785,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
             <span className="adp-divider-line adp-divider-line--long" /><span>{fechaCorta} — {hora} H</span>
           </div>
         </section>
+        )}
 
         <div data-pan="1" data-screen-label="El lugar" className="adp-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="adp-pan-sticky">
@@ -775,7 +794,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
                 <div id="ceremonia" data-tone="light" className="adp-panel adp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                   <div className="adp-hair-bg" />
                   <div className="adp-panel-top">
-                    <span>05 — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                    <span>{kn(3)} — {ceremoniaTitulo.toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                   </div>
                   <h2 className="adp-panel-title">
                     {ceremoniaNombre || ceremoniaTitulo}
@@ -800,7 +819,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
               <div id="details" data-tone="light" className="adp-panel adp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="adp-hair-bg" />
                 <div className="adp-panel-top">
-                  <span>05 — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="adp-panel-title">
                   {lugarNombre || "El lugar"}
@@ -858,7 +877,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
         </div>
 
         <section data-tone="dark" data-screen-label="Check-in" className="adp-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #181611 60%, #14120E 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="adp-kicker">06 — CHECK-IN</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="adp-h2">
             Confirmá<br /><span className="adp-accent-italic">tu acceso</span>
           </h2>
@@ -904,7 +923,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
                 <div key={pageIndex} data-tone="light" className="adp-panel adp-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="adp-hair-bg" />
                   <div className="adp-panel-top">
-                    <span>07 — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
                   </div>
                   {pageIndex === 0 && <h2 className="adp-panel-title-md">Álbum <span className="adp-accent-serif">de fotos</span></h2>}
                   <div className="adp-mosaic">
@@ -956,7 +975,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         {sugerenciaMusicaHabilitada && (
           <section id="music" data-tone="dark" data-screen-label="Música" className="adp-section" style={{ background: "#181611" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">08 — SUGERENCIA DE MÚSICA</span>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2">¿Qué tema<br /><span className="adp-accent-italic">te hace bailar?</span></h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="adp-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
@@ -975,7 +994,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         {showBankSection && (
           <section id="banco" data-tone="dark" data-screen-label="Regalos" className="adp-section" style={{ background: "#181611" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">{sugerenciaMusicaHabilitada ? "09" : "08"} — REGALOS Y PAGOS</span>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2">
               Si querés<br /><span className="adp-accent-italic">sumarte</span>
             </h2>
@@ -1026,7 +1045,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="adp-section" style={{ background: "#181611" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 8} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6 + kOffset} — EL JUEGO</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1042,7 +1061,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
         )}
 
         <section data-tone="dark" data-screen-label="Tu lámina" className="adp-section adp-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #181611 55%, #14120E 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 8} — GUARDÁ TU LÁMINA</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker">{[sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6 + kOffset} — GUARDÁ TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="adp-final-card">
             <div className="adp-medallion adp-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="adpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
@@ -1825,11 +1844,14 @@ const ADP_CSS = `
      borde propio de la familia en vez de estirarse. */
   .adp-hero-photo-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; background: #14120E; }
   .adp-hero-photo-frame { position: absolute; inset: 0; overflow: hidden; }
-  .adp-hero-photo-placeholder { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #17141F 0%, #181611 60%, #14120E 100%); }
   .adp-hero-photo-kicker { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(24px, calc((100% - 560px) / 2)) 48px; }
+  @media (max-width: 767px) {
+    .adp-hero-photo-section--no-mobile { min-height: 0; height: 0; }
+  }
   @media (min-width: 768px) {
     .adp-hero-photo-frame { inset: 64px max(24px, calc((100% - 900px) / 2)); border: 1px solid rgba(122,104,82,.3); }
     .adp-hero-photo-kicker { bottom: 40px; }
+    .adp-hero-photo-section--no-desktop { min-height: 0; height: 0; }
   }
 
   .adp-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
