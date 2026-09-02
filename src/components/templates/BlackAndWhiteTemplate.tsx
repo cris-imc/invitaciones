@@ -120,21 +120,32 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = false }: BlackAndWhiteTemplateProps) {
+  const tipo = String(invitation.tipo ?? "OTRO");
+  const isCasamiento = tipo === "CASAMIENTO";
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const nombreQuinceanera = String(invitation.nombreQuinceanera ?? "");
+  const namesTitle = isCasamiento
+    ? (novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda"))
+    : (nombreQuinceanera || String(invitation.nombreEvento ?? "Mis quince"));
+  const admitLabel = isCasamiento ? "ADMIT TWO" : "ADMIT ONE";
 
   // "Saludar por nombre del invitado/familia" (Administrar > Gestionar
   // invitados): si está activo, la portada saluda con el nombre del
-  // invitado/familia en vez de los novios -- "la boda DE Familia Juarez"
-  // suena mal, así que el kicker pierde el "de" y el nombre va debajo, como
-  // un dato propio (no como si Familia Juarez fuera quien se casa).
+  // invitado/familia en vez de los novios/quinceañera -- "la boda DE
+  // Familia Juarez" suena mal, así que el kicker pierde el "de" y el
+  // nombre va debajo, como un dato propio (no como si Familia Juarez
+  // fuera quien se casa/cumple años).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "ACCESO EXCLUSIVO A LA BODA" : "ACCESO EXCLUSIVO A LA BODA DE";
+  const coverKickerText = isCasamiento
+    ? (showGuestNameInCover ? "ACCESO EXCLUSIVO A LA BODA" : "ACCESO EXCLUSIVO A LA BODA DE")
+    : (showGuestNameInCover ? "ACCESO EXCLUSIVO PARA" : "ACCESO EXCLUSIVO A MIS QUINCE DE");
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
-    : <>{novia}<br /><span className="bcw-accent-italic" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
+    : isCasamiento
+      ? <>{novia}<br /><span className="bcw-accent-italic" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>
+      : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
   const hora = String(invitation.hora ?? "19:00");
@@ -670,7 +681,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
           <p data-xin="1" data-delay="460" className="bcw-lead">{portadaMensaje}</p>
 
           <div data-drift="-70" className="bcw-medallion bcw-medallion--corner">
-            <Medallion label="VIP" sub="ACCESO" arcId="bcwArc1" arcText="NOS CASAMOS · EDICIÓN ÚNICA · " spin="normal" />
+            <Medallion label="VIP" sub="ACCESO" arcId="bcwArc1" arcText={isCasamiento ? "NOS CASAMOS · EDICIÓN ÚNICA · " : "ADMIT ONE · MIS QUINCE · "} spin="normal" />
           </div>
         </section>
 
@@ -989,7 +1000,9 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
             </div>
             <span className="bcw-mini-label bcw-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="bcw-final-names">
-              {novia}{novia && novio ? <span className="bcw-accent-italic"> &amp; </span> : ""}{novio}
+              {isCasamiento
+                ? <>{novia}{novia && novio ? <span className="bcw-accent-italic"> &amp; </span> : ""}{novio}</>
+                : namesTitle}
             </span>
             <span className="bcw-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="bcw-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
@@ -1026,6 +1039,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            admitLabel={admitLabel}
           >
             <div className="bcw-cover-cta">ABRIR INVITACIÓN</div>
           </CoverHalf>
@@ -1038,6 +1052,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
             passNumber={passNumber}
             dressCode={dressCode}
             hora={hora}
+            admitLabel={admitLabel}
           >
             <button onClick={open} className="bcw-cover-cta bcw-cover-cta--btn">ABRIR INVITACIÓN</button>
           </CoverHalf>
@@ -1661,6 +1676,7 @@ function CoverHalf({
   passNumber,
   dressCode,
   hora,
+  admitLabel,
   children,
 }: {
   namesRef?: React.RefObject<HTMLHeadingElement | null>;
@@ -1672,6 +1688,7 @@ function CoverHalf({
   passNumber: string;
   dressCode: string;
   hora: string;
+  admitLabel: string;
   children: React.ReactNode;
 }) {
   return (
@@ -1682,7 +1699,7 @@ function CoverHalf({
       <div className="bcw-cover-frame bcw-cover-frame--inner" />
       <div className="bcw-cover-content">
         <div className="bcw-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="bcw-accent-serif-2">ADMIT TWO</span>
+          <span>PASE Nº {passNumber}</span><span className="bcw-accent-serif-2">{admitLabel}</span>
         </div>
         <div className="bcw-cover-center">
           <span ref={kickerRef} className="bcw-cover-kicker">{kickerText}</span>
