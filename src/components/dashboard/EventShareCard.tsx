@@ -121,15 +121,17 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0 w-full sm:w-auto">
-            <Link href={`/i/${slug}`} target="_blank" className="w-full sm:w-auto inline-flex items-center justify-center h-9 px-4 gap-2 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700">
+          {/* En mobile van uno al lado del otro: son dos botones cortos y
+              apilados desperdiciaban media pantalla. */}
+          <div className="flex flex-row items-center gap-2 shrink-0 w-full sm:w-auto">
+            <Link href={`/i/${slug}`} target="_blank" className="flex-1 sm:flex-none sm:w-auto inline-flex items-center justify-center h-9 px-4 gap-2 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700">
                 <Eye className="w-3.5 h-3.5" />
                 <span>Ver ejemplo</span>
             </Link>
 
             {invitationId && (
               <>
-                <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="w-full sm:w-auto">
+                <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="flex-1 sm:flex-none sm:w-auto">
                   <Button size="sm" className="w-full h-9 px-5 rounded-full gap-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm border-0">
                     <Pencil className="w-3.5 h-3.5" />
                     Editar invitación

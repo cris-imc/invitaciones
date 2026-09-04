@@ -1108,8 +1108,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   enlace es personal.
                 </p>
                 <p>
-                  <strong>Desactivado:</strong> la invitación abre sin saludo personal, igual
-                  para todos.
+                  <strong>Desactivado:</strong> en lugar del nombre del invitado muestra{" "}
+                  {tipo === "CASAMIENTO"
+                    ? "el nombre de los novios"
+                    : tipo === "QUINCE_ANOS"
+                      ? "el nombre de la quinceañera"
+                      : "el nombre del evento"}
+                  , igual para todos.
                 </p>
                 <p className="text-xs">
                   Vale para todos los invitados a la vez, y podés cambiarlo cuando quieras: la

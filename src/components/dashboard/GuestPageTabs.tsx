@@ -138,7 +138,9 @@ export function GuestPageTabs({
   return (
     <div>
       {/* 📱 Desktop horizontal tab bar (adm-tabs mockup style) 📱 */}
-      <div className="adm-tabs-container">
+      {/* Aire arriba: las pestañas venían pegadas a los botones de la tarjeta
+          del evento y en mobile se leían como un solo bloque. */}
+      <div className="adm-tabs-container mt-5 md:mt-6">
         {canScrollLeft && (
           <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[var(--ink)] to-transparent pointer-events-none z-10 flex items-center justify-start pl-2">
             <span className="text-white/40 font-ui text-lg tracking-[-2px] animate-pulse" style={{ animationDuration: '2.5s' }}>‹‹</span>
