@@ -155,6 +155,7 @@ export function GuestListWithPayment({
   const [clearConfirm, setClearConfirm] = useState<
     { guest: Guest; status: string; marked: number } | null
   >(null);
+  const [showPriceHelp, setShowPriceHelp] = useState(false);
   const isMobile = useIsMobile();
 
   const openNotes = (guest: Guest) => {
@@ -605,7 +606,19 @@ export function GuestListWithPayment({
               {/* Toggle de pago — solo visible si confirmó y si está habilitado */}
               {guest.status === "CONFIRMED" && pagoTarjetaHabilitado && (
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
-                  <span style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#888", fontWeight: 600, paddingRight: "4px" }}>Estado de pago</span>
+                  <span className="flex items-center gap-1 pr-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Estado de pago
+                    {hasPrices && (
+                      <button
+                        type="button"
+                        onClick={() => setShowPriceHelp(true)}
+                        aria-label="Cómo funciona el precio de cada cupo"
+                        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-muted-foreground/50 text-[9px] font-bold leading-none transition-colors hover:bg-muted/60"
+                      >
+                        ?
+                      </button>
+                    )}
+                  </span>
                   {/* El botón de anotaciones va en la misma línea que los
                       estados: es una acción de la fila, no del detalle de cupos. */}
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", justifyContent: "flex-end" }}>
@@ -682,7 +695,7 @@ export function GuestListWithPayment({
                       {paidSeatsCount} de {totalSeatsCount} pago{totalSeatsCount !== 1 ? "s" : ""}
                       {guest.pendingAmount > 0 ? (
                         <>
-                          {" · falta cobrar "}
+                          {" · falta marcar "}
                           <b className="text-foreground">{formatARS(guest.pendingAmount)}</b>
                         </>
                       ) : guest.surplus > 0 ? (
@@ -738,7 +751,7 @@ export function GuestListWithPayment({
                 <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
                   <span>Cupos marcados: <b className="text-foreground">{formatARS(guest.paidAmount)}</b></span>
                   {guest.pendingAmount > 0 && (
-                    <span>Falta cobrar: <b className="text-foreground">{formatARS(guest.pendingAmount)}</b></span>
+                    <span>Falta marcar: <b className="text-foreground">{formatARS(guest.pendingAmount)}</b></span>
                   )}
                   <span>Total: {formatARS(guest.totalAmount)}</span>
                   {guest.surplus > 0 && (
@@ -822,6 +835,41 @@ export function GuestListWithPayment({
           )}
         </div>
       )}
+
+      {/* Explica por qué el total de una tarjeta puede no ser "personas × precio
+          de hoy". Es la duda que aparece apenas el anfitrión cambia un precio. */}
+      <Dialog open={showPriceHelp} onOpenChange={setShowPriceHelp}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cómo se calcula lo que falta</DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-3 text-sm">
+                <p>
+                  Cada lugar que marcás como pago queda registrado con el precio que la
+                  tarjeta tenía <strong>en ese momento</strong>. Si más adelante subís el
+                  valor, esos lugares no se tocan: ya están saldados.
+                </p>
+                <p>
+                  El aumento alcanza <strong>solo a los lugares que siguen pendientes</strong>.
+                </p>
+                <p className="rounded-lg border bg-muted/40 p-3 text-xs">
+                  Una familia de 3 paga 2 tarjetas cuando valían $10.000. Después subís la
+                  tarjeta a $15.000. Esos 2 lugares siguen valiendo $10.000 y el que falta
+                  pasa a $15.000: el total de esa familia queda en <strong>$35.000</strong>,
+                  no en $45.000.
+                </p>
+                <p className="text-xs">
+                  Por eso lo que ves como pendiente puede cambiar con el tiempo, mientras que
+                  lo ya marcado no.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowPriceHelp(false)}>Entendido</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Aviso antes de desmarcar cupos ya cargados: no hay deshacer. */}
       <Dialog open={!!clearConfirm} onOpenChange={(open) => !open && setClearConfirm(null)}>
