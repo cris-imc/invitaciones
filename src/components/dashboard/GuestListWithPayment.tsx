@@ -313,6 +313,13 @@ export function GuestListWithPayment({
   const estimatedTotal = billable.reduce((sum, g) => sum + (g.expectedAmount || 0), 0);
   const collectedTotal = billable.reduce((sum, g) => sum + (g.paidAmount || 0), 0);
   const outstandingTotal = billable.reduce((sum, g) => sum + (g.balance || 0), 0);
+  // Plata cobrada de más: pasa cuando una familia paga y después baja la
+  // cantidad de personas. Sin esto, "Recaudado" queda por encima de "Total
+  // tarjetas" y el recuadro no cierra.
+  const surplusTotal = billable.reduce(
+    (sum, g) => sum + Math.max(0, (g.paidAmount || 0) - (g.expectedAmount || 0)),
+    0
+  );
   const showTotals = estimatedTotal > 0 || collectedTotal > 0;
 
   const handleExportExcel = () => {
@@ -429,6 +436,14 @@ export function GuestListWithPayment({
               <span>⏳ Falta cobrar: <b>{formatARS(outstandingTotal)}</b></span>
               <span style={{ opacity: .5 }}>·</span>
               <span style={{ opacity: .8 }}>Total tarjetas: <b>{formatARS(estimatedTotal)}</b></span>
+              {surplusTotal > 0 && (
+                <>
+                  <span style={{ opacity: .5 }}>·</span>
+                  <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
+                    ↩ {formatARS(surplusTotal)} a favor
+                  </span>
+                </>
+              )}
               {partialCount > 0 && (
                 <>
                   <span style={{ opacity: .5 }}>·</span>
@@ -659,7 +674,22 @@ export function GuestListWithPayment({
                           <span style={{ opacity: .7 }}> de {formatARS(guest.expectedAmount)}</span>
                         </>
                       ) : guest.paymentStatus === "PAID" ? (
-                        <>Pagó {formatARS(guest.paidAmount)}</>
+                        // Si la familia baja la cantidad de personas despues de
+                        // pagar, lo entregado queda por encima de lo que ahora
+                        // vale la tarjeta. Se muestra el excedente en vez de un
+                        // monto suelto que no cierra con el total.
+                        guest.paidAmount > guest.expectedAmount ? (
+                          <>
+                            Pagó {formatARS(guest.paidAmount)}
+                            <span style={{ opacity: .7 }}> de {formatARS(guest.expectedAmount)}</span>
+                            {" · "}
+                            <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
+                              {formatARS(guest.paidAmount - guest.expectedAmount)} a favor
+                            </b>
+                          </>
+                        ) : (
+                          <>Pagó {formatARS(guest.paidAmount)}</>
+                        )
                       ) : (
                         <>Tarjeta: {formatARS(guest.expectedAmount)}</>
                       )}
