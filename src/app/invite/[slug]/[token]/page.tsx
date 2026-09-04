@@ -496,9 +496,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 // Cupos pagos: el estado que ve el invitado se recalcula con
                 // ellos (ver más abajo), para que no le quede viejo si suma o
                 // resta gente después de que el anfitrión marcó algo.
-                paidAdults: true,
-                paidTeens: true,
-                paidChildren: true,
+                paidSeatPrices: true,
                 isExempt: true,
                 expectedAdults: true,
                 expectedTeens: true,

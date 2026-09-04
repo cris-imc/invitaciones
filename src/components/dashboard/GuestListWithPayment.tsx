@@ -46,11 +46,9 @@ interface Guest {
   receivedAmount: number;
   onAccount: number;
   missingAmount: number;
-  // Cobrado por franja: sirve para decir cuánto se descuenta al desmarcar un
-  // lugar concreto, en vez de avisar en abstracto.
-  paidAmountAdults?: number;
-  paidAmountTeens?: number;
-  paidAmountChildren?: number;
+  // Precio de cada lugar pago, por franja: para decir el monto exacto que se
+  // descuenta al desmarcar uno, sin promediar.
+  paidSeatPrices?: Record<Bracket, number[]>;
   /** Anotaciones privadas del anfitrión. El invitado nunca las ve. */
   hostNotes?: string | null;
   isExempt?: boolean;
@@ -245,9 +243,7 @@ export function GuestListWithPayment({
                 onAccount: data.onAccount ?? g.onAccount,
                 missingAmount: data.missingAmount ?? g.missingAmount,
                 hostNotes: data.hostNotes !== undefined ? data.hostNotes : g.hostNotes,
-                paidAmountAdults: data.paidAmountAdults ?? g.paidAmountAdults,
-                paidAmountTeens: data.paidAmountTeens ?? g.paidAmountTeens,
-                paidAmountChildren: data.paidAmountChildren ?? g.paidAmountChildren,
+                paidSeatPrices: data.paidSeatPrices ?? g.paidSeatPrices,
               }
             : g
         )
@@ -285,16 +281,15 @@ export function GuestListWithPayment({
     return patchPayment(guest.id, { seats: { ...guest.paidSeats, [bracket]: next } });
   };
 
-  /** Cuánto se descontaría al desmarcar un lugar de esta franja. */
+  /**
+   * Cuánto se descuenta al desmarcar un lugar: el precio exacto del último que
+   * se marcó en esa franja, que es el que se está deshaciendo. Nada de
+   * promedios -- si un niño entró a $3.000 y otro a $9.000, devuelve el que
+   * corresponde y no $6.000.
+   */
   const seatRefund = (guest: Guest, bracket: Bracket) => {
-    const paid = guest.paidSeats?.[bracket] ?? 0;
-    if (paid <= 0) return 0;
-    const amount = {
-      adults: guest.paidAmountAdults,
-      teens: guest.paidAmountTeens,
-      children: guest.paidAmountChildren,
-    }[bracket];
-    return (Number(amount ?? 0) || 0) / paid;
+    const list = guest.paidSeatPrices?.[bracket] ?? [];
+    return list.length > 0 ? list[list.length - 1] : 0;
   };
 
   /**

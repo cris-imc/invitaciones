@@ -134,9 +134,7 @@ export async function PATCH(
       // Cobrado por franja: el panel lo necesita para decir cuánto se descuenta
       // al desmarcar un lugar. Sin devolverlo, esa cifra quedaba con el valor
       // del primer fetch hasta recargar la página.
-      paidAmountAdults: paid.paidAmountAdults,
-      paidAmountTeens: paid.paidAmountTeens,
-      paidAmountChildren: paid.paidAmountChildren,
+      paidSeatPrices: resolved.paidSeatPrices,
     });
   } catch (error) {
     console.error("[payment PATCH]", error);

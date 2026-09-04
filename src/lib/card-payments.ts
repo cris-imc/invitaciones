@@ -2,19 +2,21 @@
  * Pago de la tarjeta por CUPO.
  *
  * Una tarjeta agrupa a varias personas (2 adultos, 1 adolescente, 1 niño). El
- * anfitrión va marcando cuántos lugares de cada franja quedaron saldados, y de
- * ahí sale todo: el estado, lo recaudado y lo que falta.
+ * anfitrión va marcando qué lugares quedaron saldados, y de ahí sale todo: el
+ * estado, lo recaudado y lo que falta.
  *
  * Dos reglas, que son las que definen el modelo:
  *
- *   1. Lo que se pagó queda pagado. La plata cobrada por un cupo se guarda al
- *      precio que regía en ese momento (`paidAmount*`) y no se recalcula nunca.
- *      Un aumento posterior no le llega.
+ *   1. Lo que se pagó queda pagado. Cada lugar guarda el precio que regía cuando
+ *      se marcó, y ese número no se recalcula nunca. Un aumento posterior no le
+ *      llega.
  *   2. Lo pendiente sigue el precio vigente. Los lugares que todavía no se
  *      pagaron se valúan con el precio de hoy, así que un aumento los alcanza.
  *
- * Por eso no hay precios congelados, ni fotos, ni escalados: la plata cobrada ES
- * el registro, y lo pendiente se calcula fresco cada vez.
+ * El precio se guarda lugar por lugar (`Guest.paidSeatPrices`) y no como un
+ * total por franja. Con un total había que promediar: si un cupo se pagó a
+ * $3.000 y otro a $9.000, desmarcar uno devolvía $6.000, que no es lo que se
+ * cobró por ninguno de los dos.
  */
 
 export type CardPaymentStatus = "PENDING" | "PARTIAL" | "PAID" | "EXEMPT";
@@ -50,22 +52,38 @@ export interface InvitationPrices {
   precioNino?: number | null;
 }
 
-/** Cupos confirmados y cuántos están pagos, tal como se guardan en Guest. */
+/** Lo que necesita el cálculo de un invitado guardado. */
 export interface StoredCardPayment {
   attendingCount?: number | null;
   attendingAdults?: number | null;
   attendingTeens?: number | null;
   attendingChildren?: number | null;
-  paidAdults?: number | null;
-  paidTeens?: number | null;
-  paidChildren?: number | null;
-  paidAmountAdults?: number | null;
-  paidAmountTeens?: number | null;
-  paidAmountChildren?: number | null;
+  /** JSON con el precio de cada lugar pago, por franja. Ver Guest.paidSeatPrices. */
+  paidSeatPrices?: string | null;
   isExempt?: boolean | null;
   paymentStatus?: string | null;
   /** Registro del anfitrión: plata realmente recibida. Ver `onAccount`. */
   receivedAmount?: number | null;
+}
+
+/** Precio de cada lugar pago, por franja. */
+export type SeatPrices = Record<Bracket, number[]>;
+
+export function parseSeatPrices(raw?: string | null): SeatPrices {
+  const empty: SeatPrices = { adults: [], teens: [], children: [] };
+  if (!raw) return empty;
+  try {
+    const p = JSON.parse(raw) as Partial<Record<Bracket, unknown>>;
+    const clean = (v: unknown) =>
+      Array.isArray(v) ? v.map((n) => Math.max(0, Number(n) || 0)) : [];
+    return { adults: clean(p.adults), teens: clean(p.teens), children: clean(p.children) };
+  } catch {
+    return empty;
+  }
+}
+
+export function serializeSeatPrices(prices: SeatPrices): string {
+  return JSON.stringify(prices);
 }
 
 /**
@@ -97,22 +115,41 @@ export function resolveSeats(guest: StoredCardPayment): Record<Bracket, number> 
 }
 
 /**
- * Cupos pagos, nunca por encima de los confirmados: si el invitado baja la
- * cantidad de personas después de pagar, sobran lugares saldados y el excedente
- * pasa a ser plata a favor.
+ * Precios de los lugares pagos, recortados a los cupos confirmados: si el
+ * invitado baja la cantidad de personas después de pagar, sobran lugares
+ * saldados y ese excedente pasa a ser plata a favor. Se conservan los primeros,
+ * que son los que se pagaron antes.
  */
-export function resolvePaidSeats(guest: StoredCardPayment): Record<Bracket, number> {
+export function resolvePaidSeatPrices(guest: StoredCardPayment): SeatPrices {
   const seats = resolveSeats(guest);
+  const stored = parseSeatPrices(guest.paidSeatPrices);
   return {
-    adults: Math.min(seats.adults, Math.max(0, guest.paidAdults ?? 0)),
-    teens: Math.min(seats.teens, Math.max(0, guest.paidTeens ?? 0)),
-    children: Math.min(seats.children, Math.max(0, guest.paidChildren ?? 0)),
+    adults: stored.adults.slice(0, seats.adults),
+    teens: stored.teens.slice(0, seats.teens),
+    children: stored.children.slice(0, seats.children),
   };
+}
+
+/** Cuántos lugares están pagos por franja. */
+export function resolvePaidSeats(guest: StoredCardPayment): Record<Bracket, number> {
+  const p = resolvePaidSeatPrices(guest);
+  return { adults: p.adults.length, teens: p.teens.length, children: p.children.length };
+}
+
+/**
+ * Precio exacto que se devuelve al desmarcar un lugar de esta franja: el del
+ * ÚLTIMO que se marcó, que es el que se está deshaciendo. Nada de promedios --
+ * cada lugar conserva lo que se cobró por él.
+ */
+export function refundForSeat(guest: StoredCardPayment, bracket: Bracket): number {
+  const list = resolvePaidSeatPrices(guest)[bracket];
+  return list.length > 0 ? list[list.length - 1] : 0;
 }
 
 export interface ResolvedCardPayment {
   seats: Record<Bracket, number>;
   paidSeats: Record<Bracket, number>;
+  paidSeatPrices: SeatPrices;
   totalSeats: number;
   totalPaidSeats: number;
   /** Plata efectivamente cobrada (histórica, al precio de cada momento). */
@@ -125,12 +162,7 @@ export interface ResolvedCardPayment {
   surplus: number;
   /** Lo que el anfitrión anotó como recibido (0 si no anotó nada). */
   receivedAmount: number;
-  /**
-   * Plata recibida por encima de los cupos ya marcados: queda a cuenta de pagos
-   * futuros. Es solo informativo para el anfitrión -- no mueve el estado, porque
-   * los cupos los marca él y esta diferencia puede ser una seña, un redondeo o
-   * simplemente que todavía no marcó el cupo que corresponde.
-   */
+  /** Recibido por encima de los cupos marcados: queda a cuenta. */
   onAccount: number;
   /** Recibido por debajo de lo marcado: probablemente marcó de más. */
   missingAmount: number;
@@ -140,43 +172,37 @@ export interface ResolvedCardPayment {
 /** Tolerancia en pesos, para que un redondeo no genere un saldo de $0,003. */
 const EPSILON = 1;
 
+const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
 export function resolveCardPayment(
   guest: StoredCardPayment,
   invitation: InvitationPrices
 ): ResolvedCardPayment {
   const prices = resolvePrices(invitation);
   const seats = resolveSeats(guest);
-  const paidSeats = resolvePaidSeats(guest);
+  const stored = parseSeatPrices(guest.paidSeatPrices);
+  const paidSeatPrices = resolvePaidSeatPrices(guest);
+  const paidSeats = {
+    adults: paidSeatPrices.adults.length,
+    teens: paidSeatPrices.teens.length,
+    children: paidSeatPrices.children.length,
+  };
 
   const totalSeats = seats.adults + seats.teens + seats.children;
   const totalPaidSeats = paidSeats.adults + paidSeats.teens + paidSeats.children;
 
-  // Lo cobrado por cada franja. Si sobran cupos pagos (bajaron la cantidad de
-  // personas), se descuenta la parte proporcional y esa plata queda a favor.
-  let paidAmount = 0;
-  let surplus = 0;
-  for (const b of BRACKETS) {
-    const stored = Math.max(0, Number(guest[amountKey(b)] ?? 0) || 0);
-    const declared = Math.max(0, guest[countKey(b)] ?? 0);
-    if (declared > 0 && paidSeats[b] < declared) {
-      const kept = stored * (paidSeats[b] / declared);
-      paidAmount += kept;
-      surplus += stored - kept;
-    } else {
-      paidAmount += stored;
-    }
-  }
+  const paidAmount = BRACKETS.reduce((t, b) => t + sum(paidSeatPrices[b]), 0);
+  // Lo cobrado por lugares que ya no existen (bajaron los asistentes).
+  const surplus = BRACKETS.reduce((t, b) => t + sum(stored[b].slice(paidSeats[b])), 0);
 
   const pendingAmount = BRACKETS.reduce(
-    (sum, b) => sum + (seats[b] - paidSeats[b]) * prices[b],
+    (t, b) => t + (seats[b] - paidSeats[b]) * prices[b],
     0
   );
 
-  // Solo la marca isExempt decide. Mirar tambien paymentStatus dejaba el estado
+  // Solo la marca isExempt decide. Mirar también paymentStatus dejaba el estado
   // pegado: al escribir se resuelve con el guest ya guardado, cuyo paymentStatus
-  // todavia dice "EXEMPT", asi que sacar la exencion volvia a dar EXEMPT y no
-  // habia forma de salir. isExempt y el estado siempre se escriben juntos, asi
-  // que la marca alcanza.
+  // todavía dice "EXEMPT", así que sacar la exención volvía a dar EXEMPT.
   const isExempt = Boolean(guest.isExempt);
   const status: CardPaymentStatus = isExempt
     ? "EXEMPT"
@@ -186,13 +212,13 @@ export function resolveCardPayment(
         ? "PARTIAL"
         : "PENDING";
 
-  // Lo anotado por el anfitrión, contra lo que representan los cupos marcados.
   const receivedAmount = Math.max(0, Number(guest.receivedAmount ?? 0) || 0);
   const diff = receivedAmount > 0 ? receivedAmount - paidAmount : 0;
 
   return {
     seats,
     paidSeats,
+    paidSeatPrices,
     totalSeats,
     totalPaidSeats,
     paidAmount,
@@ -207,47 +233,29 @@ export function resolveCardPayment(
 }
 
 /**
- * Cómo quedan los cupos y los montos al marcar/desmarcar lugares.
+ * Cómo quedan los lugares pagos al marcar o desmarcar.
  *
- * Los cupos que se suman se cobran al precio VIGENTE. Los que se sacan devuelven
- * lo que habían aportado (la parte proporcional de lo cobrado en esa franja), y
- * no el precio de hoy: si no, desmarcar despues de un aumento devolveria de mas.
+ * Los que se suman entran al precio VIGENTE. Los que se sacan salen por el
+ * final -- el último que se marcó es el que se está deshaciendo -- y se llevan
+ * exactamente lo que se había cobrado por ellos.
  */
 export function applyPaidSeats(
   guest: StoredCardPayment,
   invitation: InvitationPrices,
   next: Partial<Record<Bracket, number>>
-): { paidAdults: number; paidTeens: number; paidChildren: number; paidAmountAdults: number; paidAmountTeens: number; paidAmountChildren: number } {
+): { paidSeatPrices: string } {
   const prices = resolvePrices(invitation);
   const seats = resolveSeats(guest);
-  const current = resolvePaidSeats(guest);
+  const current = resolvePaidSeatPrices(guest);
 
-  const out = {
-    paidAdults: 0, paidTeens: 0, paidChildren: 0,
-    paidAmountAdults: 0, paidAmountTeens: 0, paidAmountChildren: 0,
-  };
-
+  const out: SeatPrices = { adults: [], teens: [], children: [] };
   for (const b of BRACKETS) {
-    const target = clamp(next[b] ?? current[b], 0, seats[b]);
-    const stored = Math.max(0, Number(guest[amountKey(b)] ?? 0) || 0);
-    const declared = Math.max(0, guest[countKey(b)] ?? 0);
-
-    let amount: number;
-    if (target >= declared) {
-      // Se suman cupos: los nuevos entran al precio de hoy.
-      amount = stored + (target - declared) * prices[b];
-    } else if (declared > 0) {
-      // Se sacan cupos: se devuelve lo que aportaron, no el precio de hoy.
-      amount = stored * (target / declared);
-    } else {
-      amount = target * prices[b];
-    }
-
-    out[countKey(b)] = target;
-    out[amountKey(b)] = round2(amount);
+    const target = clamp(next[b] ?? current[b].length, 0, seats[b]);
+    const list = current[b].slice(0, target);
+    while (list.length < target) list.push(prices[b]);
+    out[b] = list;
   }
-
-  return out;
+  return { paidSeatPrices: serializeSeatPrices(out) };
 }
 
 export function computeBalance(pendingAmount: number): number {
@@ -262,18 +270,6 @@ export function formatARS(n: number): string {
   }).format(n);
 }
 
-function countKey(b: Bracket) {
-  return ({ adults: "paidAdults", teens: "paidTeens", children: "paidChildren" } as const)[b];
-}
-
-function amountKey(b: Bracket) {
-  return ({ adults: "paidAmountAdults", teens: "paidAmountTeens", children: "paidAmountChildren" } as const)[b];
-}
-
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, Math.round(Number(n) || 0)));
-}
-
-function round2(n: number) {
-  return Math.round(n * 100) / 100;
 }

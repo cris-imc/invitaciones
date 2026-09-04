@@ -314,12 +314,14 @@ model Guest {
   // cupo y no se recalculan nunca ("lo que se pago queda pagado"). Los cupos que
   // siguen pendientes se valuan al precio vigente, asi que un aumento posterior
   // solo los alcanza a ellos. Ver src/lib/card-payments.ts.
-  paidAdults             Int              @default(0)
-  paidTeens              Int              @default(0)
-  paidChildren           Int              @default(0)
-  paidAmountAdults       Float            @default(0)
-  paidAmountTeens        Float            @default(0)
-  paidAmountChildren     Float            @default(0)
+  // El precio con el que quedo pago CADA lugar, por franja. JSON:
+  // {"adults":[10000,15000],"teens":[],"children":[3000]}
+  //
+  // Se guarda lugar por lugar y no un total por franja porque el total obliga a
+  // promediar: si un cupo se pago a $3.000 y otro a $9.000, desmarcar uno tenia
+  // que devolver $6.000, que no es lo que se cobro por ninguno de los dos. Con
+  // la lista, cada lugar conserva su precio exacto.
+  paidSeatPrices         String?
   // Plata que el anfitrion dice haber recibido, para su propio control. Es
   // independiente de los cupos marcados: si una familia de 4 paga dos tarjetas
   // pero entrega de mas, aca queda el monto real y la diferencia se muestra como
