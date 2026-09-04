@@ -1,7 +1,10 @@
 # Plan — Pagos parciales de tarjeta
 
-**Rama:** `pagos-parciales` (creada desde `experimento-foto-storytelling`)
-**Estado:** implementación completa y commiteada (`05afd21`), **sin probar end-to-end**
+**Rama:** `pagos-parciales` — pusheada, y `templates-storytelling` fast-forwardeada al mismo
+commit. **`main` NO tiene nada de esto todavía**, a propósito: se mergea cuando los pagos
+estén probados (mergear ahora arrastraría también los 40 commits de la Colección Storytelling
+que main no tiene — 47 commits y 438 archivos en total).
+**Estado:** implementación completa, **sin probar end-to-end**
 **Última revisión:** 2026-09-04
 
 > ⚠️ **Si el panel no trae los invitados, reiniciá `next dev`.** El dev server cachea
