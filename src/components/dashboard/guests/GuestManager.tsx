@@ -177,6 +177,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [hintMounted, setHintMounted] = useState(false);
   const [mostrarNombreInvitadoEnSaludo, setMostrarNombreInvitadoEnSaludo] = useState(initialMostrarNombreInvitadoEnSaludo);
   const [isSavingSaludo, setIsSavingSaludo] = useState(false);
+  const [showSaludoHelp, setShowSaludoHelp] = useState(false);
 
   // Si el plan Gratis (20 personas) bloquea el alta de un invitado, en vez
   // de un error sin salida ofrecemos pasar a Premium/Diamond ahí mismo --
@@ -661,9 +662,19 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
               Genera un enlace único para cada invitado/a.
             </CardDescription>
             <div className="flex items-center justify-between gap-3 pt-3 mt-1 border-t min-w-0">
-              <Label htmlFor="mostrarNombreInvitado" className="text-sm font-normal text-muted-foreground cursor-pointer min-w-0 flex-1">
-                Saludar por nombre del invitado/familia
-              </Label>
+              <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                <Label htmlFor="mostrarNombreInvitado" className="text-sm font-normal text-muted-foreground cursor-pointer min-w-0">
+                  Saludar por nombre del invitado/familia
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => setShowSaludoHelp(true)}
+                  aria-label="Qué hace este interruptor"
+                  className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-muted-foreground/50 text-[9px] font-bold leading-none text-muted-foreground transition-colors hover:bg-muted/60"
+                >
+                  ?
+                </button>
+              </div>
               <Switch
                 id="mostrarNombreInvitado"
                 checked={mostrarNombreInvitadoEnSaludo}
@@ -1081,6 +1092,37 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           </CardContent>
         </Card>
       </div>
+
+      {/* Qué hace el interruptor del saludo. Sin esto no se entiende qué cambia
+          al tocarlo, porque el efecto está del otro lado, en la invitación. */}
+      <Dialog open={showSaludoHelp} onOpenChange={setShowSaludoHelp}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Saludar por nombre</DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-3 text-sm">
+                <p>Cambia cómo arranca la invitación que abre cada invitado.</p>
+                <p>
+                  <strong>Activado:</strong> lo saluda por su nombre —{" "}
+                  <em>&ldquo;Hola, Familia Juárez&rdquo;</em>. Cada uno ve el suyo, porque el
+                  enlace es personal.
+                </p>
+                <p>
+                  <strong>Desactivado:</strong> la invitación abre sin saludo personal, igual
+                  para todos.
+                </p>
+                <p className="text-xs">
+                  Vale para todos los invitados a la vez, y podés cambiarlo cuando quieras: la
+                  próxima vez que alguien abra su enlace ya lo ve aplicado.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowSaludoHelp(false)}>Entendido</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={!!guestToDelete && !guestToEdit}
