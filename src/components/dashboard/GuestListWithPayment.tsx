@@ -46,6 +46,11 @@ interface Guest {
   receivedAmount: number;
   onAccount: number;
   missingAmount: number;
+  // Cobrado por franja: sirve para decir cuánto se descuenta al desmarcar un
+  // lugar concreto, en vez de avisar en abstracto.
+  paidAmountAdults?: number;
+  paidAmountTeens?: number;
+  paidAmountChildren?: number;
   /** Anotaciones privadas del anfitrión. El invitado nunca las ve. */
   hostNotes?: string | null;
   isExempt?: boolean;
@@ -156,6 +161,10 @@ export function GuestListWithPayment({
     { guest: Guest; status: string; marked: number } | null
   >(null);
   const [showPriceHelp, setShowPriceHelp] = useState(false);
+  // Aviso antes de desmarcar un lugar concreto del desplegable.
+  const [seatConfirm, setSeatConfirm] = useState<
+    { guest: Guest; bracket: Bracket; refund: number } | null
+  >(null);
   const isMobile = useIsMobile();
 
   const openNotes = (guest: Guest) => {
@@ -271,6 +280,27 @@ export function GuestListWithPayment({
       Math.max(0, (guest.paidSeats?.[bracket] ?? 0) + delta)
     );
     return patchPayment(guest.id, { seats: { ...guest.paidSeats, [bracket]: next } });
+  };
+
+  /** Cuánto se descontaría al desmarcar un lugar de esta franja. */
+  const seatRefund = (guest: Guest, bracket: Bracket) => {
+    const paid = guest.paidSeats?.[bracket] ?? 0;
+    if (paid <= 0) return 0;
+    const amount = {
+      adults: guest.paidAmountAdults,
+      teens: guest.paidAmountTeens,
+      children: guest.paidAmountChildren,
+    }[bracket];
+    return (Number(amount ?? 0) || 0) / paid;
+  };
+
+  /**
+   * Desmarcar borra el precio congelado de ese lugar: si despues se vuelve a
+   * marcar, se cobra al precio vigente. Con un aumento de por medio eso cambia
+   * plata, asi que se avisa antes.
+   */
+  const requestSeatRemoval = (guest: Guest, bracket: Bracket) => {
+    setSeatConfirm({ guest, bracket, refund: seatRefund(guest, bracket) });
   };
 
   const filtered = guests.filter((g) => {
@@ -726,7 +756,7 @@ export function GuestListWithPayment({
                       <span style={{ fontSize: "12.5px", color: "#555", textTransform: "capitalize" }}>{label}</span>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                         <button
-                          onClick={() => changeSeat(guest, b, -1)}
+                          onClick={() => requestSeatRemoval(guest, b)}
                           disabled={updatingId === guest.id || paid <= 0}
                           aria-label={`Quitar un ${BRACKET_LABELS[b].one} pago`}
                           style={stepperBtn(paid <= 0 || updatingId === guest.id)}
@@ -868,6 +898,48 @@ export function GuestListWithPayment({
           </DialogHeader>
           <DialogFooter>
             <Button onClick={() => setShowPriceHelp(false)}>Entendido</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Aviso antes de desmarcar UN lugar del desplegable. Lo que se pierde no
+          es solo el monto: es el precio con el que ese lugar quedó congelado. */}
+      <Dialog open={!!seatConfirm} onOpenChange={(open) => !open && setSeatConfirm(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              ¿Desmarcar un {seatConfirm ? BRACKET_LABELS[seatConfirm.bracket].one : ""}?
+            </DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-3 text-sm">
+                <p>
+                  Ese lugar de <strong>{seatConfirm?.guest.name}</strong> deja de estar pago
+                  {seatConfirm && seatConfirm.refund > 0 ? (
+                    <> y se descuentan <strong>{formatARS(seatConfirm.refund)}</strong> de lo cobrado</>
+                  ) : null}
+                  .
+                </p>
+                <p>
+                  Si más adelante lo volvés a marcar, se cobra{" "}
+                  <strong>al precio que tenga la tarjeta en ese momento</strong>, no al que
+                  tiene ahora. Si el precio subió en el medio, va a costar más.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setSeatConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (seatConfirm) changeSeat(seatConfirm.guest, seatConfirm.bracket, -1);
+                setSeatConfirm(null);
+              }}
+            >
+              Sí, desmarcar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
