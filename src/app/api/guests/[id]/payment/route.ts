@@ -149,14 +149,16 @@ export async function PATCH(
       isExempt: nextExempt,
     });
 
-    // Al quedar paga se congelan los precios de hoy: desde acá un aumento no le
-    // llega a este invitado. Si el monto vuelve a cero (no pago / exento) el
-    // congelamiento se descarta, porque ya no hay pago que proteger. Un pago
-    // parcial conserva el congelamiento que hubiera: puede venir de haber estado
-    // pago y haber sumado gente después.
+    // Marcar la tarjeta como paga la congela ENTERA, por lo que efectivamente se
+    // pagó. Se reescribe siempre, aunque ya hubiera una foto: si no, saldar el
+    // cupo que se sumó después dejaba la foto vieja (los 2 cupos originales) y el
+    // siguiente aumento volvía a mandar la tarjeta a parcial.
+    // Si el monto vuelve a cero (no pago / exento) la foto se descarta. Un pago
+    // parcial conserva la que hubiera: puede venir de haber estado pago y haber
+    // sumado gente después.
     const nextPaidPrices =
       nextStatus === "PAID"
-        ? serializePaidPrices(guest.invitation, guest)
+        ? serializePaidPrices(guest.invitation, guest, nextPaid)
         : nextPaid <= 0
           ? null
           : guest.paidPrices;

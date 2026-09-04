@@ -225,11 +225,31 @@ export function normalizeCounts(guest: GuestCounts) {
   return { adults, teens, children };
 }
 
-export function serializePaidPrices(invitation: InvitationPrices, guest: GuestCounts): string {
-  const prices = resolveCardPrices(invitation);
+/**
+ * Foto a guardar cuando la tarjeta queda paga: congela TODOS los cupos actuales.
+ *
+ * `settledTotal` es lo que efectivamente se pago. Puede no coincidir con el
+ * precio vigente: si dos cupos se habian pagado a $10.000 y el tercero se paga
+ * con la tarjeta ya a $15.000, la tarjeta se salda en $35.000 y no en $45.000.
+ * Los precios se escalan para que el total congelado sea exactamente ese, y asi
+ * un aumento posterior no la reabre. Se escala manteniendo la proporcion entre
+ * franjas, para no aplanar adulto/adolescente/nino a un promedio.
+ */
+export function serializePaidPrices(
+  invitation: InvitationPrices,
+  guest: GuestCounts,
+  settledTotal?: number
+): string {
+  const live = resolveCardPrices(invitation);
   const counts = normalizeCounts(guest);
+  const liveTotal = computeExpectedAmount(guest, invitation);
+  const factor =
+    settledTotal != null && settledTotal > 0 && liveTotal > 0 ? settledTotal / liveTotal : 1;
+
   return JSON.stringify({
-    ...prices,
+    adult: live.adult * factor,
+    teen: live.teen * factor,
+    child: live.child * factor,
     adults: counts.adults,
     teens: counts.teens,
     children: counts.children,
