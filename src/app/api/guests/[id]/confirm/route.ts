@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { derivePaymentStatus, resolveExpectedAmount, resolveGuestPayment } from "@/lib/payments";
+import {
+  derivePaymentStatus,
+  resolveExpectedAmount,
+  resolveGuestPayment,
+  serializePaidPrices,
+} from "@/lib/payments";
 
 // POST /api/guests/[id]/confirm
 export async function POST(
@@ -54,6 +59,7 @@ export async function POST(
 
     let paymentStatus = guest.paymentStatus;
     let expectedAmount = guest.expectedAmount;
+    let paidPrices = guest.paidPrices;
 
     if (status === "CONFIRMED") {
       // Con las cantidades nuevas: si sumó gente el total sube y vuelve a haber
@@ -65,6 +71,16 @@ export async function POST(
       });
       paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount: resolvedExpected, isExempt });
       expectedAmount = paymentStatus === "PAID" ? resolvedExpected : null;
+      // Queda pago y no tenía congelamiento: se congela con estas cantidades. Si
+      // ya tenía, no se toca -- reescribirlo achicaría los cupos ya pagos.
+      if (paymentStatus === "PAID" && !paidPrices) {
+        paidPrices = serializePaidPrices(guest.invitation, {
+          attendingCount,
+          attendingAdults,
+          attendingTeens,
+          attendingChildren,
+        });
+      }
     }
 
     const updatedGuest = await prisma.guest.update({
@@ -74,6 +90,7 @@ export async function POST(
         paymentStatus,
         paidAmount,
         expectedAmount,
+        paidPrices,
         attendingCount,
         attendingAdults,
         attendingTeens,

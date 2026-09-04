@@ -193,24 +193,59 @@ export function resolveGuestPayment(
   };
 }
 
-/** Precios congelados al quedar paga la tarjeta (columna Guest.paidPrices). */
-export interface FrozenPrices {
+/**
+ * Foto del momento en que la tarjeta quedo paga (columna Guest.paidPrices):
+ * los precios de ese dia y CUANTOS cupos quedaron cubiertos con ellos.
+ *
+ * Los cupos importan tanto como los precios: si despues se suma un asistente,
+ * ese lugar nuevo no estaba pago, asi que se cobra al precio vigente. El
+ * congelamiento cubre lo que se pago, no la invitacion entera para siempre.
+ */
+export interface FrozenSnapshot {
   adult: number;
   teen: number;
   child: number;
+  /** Cupos pagos por franja. Ausentes en registros previos a este cambio. */
+  adults?: number;
+  teens?: number;
+  children?: number;
 }
 
-export function serializePaidPrices(invitation: InvitationPrices): string {
-  return JSON.stringify(resolveCardPrices(invitation));
+/** Cantidades por franja, con el mismo fallback que computeExpectedAmount(). */
+export function normalizeCounts(guest: GuestCounts) {
+  const adults = guest.attendingAdults ?? 0;
+  const teens = guest.attendingTeens ?? 0;
+  const children = guest.attendingChildren ?? 0;
+  if (adults + teens + children === 0) {
+    return { adults: guest.attendingCount ?? 0, teens: 0, children: 0 };
+  }
+  return { adults, teens, children };
 }
 
-export function parsePaidPrices(raw?: string | null): FrozenPrices | null {
+export function serializePaidPrices(invitation: InvitationPrices, guest: GuestCounts): string {
+  const prices = resolveCardPrices(invitation);
+  const counts = normalizeCounts(guest);
+  return JSON.stringify({
+    ...prices,
+    adults: counts.adults,
+    teens: counts.teens,
+    children: counts.children,
+  });
+}
+
+export function parsePaidPrices(raw?: string | null): FrozenSnapshot | null {
   if (!raw) return null;
   try {
-    const p = JSON.parse(raw) as Partial<FrozenPrices>;
+    const p = JSON.parse(raw) as Partial<FrozenSnapshot>;
     const adult = Number(p.adult) || 0;
     if (adult <= 0) return null;
-    return { adult, teen: Number(p.teen) || adult, child: Number(p.child) || adult };
+    const snap: FrozenSnapshot = { adult, teen: Number(p.teen) || adult, child: Number(p.child) || adult };
+    if (p.adults != null || p.teens != null || p.children != null) {
+      snap.adults = Number(p.adults) || 0;
+      snap.teens = Number(p.teens) || 0;
+      snap.children = Number(p.children) || 0;
+    }
+    return snap;
   } catch {
     return null;
   }
@@ -223,14 +258,15 @@ export function parsePaidPrices(raw?: string | null): FrozenPrices | null {
  * Congelar el total estaba mal: tambien absorbia los cambios de asistentes, asi
  * que alguien que pagaba y despues sumaba dos personas seguia debiendo $0.
  *
- * Con los precios congelados se cumplen las dos reglas a la vez:
- *   - sube el precio de la tarjeta y no cambia la gente -> el que ya pago no
- *     debe la diferencia;
- *   - cambia la cantidad de asistentes -> el total se recalcula y el saldo se
- *     mueve, sin tocar lo ya pagado.
+ * El congelamiento se aplica CUPO POR CUPO, no a la invitacion entera:
+ *   - los lugares que ya estaban pagos mantienen su precio, asi que una suba
+ *     posterior no les cobra diferencia;
+ *   - los lugares que se suman despues se cobran al precio vigente, porque ese
+ *     lugar nunca se pago;
+ *   - si se restan lugares, se cobran menos, y lo entregado de mas queda a favor.
  *
- * Se cobra el menor entre el precio congelado y el vigente: el congelamiento
- * protege de los aumentos, pero si el anfitrion BAJA el precio esa baja se
+ * Sobre los cupos ya pagos se cobra el menor entre el precio congelado y el
+ * vigente: el congelamiento protege de los aumentos, pero una BAJA de precio se
  * traslada igual.
  */
 export function resolveExpectedAmount({
@@ -242,14 +278,24 @@ export function resolveExpectedAmount({
   invitation: InvitationPrices;
   paidPrices?: string | null;
 }): number {
-  const liveExpected = computeExpectedAmount(guest, invitation);
-  const frozen = parsePaidPrices(paidPrices);
-  if (!frozen) return liveExpected;
+  const snap = parsePaidPrices(paidPrices);
+  if (!snap) return computeExpectedAmount(guest, invitation);
 
-  const lockedExpected = computeExpectedAmount(guest, {
-    pagoTarjetaMonto: frozen.adult,
-    precioAdolescente: frozen.teen,
-    precioNino: frozen.child,
-  });
-  return Math.min(lockedExpected, liveExpected);
+  const live = resolveCardPrices(invitation);
+  const now = normalizeCounts(guest);
+  // Registros previos a que se guardaran los cupos: se asume que todo lo
+  // confirmado hoy estaba pago (el comportamiento anterior).
+  const paid = snap.adults != null
+    ? { adults: snap.adults, teens: snap.teens ?? 0, children: snap.children ?? 0 }
+    : now;
+
+  const bill = (nowQty: number, paidQty: number, frozenPrice: number, livePrice: number) =>
+    Math.min(nowQty, paidQty) * Math.min(frozenPrice, livePrice) +
+    Math.max(0, nowQty - paidQty) * livePrice;
+
+  return (
+    bill(now.adults, paid.adults, snap.adult, live.adult) +
+    bill(now.teens, paid.teens, snap.teen, live.teen) +
+    bill(now.children, paid.children, snap.child, live.child)
+  );
 }

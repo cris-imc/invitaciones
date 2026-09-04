@@ -7,6 +7,7 @@ import {
   derivePaymentStatus,
   resolveExpectedAmount,
   resolveGuestPayment,
+  serializePaidPrices,
 } from "@/lib/payments";
 
 // DELETE /api/guests/[id] — Eliminar invitado
@@ -181,6 +182,18 @@ export async function PUT(
       updateData.paidAmount = paidAmount;
       updateData.paymentStatus = nextStatus;
       updateData.expectedAmount = nextStatus === "PAID" ? expectedAmount : null;
+      // Si queda pago y todavía no tenía congelamiento (por ejemplo, venía de un
+      // parcial y el anfitrión bajó la cantidad hasta cubrirlo), se congela acá.
+      // Un congelamiento existente NO se reescribe: eso achicaría los cupos ya
+      // pagos y le sacaría la protección si después vuelve a sumar gente.
+      if (nextStatus === "PAID" && !existingGuest.paidPrices) {
+        updateData.paidPrices = serializePaidPrices(existingGuest.invitation, {
+          attendingCount: (updateData.attendingCount as number | undefined) ?? existingGuest.attendingCount,
+          attendingAdults: (updateData.attendingAdults as number | undefined) ?? existingGuest.attendingAdults,
+          attendingTeens: (updateData.attendingTeens as number | undefined) ?? existingGuest.attendingTeens,
+          attendingChildren: (updateData.attendingChildren as number | undefined) ?? existingGuest.attendingChildren,
+        });
+      }
       // Marcar exento descarta el congelamiento: ya no hay pago que proteger.
       if (isExempt) updateData.paidPrices = null;
     } else if (body.isExempt !== undefined) {

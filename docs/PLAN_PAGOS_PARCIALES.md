@@ -26,25 +26,34 @@ El dinero recibido pasa a ser el dato real (`Guest.paidAmount`) y **el estado se
 Nunca se guarda un estado que contradiga el monto. Se agrega un cuarto estado `PARTIAL`, que
 nadie escribe a mano: sale del cálculo `paidAmount` vs `expectedAmount`.
 
-### Qué se congela: el precio, no el total
+### Qué se congela: el precio, y cupo por cupo
 
-Al quedar paga la tarjeta se guardan en `Guest.paidPrices` los **precios** vigentes de ese
-momento (JSON `{adult,teen,child}`), y el total se recalcula siempre contra las cantidades
-actuales. Congelar el *total* estaba mal: también absorbía los cambios de asistentes, así que
-quien pagaba y después sumaba dos personas seguía debiendo $0.
+Al quedar paga la tarjeta se guarda en `Guest.paidPrices` una foto del momento: los **precios**
+vigentes y **cuántos cupos** cubrió ese pago (JSON `{adult,teen,child,adults,teens,children}`).
+El total se recalcula siempre contra las cantidades actuales.
 
-Se cobra el menor entre el precio congelado y el vigente, así una **baja** de precio sí se
-traslada.
+El congelamiento se aplica **por cupo**, no a la invitación entera:
 
-| Qué cambia | No pagó nada / pagó una parte | Ya pagó todo |
+- los lugares **ya pagos** mantienen su precio → una suba no les cobra diferencia;
+- los lugares que se **suman después** van al precio vigente → ese lugar nunca se pagó;
+- si se **restan** lugares, se cobra menos y lo entregado de más queda a favor (solo visible
+  en el panel del anfitrión, nunca en la invitación).
+
+Sobre los cupos ya pagos se cobra el menor entre el precio congelado y el vigente, así una
+**baja** de precio se traslada igual.
+
+Verificado con `resolveGuestPayment()` — pagó 2 cupos a $100.000 y la tarjeta sube a $150.000:
+
+| Situación | Tarjeta | Debe |
 |---|---|---|
-| **Sube el precio** de la tarjeta | El saldo le sube | **No le afecta**: no debe la diferencia |
-| **Suma asistentes** | El saldo le sube | Debe las personas nuevas, al precio que congeló |
-| **Resta asistentes** | El saldo le baja | Sigue pago |
+| Sigue con 2 | $200.000 | $0 |
+| Suma 1 | $350.000 | $150.000 (el cupo nuevo al precio de hoy) |
+| Suma 2 | $500.000 | $300.000 |
+| Si en cambio el precio baja a $60.000 | $120.000 | $0 |
 
-Verificado con `resolveGuestPayment()` (tarjeta $100.000 → $150.000, familia de 3 → 5):
-quien pagó $300.000 por 3 y suma 2 pasa a `PARTIAL` debiendo $200.000, y si en cambio solo
-sube el precio sigue en `PAID` con saldo $0.
+Dos intentos previos fallaron y quedan como advertencia: congelar el **total** absorbía también
+los cambios de asistentes (quien pagaba y sumaba gente seguía debiendo $0), y congelar solo los
+**precios sin los cupos** cobraba las personas nuevas al precio viejo.
 
 Fuente única de verdad del cálculo: `src/lib/payments.ts`.
 

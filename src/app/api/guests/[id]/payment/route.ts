@@ -153,7 +153,7 @@ export async function PATCH(
     // pago y haber sumado gente después.
     const nextPaidPrices =
       nextStatus === "PAID"
-        ? serializePaidPrices(guest.invitation)
+        ? serializePaidPrices(guest.invitation, guest)
         : nextPaid <= 0
           ? null
           : guest.paidPrices;
