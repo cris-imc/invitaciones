@@ -172,7 +172,12 @@ export function resolveCardPayment(
     0
   );
 
-  const isExempt = Boolean(guest.isExempt) || guest.paymentStatus === "EXEMPT";
+  // Solo la marca isExempt decide. Mirar tambien paymentStatus dejaba el estado
+  // pegado: al escribir se resuelve con el guest ya guardado, cuyo paymentStatus
+  // todavia dice "EXEMPT", asi que sacar la exencion volvia a dar EXEMPT y no
+  // habia forma de salir. isExempt y el estado siempre se escriben juntos, asi
+  // que la marca alcanza.
+  const isExempt = Boolean(guest.isExempt);
   const status: CardPaymentStatus = isExempt
     ? "EXEMPT"
     : totalSeats > 0 && totalPaidSeats >= totalSeats

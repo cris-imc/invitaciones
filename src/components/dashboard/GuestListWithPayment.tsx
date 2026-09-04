@@ -151,6 +151,10 @@ export function GuestListWithPayment({
   const [notesText, setNotesText] = useState("");
   const [notesAmount, setNotesAmount] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
+  // Aviso antes de desmarcar cupos ya cargados (pasar a "no pago" o "exento").
+  const [clearConfirm, setClearConfirm] = useState<
+    { guest: Guest; status: string; marked: number } | null
+  >(null);
   const isMobile = useIsMobile();
 
   const openNotes = (guest: Guest) => {
@@ -245,6 +249,19 @@ export function GuestListWithPayment({
 
   const handlePaymentChange = (guestId: string, newStatus: string) =>
     patchPayment(guestId, { status: newStatus });
+
+  /**
+   * "No pago" y "Exento" desmarcan todos los cupos. Si habia alguno marcado eso
+   * borra trabajo del anfitrion y no se puede deshacer, asi que se avisa antes.
+   */
+  const requestPaymentChange = (guest: Guest, newStatus: string) => {
+    const marked = BRACKETS.reduce((n, b) => n + (guest.paidSeats?.[b] ?? 0), 0);
+    if ((newStatus === "PENDING" || newStatus === "EXEMPT") && marked > 0) {
+      setClearConfirm({ guest, status: newStatus, marked });
+      return;
+    }
+    handlePaymentChange(guest.id, newStatus);
+  };
 
   /** Suma o resta un cupo pago de una franja, sin pasarse de los confirmados. */
   const changeSeat = (guest: Guest, bracket: Bracket, delta: number) => {
@@ -611,7 +628,7 @@ export function GuestListWithPayment({
                         onClick={() =>
                           s === "PARTIAL"
                             ? setOpenSeatsFor(seatsOpen ? null : guest.id)
-                            : handlePaymentChange(guest.id, s)
+                            : requestPaymentChange(guest, s)
                         }
                         disabled={updatingId === guest.id}
                         title={s === "PARTIAL" ? "Marcá cupos en el detalle para dejarla en parcial" : undefined}
@@ -805,6 +822,49 @@ export function GuestListWithPayment({
           )}
         </div>
       )}
+
+      {/* Aviso antes de desmarcar cupos ya cargados: no hay deshacer. */}
+      <Dialog open={!!clearConfirm} onOpenChange={(open) => !open && setClearConfirm(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {clearConfirm?.status === "EXEMPT" ? "¿Marcar como exento?" : "¿Pasar a no pago?"}
+            </DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  <strong>{clearConfirm?.guest.name}</strong> tiene{" "}
+                  <strong>
+                    {clearConfirm?.marked} cupo{clearConfirm?.marked !== 1 ? "s" : ""}
+                  </strong>{" "}
+                  marcado{clearConfirm?.marked !== 1 ? "s" : ""} como pago
+                  {clearConfirm && clearConfirm.guest.paidAmount > 0
+                    ? ` (${formatARS(clearConfirm.guest.paidAmount)})`
+                    : ""}
+                  . Se van a desmarcar todos y no se puede deshacer.
+                </p>
+                <p className="text-xs">
+                  Tus anotaciones y el monto que registraste como recibido se conservan.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setClearConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (clearConfirm) handlePaymentChange(clearConfirm.guest.id, clearConfirm.status);
+                setClearConfirm(null);
+              }}
+            >
+              Sí, desmarcar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Anotaciones del anfitrión: notas libres + la plata que le fue
           entregando. Es su registro privado -- el invitado no ve nada de esto, y
