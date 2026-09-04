@@ -915,6 +915,8 @@ export function AtelierDePapelTemplateGrisGrafito({ invitation, guest, isPersona
                 hasPayment={paymentEnabled}
                 paymentAmount={paymentAmount}
                 isExempt={guest?.isExempt ?? false}
+                paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
+                paidAmount={Number((guest as any)?.paidAmount ?? 0)}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1297,6 +1299,8 @@ function AdpRsvpCard({
   hasPayment,
   paymentAmount,
   isExempt,
+  paymentStatus,
+  paidAmount,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1322,6 +1326,8 @@ function AdpRsvpCard({
   hasPayment: boolean;
   paymentAmount?: number;
   isExempt: boolean;
+  paymentStatus?: string;
+  paidAmount?: number;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1357,6 +1363,13 @@ function AdpRsvpCard({
   const teenPrice = precioAdolescente ?? adultPrice;
   const childPrice = precioNino ?? adultPrice;
   const totalPayment = isExempt ? 0 : adultPrice * adultCount + teenPrice * teenCount + childPrice * childCount;
+  // Pagos parciales: lo que la familia ya entregó y lo que falta. El saldo
+  // se mide contra el total de las personas confirmadas, así que si el
+  // invitado cambia la asistencia el número se actualiza solo.
+  const paidSoFar = Math.max(0, paidAmount ?? 0);
+  const paymentBalance = Math.max(0, totalPayment - paidSoFar);
+  const isPaidInFull = paymentStatus === "PAID" || (paidSoFar > 0 && paymentBalance <= 0);
+  const isPartialPayment = paidSoFar > 0 && paymentBalance > 0;
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
 
@@ -1480,9 +1493,19 @@ function AdpRsvpCard({
           // la cantidad, y una vez confirmado desaparecía justo cuando el
           // invitado más lo necesita: saber cuánto tiene que pagar en total.
           <div className="adp-rsvp-row adp-rsvp-row--payment">
-            <span>VALOR</span>
+            <span>{isPaidInFull ? "ABONADO" : isPartialPayment ? "SALDO" : "VALOR"}</span>
             <div className="adp-rsvp-payment-value">
-              <span className="adp-rsvp-payment-total">{formatARS(totalPayment)}</span>
+              <span className="adp-rsvp-payment-total">
+                {formatARS(isPartialPayment ? paymentBalance : totalPayment)}
+              </span>
+              {isPaidInFull && (
+                <div className="adp-rsvp-payment-detail"><span>Pago registrado ✓</span></div>
+              )}
+              {isPartialPayment && (
+                <div className="adp-rsvp-payment-detail">
+                  <span>Ya registramos {formatARS(paidSoFar)} de {formatARS(totalPayment)}</span>
+                </div>
+              )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="adp-rsvp-payment-detail">
                   {adultCount > 0 && (

@@ -105,13 +105,24 @@ Fuente única de verdad del cálculo: `src/lib/payments.ts`.
 - [ ] Confirmación al borrar un monto: en la lista de pagos y al tildar "exento" desde
       `GuestManager`; que **Cancelar** no guarde nada
 - [ ] Intentar cargar un monto mayor al total: tiene que rechazarlo con el mensaje del servidor
+- [ ] Una plantilla de **Storytelling** con pago parcial: la fila tiene que decir SALDO, y
+      ABONADO cuando esté pago
 
-### 3. Colección Storytelling sin pago de tarjeta
-177 plantillas usan `RSVPWizardV2` pero **no pasan `initialPaymentStatus`** (ni el viejo).
-No es una regresión de este trabajo, pero hay que decidirlo.
+### ~~3. Colección Storytelling~~ — resuelta
+Las 177 plantillas de Storytelling **no usan `RSVPWizardV2`** (solo lo nombran en un
+comentario): cada familia tiene su propia tarjeta de RSVP. Esa tarjeta sí mostraba el pago,
+pero solo miraba `isExempt`: nunca el estado de pago del invitado. Un invitado que ya había
+pagado seguía viendo "VALOR: $total", como si no hubiera pagado nada — un bug anterior a los
+pagos parciales.
 
-- [ ] Confirmar si esas plantillas deben soportar pago de tarjeta
-- [ ] Si sí: cablear `initialPaymentStatus` + `initialPaidAmount` en las 177
+- [x] La tarjeta recibe `paymentStatus` y `paidAmount`, y la fila de pago pasa de mostrar
+      siempre "VALOR" a distinguir tres casos:
+      - **VALOR** — el total, cuando no hay nada abonado (como antes)
+      - **SALDO** — lo que falta, más "Ya registramos $X de $Y", con un pago parcial
+      - **ABONADO** — el total, más "Pago registrado ✓", cuando está pago
+- [x] Aplicado a las 177 con un script (el markup solo difiere en el prefijo de clase:
+      `acp`, `gpv`, `prc`, ...). Las 177 coincidieron con los 5 puntos de anclaje, ninguna
+      falló ni quedó a medias.
 
 ### ~~4. Deuda menor~~ — resuelta
 - [x] `PaymentBadge.tsx` ahora conoce `PARTIAL` y acepta `paidAmount`: muestra el saldo en vez
