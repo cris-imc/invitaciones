@@ -64,6 +64,8 @@ export interface StoredCardPayment {
   paidAmountChildren?: number | null;
   isExempt?: boolean | null;
   paymentStatus?: string | null;
+  /** Registro del anfitrión: plata realmente recibida. Ver `onAccount`. */
+  receivedAmount?: number | null;
 }
 
 /**
@@ -121,6 +123,17 @@ export interface ResolvedCardPayment {
   totalAmount: number;
   /** Cobrado de más, cuando se bajaron asistentes después de pagar. */
   surplus: number;
+  /** Lo que el anfitrión anotó como recibido (0 si no anotó nada). */
+  receivedAmount: number;
+  /**
+   * Plata recibida por encima de los cupos ya marcados: queda a cuenta de pagos
+   * futuros. Es solo informativo para el anfitrión -- no mueve el estado, porque
+   * los cupos los marca él y esta diferencia puede ser una seña, un redondeo o
+   * simplemente que todavía no marcó el cupo que corresponde.
+   */
+  onAccount: number;
+  /** Recibido por debajo de lo marcado: probablemente marcó de más. */
+  missingAmount: number;
   status: CardPaymentStatus;
 }
 
@@ -168,6 +181,10 @@ export function resolveCardPayment(
         ? "PARTIAL"
         : "PENDING";
 
+  // Lo anotado por el anfitrión, contra lo que representan los cupos marcados.
+  const receivedAmount = Math.max(0, Number(guest.receivedAmount ?? 0) || 0);
+  const diff = receivedAmount > 0 ? receivedAmount - paidAmount : 0;
+
   return {
     seats,
     paidSeats,
@@ -177,6 +194,9 @@ export function resolveCardPayment(
     pendingAmount: pendingAmount >= EPSILON ? pendingAmount : 0,
     totalAmount: paidAmount + pendingAmount,
     surplus: surplus >= EPSILON ? surplus : 0,
+    receivedAmount,
+    onAccount: diff >= EPSILON ? diff : 0,
+    missingAmount: -diff >= EPSILON ? -diff : 0,
     status,
   };
 }

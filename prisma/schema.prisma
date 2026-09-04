@@ -320,6 +320,11 @@ model Guest {
   paidAmountAdults       Float            @default(0)
   paidAmountTeens        Float            @default(0)
   paidAmountChildren     Float            @default(0)
+  // Plata que el anfitrion dice haber recibido, para su propio control. Es
+  // independiente de los cupos marcados: si una familia de 4 paga dos tarjetas
+  // pero entrega de mas, aca queda el monto real y la diferencia se muestra como
+  // saldo a cuenta de pagos futuros. No participa de ningun calculo de estado.
+  receivedAmount         Float            @default(0)
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

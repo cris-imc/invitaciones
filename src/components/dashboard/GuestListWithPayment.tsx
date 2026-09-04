@@ -30,6 +30,11 @@ interface Guest {
   pendingAmount: number;
   totalAmount: number;
   surplus: number;
+  // Registro propio del anfitrión: plata que dice haber recibido, y la
+  // diferencia contra lo que representan los cupos marcados.
+  receivedAmount: number;
+  onAccount: number;
+  missingAmount: number;
   isExempt?: boolean;
   dietaryRestrictions?: string;
   message?: string;
@@ -57,6 +62,27 @@ const PAYMENT_FILTER_LABELS: Record<string, string> = {
   PARTIAL: "Parcial",
   PENDING: "No pago",
 };
+
+/**
+ * Filtra lo que se puede tipear en el monto recibido: solo dígitos y
+ * separadores. El campo es `type="text"` porque `type="number"` no acepta el
+ * formato local "25.000,50" y suma flechitas que acá molestan.
+ */
+function sanitizeAmountInput(text: string): string {
+  return text.replace(/[^\d.,]/g, "");
+}
+
+/** "25000", "$25.000", "25.000,50" → 25000 / 25000.5. NaN si no es un número. */
+function parseAmountInput(text: string): number {
+  const normalized = text
+    .trim()
+    .split("$").join("")
+    .split(" ").join("")
+    .split(".").join("")
+    .split(",").join(".");
+  if (normalized === "") return NaN;
+  return Number(normalized);
+}
 
 /** Botón redondo de +/- del desplegable de cupos. */
 function stepperBtn(disabled: boolean): React.CSSProperties {
@@ -125,7 +151,10 @@ export function GuestListWithPayment({
   // se pueden adivinar de este lado.
   const patchPayment = async (
     guestId: string,
-    payload: { status: string } | { seats: Partial<Record<Bracket, number>> }
+    payload:
+      | { status: string }
+      | { seats: Partial<Record<Bracket, number>> }
+      | { receivedAmount: number }
   ) => {
     setUpdatingId(guestId);
     setRowError(null);
@@ -156,6 +185,9 @@ export function GuestListWithPayment({
                 pendingAmount: data.pendingAmount ?? g.pendingAmount,
                 totalAmount: data.totalAmount ?? g.totalAmount,
                 surplus: data.surplus ?? g.surplus,
+                receivedAmount: data.receivedAmount ?? g.receivedAmount,
+                onAccount: data.onAccount ?? g.onAccount,
+                missingAmount: data.missingAmount ?? g.missingAmount,
               }
             : g
         )
@@ -398,7 +430,7 @@ export function GuestListWithPayment({
         {pagoTarjetaHabilitado && (
           <>
             <span style={{ width: "1px", alignSelf: "stretch", background: "#e2e2e2", margin: "2px 2px" }} />
-            {(["PAID", "PENDING"] as const).map((p) => {
+            {(["PAID", "PARTIAL", "PENDING"] as const).map((p) => {
               const disabled = isPaymentDisabled(p);
               const active = paymentFilter === p;
               return (
@@ -512,13 +544,21 @@ export function GuestListWithPayment({
                     role="group"
                     aria-label={`Estado de pago de ${guest.name}`}
                   >
-                    {(["PENDING", "EXEMPT", "PAID"] as const).map((s) => (
+                    {/* "Parcial" no se elige: sale de marcar cupos. Se muestra
+                        para que el estado se vea, y tocarlo abre el desplegable
+                        que es donde realmente se resuelve. */}
+                    {(["PENDING", "PARTIAL", "EXEMPT", "PAID"] as const).map((s) => (
                       <button
                         key={s}
-                        onClick={() => handlePaymentChange(guest.id, s)}
+                        onClick={() =>
+                          s === "PARTIAL"
+                            ? setOpenSeatsFor(seatsOpen ? null : guest.id)
+                            : handlePaymentChange(guest.id, s)
+                        }
                         disabled={updatingId === guest.id}
+                        title={s === "PARTIAL" ? "Marcá cupos en el detalle para dejarla en parcial" : undefined}
                         style={{
-                          padding: "6px 12px",
+                          padding: "6px 10px",
                           fontSize: "11px",
                           fontWeight: 700,
                           border: "none",
@@ -612,7 +652,7 @@ export function GuestListWithPayment({
                 })}
 
                 <div style={{ borderTop: "1px dashed #e2e2e2", paddingTop: "10px", fontSize: "12px", color: "#666", display: "flex", flexWrap: "wrap", gap: "4px 10px" }}>
-                  <span>Cobrado: <b style={{ color: PAYMENT_STATUS_COLORS.PAID }}>{formatARS(guest.paidAmount)}</b></span>
+                  <span>Cupos marcados: <b style={{ color: PAYMENT_STATUS_COLORS.PAID }}>{formatARS(guest.paidAmount)}</b></span>
                   {guest.pendingAmount > 0 && (
                     <span>Falta: <b>{formatARS(guest.pendingAmount)}</b></span>
                   )}
@@ -620,6 +660,45 @@ export function GuestListWithPayment({
                   {guest.surplus > 0 && (
                     <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>{formatARS(guest.surplus)} a favor</span>
                   )}
+                </div>
+
+                {/* Registro propio del anfitrión: la plata que realmente entró.
+                    No mueve el estado ni los cupos -- sirve para saber si quedó
+                    algo a cuenta cuando la familia entrega distinto de lo que
+                    cubren los cupos marcados. */}
+                <div style={{ borderTop: "1px dashed #e2e2e2", paddingTop: "10px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label htmlFor={`recibido-${guest.id}`} style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#888", fontWeight: 600 }}>
+                    Recibido — tu registro
+                  </label>
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                    <input
+                      id={`recibido-${guest.id}`}
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={guest.receivedAmount > 0 ? String(guest.receivedAmount) : ""}
+                      onChange={(ev) => { ev.target.value = sanitizeAmountInput(ev.target.value); }}
+                      onBlur={(ev) => {
+                        const n = parseAmountInput(ev.target.value);
+                        const value = ev.target.value.trim() === "" ? 0 : n;
+                        if (!Number.isFinite(value) || value < 0) return;
+                        if (Math.abs(value - guest.receivedAmount) < 1) return;
+                        patchPayment(guest.id, { receivedAmount: value });
+                      }}
+                      placeholder="Ej: 25000"
+                      aria-label={`Monto recibido de ${guest.name}`}
+                      style={{ width: "130px", padding: "7px 12px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "13px", fontFamily: "var(--font-body)" }}
+                    />
+                    {guest.onAccount > 0 && (
+                      <span style={{ fontSize: "12px", color: PAYMENT_STATUS_COLORS.PARTIAL }}>
+                        <b>{formatARS(guest.onAccount)}</b> a cuenta de futuros pagos
+                      </span>
+                    )}
+                    {guest.missingAmount > 0 && (
+                      <span style={{ fontSize: "12px", color: "#c0392b" }}>
+                        Faltan <b>{formatARS(guest.missingAmount)}</b> para cubrir los cupos marcados
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

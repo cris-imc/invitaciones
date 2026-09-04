@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { isAdmin } from "@/lib/roles";
-import { applyPaidSeats, resolveCardPayment, resolveSeats } from "@/lib/card-payments";
+import { applyPaidSeats, resolveCardPayment, resolvePaidSeats, resolveSeats } from "@/lib/card-payments";
 
 // PATCH /api/guests/[id]/payment — Pago de tarjeta (solo anfitrión autenticado)
 //
@@ -23,9 +23,17 @@ export async function PATCH(
 
   const { id: guestId } = await params;
   const body = await request.json().catch(() => ({}));
-  const { status, seats } = body;
+  const { status, seats, receivedAmount } = body;
 
   const hasSeats = seats !== undefined && seats !== null;
+  const hasReceived = receivedAmount !== undefined && receivedAmount !== null;
+
+  if (hasReceived && (typeof receivedAmount !== "number" || !Number.isFinite(receivedAmount) || receivedAmount < 0)) {
+    return NextResponse.json(
+      { error: "receivedAmount debe ser un número mayor o igual a 0" },
+      { status: 400 }
+    );
+  }
   if (hasSeats) {
     if (typeof seats !== "object") {
       return NextResponse.json({ error: "seats debe ser un objeto" }, { status: 400 });
@@ -39,9 +47,9 @@ export async function PATCH(
         );
       }
     }
-  } else if (!["PENDING", "EXEMPT", "PAID"].includes(status)) {
+  } else if (!hasReceived && !["PENDING", "EXEMPT", "PAID"].includes(status)) {
     return NextResponse.json(
-      { error: "Enviá seats (cupos por franja) o status PENDING, EXEMPT o PAID" },
+      { error: "Enviá seats, receivedAmount, o status PENDING, EXEMPT o PAID" },
       { status: 400 }
     );
   }
@@ -71,18 +79,25 @@ export async function PATCH(
     }
 
     const all = resolveSeats(guest);
+    // Anotar el monto recibido no toca los cupos ni el estado: es el registro
+    // aparte que lleva el anfitrión.
+    const onlyReceived = hasReceived && !hasSeats && status === undefined;
+
     // Los atajos son casos particulares de "marcar cupos": todos, o ninguno.
     const target = hasSeats
       ? (seats as Record<string, number>)
-      : status === "PAID"
-        ? all
-        : { adults: 0, teens: 0, children: 0 };
+      : onlyReceived
+        ? resolvePaidSeats(guest)
+        : status === "PAID"
+          ? all
+          : { adults: 0, teens: 0, children: 0 };
 
     const paid = applyPaidSeats(guest, guest.invitation, target);
-    const isExempt = !hasSeats && status === "EXEMPT";
+    const isExempt = onlyReceived ? Boolean(guest.isExempt) : status === "EXEMPT";
+    const nextReceived = hasReceived ? (receivedAmount as number) : guest.receivedAmount;
 
     const resolved = resolveCardPayment(
-      { ...guest, ...paid, isExempt },
+      { ...guest, ...paid, isExempt, receivedAmount: nextReceived },
       guest.invitation
     );
 
@@ -91,6 +106,7 @@ export async function PATCH(
       data: {
         ...paid,
         isExempt,
+        receivedAmount: nextReceived,
         paymentStatus: resolved.status,
         paymentStatusUpdatedAt: new Date(),
         paymentStatusUpdatedBy: String(session.user.id),
@@ -106,6 +122,9 @@ export async function PATCH(
       pendingAmount: resolved.pendingAmount,
       totalAmount: resolved.totalAmount,
       surplus: resolved.surplus,
+      receivedAmount: resolved.receivedAmount,
+      onAccount: resolved.onAccount,
+      missingAmount: resolved.missingAmount,
     });
   } catch (error) {
     console.error("[payment PATCH]", error);

@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
         paidAmountAdults: true,
         paidAmountTeens: true,
         paidAmountChildren: true,
+        receivedAmount: true,
         dietaryRestrictions: true,
         message: true,
         uniqueToken: true,
@@ -78,6 +79,9 @@ export async function GET(request: NextRequest) {
           pendingAmount: p.pendingAmount,
           totalAmount: p.totalAmount,
           surplus: p.surplus,
+          receivedAmount: p.receivedAmount,
+          onAccount: p.onAccount,
+          missingAmount: p.missingAmount,
         };
       })
     );
