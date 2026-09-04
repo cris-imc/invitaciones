@@ -126,6 +126,9 @@ export function RSVPWizardV2({
   const paidAmount = Math.max(0, initialPaidAmount);
   const balance = Math.max(0, totalPayment - paidAmount);
   const isPartial = paymentStatus === "PARTIAL" || (paidAmount > 0 && balance > 0);
+  // Plata a favor: queda cuando el invitado paga y despues baja la cantidad de
+  // personas. Si vuelve a sumar gente, esto se descuenta solo del nuevo total.
+  const surplus = Math.max(0, paidAmount - totalPayment);
 
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
@@ -298,14 +301,22 @@ export function RSVPWizardV2({
               `Confirmaste ${count} ${count === 1 ? "persona" : "personas"}.`
             )}
           </p>
-          {paymentStatus !== "PAID" && (
-            <button
-              className="t-btn"
-              onClick={() => setStep("decision")}
-              style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", border: "1px solid currentColor", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}
-            >
-              Modificar asistencia
-            </button>
+          {/* Haber pagado ya no cierra la puerta a modificar la asistencia: si al
+              invitado le quedan cupos y quiere sumar a alguien, tiene que poder.
+              La tarjeta pasa sola a pago parcial por la diferencia (y si le
+              habia quedado plata a favor, esa se descuenta primero). Lo mismo
+              hace la Colección Storytelling, que nunca lo bloqueó. */}
+          <button
+            className="t-btn"
+            onClick={() => setStep("decision")}
+            style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", border: "1px solid currentColor", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}
+          >
+            Modificar asistencia
+          </button>
+          {paymentStatus === "PAID" && hasPayment && count < maxGuests && (
+            <p style={{ marginTop: "10px", fontSize: "12.5px", lineHeight: 1.5, opacity: 0.75, textAlign: "center", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}>
+              Si sumás personas se genera un saldo por la diferencia.
+            </p>
           )}
         </div>
       );
@@ -361,7 +372,9 @@ export function RSVPWizardV2({
                     : "Valor de la tarjeta"}
             </h4>
             <p style={{ display: "block", opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
-              {paymentStatus === "PAID" ? "Monto pagado:" : "Monto total a pagar:"} <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(totalPayment)}</span>
+              {/* Con un pago de más, "Monto pagado" tiene que ser lo que el
+                  invitado entregó, no lo que vale hoy la tarjeta. */}
+              {paymentStatus === "PAID" ? "Monto pagado:" : "Monto total a pagar:"} <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(paymentStatus === "PAID" && paidAmount > 0 ? paidAmount : totalPayment)}</span>
               <br />
               <span style={{ fontSize: "12px", opacity: 0.8 }}>
                 ({adultCount} adultos{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} adolescentes` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} niños` : ""})
@@ -382,6 +395,12 @@ export function RSVPWizardV2({
             {isPartial && paymentStatus !== "PAID" && (
               <p style={{ display: "block", margin: "2px 0 0", fontSize: "13.5px", lineHeight: 1.5, color: "inherit" }}>
                 Saldo pendiente: <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(balance)}</span>
+              </p>
+            )}
+            {surplus > 0 && (
+              <p style={{ display: "block", margin: "8px 0 0", fontSize: "13.5px", lineHeight: 1.5, color: "inherit" }}>
+                Tenés <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(surplus)}</span> a favor
+                <span style={{ opacity: 0.8 }}> (la tarjeta quedó en {formatARS(totalPayment)})</span>
               </p>
             )}
             {maxGuests > 1 && (
