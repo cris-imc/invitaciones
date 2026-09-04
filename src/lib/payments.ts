@@ -169,13 +169,14 @@ export function resolveGuestPayment(
   guest: StoredGuestPayment,
   invitation: InvitationPrices
 ): ResolvedGuestPayment {
-  const expectedAmount = guest.expectedAmount != null
-    ? Number(guest.expectedAmount) || 0
-    : computeExpectedAmount(guest, invitation);
+  const liveExpected = computeExpectedAmount(guest, invitation);
+  const frozenExpected = guest.expectedAmount != null ? Number(guest.expectedAmount) || 0 : null;
 
   const storedPaid = Number(guest.paidAmount ?? 0) || 0;
   const isLegacyPaid = storedPaid <= 0 && guest.paymentStatus === "PAID";
-  const paidAmount = isLegacyPaid ? expectedAmount : storedPaid;
+  const paidAmount = isLegacyPaid ? (frozenExpected ?? liveExpected) : storedPaid;
+
+  const expectedAmount = resolveExpectedAmount({ frozenExpected, liveExpected, paidAmount });
 
   return {
     expectedAmount,
@@ -187,4 +188,31 @@ export function resolveGuestPayment(
       isExempt: guest.isExempt || guest.paymentStatus === "EXEMPT",
     }),
   };
+}
+
+/**
+ * Total que le corresponde pagar hoy a un invitado.
+ *
+ * El congelamiento vale SOLO para la tarjeta ya paga. Si el anfitrion sube el
+ * precio:
+ *   - al que ya pago no se le cobra la diferencia: queda pago y confirmado para
+ *     siempre, con el total que pago en su momento (`frozenExpected`);
+ *   - al que debe saldo (no pago nada, o pago una parte) el saldo le sube, o
+ *     sea que su total pasa a ser el precio vigente (`liveExpected`).
+ *
+ * Antes esto se congelaba al confirmar el RSVP, asi que un aumento de precio no
+ * le llegaba a nadie y el anfitrion cobraba de menos sin darse cuenta.
+ */
+export function resolveExpectedAmount({
+  frozenExpected,
+  liveExpected,
+  paidAmount,
+}: {
+  frozenExpected?: number | null;
+  liveExpected: number;
+  paidAmount: number;
+}): number {
+  const frozen = frozenExpected != null ? Number(frozenExpected) || 0 : null;
+  const isSettled = frozen != null && frozen > 0 && paidAmount >= frozen - EPSILON;
+  return isSettled ? frozen : liveExpected;
 }

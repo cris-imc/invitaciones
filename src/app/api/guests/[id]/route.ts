@@ -6,6 +6,7 @@ import {
   PAYMENT_CLEAR_CODE,
   computeExpectedAmount,
   derivePaymentStatus,
+  resolveExpectedAmount,
   resolveGuestPayment,
 } from "@/lib/payments";
 
@@ -167,7 +168,7 @@ export async function PUT(
     // (PARTIAL) sin que nadie tenga que corregirlo a mano.
     const finalStatus = (updateData.status as string | undefined) ?? existingGuest.status;
     if (finalStatus === "CONFIRMED") {
-      const expectedAmount = computeExpectedAmount(
+      const liveExpected = computeExpectedAmount(
         {
           attendingCount: (updateData.attendingCount as number | undefined) ?? existingGuest.attendingCount,
           attendingAdults: (updateData.attendingAdults as number | undefined) ?? existingGuest.attendingAdults,
@@ -176,9 +177,16 @@ export async function PUT(
         },
         existingGuest.invitation
       );
-      updateData.expectedAmount = expectedAmount;
+      const expectedAmount = resolveExpectedAmount({
+        frozenExpected: existingGuest.expectedAmount,
+        liveExpected,
+        paidAmount,
+      });
+      const nextStatus = derivePaymentStatus({ paidAmount, expectedAmount, isExempt });
       updateData.paidAmount = paidAmount;
-      updateData.paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount, isExempt });
+      updateData.paymentStatus = nextStatus;
+      // Congelado solo si la tarjeta queda paga (ver resolveExpectedAmount).
+      updateData.expectedAmount = nextStatus === "PAID" ? expectedAmount : null;
     } else if (body.isExempt !== undefined) {
       updateData.paymentStatus = derivePaymentStatus({
         paidAmount,

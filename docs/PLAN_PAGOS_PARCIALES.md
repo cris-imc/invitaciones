@@ -26,8 +26,21 @@ El dinero recibido pasa a ser el dato real (`Guest.paidAmount`) y **el estado se
 Nunca se guarda un estado que contradiga el monto. Se agrega un cuarto estado `PARTIAL`, que
 nadie escribe a mano: sale del cálculo `paidAmount` vs `expectedAmount`.
 
-`expectedAmount` se **congela** al confirmar el RSVP (o al tocar el pago por primera vez) para
-que una suba posterior del precio de la tarjeta no reabra saldo sobre pagos ya cerrados.
+### Qué pasa cuando sube el precio de la tarjeta
+
+`expectedAmount` guarda el total **congelado**, y se escribe **solo cuando la tarjeta queda
+paga**. Mientras haya saldo la columna queda en `null` y el total sigue el precio vigente:
+
+| Estado del invitado | Si el anfitrión sube el precio |
+|---|---|
+| No pagó nada | El total sube: debe el precio nuevo |
+| Pagó una parte | **El saldo sube**: se le suma la diferencia |
+| **Ya pagó todo** | **No le afecta.** Queda pago y confirmado para siempre, con el total que pagó en su momento. Nunca debe la diferencia |
+| Exento | No paga |
+
+Verificado con `resolveGuestPayment()` sobre una tarjeta que pasa de $100.000 a $150.000: quien
+debía $60.000 pasa a deber $110.000, y quien había pagado los $100.000 sigue en `PAID` con
+saldo $0.
 
 Fuente única de verdad del cálculo: `src/lib/payments.ts`.
 

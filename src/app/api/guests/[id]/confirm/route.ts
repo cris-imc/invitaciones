@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { computeExpectedAmount, derivePaymentStatus, resolveGuestPayment } from "@/lib/payments";
+import {
+  computeExpectedAmount,
+  derivePaymentStatus,
+  resolveExpectedAmount,
+  resolveGuestPayment,
+} from "@/lib/payments";
 
 // POST /api/guests/[id]/confirm
 export async function POST(
@@ -41,11 +46,14 @@ export async function POST(
       ? attendingAdults + attendingTeens + attendingChildren
       : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 1);
 
-    // El monto esperado se recalcula con lo que acaba de confirmar (cambiar la
-    // cantidad de personas cambia lo que le toca pagar) y queda congelado con el
-    // precio vigente hoy. Lo ya abonado se conserva, así que si una familia pagó
-    // una parte y después suma o resta gente, el estado se reacomoda solo:
-    // sigue PARTIAL, o pasa a PAID si lo entregado ya cubre el nuevo total.
+    // El monto esperado se recalcula con lo que acaba de confirmar: cambiar la
+    // cantidad de personas cambia lo que le toca pagar. Lo ya abonado se
+    // conserva, así que si una familia pagó una parte y después suma o resta
+    // gente, el estado se reacomoda solo: sigue PARTIAL, o pasa a PAID si lo
+    // entregado ya cubre el nuevo total.
+    //
+    // El total se congela SOLO si queda pago (ver resolveExpectedAmount): al que
+    // debe saldo tiene que alcanzarlo un aumento posterior del precio.
     const paidAmount = resolveGuestPayment(guest, guest.invitation).paidAmount;
     const isExempt = guest.isExempt;
 
@@ -53,11 +61,17 @@ export async function POST(
     let expectedAmount = guest.expectedAmount;
 
     if (status === "CONFIRMED") {
-      expectedAmount = computeExpectedAmount(
+      const liveExpected = computeExpectedAmount(
         { attendingCount, attendingAdults, attendingTeens, attendingChildren },
         guest.invitation
       );
-      paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount, isExempt });
+      const resolvedExpected = resolveExpectedAmount({
+        frozenExpected: guest.expectedAmount,
+        liveExpected,
+        paidAmount,
+      });
+      paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount: resolvedExpected, isExempt });
+      expectedAmount = paymentStatus === "PAID" ? resolvedExpected : null;
     }
 
     const updatedGuest = await prisma.guest.update({

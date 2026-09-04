@@ -310,8 +310,9 @@ model Guest {
   // Pagos de tarjeta: paidAmount es la unica fuente de verdad del dinero
   // recibido (habilita pagos parciales de grupos/familias) y paymentStatus se
   // deriva de el -- ver derivePaymentStatus() en src/lib/payments.ts.
-  // expectedAmount se congela al confirmar el RSVP para que una suba posterior
-  // del precio de la tarjeta no reabra pagos ya cerrados.
+  // expectedAmount guarda el total congelado, y se escribe SOLO cuando la
+  // tarjeta queda paga: si despues sube el precio, al que ya pago no se le
+  // cobra la diferencia, y al que debe saldo el saldo le sube.
   paidAmount             Float            @default(0)
   expectedAmount         Float?
   message                String?

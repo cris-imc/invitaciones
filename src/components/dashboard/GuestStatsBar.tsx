@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 
 interface Guest {
@@ -42,26 +42,28 @@ export function GuestStatsBar({ invitationId, pagoTarjetaHabilitado = false }: G
   const confirmed = guests.filter((g) => g.status === "CONFIRMED");
   const totalPeople = confirmed.reduce((s, g) => s + g.attendingCount, 0);
   const paidCount = confirmed.filter((g) => g.paymentStatus === "PAID").length;
-  // Un pago parcial sigue siendo plata por cobrar: cuenta como pendiente, no
-  // como pagado (si no, un grupo que entregó una parte desaparecería del radar).
-  const pendingPayCount = confirmed.filter(
-    (g) => g.paymentStatus === "PENDING" || g.paymentStatus === "PARTIAL"
-  ).length;
   const partialCount = confirmed.filter((g) => g.paymentStatus === "PARTIAL").length;
+  // Los parciales viven en el recuadro de "Pagaron", con su propio color: ya
+  // entregaron algo, así que no son lo mismo que quien no pagó nada. "Pendientes
+  // de Pago" queda solo con los que no pagaron nada.
+  const pendingPayCount = confirmed.filter((g) => g.paymentStatus === "PENDING").length;
 
-  const stats = [
+  const stats: { label: string; value: ReactNode; colorClass?: string }[] = [
     { label: "Enviadas / Aceptadas", value: `${guests.length} / ${confirmed.length}` },
     { label: "Personas", value: totalPeople },
     ...(pagoTarjetaHabilitado
       ? [
-          { label: "Pagaron", value: paidCount, colorClass: "text-green-600" },
           {
-            label: partialCount > 0
-              ? `Pendientes de Pago (${partialCount} parcial${partialCount !== 1 ? "es" : ""})`
-              : "Pendientes de Pago",
-            value: pendingPayCount,
-            colorClass: "text-yellow-600",
+            label: "Pagaron / Parciales",
+            value: (
+              <>
+                <span className="text-green-600">{paidCount}</span>
+                <span className="text-muted-foreground font-normal"> / </span>
+                <span className="text-orange-500">{partialCount}</span>
+              </>
+            ),
           },
+          { label: "Pendientes de Pago", value: pendingPayCount, colorClass: "text-yellow-600" },
         ]
       : []),
   ];

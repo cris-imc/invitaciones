@@ -7,6 +7,7 @@ import {
   computeBalance,
   computeExpectedAmount,
   derivePaymentStatus,
+  resolveExpectedAmount,
   resolveGuestPayment,
 } from "@/lib/payments";
 
@@ -78,15 +79,18 @@ export async function PATCH(
       return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
     }
 
-    // Monto esperado: el congelado si existe, si no el vigente según los
-    // precios actuales de la invitación (y desde ahora queda congelado).
-    const expectedAmount = guest.expectedAmount != null
-      ? guest.expectedAmount
-      : computeExpectedAmount(guest, guest.invitation);
-
     // Lo que hay registrado hoy. Sirve para dos controles distintos: no aceptar
     // más plata de la que corresponde, y no borrar la que ya está.
     const currentPaid = resolveGuestPayment(guest, guest.invitation).paidAmount;
+
+    // Monto esperado: el congelado solo si la tarjeta ya estaba paga; si no, el
+    // vigente según los precios actuales de la invitación. Así una suba de
+    // precio le sube el saldo al que debe, y no le reabre nada al que ya pagó.
+    const expectedAmount = resolveExpectedAmount({
+      frozenExpected: guest.expectedAmount,
+      liveExpected: computeExpectedAmount(guest, guest.invitation),
+      paidAmount: currentPaid,
+    });
 
     // Sobrepago: el panel ya lo rechaza al escribir el monto, pero la regla real
     // tiene que estar acá o depende de qué cliente llame. Sin precio cargado
@@ -143,11 +147,16 @@ export async function PATCH(
       isExempt: nextExempt,
     });
 
+    // El total se congela unicamente al quedar paga la tarjeta. Mientras haya
+    // saldo se guarda null, para que el monto siga el precio vigente y una suba
+    // posterior aumente lo que falta cobrar.
+    const nextExpected = nextStatus === "PAID" ? expectedAmount : null;
+
     const updated = await prisma.guest.update({
       where: { id: guestId },
       data: {
         paidAmount: nextPaid,
-        expectedAmount,
+        expectedAmount: nextExpected,
         paymentStatus: nextStatus,
         isExempt: nextExempt,
         paymentStatusUpdatedAt: new Date(),
@@ -164,9 +173,13 @@ export async function PATCH(
       },
     });
 
+    // Se devuelve el total efectivo, no el guardado: mientras haya saldo la
+    // columna queda en null y el panel necesita el monto vigente para mostrar
+    // "falta $X de $Y".
     return NextResponse.json({
       ...updated,
-      balance: computeBalance(updated.paidAmount, updated.expectedAmount),
+      expectedAmount,
+      balance: computeBalance(updated.paidAmount, expectedAmount),
     });
   } catch (error) {
     console.error("[payment PATCH]", error);
