@@ -370,10 +370,18 @@ export function RSVPWizardV2({
             {/* Con un pago parcial, el invitado ve su saldo sin tener que
                 preguntarle al anfitrión. */}
             {isPartial && paymentStatus !== "PAID" && (
-              <p style={{ margin: "8px 0 0", fontSize: "13.5px", lineHeight: 1.6, color: "inherit" }}>
-                Ya registramos <span style={{ fontWeight: 600 }}>{formatARS(paidAmount)}</span>.
-                <br />
-                Saldo pendiente: <span style={{ fontWeight: 600 }}>{formatARS(balance)}</span>
+              // `display: block` explícito, igual que el párrafo de arriba: sin
+              // eso el párrafo hereda el layout del contenedor de la plantilla y
+              // los montos se separan de su etiqueta. Y dos párrafos en vez de
+              // un <br/>, así cada línea es un bloque y no depende de dónde
+              // corte el texto.
+              <p style={{ display: "block", margin: "8px 0 0", fontSize: "13.5px", lineHeight: 1.5, color: "inherit" }}>
+                Ya registramos <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(paidAmount)}</span>
+              </p>
+            )}
+            {isPartial && paymentStatus !== "PAID" && (
+              <p style={{ display: "block", margin: "2px 0 0", fontSize: "13.5px", lineHeight: 1.5, color: "inherit" }}>
+                Saldo pendiente: <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(balance)}</span>
               </p>
             )}
             {maxGuests > 1 && (
