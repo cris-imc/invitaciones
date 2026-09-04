@@ -23,10 +23,15 @@ export async function PATCH(
 
   const { id: guestId } = await params;
   const body = await request.json().catch(() => ({}));
-  const { status, seats, receivedAmount } = body;
+  const { status, seats, receivedAmount, notes } = body;
 
   const hasSeats = seats !== undefined && seats !== null;
   const hasReceived = receivedAmount !== undefined && receivedAmount !== null;
+  const hasNotes = notes !== undefined;
+
+  if (hasNotes && notes !== null && typeof notes !== "string") {
+    return NextResponse.json({ error: "notes debe ser texto" }, { status: 400 });
+  }
 
   if (hasReceived && (typeof receivedAmount !== "number" || !Number.isFinite(receivedAmount) || receivedAmount < 0)) {
     return NextResponse.json(
@@ -47,9 +52,9 @@ export async function PATCH(
         );
       }
     }
-  } else if (!hasReceived && !["PENDING", "EXEMPT", "PAID"].includes(status)) {
+  } else if (!hasReceived && !hasNotes && !["PENDING", "EXEMPT", "PAID"].includes(status)) {
     return NextResponse.json(
-      { error: "Enviá seats, receivedAmount, o status PENDING, EXEMPT o PAID" },
+      { error: "Enviá seats, receivedAmount, notes, o status PENDING, EXEMPT o PAID" },
       { status: 400 }
     );
   }
@@ -79,9 +84,9 @@ export async function PATCH(
     }
 
     const all = resolveSeats(guest);
-    // Anotar el monto recibido no toca los cupos ni el estado: es el registro
-    // aparte que lleva el anfitrión.
-    const onlyReceived = hasReceived && !hasSeats && status === undefined;
+    // Anotar el monto recibido o una nota no toca los cupos ni el estado: es el
+    // registro aparte que lleva el anfitrión.
+    const onlyReceived = (hasReceived || hasNotes) && !hasSeats && status === undefined;
 
     // Los atajos son casos particulares de "marcar cupos": todos, o ninguno.
     const target = hasSeats
@@ -107,11 +112,12 @@ export async function PATCH(
         ...paid,
         isExempt,
         receivedAmount: nextReceived,
+        ...(hasNotes ? { hostNotes: notes ? String(notes).slice(0, 2000) : null } : {}),
         paymentStatus: resolved.status,
         paymentStatusUpdatedAt: new Date(),
         paymentStatusUpdatedBy: String(session.user.id),
       },
-      select: { id: true, name: true, paymentStatus: true, isExempt: true },
+      select: { id: true, name: true, paymentStatus: true, isExempt: true, hostNotes: true },
     });
 
     return NextResponse.json({

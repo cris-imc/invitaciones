@@ -325,6 +325,9 @@ model Guest {
   // pero entrega de mas, aca queda el monto real y la diferencia se muestra como
   // saldo a cuenta de pagos futuros. No participa de ningun calculo de estado.
   receivedAmount         Float            @default(0)
+  // Anotaciones privadas del anfitrion sobre este invitado (como pago, que
+  // quedo pendiente, lo que sea). El invitado no las ve nunca.
+  hostNotes              String?
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

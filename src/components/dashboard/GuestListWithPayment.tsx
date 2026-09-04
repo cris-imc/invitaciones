@@ -1,8 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Info, ChevronUp, ChevronDown, Download, Minus, Plus, Wallet, Hourglass, Ban, Undo2, CircleDashed } from "lucide-react";
+import { Info, ChevronUp, ChevronDown, Download, Minus, Plus, NotebookPen } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   BRACKETS,
   BRACKET_LABELS,
@@ -35,6 +46,8 @@ interface Guest {
   receivedAmount: number;
   onAccount: number;
   missingAmount: number;
+  /** Anotaciones privadas del anfitrión. El invitado nunca las ve. */
+  hostNotes?: string | null;
   isExempt?: boolean;
   dietaryRestrictions?: string;
   message?: string;
@@ -132,7 +145,29 @@ export function GuestListWithPayment({
   // Fila con el desplegable de cupos abierto, y el error que devolvió el server.
   const [openSeatsFor, setOpenSeatsFor] = useState<string | null>(null);
   const [rowError, setRowError] = useState<{ guestId: string; message: string } | null>(null);
+  // Modal de anotaciones: invitado abierto y lo tipeado, sin guardar hasta que
+  // el anfitrión confirme.
+  const [notesFor, setNotesFor] = useState<Guest | null>(null);
+  const [notesText, setNotesText] = useState("");
+  const [notesAmount, setNotesAmount] = useState("");
+  const [savingNotes, setSavingNotes] = useState(false);
   const isMobile = useIsMobile();
+
+  const openNotes = (guest: Guest) => {
+    setNotesFor(guest);
+    setNotesText(guest.hostNotes ?? "");
+    setNotesAmount(guest.receivedAmount > 0 ? String(guest.receivedAmount) : "");
+  };
+
+  const saveNotes = async () => {
+    if (!notesFor) return;
+    const parsed = notesAmount.trim() === "" ? 0 : parseAmountInput(notesAmount);
+    if (!Number.isFinite(parsed) || parsed < 0) return;
+    setSavingNotes(true);
+    await patchPayment(notesFor.id, { receivedAmount: parsed, notes: notesText.trim() || null });
+    setSavingNotes(false);
+    setNotesFor(null);
+  };
 
   useEffect(() => {
     if (showPaymentInfo) {
@@ -161,7 +196,7 @@ export function GuestListWithPayment({
     payload:
       | { status: string }
       | { seats: Partial<Record<Bracket, number>> }
-      | { receivedAmount: number }
+      | { receivedAmount: number; notes?: string | null }
   ) => {
     setUpdatingId(guestId);
     setRowError(null);
@@ -195,6 +230,7 @@ export function GuestListWithPayment({
                 receivedAmount: data.receivedAmount ?? g.receivedAmount,
                 onAccount: data.onAccount ?? g.onAccount,
                 missingAmount: data.missingAmount ?? g.missingAmount,
+                hostNotes: data.hostNotes !== undefined ? data.hostNotes : g.hostNotes,
               }
             : g
         )
@@ -505,8 +541,25 @@ export function GuestListWithPayment({
             const seatsOpen = openSeatsFor === guest.id;
             const paidSeatsCount = BRACKETS.reduce((n, b) => n + (guest.paidSeats?.[b] ?? 0), 0);
             const totalSeatsCount = BRACKETS.reduce((n, b) => n + (guest.seats?.[b] ?? 0), 0);
+            // Con el desplegable abierto la fila crece y se confunde con la
+            // siguiente: se le dan fondo y borde propios para que se lea como un
+            // bloque separado.
             return (
-            <div key={guest.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
+            <div
+              key={guest.id}
+              style={
+                seatsOpen
+                  ? {
+                      borderBottom: "1px solid #e2e2e2",
+                      background: "#fafafa",
+                      borderRadius: "10px",
+                      padding: "0 12px",
+                      margin: "8px -12px",
+                      boxShadow: "inset 0 0 0 1px #ececec",
+                    }
+                  : { borderBottom: "1px solid #f0f0f0" }
+              }
+            >
             <div
               className="inv-guest-row"
               style={{
@@ -618,6 +671,25 @@ export function GuestListWithPayment({
                       {seatsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                     </button>
                   )}
+
+                  {/* Anotaciones del anfitrión + la plata que le fue entregando.
+                      Van en un modal para no llenar la fila de campos. */}
+                  <button
+                    onClick={() => openNotes(guest)}
+                    aria-label={`Anotaciones de ${guest.name}`}
+                    title="Anotaciones y monto recibido"
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: "5px",
+                      background: "transparent",
+                      border: `1px solid ${guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#ddd"}`,
+                      color: guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#888",
+                      borderRadius: "999px", padding: "4px 10px", cursor: "pointer",
+                      fontSize: "11px", fontWeight: 600, fontFamily: "var(--font-body)",
+                    }}
+                  >
+                    <NotebookPen className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    {guest.hostNotes || guest.receivedAmount > 0 ? "Con notas" : "Anotar"}
+                  </button>
                 </div>
               )}
             </div>
@@ -674,44 +746,25 @@ export function GuestListWithPayment({
                   )}
                 </div>
 
-                {/* Registro propio del anfitrión: la plata que realmente entró.
-                    No mueve el estado ni los cupos -- sirve para saber si quedó
-                    algo a cuenta cuando la familia entrega distinto de lo que
-                    cubren los cupos marcados. */}
-                <div style={{ borderTop: "1px dashed #e2e2e2", paddingTop: "10px", display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <label htmlFor={`recibido-${guest.id}`} style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#888", fontWeight: 600 }}>
-                    Recibido — tu registro
-                  </label>
-                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                    <input
-                      id={`recibido-${guest.id}`}
-                      type="text"
-                      inputMode="decimal"
-                      defaultValue={guest.receivedAmount > 0 ? String(guest.receivedAmount) : ""}
-                      onChange={(ev) => { ev.target.value = sanitizeAmountInput(ev.target.value); }}
-                      onBlur={(ev) => {
-                        const n = parseAmountInput(ev.target.value);
-                        const value = ev.target.value.trim() === "" ? 0 : n;
-                        if (!Number.isFinite(value) || value < 0) return;
-                        if (Math.abs(value - guest.receivedAmount) < 1) return;
-                        patchPayment(guest.id, { receivedAmount: value });
-                      }}
-                      placeholder="Ej: 25000"
-                      aria-label={`Monto recibido de ${guest.name}`}
-                      style={{ width: "130px", padding: "7px 12px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "13px", fontFamily: "var(--font-body)" }}
-                    />
+                {/* El monto recibido y las notas viven en el modal del botón de
+                    anotaciones, para no llenar la fila de campos. */}
+                {(guest.receivedAmount > 0 || guest.hostNotes) && (
+                  <div style={{ borderTop: "1px dashed #e2e2e2", paddingTop: "10px", fontSize: "12px", color: "#666", display: "flex", flexWrap: "wrap", gap: "4px 10px" }}>
+                    {guest.receivedAmount > 0 && (
+                      <span>Recibido: <b>{formatARS(guest.receivedAmount)}</b></span>
+                    )}
                     {guest.onAccount > 0 && (
-                      <span style={{ fontSize: "12px", color: PAYMENT_STATUS_COLORS.PARTIAL }}>
-                        <b>{formatARS(guest.onAccount)}</b> a cuenta de futuros pagos
+                      <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
+                        <b>{formatARS(guest.onAccount)}</b> a cuenta
                       </span>
                     )}
                     {guest.missingAmount > 0 && (
-                      <span style={{ fontSize: "12px", color: "#c0392b" }}>
-                        Faltan <b>{formatARS(guest.missingAmount)}</b> para cubrir los cupos marcados
+                      <span style={{ color: "#c0392b" }}>
+                        Faltan <b>{formatARS(guest.missingAmount)}</b> de lo marcado
                       </span>
                     )}
                   </div>
-                </div>
+                )}
               </div>
             )}
             </div>
@@ -767,6 +820,63 @@ export function GuestListWithPayment({
           )}
         </div>
       )}
+
+      {/* Anotaciones del anfitrión: notas libres + la plata que le fue
+          entregando. Es su registro privado -- el invitado no ve nada de esto, y
+          no mueve el estado de la tarjeta. */}
+      <Dialog open={!!notesFor} onOpenChange={(open) => !open && setNotesFor(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Anotaciones de {notesFor?.name}</DialogTitle>
+            <DialogDescription>
+              Solo las ves vos. No cambian el estado de la tarjeta ni los cupos marcados.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {hasPrices && (
+              <div className="space-y-1.5">
+                <Label htmlFor="notas-monto">Plata recibida hasta ahora</Label>
+                <Input
+                  id="notas-monto"
+                  type="text"
+                  inputMode="decimal"
+                  value={notesAmount}
+                  onChange={(e) => setNotesAmount(sanitizeAmountInput(e.target.value))}
+                  placeholder="Ej: 25000"
+                />
+                {notesFor && (
+                  <p className="text-xs text-muted-foreground">
+                    Los cupos que marcaste suman {formatARS(notesFor.paidAmount)}.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label htmlFor="notas-texto">Notas</Label>
+              <textarea
+                id="notas-texto"
+                value={notesText}
+                onChange={(e) => setNotesText(e.target.value)}
+                rows={5}
+                maxLength={2000}
+                placeholder="Ej: Pagaron los dos adultos por transferencia. El resto lo traen el sábado."
+                className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setNotesFor(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={saveNotes} disabled={savingNotes}>
+              {savingNotes ? "Guardando…" : "Guardar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

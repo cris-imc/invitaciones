@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
         paidAmountTeens: true,
         paidAmountChildren: true,
         receivedAmount: true,
+        hostNotes: true,
         dietaryRestrictions: true,
         message: true,
         uniqueToken: true,
