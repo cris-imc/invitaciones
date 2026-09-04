@@ -880,6 +880,7 @@ export function InfantilJurasicoTemplateAmarillo({ invitation, guest, isPersonal
                 hasPayment={paymentEnabled}
                 paymentAmount={paymentAmount}
                 isExempt={guest?.isExempt ?? false}
+                paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1255,6 +1256,7 @@ function IfjRsvpCard({
   hasPayment,
   paymentAmount,
   isExempt,
+  paymentStatus,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1279,6 +1281,7 @@ function IfjRsvpCard({
   hasPayment: boolean;
   paymentAmount?: number;
   isExempt: boolean;
+  paymentStatus?: string;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1436,9 +1439,12 @@ function IfjRsvpCard({
           // la cantidad, y una vez confirmado desaparecía justo cuando el
           // invitado más lo necesita: saber cuánto tiene que pagar en total.
           <div className="ifj-rsvp-row ifj-rsvp-row--payment">
-            <span>VALOR</span>
+            <span>{paymentStatus === "PAID" ? "ABONADO" : "VALOR"}</span>
             <div className="ifj-rsvp-payment-value">
               <span className="ifj-rsvp-payment-total">{formatARS(totalPayment)}</span>
+              {paymentStatus === "PARTIAL" && (
+                <div className="ifj-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+              )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="ifj-rsvp-payment-detail">
                   {adultCount > 0 && (

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { resolveCardPayment } from "@/lib/card-payments";
 
 // POST /api/guests/[id]/confirm
 export async function POST(
@@ -12,6 +13,16 @@ export async function POST(
 
     const guest = await prisma.guest.findFirst({
       where: { uniqueToken: id },
+      include: {
+        invitation: {
+          select: {
+            pagoTarjetaMonto: true,
+            regaloMonto: true,
+            precioAdolescente: true,
+            precioNino: true,
+          },
+        },
+      },
     });
 
     if (!guest) {
@@ -20,11 +31,27 @@ export async function POST(
 
     // Actualizamos el Guest
     const status = body.asistencia === "CONFIRMA" ? "CONFIRMED" : "DECLINED";
-    
-    // Lógica para paymentStatus si es exento
+
+    const attendingAdults = body.attendingAdults !== undefined
+      ? body.attendingAdults
+      : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 0);
+    const attendingTeens = body.attendingTeens || 0;
+    const attendingChildren = body.attendingChildren || 0;
+    const attendingCount = attendingAdults + attendingTeens + attendingChildren > 0
+      ? attendingAdults + attendingTeens + attendingChildren
+      : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 1);
+
+    // El estado de pago se recalcula con las cantidades que acaba de confirmar.
+    // Los cupos ya marcados como pagos no se tocan: si suma gente, esos lugares
+    // nuevos quedan pendientes y la tarjeta vuelve a "parcial". Sin esto, un
+    // invitado que sumaba a alguien despues de pagar seguia viendo "Tarjeta
+    // abonada", porque el estado guardado quedaba viejo.
     let paymentStatus = guest.paymentStatus;
-    if (status === "CONFIRMED" && guest.isExempt) {
-      paymentStatus = "EXEMPT";
+    if (status === "CONFIRMED") {
+      paymentStatus = resolveCardPayment(
+        { ...guest, attendingCount, attendingAdults, attendingTeens, attendingChildren },
+        guest.invitation
+      ).status;
     }
 
     const updatedGuest = await prisma.guest.update({
@@ -32,12 +59,10 @@ export async function POST(
       data: {
         status,
         paymentStatus,
-        attendingCount: (body.attendingAdults || 0) + (body.attendingTeens || 0) + (body.attendingChildren || 0) > 0
-          ? (body.attendingAdults || 0) + (body.attendingTeens || 0) + (body.attendingChildren || 0)
-          : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 1),
-        attendingAdults: body.attendingAdults !== undefined ? body.attendingAdults : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 0),
-        attendingTeens: body.attendingTeens || 0,
-        attendingChildren: body.attendingChildren || 0,
+        attendingCount,
+        attendingAdults,
+        attendingTeens,
+        attendingChildren,
         dietaryRestrictions: body.restricciones,
         responseDate: new Date(),
         name: body.nombre || guest.name, // Opcionalmente actualizar el nombre si lo cambió

@@ -874,6 +874,7 @@ export function PaseVipTemplate({ invitation, guest, isPersonalized = false }: P
                 hasPayment={paymentEnabled}
                 paymentAmount={paymentAmount}
                 isExempt={guest?.isExempt ?? false}
+                paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1250,6 +1251,7 @@ function PvpRsvpCard({
   hasPayment,
   paymentAmount,
   isExempt,
+  paymentStatus,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1274,6 +1276,7 @@ function PvpRsvpCard({
   hasPayment: boolean;
   paymentAmount?: number;
   isExempt: boolean;
+  paymentStatus?: string;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1424,9 +1427,12 @@ function PvpRsvpCard({
 
         {hasPayment && paymentAmount != null && !isExempt && (
           <div className="pvp-rsvp-row pvp-rsvp-row--payment">
-            <span>VALOR</span>
+            <span>{paymentStatus === "PAID" ? "ABONADO" : "VALOR"}</span>
             <div className="pvp-rsvp-payment-value">
               <span className="pvp-rsvp-payment-total">{formatARS(totalPayment)}</span>
+              {paymentStatus === "PARTIAL" && (
+                <div className="pvp-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+              )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="pvp-rsvp-payment-detail">
                   {adultCount > 0 && (

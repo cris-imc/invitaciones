@@ -922,6 +922,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
                 hasPayment={paymentEnabled}
                 paymentAmount={paymentAmount}
                 isExempt={guest?.isExempt ?? false}
+                paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1303,6 +1304,7 @@ function GpRsvpCard({
   hasPayment,
   paymentAmount,
   isExempt,
+  paymentStatus,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1327,6 +1329,7 @@ function GpRsvpCard({
   hasPayment: boolean;
   paymentAmount?: number;
   isExempt: boolean;
+  paymentStatus?: string;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1484,9 +1487,12 @@ function GpRsvpCard({
           // la cantidad, y una vez confirmado desaparecía justo cuando el
           // invitado más lo necesita: saber cuánto tiene que pagar en total.
           <div className="bcw-rsvp-row bcw-rsvp-row--payment">
-            <span>VALOR</span>
+            <span>{paymentStatus === "PAID" ? "ABONADO" : "VALOR"}</span>
             <div className="bcw-rsvp-payment-value">
               <span className="bcw-rsvp-payment-total">{formatARS(totalPayment)}</span>
+              {paymentStatus === "PARTIAL" && (
+                <div className="bcw-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+              )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="bcw-rsvp-payment-detail">
                   {adultCount > 0 && (

@@ -915,6 +915,7 @@ export function AtelierDePapelTemplateAzulTinta({ invitation, guest, isPersonali
                 hasPayment={paymentEnabled}
                 paymentAmount={paymentAmount}
                 isExempt={guest?.isExempt ?? false}
+                paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1297,6 +1298,7 @@ function AdpRsvpCard({
   hasPayment,
   paymentAmount,
   isExempt,
+  paymentStatus,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1322,6 +1324,7 @@ function AdpRsvpCard({
   hasPayment: boolean;
   paymentAmount?: number;
   isExempt: boolean;
+  paymentStatus?: string;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1480,9 +1483,12 @@ function AdpRsvpCard({
           // la cantidad, y una vez confirmado desaparecía justo cuando el
           // invitado más lo necesita: saber cuánto tiene que pagar en total.
           <div className="adp-rsvp-row adp-rsvp-row--payment">
-            <span>VALOR</span>
+            <span>{paymentStatus === "PAID" ? "ABONADO" : "VALOR"}</span>
             <div className="adp-rsvp-payment-value">
               <span className="adp-rsvp-payment-total">{formatARS(totalPayment)}</span>
+              {paymentStatus === "PARTIAL" && (
+                <div className="adp-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+              )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="adp-rsvp-payment-detail">
                   {adultCount > 0 && (

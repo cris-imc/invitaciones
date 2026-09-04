@@ -868,6 +868,7 @@ export function CineAbstractoXvTemplate({ invitation, guest, isPersonalized = fa
                 hasPayment={paymentEnabled}
                 paymentAmount={paymentAmount}
                 isExempt={guest?.isExempt ?? false}
+                paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1239,6 +1240,7 @@ function CxvRsvpCard({
   hasPayment,
   paymentAmount,
   isExempt,
+  paymentStatus,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1263,6 +1265,7 @@ function CxvRsvpCard({
   hasPayment: boolean;
   paymentAmount?: number;
   isExempt: boolean;
+  paymentStatus?: string;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1413,9 +1416,12 @@ function CxvRsvpCard({
 
         {hasPayment && paymentAmount != null && !isExempt && (
           <div className="cxv-rsvp-row cxv-rsvp-row--payment">
-            <span>VALOR</span>
+            <span>{paymentStatus === "PAID" ? "ABONADO" : "VALOR"}</span>
             <div className="cxv-rsvp-payment-value">
               <span className="cxv-rsvp-payment-total">{formatARS(totalPayment)}</span>
+              {paymentStatus === "PARTIAL" && (
+                <div className="cxv-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+              )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="cxv-rsvp-payment-detail">
                   {adultCount > 0 && (

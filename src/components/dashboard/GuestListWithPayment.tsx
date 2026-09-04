@@ -665,7 +665,7 @@ export function GuestListWithPayment({
                       {paidSeatsCount} de {totalSeatsCount} pago{totalSeatsCount !== 1 ? "s" : ""}
                       {guest.pendingAmount > 0 ? (
                         <>
-                          {" · falta "}
+                          {" · falta cobrar "}
                           <b className="text-foreground">{formatARS(guest.pendingAmount)}</b>
                         </>
                       ) : guest.surplus > 0 ? (
@@ -721,7 +721,7 @@ export function GuestListWithPayment({
                 <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
                   <span>Cupos marcados: <b className="text-foreground">{formatARS(guest.paidAmount)}</b></span>
                   {guest.pendingAmount > 0 && (
-                    <span>Falta: <b className="text-foreground">{formatARS(guest.pendingAmount)}</b></span>
+                    <span>Falta cobrar: <b className="text-foreground">{formatARS(guest.pendingAmount)}</b></span>
                   )}
                   <span>Total: {formatARS(guest.totalAmount)}</span>
                   {guest.surplus > 0 && (
@@ -731,18 +731,21 @@ export function GuestListWithPayment({
 
                 {/* El monto recibido y las notas viven en el modal del botón de
                     anotaciones, para no llenar la fila de campos. */}
+                {/* Este bloque es OTRO eje: no es lo que debe el invitado, es el
+                    cuadre del registro propio del anfitrión. Va rotulado como
+                    tal porque decir "falta" en los dos lados se lee como una
+                    contradicción. */}
                 {(guest.receivedAmount > 0 || guest.hostNotes) && (
                   <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
+                    <span className="font-medium uppercase tracking-wide opacity-70">Tu registro</span>
                     {guest.receivedAmount > 0 && (
-                      <span>Recibido: <b className="text-foreground">{formatARS(guest.receivedAmount)}</b></span>
+                      <span>recibiste <b className="text-foreground">{formatARS(guest.receivedAmount)}</b></span>
                     )}
                     {guest.onAccount > 0 && (
-                      <span><b className="text-foreground">{formatARS(guest.onAccount)}</b> a cuenta</span>
+                      <span>· <b className="text-foreground">{formatARS(guest.onAccount)}</b> más de lo que marcaste, queda a cuenta</span>
                     )}
                     {guest.missingAmount > 0 && (
-                      <span className="text-destructive">
-                        Faltan <b>{formatARS(guest.missingAmount)}</b> de lo marcado
-                      </span>
+                      <span>· <b className="text-foreground">{formatARS(guest.missingAmount)}</b> menos de lo que marcaste</span>
                     )}
                   </div>
                 )}

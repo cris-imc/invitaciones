@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
+import { resolveCardPayment } from "@/lib/card-payments";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 import { ElegantTemplate } from "@/components/templates/ElegantTemplate";
 import { ElegantTemplateGreen } from "@/components/templates/ElegantTemplateGreen";
@@ -492,6 +493,12 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 message: true,
                 responseDate: true,
                 paymentStatus: true,
+                // Cupos pagos: el estado que ve el invitado se recalcula con
+                // ellos (ver más abajo), para que no le quede viejo si suma o
+                // resta gente después de que el anfitrión marcó algo.
+                paidAdults: true,
+                paidTeens: true,
+                paidChildren: true,
                 isExempt: true,
                 expectedAdults: true,
                 expectedTeens: true,
@@ -546,7 +553,17 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         if (validInvitation.tipo === 'CASAMIENTO' || validInvitation.tipo === 'QUINCE_ANOS' || validInvitation.tipo === 'CUMPLEANOS') {
             const color = temaColoresObj.colorPrincipal || 'default';
             const invRecord = validInvitation as Record<string, unknown>;
-            const guestRecord = { ...guest, orderNumber: guestOrderNumber } as any;
+            // El estado de pago se recalcula acá con la misma función que usa el
+            // panel, en vez de confiar en el valor guardado: si el invitado sumó
+            // o restó gente después de que el anfitrión marcó cupos, el guardado
+            // quedó viejo y le mostraría "Tarjeta abonada" debiendo la diferencia.
+            const guestRecord = {
+                ...guest,
+                orderNumber: guestOrderNumber,
+                paymentStatus: guest
+                    ? resolveCardPayment(guest, validInvitation as never).status
+                    : undefined,
+            } as any;
 
             if (validInvitation.templateTipo === 'NEON') {
                 switch (color) {
