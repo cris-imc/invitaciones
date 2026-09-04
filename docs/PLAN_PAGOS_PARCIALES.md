@@ -1,8 +1,13 @@
 # Plan — Pagos parciales de tarjeta
 
-**Rama:** `pagos-parciales` (creada desde `experimento-foto-storytelling`, sin commits propios todavía)
-**Estado:** implementación avanzada, **sin commitear** y **sin probar end-to-end**
+**Rama:** `pagos-parciales` (creada desde `experimento-foto-storytelling`)
+**Estado:** implementación completa y commiteada (`05afd21`), **sin probar end-to-end**
 **Última revisión:** 2026-09-04
+
+> ⚠️ **Si el panel no trae los invitados, reiniciá `next dev`.** El dev server cachea
+> `@prisma/client` en memoria al arrancar. Si venía corriendo desde antes de que se
+> agregaran `paidAmount` / `expectedAmount` al schema, el `select` de `GET /api/guests`
+> tira error, la respuesta es un 500 y la lista queda vacía. No es un bug del código.
 
 ---
 
@@ -25,7 +30,7 @@ Fuente única de verdad del cálculo: `src/lib/payments.ts`.
 
 ---
 
-## ✅ Hecho (todo en el working tree, sin commitear)
+## ✅ Hecho
 
 ### Datos
 - [x] `prisma/schema.prisma` — `Guest.paidAmount Float @default(0)` y `Guest.expectedAmount Float?`
@@ -60,26 +65,22 @@ Fuente única de verdad del cálculo: `src/lib/payments.ts`.
 - [x] `RSVPWizardV2.tsx` — prop `initialPaidAmount`, título "Pago registrado en parte" y
       líneas "Ya registramos $X / Saldo pendiente $Y".
 - [x] 184 plantillas — leen `guest.paidAmount` y lo pasan al wizard.
+- [x] `src/app/invite/[slug]/[token]/page.tsx` — el `select` del guest ahora pide
+      `paidAmount` y `expectedAmount`. Sin esto llegaban `undefined` a las plantillas y el
+      invitado **nunca veía su saldo**: era el eslabón que dejaba muerto todo el trabajo del
+      wizard y de las 184 plantillas.
 
 ### Verificado
 - [x] `npx tsc --noEmit` pasa sin errores.
 - [x] Las columnas `paidAmount` / `expectedAmount` **existen** en `prisma/dev.db`.
+- [x] Commiteado en `05afd21` — solo los 197 archivos de pagos, sin arrastrar los borrados
+      de `mockup/` ni `public/uploads/` que estaban sueltos en el working tree.
 
 ---
 
 ## ❌ Falta
 
-### 1. BLOQUEANTE — el invitado nunca ve su saldo
-`src/app/invite/[slug]/[token]/page.tsx:479-501` — el `select` del guest **no pide
-`paidAmount` ni `expectedAmount`**. Llegan `undefined` a las plantillas, así que
-`guestPaidAmount` siempre vale `0` y el bloque de pago parcial **nunca se muestra**.
-
-Todo el trabajo del wizard y de las 184 plantillas está muerto hasta arreglar esto.
-
-- [ ] Agregar `paidAmount: true` y `expectedAmount: true` al select
-- [ ] Verificar que el saldo que ve el invitado coincide con el del panel
-
-### 2. Estrategia de despliegue de la migración
+### 1. Estrategia de despliegue de la migración
 `prisma migrate status` reporta **4 migraciones sin aplicar**, incluida la de pagos parciales
 (las otras 3 son de Diamond/teléfono, previas a este trabajo). Las columnas existen en
 `dev.db`, o sea que en algún momento se usó `db push` en vez de `migrate`.
@@ -89,7 +90,7 @@ Todo el trabajo del wizard y de las 184 plantillas está muerto hasta arreglar e
       legacy de `resolveGuestPayment()` cubre a todos los clientes que ya cobraron
 - [ ] Si usa `migrate deploy`, resolver primero las 3 migraciones atrasadas
 
-### 3. Probar en la app real (nada se probó todavía)
+### 2. Probar en la app real (nada se probó todavía)
 - [ ] Cargar un parcial desde el panel y ver que queda `PARTIAL` con el saldo correcto
 - [ ] Abrir la invitación de ese invitado y ver "Ya registramos / Saldo pendiente"
 - [ ] Completar el saldo → pasa a `PAID` solo
@@ -99,33 +100,31 @@ Todo el trabajo del wizard y de las 184 plantillas está muerto hasta arreglar e
 - [ ] Export a Excel con las columnas nuevas
 - [ ] Invitación **sin** precio de tarjeta cargado: el botón Parcial debe estar deshabilitado
 
-### 4. Colección Storytelling sin pago de tarjeta
+### 3. Colección Storytelling sin pago de tarjeta
 177 plantillas usan `RSVPWizardV2` pero **no pasan `initialPaymentStatus`** (ni el viejo).
 No es una regresión de este trabajo, pero hay que decidirlo.
 
 - [ ] Confirmar si esas plantillas deben soportar pago de tarjeta
 - [ ] Si sí: cablear `initialPaymentStatus` + `initialPaidAmount` en las 177
 
-### 5. Deuda menor
+### 4. Deuda menor
 - [ ] `PaymentBadge.tsx` — su tipo sigue siendo `"PENDING" | "EXEMPT" | "PAID"`, no conoce
       `PARTIAL`. Hoy está **importado pero nunca renderizado** en las plantillas, así que no
       rompe nada; si se reactiva mostraría el total sin descontar lo abonado.
 - [ ] `GuestListWithPayment` sigue recibiendo el prop `paymentAmount` que ya no usa —
       limpiarlo acá y en `GuestPageTabs`.
 
-### 6. Casos de borde a decidir
+### 5. Casos de borde a decidir
 - [ ] **Sobrepago**: el panel lo bloquea con un error, pero la API lo acepta. Unificar.
 - [ ] **Quitar la exención** a un invitado que antes había pagado: hoy vuelve con
       `paidAmount = 0`, se pierde lo que había entregado.
 - [ ] **Historial de pagos**: hoy solo hay un monto acumulado, no un registro de cada entrega
       ("el 3/9 trajeron $150.000"). Decidir si alcanza así.
 
-### 7. Higiene de la rama
-- [ ] **Commitear**. Hay 198 archivos modificados sin commitear, mezclados con borrados de
-      `mockup/` y `public/uploads/` que vienen de otras ramas. Todo este trabajo se pierde
-      con cualquier `checkout` o `reset` mal apuntado.
-- [ ] Commitear **solo** los archivos de pagos (14 archivos de lógica + las 184 plantillas),
-      dejando los borrados de `mockup/` afuera.
+### 6. Higiene de la rama
+- [ ] `prisma/dev.db` quedó modificado y **fuera del commit** a propósito (es la base local).
+- [ ] En el working tree siguen sueltos los borrados de `mockup/` y `public/uploads/` que
+      vienen de otras ramas. No son de este trabajo: decidir aparte qué hacer con ellos.
 
 ---
 
@@ -145,4 +144,4 @@ No es una regresión de este trabajo, pero hay que decidirlo.
 | `src/app/dashboard/page.tsx` | stats globales |
 | `src/components/invitation/v2/RSVPWizardV2.tsx` | saldo del invitado |
 | `src/components/templates/*.tsx` (184) | pasan `initialPaidAmount` |
-| `src/app/invite/[slug]/[token]/page.tsx` | **← falta tocarlo (punto 1)** |
+| `src/app/invite/[slug]/[token]/page.tsx` | select del guest con los montos |
