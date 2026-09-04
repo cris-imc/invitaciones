@@ -541,25 +541,14 @@ export function GuestListWithPayment({
             const seatsOpen = openSeatsFor === guest.id;
             const paidSeatsCount = BRACKETS.reduce((n, b) => n + (guest.paidSeats?.[b] ?? 0), 0);
             const totalSeatsCount = BRACKETS.reduce((n, b) => n + (guest.seats?.[b] ?? 0), 0);
-            // Con el desplegable abierto la fila crece y se confunde con la
-            // siguiente: se le dan fondo y borde propios para que se lea como un
-            // bloque separado.
             return (
+            // Mismo lenguaje que las tarjetas de "Gestionar invitados": borde,
+            // esquinas redondeadas y separación entre una y otra. Nada de
+            // fondos ni acentos propios -- el panel puede ser claro u oscuro y
+            // los colores los pone el tema.
             <div
               key={guest.id}
-              style={{
-                borderBottom: "1px solid #f0f0f0",
-                // Nada de fondo: el panel puede ser oscuro y un bloque claro
-                // quedaba pegado encima. Alcanza con una guía lateral en el
-                // acento para marcar qué fila está abierta.
-                ...(seatsOpen
-                  ? {
-                      borderLeft: `2px solid ${PAYMENT_STATUS_COLORS.PARTIAL}`,
-                      paddingLeft: "12px",
-                      marginLeft: "-14px",
-                    }
-                  : {}),
-              }}
+              className="border rounded-xl bg-card hover:bg-muted/50 transition-colors px-4 mb-2"
             >
             <div
               className="inv-guest-row"
@@ -644,57 +633,45 @@ export function GuestListWithPayment({
                     ))}
                   </div>
 
+                  {hasPrices && !guest.isExempt && totalSeatsCount > 0 && (
+                    <button
+                      onClick={() => setOpenSeatsFor(seatsOpen ? null : guest.id)}
+                      aria-expanded={seatsOpen}
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted/60"
+                    >
+                      {seatsOpen ? <ChevronUp className="w-3.5 h-3.5" strokeWidth={2} /> : <ChevronDown className="w-3.5 h-3.5" strokeWidth={2} />}
+                      {seatsOpen ? "Ocultar detalles" : "Ver detalles"}
+                    </button>
+                  )}
+
                   <button
                     onClick={() => openNotes(guest)}
                     aria-label={`Anotaciones de ${guest.name}`}
                     title="Notas y monto recibido"
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: "5px",
-                      background: "transparent",
-                      border: `1px solid ${guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#c9c9c9"}`,
-                      color: guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#888",
-                      borderRadius: "999px", padding: "5px 11px", cursor: "pointer",
-                      fontSize: "11px", fontWeight: 700, fontFamily: "var(--font-body)",
-                      whiteSpace: "nowrap",
-                    }}
+                    className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted/60 ${
+                      guest.hostNotes || guest.receivedAmount > 0 ? "border-foreground/40 text-foreground" : ""
+                    }`}
                   >
                     <NotebookPen className="w-3.5 h-3.5" strokeWidth={1.75} />
                     Anotaciones
                   </button>
                   </div>
 
-                  {/* Resumen de plata de la fila + acceso al detalle por franja */}
+                  {/* Resumen de plata de la fila: texto, no control. Abrir el
+                      detalle es un botón con etiqueta, arriba, junto a los otros
+                      -- una flechita sola no dice qué va a pasar al tocarla. */}
                   {hasPrices && !guest.isExempt && totalSeatsCount > 0 && (
-                    <button
-                      onClick={() => setOpenSeatsFor(seatsOpen ? null : guest.id)}
-                      aria-expanded={seatsOpen}
-                      style={{
-                        display: "flex", alignItems: "center", gap: "6px",
-                        background: "transparent", border: "none", cursor: "pointer",
-                        fontSize: "11.5px", color: "#666", padding: "2px 0",
-                        fontFamily: "var(--font-body)",
-                      }}
-                    >
-                      <span>
-                        {paidSeatsCount} de {totalSeatsCount} pago{totalSeatsCount !== 1 ? "s" : ""}
-                        {guest.pendingAmount > 0 ? (
-                          <>
-                            {" · falta "}
-                            <b>{formatARS(guest.pendingAmount)}</b>
-                          </>
-                        ) : guest.surplus > 0 ? (
-                          <>
-                            {" · "}
-                            <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
-                              {formatARS(guest.surplus)} a favor
-                            </b>
-                          </>
-                        ) : null}
-                      </span>
-                      {seatsOpen
-                        ? <ChevronUp className="w-4 h-4" strokeWidth={2.25} style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }} />
-                        : <ChevronDown className="w-4 h-4" strokeWidth={2.25} style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }} />}
-                    </button>
+                    <span className="text-xs text-muted-foreground">
+                      {paidSeatsCount} de {totalSeatsCount} pago{totalSeatsCount !== 1 ? "s" : ""}
+                      {guest.pendingAmount > 0 ? (
+                        <>
+                          {" · falta "}
+                          <b className="text-foreground">{formatARS(guest.pendingAmount)}</b>
+                        </>
+                      ) : guest.surplus > 0 ? (
+                        <>{" · "}<b className="text-foreground">{formatARS(guest.surplus)} a favor</b></>
+                      ) : null}
+                    </span>
                   )}
                 </div>
               )}
@@ -741,31 +718,29 @@ export function GuestListWithPayment({
                   );
                 })}
 
-                <div style={{ borderTop: "1px dashed #e2e2e2", paddingTop: "10px", fontSize: "12px", color: "#666", display: "flex", flexWrap: "wrap", gap: "4px 10px" }}>
-                  <span>Cupos marcados: <b style={{ color: PAYMENT_STATUS_COLORS.PAID }}>{formatARS(guest.paidAmount)}</b></span>
+                <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
+                  <span>Cupos marcados: <b className="text-foreground">{formatARS(guest.paidAmount)}</b></span>
                   {guest.pendingAmount > 0 && (
-                    <span>Falta: <b>{formatARS(guest.pendingAmount)}</b></span>
+                    <span>Falta: <b className="text-foreground">{formatARS(guest.pendingAmount)}</b></span>
                   )}
-                  <span style={{ opacity: .75 }}>Total: {formatARS(guest.totalAmount)}</span>
+                  <span>Total: {formatARS(guest.totalAmount)}</span>
                   {guest.surplus > 0 && (
-                    <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>{formatARS(guest.surplus)} a favor</span>
+                    <span><b className="text-foreground">{formatARS(guest.surplus)}</b> a favor</span>
                   )}
                 </div>
 
                 {/* El monto recibido y las notas viven en el modal del botón de
                     anotaciones, para no llenar la fila de campos. */}
                 {(guest.receivedAmount > 0 || guest.hostNotes) && (
-                  <div style={{ borderTop: "1px dashed #e2e2e2", paddingTop: "10px", fontSize: "12px", color: "#666", display: "flex", flexWrap: "wrap", gap: "4px 10px" }}>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
                     {guest.receivedAmount > 0 && (
-                      <span>Recibido: <b>{formatARS(guest.receivedAmount)}</b></span>
+                      <span>Recibido: <b className="text-foreground">{formatARS(guest.receivedAmount)}</b></span>
                     )}
                     {guest.onAccount > 0 && (
-                      <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
-                        <b>{formatARS(guest.onAccount)}</b> a cuenta
-                      </span>
+                      <span><b className="text-foreground">{formatARS(guest.onAccount)}</b> a cuenta</span>
                     )}
                     {guest.missingAmount > 0 && (
-                      <span style={{ color: "#c0392b" }}>
+                      <span className="text-destructive">
                         Faltan <b>{formatARS(guest.missingAmount)}</b> de lo marcado
                       </span>
                     )}
