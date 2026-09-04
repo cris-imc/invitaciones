@@ -123,11 +123,25 @@ export function derivePaymentStatus({
   return "PARTIAL";
 }
 
-/** Saldo pendiente, nunca negativo (un sobrepago no genera saldo a favor). */
+/**
+ * Saldo pendiente, nunca negativo. Diferencias menores a EPSILON se toman como
+ * cero: al escalar las tarifas congeladas quedan residuos de coma flotante
+ * (30500.000000000004 contra 30500) que si no se filtran terminan a la vista
+ * como un "falta $0" sin sentido.
+ */
 export function computeBalance(paidAmount?: number | null, expectedAmount?: number | null): number {
   const paid = Number(paidAmount ?? 0) || 0;
   const expected = Number(expectedAmount ?? 0) || 0;
-  return Math.max(0, expected - paid);
+  const balance = expected - paid;
+  return balance >= EPSILON ? balance : 0;
+}
+
+/** Plata cobrada de más, con la misma tolerancia: evita el "$0 a favor". */
+export function computeSurplus(paidAmount?: number | null, expectedAmount?: number | null): number {
+  const paid = Number(paidAmount ?? 0) || 0;
+  const expected = Number(expectedAmount ?? 0) || 0;
+  const surplus = paid - expected;
+  return surplus >= EPSILON ? surplus : 0;
 }
 
 export function formatARS(n: number): string {

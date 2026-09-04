@@ -7,6 +7,7 @@ import {
   PAYMENT_STATUS_COLORS,
   PAYMENT_STATUS_LABELS,
   computeBalance,
+  computeSurplus,
   formatARS,
 } from "@/lib/payments";
 
@@ -316,10 +317,7 @@ export function GuestListWithPayment({
   // Plata cobrada de más: pasa cuando una familia paga y después baja la
   // cantidad de personas. Sin esto, "Recaudado" queda por encima de "Total
   // tarjetas" y el recuadro no cierra.
-  const surplusTotal = billable.reduce(
-    (sum, g) => sum + Math.max(0, (g.paidAmount || 0) - (g.expectedAmount || 0)),
-    0
-  );
+  const surplusTotal = billable.reduce((sum, g) => sum + computeSurplus(g.paidAmount, g.expectedAmount), 0);
   const showTotals = estimatedTotal > 0 || collectedTotal > 0;
 
   const handleExportExcel = () => {
@@ -674,13 +672,13 @@ export function GuestListWithPayment({
                         // pagar, lo entregado queda por encima de lo que ahora
                         // vale la tarjeta. Se muestra el excedente en vez de un
                         // monto suelto que no cierra con el total.
-                        guest.paidAmount > guest.expectedAmount ? (
+                        computeSurplus(guest.paidAmount, guest.expectedAmount) > 0 ? (
                           <>
                             Pagó {formatARS(guest.paidAmount)}
                             <span style={{ opacity: .7 }}> de {formatARS(guest.expectedAmount)}</span>
                             {" · "}
                             <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
-                              {formatARS(guest.paidAmount - guest.expectedAmount)} a favor
+                              {formatARS(computeSurplus(guest.paidAmount, guest.expectedAmount))} a favor
                             </b>
                           </>
                         ) : (
