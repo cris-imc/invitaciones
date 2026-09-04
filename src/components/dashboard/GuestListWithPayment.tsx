@@ -342,18 +342,41 @@ export function GuestListWithPayment({
     if (guests.length === 0) return;
 
     const escape = (str: string) => `"${(str ?? "").replace(/"/g, '""')}"`;
-    const header = "Nombre;Estado;Personas;Pago;Restricciones alimentarias\n";
+    // Los montos van como número plano, sin símbolo ni separador de miles, para
+    // que Excel los sume sin tener que reformatear la columna.
+    const money = (n: number) => String(Math.round(n));
+
+    const header = pagoTarjetaHabilitado
+      ? "Nombre;Estado;Personas;Pago;Cupos pagos;Cupos totales;Cobrado;Falta marcar;Total tarjeta;Recibido (tu registro);Notas;Restricciones alimentarias\n"
+      : "Nombre;Estado;Personas;Pago;Restricciones alimentarias\n";
+
     const rows = guests
       .map((g) => {
-        const personas = g.status === "CONFIRMED" ? g.attendingCount : g.expectedCount;
-        const pago = g.status === "CONFIRMED"
+        const confirmado = g.status === "CONFIRMED";
+        const personas = confirmado ? g.attendingCount : g.expectedCount;
+        const pago = confirmado
           ? PAYMENT_STATUS_LABELS[g.paymentStatus as CardPaymentStatus] ?? g.paymentStatus
           : "—";
+        const paidSeats = BRACKETS.reduce((n, b) => n + (g.paidSeats?.[b] ?? 0), 0);
+        const totalSeats = BRACKETS.reduce((n, b) => n + (g.seats?.[b] ?? 0), 0);
+        const exento = g.paymentStatus === "EXEMPT";
+
         return [
           escape(g.name),
           escape(STATUS_LABELS[g.status] ?? g.status),
           personas,
           escape(pago),
+          ...(pagoTarjetaHabilitado
+            ? [
+                confirmado && !exento ? paidSeats : "",
+                confirmado && !exento ? totalSeats : "",
+                confirmado && !exento ? money(g.paidAmount) : "",
+                confirmado && !exento ? money(g.pendingAmount) : "",
+                confirmado && !exento ? money(g.totalAmount) : "",
+                g.receivedAmount > 0 ? money(g.receivedAmount) : "",
+                escape(g.hostNotes || ""),
+              ]
+            : []),
           escape(g.dietaryRestrictions || ""),
         ].join(";");
       })
@@ -443,54 +466,42 @@ export function GuestListWithPayment({
         </>
       )}
 
-      {/* Filtros + búsqueda */}
-      <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
+      {/* Filtros + búsqueda. En mobile van apilados en bloques: buscador,
+          asistencia y pago. Antes era una sola fila que envolvía donde caía y
+          los dos grupos de pills se mezclaban entre sí. */}
+      <div className="mb-4 flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center">
         <input
           type="search"
           placeholder="Buscar invitado…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{
-            flex: 1,
-            minWidth: "180px",
-            padding: "8px 14px",
-            borderRadius: "999px",
-            border: "1px solid #ddd",
-            fontSize: "13px",
-            fontFamily: "var(--font-body)",
-          }}
+          className="w-full rounded-full border px-4 py-2 text-sm md:w-auto md:min-w-[180px] md:flex-1"
           aria-label="Buscar invitado por nombre"
         />
-        {(["all", "CONFIRMED", "PENDING", "DECLINED"] as const).map((f) => {
-          const disabled = isAttendanceDisabled(f);
-          const active = attendanceFilter === f;
-          return (
-            <button
-              key={f}
-              onClick={() => !disabled && toggleAttendance(f)}
-              disabled={disabled}
-              style={{
-                padding: "5px 10px",
-                borderRadius: "999px",
-                border: "1px solid #ddd",
-                background: active ? "#1a1a1a" : "#fff",
-                color: active ? "#fff" : "#555",
-                fontSize: "11px",
-                fontWeight: 600,
-                cursor: disabled ? "not-allowed" : "pointer",
-                opacity: disabled ? 0.35 : 1,
-                fontFamily: "var(--font-body)",
-                minHeight: "32px",
-              }}
-            >
-              {f === "all" ? "Todos" : STATUS_LABELS[f]}
-            </button>
-          );
-        })}
+
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por asistencia">
+          {(["all", "CONFIRMED", "PENDING", "DECLINED"] as const).map((f) => {
+            const disabled = isAttendanceDisabled(f);
+            const active = attendanceFilter === f;
+            return (
+              <button
+                key={f}
+                onClick={() => !disabled && toggleAttendance(f)}
+                disabled={disabled}
+                aria-pressed={active}
+                className={`min-h-8 rounded-full border px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-35 ${
+                  active ? "bg-foreground text-background" : "hover:bg-muted/60"
+                }`}
+              >
+                {f === "all" ? "Todos" : STATUS_LABELS[f]}
+              </button>
+            );
+          })}
+        </div>
 
         {pagoTarjetaHabilitado && (
-          <>
-            <span style={{ width: "1px", alignSelf: "stretch", background: "#e2e2e2", margin: "2px 2px" }} />
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por estado de pago">
+            <span className="hidden self-stretch border-l md:block" aria-hidden="true" />
             {(["PAID", "PARTIAL", "PENDING"] as const).map((p) => {
               const disabled = isPaymentDisabled(p);
               const active = paymentFilter === p;
@@ -499,25 +510,15 @@ export function GuestListWithPayment({
                   key={p}
                   onClick={() => !disabled && togglePayment(p)}
                   disabled={disabled}
-                  style={{
-                    padding: "5px 10px",
-                    borderRadius: "999px",
-                    border: `1px solid ${active ? PAYMENT_STATUS_COLORS[p] : "#ddd"}`,
-                    background: active ? PAYMENT_STATUS_COLORS[p] : "#fff",
-                    color: active ? "#fff" : "#555",
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    cursor: disabled ? "not-allowed" : "pointer",
-                    opacity: disabled ? 0.35 : 1,
-                    fontFamily: "var(--font-body)",
-                    minHeight: "32px",
-                  }}
+                  aria-pressed={active}
+                  className="min-h-8 rounded-full border px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-35 hover:bg-muted/60"
+                  style={active ? { background: PAYMENT_STATUS_COLORS[p], borderColor: PAYMENT_STATUS_COLORS[p], color: "#fff" } : undefined}
                 >
                   {PAYMENT_FILTER_LABELS[p]}
                 </button>
               );
             })}
-          </>
+          </div>
         )}
       </div>
 
