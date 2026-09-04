@@ -110,7 +110,11 @@ export function GuestListWithPayment({
   const [partialInput, setPartialInput] = useState("");
   const [partialError, setPartialError] = useState("");
   // Fila esperando que se confirme el borrado de un monto ya registrado.
-  const [clearConfirm, setClearConfirm] = useState<{ guestId: string; status: string } | null>(null);
+  const [clearConfirm, setClearConfirm] = useState<
+    { guestId: string; status: string; paidAmount?: number } | null
+  >(null);
+  // Error de una fila (lo que devolvió el servidor al cambiar el estado).
+  const [rowError, setRowError] = useState<{ guestId: string; message: string } | null>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -150,7 +154,14 @@ export function GuestListWithPayment({
       // El servidor es el que valida (sobrepago, borrado de un monto ya
       // registrado): se muestra su mensaje en vez de un "no se pudo guardar"
       // que no dice nada.
-      if (!res.ok) return { ok: false as const, error: updated?.error as string | undefined };
+      if (!res.ok) {
+        return {
+          ok: false as const,
+          error: (updated?.error as string | undefined) ?? `El servidor rechazó el cambio (${res.status}).`,
+          code: updated?.code as string | undefined,
+          paidAmount: updated?.paidAmount as number | undefined,
+        };
+      }
       setGuests((prev) =>
         prev.map((g) =>
           g.id === guestId
@@ -168,16 +179,27 @@ export function GuestListWithPayment({
       onPaymentChange?.(guestId, updated.paymentStatus);
       return { ok: true as const };
     } catch {
-      return { ok: false as const, error: undefined };
+      return { ok: false as const, error: "No se pudo conectar con el servidor." };
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const handlePaymentChange = (guestId: string, newStatus: string, confirmClearPayment = false) => {
+  const handlePaymentChange = async (guestId: string, newStatus: string, confirmClearPayment = false) => {
     setPartialFor(null);
     setClearConfirm(null);
-    return patchPayment(guestId, { status: newStatus, confirmClearPayment });
+    const res = await patchPayment(guestId, { status: newStatus, confirmClearPayment });
+    if (!res.ok) {
+      // El servidor tiene la última palabra sobre cuánto hay abonado. Si frena
+      // el cambio porque borraría plata (la fila podía tener el monto viejo),
+      // se abre la confirmación en vez de dejar el clic sin efecto ni aviso.
+      if (res.code === "PAYMENT_WOULD_BE_CLEARED") {
+        setClearConfirm({ guestId, status: newStatus, paidAmount: res.paidAmount });
+      } else {
+        setRowError({ guestId, message: res.error ?? "No se pudo guardar." });
+      }
+    }
+    return res;
   };
 
   /**
@@ -187,10 +209,11 @@ export function GuestListWithPayment({
    * registrado primero se pide confirmación.
    */
   const requestPaymentChange = (guest: Guest, newStatus: string) => {
+    setRowError(null);
     const wipesMoney = (newStatus === "PENDING" || newStatus === "EXEMPT") && guest.paidAmount > 0;
     if (wipesMoney) {
       setPartialFor(null);
-      setClearConfirm({ guestId: guest.id, status: newStatus });
+      setClearConfirm({ guestId: guest.id, status: newStatus, paidAmount: guest.paidAmount });
       return;
     }
     handlePaymentChange(guest.id, newStatus);
@@ -199,6 +222,7 @@ export function GuestListWithPayment({
   const openPartialEditor = (guest: Guest) => {
     setPartialError("");
     setClearConfirm(null);
+    setRowError(null);
     setPartialFor(guest.id);
     // Se precarga lo ya abonado (si hay), que es lo que el anfitrión va a querer
     // corregir o completar.
@@ -645,6 +669,13 @@ export function GuestListWithPayment({
               )}
             </div>
 
+            {/* Lo que respondió el servidor cuando el cambio no se pudo aplicar */}
+            {rowError?.guestId === guest.id && (
+              <div style={{ padding: "0 0 12px", fontSize: "11.5px", color: "#c0392b" }}>
+                {rowError.message}
+              </div>
+            )}
+
             {/* Confirmación antes de borrar un monto ya registrado */}
             {confirmOpen && (
               <div
@@ -659,7 +690,11 @@ export function GuestListWithPayment({
               >
                 <span style={{ fontSize: "12px", color: "#666" }}>
                   {confirmOpen.status === "EXEMPT" ? "Marcar exento a " : "Pasar a “No pago” a "}
-                  <b>{guest.name}</b> borra los <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>{formatARS(guest.paidAmount)}</b> ya registrados. ¿Seguro?
+                  <b>{guest.name}</b> borra los{" "}
+                  <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
+                    {formatARS(confirmOpen.paidAmount ?? guest.paidAmount)}
+                  </b>{" "}
+                  ya registrados. ¿Seguro?
                 </span>
                 <button
                   onClick={() => handlePaymentChange(guest.id, confirmOpen.status, true)}
