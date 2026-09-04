@@ -575,10 +575,6 @@ export function GuestListWithPayment({
             const partialOpen = partialFor === guest.id;
             const confirmOpen = clearConfirm?.guestId === guest.id ? clearConfirm : null;
             const billableRow = guest.status === "CONFIRMED" && guest.paymentStatus !== "EXEMPT" && guest.expectedAmount > 0;
-            // Valor de "una tarjeta" del grupo, para los atajos. Con precios
-            // diferenciados por edad es un promedio: el monto exacto queda a la
-            // vista en el input antes de guardar.
-            const perPerson = guest.attendingCount > 0 ? guest.expectedAmount / guest.attendingCount : 0;
             const typedAmount = parseAmountInput(partialInput);
             const previewBalance = Number.isFinite(typedAmount)
               ? computeBalance(typedAmount, guest.expectedAmount)
@@ -840,32 +836,6 @@ export function GuestListWithPayment({
                     Cancelar
                   </button>
                 </div>
-
-                {/* Atajo para el caso típico: "pagaron 2 tarjetas de las 5". */}
-                {guest.attendingCount > 1 && perPerson > 0 && (
-                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                    <span style={{ fontSize: "11px", color: "#999" }}>Pagaron</span>
-                    {Array.from({ length: Math.min(guest.attendingCount - 1, 8) }, (_, i) => i + 1).map((k) => (
-                      <button
-                        key={k}
-                        onClick={() => { setPartialInput(String(Math.round(perPerson * k))); setPartialError(""); }}
-                        style={{
-                          padding: "5px 10px",
-                          borderRadius: "999px",
-                          border: "1px dashed #ccc",
-                          background: "transparent",
-                          color: "#666",
-                          fontSize: "11px",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          fontFamily: "var(--font-body)",
-                        }}
-                      >
-                        {k} tarjeta{k !== 1 ? "s" : ""}
-                      </button>
-                    ))}
-                  </div>
-                )}
 
                 <div style={{ fontSize: "11.5px", color: partialError ? "#c0392b" : "#888" }}>
                   {partialError
