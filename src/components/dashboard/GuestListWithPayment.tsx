@@ -547,18 +547,19 @@ export function GuestListWithPayment({
             return (
             <div
               key={guest.id}
-              style={
-                seatsOpen
+              style={{
+                borderBottom: "1px solid #f0f0f0",
+                // Nada de fondo: el panel puede ser oscuro y un bloque claro
+                // quedaba pegado encima. Alcanza con una guía lateral en el
+                // acento para marcar qué fila está abierta.
+                ...(seatsOpen
                   ? {
-                      borderBottom: "1px solid #e2e2e2",
-                      background: "#fafafa",
-                      borderRadius: "10px",
-                      padding: "0 12px",
-                      margin: "8px -12px",
-                      boxShadow: "inset 0 0 0 1px #ececec",
+                      borderLeft: `2px solid ${PAYMENT_STATUS_COLORS.PARTIAL}`,
+                      paddingLeft: "12px",
+                      marginLeft: "-14px",
                     }
-                  : { borderBottom: "1px solid #f0f0f0" }
-              }
+                  : {}),
+              }}
             >
             <div
               className="inv-guest-row"
@@ -599,6 +600,9 @@ export function GuestListWithPayment({
               {guest.status === "CONFIRMED" && pagoTarjetaHabilitado && (
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
                   <span style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.05em", color: "#888", fontWeight: 600, paddingRight: "4px" }}>Estado de pago</span>
+                  {/* El botón de anotaciones va en la misma línea que los
+                      estados: es una acción de la fila, no del detalle de cupos. */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", justifyContent: "flex-end" }}>
                   <div
                     className="inv-status-toggle"
                     role="group"
@@ -640,6 +644,25 @@ export function GuestListWithPayment({
                     ))}
                   </div>
 
+                  <button
+                    onClick={() => openNotes(guest)}
+                    aria-label={`Anotaciones de ${guest.name}`}
+                    title="Notas y monto recibido"
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: "5px",
+                      background: "transparent",
+                      border: `1px solid ${guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#c9c9c9"}`,
+                      color: guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#888",
+                      borderRadius: "999px", padding: "5px 11px", cursor: "pointer",
+                      fontSize: "11px", fontWeight: 700, fontFamily: "var(--font-body)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <NotebookPen className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    Anotaciones
+                  </button>
+                  </div>
+
                   {/* Resumen de plata de la fila + acceso al detalle por franja */}
                   {hasPrices && !guest.isExempt && totalSeatsCount > 0 && (
                     <button
@@ -668,28 +691,11 @@ export function GuestListWithPayment({
                           </>
                         ) : null}
                       </span>
-                      {seatsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      {seatsOpen
+                        ? <ChevronUp className="w-4 h-4" strokeWidth={2.25} style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }} />
+                        : <ChevronDown className="w-4 h-4" strokeWidth={2.25} style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }} />}
                     </button>
                   )}
-
-                  {/* Anotaciones del anfitrión + la plata que le fue entregando.
-                      Van en un modal para no llenar la fila de campos. */}
-                  <button
-                    onClick={() => openNotes(guest)}
-                    aria-label={`Anotaciones de ${guest.name}`}
-                    title="Anotaciones y monto recibido"
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: "5px",
-                      background: "transparent",
-                      border: `1px solid ${guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#ddd"}`,
-                      color: guest.hostNotes || guest.receivedAmount > 0 ? PAYMENT_STATUS_COLORS.PARTIAL : "#888",
-                      borderRadius: "999px", padding: "4px 10px", cursor: "pointer",
-                      fontSize: "11px", fontWeight: 600, fontFamily: "var(--font-body)",
-                    }}
-                  >
-                    <NotebookPen className="w-3.5 h-3.5" strokeWidth={1.75} />
-                    {guest.hostNotes || guest.receivedAmount > 0 ? "Con notas" : "Anotar"}
-                  </button>
                 </div>
               )}
             </div>

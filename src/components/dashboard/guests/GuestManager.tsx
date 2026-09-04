@@ -55,6 +55,7 @@ import {
   Minus,
   X,
   Info,
+  ChevronLeft,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { getInvitePhrase } from "@/lib/invitation-copy";
@@ -727,12 +728,15 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
               </div>
             ) : (
             <form onSubmit={handleAddGuest} className="space-y-4">
+              {/* Era un texto chiquito en color atenuado y se perdía. Como es la
+                  única forma de volver atrás en este paso, va como botón. */}
               <button
                 type="button"
                 onClick={() => setNewGuestType(null)}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-full border border-muted-foreground/40 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted/60"
               >
-                ← Cambiar tipo de invitación
+                <ChevronLeft className="w-3.5 h-3.5" strokeWidth={2} />
+                Cambiar tipo de invitación
               </button>
 
               {newGuestType === "FAMILY" ? (
