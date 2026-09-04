@@ -60,6 +60,9 @@ Fuente única de verdad del cálculo: `src/lib/payments.ts`.
       Total tarjeta / Abonado / Saldo.
 - [x] `GuestStatsBar.tsx` — los parciales cuentan como pendientes + contador de parciales.
 - [x] `dashboard/page.tsx` — idem en las stats globales.
+- [x] El campo de monto acepta **solo dígitos y separadores**: las letras y símbolos ya no se
+      pueden tipear (antes entraban y recién se rechazaban al guardar).
+- [x] Confirmación antes de borrar un monto ya registrado (ver punto 5).
 
 ### Invitación del invitado
 - [x] `RSVPWizardV2.tsx` — prop `initialPaidAmount`, título "Pago registrado en parte" y
@@ -114,12 +117,17 @@ No es una regresión de este trabajo, pero hay que decidirlo.
 - [ ] `GuestListWithPayment` sigue recibiendo el prop `paymentAmount` que ya no usa —
       limpiarlo acá y en `GuestPageTabs`.
 
-### 5. Casos de borde a decidir
+### 5. Casos de borde
+- [x] **Borrado accidental del monto**: pasar a "No pago" o "Exento" deja el monto en cero (es
+      coherente con el modelo: son estados sin plata). Pero un clic al pasar borraba en
+      silencio lo que la familia ya había entregado, sin deshacer. Ahora, **solo si hay monto
+      registrado**, la fila pide confirmación diciendo cuánto se va a borrar.
+- [ ] Mismo problema en `PUT /api/guests/[id]`: tildar "exento" al **editar** un invitado desde
+      `GuestManager` sigue poniendo `paidAmount = 0` sin avisar. Falta el mismo guardarraíl ahí.
 - [ ] **Sobrepago**: el panel lo bloquea con un error, pero la API lo acepta. Unificar.
-- [ ] **Quitar la exención** a un invitado que antes había pagado: hoy vuelve con
-      `paidAmount = 0`, se pierde lo que había entregado.
 - [ ] **Historial de pagos**: hoy solo hay un monto acumulado, no un registro de cada entrega
-      ("el 3/9 trajeron $150.000"). Decidir si alcanza así.
+      ("el 3/9 trajeron $150.000"). Decidir si alcanza así. Resolvería también el caso de
+      arriba: con historial, quitar la exención podría devolver lo que se había pagado.
 
 ### 6. Higiene de la rama
 - [ ] `prisma/dev.db` quedó modificado y **fuera del commit** a propósito (es la base local).

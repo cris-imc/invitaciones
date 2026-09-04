@@ -61,6 +61,17 @@ const TOGGLE_LABELS: Record<string, string> = {
 const PAYMENT_TOGGLE_STATES = ["PENDING", "PARTIAL", "EXEMPT", "PAID"] as const;
 
 /**
+ * Filtra lo que se puede tipear en el monto: solo dígitos y separadores. El
+ * campo es `type="text"` (un `type="number"` no acepta el formato local
+ * "150.000,50" y además suma flechitas y scroll que acá molestan), así que el
+ * teclado hay que acotarlo a mano -- si no, entran letras y símbolos que recién
+ * se rechazan al guardar.
+ */
+function sanitizeAmountInput(text: string): string {
+  return text.replace(/[^\d.,]/g, "");
+}
+
+/**
  * Interpreta lo que el anfitrión tipea en el monto: "150000", "$150.000",
  * "150.000,50". El punto se toma como separador de miles y la coma como decimal.
  * Devuelve NaN si no es un número.
@@ -100,6 +111,8 @@ export function GuestListWithPayment({
   const [partialFor, setPartialFor] = useState<string | null>(null);
   const [partialInput, setPartialInput] = useState("");
   const [partialError, setPartialError] = useState("");
+  // Fila esperando que se confirme el borrado de un monto ya registrado.
+  const [clearConfirm, setClearConfirm] = useState<{ guestId: string; status: string } | null>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -159,11 +172,29 @@ export function GuestListWithPayment({
 
   const handlePaymentChange = (guestId: string, newStatus: string) => {
     setPartialFor(null);
+    setClearConfirm(null);
     return patchPayment(guestId, { status: newStatus });
+  };
+
+  /**
+   * "No pago" y "Exento" dejan el monto en cero -- son estados sin plata, y el
+   * estado se deriva del monto. Pero un clic al pasar borraría en silencio lo
+   * que la familia ya entregó, sin deshacer, así que cuando hay un monto
+   * registrado primero se pide confirmación.
+   */
+  const requestPaymentChange = (guest: Guest, newStatus: string) => {
+    const wipesMoney = (newStatus === "PENDING" || newStatus === "EXEMPT") && guest.paidAmount > 0;
+    if (wipesMoney) {
+      setPartialFor(null);
+      setClearConfirm({ guestId: guest.id, status: newStatus });
+      return;
+    }
+    handlePaymentChange(guest.id, newStatus);
   };
 
   const openPartialEditor = (guest: Guest) => {
     setPartialError("");
+    setClearConfirm(null);
     setPartialFor(guest.id);
     // Se precarga lo ya abonado (si hay), que es lo que el anfitrión va a querer
     // corregir o completar.
@@ -497,6 +528,7 @@ export function GuestListWithPayment({
         <div>
           {paginated.map((guest) => {
             const partialOpen = partialFor === guest.id;
+            const confirmOpen = clearConfirm?.guestId === guest.id ? clearConfirm : null;
             const billableRow = guest.status === "CONFIRMED" && guest.paymentStatus !== "EXEMPT" && guest.expectedAmount > 0;
             // Valor de "una tarjeta" del grupo, para los atajos. Con precios
             // diferenciados por edad es un promedio: el monto exacto queda a la
@@ -557,8 +589,10 @@ export function GuestListWithPayment({
                         key={s}
                         onClick={() =>
                           // "Parcial" no se aplica de una: necesita el monto, así
-                          // que abre el editor de la fila.
-                          s === "PARTIAL" ? openPartialEditor(guest) : handlePaymentChange(guest.id, s)
+                          // que abre el editor de la fila. Los demás pasan por
+                          // requestPaymentChange, que frena si el cambio borraría
+                          // un monto ya registrado.
+                          s === "PARTIAL" ? openPartialEditor(guest) : requestPaymentChange(guest, s)
                         }
                         disabled={updatingId === guest.id || (s === "PARTIAL" && guest.expectedAmount <= 0)}
                         title={
@@ -605,6 +639,61 @@ export function GuestListWithPayment({
               )}
             </div>
 
+            {/* Confirmación antes de borrar un monto ya registrado */}
+            {confirmOpen && (
+              <div
+                style={{
+                  padding: "0 0 16px",
+                  display: "flex",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  animation: "fadeIn .2s ease",
+                }}
+              >
+                <span style={{ fontSize: "12px", color: "#666" }}>
+                  {confirmOpen.status === "EXEMPT" ? "Marcar exento a " : "Pasar a “No pago” a "}
+                  <b>{guest.name}</b> borra los <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>{formatARS(guest.paidAmount)}</b> ya registrados. ¿Seguro?
+                </span>
+                <button
+                  onClick={() => handlePaymentChange(guest.id, confirmOpen.status)}
+                  disabled={updatingId === guest.id}
+                  style={{
+                    padding: "8px 14px",
+                    borderRadius: "999px",
+                    border: "none",
+                    background: "#c0392b",
+                    color: "#fff",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    opacity: updatingId === guest.id ? 0.5 : 1,
+                    fontFamily: "var(--font-body)",
+                    minHeight: "38px",
+                  }}
+                >
+                  Sí, borrar el monto
+                </button>
+                <button
+                  onClick={() => setClearConfirm(null)}
+                  style={{
+                    padding: "8px 12px",
+                    borderRadius: "999px",
+                    border: "1px solid #ddd",
+                    background: "transparent",
+                    color: "#777",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-body)",
+                    minHeight: "38px",
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
+
             {/* Editor de pago parcial de la fila */}
             {partialOpen && (
               <div
@@ -627,7 +716,7 @@ export function GuestListWithPayment({
                     inputMode="decimal"
                     autoFocus
                     value={partialInput}
-                    onChange={(ev) => { setPartialInput(ev.target.value); setPartialError(""); }}
+                    onChange={(ev) => { setPartialInput(sanitizeAmountInput(ev.target.value)); setPartialError(""); }}
                     onKeyDown={(ev) => {
                       if (ev.key === "Enter") handlePartialSubmit(guest);
                       if (ev.key === "Escape") setPartialFor(null);
