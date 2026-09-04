@@ -163,7 +163,7 @@ export function GuestListWithPayment({
   const [showPriceHelp, setShowPriceHelp] = useState(false);
   // Aviso antes de desmarcar un lugar concreto del desplegable.
   const [seatConfirm, setSeatConfirm] = useState<
-    { guest: Guest; bracket: Bracket; refund: number } | null
+    { guestId: string; bracket: Bracket } | null
   >(null);
   const isMobile = useIsMobile();
 
@@ -245,6 +245,9 @@ export function GuestListWithPayment({
                 onAccount: data.onAccount ?? g.onAccount,
                 missingAmount: data.missingAmount ?? g.missingAmount,
                 hostNotes: data.hostNotes !== undefined ? data.hostNotes : g.hostNotes,
+                paidAmountAdults: data.paidAmountAdults ?? g.paidAmountAdults,
+                paidAmountTeens: data.paidAmountTeens ?? g.paidAmountTeens,
+                paidAmountChildren: data.paidAmountChildren ?? g.paidAmountChildren,
               }
             : g
         )
@@ -300,8 +303,16 @@ export function GuestListWithPayment({
    * plata, asi que se avisa antes.
    */
   const requestSeatRemoval = (guest: Guest, bracket: Bracket) => {
-    setSeatConfirm({ guest, bracket, refund: seatRefund(guest, bracket) });
+    setSeatConfirm({ guestId: guest.id, bracket });
   };
+
+  // El invitado se resuelve contra el estado vivo, no contra una copia guardada
+  // al abrir: si no, el monto del modal se quedaba con el del primer fetch.
+  const seatConfirmGuest = seatConfirm
+    ? guests.find((g) => g.id === seatConfirm.guestId) ?? null
+    : null;
+  const seatConfirmRefund =
+    seatConfirmGuest && seatConfirm ? seatRefund(seatConfirmGuest, seatConfirm.bracket) : 0;
 
   const filtered = guests.filter((g) => {
     const matchAttendance = attendanceFilter === "all" || g.status === attendanceFilter;
@@ -913,9 +924,9 @@ export function GuestListWithPayment({
             <DialogDescription asChild>
               <div className="space-y-3 text-sm">
                 <p>
-                  Ese lugar de <strong>{seatConfirm?.guest.name}</strong> deja de estar pago
-                  {seatConfirm && seatConfirm.refund > 0 ? (
-                    <> y se descuentan <strong>{formatARS(seatConfirm.refund)}</strong> de lo cobrado</>
+                  Ese lugar de <strong>{seatConfirmGuest?.name}</strong> deja de estar pago
+                  {seatConfirmRefund > 0 ? (
+                    <> y se descuentan <strong>{formatARS(seatConfirmRefund)}</strong> de lo cobrado</>
                   ) : null}
                   .
                 </p>
@@ -934,7 +945,9 @@ export function GuestListWithPayment({
             <Button
               variant="destructive"
               onClick={() => {
-                if (seatConfirm) changeSeat(seatConfirm.guest, seatConfirm.bracket, -1);
+                if (seatConfirmGuest && seatConfirm) {
+                  changeSeat(seatConfirmGuest, seatConfirm.bracket, -1);
+                }
                 setSeatConfirm(null);
               }}
             >

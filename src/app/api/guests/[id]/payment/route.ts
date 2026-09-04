@@ -131,6 +131,12 @@ export async function PATCH(
       receivedAmount: resolved.receivedAmount,
       onAccount: resolved.onAccount,
       missingAmount: resolved.missingAmount,
+      // Cobrado por franja: el panel lo necesita para decir cuánto se descuenta
+      // al desmarcar un lugar. Sin devolverlo, esa cifra quedaba con el valor
+      // del primer fetch hasta recargar la página.
+      paidAmountAdults: paid.paidAmountAdults,
+      paidAmountTeens: paid.paidAmountTeens,
+      paidAmountChildren: paid.paidAmountChildren,
     });
   } catch (error) {
     console.error("[payment PATCH]", error);
