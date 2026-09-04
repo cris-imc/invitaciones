@@ -31,6 +31,13 @@ function TypewriterText() {
   );
 }
 
+/**
+ * "Cambiar Plantilla" oculto: hoy lleva al mismo editor que "Editar invitación"
+ * (solo cambia el paso), asi que eran dos botones para el mismo lugar. Queda el
+ * codigo para volver a mostrarlo con solo poner true.
+ */
+const MOSTRAR_CAMBIAR_PLANTILLA = false;
+
 interface EventShareCardProps {
   slug: string;
   eventName: string;
@@ -125,14 +132,16 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
                 <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="w-full sm:w-auto">
                   <Button size="sm" className="w-full h-9 px-5 rounded-full gap-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm border-0">
                     <Pencil className="w-3.5 h-3.5" />
-                    Editar Info
+                    Editar invitación
                   </Button>
                 </Link>
-                <Link href={`/dashboard/invitaciones/editar/${invitationId}?step=design`} className="w-full sm:w-auto">
-                  <Button size="sm" className="w-full h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm btn-color-cycle">
-                    Cambiar Plantilla
-                  </Button>
-                </Link>
+                {MOSTRAR_CAMBIAR_PLANTILLA && (
+                  <Link href={`/dashboard/invitaciones/editar/${invitationId}?step=design`} className="w-full sm:w-auto">
+                    <Button size="sm" className="w-full h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm btn-color-cycle">
+                      Cambiar Plantilla
+                    </Button>
+                  </Link>
+                )}
               </>
             )}
           </div>
