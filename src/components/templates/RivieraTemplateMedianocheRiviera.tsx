@@ -1461,6 +1461,7 @@ export function RivieraTemplateMedianocheRiviera({ invitation, guest, isPersonal
             initialAttendingChildren={guest?.attendingChildren ?? undefined}
             initialPaymentStatus={guestPayStatus}
             initialPaidAmount={guestPaidAmount}
+            paidPrices={(guest as any)?.paidPrices ?? null}
             isExempt={guest?.isExempt ?? false}
             precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
             precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}

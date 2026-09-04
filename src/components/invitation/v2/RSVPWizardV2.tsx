@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PartyPopper, Heart, UserCheck } from "lucide-react";
 import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
+import { resolveExpectedAmount } from "@/lib/payments";
 
 type PaymentStatus = "PENDING" | "PARTIAL" | "EXEMPT" | "PAID";
 
@@ -37,6 +38,8 @@ interface RSVPWizardV2Props {
   // Plata ya entregada por este invitado (o su familia/grupo). Con un pago
   // parcial, la tarjeta muestra abonado y saldo en vez de un simple "pendiente".
   initialPaidAmount?: number;
+  /** Foto del pago (Guest.paidPrices): congela el precio de los cupos ya pagos. */
+  paidPrices?: string | null;
   // Callbacks
   onConfirmed?: (data: { attending: boolean; count: number }) => void;
 }
@@ -69,6 +72,7 @@ export function RSVPWizardV2({
   initialAttendingChildren,
   initialPaymentStatus = "PENDING",
   initialPaidAmount = 0,
+  paidPrices,
   onConfirmed,
 }: RSVPWizardV2Props) {
   const router = useRouter();
@@ -107,7 +111,10 @@ export function RSVPWizardV2({
   const [name, setName] = useState(guestName);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [paymentStatus] = useState<PaymentStatus>(initialPaymentStatus);
+  // Sin useState: congelarlo al montar dejaba "Tarjeta abonada" pegado despues
+  // de que el invitado sumaba gente, porque router.refresh() actualiza la prop
+  // pero no el estado local.
+  const paymentStatus: PaymentStatus = initialPaymentStatus;
 
   const sectionClass = `section${dark ? " dark" : ""}`;
 
@@ -115,17 +122,39 @@ export function RSVPWizardV2({
   const teenPrice = precioAdolescente != null ? precioAdolescente : adultPrice;
   const childPrice = precioNino != null ? precioNino : adultPrice;
 
-  let totalPayment = 0;
-  if (!isExempt) {
-    totalPayment = (adultPrice * adultCount) + (teenPrice * teenCount) + (childPrice * childCount);
-  }
+  // Mismo cálculo que el servidor: los cupos que el invitado ya pagó mantienen
+  // su precio congelado y los que suma van al vigente. Calcularlo acá con el
+  // precio de hoy le mostraba saldo a alguien que ya había pagado, apenas el
+  // anfitrión subía la tarjeta.
+  const totalPayment = isExempt
+    ? 0
+    : resolveExpectedAmount({
+        guest: {
+          attendingCount: count,
+          attendingAdults: adultCount,
+          attendingTeens: teenCount,
+          attendingChildren: childCount,
+        },
+        invitation: {
+          pagoTarjetaMonto: adultPrice,
+          precioAdolescente: precioAdolescente ?? adultPrice,
+          precioNino: precioNino ?? adultPrice,
+        },
+        paidPrices,
+      });
 
   // Pago parcial: lo entregado y lo que falta. El saldo se calcula contra el
   // total que corresponde a las personas confirmadas, así que si el invitado
   // modifica la asistencia el número se actualiza solo.
   const paidAmount = Math.max(0, initialPaidAmount);
   const balance = Math.max(0, totalPayment - paidAmount);
-  const isPartial = paymentStatus === "PARTIAL" || (paidAmount > 0 && balance > 0);
+  // El saldo se recalcula acá con las personas que el invitado tiene elegidas en
+  // este momento, así que manda sobre el estado que vino del servidor: apenas
+  // suma a alguien la tarjeta ya se muestra como pago parcial, sin esperar a que
+  // el servidor confirme. Antes "PAID" ganaba el condicional y seguía diciendo
+  // "Tarjeta abonada" con saldo pendiente a la vista.
+  const isPartial = paidAmount > 0 && balance > 0;
+  const isFullyPaid = !isPartial && (paymentStatus === "PAID" || (paidAmount > 0 && balance <= 0));
   // La plata a favor (pago de mas, tras bajar la cantidad de personas) NO se le
   // muestra al invitado: seria prometerle una devolucion que el anfitrion tal
   // vez no pueda hacer. Queda solo en el panel del anfitrion, que es quien
@@ -314,7 +343,7 @@ export function RSVPWizardV2({
           >
             Modificar asistencia
           </button>
-          {paymentStatus === "PAID" && hasPayment && count < maxGuests && (
+          {isFullyPaid && hasPayment && count < maxGuests && (
             <p style={{ marginTop: "10px", fontSize: "12.5px", lineHeight: 1.5, opacity: 0.75, textAlign: "center", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}>
               Si sumás personas se genera un saldo por la diferencia.
             </p>
@@ -366,7 +395,7 @@ export function RSVPWizardV2({
             <h4 style={{ marginBottom: "8px", fontFamily: "var(--t-font-d)", fontSize: "15px", color: "var(--t-acc)", marginTop: 0 }}>
               {!guestToken
                 ? "Valor de la tarjeta (vista previa)"
-                : paymentStatus === "PAID"
+                : isFullyPaid
                   ? "Tarjeta abonada ✓"
                   : isPartial
                     ? "Pago registrado en parte"
@@ -375,7 +404,7 @@ export function RSVPWizardV2({
             <p style={{ display: "block", opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
               {/* Con un pago de más, "Monto pagado" tiene que ser lo que el
                   invitado entregó, no lo que vale hoy la tarjeta. */}
-              {paymentStatus === "PAID" ? "Monto pagado:" : "Monto total a pagar:"} <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(paymentStatus === "PAID" && paidAmount > 0 ? paidAmount : totalPayment)}</span>
+              {isFullyPaid ? "Monto pagado:" : "Monto total a pagar:"} <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(isFullyPaid && paidAmount > 0 ? paidAmount : totalPayment)}</span>
               <br />
               <span style={{ fontSize: "12px", opacity: 0.8 }}>
                 ({adultCount} adultos{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} adolescentes` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} niños` : ""})
@@ -383,7 +412,7 @@ export function RSVPWizardV2({
             </p>
             {/* Con un pago parcial, el invitado ve su saldo sin tener que
                 preguntarle al anfitrión. */}
-            {isPartial && paymentStatus !== "PAID" && (
+            {isPartial && (
               // `display: block` explícito, igual que el párrafo de arriba: sin
               // eso el párrafo hereda el layout del contenedor de la plantilla y
               // los montos se separan de su etiqueta. Y dos párrafos en vez de
@@ -393,7 +422,7 @@ export function RSVPWizardV2({
                 Ya registramos <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(paidAmount)}</span>
               </p>
             )}
-            {isPartial && paymentStatus !== "PAID" && (
+            {isPartial && (
               <p style={{ display: "block", margin: "2px 0 0", fontSize: "13.5px", lineHeight: 1.5, color: "inherit" }}>
                 Saldo pendiente: <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(balance)}</span>
               </p>

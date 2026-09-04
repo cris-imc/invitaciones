@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Info, ChevronUp, ChevronDown, Download } from "lucide-react";
+import {
+  Info, ChevronUp, ChevronDown, Download,
+  Wallet, Hourglass, Undo2, CircleDashed, Ban, MousePointerClick, Lightbulb,
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   PAYMENT_STATUS_COLORS,
@@ -398,15 +401,15 @@ export function GuestListWithPayment({
                     <div className="w-full h-px bg-amber-500/20" />
                     <div className="space-y-1">
                       <p className="flex gap-2">
-                          <span>👉</span>
+                          <MousePointerClick className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
                           <span>Tocá un estado de pago (No pago aún / Exento / Pagado) en la lista para cambiarlo de manera rápida.</span>
                       </p>
                       <p className="flex gap-2">
-                          <span>◐</span>
+                          <CircleDashed className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
                           <span>Si una familia o grupo abonó solo una parte, usá <strong>Parcial</strong> y cargá el monto recibido: la lista te va a mostrar el saldo que falta, y el invitado también lo ve en su invitación.</span>
                       </p>
                       <p className="font-medium text-amber-300 flex gap-2">
-                          <span>💡</span>
+                          <Lightbulb className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
                           <span>El invitado verá el cambio reflejado automáticamente cuando abra su invitación.</span>
                       </p>
                     </div>
@@ -429,16 +432,16 @@ export function GuestListWithPayment({
                 fontSize: "13px",
               }}
             >
-              <span>💰 Recaudado: <b style={{ color: "var(--accent)" }}>{formatARS(collectedTotal)}</b></span>
+              <span className="inline-flex items-center gap-1.5"><Wallet className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />Recaudado: <b style={{ color: "var(--accent)" }}>{formatARS(collectedTotal)}</b></span>
               <span style={{ opacity: .5 }}>·</span>
-              <span>⏳ Falta cobrar: <b>{formatARS(outstandingTotal)}</b></span>
+              <span className="inline-flex items-center gap-1.5"><Hourglass className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />Falta cobrar: <b>{formatARS(outstandingTotal)}</b></span>
               <span style={{ opacity: .5 }}>·</span>
               <span style={{ opacity: .8 }}>Total tarjetas: <b>{formatARS(estimatedTotal)}</b></span>
               {surplusTotal > 0 && (
                 <>
                   <span style={{ opacity: .5 }}>·</span>
                   <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
-                    ↩ {formatARS(surplusTotal)} a favor
+                    <span className="inline-flex items-center gap-1.5"><Undo2 className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />{formatARS(surplusTotal)} a favor</span>
                   </span>
                 </>
               )}
@@ -446,12 +449,12 @@ export function GuestListWithPayment({
                 <>
                   <span style={{ opacity: .5 }}>·</span>
                   <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
-                    ◐ {partialCount} pago{partialCount !== 1 ? "s" : ""} parcial{partialCount !== 1 ? "es" : ""}
+                    <span className="inline-flex items-center gap-1.5"><CircleDashed className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />{partialCount} pago{partialCount !== 1 ? "s" : ""} parcial{partialCount !== 1 ? "es" : ""}</span>
                   </span>
                 </>
               )}
               <span style={{ opacity: .5 }}>·</span>
-              <span style={{ opacity: .6 }}>⊘ Exentos: {exemptCount}</span>
+              <span className="inline-flex items-center gap-1.5" style={{ opacity: .6 }}><Ban className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />Exentos: {exemptCount}</span>
             </div>
           )}
         </>
@@ -465,8 +468,11 @@ export function GuestListWithPayment({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
-            flex: 1,
-            minWidth: "180px",
+            // En mobile el buscador con flex:1 y 180px de mínimo se comía la
+            // primera línea entera y empujaba todos los pills de estado abajo.
+            // Achicado, comparten fila.
+            flex: isMobile ? "1 1 42%" : 1,
+            minWidth: isMobile ? "108px" : "180px",
             padding: "8px 14px",
             borderRadius: "999px",
             border: "1px solid #ddd",

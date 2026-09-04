@@ -30,6 +30,7 @@ import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/Music
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { CreditCard, Gift } from "lucide-react";
+import { resolveExpectedAmount } from "@/lib/payments";
 import { createPortal } from "react-dom";
 
 const bteSerif = Cormorant_Garamond({
@@ -920,6 +921,7 @@ export function BotanicaEditorialTemplate({ invitation, guest, isPersonalized = 
                 isExempt={guest?.isExempt ?? false}
                 paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
                 paidAmount={Number((guest as any)?.paidAmount ?? 0)}
+                paidPrices={(guest as any)?.paidPrices ?? null}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1299,6 +1301,7 @@ function BteRsvpCard({
   isExempt,
   paymentStatus,
   paidAmount,
+  paidPrices,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1325,6 +1328,7 @@ function BteRsvpCard({
   isExempt: boolean;
   paymentStatus?: string;
   paidAmount?: number;
+  paidPrices?: string | null;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1358,14 +1362,22 @@ function BteRsvpCard({
   const adultPrice = paymentAmount ?? 0;
   const teenPrice = precioAdolescente ?? adultPrice;
   const childPrice = precioNino ?? adultPrice;
-  const totalPayment = isExempt ? 0 : adultPrice * adultCount + teenPrice * teenCount + childPrice * childCount;
+  const totalPayment = isExempt
+    ? 0
+    : resolveExpectedAmount({
+        guest: { attendingCount: adultCount + teenCount + childCount, attendingAdults: adultCount, attendingTeens: teenCount, attendingChildren: childCount },
+        invitation: { pagoTarjetaMonto: adultPrice, precioAdolescente: teenPrice, precioNino: childPrice },
+        paidPrices,
+      });
   // Pagos parciales: lo que la familia ya entregó y lo que falta. El saldo
   // se mide contra el total de las personas confirmadas, así que si el
   // invitado cambia la asistencia el número se actualiza solo.
   const paidSoFar = Math.max(0, paidAmount ?? 0);
   const paymentBalance = Math.max(0, totalPayment - paidSoFar);
-  const isPaidInFull = paymentStatus === "PAID" || (paidSoFar > 0 && paymentBalance <= 0);
   const isPartialPayment = paidSoFar > 0 && paymentBalance > 0;
+  // El saldo recien calculado manda sobre el estado que vino del servidor: si
+  // el invitado sumo gente, la tarjeta es parcial aunque todavia figure paga.
+  const isPaidInFull = !isPartialPayment && (paymentStatus === "PAID" || (paidSoFar > 0 && paymentBalance <= 0));
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
 

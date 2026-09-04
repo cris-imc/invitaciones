@@ -1481,6 +1481,7 @@ export function Cristal3DTemplateEsmeralda({ invitation, guest, isPersonalized =
             initialAttendingChildren={guest?.attendingChildren ?? undefined}
             initialPaymentStatus={guestPayStatus}
             initialPaidAmount={guestPaidAmount}
+            paidPrices={(guest as any)?.paidPrices ?? null}
             isExempt={guest?.isExempt ?? false}
             precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
             precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}

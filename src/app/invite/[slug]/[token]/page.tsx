@@ -497,6 +497,10 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 // el anfitrión lo tenga cargado (ver src/lib/payments.ts).
                 paidAmount: true,
                 expectedAmount: true,
+                // La foto del pago: sin ella las plantillas recalculan el total
+                // con el precio vigente y le muestran saldo a alguien que ya
+                // pagó (ver resolveExpectedAmount en src/lib/payments.ts).
+                paidPrices: true,
                 isExempt: true,
                 expectedAdults: true,
                 expectedTeens: true,
