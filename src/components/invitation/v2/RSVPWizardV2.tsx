@@ -126,9 +126,10 @@ export function RSVPWizardV2({
   const paidAmount = Math.max(0, initialPaidAmount);
   const balance = Math.max(0, totalPayment - paidAmount);
   const isPartial = paymentStatus === "PARTIAL" || (paidAmount > 0 && balance > 0);
-  // Plata a favor: queda cuando el invitado paga y despues baja la cantidad de
-  // personas. Si vuelve a sumar gente, esto se descuenta solo del nuevo total.
-  const surplus = Math.max(0, paidAmount - totalPayment);
+  // La plata a favor (pago de mas, tras bajar la cantidad de personas) NO se le
+  // muestra al invitado: seria prometerle una devolucion que el anfitrion tal
+  // vez no pueda hacer. Queda solo en el panel del anfitrion, que es quien
+  // decide si la devuelve o la deja a cuenta.
 
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
@@ -395,12 +396,6 @@ export function RSVPWizardV2({
             {isPartial && paymentStatus !== "PAID" && (
               <p style={{ display: "block", margin: "2px 0 0", fontSize: "13.5px", lineHeight: 1.5, color: "inherit" }}>
                 Saldo pendiente: <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(balance)}</span>
-              </p>
-            )}
-            {surplus > 0 && (
-              <p style={{ display: "block", margin: "8px 0 0", fontSize: "13.5px", lineHeight: 1.5, color: "inherit" }}>
-                Tenés <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(surplus)}</span> a favor
-                <span style={{ opacity: 0.8 }}> (la tarjeta quedó en {formatARS(totalPayment)})</span>
               </p>
             )}
             {maxGuests > 1 && (
