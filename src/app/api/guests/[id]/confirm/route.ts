@@ -68,6 +68,8 @@ export async function POST(
         guest: { attendingCount, attendingAdults, attendingTeens, attendingChildren },
         invitation: guest.invitation,
         paidPrices: guest.paidPrices,
+        paidAmount,
+        paymentStatus: guest.paymentStatus,
       });
       paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount: resolvedExpected, isExempt });
       expectedAmount = paymentStatus === "PAID" ? resolvedExpected : null;

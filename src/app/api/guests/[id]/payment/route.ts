@@ -18,9 +18,10 @@ import {
 //   { status: "PENDING" | "EXEMPT" | "PAID" }  → atajos de siempre (0 / exento / total)
 //   { paidAmount: 150000 }                     → pago parcial de un grupo/familia
 //
-// El monto esperado se congela en expectedAmount la primera vez que se toca el
-// pago (si el RSVP no lo congeló ya), así una suba posterior del precio de la
-// tarjeta no reabre saldo sobre pagos que el anfitrión ya dio por cerrados.
+// Al quedar paga la tarjeta se guarda en paidPrices una foto de los precios de
+// hoy y de cuántos cupos cubrió ese pago. Desde ahí, una suba de precio no le
+// cobra diferencia a esos cupos, pero un asistente que se sume después sí paga
+// el precio vigente (ver resolveExpectedAmount en src/lib/payments.ts).
 //
 // Un cambio que dejaría en cero un monto ya registrado responde 409 con
 // PAYMENT_CLEAR_CODE en vez de aplicarse; para confirmarlo se reintenta con
@@ -89,6 +90,8 @@ export async function PATCH(
       guest,
       invitation: guest.invitation,
       paidPrices: guest.paidPrices,
+      paidAmount: currentPaid,
+      paymentStatus: guest.paymentStatus,
     });
 
     // Sobrepago: el panel ya lo rechaza al escribir el monto, pero la regla real

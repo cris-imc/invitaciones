@@ -177,6 +177,8 @@ export async function PUT(
         },
         invitation: existingGuest.invitation,
         paidPrices: existingGuest.paidPrices,
+        paidAmount,
+        paymentStatus: existingGuest.paymentStatus,
       });
       const nextStatus = derivePaymentStatus({ paidAmount, expectedAmount, isExempt });
       updateData.paidAmount = paidAmount;

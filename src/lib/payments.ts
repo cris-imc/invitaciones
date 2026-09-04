@@ -171,13 +171,16 @@ export function resolveGuestPayment(
   guest: StoredGuestPayment,
   invitation: InvitationPrices
 ): ResolvedGuestPayment {
+  const storedPaid = Number(guest.paidAmount ?? 0) || 0;
+
   const expectedAmount = resolveExpectedAmount({
     guest,
     invitation,
     paidPrices: guest.paidPrices,
+    paidAmount: storedPaid,
+    paymentStatus: guest.paymentStatus,
   });
 
-  const storedPaid = Number(guest.paidAmount ?? 0) || 0;
   const isLegacyPaid = storedPaid <= 0 && guest.paymentStatus === "PAID";
   const paidAmount = isLegacyPaid ? expectedAmount : storedPaid;
 
@@ -273,11 +276,23 @@ export function resolveExpectedAmount({
   guest,
   invitation,
   paidPrices,
+  paidAmount,
+  paymentStatus,
 }: {
   guest: GuestCounts;
   invitation: InvitationPrices;
   paidPrices?: string | null;
+  paidAmount?: number | null;
+  paymentStatus?: string | null;
 }): number {
+  // Sin foto no se adivina: reconstruirla desde los cupos actuales daba mal
+  // apenas la cantidad de asistentes ya había cambiado (decía "pago, debe $0"
+  // cuando en realidad debía la persona nueva). Un invitado pagado antes de que
+  // existiera `paidPrices` queda cubierto por la via legacy de
+  // resolveGuestPayment, que lo mantiene pago.
+  void paidAmount;
+  void paymentStatus;
+
   const snap = parsePaidPrices(paidPrices);
   if (!snap) return computeExpectedAmount(guest, invitation);
 
