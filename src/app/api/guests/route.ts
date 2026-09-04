@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
         paymentStatus: true,
         paidAmount: true,
         expectedAmount: true,
+        paidPrices: true,
         isExempt: true,
         attendingAdults: true,
         attendingTeens: true,

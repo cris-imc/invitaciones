@@ -310,11 +310,15 @@ model Guest {
   // Pagos de tarjeta: paidAmount es la unica fuente de verdad del dinero
   // recibido (habilita pagos parciales de grupos/familias) y paymentStatus se
   // deriva de el -- ver derivePaymentStatus() en src/lib/payments.ts.
-  // expectedAmount guarda el total congelado, y se escribe SOLO cuando la
-  // tarjeta queda paga: si despues sube el precio, al que ya pago no se le
-  // cobra la diferencia, y al que debe saldo el saldo le sube.
+  // paidPrices congela los PRECIOS (no el total) del momento en que la tarjeta
+  // quedo paga, como JSON {adult,teen,child}. Congelar el total estaba mal:
+  // tambien absorbia los cambios de asistentes, asi que quien pagaba y despues
+  // sumaba gente seguia debiendo $0. Con los precios congelados, una suba de
+  // precio no le llega, pero sumar personas si le suma saldo.
+  // expectedAmount queda solo por compatibilidad con los registros viejos.
   paidAmount             Float            @default(0)
   expectedAmount         Float?
+  paidPrices             String?
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

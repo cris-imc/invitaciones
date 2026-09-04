@@ -4,7 +4,6 @@ import { auth } from "@/auth";
 import { isAdmin } from "@/lib/roles";
 import {
   PAYMENT_CLEAR_CODE,
-  computeExpectedAmount,
   derivePaymentStatus,
   resolveExpectedAmount,
   resolveGuestPayment,
@@ -168,25 +167,22 @@ export async function PUT(
     // (PARTIAL) sin que nadie tenga que corregirlo a mano.
     const finalStatus = (updateData.status as string | undefined) ?? existingGuest.status;
     if (finalStatus === "CONFIRMED") {
-      const liveExpected = computeExpectedAmount(
-        {
+      const expectedAmount = resolveExpectedAmount({
+        guest: {
           attendingCount: (updateData.attendingCount as number | undefined) ?? existingGuest.attendingCount,
           attendingAdults: (updateData.attendingAdults as number | undefined) ?? existingGuest.attendingAdults,
           attendingTeens: (updateData.attendingTeens as number | undefined) ?? existingGuest.attendingTeens,
           attendingChildren: (updateData.attendingChildren as number | undefined) ?? existingGuest.attendingChildren,
         },
-        existingGuest.invitation
-      );
-      const expectedAmount = resolveExpectedAmount({
-        frozenExpected: existingGuest.expectedAmount,
-        liveExpected,
-        paidAmount,
+        invitation: existingGuest.invitation,
+        paidPrices: existingGuest.paidPrices,
       });
       const nextStatus = derivePaymentStatus({ paidAmount, expectedAmount, isExempt });
       updateData.paidAmount = paidAmount;
       updateData.paymentStatus = nextStatus;
-      // Congelado solo si la tarjeta queda paga (ver resolveExpectedAmount).
       updateData.expectedAmount = nextStatus === "PAID" ? expectedAmount : null;
+      // Marcar exento descarta el congelamiento: ya no hay pago que proteger.
+      if (isExempt) updateData.paidPrices = null;
     } else if (body.isExempt !== undefined) {
       updateData.paymentStatus = derivePaymentStatus({
         paidAmount,

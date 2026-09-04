@@ -26,21 +26,25 @@ El dinero recibido pasa a ser el dato real (`Guest.paidAmount`) y **el estado se
 Nunca se guarda un estado que contradiga el monto. Se agrega un cuarto estado `PARTIAL`, que
 nadie escribe a mano: sale del cálculo `paidAmount` vs `expectedAmount`.
 
-### Qué pasa cuando sube el precio de la tarjeta
+### Qué se congela: el precio, no el total
 
-`expectedAmount` guarda el total **congelado**, y se escribe **solo cuando la tarjeta queda
-paga**. Mientras haya saldo la columna queda en `null` y el total sigue el precio vigente:
+Al quedar paga la tarjeta se guardan en `Guest.paidPrices` los **precios** vigentes de ese
+momento (JSON `{adult,teen,child}`), y el total se recalcula siempre contra las cantidades
+actuales. Congelar el *total* estaba mal: también absorbía los cambios de asistentes, así que
+quien pagaba y después sumaba dos personas seguía debiendo $0.
 
-| Estado del invitado | Si el anfitrión sube el precio |
-|---|---|
-| No pagó nada | El total sube: debe el precio nuevo |
-| Pagó una parte | **El saldo sube**: se le suma la diferencia |
-| **Ya pagó todo** | **No le afecta.** Queda pago y confirmado para siempre, con el total que pagó en su momento. Nunca debe la diferencia |
-| Exento | No paga |
+Se cobra el menor entre el precio congelado y el vigente, así una **baja** de precio sí se
+traslada.
 
-Verificado con `resolveGuestPayment()` sobre una tarjeta que pasa de $100.000 a $150.000: quien
-debía $60.000 pasa a deber $110.000, y quien había pagado los $100.000 sigue en `PAID` con
-saldo $0.
+| Qué cambia | No pagó nada / pagó una parte | Ya pagó todo |
+|---|---|---|
+| **Sube el precio** de la tarjeta | El saldo le sube | **No le afecta**: no debe la diferencia |
+| **Suma asistentes** | El saldo le sube | Debe las personas nuevas, al precio que congeló |
+| **Resta asistentes** | El saldo le baja | Sigue pago |
+
+Verificado con `resolveGuestPayment()` (tarjeta $100.000 → $150.000, familia de 3 → 5):
+quien pagó $300.000 por 3 y suma 2 pasa a `PARTIAL` debiendo $200.000, y si en cambio solo
+sube el precio sigue en `PAID` con saldo $0.
 
 Fuente única de verdad del cálculo: `src/lib/payments.ts`.
 

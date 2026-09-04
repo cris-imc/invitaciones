@@ -5,10 +5,10 @@ import { isAdmin } from "@/lib/roles";
 import {
   PAYMENT_CLEAR_CODE,
   computeBalance,
-  computeExpectedAmount,
   derivePaymentStatus,
   resolveExpectedAmount,
   resolveGuestPayment,
+  serializePaidPrices,
 } from "@/lib/payments";
 
 // PATCH /api/guests/[id]/payment — Cambiar el pago de tarjeta (solo anfitrión autenticado)
@@ -83,13 +83,12 @@ export async function PATCH(
     // más plata de la que corresponde, y no borrar la que ya está.
     const currentPaid = resolveGuestPayment(guest, guest.invitation).paidAmount;
 
-    // Monto esperado: el congelado solo si la tarjeta ya estaba paga; si no, el
-    // vigente según los precios actuales de la invitación. Así una suba de
-    // precio le sube el saldo al que debe, y no le reabre nada al que ya pagó.
+    // Monto esperado según los precios vigentes, o los congelados si este
+    // invitado ya había pagado su tarjeta (ver resolveExpectedAmount).
     const expectedAmount = resolveExpectedAmount({
-      frozenExpected: guest.expectedAmount,
-      liveExpected: computeExpectedAmount(guest, guest.invitation),
-      paidAmount: currentPaid,
+      guest,
+      invitation: guest.invitation,
+      paidPrices: guest.paidPrices,
     });
 
     // Sobrepago: el panel ya lo rechaza al escribir el monto, pero la regla real
@@ -147,16 +146,24 @@ export async function PATCH(
       isExempt: nextExempt,
     });
 
-    // El total se congela unicamente al quedar paga la tarjeta. Mientras haya
-    // saldo se guarda null, para que el monto siga el precio vigente y una suba
-    // posterior aumente lo que falta cobrar.
-    const nextExpected = nextStatus === "PAID" ? expectedAmount : null;
+    // Al quedar paga se congelan los precios de hoy: desde acá un aumento no le
+    // llega a este invitado. Si el monto vuelve a cero (no pago / exento) el
+    // congelamiento se descarta, porque ya no hay pago que proteger. Un pago
+    // parcial conserva el congelamiento que hubiera: puede venir de haber estado
+    // pago y haber sumado gente después.
+    const nextPaidPrices =
+      nextStatus === "PAID"
+        ? serializePaidPrices(guest.invitation)
+        : nextPaid <= 0
+          ? null
+          : guest.paidPrices;
 
     const updated = await prisma.guest.update({
       where: { id: guestId },
       data: {
         paidAmount: nextPaid,
-        expectedAmount: nextExpected,
+        expectedAmount: nextStatus === "PAID" ? expectedAmount : null,
+        paidPrices: nextPaidPrices,
         paymentStatus: nextStatus,
         isExempt: nextExempt,
         paymentStatusUpdatedAt: new Date(),

@@ -145,6 +145,8 @@ export interface StoredGuestPayment extends GuestCounts {
   paymentStatus?: string | null;
   paidAmount?: number | null;
   expectedAmount?: number | null;
+  /** JSON de los precios congelados al quedar paga (ver resolveExpectedAmount). */
+  paidPrices?: string | null;
 }
 
 export interface ResolvedGuestPayment {
@@ -169,14 +171,15 @@ export function resolveGuestPayment(
   guest: StoredGuestPayment,
   invitation: InvitationPrices
 ): ResolvedGuestPayment {
-  const liveExpected = computeExpectedAmount(guest, invitation);
-  const frozenExpected = guest.expectedAmount != null ? Number(guest.expectedAmount) || 0 : null;
+  const expectedAmount = resolveExpectedAmount({
+    guest,
+    invitation,
+    paidPrices: guest.paidPrices,
+  });
 
   const storedPaid = Number(guest.paidAmount ?? 0) || 0;
   const isLegacyPaid = storedPaid <= 0 && guest.paymentStatus === "PAID";
-  const paidAmount = isLegacyPaid ? (frozenExpected ?? liveExpected) : storedPaid;
-
-  const expectedAmount = resolveExpectedAmount({ frozenExpected, liveExpected, paidAmount });
+  const paidAmount = isLegacyPaid ? expectedAmount : storedPaid;
 
   return {
     expectedAmount,
@@ -190,29 +193,63 @@ export function resolveGuestPayment(
   };
 }
 
+/** Precios congelados al quedar paga la tarjeta (columna Guest.paidPrices). */
+export interface FrozenPrices {
+  adult: number;
+  teen: number;
+  child: number;
+}
+
+export function serializePaidPrices(invitation: InvitationPrices): string {
+  return JSON.stringify(resolveCardPrices(invitation));
+}
+
+export function parsePaidPrices(raw?: string | null): FrozenPrices | null {
+  if (!raw) return null;
+  try {
+    const p = JSON.parse(raw) as Partial<FrozenPrices>;
+    const adult = Number(p.adult) || 0;
+    if (adult <= 0) return null;
+    return { adult, teen: Number(p.teen) || adult, child: Number(p.child) || adult };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Total que le corresponde pagar hoy a un invitado.
  *
- * El congelamiento vale SOLO para la tarjeta ya paga. Si el anfitrion sube el
- * precio:
- *   - al que ya pago no se le cobra la diferencia: queda pago y confirmado para
- *     siempre, con el total que pago en su momento (`frozenExpected`);
- *   - al que debe saldo (no pago nada, o pago una parte) el saldo le sube, o
- *     sea que su total pasa a ser el precio vigente (`liveExpected`).
+ * Lo que se congela al quedar paga la tarjeta son los PRECIOS, no el total.
+ * Congelar el total estaba mal: tambien absorbia los cambios de asistentes, asi
+ * que alguien que pagaba y despues sumaba dos personas seguia debiendo $0.
  *
- * Antes esto se congelaba al confirmar el RSVP, asi que un aumento de precio no
- * le llegaba a nadie y el anfitrion cobraba de menos sin darse cuenta.
+ * Con los precios congelados se cumplen las dos reglas a la vez:
+ *   - sube el precio de la tarjeta y no cambia la gente -> el que ya pago no
+ *     debe la diferencia;
+ *   - cambia la cantidad de asistentes -> el total se recalcula y el saldo se
+ *     mueve, sin tocar lo ya pagado.
+ *
+ * Se cobra el menor entre el precio congelado y el vigente: el congelamiento
+ * protege de los aumentos, pero si el anfitrion BAJA el precio esa baja se
+ * traslada igual.
  */
 export function resolveExpectedAmount({
-  frozenExpected,
-  liveExpected,
-  paidAmount,
+  guest,
+  invitation,
+  paidPrices,
 }: {
-  frozenExpected?: number | null;
-  liveExpected: number;
-  paidAmount: number;
+  guest: GuestCounts;
+  invitation: InvitationPrices;
+  paidPrices?: string | null;
 }): number {
-  const frozen = frozenExpected != null ? Number(frozenExpected) || 0 : null;
-  const isSettled = frozen != null && frozen > 0 && paidAmount >= frozen - EPSILON;
-  return isSettled ? frozen : liveExpected;
+  const liveExpected = computeExpectedAmount(guest, invitation);
+  const frozen = parsePaidPrices(paidPrices);
+  if (!frozen) return liveExpected;
+
+  const lockedExpected = computeExpectedAmount(guest, {
+    pagoTarjetaMonto: frozen.adult,
+    precioAdolescente: frozen.teen,
+    precioNino: frozen.child,
+  });
+  return Math.min(lockedExpected, liveExpected);
 }

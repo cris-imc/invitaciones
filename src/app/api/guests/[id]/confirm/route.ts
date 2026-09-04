@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import {
-  computeExpectedAmount,
-  derivePaymentStatus,
-  resolveExpectedAmount,
-  resolveGuestPayment,
-} from "@/lib/payments";
+import { derivePaymentStatus, resolveExpectedAmount, resolveGuestPayment } from "@/lib/payments";
 
 // POST /api/guests/[id]/confirm
 export async function POST(
@@ -61,14 +56,12 @@ export async function POST(
     let expectedAmount = guest.expectedAmount;
 
     if (status === "CONFIRMED") {
-      const liveExpected = computeExpectedAmount(
-        { attendingCount, attendingAdults, attendingTeens, attendingChildren },
-        guest.invitation
-      );
+      // Con las cantidades nuevas: si sumó gente el total sube y vuelve a haber
+      // saldo; si restó, puede quedar cubierto. Lo ya pagado no se toca.
       const resolvedExpected = resolveExpectedAmount({
-        frozenExpected: guest.expectedAmount,
-        liveExpected,
-        paidAmount,
+        guest: { attendingCount, attendingAdults, attendingTeens, attendingChildren },
+        invitation: guest.invitation,
+        paidPrices: guest.paidPrices,
       });
       paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount: resolvedExpected, isExempt });
       expectedAmount = paymentStatus === "PAID" ? resolvedExpected : null;
