@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { computeExpectedAmount, derivePaymentStatus, resolveGuestPayment } from "@/lib/payments";
 
 // POST /api/guests/[id]/confirm
 export async function POST(
@@ -12,6 +13,16 @@ export async function POST(
 
     const guest = await prisma.guest.findFirst({
       where: { uniqueToken: id },
+      include: {
+        invitation: {
+          select: {
+            pagoTarjetaMonto: true,
+            regaloMonto: true,
+            precioAdolescente: true,
+            precioNino: true,
+          },
+        },
+      },
     });
 
     if (!guest) {
@@ -20,11 +31,33 @@ export async function POST(
 
     // Actualizamos el Guest
     const status = body.asistencia === "CONFIRMA" ? "CONFIRMED" : "DECLINED";
-    
-    // Lógica para paymentStatus si es exento
+
+    const attendingAdults = body.attendingAdults !== undefined
+      ? body.attendingAdults
+      : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 0);
+    const attendingTeens = body.attendingTeens || 0;
+    const attendingChildren = body.attendingChildren || 0;
+    const attendingCount = attendingAdults + attendingTeens + attendingChildren > 0
+      ? attendingAdults + attendingTeens + attendingChildren
+      : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 1);
+
+    // El monto esperado se recalcula con lo que acaba de confirmar (cambiar la
+    // cantidad de personas cambia lo que le toca pagar) y queda congelado con el
+    // precio vigente hoy. Lo ya abonado se conserva, así que si una familia pagó
+    // una parte y después suma o resta gente, el estado se reacomoda solo:
+    // sigue PARTIAL, o pasa a PAID si lo entregado ya cubre el nuevo total.
+    const paidAmount = resolveGuestPayment(guest, guest.invitation).paidAmount;
+    const isExempt = guest.isExempt;
+
     let paymentStatus = guest.paymentStatus;
-    if (status === "CONFIRMED" && guest.isExempt) {
-      paymentStatus = "EXEMPT";
+    let expectedAmount = guest.expectedAmount;
+
+    if (status === "CONFIRMED") {
+      expectedAmount = computeExpectedAmount(
+        { attendingCount, attendingAdults, attendingTeens, attendingChildren },
+        guest.invitation
+      );
+      paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount, isExempt });
     }
 
     const updatedGuest = await prisma.guest.update({
@@ -32,12 +65,12 @@ export async function POST(
       data: {
         status,
         paymentStatus,
-        attendingCount: (body.attendingAdults || 0) + (body.attendingTeens || 0) + (body.attendingChildren || 0) > 0
-          ? (body.attendingAdults || 0) + (body.attendingTeens || 0) + (body.attendingChildren || 0)
-          : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 1),
-        attendingAdults: body.attendingAdults !== undefined ? body.attendingAdults : (body.numeroAcompanantes !== undefined ? body.numeroAcompanantes + 1 : 0),
-        attendingTeens: body.attendingTeens || 0,
-        attendingChildren: body.attendingChildren || 0,
+        paidAmount,
+        expectedAmount,
+        attendingCount,
+        attendingAdults,
+        attendingTeens,
+        attendingChildren,
         dietaryRestrictions: body.restricciones,
         responseDate: new Date(),
         name: body.nombre || guest.name, // Opcionalmente actualizar el nombre si lo cambió

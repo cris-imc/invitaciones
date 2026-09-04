@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { isAdmin } from "@/lib/roles";
+import { computeExpectedAmount, derivePaymentStatus, resolveGuestPayment } from "@/lib/payments";
 
 // DELETE /api/guests/[id] — Eliminar invitado
 export async function DELETE(
@@ -61,7 +62,17 @@ export async function PUT(
 
     const existingGuest = await prisma.guest.findUnique({
       where: { id },
-      include: { invitation: { select: { userId: true } } },
+      include: {
+        invitation: {
+          select: {
+            userId: true,
+            pagoTarjetaMonto: true,
+            regaloMonto: true,
+            precioAdolescente: true,
+            precioNino: true,
+          },
+        },
+      },
     });
     if (!existingGuest) {
       return NextResponse.json({ error: "Invitado no encontrado" }, { status: 404 });
@@ -92,12 +103,17 @@ export async function PUT(
       if (updateData[k] === undefined) delete updateData[k];
     });
 
-    // Lógica para paymentStatus al cambiar isExempt
+    // Pago de tarjeta: el estado sale del monto abonado (ver src/lib/payments.ts).
+    // Marcar exento borra lo abonado -- ese invitado no paga; sacarle la exención
+    // lo devuelve al estado que le corresponda según lo que efectivamente pagó.
+    let paidAmount = resolveGuestPayment(existingGuest, existingGuest.invitation).paidAmount;
+    let isExempt = existingGuest.isExempt;
+
     if (body.isExempt !== undefined) {
-      if (body.isExempt === true) {
-        updateData.paymentStatus = "EXEMPT";
-      } else if (body.isExempt === false && existingGuest.paymentStatus === "EXEMPT") {
-        updateData.paymentStatus = "PENDING";
+      isExempt = Boolean(body.isExempt);
+      if (isExempt) {
+        paidAmount = 0;
+        updateData.paidAmount = 0;
       }
     }
 
@@ -124,6 +140,33 @@ export async function PUT(
       updateData.attendingTeens = 0;
       updateData.attendingChildren = 0;
       updateData.responseDate = null;
+    }
+
+    // Si el invitado queda confirmado, el monto esperado se recalcula con las
+    // cantidades finales y se congela, y el estado de pago se re-deriva: editar
+    // la cantidad de personas de una familia cambia lo que le toca pagar, y un
+    // pago parcial ya recibido puede quedar cubierto (PAID) o seguir corto
+    // (PARTIAL) sin que nadie tenga que corregirlo a mano.
+    const finalStatus = (updateData.status as string | undefined) ?? existingGuest.status;
+    if (finalStatus === "CONFIRMED") {
+      const expectedAmount = computeExpectedAmount(
+        {
+          attendingCount: (updateData.attendingCount as number | undefined) ?? existingGuest.attendingCount,
+          attendingAdults: (updateData.attendingAdults as number | undefined) ?? existingGuest.attendingAdults,
+          attendingTeens: (updateData.attendingTeens as number | undefined) ?? existingGuest.attendingTeens,
+          attendingChildren: (updateData.attendingChildren as number | undefined) ?? existingGuest.attendingChildren,
+        },
+        existingGuest.invitation
+      );
+      updateData.expectedAmount = expectedAmount;
+      updateData.paidAmount = paidAmount;
+      updateData.paymentStatus = derivePaymentStatus({ paidAmount, expectedAmount, isExempt });
+    } else if (body.isExempt !== undefined) {
+      updateData.paymentStatus = derivePaymentStatus({
+        paidAmount,
+        expectedAmount: existingGuest.expectedAmount,
+        isExempt,
+      });
     }
 
     const updatedGuest = await prisma.guest.update({

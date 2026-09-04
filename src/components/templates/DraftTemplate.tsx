@@ -401,7 +401,10 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
   // PAGOS Y COBROS DE TARJETAS SOLO ACTIVOS SI PAGO DE TARJETAS ESTÁ HABILITADO
   const paymentEnabled = pagoTarjetaHabilitado;
   const paymentAmount  = paymentEnabled ? (Number((invitation as any).pagoTarjetaMonto ?? invitation.regaloMonto ?? 0) || (isPreview && !invitation.id ? 25000 : undefined)) : undefined;
-  const guestPayStatus = paymentEnabled ? ((guest?.paymentStatus ?? "PENDING") as "PENDING" | "EXEMPT" | "PAID") : undefined;
+  const guestPayStatus = paymentEnabled ? ((guest?.paymentStatus ?? "PENDING") as "PENDING" | "PARTIAL" | "EXEMPT" | "PAID") : undefined;
+  // Monto ya abonado (pagos parciales de familias/grupos): el mismo patron que
+  // el resto de los campos que el tipo local de guest no declara.
+  const guestPaidAmount = paymentEnabled ? Number((guest as any)?.paidAmount ?? 0) : 0;
 
   const showBankDetails = showGiftSection && Boolean(
     invitation.regaloCbu || invitation.regaloAlias || invitation.regaloTitular || 
@@ -1307,6 +1310,7 @@ export function DraftTemplate({ invitation, guest, isPersonalized = false }: Con
             initialAttendingTeens={(guest as any)?.attendingTeens ?? undefined}
             initialAttendingChildren={guest?.attendingChildren ?? undefined}
             initialPaymentStatus={guestPayStatus}
+            initialPaidAmount={guestPaidAmount}
             isExempt={guest?.isExempt ?? false}
             precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
             precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}

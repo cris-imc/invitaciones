@@ -307,6 +307,13 @@ model Guest {
   attendingTeens         Int              @default(0)
   attendingChildren      Int              @default(0)
   isExempt               Boolean          @default(false)
+  // Pagos de tarjeta: paidAmount es la unica fuente de verdad del dinero
+  // recibido (habilita pagos parciales de grupos/familias) y paymentStatus se
+  // deriva de el -- ver derivePaymentStatus() en src/lib/payments.ts.
+  // expectedAmount se congela al confirmar el RSVP para que una suba posterior
+  // del precio de la tarjeta no reabra pagos ya cerrados.
+  paidAmount             Float            @default(0)
+  expectedAmount         Float?
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

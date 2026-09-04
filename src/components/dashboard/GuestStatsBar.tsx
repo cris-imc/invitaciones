@@ -7,6 +7,9 @@ interface Guest {
   status: string;
   attendingCount: number;
   paymentStatus: string;
+  paidAmount: number;
+  expectedAmount: number;
+  balance: number;
 }
 
 interface GuestStatsBarProps {
@@ -39,7 +42,12 @@ export function GuestStatsBar({ invitationId, pagoTarjetaHabilitado = false }: G
   const confirmed = guests.filter((g) => g.status === "CONFIRMED");
   const totalPeople = confirmed.reduce((s, g) => s + g.attendingCount, 0);
   const paidCount = confirmed.filter((g) => g.paymentStatus === "PAID").length;
-  const pendingPayCount = confirmed.filter((g) => g.paymentStatus === "PENDING").length;
+  // Un pago parcial sigue siendo plata por cobrar: cuenta como pendiente, no
+  // como pagado (si no, un grupo que entregó una parte desaparecería del radar).
+  const pendingPayCount = confirmed.filter(
+    (g) => g.paymentStatus === "PENDING" || g.paymentStatus === "PARTIAL"
+  ).length;
+  const partialCount = confirmed.filter((g) => g.paymentStatus === "PARTIAL").length;
 
   const stats = [
     { label: "Enviadas / Aceptadas", value: `${guests.length} / ${confirmed.length}` },
@@ -47,7 +55,13 @@ export function GuestStatsBar({ invitationId, pagoTarjetaHabilitado = false }: G
     ...(pagoTarjetaHabilitado
       ? [
           { label: "Pagaron", value: paidCount, colorClass: "text-green-600" },
-          { label: "Pendientes de Pago", value: pendingPayCount, colorClass: "text-yellow-600" },
+          {
+            label: partialCount > 0
+              ? `Pendientes de Pago (${partialCount} parcial${partialCount !== 1 ? "es" : ""})`
+              : "Pendientes de Pago",
+            value: pendingPayCount,
+            colorClass: "text-yellow-600",
+          },
         ]
       : []),
   ];

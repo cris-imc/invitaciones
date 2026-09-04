@@ -492,6 +492,11 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 message: true,
                 responseDate: true,
                 paymentStatus: true,
+                // Pagos parciales: sin estos dos campos las plantillas reciben
+                // paidAmount undefined y el invitado nunca ve su saldo, aunque
+                // el anfitrión lo tenga cargado (ver src/lib/payments.ts).
+                paidAmount: true,
+                expectedAmount: true,
                 isExempt: true,
                 expectedAdults: true,
                 expectedTeens: true,

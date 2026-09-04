@@ -3,6 +3,12 @@
 import { useState, useEffect } from "react";
 import { Info, ChevronUp, ChevronDown, Download } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  PAYMENT_STATUS_COLORS,
+  PAYMENT_STATUS_LABELS,
+  computeBalance,
+  formatARS,
+} from "@/lib/payments";
 
 interface Guest {
   id: string;
@@ -12,6 +18,12 @@ interface Guest {
   attendingCount: number;
   expectedCount: number;
   paymentStatus: string;
+  // Montos resueltos por el servidor (GET /api/guests) -- el panel no vuelve a
+  // calcular precios, así lo que ve el anfitrión y lo que ve el invitado coinciden.
+  paidAmount: number;
+  expectedAmount: number;
+  balance: number;
+  isExempt?: boolean;
   dietaryRestrictions?: string;
   message?: string;
 }
@@ -29,28 +41,46 @@ const STATUS_LABELS: Record<string, string> = {
   DECLINED: "No asistirá",
 };
 
-const PAYMENT_STATUS_LABELS: Record<string, string> = {
-  PENDING: "No pago aún",
+// Los labels y colores de estado viven en src/lib/payments.ts (los comparte la
+// barra de estadísticas).
+const PAYMENT_FILTER_LABELS: Record<string, string> = {
+  PAID: "Pago",
+  PARTIAL: "Parcial",
+  PENDING: "No pago",
+};
+
+// Labels cortos: en mobile el toggle ocupa el ancho completo y ahora tiene
+// cuatro estados, así que "No pago aún" no entra.
+const TOGGLE_LABELS: Record<string, string> = {
+  PENDING: "No pago",
+  PARTIAL: "Parcial",
   EXEMPT: "Exento",
   PAID: "Pagado",
 };
 
-const PAYMENT_FILTER_LABELS: Record<string, string> = {
-  PAID: "Pago",
-  PENDING: "No pago",
-};
+const PAYMENT_TOGGLE_STATES = ["PENDING", "PARTIAL", "EXEMPT", "PAID"] as const;
 
-const PAYMENT_STATUS_COLORS: Record<string, string> = {
-  PENDING: "#B98B3E",
-  EXEMPT:  "#8b8b8b",
-  PAID:    "#5a8a6e",
-};
+/**
+ * Interpreta lo que el anfitrión tipea en el monto: "150000", "$150.000",
+ * "150.000,50". El punto se toma como separador de miles y la coma como decimal.
+ * Devuelve NaN si no es un número.
+ */
+function parseAmountInput(text: string): number {
+  const normalized = text
+    .trim()
+    .split("$").join("")
+    .split(" ").join("")
+    .split(".").join("")
+    .split(",").join(".");
+  if (normalized === "") return NaN;
+  return Number(normalized);
+}
 
 const DESKTOP_PAGE_SIZE = 8;
 const MOBILE_PAGE_SIZE = 5;
 
 type AttendanceFilter = "all" | "CONFIRMED" | "PENDING" | "DECLINED";
-type PaymentFilter = "all" | "PAID" | "PENDING";
+type PaymentFilter = "all" | "PAID" | "PARTIAL" | "PENDING";
 
 export function GuestListWithPayment({
   invitationId,
@@ -66,6 +96,10 @@ export function GuestListWithPayment({
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showPaymentInfo, setShowPaymentInfo] = useState(true);
   const [page, setPage] = useState(1);
+  // Fila con el editor de pago parcial abierto, y lo tipeado ahí.
+  const [partialFor, setPartialFor] = useState<string | null>(null);
+  const [partialInput, setPartialInput] = useState("");
+  const [partialError, setPartialError] = useState("");
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -86,31 +120,73 @@ export function GuestListWithPayment({
       .catch(() => setLoading(false));
   }, [invitationId]);
 
-  const handlePaymentChange = async (guestId: string, newStatus: string) => {
+  // Un solo camino para cambiar el pago: se manda o un estado (atajo) o un monto
+  // (pago parcial), y la fila se sincroniza con lo que responde el servidor --
+  // que es quien deriva el estado a partir del monto. Sin optimismo local: el
+  // estado ya no es un dato independiente que se pueda adivinar de este lado.
+  const patchPayment = async (guestId: string, payload: { status?: string } | { paidAmount: number }) => {
     setUpdatingId(guestId);
-    // Optimistic update
-    setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, paymentStatus: newStatus } : g))
-    );
     try {
       const res = await fetch(`/api/guests/${guestId}/payment`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
-      onPaymentChange?.(guestId, newStatus);
-    } catch {
-      // Revert
+      const updated = await res.json();
       setGuests((prev) =>
         prev.map((g) =>
           g.id === guestId
-            ? { ...g, paymentStatus: g.paymentStatus }
+            ? {
+                ...g,
+                paymentStatus: updated.paymentStatus,
+                paidAmount: updated.paidAmount ?? g.paidAmount,
+                expectedAmount: updated.expectedAmount ?? g.expectedAmount,
+                balance: updated.balance ?? computeBalance(updated.paidAmount, updated.expectedAmount),
+                isExempt: updated.isExempt ?? g.isExempt,
+              }
             : g
         )
       );
+      onPaymentChange?.(guestId, updated.paymentStatus);
+      return true;
+    } catch {
+      return false;
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handlePaymentChange = (guestId: string, newStatus: string) => {
+    setPartialFor(null);
+    return patchPayment(guestId, { status: newStatus });
+  };
+
+  const openPartialEditor = (guest: Guest) => {
+    setPartialError("");
+    setPartialFor(guest.id);
+    // Se precarga lo ya abonado (si hay), que es lo que el anfitrión va a querer
+    // corregir o completar.
+    setPartialInput(guest.paidAmount > 0 && guest.paidAmount < guest.expectedAmount ? String(guest.paidAmount) : "");
+  };
+
+  const handlePartialSubmit = async (guest: Guest) => {
+    const amount = parseAmountInput(partialInput);
+    if (!Number.isFinite(amount) || amount < 0) {
+      setPartialError("Ingresá un monto válido.");
+      return;
+    }
+    if (guest.expectedAmount > 0 && amount > guest.expectedAmount) {
+      setPartialError(`No puede superar el total de ${formatARS(guest.expectedAmount)}.`);
+      return;
+    }
+    const ok = await patchPayment(guest.id, { paidAmount: amount });
+    if (ok) {
+      setPartialFor(null);
+      setPartialInput("");
+      setPartialError("");
+    } else {
+      setPartialError("No se pudo guardar. Intentá de nuevo.");
     }
   };
 
@@ -165,34 +241,45 @@ export function GuestListWithPayment({
   // Resumen
   const confirmed  = guests.filter((g) => g.status === "CONFIRMED");
   const exemptCount = confirmed.filter((g) => g.paymentStatus === "EXEMPT").length;
-  const estimatedTotal = paymentAmount
-    ? confirmed
-        .filter((g) => g.paymentStatus === "PAID" || g.paymentStatus === "PENDING")
-        .reduce((s, g) => s + g.attendingCount * paymentAmount, 0)
-    : 0;
-  const collectedTotal = paymentAmount
-    ? confirmed
-        .filter((g) => g.paymentStatus === "PAID")
-        .reduce((s, g) => s + g.attendingCount * paymentAmount, 0)
-    : 0;
+  const partialCount = confirmed.filter((g) => g.paymentStatus === "PARTIAL").length;
 
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  // Se suman los montos que ya resolvió el servidor (incluye pagos parciales y
+  // los precios diferenciados por franja de edad). Antes esto se estimaba acá
+  // multiplicando plano por attendingCount, y encima dependía de un prop
+  // paymentAmount que esta lista nunca recibe -- por eso el recuadro de
+  // recaudación no llegaba a mostrarse nunca.
+  const billable = confirmed.filter((g) => g.paymentStatus !== "EXEMPT");
+  const estimatedTotal = billable.reduce((sum, g) => sum + (g.expectedAmount || 0), 0);
+  const collectedTotal = billable.reduce((sum, g) => sum + (g.paidAmount || 0), 0);
+  const outstandingTotal = billable.reduce((sum, g) => sum + (g.balance || 0), 0);
+  const showTotals = estimatedTotal > 0 || collectedTotal > 0;
 
   const handleExportExcel = () => {
     if (guests.length === 0) return;
 
     const escape = (str: string) => `"${(str ?? "").replace(/"/g, '""')}"`;
-    const header = "Nombre;Estado;Personas;Pago;Restricciones alimentarias\n";
+    const header = pagoTarjetaHabilitado
+      ? "Nombre;Estado;Personas;Pago;Total tarjeta;Abonado;Saldo;Restricciones alimentarias\n"
+      : "Nombre;Estado;Personas;Pago;Restricciones alimentarias\n";
     const rows = guests
       .map((g) => {
         const personas = g.status === "CONFIRMED" ? g.attendingCount : g.expectedCount;
         const pago = g.status === "CONFIRMED" ? PAYMENT_STATUS_LABELS[g.paymentStatus] ?? g.paymentStatus : "—";
+        // Los montos van como número plano (sin símbolo ni separador de miles)
+        // para que Excel los sume sin reformatear la columna.
+        const money = (n: number) => (g.status === "CONFIRMED" ? String(Math.round(n)) : "");
         return [
           escape(g.name),
           escape(STATUS_LABELS[g.status] ?? g.status),
           personas,
           escape(pago),
+          ...(pagoTarjetaHabilitado
+            ? [
+                money(g.paymentStatus === "EXEMPT" ? 0 : g.expectedAmount || 0),
+                money(g.paidAmount || 0),
+                money(g.paymentStatus === "EXEMPT" ? 0 : g.balance || 0),
+              ]
+            : []),
           escape(g.dietaryRestrictions || ""),
         ].join(";");
       })
@@ -248,6 +335,10 @@ export function GuestListWithPayment({
                           <span>👉</span>
                           <span>Tocá un estado de pago (No pago aún / Exento / Pagado) en la lista para cambiarlo de manera rápida.</span>
                       </p>
+                      <p className="flex gap-2">
+                          <span>◐</span>
+                          <span>Si una familia o grupo abonó solo una parte, usá <strong>Parcial</strong> y cargá el monto recibido: la lista te va a mostrar el saldo que falta, y el invitado también lo ve en su invitación.</span>
+                      </p>
                       <p className="font-medium text-amber-300 flex gap-2">
                           <span>💡</span>
                           <span>El invitado verá el cambio reflejado automáticamente cuando abra su invitación.</span>
@@ -257,7 +348,7 @@ export function GuestListWithPayment({
             )}
           </div>
 
-          {paymentAmount && (
+          {showTotals && (
             <div
               style={{
                 display: "flex",
@@ -274,7 +365,17 @@ export function GuestListWithPayment({
             >
               <span>💰 Recaudado: <b style={{ color: "var(--accent)" }}>{formatARS(collectedTotal)}</b></span>
               <span style={{ opacity: .5 }}>·</span>
-              <span>⏳ Estimado total: <b>{formatARS(estimatedTotal)}</b></span>
+              <span>⏳ Falta cobrar: <b>{formatARS(outstandingTotal)}</b></span>
+              <span style={{ opacity: .5 }}>·</span>
+              <span style={{ opacity: .8 }}>Total tarjetas: <b>{formatARS(estimatedTotal)}</b></span>
+              {partialCount > 0 && (
+                <>
+                  <span style={{ opacity: .5 }}>·</span>
+                  <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
+                    ◐ {partialCount} pago{partialCount !== 1 ? "s" : ""} parcial{partialCount !== 1 ? "es" : ""}
+                  </span>
+                </>
+              )}
               <span style={{ opacity: .5 }}>·</span>
               <span style={{ opacity: .6 }}>⊘ Exentos: {exemptCount}</span>
             </div>
@@ -330,7 +431,7 @@ export function GuestListWithPayment({
         {pagoTarjetaHabilitado && (
           <>
             <span style={{ width: "1px", alignSelf: "stretch", background: "#e2e2e2", margin: "2px 2px" }} />
-            {(["PAID", "PENDING"] as const).map((p) => {
+            {(["PAID", "PARTIAL", "PENDING"] as const).map((p) => {
               const disabled = isPaymentDisabled(p);
               const active = paymentFilter === p;
               return (
@@ -394,9 +495,20 @@ export function GuestListWithPayment({
         </p>
       ) : (
         <div>
-          {paginated.map((guest) => (
+          {paginated.map((guest) => {
+            const partialOpen = partialFor === guest.id;
+            const billableRow = guest.status === "CONFIRMED" && guest.paymentStatus !== "EXEMPT" && guest.expectedAmount > 0;
+            // Valor de "una tarjeta" del grupo, para los atajos. Con precios
+            // diferenciados por edad es un promedio: el monto exacto queda a la
+            // vista en el input antes de guardar.
+            const perPerson = guest.attendingCount > 0 ? guest.expectedAmount / guest.attendingCount : 0;
+            const typedAmount = parseAmountInput(partialInput);
+            const previewBalance = Number.isFinite(typedAmount)
+              ? computeBalance(typedAmount, guest.expectedAmount)
+              : guest.balance;
+            return (
+            <div key={guest.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
             <div
-              key={guest.id}
               className="inv-guest-row"
               style={{
                 display: "flex",
@@ -404,7 +516,6 @@ export function GuestListWithPayment({
                 justifyContent: "space-between",
                 gap: "10px",
                 padding: "14px 0",
-                borderBottom: "1px solid #f0f0f0",
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -441,13 +552,22 @@ export function GuestListWithPayment({
                     role="group"
                     aria-label={`Estado de pago de ${guest.name}`}
                   >
-                    {(["PENDING", "EXEMPT", "PAID"] as const).map((s) => (
+                    {PAYMENT_TOGGLE_STATES.map((s) => (
                       <button
                         key={s}
-                        onClick={() => handlePaymentChange(guest.id, s)}
-                        disabled={updatingId === guest.id}
+                        onClick={() =>
+                          // "Parcial" no se aplica de una: necesita el monto, así
+                          // que abre el editor de la fila.
+                          s === "PARTIAL" ? openPartialEditor(guest) : handlePaymentChange(guest.id, s)
+                        }
+                        disabled={updatingId === guest.id || (s === "PARTIAL" && guest.expectedAmount <= 0)}
+                        title={
+                          s === "PARTIAL" && guest.expectedAmount <= 0
+                            ? "Cargá el precio de la tarjeta para poder registrar pagos parciales"
+                            : undefined
+                        }
                         style={{
-                          padding: "6px 12px",
+                          padding: "6px 10px",
                           fontSize: "11px",
                           fontWeight: 700,
                           border: "none",
@@ -455,18 +575,150 @@ export function GuestListWithPayment({
                           color: guest.paymentStatus === s ? "#fff" : "#888",
                           cursor: "pointer",
                           transition: "all 0.2s",
-                          opacity: updatingId === guest.id ? 0.5 : 1,
+                          opacity: updatingId === guest.id || (s === "PARTIAL" && guest.expectedAmount <= 0) ? 0.5 : 1,
                         }}
                         aria-pressed={guest.paymentStatus === s}
                       >
-                        {PAYMENT_STATUS_LABELS[s]}
+                        {TOGGLE_LABELS[s]}
                       </button>
                     ))}
                   </div>
+
+                  {/* Plata concreta de esta fila: lo que entregó y lo que falta. */}
+                  {billableRow && (
+                    <div style={{ fontSize: "11.5px", color: "#666", textAlign: "right" }}>
+                      {guest.paymentStatus === "PARTIAL" ? (
+                        <>
+                          Abonó <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>{formatARS(guest.paidAmount)}</b>
+                          {" · falta "}
+                          <b>{formatARS(guest.balance)}</b>
+                          <span style={{ opacity: .7 }}> de {formatARS(guest.expectedAmount)}</span>
+                        </>
+                      ) : guest.paymentStatus === "PAID" ? (
+                        <>Pagó {formatARS(guest.paidAmount)}</>
+                      ) : (
+                        <>Tarjeta: {formatARS(guest.expectedAmount)}</>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          ))}
+
+            {/* Editor de pago parcial de la fila */}
+            {partialOpen && (
+              <div
+                style={{
+                  padding: "0 0 16px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  animation: "fadeIn .2s ease",
+                }}
+              >
+                <div style={{ fontSize: "12px", color: "#666" }}>
+                  Monto recibido de <b>{guest.name}</b> — total de la tarjeta {formatARS(guest.expectedAmount)}
+                  {guest.attendingCount > 1 ? ` (${guest.attendingCount} personas)` : ""}
+                </div>
+
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    autoFocus
+                    value={partialInput}
+                    onChange={(ev) => { setPartialInput(ev.target.value); setPartialError(""); }}
+                    onKeyDown={(ev) => {
+                      if (ev.key === "Enter") handlePartialSubmit(guest);
+                      if (ev.key === "Escape") setPartialFor(null);
+                    }}
+                    placeholder="Ej: 150000"
+                    aria-label={`Monto abonado por ${guest.name}`}
+                    style={{
+                      width: "140px",
+                      padding: "8px 12px",
+                      borderRadius: "10px",
+                      border: `1px solid ${partialError ? "#c0392b" : "#ddd"}`,
+                      fontSize: "13px",
+                      fontFamily: "var(--font-body)",
+                    }}
+                  />
+                  <button
+                    onClick={() => handlePartialSubmit(guest)}
+                    disabled={updatingId === guest.id}
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: "999px",
+                      border: "none",
+                      background: PAYMENT_STATUS_COLORS.PARTIAL,
+                      color: "#fff",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      opacity: updatingId === guest.id ? 0.5 : 1,
+                      fontFamily: "var(--font-body)",
+                      minHeight: "38px",
+                    }}
+                  >
+                    Guardar monto
+                  </button>
+                  <button
+                    onClick={() => { setPartialFor(null); setPartialError(""); }}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: "999px",
+                      border: "1px solid #ddd",
+                      background: "transparent",
+                      color: "#777",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: "var(--font-body)",
+                      minHeight: "38px",
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+
+                {/* Atajo para el caso típico: "pagaron 2 tarjetas de las 5". */}
+                {guest.attendingCount > 1 && perPerson > 0 && (
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                    <span style={{ fontSize: "11px", color: "#999" }}>Pagaron</span>
+                    {Array.from({ length: Math.min(guest.attendingCount - 1, 8) }, (_, i) => i + 1).map((k) => (
+                      <button
+                        key={k}
+                        onClick={() => { setPartialInput(String(Math.round(perPerson * k))); setPartialError(""); }}
+                        style={{
+                          padding: "5px 10px",
+                          borderRadius: "999px",
+                          border: "1px dashed #ccc",
+                          background: "transparent",
+                          color: "#666",
+                          fontSize: "11px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-body)",
+                        }}
+                      >
+                        {k} tarjeta{k !== 1 ? "s" : ""}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ fontSize: "11.5px", color: partialError ? "#c0392b" : "#888" }}>
+                  {partialError
+                    ? partialError
+                    : previewBalance > 0
+                      ? `Quedaría un saldo de ${formatARS(previewBalance)}.`
+                      : "Con este monto la tarjeta queda paga."}
+                </div>
+              </div>
+            )}
+            </div>
+            );
+          })}
 
           {totalPages > 1 && (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "20px" }}>

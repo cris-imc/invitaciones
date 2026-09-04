@@ -42,7 +42,8 @@ async function getDashboardStats(userId: string) {
     const confirmed = inv.guests.filter((g) => g.status === "CONFIRMED");
     totalConfirmed    += confirmed.reduce((s, g) => s + g.attendingCount, 0);
     totalPaid         += confirmed.filter((g) => g.paymentStatus === "PAID").length;
-    totalPending      += confirmed.filter((g) => g.paymentStatus === "PENDING").length;
+    // Los pagos parciales van a "pendientes": todavía hay saldo por cobrar.
+    totalPending      += confirmed.filter((g) => g.paymentStatus === "PENDING" || g.paymentStatus === "PARTIAL").length;
     totalSongsPending += inv.songSuggestions.length;
   }
 
