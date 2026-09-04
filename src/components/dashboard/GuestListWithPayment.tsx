@@ -30,7 +30,6 @@ interface Guest {
 
 interface GuestListWithPaymentProps {
   invitationId: string;
-  paymentAmount?: number;
   pagoTarjetaHabilitado?: boolean;
   onPaymentChange?: (guestId: string, newStatus: string) => void;
 }
@@ -95,7 +94,6 @@ type PaymentFilter = "all" | "PAID" | "PARTIAL" | "PENDING";
 
 export function GuestListWithPayment({
   invitationId,
-  paymentAmount,
   pagoTarjetaHabilitado = false,
   onPaymentChange,
 }: GuestListWithPaymentProps) {
@@ -137,7 +135,10 @@ export function GuestListWithPayment({
   // (pago parcial), y la fila se sincroniza con lo que responde el servidor --
   // que es quien deriva el estado a partir del monto. Sin optimismo local: el
   // estado ya no es un dato independiente que se pueda adivinar de este lado.
-  const patchPayment = async (guestId: string, payload: { status?: string } | { paidAmount: number }) => {
+  const patchPayment = async (
+    guestId: string,
+    payload: ({ status?: string } | { paidAmount: number }) & { confirmClearPayment?: boolean }
+  ) => {
     setUpdatingId(guestId);
     try {
       const res = await fetch(`/api/guests/${guestId}/payment`, {
@@ -145,8 +146,11 @@ export function GuestListWithPayment({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error();
-      const updated = await res.json();
+      const updated = await res.json().catch(() => ({}));
+      // El servidor es el que valida (sobrepago, borrado de un monto ya
+      // registrado): se muestra su mensaje en vez de un "no se pudo guardar"
+      // que no dice nada.
+      if (!res.ok) return { ok: false as const, error: updated?.error as string | undefined };
       setGuests((prev) =>
         prev.map((g) =>
           g.id === guestId
@@ -162,18 +166,18 @@ export function GuestListWithPayment({
         )
       );
       onPaymentChange?.(guestId, updated.paymentStatus);
-      return true;
+      return { ok: true as const };
     } catch {
-      return false;
+      return { ok: false as const, error: undefined };
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const handlePaymentChange = (guestId: string, newStatus: string) => {
+  const handlePaymentChange = (guestId: string, newStatus: string, confirmClearPayment = false) => {
     setPartialFor(null);
     setClearConfirm(null);
-    return patchPayment(guestId, { status: newStatus });
+    return patchPayment(guestId, { status: newStatus, confirmClearPayment });
   };
 
   /**
@@ -211,13 +215,15 @@ export function GuestListWithPayment({
       setPartialError(`No puede superar el total de ${formatARS(guest.expectedAmount)}.`);
       return;
     }
-    const ok = await patchPayment(guest.id, { paidAmount: amount });
-    if (ok) {
+    // Tipear un 0 acá es deliberado (a diferencia de un clic al pasar en "No
+    // pago"), así que se confirma solo el borrado del monto.
+    const res = await patchPayment(guest.id, { paidAmount: amount, confirmClearPayment: amount === 0 });
+    if (res.ok) {
       setPartialFor(null);
       setPartialInput("");
       setPartialError("");
     } else {
-      setPartialError("No se pudo guardar. Intentá de nuevo.");
+      setPartialError(res.error ?? "No se pudo guardar. Intentá de nuevo.");
     }
   };
 
@@ -277,8 +283,8 @@ export function GuestListWithPayment({
   // Se suman los montos que ya resolvió el servidor (incluye pagos parciales y
   // los precios diferenciados por franja de edad). Antes esto se estimaba acá
   // multiplicando plano por attendingCount, y encima dependía de un prop
-  // paymentAmount que esta lista nunca recibe -- por eso el recuadro de
-  // recaudación no llegaba a mostrarse nunca.
+  // `paymentAmount` que esta lista nunca recibía -- por eso el recuadro de
+  // recaudación no llegaba a mostrarse nunca. Ese prop ya no existe.
   const billable = confirmed.filter((g) => g.paymentStatus !== "EXEMPT");
   const estimatedTotal = billable.reduce((sum, g) => sum + (g.expectedAmount || 0), 0);
   const collectedTotal = billable.reduce((sum, g) => sum + (g.paidAmount || 0), 0);
@@ -656,7 +662,7 @@ export function GuestListWithPayment({
                   <b>{guest.name}</b> borra los <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>{formatARS(guest.paidAmount)}</b> ya registrados. ¿Seguro?
                 </span>
                 <button
-                  onClick={() => handlePaymentChange(guest.id, confirmOpen.status)}
+                  onClick={() => handlePaymentChange(guest.id, confirmOpen.status, true)}
                   disabled={updatingId === guest.id}
                   style={{
                     padding: "8px 14px",

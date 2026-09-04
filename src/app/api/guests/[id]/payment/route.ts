@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { isAdmin } from "@/lib/roles";
 import {
+  PAYMENT_CLEAR_CODE,
   computeBalance,
   computeExpectedAmount,
   derivePaymentStatus,
@@ -19,6 +20,10 @@ import {
 // El monto esperado se congela en expectedAmount la primera vez que se toca el
 // pago (si el RSVP no lo congeló ya), así una suba posterior del precio de la
 // tarjeta no reabre saldo sobre pagos que el anfitrión ya dio por cerrados.
+//
+// Un cambio que dejaría en cero un monto ya registrado responde 409 con
+// PAYMENT_CLEAR_CODE en vez de aplicarse; para confirmarlo se reintenta con
+// { confirmClearPayment: true }.
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -78,6 +83,37 @@ export async function PATCH(
     const expectedAmount = guest.expectedAmount != null
       ? guest.expectedAmount
       : computeExpectedAmount(guest, guest.invitation);
+
+    // Lo que hay registrado hoy. Sirve para dos controles distintos: no aceptar
+    // más plata de la que corresponde, y no borrar la que ya está.
+    const currentPaid = resolveGuestPayment(guest, guest.invitation).paidAmount;
+
+    // Sobrepago: el panel ya lo rechaza al escribir el monto, pero la regla real
+    // tiene que estar acá o depende de qué cliente llame. Sin precio cargado
+    // (expectedAmount 0) no hay total contra el cual medir, así que no se valida.
+    if (hasPaidAmount && expectedAmount > 0 && (paidAmount as number) > expectedAmount) {
+      return NextResponse.json(
+        { error: `El monto no puede superar el total de la tarjeta (${expectedAmount}).` },
+        { status: 400 }
+      );
+    }
+
+    // Pasar a "no pago" o marcar exento pone el monto en cero, y sin historial
+    // de pagos eso no se puede deshacer: se confirma explícitamente.
+    const wipesMoney =
+      currentPaid > 0 &&
+      ((hasPaidAmount && (paidAmount as number) === 0) || status === "PENDING" || status === "EXEMPT");
+
+    if (wipesMoney && body.confirmClearPayment !== true) {
+      return NextResponse.json(
+        {
+          error: `Este invitado tiene ${currentPaid} registrado como abonado. Este cambio lo borra.`,
+          code: PAYMENT_CLEAR_CODE,
+          paidAmount: currentPaid,
+        },
+        { status: 409 }
+      );
+    }
 
     let nextPaid: number;
     let nextExempt: boolean;

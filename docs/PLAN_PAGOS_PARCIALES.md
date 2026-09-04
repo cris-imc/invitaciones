@@ -102,6 +102,9 @@ Fuente única de verdad del cálculo: `src/lib/payments.ts`.
 - [ ] Marcar y desmarcar exento sobre un invitado con parcial
 - [ ] Export a Excel con las columnas nuevas
 - [ ] Invitación **sin** precio de tarjeta cargado: el botón Parcial debe estar deshabilitado
+- [ ] Confirmación al borrar un monto: en la lista de pagos y al tildar "exento" desde
+      `GuestManager`; que **Cancelar** no guarde nada
+- [ ] Intentar cargar un monto mayor al total: tiene que rechazarlo con el mensaje del servidor
 
 ### 3. Colección Storytelling sin pago de tarjeta
 177 plantillas usan `RSVPWizardV2` pero **no pasan `initialPaymentStatus`** (ni el viejo).
@@ -110,24 +113,30 @@ No es una regresión de este trabajo, pero hay que decidirlo.
 - [ ] Confirmar si esas plantillas deben soportar pago de tarjeta
 - [ ] Si sí: cablear `initialPaymentStatus` + `initialPaidAmount` en las 177
 
-### 4. Deuda menor
-- [ ] `PaymentBadge.tsx` — su tipo sigue siendo `"PENDING" | "EXEMPT" | "PAID"`, no conoce
-      `PARTIAL`. Hoy está **importado pero nunca renderizado** en las plantillas, así que no
-      rompe nada; si se reactiva mostraría el total sin descontar lo abonado.
-- [ ] `GuestListWithPayment` sigue recibiendo el prop `paymentAmount` que ya no usa —
-      limpiarlo acá y en `GuestPageTabs`.
+### ~~4. Deuda menor~~ — resuelta
+- [x] `PaymentBadge.tsx` ahora conoce `PARTIAL` y acepta `paidAmount`: muestra el saldo en vez
+      del total, para que el invitado no vuelva a transferir todo. (Sigue importado pero no
+      renderizado en las plantillas; queda correcto para cuando se use.)
+- [x] Eliminado el prop `paymentAmount` de `GuestListWithPayment`, que no se usaba.
 
-### 5. Casos de borde
+### ~~5. Casos de borde~~ — resueltos
 - [x] **Borrado accidental del monto**: pasar a "No pago" o "Exento" deja el monto en cero (es
       coherente con el modelo: son estados sin plata). Pero un clic al pasar borraba en
-      silencio lo que la familia ya había entregado, sin deshacer. Ahora, **solo si hay monto
-      registrado**, la fila pide confirmación diciendo cuánto se va a borrar.
-- [ ] Mismo problema en `PUT /api/guests/[id]`: tildar "exento" al **editar** un invitado desde
-      `GuestManager` sigue poniendo `paidAmount = 0` sin avisar. Falta el mismo guardarraíl ahí.
-- [ ] **Sobrepago**: el panel lo bloquea con un error, pero la API lo acepta. Unificar.
-- [ ] **Historial de pagos**: hoy solo hay un monto acumulado, no un registro de cada entrega
-      ("el 3/9 trajeron $150.000"). Decidir si alcanza así. Resolvería también el caso de
-      arriba: con historial, quitar la exención podría devolver lo que se había pagado.
+      silencio lo que la familia ya había entregado, sin deshacer.
+
+      El guardarraíl quedó en la **API**, no en cada panel: `PATCH .../payment` y
+      `PUT /api/guests/[id]` responden **409** con `PAYMENT_CLEAR_CODE` cuando el cambio
+      pondría en cero un monto registrado, y solo lo aplican si el cliente reintenta con
+      `confirmClearPayment: true`. Así queda cubierta cualquier pantalla, no solo la lista.
+      - Lista de pagos: confirmación inline en la fila, con el monto que se va a borrar.
+      - `GuestManager` (editar invitado → tildar "exento"): diálogo de confirmación.
+      - Tipear un `0` en el editor de monto **no** pide confirmación: es un acto deliberado,
+        no un clic al pasar.
+- [x] **Sobrepago**: la regla ahora vive en la API (`400` si el monto supera el total), no solo
+      en el panel. Sin precio cargado (`expectedAmount = 0`) no se valida, porque no hay total
+      contra el cual medir. El panel muestra el mensaje que devuelve el servidor.
+- [x] **Historial de pagos**: **descartado** por decisión del usuario (2026-09-04) — complejiza
+      todo para el valor que aporta. Se queda el monto acumulado único.
 
 ### 6. Higiene de la rama
 - [ ] `prisma/dev.db` quedó modificado y **fuera del commit** a propósito (es la base local).

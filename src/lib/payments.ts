@@ -19,6 +19,18 @@
 
 export type PaymentStatus = "PENDING" | "PARTIAL" | "PAID" | "EXEMPT";
 
+/**
+ * Código que devuelven las rutas (409) cuando el cambio pedido pondría en cero
+ * un monto ya registrado -- pasar a "no pago" o marcar exento a alguien que ya
+ * entregó plata. No se guarda salvo que el cliente reintente con
+ * `confirmClearPayment: true`.
+ *
+ * El guardarraíl vive acá y no en cada panel porque la pérdida es irreversible
+ * (no hay historial de pagos, solo el monto acumulado) y hay más de una
+ * pantalla que puede provocarla.
+ */
+export const PAYMENT_CLEAR_CODE = "PAYMENT_WOULD_BE_CLEARED";
+
 /** Tolerancia en pesos para comparar montos (evita que 499999.999 quede PARTIAL). */
 const EPSILON = 1;
 

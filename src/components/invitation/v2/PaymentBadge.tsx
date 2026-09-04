@@ -3,8 +3,9 @@
 import { useState } from "react";
 
 interface PaymentBadgeProps {
-  paymentStatus: "PENDING" | "EXEMPT" | "PAID";
+  paymentStatus: "PENDING" | "PARTIAL" | "EXEMPT" | "PAID";
   amount?: number;          // monto por persona en ARS
+  paidAmount?: number;      // plata ya entregada (pagos parciales de familias/grupos)
   precioNino?: number;
   precioAdolescente?: number;
   attendingCount?: number;  // cantidad de personas confirmadas (legacy)
@@ -20,6 +21,7 @@ interface PaymentBadgeProps {
 export function PaymentBadge({
   paymentStatus,
   amount,
+  paidAmount = 0,
   precioNino,
   precioAdolescente,
   attendingCount = 1,
@@ -65,7 +67,8 @@ export function PaymentBadge({
     );
   }
 
-  // PENDING
+  // PENDING y PARTIAL: los dos muestran cómo pagar, pero el parcial descuenta
+  // lo ya entregado para que el invitado no vuelva a transferir el total.
   if (!amount) return null;
 
   const hasSpecificCounts = (attendingAdults !== undefined && attendingAdults > 0) || (attendingTeens !== undefined && attendingTeens > 0) || (attendingChildren !== undefined && attendingChildren > 0);
@@ -77,11 +80,17 @@ export function PaymentBadge({
 
   const total = (amount * adults) + (teenPrice * teens) + (childPrice * children);
 
-  const formattedTotal = new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-  }).format(total);
+  const money = (n: number) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      minimumFractionDigits: 0,
+    }).format(n);
+
+  const paid = Math.max(0, paidAmount);
+  const balance = Math.max(0, total - paid);
+  const isPartial = paid > 0 && balance > 0;
+  const formattedTotal = money(total);
 
   const handleCopyAlias = async () => {
     if (!alias) return;
@@ -95,8 +104,14 @@ export function PaymentBadge({
       <div className="inv-pay-dot" aria-hidden="true" />
       <div style={{ flex: 1 }}>
         <strong style={{ display: "block", fontSize: "13.5px", marginBottom: 4 }}>
-          Monto a pagar: {formattedTotal}
+          {isPartial ? `Saldo pendiente: ${money(balance)}` : `Monto a pagar: ${formattedTotal}`}
         </strong>
+
+        {isPartial && (
+          <p style={{ margin: "0 0 8px", fontSize: "13px", lineHeight: 1.5, opacity: 0.85 }}>
+            Ya registramos {money(paid)} de {formattedTotal}.
+          </p>
+        )}
 
         {alias && (
           <p style={{ margin: "0 0 8px", fontSize: "13px", lineHeight: 1.5 }}>

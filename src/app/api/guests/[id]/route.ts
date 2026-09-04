@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { isAdmin } from "@/lib/roles";
-import { computeExpectedAmount, derivePaymentStatus, resolveGuestPayment } from "@/lib/payments";
+import {
+  PAYMENT_CLEAR_CODE,
+  computeExpectedAmount,
+  derivePaymentStatus,
+  resolveGuestPayment,
+} from "@/lib/payments";
 
 // DELETE /api/guests/[id] — Eliminar invitado
 export async function DELETE(
@@ -112,6 +117,19 @@ export async function PUT(
     if (body.isExempt !== undefined) {
       isExempt = Boolean(body.isExempt);
       if (isExempt) {
+        // Sin historial de pagos, poner el monto en cero es irreversible: hay
+        // que confirmarlo explícitamente antes de perder lo que el invitado ya
+        // entregó.
+        if (paidAmount > 0 && body.confirmClearPayment !== true) {
+          return NextResponse.json(
+            {
+              error: `Este invitado tiene ${paidAmount} registrado como abonado. Marcarlo exento lo borra.`,
+              code: PAYMENT_CLEAR_CODE,
+              paidAmount,
+            },
+            { status: 409 }
+          );
+        }
         paidAmount = 0;
         updateData.paidAmount = 0;
       }

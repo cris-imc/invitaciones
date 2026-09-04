@@ -59,6 +59,7 @@ import {
 import { useToast } from "@/components/ui/Toast";
 import { getInvitePhrase } from "@/lib/invitation-copy";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
+import { PAYMENT_CLEAR_CODE, formatARS } from "@/lib/payments";
 import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
 import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
 
@@ -171,6 +172,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const isMobile = useIsMobile();
   const [guestToDelete, setGuestToDelete] = useState<Guest | null>(null);
   const [guestToEdit, setGuestToEdit] = useState<Guest | null>(null);
+  // Monto que se perdería al marcar exento, esperando confirmación (ver submitEditGuest).
+  const [clearPaymentConfirm, setClearPaymentConfirm] = useState<{ paidAmount: number } | null>(null);
   const [firstGuestHintDismissed, setFirstGuestHintDismissed] = useState(true);
   const [hintVisible, setHintVisible] = useState(false);
   const [hintMounted, setHintMounted] = useState(false);
@@ -535,8 +538,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     }
   };
 
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  /**
+   * Guarda la edición. Marcar exento a alguien que ya tiene plata registrada le
+   * pone el monto en cero, y sin historial de pagos eso no se deshace: la API
+   * responde 409 en vez de aplicarlo y acá se pide confirmación antes de
+   * reintentar con `confirmClearPayment`.
+   */
+  const submitEditGuest = async (confirmClearPayment: boolean) => {
     if (!guestToEdit) return;
     setIsEditSubmitting(true);
 
@@ -560,6 +568,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           expectedChildren:
             editGuestType === "FAMILY" ? effectiveChildren : 0,
           isExempt: editGuestIsExempt,
+          confirmClearPayment,
         }),
       });
 
@@ -569,16 +578,28 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           guests.map((g) => (g.id === updatedGuest.id ? updatedGuest : g)),
         );
         showToast("Invitado actualizado exitosamente", "success");
+        setClearPaymentConfirm(null);
         setGuestToEdit(null);
-      } else {
-        showToast("Error al actualizar invitado", "error");
+        return;
       }
+
+      const error = await res.json().catch(() => ({}));
+      if (res.status === 409 && error?.code === PAYMENT_CLEAR_CODE) {
+        setClearPaymentConfirm({ paidAmount: Number(error.paidAmount) || 0 });
+        return;
+      }
+      showToast("Error al actualizar invitado", "error");
     } catch (error) {
       console.error(error);
       showToast("Error de conexión", "error");
     } finally {
       setIsEditSubmitting(false);
     }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitEditGuest(false);
   };
 
   const handleDeleteGuest = async () => {
@@ -1103,7 +1124,35 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       </Dialog>
 
       <Dialog
-        open={!!guestToEdit}
+        open={!!clearPaymentConfirm}
+        onOpenChange={(open) => !open && setClearPaymentConfirm(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Marcar exento y borrar el pago?</DialogTitle>
+            <DialogDescription>
+              <strong>{guestToEdit?.name}</strong> tiene{" "}
+              <strong>{formatARS(clearPaymentConfirm?.paidAmount ?? 0)}</strong> registrados como
+              abonados. Marcarlo exento pone ese monto en cero y no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setClearPaymentConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={isEditSubmitting}
+              onClick={() => submitEditGuest(true)}
+            >
+              Sí, marcar exento
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!guestToEdit && !clearPaymentConfirm}
         onOpenChange={(open) => !open && setGuestToEdit(null)}
       >
         <DialogContent className="max-w-md">
