@@ -46,3 +46,15 @@ next-env.d.ts
 docs/ANALISIS.md
 img/*
 /svg/
+
+# Fotos que suben los clientes en tiempo de ejecución.
+#
+# Sin esta regla quedaban como "sin rastrear" dentro de un directorio que git sí
+# mira, y cualquier `git stash -u` o `git clean -fd` se las llevaba puestas: eso
+# fue lo que borró 89 fotos de invitaciones activas el 2026-09-02 (el stash
+# "wip: local uncommitted state before rebase"). Ignoradas, esos comandos ya no
+# las tocan.
+#
+# Los archivos que ya estaban commiteados siguen rastreados -- .gitignore no
+# afecta a lo que git ya sigue -- así que esto no borra ni desprotege nada.
+/public/uploads/
