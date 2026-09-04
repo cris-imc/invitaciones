@@ -1,8 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Info, ChevronUp, ChevronDown, Download } from "lucide-react";
+import { Info, ChevronUp, ChevronDown, Download, Minus, Plus, Wallet, Hourglass, Ban, Undo2, CircleDashed } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  BRACKETS,
+  BRACKET_LABELS,
+  CARD_PAYMENT_COLORS,
+  CARD_PAYMENT_LABELS,
+  formatARS,
+  type Bracket,
+  type CardPaymentStatus,
+} from "@/lib/card-payments";
 
 interface Guest {
   id: string;
@@ -12,6 +21,16 @@ interface Guest {
   attendingCount: number;
   expectedCount: number;
   paymentStatus: string;
+  // Resuelto por el servidor (GET /api/guests) con src/lib/card-payments.ts. El
+  // panel no vuelve a calcular precios: así lo que ve el anfitrión y lo que se
+  // guarda no pueden discrepar.
+  seats: Record<Bracket, number>;
+  paidSeats: Record<Bracket, number>;
+  paidAmount: number;
+  pendingAmount: number;
+  totalAmount: number;
+  surplus: number;
+  isExempt?: boolean;
   dietaryRestrictions?: string;
   message?: string;
 }
@@ -29,28 +48,39 @@ const STATUS_LABELS: Record<string, string> = {
   DECLINED: "No asistirá",
 };
 
-const PAYMENT_STATUS_LABELS: Record<string, string> = {
-  PENDING: "No pago aún",
-  EXEMPT: "Exento",
-  PAID: "Pagado",
-};
+// Los labels y colores viven en src/lib/card-payments.ts, con el cálculo.
+const PAYMENT_STATUS_LABELS = CARD_PAYMENT_LABELS;
+const PAYMENT_STATUS_COLORS = CARD_PAYMENT_COLORS;
 
 const PAYMENT_FILTER_LABELS: Record<string, string> = {
   PAID: "Pago",
+  PARTIAL: "Parcial",
   PENDING: "No pago",
 };
 
-const PAYMENT_STATUS_COLORS: Record<string, string> = {
-  PENDING: "#B98B3E",
-  EXEMPT:  "#8b8b8b",
-  PAID:    "#5a8a6e",
-};
+/** Botón redondo de +/- del desplegable de cupos. */
+function stepperBtn(disabled: boolean): React.CSSProperties {
+  return {
+    width: "26px",
+    height: "26px",
+    borderRadius: "50%",
+    border: "1px solid #ddd",
+    background: "transparent",
+    color: "#555",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: disabled ? "default" : "pointer",
+    opacity: disabled ? 0.3 : 1,
+    padding: 0,
+  };
+}
 
 const DESKTOP_PAGE_SIZE = 8;
 const MOBILE_PAGE_SIZE = 5;
 
 type AttendanceFilter = "all" | "CONFIRMED" | "PENDING" | "DECLINED";
-type PaymentFilter = "all" | "PAID" | "PENDING";
+type PaymentFilter = "all" | "PAID" | "PARTIAL" | "PENDING";
 
 export function GuestListWithPayment({
   invitationId,
@@ -66,6 +96,9 @@ export function GuestListWithPayment({
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showPaymentInfo, setShowPaymentInfo] = useState(true);
   const [page, setPage] = useState(1);
+  // Fila con el desplegable de cupos abierto, y el error que devolvió el server.
+  const [openSeatsFor, setOpenSeatsFor] = useState<string | null>(null);
+  const [rowError, setRowError] = useState<{ guestId: string; message: string } | null>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -86,32 +119,65 @@ export function GuestListWithPayment({
       .catch(() => setLoading(false));
   }, [invitationId]);
 
-  const handlePaymentChange = async (guestId: string, newStatus: string) => {
+  // Un solo camino hacia la API: se manda un estado (atajo) o los cupos pagos por
+  // franja, y la fila se sincroniza con lo que responde el servidor -- que es
+  // quien sabe a qué precio entró cada cupo. Sin optimismo local: los montos no
+  // se pueden adivinar de este lado.
+  const patchPayment = async (
+    guestId: string,
+    payload: { status: string } | { seats: Partial<Record<Bracket, number>> }
+  ) => {
     setUpdatingId(guestId);
-    // Optimistic update
-    setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, paymentStatus: newStatus } : g))
-    );
+    setRowError(null);
     try {
       const res = await fetch(`/api/guests/${guestId}/payment`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error();
-      onPaymentChange?.(guestId, newStatus);
-    } catch {
-      // Revert
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setRowError({
+          guestId,
+          message: data?.error ?? `El servidor rechazó el cambio (${res.status}).`,
+        });
+        return;
+      }
       setGuests((prev) =>
         prev.map((g) =>
           g.id === guestId
-            ? { ...g, paymentStatus: g.paymentStatus }
+            ? {
+                ...g,
+                paymentStatus: data.paymentStatus,
+                isExempt: data.isExempt ?? g.isExempt,
+                paidSeats: data.paidSeats ?? g.paidSeats,
+                seats: data.seats ?? g.seats,
+                paidAmount: data.paidAmount ?? g.paidAmount,
+                pendingAmount: data.pendingAmount ?? g.pendingAmount,
+                totalAmount: data.totalAmount ?? g.totalAmount,
+                surplus: data.surplus ?? g.surplus,
+              }
             : g
         )
       );
+      onPaymentChange?.(guestId, data.paymentStatus);
+    } catch {
+      setRowError({ guestId, message: "No se pudo conectar con el servidor." });
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const handlePaymentChange = (guestId: string, newStatus: string) =>
+    patchPayment(guestId, { status: newStatus });
+
+  /** Suma o resta un cupo pago de una franja, sin pasarse de los confirmados. */
+  const changeSeat = (guest: Guest, bracket: Bracket, delta: number) => {
+    const next = Math.min(
+      guest.seats?.[bracket] ?? 0,
+      Math.max(0, (guest.paidSeats?.[bracket] ?? 0) + delta)
+    );
+    return patchPayment(guest.id, { seats: { ...guest.paidSeats, [bracket]: next } });
   };
 
   const filtered = guests.filter((g) => {
@@ -187,7 +253,9 @@ export function GuestListWithPayment({
     const rows = guests
       .map((g) => {
         const personas = g.status === "CONFIRMED" ? g.attendingCount : g.expectedCount;
-        const pago = g.status === "CONFIRMED" ? PAYMENT_STATUS_LABELS[g.paymentStatus] ?? g.paymentStatus : "—";
+        const pago = g.status === "CONFIRMED"
+          ? PAYMENT_STATUS_LABELS[g.paymentStatus as CardPaymentStatus] ?? g.paymentStatus
+          : "—";
         return [
           escape(g.name),
           escape(STATUS_LABELS[g.status] ?? g.status),
@@ -394,9 +462,13 @@ export function GuestListWithPayment({
         </p>
       ) : (
         <div>
-          {paginated.map((guest) => (
+          {paginated.map((guest) => {
+            const seatsOpen = openSeatsFor === guest.id;
+            const paidSeatsCount = BRACKETS.reduce((n, b) => n + (guest.paidSeats?.[b] ?? 0), 0);
+            const totalSeatsCount = BRACKETS.reduce((n, b) => n + (guest.seats?.[b] ?? 0), 0);
+            return (
+            <div key={guest.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
             <div
-              key={guest.id}
               className="inv-guest-row"
               style={{
                 display: "flex",
@@ -404,7 +476,6 @@ export function GuestListWithPayment({
                 justifyContent: "space-between",
                 gap: "10px",
                 padding: "14px 0",
-                borderBottom: "1px solid #f0f0f0",
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -463,10 +534,98 @@ export function GuestListWithPayment({
                       </button>
                     ))}
                   </div>
+
+                  {/* Resumen de plata de la fila + acceso al detalle por franja */}
+                  {!guest.isExempt && guest.totalAmount > 0 && (
+                    <button
+                      onClick={() => setOpenSeatsFor(seatsOpen ? null : guest.id)}
+                      aria-expanded={seatsOpen}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "6px",
+                        background: "transparent", border: "none", cursor: "pointer",
+                        fontSize: "11.5px", color: "#666", padding: "2px 0",
+                        fontFamily: "var(--font-body)",
+                      }}
+                    >
+                      <span>
+                        {paidSeatsCount} de {totalSeatsCount} pago{totalSeatsCount !== 1 ? "s" : ""}
+                        {guest.pendingAmount > 0 ? (
+                          <>
+                            {" · falta "}
+                            <b>{formatARS(guest.pendingAmount)}</b>
+                          </>
+                        ) : guest.surplus > 0 ? (
+                          <>
+                            {" · "}
+                            <b style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>
+                              {formatARS(guest.surplus)} a favor
+                            </b>
+                          </>
+                        ) : null}
+                      </span>
+                      {seatsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
-          ))}
+
+            {rowError?.guestId === guest.id && (
+              <div style={{ padding: "0 0 12px", fontSize: "11.5px", color: "#c0392b" }}>
+                {rowError.message}
+              </div>
+            )}
+
+            {/* Desplegable: qué cupos de cada franja están pagos */}
+            {seatsOpen && (
+              <div style={{ padding: "0 0 16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                {BRACKETS.filter((b) => (guest.seats?.[b] ?? 0) > 0).map((b) => {
+                  const total = guest.seats[b];
+                  const paid = guest.paidSeats?.[b] ?? 0;
+                  const label = total === 1 ? BRACKET_LABELS[b].one : BRACKET_LABELS[b].many;
+                  return (
+                    <div key={b} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                      <span style={{ fontSize: "12.5px", color: "#555", textTransform: "capitalize" }}>{label}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <button
+                          onClick={() => changeSeat(guest, b, -1)}
+                          disabled={updatingId === guest.id || paid <= 0}
+                          aria-label={`Quitar un ${BRACKET_LABELS[b].one} pago`}
+                          style={stepperBtn(paid <= 0 || updatingId === guest.id)}
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span style={{ fontSize: "12.5px", fontWeight: 700, minWidth: "56px", textAlign: "center", color: paid === total ? PAYMENT_STATUS_COLORS.PAID : "#555" }}>
+                          {paid} de {total}
+                        </span>
+                        <button
+                          onClick={() => changeSeat(guest, b, 1)}
+                          disabled={updatingId === guest.id || paid >= total}
+                          aria-label={`Marcar un ${BRACKET_LABELS[b].one} como pago`}
+                          style={stepperBtn(paid >= total || updatingId === guest.id)}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div style={{ borderTop: "1px dashed #e2e2e2", paddingTop: "10px", fontSize: "12px", color: "#666", display: "flex", flexWrap: "wrap", gap: "4px 10px" }}>
+                  <span>Cobrado: <b style={{ color: PAYMENT_STATUS_COLORS.PAID }}>{formatARS(guest.paidAmount)}</b></span>
+                  {guest.pendingAmount > 0 && (
+                    <span>Falta: <b>{formatARS(guest.pendingAmount)}</b></span>
+                  )}
+                  <span style={{ opacity: .75 }}>Total: {formatARS(guest.totalAmount)}</span>
+                  {guest.surplus > 0 && (
+                    <span style={{ color: PAYMENT_STATUS_COLORS.PARTIAL }}>{formatARS(guest.surplus)} a favor</span>
+                  )}
+                </div>
+              </div>
+            )}
+            </div>
+            );
+          })}
 
           {totalPages > 1 && (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "20px" }}>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { PartyPopper, Heart, UserCheck } from "lucide-react";
 import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
 
-type PaymentStatus = "PENDING" | "EXEMPT" | "PAID";
+type PaymentStatus = "PENDING" | "PARTIAL" | "EXEMPT" | "PAID";
 
 interface RSVPWizardV2Props {
   invitationId: string;
@@ -103,7 +103,10 @@ export function RSVPWizardV2({
   const [name, setName] = useState(guestName);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [paymentStatus] = useState<PaymentStatus>(initialPaymentStatus);
+  // Sin useState: congelarlo al montar deja el estado viejo pegado despues de
+  // que el invitado modifica la asistencia, porque router.refresh() actualiza la
+  // prop pero no el estado local.
+  const paymentStatus: PaymentStatus = initialPaymentStatus;
 
   const sectionClass = `section${dark ? " dark" : ""}`;
 
@@ -341,7 +344,11 @@ export function RSVPWizardV2({
         {hasPayment && paymentAmount != null && !isExempt && (
           <div className="t-detail" style={{ background: "rgba(255,255,255,.07)", border: "1px dashed var(--t-acc)", margin: 0, height: "fit-content", borderRadius: "12px", padding: "16px" }}>
             <h4 style={{ marginBottom: "8px", fontFamily: "var(--t-font-d)", fontSize: "15px", color: "var(--t-acc)", marginTop: 0 }}>
-              {!guestToken ? "Valor de la tarjeta (vista previa)" : (paymentStatus === "PAID" ? "Tarjeta abonada ✓" : "Valor de la tarjeta")}
+              {!guestToken
+                ? "Valor de la tarjeta (vista previa)"
+                : paymentStatus === "PAID"
+                  ? "Tarjeta abonada ✓"
+                  : "Valor de la tarjeta"}
             </h4>
             <p style={{ display: "block", opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
               {paymentStatus === "PAID" ? "Monto pagado:" : "Monto total a pagar:"} <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(totalPayment)}</span>
@@ -350,6 +357,14 @@ export function RSVPWizardV2({
                 ({adultCount} adultos{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} adolescentes` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} niños` : ""})
               </span>
             </p>
+            {/* Con un pago parcial el invitado solo se entera de que hay algo
+                registrado. Nada de montos ni saldos: los numeros los maneja el
+                anfitrion, que es quien sabe quien de la familia puso que. */}
+            {paymentStatus === "PARTIAL" && (
+              <p style={{ display: "block", margin: "8px 0 0", fontSize: "13px", lineHeight: 1.5, opacity: 0.9, color: "inherit" }}>
+                Ya tenés un pago parcial registrado.
+              </p>
+            )}
             {maxGuests > 1 && (
               <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px dashed currentColor", opacity: 0.85, display: "flex", flexDirection: "column", gap: "2px" }}>
                 {adultCount > 0 && (
