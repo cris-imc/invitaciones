@@ -258,7 +258,18 @@ export function GuestPageTabs({
           {tab === "invitados" && (
             <div>
               <h2 className="text-xl font-semibold mb-6">Lista de Invitados</h2>
-              <GuestListWithPayment invitationId={invitationId} pagoTarjetaHabilitado={pagoTarjetaHabilitado} />
+              <GuestListWithPayment
+                invitationId={invitationId}
+                pagoTarjetaHabilitado={pagoTarjetaHabilitado}
+                // Sin un precio cargado no hay monto que repartir entre los
+                // cupos: el panel se queda con los estados simples y esconde
+                // todo lo que hable de plata.
+                hasPrices={
+                  (Number(regaloMonto) || 0) > 0 ||
+                  (Number(precioAdolescente) || 0) > 0 ||
+                  (Number(precioNino) || 0) > 0
+                }
+              />
             </div>
           )}
           {tab === "canciones" && (

@@ -290,14 +290,22 @@ export function RSVPWizardV2({
               `Confirmaste ${count} ${count === 1 ? "persona" : "personas"}.`
             )}
           </p>
-          {paymentStatus !== "PAID" && (
-            <button
-              className="t-btn"
-              onClick={() => setStep("decision")}
-              style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", border: "1px solid currentColor", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}
-            >
-              Modificar asistencia
-            </button>
+          {/* Haber pagado no cierra la puerta: si al invitado le quedan cupos y
+              quiere sumar a alguien, tiene que poder. El lugar nuevo entra al
+              precio vigente y la tarjeta vuelve a quedar parcial hasta que el
+              anfitrión marque ese cupo. La Colección Storytelling nunca lo
+              bloqueó, así que además se comportaban distinto entre sí. */}
+          <button
+            className="t-btn"
+            onClick={() => setStep("decision")}
+            style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", border: "1px solid currentColor", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}
+          >
+            Modificar asistencia
+          </button>
+          {paymentStatus === "PAID" && hasPayment && count < maxGuests && (
+            <p style={{ marginTop: "10px", fontSize: "12.5px", lineHeight: 1.5, opacity: 0.75, textAlign: "center", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}>
+              Si sumás personas, el lugar nuevo se cobra aparte.
+            </p>
           )}
         </div>
       );

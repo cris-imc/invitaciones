@@ -44,6 +44,12 @@ interface GuestListWithPaymentProps {
   invitationId: string;
   paymentAmount?: number;
   pagoTarjetaHabilitado?: boolean;
+  /**
+   * Si la invitación tiene algún precio cargado. Sin precio no hay monto que
+   * repartir entre los cupos: el panel se queda con los estados simples y no
+   * muestra nada que hable de plata (sería todo $0).
+   */
+  hasPrices?: boolean;
   onPaymentChange?: (guestId: string, newStatus: string) => void;
 }
 
@@ -112,6 +118,7 @@ export function GuestListWithPayment({
   invitationId,
   paymentAmount,
   pagoTarjetaHabilitado = false,
+  hasPrices = false,
   onPaymentChange,
 }: GuestListWithPaymentProps) {
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -547,7 +554,12 @@ export function GuestListWithPayment({
                     {/* "Parcial" no se elige: sale de marcar cupos. Se muestra
                         para que el estado se vea, y tocarlo abre el desplegable
                         que es donde realmente se resuelve. */}
-                    {(["PENDING", "PARTIAL", "EXEMPT", "PAID"] as const).map((s) => (
+                    {/* Sin precios cargados no hay pagos parciales posibles:
+                        quedan los tres estados de siempre. */}
+                    {(hasPrices
+                      ? (["PENDING", "PARTIAL", "EXEMPT", "PAID"] as const)
+                      : (["PENDING", "EXEMPT", "PAID"] as const)
+                    ).map((s) => (
                       <button
                         key={s}
                         onClick={() =>
@@ -576,7 +588,7 @@ export function GuestListWithPayment({
                   </div>
 
                   {/* Resumen de plata de la fila + acceso al detalle por franja */}
-                  {!guest.isExempt && guest.totalAmount > 0 && (
+                  {hasPrices && !guest.isExempt && totalSeatsCount > 0 && (
                     <button
                       onClick={() => setOpenSeatsFor(seatsOpen ? null : guest.id)}
                       aria-expanded={seatsOpen}
@@ -617,7 +629,7 @@ export function GuestListWithPayment({
             )}
 
             {/* Desplegable: qué cupos de cada franja están pagos */}
-            {seatsOpen && (
+            {seatsOpen && hasPrices && (
               <div style={{ padding: "0 0 16px", display: "flex", flexDirection: "column", gap: "10px" }}>
                 {BRACKETS.filter((b) => (guest.seats?.[b] ?? 0) > 0).map((b) => {
                   const total = guest.seats[b];
