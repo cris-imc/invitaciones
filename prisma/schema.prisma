@@ -307,6 +307,19 @@ model Guest {
   attendingTeens         Int              @default(0)
   attendingChildren      Int              @default(0)
   isExempt               Boolean          @default(false)
+  // Pago de tarjeta por CUPO. En vez de llevar un monto suelto, se lleva cuantos
+  // lugares de cada franja estan saldados y cuanta plata entro por ellos.
+  //
+  // Los montos son historia: se acumulan al precio que regia cuando se marco el
+  // cupo y no se recalculan nunca ("lo que se pago queda pagado"). Los cupos que
+  // siguen pendientes se valuan al precio vigente, asi que un aumento posterior
+  // solo los alcanza a ellos. Ver src/lib/card-payments.ts.
+  paidAdults             Int              @default(0)
+  paidTeens              Int              @default(0)
+  paidChildren           Int              @default(0)
+  paidAmountAdults       Float            @default(0)
+  paidAmountTeens        Float            @default(0)
+  paidAmountChildren     Float            @default(0)
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

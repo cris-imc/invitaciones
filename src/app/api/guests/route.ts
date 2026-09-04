@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { isAdmin } from "@/lib/roles";
+import { resolveCardPayment } from "@/lib/card-payments";
 
 // GET /api/guests?invitationId=X — Lista de invitados del anfitrión
 export async function GET(request: NextRequest) {
@@ -21,7 +22,13 @@ export async function GET(request: NextRequest) {
     // Verificar que la invitación pertenece al usuario
     const invitation = await prisma.invitation.findUnique({
       where: { id: invitationId },
-      select: { userId: true },
+      select: {
+        userId: true,
+        pagoTarjetaMonto: true,
+        regaloMonto: true,
+        precioAdolescente: true,
+        precioNino: true,
+      },
     });
 
     if (!invitation || (invitation.userId !== session.user.id && !isAdmin(session.user.role))) {
@@ -39,6 +46,16 @@ export async function GET(request: NextRequest) {
         attendingCount: true,
         expectedCount: true,
         paymentStatus: true,
+        isExempt: true,
+        attendingAdults: true,
+        attendingTeens: true,
+        attendingChildren: true,
+        paidAdults: true,
+        paidTeens: true,
+        paidChildren: true,
+        paidAmountAdults: true,
+        paidAmountTeens: true,
+        paidAmountChildren: true,
         dietaryRestrictions: true,
         message: true,
         uniqueToken: true,
@@ -47,7 +64,23 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(guests);
+    // Los montos se resuelven en el servidor: el panel no vuelve a calcular
+    // precios, asi que lo que ve el anfitrion y lo que ve el invitado coinciden.
+    return NextResponse.json(
+      guests.map((g) => {
+        const p = resolveCardPayment(g, invitation);
+        return {
+          ...g,
+          paymentStatus: p.status,
+          seats: p.seats,
+          paidSeats: p.paidSeats,
+          paidAmount: p.paidAmount,
+          pendingAmount: p.pendingAmount,
+          totalAmount: p.totalAmount,
+          surplus: p.surplus,
+        };
+      })
+    );
   } catch (error) {
     console.error("[guests GET]", error);
     return NextResponse.json({ error: "Error al obtener invitados" }, { status: 500 });
