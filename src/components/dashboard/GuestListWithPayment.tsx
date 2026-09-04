@@ -735,12 +735,13 @@ export function GuestListWithPayment({
                     cuadre del registro propio del anfitrión. Va rotulado como
                     tal porque decir "falta" en los dos lados se lee como una
                     contradicción. */}
-                {(guest.receivedAmount > 0 || guest.hostNotes) && (
+                {/* Solo si hay un monto anotado: con notas nada más, el rótulo
+                    quedaba solo y sin nada debajo. Que haya notas ya se ve en el
+                    botón de Anotaciones, que se tinta. */}
+                {guest.receivedAmount > 0 && (
                   <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
                     <span className="font-medium uppercase tracking-wide opacity-70">Tu registro</span>
-                    {guest.receivedAmount > 0 && (
-                      <span>recibiste <b className="text-foreground">{formatARS(guest.receivedAmount)}</b></span>
-                    )}
+                    <span>recibiste <b className="text-foreground">{formatARS(guest.receivedAmount)}</b></span>
                     {guest.onAccount > 0 && (
                       <span>· <b className="text-foreground">{formatARS(guest.onAccount)}</b> más de lo que marcaste, queda a cuenta</span>
                     )}
