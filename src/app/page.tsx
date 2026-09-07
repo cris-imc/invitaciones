@@ -38,10 +38,6 @@ export default async function Home() {
         <section className="l-hero">
           <div>
             <AnimatedHeroText />
-            <p className="sub">
-              Confirmaciones, pagos, fotos y mensajes en vivo — un solo link,
-              sin suscripciones.
-            </p>
             <div className="l-hero-ctas font-ui">
               <Link href={registerUrl}>
                 <Button className="rounded-full bg-[var(--accent)] text-[var(--ink)] transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--accent)]/20 px-6 font-ui">Empezar gratis</Button>
