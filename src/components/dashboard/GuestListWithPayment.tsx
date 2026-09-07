@@ -1049,8 +1049,8 @@ export function GuestListWithPayment({
               </span>
               {detailGuest.onAccount > 0 && (
                 <span>
-                  · <b className="text-foreground">{formatARS(detailGuest.onAccount)}</b> más de lo que
-                  marcaste, queda a cuenta
+                  · recibiste <b className="text-foreground">{formatARS(detailGuest.onAccount)}</b> más de
+                  lo que marcaste como pagado
                 </span>
               )}
               {detailGuest.missingAmount > 0 && (
