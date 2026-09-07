@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Info, ChevronUp, ChevronDown, Download, NotebookPen, ListChecks, Undo2, Pencil, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { hapticoConfirmar, hapticoDeshacer } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -206,6 +207,7 @@ export function GuestListWithPayment({
     if (!notesFor) return;
     const parsed = notesAmount.trim() === "" ? 0 : parseAmountInput(notesAmount);
     if (!Number.isFinite(parsed) || parsed < 0) return;
+    hapticoConfirmar();
     setSavingNotes(true);
     await patchPayment(notesFor.id, { receivedAmount: parsed, notes: notesText.trim() || null });
     setSavingNotes(false);
@@ -305,12 +307,18 @@ export function GuestListWithPayment({
       setClearConfirm({ guest, status: newStatus, marked });
       return;
     }
+    hapticoConfirmar();
     handlePaymentChange(guest.id, newStatus);
   };
 
   /** Marca o desmarca un lugar puntual. */
-  const setSeatPaid = (guestId: string, seat: Seat, paid: boolean) =>
-    patchPayment(guestId, { seat: { bracket: seat.bracket, index: seat.index, paid } });
+  const setSeatPaid = (guestId: string, seat: Seat, paid: boolean) => {
+    // Al tocar y no cuando contesta el servidor: el golpecito es el acuse de
+    // que el dedo dio en el lugar correcto, y llega tarde si espera la red.
+    if (paid) hapticoConfirmar();
+    else hapticoDeshacer();
+    return patchPayment(guestId, { seat: { bracket: seat.bracket, index: seat.index, paid } });
+  };
 
   /** Precio propio de un lugar. null lo devuelve al precio global de su franja. */
   const setSeatPrice = (guestId: string, seat: Seat, override: number | null) =>
@@ -1276,6 +1284,7 @@ export function GuestListWithPayment({
             <Button
               variant="destructive"
               onClick={() => {
+                hapticoDeshacer();
                 if (clearConfirm) handlePaymentChange(clearConfirm.guest.id, clearConfirm.status);
                 setClearConfirm(null);
               }}
