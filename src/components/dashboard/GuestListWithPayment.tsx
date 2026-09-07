@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Info, ChevronUp, ChevronDown, Download, NotebookPen, ListChecks, Undo2, Pencil } from "lucide-react";
+import { Info, ChevronUp, ChevronDown, Download, NotebookPen, ListChecks, Undo2, Pencil, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -530,14 +530,29 @@ export function GuestListWithPayment({
           asistencia y pago. Antes era una sola fila que envolvía donde caía y
           los dos grupos de pills se mezclaban entre sí. */}
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-2">
-        <input
-          type="search"
-          placeholder="Buscar invitado…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-full border px-4 py-2 text-sm md:w-auto md:min-w-[180px] md:flex-1"
-          aria-label="Buscar invitado por nombre"
-        />
+        {/* La cruz para vaciar la busqueda es propia y no la nativa de
+            type="search": esa no aparece en todos los navegadores, en el celular
+            casi nunca, y con el tema oscuro se ve como una mancha clara. */}
+        <div className="relative w-full md:w-auto md:min-w-[180px] md:flex-1">
+          <input
+            type="text"
+            placeholder="Buscar invitado…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`w-full rounded-full border bg-transparent px-4 py-2 text-sm ${search ? "pr-11" : ""}`}
+            aria-label="Buscar invitado por nombre"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              aria-label="Borrar la búsqueda"
+              className="absolute right-1.5 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+            >
+              <X className="h-4 w-4" strokeWidth={2} />
+            </button>
+          )}
+        </div>
 
         {/* En celular van en grilla y no envolviendo: con flex-wrap los cuatro
             caían 3 + 1 y quedaban de anchos distintos según el largo del texto.

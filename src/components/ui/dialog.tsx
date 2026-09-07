@@ -83,9 +83,18 @@ function useVisualViewportFit() {
  */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, style, onOpenAutoFocus, ...props }, ref) => {
-  const fit = useVisualViewportFit();
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    /**
+     * "sheet" (por defecto) sube desde abajo en celular: sirve cuando el modal
+     * es largo o se trabaja adentro un rato. "centered" lo deja en el medio en
+     * cualquier pantalla, que es lo que piden los modales cortos -- un avisito
+     * de confirmar o un formulario de dos campos se ve raro pegado abajo.
+     */
+    variant?: "sheet" | "centered";
+  }
+>(({ className, children, style, onOpenAutoFocus, variant = "sheet", ...props }, ref) => {
+  const sheetFit = useVisualViewportFit();
+  const fit = variant === "sheet" ? sheetFit : null;
   return (
   <DialogPortal>
     <DialogOverlay />
@@ -103,14 +112,24 @@ const DialogContent = React.forwardRef<
         (event.currentTarget as HTMLElement | null)?.focus();
       }}
       className={cn(
-        "inv-dialog-sheet fixed z-[100] flex flex-col gap-4 border bg-background shadow-lg",
-        // Celular: hoja al ras de abajo. El padding de abajo respeta la barra de
-        // gestos del sistema, que si no se come el último botón.
-        "inset-x-0 bottom-0 max-h-[88svh] rounded-t-2xl px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3",
-        // Desktop: centrado, con techo para que un modal largo no se estire mas
-        // alla de la ventana.
-        "sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:max-h-[85vh] sm:w-full sm:max-w-lg",
-        "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg sm:p-6",
+        variant === "sheet" ? "inv-dialog-sheet" : "inv-dialog-centered",
+        "fixed z-[100] flex flex-col gap-4 border bg-background shadow-lg",
+        variant === "sheet"
+          ? [
+              // Celular: hoja al ras de abajo. El padding de abajo respeta la
+              // barra de gestos del sistema, que si no se come el último botón.
+              "inset-x-0 bottom-0 max-h-[88svh] rounded-t-2xl px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3",
+              // Desktop: centrado, con techo para que un modal largo no se
+              // estire mas alla de la ventana.
+              "sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:max-h-[85vh] sm:w-full sm:max-w-lg",
+              "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg sm:p-6",
+            ]
+          : [
+              // Centrado en cualquier pantalla. En celular deja aire a los
+              // costados en vez de ir de borde a borde.
+              "left-1/2 top-1/2 max-h-[85svh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2",
+              "rounded-2xl p-5 sm:rounded-lg sm:p-6",
+            ],
         // Los modales que no separan su cuerpo con <DialogBody> scrollean
         // enteros: siguen andando sin tocarlos, solo que ahora con techo.
         "overflow-y-auto overscroll-contain has-[[data-dialog-body]]:overflow-hidden",
@@ -119,11 +138,14 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {/* La barra de arrastre no hace nada por si sola: esta para que se lea
-          como hoja deslizable y no como un cartel que cayo en el medio. */}
-      <div
-        aria-hidden
-        className="mx-auto h-1 w-10 shrink-0 rounded-full bg-foreground/20 sm:hidden"
-      />
+          como hoja deslizable y no como un cartel que cayo en el medio. En un
+          modal centrado no viene al caso, porque no se desliza de ningun lado. */}
+      {variant === "sheet" && (
+        <div
+          aria-hidden
+          className="mx-auto h-1 w-10 shrink-0 rounded-full bg-foreground/20 sm:hidden"
+        />
+      )}
       {children}
       {/* En el celular se toca con el dedo: el area de toque es de 44px aunque
           la cruz siga siendo chica. */}

@@ -2176,3 +2176,21 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   .inv-dialog-overlay[data-state],
   .inv-dialog-sheet[data-state] { animation-duration: 1ms }
 }
+
+/* Modal centrado: entra con un zoom corto en cualquier pantalla. La hoja
+   sube desde el borde porque viene de ahi; este aparece en el medio, y
+   deslizarlo desde abajo lo haria ver como una hoja a medio camino. */
+@keyframes inv-centered-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.96) }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+}
+@keyframes inv-centered-out {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(.96) }
+}
+.inv-dialog-centered[data-state="open"] { animation: inv-centered-in 180ms ease-out }
+.inv-dialog-centered[data-state="closed"] { animation: inv-centered-out 150ms ease-in }
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-dialog-centered[data-state] { animation-duration: 1ms }
+}

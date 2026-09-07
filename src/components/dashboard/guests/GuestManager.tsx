@@ -914,16 +914,34 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 Gestiona tus invitados y comparte sus enlaces.
               </CardDescription>
             </div>
-            <div className="w-full sm:w-64">
+            {/* La cruz para vaciar la busqueda es propia y no la nativa de
+                type="search": esa no aparece en todos los navegadores, en el
+                celular casi nunca, y con el tema oscuro se ve como una mancha
+                clara. */}
+            <div className="relative w-full sm:w-64">
               <Input
-                type="search"
+                type="text"
                 placeholder="Buscar invitado..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
+                className={searchQuery ? "pr-10" : undefined}
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setCurrentPage(1);
+                  }}
+                  aria-label="Borrar la búsqueda"
+                  className="absolute right-1 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                >
+                  <X className="h-4 w-4" strokeWidth={2} />
+                </button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -1103,7 +1121,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       {/* Qué hace el interruptor del saludo. Sin esto no se entiende qué cambia
           al tocarlo, porque el efecto está del otro lado, en la invitación. */}
       <Dialog open={showSaludoHelp} onOpenChange={setShowSaludoHelp}>
-        <DialogContent>
+        <DialogContent variant="centered">
           <DialogHeader>
             <DialogTitle>Saludar por nombre</DialogTitle>
             <DialogDescription asChild>
@@ -1140,7 +1158,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         open={!!guestToDelete && !guestToEdit}
         onOpenChange={(open) => !open && setGuestToDelete(null)}
       >
-        <DialogContent>
+        <DialogContent variant="centered">
           <DialogHeader>
             <DialogTitle>¿Eliminar invitado?</DialogTitle>
             <DialogDescription>
@@ -1164,7 +1182,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         open={!!guestToEdit}
         onOpenChange={(open) => !open && setGuestToEdit(null)}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent variant="centered" className="max-w-md">
           <DialogHeader>
             <DialogTitle>Editar Invitado</DialogTitle>
           </DialogHeader>
@@ -1376,7 +1394,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
       {/* Price-set Modal */}
       <Dialog open={priceModal.open} onOpenChange={(open) => !open && setPriceModal(m => ({ ...m, open: false }))}>
-        <DialogContent className="max-w-sm">
+        <DialogContent variant="centered" className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
               {priceModal.category === 'adult' ? '💰 Precio Adulto' : priceModal.category === 'teen' ? '🎓 Precio Adolescente' : '👶 Precio Niño'}
