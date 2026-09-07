@@ -133,6 +133,14 @@ const MOBILE_PAGE_SIZE = 5;
 type AttendanceFilter = "all" | "CONFIRMED" | "PENDING" | "DECLINED";
 type PaymentFilter = "all" | "PAID" | "PARTIAL" | "PENDING";
 
+/**
+ * Que el anfitrión cerró el aviso de pagos para siempre. Va en localStorage y
+ * no en sessionStorage justamente por eso: sessionStorage se vacía al cerrar la
+ * pestaña y el aviso volvía a aparecer al día siguiente. Como es definitivo, se
+ * pregunta antes de guardarlo.
+ */
+const AVISO_OCULTO_KEY = "inv:aviso-pagos-oculto";
+
 type SortBy = "debt" | "name" | "recent";
 
 const SORT_LABELS: Record<SortBy, string> = {
@@ -154,7 +162,11 @@ export function GuestListWithPayment({
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [showPaymentInfo, setShowPaymentInfo] = useState(true);
+  // Arranca plegado: el aviso importa la primera vez, no en cada visita.
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false);
+  // null = todavía no se sabe si el anfitrión lo cerró alguna vez.
+  const [avisoVisible, setAvisoVisible] = useState<boolean | null>(null);
+  const [confirmarCierreAviso, setConfirmarCierreAviso] = useState(false);
   const [page, setPage] = useState(1);
   // Invitado cuyo detalle de pago está abierto en el modal, y el error que
   // devolvió el server para esa fila.
@@ -200,12 +212,28 @@ export function GuestListWithPayment({
     setNotesFor(null);
   };
 
+  // Si el anfitrión ya lo cerró, no vuelve a aparecer nunca más. Se resuelve
+  // acá y no en el estado inicial porque localStorage no existe cuando el
+  // servidor arma el HTML; hasta que se sabe, `avisoVisible` es null y no se
+  // dibuja nada, así que el aviso no llega a asomarse para desaparecer.
   useEffect(() => {
-    if (showPaymentInfo) {
-      const timer = setTimeout(() => setShowPaymentInfo(false), 5000);
-      return () => clearTimeout(timer);
+    try {
+      setAvisoVisible(localStorage.getItem(AVISO_OCULTO_KEY) !== "1");
+    } catch {
+      setAvisoVisible(true);
     }
-  }, [showPaymentInfo]);
+  }, []);
+
+  const ocultarAvisoParaSiempre = () => {
+    setConfirmarCierreAviso(false);
+    setAvisoVisible(false);
+    try {
+      localStorage.setItem(AVISO_OCULTO_KEY, "1");
+    } catch {
+      // Modo privado o storage bloqueado: se cierra igual por ahora, y vuelve
+      // a aparecer en la próxima carga. Mejor eso que romper el panel entero.
+    }
+  };
 
 
   useEffect(() => {
@@ -465,41 +493,74 @@ export function GuestListWithPayment({
       {/* Totales de recaudación */}
       {pagoTarjetaHabilitado && (
         <>
-          {/* Burbuja informativa colapsable animada */}
+          {/* Aviso plegable. Arranca cerrado y, si el anfitrión lo cierra con la
+              cruz, no vuelve a aparecer en toda la sesión: es una explicación
+              para leer una vez, no un cartel para esquivar en cada visita. */}
+          {avisoVisible && (
           <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-900/10 border border-amber-500/30 text-amber-200/90 text-xs overflow-hidden transition-all duration-300 mb-5 shadow-[0_0_15px_rgba(245,158,11,0.05)]">
-            <button
-                type="button"
-                onClick={() => setShowPaymentInfo(!showPaymentInfo)}
-                className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-amber-500/15 transition-colors cursor-pointer"
-            >
-                <div className="flex items-center gap-2 font-medium">
-                    <Info className={`w-5 h-5 shrink-0 text-amber-400 ${showPaymentInfo ? 'animate-pulse' : ''}`} />
-                    <span className="text-amber-400 text-[13px]">Aviso Importante y Gestión de Pagos</span>
-                </div>
-                <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
-                    {showPaymentInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </div>
-            </button>
+            <div className="flex items-center gap-1 pr-2">
+              <button
+                  type="button"
+                  onClick={() => setShowPaymentInfo(!showPaymentInfo)}
+                  aria-expanded={showPaymentInfo}
+                  className="flex flex-1 items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-amber-500/15"
+              >
+                  <div className="flex items-center gap-2 font-medium">
+                      <Info className="w-5 h-5 shrink-0 text-amber-400" />
+                      <span className="text-amber-400 text-[13px]">Cómo funciona la gestión de pagos</span>
+                  </div>
+                  <div className="text-amber-400 opacity-80 shrink-0">
+                      {showPaymentInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+              </button>
+              {/* La cruz sólo con el aviso abierto: cerrado ya no molesta, y
+                  tenerla siempre invita a descartarlo sin haberlo leído.
+                  Pregunta antes, porque no hay forma de volver a traerlo. */}
+              {showPaymentInfo && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmarCierreAviso(true)}
+                  title="No volver a mostrar este aviso"
+                  aria-label="No volver a mostrar este aviso"
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-amber-400/80 transition-colors hover:bg-amber-500/20 hover:text-amber-300"
+                >
+                  <X className="h-4 w-4" strokeWidth={2} />
+                </button>
+              )}
+            </div>
 
             {showPaymentInfo && (
-                <div className="px-4 pb-5 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in slide-in-from-top-4 duration-300 space-y-3">
+                <div className="px-4 pb-5 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 space-y-3">
                     <p>
-                      <strong>Aviso importante:</strong> Los pagos gestionados aquí son solamente figurativos para que puedas llevar un control. Esta plataforma <strong>no moviliza dinero</strong> y cualquier dato mal cargado es responsabilidad del cliente.
+                      <strong>Importante:</strong> acá llevás tu propio control de quién te pagó. La plataforma <strong>no mueve dinero</strong>: lo que marcás es un registro tuyo, y lo que cargues mal queda a tu cargo.
                     </p>
                     <div className="w-full h-px bg-amber-500/20" />
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <p className="flex gap-2">
                           <span>👉</span>
-                          <span>Tocá un estado de pago (No pago aún / Exento / Pagado) en la lista para cambiarlo de manera rápida.</span>
+                          <span>Los botones <strong>No pago / Parcial / Exento / Pagado</strong> cambian la tarjeta entera de una vez.</span>
+                      </p>
+                      <p className="flex gap-2">
+                          <span>🧾</span>
+                          <span>En <strong>Ver detalles</strong> marcás lugar por lugar, le ponés el nombre a cada uno y, si hace falta, no cobrarle o cobrarle un precio diferente a un invitado específico.</span>
+                      </p>
+                      <p className="flex gap-2">
+                          <span>🔒</span>
+                          <span>Lo que marcás pago queda al precio de ese momento. Si después subís los precios, sólo alcanza a los lugares que todavía no pagaron.</span>
+                      </p>
+                      <p className="flex gap-2">
+                          <span>📝</span>
+                          <span>En <strong>Anotaciones</strong> guardás cuánta plata te entregaron y notas sueltas. Eso no lo ve nadie más que vos.</span>
                       </p>
                       <p className="font-medium text-amber-300 flex gap-2">
                           <span>💡</span>
-                          <span>El invitado verá el cambio reflejado automáticamente cuando abra su invitación.</span>
+                          <span>El invitado ve en su invitación lo que realmente tiene que pagar, con los precios que le pusiste.</span>
                       </p>
                     </div>
                 </div>
             )}
           </div>
+          )}
 
           {paymentAmount && (
             <div
@@ -1079,6 +1140,27 @@ export function GuestListWithPayment({
 
           <DialogFooter>
             <Button onClick={() => setDetailFor(null)}>Listo</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cerrar el aviso es definitivo y no hay desde dónde volver a abrirlo,
+          asi que se avisa antes en vez de hacerlo desaparecer de un toque. */}
+      <Dialog open={confirmarCierreAviso} onOpenChange={setConfirmarCierreAviso}>
+        <DialogContent variant="centered" className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>¿Ocultar este aviso?</DialogTitle>
+            <DialogDescription>
+              No se va a volver a mostrar: ni al recargar, ni al volver a entrar más
+              adelante con una sesión nueva. Es sólo la explicación de cómo funciona el
+              panel — tus pagos y tus invitados no se tocan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setConfirmarCierreAviso(false)}>
+              Mejor no
+            </Button>
+            <Button onClick={ocultarAvisoParaSiempre}>Sí, ocultar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
