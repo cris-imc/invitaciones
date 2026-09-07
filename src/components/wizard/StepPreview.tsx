@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { TemplateLoadingFallback } from "./TemplateLoadingFallback";
 import { saveInvitationFromWizard } from "@/lib/save-invitation";
+import { hapticoExito, hapticoError } from "@/lib/haptics";
 
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 
@@ -21,10 +22,12 @@ export function StepPreview() {
         try {
             const invitation = await saveInvitationFromWizard(data, themeConfig, usePremiumCredit, useDiamondCredit);
 
+            hapticoExito();
             // Redirigir a la invitación creada
             window.location.href = `/invitation/${invitation.slug}`;
         } catch (error) {
             console.error('Error creating invitation:', error);
+            hapticoError();
             alert(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`);
             setIsCreating(false);
         }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { hapticoExito, hapticoError } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -182,34 +183,40 @@ function RegisterForm() {
     e.preventDefault();
 
     if (!acceptedTerms) {
+      hapticoError();
       showToast("Debés aceptar los Términos y Condiciones para registrarte", "error");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
+      hapticoError();
       showToast("Las contraseñas no coinciden", "error");
       return;
     }
 
     const passwordError = validatePassword(formData.password);
     if (passwordError) {
+      hapticoError();
       showToast(passwordError, "error");
       return;
     }
 
     const areaCodeError = validatePhoneAreaCode(formData.phoneAreaCode);
     if (areaCodeError) {
+      hapticoError();
       showToast(areaCodeError, "error");
       return;
     }
 
     const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
     if (phoneNumberError) {
+      hapticoError();
       showToast(phoneNumberError, "error");
       return;
     }
 
     if (discountInput.trim() && !appliedDiscount) {
+      hapticoError();
       showToast("Aplicá el código de descuento antes de continuar, o borralo si no lo vas a usar", "error");
       return;
     }
@@ -235,6 +242,7 @@ function RegisterForm() {
       const data = await response.json();
 
       if (!response.ok) {
+        hapticoError();
         showToast(data.error || "Error al registrarse", "error");
         return;
       }
@@ -248,6 +256,7 @@ function RegisterForm() {
         if (fromWizard) {
           setPendingWizardDesiredCredit(selectedPlan === "DIAMOND" ? "DIAMOND" : "PREMIUM");
         }
+        hapticoExito();
         showToast("¡Cuenta creada! Redirigiendo a Mercado Pago...", "success");
         window.location.href = data.checkoutUrl;
         return;
@@ -255,14 +264,17 @@ function RegisterForm() {
 
       if (data.error) {
         // Cuenta creada, pero el cobro no se pudo generar (ver mensaje del servidor).
+        hapticoError();
         showToast(data.error, "error");
         router.push("/login");
         return;
       }
 
+      hapticoExito();
       showToast("¡Cuenta creada exitosamente!", "success");
       router.push("/login");
     } catch (error) {
+      hapticoError();
       showToast("Error al crear la cuenta", "error");
     } finally {
       setIsLoading(false);

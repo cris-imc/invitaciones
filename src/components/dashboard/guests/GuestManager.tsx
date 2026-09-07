@@ -57,6 +57,7 @@ import {
   Info,
   ChevronLeft,
 } from "lucide-react";
+import { hapticoConfirmar, hapticoDeshacer, hapticoError } from "@/lib/haptics";
 import { useToast } from "@/components/ui/Toast";
 import { getInvitePhrase } from "@/lib/invitation-copy";
 import { PLAN_LIMITS } from "@/lib/plan-limits";
@@ -410,6 +411,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
     });
 
     if (res.ok) {
+      hapticoConfirmar();
       const newGuest = await res.json();
       // Entra en su lugar alfabético y no arriba de todo: si no, la lista queda
       // desordenada hasta el próximo refresco y el invitado recién cargado
@@ -592,6 +594,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
   const handleDeleteGuest = async () => {
     if (!guestToDelete) return;
+    // Borrar un invitado no se deshace: el doble golpe lo separa de un guardado.
+    hapticoDeshacer();
 
     try {
       const res = await fetch(`/api/guests/${guestToDelete.id}`, {
@@ -603,6 +607,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       }
     } catch (error) {
       console.error(error);
+      hapticoError();
       showToast("Error al eliminar", "error");
     } finally {
       setGuestToDelete(null);

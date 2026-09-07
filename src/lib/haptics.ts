@@ -30,5 +30,14 @@ function vibrar(patron: Patron) {
 /** Confirmación breve: se marcó un pago, se guardó una anotación. */
 export const hapticoConfirmar = () => vibrar(18);
 
+/** Algo salió bien y costó: entraste, se creó la invitación, se registró. */
+export const hapticoExito = () => vibrar([14, 60, 26]);
+
 /** Algo se deshace o se borra: dos golpecitos para que no pase por lo mismo. */
 export const hapticoDeshacer = () => vibrar([12, 45, 12]);
+
+/**
+ * Algo falló: la contraseña, el formulario, el servidor. Más largo y parejo que
+ * los otros, para que se distinga sin mirar la pantalla.
+ */
+export const hapticoError = () => vibrar([50, 70, 50]);

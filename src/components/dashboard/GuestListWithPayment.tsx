@@ -90,6 +90,21 @@ const PAYMENT_FILTER_LABELS: Record<string, string> = {
 };
 
 /**
+ * El pill de asistencia de cada fila. Los tres comparten forma y sólo cambian
+ * texto y color; juntos acá, no hay manera de que uno quede desalineado de los
+ * otros. El plural sale de cuántos vienen, o de cuántos se esperaban si dijo
+ * que no.
+ */
+const ASISTENCIA_PILL: Record<
+  string,
+  (g: { attendingCount: number; expectedCount: number }) => { texto: string; rgb: string }
+> = {
+  CONFIRMED: (g) => ({ texto: g.attendingCount > 1 ? "Asistirán" : "Asistirá", rgb: "16, 185, 129" }),
+  DECLINED: (g) => ({ texto: g.expectedCount > 1 ? "No asistirán" : "No asistirá", rgb: "239, 68, 68" }),
+  PENDING: () => ({ texto: "Pendiente", rgb: "234, 179, 8" }),
+};
+
+/**
  * Filtra lo que se puede tipear en el monto recibido: solo dígitos y
  * separadores. El campo es `type="text"` porque `type="number"` no acepta el
  * formato local "25.000,50" y suma flechitas que acá molestan.
@@ -732,6 +747,7 @@ export function GuestListWithPayment({
           {paginated.map((guest) => {
             const paidSeatsCount = guest.paidSeats ?? 0;
             const totalSeatsCount = guest.totalSeats ?? 0;
+            const asistencia = ASISTENCIA_PILL[guest.status]?.(guest);
             return (
             // Mismo lenguaje que las tarjetas de "Gestionar invitados": borde,
             // esquinas redondeadas y separación entre una y otra. Nada de
@@ -752,27 +768,28 @@ export function GuestListWithPayment({
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: 4 }}>
-                  <div style={{ fontWeight: 600, fontSize: "14px" }}>{guest.name}</div>
-                  {guest.status === "DECLINED" && (
-                    <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", background: "rgba(239, 68, 68, 0.1)", color: "rgb(239, 68, 68)", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
-                      {guest.expectedCount > 1 ? "No asistirán" : "No asistirá"}
-                    </span>
-                  )}
-                  {guest.status === "CONFIRMED" && (
-                    <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", background: "rgba(16, 185, 129, 0.1)", color: "rgb(16, 185, 129)", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
-                      {guest.attendingCount > 1 ? "Asistirán" : "Asistirá"}
-                    </span>
-                  )}
-                  {guest.status === "PENDING" && (
-                    <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", background: "rgba(234, 179, 8, 0.1)", color: "rgb(234, 179, 8)", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
-                      Pendiente
-                    </span>
-                  )}
+                {/* El nombre ocupa su renglon entero y se recorta si no entra;
+                    el pill baja al de abajo, arrancando siempre contra el borde
+                    izquierdo de la tarjeta. Al lado del nombre no habia forma de
+                    alinearlo: cada fila lo empujaba distinto, primero segun el
+                    largo del nombre y despues segun cuanto ocupara el bloque de
+                    pago de la derecha. */}
+                <div className="truncate text-sm font-semibold" title={guest.name}>
+                  {guest.name}
                 </div>
-                <div style={{ fontSize: "11.5px", color: "#888", marginTop: "4px" }}>
-                  {guest.status === "CONFIRMED" && `${guest.attendingCount} persona${guest.attendingCount !== 1 ? "s" : ""}`}
-                  {guest.dietaryRestrictions && (guest.status === "CONFIRMED" ? ` · ${guest.dietaryRestrictions}` : guest.dietaryRestrictions)}
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  {asistencia && (
+                    <span
+                      className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.05em]"
+                      style={{ background: `rgba(${asistencia.rgb}, 0.1)`, color: `rgb(${asistencia.rgb})` }}
+                    >
+                      {asistencia.texto}
+                    </span>
+                  )}
+                  <span className="text-[11.5px] text-muted-foreground">
+                    {guest.status === "CONFIRMED" && `${guest.attendingCount} persona${guest.attendingCount !== 1 ? "s" : ""}`}
+                    {guest.dietaryRestrictions && (guest.status === "CONFIRMED" ? ` · ${guest.dietaryRestrictions}` : guest.dietaryRestrictions)}
+                  </span>
                 </div>
               </div>
 

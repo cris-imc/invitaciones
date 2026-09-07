@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { authenticate } from "@/app/actions/auth";
+import { hapticoExito, hapticoError } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -29,8 +30,10 @@ export default function LoginPage() {
     try {
       const res = await authenticate(formData.email, formData.password);
       if (res?.error) {
+        hapticoError();
         showToast(res.error, "error");
       } else {
+        hapticoExito();
         showToast("¡Bienvenido!", "success");
         await update();
         router.push("/dashboard");
@@ -47,10 +50,12 @@ export default function LoginPage() {
         // que la botonera de admin y la opción de crear admin aparezcan sin
         // recargar.
         await update();
+        hapticoExito();
         showToast("¡Bienvenido!", "success");
         return;
       }
       console.error("[LOGIN ERROR]", error);
+      hapticoError();
       showToast("Error al iniciar sesión", "error");
     } finally {
       setIsLoading(false);
