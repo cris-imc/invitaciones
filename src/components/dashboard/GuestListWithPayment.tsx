@@ -609,12 +609,18 @@ export function GuestListWithPayment({
             value={effectiveSort}
             onChange={(e) => setSortBy(e.target.value as SortBy)}
             aria-label="Ordenar la lista"
-            className="h-8 min-w-0 rounded-full border bg-transparent px-3 text-xs font-medium transition-colors hover:bg-muted/60"
+            // El desplegable lo dibuja el sistema, no la pagina: con fondo
+            // transparente lo pintaba blanco y sobre el tema oscuro las opciones
+            // quedaban en blanco sobre blanco. `color-scheme` es lo que le avisa
+            // al navegador de que lado esta el tema; el resto es por las dudas,
+            // porque cada navegador hace lo suyo con este control.
+            style={{ colorScheme: "dark" }}
+            className="h-8 min-w-0 rounded-full border bg-background px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted/60"
           >
             {(Object.keys(SORT_LABELS) as SortBy[])
               .filter((s) => s !== "debt" || canSortByDebt)
               .map((s) => (
-                <option key={s} value={s}>
+                <option key={s} value={s} className="bg-background text-foreground">
                   {SORT_LABELS[s]}
                 </option>
               ))}
@@ -728,6 +734,11 @@ export function GuestListWithPayment({
                         }
                         disabled={updatingId === guest.id}
                         title={s === "PARTIAL" ? "Marcá cupos en el detalle para dejarla en parcial" : undefined}
+                        // En celular el grupo ocupa todo el ancho, asi que los
+                        // botones se lo reparten: sin esto quedaban con su ancho
+                        // natural y sobraba un hueco muerto despues del ultimo.
+                        // El alto minimo es para que se puedan tocar con el dedo.
+                        className="max-sm:min-h-10 max-sm:flex-1"
                         style={{
                           padding: "6px 10px",
                           fontSize: "11px",
