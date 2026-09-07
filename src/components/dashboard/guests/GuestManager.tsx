@@ -411,7 +411,14 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
     if (res.ok) {
       const newGuest = await res.json();
-      setGuests((prev) => [newGuest, ...prev]);
+      // Entra en su lugar alfabético y no arriba de todo: si no, la lista queda
+      // desordenada hasta el próximo refresco y el invitado recién cargado
+      // aparece en un sitio distinto del que va a ocupar después.
+      setGuests((prev) =>
+        [...prev, newGuest].sort((a, b) =>
+          String(a.name ?? "").localeCompare(String(b.name ?? ""), "es", { sensitivity: "base" })
+        )
+      );
       setNewGuestNombre("");
       setNewGuestApellido("");
       setNewGuestAdultCount(2);

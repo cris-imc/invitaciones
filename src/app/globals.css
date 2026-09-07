@@ -2139,3 +2139,40 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 @media (min-width: 768px) {
   .adm-mobile-nav { display: none !important; }
 }
+
+/* ── Modales: hoja en celular, modal centrado en desktop ──
+   Las utilidades de animación de shadcn (slide-in-from-*, zoom-in-*, fade-in-*)
+   vienen de un plugin que este proyecto no importa, así que nunca hicieron
+   nada: los modales aparecían de golpe. Acá va la animación propia, que además
+   es la que le da sentido a la hoja -- si no sube desde el borde, no se lee
+   como algo que se desliza. */
+@keyframes inv-dialog-fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes inv-dialog-fade-out { from { opacity: 1 } to { opacity: 0 } }
+@keyframes inv-sheet-in { from { transform: translateY(100%) } to { transform: translateY(0) } }
+@keyframes inv-sheet-out { from { transform: translateY(0) } to { transform: translateY(100%) } }
+
+.inv-dialog-overlay[data-state="open"] { animation: inv-dialog-fade-in 200ms ease }
+.inv-dialog-overlay[data-state="closed"] { animation: inv-dialog-fade-out 180ms ease }
+
+/* La curva es la de las hojas del sistema: sale rápido y frena al final, que es
+   lo que la hace sentir arrastrada y no disparada. */
+.inv-dialog-sheet[data-state="open"] { animation: inv-sheet-in 300ms cubic-bezier(.32, .72, 0, 1) }
+.inv-dialog-sheet[data-state="closed"] { animation: inv-sheet-out 220ms cubic-bezier(.32, .72, 0, 1) }
+
+@media (min-width: 640px) {
+  @keyframes inv-dialog-zoom-in {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(.96) }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+  }
+  @keyframes inv-dialog-zoom-out {
+    from { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+    to { opacity: 0; transform: translate(-50%, -50%) scale(.96) }
+  }
+  .inv-dialog-sheet[data-state="open"] { animation: inv-dialog-zoom-in 180ms ease-out }
+  .inv-dialog-sheet[data-state="closed"] { animation: inv-dialog-zoom-out 150ms ease-in }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-dialog-overlay[data-state],
+  .inv-dialog-sheet[data-state] { animation-duration: 1ms }
+}

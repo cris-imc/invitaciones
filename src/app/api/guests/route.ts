@@ -65,11 +65,14 @@ export async function GET(request: NextRequest) {
     // precios, asi que lo que ve el anfitrion y lo que ve el invitado coinciden.
     return NextResponse.json(
       guests.map((g) => {
-        const p = resolveCardPayment(g, invitation);
+        // `status` se saca aparte a proposito: el invitado ya tiene el suyo
+        // (CONFIRMED / PENDING / DECLINED) y derramar el resultado entero lo
+        // pisaba con el estado del pago, dejando al panel sin confirmados.
+        const { status: cardStatus, ...payment } = resolveCardPayment(g, invitation);
         return {
           ...g,
-          ...p,
-          paymentStatus: p.status,
+          ...payment,
+          paymentStatus: cardStatus,
         };
       })
     );

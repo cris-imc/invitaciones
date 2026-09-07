@@ -907,6 +907,7 @@ export function PapeleriaDeHotelDeLujoTemplateNegroYBronce({ invitation, guest, 
                 paymentAmount={paymentAmount}
                 isExempt={guest?.isExempt ?? false}
                 paymentStatus={(guest as any)?.paymentStatus ?? "PENDING"}
+                paymentView={(guest as any)?.paymentView ?? null}
                 precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
                 precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
                 initialStatus={guestStatus}
@@ -1285,6 +1286,7 @@ function PhlRsvpCard({
   paymentAmount,
   isExempt,
   paymentStatus,
+  paymentView,
   precioNino,
   precioAdolescente,
   initialStatus,
@@ -1310,6 +1312,7 @@ function PhlRsvpCard({
   paymentAmount?: number;
   isExempt: boolean;
   paymentStatus?: string;
+  paymentView?: { total: number; paid: number; pending: number; lines: string[] } | null;
   precioNino?: number;
   precioAdolescente?: number;
   initialStatus: GuestStatus;
@@ -1343,7 +1346,19 @@ function PhlRsvpCard({
   const adultPrice = paymentAmount ?? 0;
   const teenPrice = precioAdolescente ?? adultPrice;
   const childPrice = precioNino ?? adultPrice;
-  const totalPayment = isExempt ? 0 : adultPrice * adultCount + teenPrice * teenCount + childPrice * childCount;
+  // Mientras el invitado elige cuantos van, el total se estima con los
+  // precios generales. Ya confirmado manda lo que resolvio el servidor: ahi
+  // estan aplicados los precios propios que el anfitrion le puso a cada
+  // lugar, que de este lado no se conocen.
+  const liveTotal = isExempt ? 0 : adultPrice * adultCount + teenPrice * teenCount + childPrice * childCount;
+  const useServerTotal =
+    !isExempt &&
+    !!paymentView &&
+    status === "CONFIRMED" &&
+    adultCount === (initialAttendingAdults ?? 0) &&
+    teenCount === (initialAttendingTeens ?? 0) &&
+    childCount === (initialAttendingChildren ?? 0);
+  const totalPayment = useServerTotal ? paymentView.total : liveTotal;
   const formatARS = (n: number) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
 
@@ -1475,15 +1490,19 @@ function PhlRsvpCard({
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="phl-rsvp-payment-detail">
-                  {adultCount > 0 && (
-                    <span>{adultCount} {adultCount === 1 ? "adulto" : "adultos"} × {formatARS(adultPrice)}</span>
-                  )}
-                  {teenCount > 0 && (
-                    <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
-                  )}
-                  {childCount > 0 && (
-                    <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
-                  )}
+                  {useServerTotal
+                    ? paymentView.lines.map((l, i) => <span key={i}>{l}</span>)
+                    : <>
+                      {adultCount > 0 && (
+                      <span>{adultCount} {adultCount === 1 ? "adulto" : "adultos"} × {formatARS(adultPrice)}</span>
+                    )}
+                    {teenCount > 0 && (
+                      <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
+                    )}
+                    {childCount > 0 && (
+                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                    )}
+                      </>}
                 </div>
               )}
             </div>

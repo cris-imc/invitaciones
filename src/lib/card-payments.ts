@@ -71,20 +71,33 @@ export interface StoredCardPayment {
  * Cómo se guarda cada lugar. Formato compacto porque va serializado:
  *   o = precio propio de este lugar (null: usa el precio global de su franja)
  *   p = lo que se cobró al marcarlo pago (null: todavía no está pago)
+ *   n = nombre de quien ocupa el lugar (null: se muestra "Adulto 2", "Niño 1")
  */
 interface StoredSeat {
   o: number | null;
   p: number | null;
+  n: string | null;
 }
 
 type StoredSeats = Record<Bracket, StoredSeat[]>;
+
+/** Hasta dónde se guarda un nombre de lugar. */
+const MAX_SEAT_NAME = 60;
+
+function cleanSeatName(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const name = v.trim().slice(0, MAX_SEAT_NAME);
+  return name === "" ? null : name;
+}
 
 /** Un lugar ya resuelto, listo para mostrar. */
 export interface Seat {
   bracket: Bracket;
   index: number;
-  /** "Adulto 2", "Niño 1" */
+  /** "Adulto 2", "Niño 1" -- la posición, siempre presente. */
   label: string;
+  /** Nombre que le puso el anfitrión. null = se muestra el label. */
+  name: string | null;
   /** Precio propio, si el anfitrión se lo puso. null = sigue el global. */
   override: number | null;
   paid: boolean;
@@ -105,6 +118,7 @@ function parseSeats(raw?: string | null): StoredSeats {
             return {
               o: seat.o == null ? null : Math.max(0, Number(seat.o) || 0),
               p: seat.p == null ? null : Math.max(0, Number(seat.p) || 0),
+              n: cleanSeatName(seat.n),
             };
           })
         : [];
@@ -159,10 +173,43 @@ function alignSeats(stored: StoredSeats, counts: Record<Bracket, number>): Store
   const out = emptySeats();
   for (const b of BRACKETS) {
     const list = stored[b].slice(0, counts[b]);
-    while (list.length < counts[b]) list.push({ o: null, p: null });
+    while (list.length < counts[b]) list.push({ o: null, p: null, n: null });
     out[b] = list;
   }
   return out;
+}
+
+/**
+ * Los lugares listos para trabajar, con la compatibilidad hacia atrás aplicada.
+ *
+ * Antes el pago era de la tarjeta entera (Guest.paymentStatus), sin detalle por
+ * lugar: un invitado marcado PAID llega acá con seatDetails vacío y, tomado
+ * literal, se mostraría como impago. Se interpreta como lo que significaba:
+ * todos sus lugares están pagos. Al precio de hoy, porque el modelo viejo no
+ * guardaba cuánto se cobró.
+ *
+ * Está acá y no solo en la lectura porque escribir tiene que partir de la misma
+ * interpretación: si no, desmarcar un lugar de una tarjeta vieja arrancaba de
+ * cero y se llevaba puesto el pago de todos los demás.
+ *
+ * Solo aplica mientras nadie haya tocado el pago desde el panel nuevo: en cuanto
+ * se marca o desmarca un lugar, seatDetails deja de estar vacío y este camino no
+ * vuelve a usarse.
+ */
+function resolveSeats(
+  guest: StoredCardPayment,
+  prices: Record<Bracket, number>,
+  counts: Record<Bracket, number>
+): StoredSeats {
+  const seats = alignSeats(parseSeats(guest.seatDetails), counts);
+  if (!guest.seatDetails && guest.paymentStatus === "PAID") {
+    for (const b of BRACKETS) {
+      for (const seat of seats[b]) {
+        if (seat.p == null) seat.p = seat.o ?? prices[b];
+      }
+    }
+  }
+  return seats;
 }
 
 export interface ResolvedCardPayment {
@@ -195,7 +242,7 @@ export function resolveCardPayment(
   const prices = resolvePrices(invitation);
   const seatCounts = resolveSeatCounts(guest);
   const stored = parseSeats(guest.seatDetails);
-  const aligned = alignSeats(stored, seatCounts);
+  const aligned = resolveSeats(guest, prices, seatCounts);
 
   const seats: Seat[] = [];
   let paidAmount = 0;
@@ -216,6 +263,7 @@ export function resolveCardPayment(
         bracket: b,
         index: i,
         label: `${BRACKET_LABELS[b].one} ${i + 1}`,
+        name: s.n,
         override: s.o,
         paid,
         price,
@@ -270,6 +318,8 @@ export interface SeatChange {
   paid?: boolean;
   /** Precio propio del lugar. `null` lo devuelve al precio global. */
   override?: number | null;
+  /** Nombre de quien ocupa el lugar. `null` o vacío lo vuelve a "Niño 1". */
+  name?: string | null;
 }
 
 /**
@@ -286,7 +336,7 @@ export function applySeatChange(
 ): { seatDetails: string } {
   const prices = resolvePrices(invitation);
   const counts = resolveSeatCounts(guest);
-  const seats = alignSeats(parseSeats(guest.seatDetails), counts);
+  const seats = resolveSeats(guest, prices, counts);
 
   const list = seats[change.bracket];
   const seat = list[change.index];
@@ -297,6 +347,10 @@ export function applySeatChange(
     // Si ya estaba pago, cambiar su precio corrige lo cobrado por ese lugar: es
     // el anfitrión diciendo cuánto valía en realidad.
     if (seat.p != null) seat.p = seat.o ?? prices[change.bracket];
+  }
+
+  if (change.name !== undefined) {
+    seat.n = cleanSeatName(change.name);
   }
 
   if (change.paid !== undefined) {
@@ -330,4 +384,62 @@ export function formatARS(n: number): string {
     currency: "ARS",
     minimumFractionDigits: 0,
   }).format(n);
+}
+
+/**
+ * Lo que tiene que ver el invitado en su invitación.
+ *
+ * La plantilla calculaba el total sola, multiplicando el precio de cada franja
+ * por cuánta gente venía. Eso ignora los precios propios por lugar: si el
+ * anfitrión le puso $0 al hijo menor de una familia, la familia igual veía el
+ * precio de niño en su invitación y no lo que realmente iba a pagar.
+ *
+ * Se arma en el servidor, con el mismo resolvedor que usa el panel, así los dos
+ * lados no pueden discrepar. Sólo tiene sentido con cupos ya confirmados: antes
+ * de confirmar no hay lugares y la plantilla sigue estimando con los precios
+ * generales, que es lo correcto mientras el invitado todavía elige cuántos van.
+ */
+export interface GuestPaymentView {
+  total: number;
+  paid: number;
+  pending: number;
+  /**
+   * El desglose ya escrito ("2 adultos × $30.000", "Jorge · $0"). Va armado y no
+   * en partes porque lo consumen 177 plantillas: cuanto menos tenga que decidir
+   * cada una, menos formas hay de que una quede distinta de las otras.
+   */
+  lines: string[];
+}
+
+export function resolveGuestPaymentView(
+  guest: StoredCardPayment,
+  invitation: InvitationPrices
+): GuestPaymentView | null {
+  const resolved = resolveCardPayment(guest, invitation);
+  if (resolved.totalSeats === 0) return null;
+
+  const lines: string[] = [];
+  for (const b of BRACKETS) {
+    const seats = resolved.seats.filter((s) => s.bracket === b);
+    if (seats.length === 0) continue;
+
+    // Si todos los lugares de la franja valen lo mismo alcanza con una línea
+    // ("2 adultos × $15.000"). Con un precio distinto en el medio esa cuenta
+    // deja de cerrar, así que ahí se enumeran los lugares uno por uno.
+    const uniform = seats.every((s) => s.price === seats[0].price);
+    if (uniform) {
+      const { one, many } = BRACKET_LABELS[b];
+      const noun = seats.length === 1 ? one.toLowerCase() : many.toLowerCase();
+      lines.push(`${seats.length} ${noun} × ${formatARS(seats[0].price)}`);
+    } else {
+      for (const s of seats) lines.push(`${s.name ?? s.label} · ${formatARS(s.price)}`);
+    }
+  }
+
+  return {
+    total: resolved.totalAmount,
+    paid: resolved.paidAmount,
+    pending: resolved.pendingAmount,
+    lines,
+  };
 }

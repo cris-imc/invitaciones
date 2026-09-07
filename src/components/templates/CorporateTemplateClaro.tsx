@@ -1361,6 +1361,7 @@ export function CorporateTemplateClaro({ invitation, guest, isPersonalized = fal
             initialAttendingTeens={(guest as any)?.attendingTeens ?? undefined}
             initialAttendingChildren={guest?.attendingChildren ?? undefined}
             initialPaymentStatus={guestPayStatus}
+            paymentView={(guest as any)?.paymentView ?? null}
             isExempt={guest?.isExempt ?? false}
             precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
             precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}

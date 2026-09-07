@@ -9,6 +9,7 @@ import { BRACKETS, applyAllSeats, applySeatChange, resolveCardPayment, type Brac
 // Formas de pedirlo:
 //   { seat: { bracket, index, paid } }            → marca/desmarca un lugar
 //   { seat: { bracket, index, override } }        → precio propio de ese lugar
+//   { seat: { bracket, index, name } }            → nombre de quien ocupa el lugar
 //   { status: "PENDING" | "EXEMPT" | "PAID" }     → atajos (ninguno / exento / todos)
 //   { receivedAmount, notes }                     → registro privado del anfitrión
 //
@@ -51,6 +52,9 @@ export async function PATCH(
         { error: "seat.override debe ser un número mayor o igual a 0, o null" },
         { status: 400 }
       );
+    }
+    if (s.name !== undefined && s.name !== null && typeof s.name !== "string") {
+      return NextResponse.json({ error: "seat.name debe ser texto o null" }, { status: 400 });
     }
   }
 
@@ -109,6 +113,7 @@ export async function PATCH(
           index: (seat as { index: number }).index,
           paid: (seat as { paid?: boolean }).paid,
           override: (seat as { override?: number | null }).override,
+          name: (seat as { name?: string | null }).name,
         })
       : onlyRegistro
         ? { seatDetails: guest.seatDetails ?? "" }
@@ -136,7 +141,10 @@ export async function PATCH(
       select: { id: true, name: true, paymentStatus: true, isExempt: true, hostNotes: true },
     });
 
-    return NextResponse.json({ ...updated, ...resolved });
+    // Mismo cuidado que en GET /api/guests: `resolved.status` es el estado del
+    // pago, no el del RSVP. Viaja solo como paymentStatus.
+    const { status: cardStatus, ...payment } = resolved;
+    return NextResponse.json({ ...updated, ...payment, paymentStatus: cardStatus });
   } catch (error) {
     console.error("[payment PATCH]", error);
     return NextResponse.json({ error: "Error al actualizar el pago" }, { status: 500 });

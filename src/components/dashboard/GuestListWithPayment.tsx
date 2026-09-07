@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Info, ChevronUp, ChevronDown, Download, NotebookPen, ListChecks, Undo2 } from "lucide-react";
+import { Info, ChevronUp, ChevronDown, Download, NotebookPen, ListChecks, Undo2, Pencil } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
+  DialogBody,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -54,6 +55,8 @@ interface Guest {
   isExempt?: boolean;
   dietaryRestrictions?: string;
   message?: string;
+  /** ISO. Sólo se usa para ordenar por "últimos agregados". */
+  createdAt?: string;
 }
 
 interface GuestListWithPaymentProps {
@@ -130,6 +133,14 @@ const MOBILE_PAGE_SIZE = 5;
 type AttendanceFilter = "all" | "CONFIRMED" | "PENDING" | "DECLINED";
 type PaymentFilter = "all" | "PAID" | "PARTIAL" | "PENDING";
 
+type SortBy = "debt" | "name" | "recent";
+
+const SORT_LABELS: Record<SortBy, string> = {
+  debt: "Primero los que deben",
+  name: "Nombre (A-Z)",
+  recent: "Últimos agregados",
+};
+
 export function GuestListWithPayment({
   invitationId,
   paymentAmount,
@@ -149,7 +160,14 @@ export function GuestListWithPayment({
   // devolvió el server para esa fila.
   const [detailFor, setDetailFor] = useState<string | null>(null);
   // Precio propio que se está editando: "bracket-index" -> texto tipeado.
+  // Por defecto suben los que tienen saldo: la pregunta que se le hace a esta
+  // pantalla casi siempre es "a quién le falta cobrarle".
+  const [sortBy, setSortBy] = useState<SortBy>("debt");
   const [priceDraft, setPriceDraft] = useState<Record<string, string>>({});
+  // Nombre de un lugar puntual: se edita de a uno, y lo tipeado no se guarda
+  // hasta confirmar, para no mandar un PATCH por cada tecla.
+  const [nameEditing, setNameEditing] = useState<string | null>(null);
+  const [nameDraft, setNameDraft] = useState("");
   const [rowError, setRowError] = useState<{ guestId: string; message: string } | null>(null);
   // Modal de anotaciones: invitado abierto y lo tipeado, sin guardar hasta que
   // el anfitrión confirme.
@@ -208,7 +226,15 @@ export function GuestListWithPayment({
     guestId: string,
     payload:
       | { status: string }
-      | { seat: { bracket: Bracket; index: number; paid?: boolean; override?: number | null } }
+      | {
+          seat: {
+            bracket: Bracket;
+            index: number;
+            paid?: boolean;
+            override?: number | null;
+            name?: string | null;
+          };
+        }
       | { receivedAmount: number; notes?: string | null }
   ) => {
     setUpdatingId(guestId);
@@ -262,20 +288,61 @@ export function GuestListWithPayment({
   const setSeatPrice = (guestId: string, seat: Seat, override: number | null) =>
     patchPayment(guestId, { seat: { bracket: seat.bracket, index: seat.index, override } });
 
+  /** Nombre de quien ocupa un lugar. Vacío lo devuelve a "Adulto 2", "Niño 1". */
+  const setSeatName = (guestId: string, seat: Seat, name: string) =>
+    patchPayment(guestId, {
+      seat: { bracket: seat.bracket, index: seat.index, name: name.trim() || null },
+    });
+
+  const openNameEditor = (seat: Seat, current: string) => {
+    setNameEditing(`${seat.bracket}-${seat.index}`);
+    setNameDraft(current);
+  };
+
+  const commitName = (guestId: string, seat: Seat, previous: string) => {
+    setNameEditing(null);
+    if (nameDraft.trim() === previous.trim()) return;
+    setSeatName(guestId, seat, nameDraft);
+  };
+
   // El invitado del modal se resuelve contra el estado vivo, no contra una copia
   // guardada al abrir: si no, los montos se quedaban con los del primer fetch.
   const detailGuest = detailFor ? guests.find((g) => g.id === detailFor) ?? null : null;
 
-  const filtered = guests.filter((g) => {
+  const matching = guests.filter((g) => {
     const matchAttendance = attendanceFilter === "all" || g.status === attendanceFilter;
     const matchPayment = paymentFilter === "all" || (g.status === "CONFIRMED" && g.paymentStatus === paymentFilter);
     const matchSearch = g.name.toLowerCase().includes(search.toLowerCase());
     return matchAttendance && matchPayment && matchSearch;
   });
 
+  const byName = (a: Guest, b: Guest) =>
+    a.name.localeCompare(b.name, "es", { sensitivity: "base" });
+
+  /**
+   * Cuánto falta cobrarle. Ordena el modo "deben primero" y deja al final a
+   * quien no debe nada: los pagos, los exentos y los que todavía no confirmaron
+   * (que no tienen cupos, así que no deben).
+   */
+  const owed = (g: Guest) =>
+    g.status === "CONFIRMED" && !g.isExempt ? g.pendingAmount ?? 0 : 0;
+
+  // Sin precios cargados nadie "debe", así que ese orden no existe y se cae al
+  // alfabético en vez de dejar la lista ordenada por un criterio vacío.
+  const canSortByDebt = pagoTarjetaHabilitado && hasPrices;
+  const effectiveSort: SortBy = sortBy === "debt" && !canSortByDebt ? "name" : sortBy;
+
+  const filtered = [...matching].sort((a, b) => {
+    if (effectiveSort === "name") return byName(a, b);
+    if (effectiveSort === "recent") return (b.createdAt ?? "").localeCompare(a.createdAt ?? "");
+    // "debt": primero los que tienen saldo, del que más debe al que menos, y
+    // alfabético entre los que deben lo mismo (incluidos los que no deben nada).
+    return owed(b) - owed(a) || byName(a, b);
+  });
+
   useEffect(() => {
     setPage(1);
-  }, [attendanceFilter, paymentFilter, search]);
+  }, [attendanceFilter, paymentFilter, search, sortBy]);
 
   // Los pills de estado y de pago son combinables (ej: Confirmó + No pago),
   // pero no todas las combinaciones tienen sentido -- el pago solo aplica a
@@ -462,7 +529,7 @@ export function GuestListWithPayment({
       {/* Filtros + búsqueda. En mobile van apilados en bloques: buscador,
           asistencia y pago. Antes era una sola fila que envolvía donde caía y
           los dos grupos de pills se mezclaban entre sí. */}
-      <div className="mb-4 flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center">
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-2">
         <input
           type="search"
           placeholder="Buscar invitado…"
@@ -472,7 +539,14 @@ export function GuestListWithPayment({
           aria-label="Buscar invitado por nombre"
         />
 
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por asistencia">
+        {/* En celular van en grilla y no envolviendo: con flex-wrap los cuatro
+            caían 3 + 1 y quedaban de anchos distintos según el largo del texto.
+            En grilla todos miden lo mismo y las filas cierran parejas. */}
+        <div
+          className="grid grid-cols-2 gap-2 md:flex md:flex-wrap"
+          role="group"
+          aria-label="Filtrar por asistencia"
+        >
           {(["all", "CONFIRMED", "PENDING", "DECLINED"] as const).map((f) => {
             const disabled = isAttendanceDisabled(f);
             const active = attendanceFilter === f;
@@ -493,7 +567,11 @@ export function GuestListWithPayment({
         </div>
 
         {pagoTarjetaHabilitado && (
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por estado de pago">
+          <div
+            className="grid grid-cols-3 gap-2 md:flex md:flex-wrap"
+            role="group"
+            aria-label="Filtrar por estado de pago"
+          >
             <span className="hidden self-stretch border-l md:block" aria-hidden="true" />
             {(["PAID", "PARTIAL", "PENDING"] as const).map((p) => {
               const disabled = isPaymentDisabled(p);
@@ -513,6 +591,29 @@ export function GuestListWithPayment({
             })}
           </div>
         )}
+      </div>
+
+      {/* Orden de la lista. Va aparte de los pills porque no filtra: cambia
+          cómo se muestra lo mismo. Por defecto suben los que deben, que es a
+          quiénes hay que ir a buscar. */}
+      <div className="mb-3 flex items-center justify-end gap-2">
+        <label htmlFor="inv-orden" className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          Ordenar por
+        </label>
+        <select
+          id="inv-orden"
+          value={effectiveSort}
+          onChange={(e) => setSortBy(e.target.value as SortBy)}
+          className="h-8 rounded-full border bg-transparent px-3 text-xs font-medium transition-colors hover:bg-muted/60"
+        >
+          {(Object.keys(SORT_LABELS) as SortBy[])
+            .filter((s) => s !== "debt" || canSortByDebt)
+            .map((s) => (
+              <option key={s} value={s}>
+                {SORT_LABELS[s]}
+              </option>
+            ))}
+        </select>
       </div>
 
       {/* Descarga discreta de la lista */}
@@ -763,21 +864,42 @@ export function GuestListWithPayment({
           fila porque con varias personas se comprimía todo entre un invitado y
           el siguiente. Acá cada lugar tiene su tilde de pago y su precio. */}
       <Dialog open={!!detailFor} onOpenChange={(open) => !open && setDetailFor(null)}>
-        <DialogContent className="max-w-lg">
+        {/* Alto fijo, no "hasta tanto": es el unico modal cuya lista cambia de
+            largo con cada invitado, y sin fijarlo pasaba de una tarjeta de dos
+            lineas a ocupar la pantalla entera segun a quien se abriera. Ahora
+            mide siempre lo mismo y lo que sobra se desliza adentro. */}
+        <DialogContent className="h-[80svh] sm:h-[min(85vh,34rem)]">
           <DialogHeader>
             <DialogTitle>{detailGuest?.name}</DialogTitle>
             <DialogDescription>
-              Marcá qué lugares están pagos. Podés darle a cualquiera un precio propio
-              distinto del general.
+              Marcá qué lugares están pagos. Podés ponerle el nombre a cada uno y darle
+              un precio propio distinto del general.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="max-h-[50vh] space-y-1 overflow-y-auto">
+          {/* Solo la lista de lugares se desliza: el resumen de plata y el boton
+              quedan fijos, asi el modal mide lo mismo con una familia de dos que
+              con una de doce. */}
+          <DialogBody className="space-y-1">
             {detailGuest?.seats.map((seat) => {
               const key = `${seat.bracket}-${seat.index}`;
               const draft = priceDraft[key];
+              // En una tarjeta de una sola persona el lugar ES el invitado: decir
+              // "Adulto 1" arriba de un modal que ya se titula con su nombre no
+              // agrega nada. Con varios, sin nombre puesto queda la posición.
+              const fallback = detailGuest.seats.length === 1 ? detailGuest.name : seat.label;
+              const shown = seat.name ?? fallback;
+              const editingName = nameEditing === key;
               return (
-                <div key={key} className="flex items-center gap-3 rounded-lg border px-3 py-2">
+                // En celular el nombre se lleva su propia línea y el precio baja
+                // abajo. En una sola línea, con el input y la etiqueta comiéndose
+                // el ancho, un nombre de persona entraba recortado a dos o tres
+                // letras -- justo el dato que se puso para poder leerlo.
+                <div
+                  key={key}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border px-3 py-2"
+                >
+                  <div className="flex min-w-0 flex-1 items-center gap-3 max-sm:w-full max-sm:flex-none">
                   <input
                     type="checkbox"
                     checked={seat.paid}
@@ -792,52 +914,113 @@ export function GuestListWithPayment({
                     aria-label={`${seat.label} pago`}
                     className="h-4 w-4 shrink-0 accent-current"
                   />
-                  <span className={`flex-1 text-sm ${seat.paid ? "text-muted-foreground line-through" : ""}`}>
-                    {seat.label}
-                  </span>
-                  {seat.override != null && !seat.paid && (
-                    <span className="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      precio propio
-                    </span>
-                  )}
-                  <Input
-                    value={draft !== undefined ? draft : String(Math.round(seat.price))}
-                    onChange={(e) =>
-                      setPriceDraft((d) => ({ ...d, [key]: sanitizeAmountInput(e.target.value) }))
-                    }
-                    onBlur={(e) => {
-                      setPriceDraft((d) => {
-                        const next = { ...d };
-                        delete next[key];
-                        return next;
-                      });
-                      const n = parseAmountInput(e.target.value);
-                      if (!Number.isFinite(n) || n < 0) return;
-                      if (Math.abs(n - seat.price) < 1) return;
-                      setSeatPrice(detailGuest.id, seat, n);
-                    }}
-                    inputMode="decimal"
-                    aria-label={`Precio de ${seat.label}`}
-                    className="h-8 w-28 text-right text-sm"
-                  />
-                  {seat.override != null && (
+                  {editingName ? (
+                    <Input
+                      value={nameDraft}
+                      autoFocus
+                      maxLength={60}
+                      placeholder={fallback}
+                      onChange={(e) => setNameDraft(e.target.value)}
+                      onBlur={() => commitName(detailGuest.id, seat, seat.name ?? "")}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") e.currentTarget.blur();
+                        // Escape descarta lo tipeado: cerrar sin guardar tiene que
+                        // ser posible, si no el unico modo de salir es guardar.
+                        if (e.key === "Escape") {
+                          setNameDraft(seat.name ?? "");
+                          setNameEditing(null);
+                        }
+                      }}
+                      aria-label={`Nombre de ${seat.label}`}
+                      className="h-8 flex-1 text-sm"
+                    />
+                  ) : (
                     <button
                       type="button"
-                      onClick={() => setSeatPrice(detailGuest.id, seat, null)}
-                      title="Volver al precio general"
-                      aria-label={`Volver ${seat.label} al precio general`}
-                      className="shrink-0 rounded-full border p-1 text-muted-foreground transition-colors hover:bg-muted/60"
+                      onClick={() => openNameEditor(seat, seat.name ?? "")}
+                      // Toda la etiqueta abre la edicion, no solo el lapiz: en el
+                      // celular apuntarle a un icono de 14px es una loteria.
+                      title={seat.name ? "Cambiar el nombre" : "Ponerle nombre a este lugar"}
+                      className="group flex min-w-0 flex-1 items-center gap-1.5 text-left"
                     >
-                      <Undo2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      <span
+                        className={`truncate text-sm ${seat.name ? "font-medium" : ""} ${
+                          seat.paid ? "text-muted-foreground line-through" : ""
+                        }`}
+                      >
+                        {shown}
+                      </span>
+                      {/* Con nombre puesto, el "Niño 1" desaparece: el nombre lo
+                          reemplaza, no lo acompaña. La franja se sigue leyendo en
+                          el precio y en el orden de la lista. */}
+                      <Pencil
+                        className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100"
+                        strokeWidth={1.75}
+                      />
                     </button>
                   )}
+                  </div>
+
+                  {/* La etiqueta y el precio viajan juntos: en celular bajan a la
+                      segunda línea, pegados a la derecha. */}
+                  <div className="flex items-center gap-3 max-sm:w-full max-sm:justify-end">
+                  {seat.override != null && !seat.paid && (
+                    <span className="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      precio editado
+                    </span>
+                  )}
+                  {/* El botón va dentro del input, contra el borde izquierdo:
+                      aparece sólo cuando el lugar tiene precio propio, y afuera
+                      corría el input de lugar en lugar dejando la columna de
+                      precios desalineada. El importe va a la derecha, así que
+                      adentro no se pisan. */}
+                  <div className="relative shrink-0">
+                    <Input
+                      value={draft !== undefined ? draft : String(Math.round(seat.price))}
+                      onChange={(e) =>
+                        setPriceDraft((d) => ({ ...d, [key]: sanitizeAmountInput(e.target.value) }))
+                      }
+                      onBlur={(e) => {
+                        setPriceDraft((d) => {
+                          const next = { ...d };
+                          delete next[key];
+                          return next;
+                        });
+                        const n = parseAmountInput(e.target.value);
+                        if (!Number.isFinite(n) || n < 0) return;
+                        if (Math.abs(n - seat.price) < 1) return;
+                        setSeatPrice(detailGuest.id, seat, n);
+                      }}
+                      inputMode="decimal"
+                      aria-label={`Precio de ${seat.label}`}
+                      className={`h-8 w-28 text-right text-sm ${seat.override != null ? "pl-8" : ""}`}
+                    />
+                    {seat.override != null && (
+                      <button
+                        type="button"
+                        // onMouseDown y no onClick: el input pierde el foco al
+                        // tocarlo y su onBlur guardaría el precio que se está
+                        // por descartar, pisando la vuelta al general.
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setSeatPrice(detailGuest.id, seat, null);
+                        }}
+                        title="Volver al precio general"
+                        aria-label={`Volver ${seat.label} al precio general`}
+                        className="absolute left-1 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                      >
+                        <Undo2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      </button>
+                    )}
+                  </div>
+                  </div>
                 </div>
               );
             })}
-          </div>
+          </DialogBody>
 
           {detailGuest && (
-            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
+            <div className="flex shrink-0 flex-wrap gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
               <span>
                 {detailGuest.paidSeats} de {detailGuest.totalSeats} pagos
               </span>
@@ -859,7 +1042,7 @@ export function GuestListWithPayment({
           )}
 
           {detailGuest && detailGuest.receivedAmount > 0 && (
-            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
+            <div className="flex shrink-0 flex-wrap gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
               <span className="font-medium uppercase tracking-wide opacity-70">Tu registro</span>
               <span>
                 recibiste <b className="text-foreground">{formatARS(detailGuest.receivedAmount)}</b>
@@ -872,8 +1055,8 @@ export function GuestListWithPayment({
               )}
               {detailGuest.missingAmount > 0 && (
                 <span>
-                  · <b className="text-foreground">{formatARS(detailGuest.missingAmount)}</b> menos de lo
-                  que marcaste
+                  · recibiste <b className="text-foreground">{formatARS(detailGuest.missingAmount)}</b> menos
+                  de lo que marcaste como pagado
                 </span>
               )}
             </div>
@@ -926,7 +1109,7 @@ export function GuestListWithPayment({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              ¿Desmarcar {seatConfirm?.seat.label}?
+              ¿Desmarcar {seatConfirm?.seat.name ?? seatConfirm?.seat.label}?
             </DialogTitle>
             <DialogDescription asChild>
               <div className="space-y-3 text-sm">

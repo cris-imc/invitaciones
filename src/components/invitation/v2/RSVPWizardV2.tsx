@@ -34,6 +34,13 @@ interface RSVPWizardV2Props {
   initialAttendingTeens?: number;
   initialAttendingChildren?: number;
   initialPaymentStatus?: PaymentStatus;
+  /**
+   * Lo que el invitado realmente va a pagar, resuelto en el servidor. Trae los
+   * precios propios que el anfitrión le puso a cada lugar desde el panel, que
+   * acá no se conocen: de este lado sólo están los precios generales por franja.
+   * Llega null mientras no haya cupos confirmados.
+   */
+  paymentView?: { total: number; paid: number; pending: number; lines: string[] } | null;
   // Callbacks
   onConfirmed?: (data: { attending: boolean; count: number }) => void;
 }
@@ -65,6 +72,7 @@ export function RSVPWizardV2({
   initialAttendingTeens,
   initialAttendingChildren,
   initialPaymentStatus = "PENDING",
+  paymentView = null,
   onConfirmed,
 }: RSVPWizardV2Props) {
   const router = useRouter();
@@ -114,8 +122,23 @@ export function RSVPWizardV2({
   const teenPrice = precioAdolescente != null ? precioAdolescente : adultPrice;
   const childPrice = precioNino != null ? precioNino : adultPrice;
 
+  // Mientras el invitado todavía elige cuántos van, el total se estima acá con
+  // los precios generales. Ya confirmado manda lo que resolvió el servidor: es
+  // lo único que sabe de los precios propios por lugar. Se compara contra los
+  // cupos guardados porque si el invitado está cambiando la cantidad, el número
+  // del servidor corresponde a la composición anterior.
+  const useServerTotal =
+    !isExempt &&
+    !!paymentView &&
+    initialStatus === "CONFIRMED" &&
+    adultCount === (initialAttendingAdults ?? 0) &&
+    teenCount === (initialAttendingTeens ?? 0) &&
+    childCount === (initialAttendingChildren ?? 0);
+
   let totalPayment = 0;
-  if (!isExempt) {
+  if (useServerTotal) {
+    totalPayment = paymentView!.total;
+  } else if (!isExempt) {
     totalPayment = (adultPrice * adultCount) + (teenPrice * teenCount) + (childPrice * childCount);
   }
 
@@ -375,20 +398,33 @@ export function RSVPWizardV2({
             )}
             {maxGuests > 1 && (
               <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px dashed currentColor", opacity: 0.85, display: "flex", flexDirection: "column", gap: "2px" }}>
-                {adultCount > 0 && (
-                  <span style={{ fontSize: "12px" }}>
-                    {adultCount} adulto{adultCount !== 1 ? "s" : ""} × {formatARS(adultPrice)}
-                  </span>
-                )}
-                {teenCount > 0 && (
-                  <span style={{ fontSize: "12px" }}>
-                    {teenCount} adolescente{teenCount !== 1 ? "s" : ""} × {formatARS(teenPrice)}
-                  </span>
-                )}
-                {childCount > 0 && (
-                  <span style={{ fontSize: "12px" }}>
-                    {childCount} niño{childCount !== 1 ? "s" : ""} × {formatARS(childPrice)}
-                  </span>
+                {/* El desglose del servidor viene escrito lugar por lugar cuando
+                    dentro de una franja no todos pagan lo mismo: es la unica
+                    forma de que la cuenta cierre con el total de arriba. */}
+                {useServerTotal ? (
+                  paymentView!.lines.map((linea, i) => (
+                    <span key={i} style={{ fontSize: "12px" }}>
+                      {linea}
+                    </span>
+                  ))
+                ) : (
+                  <>
+                    {adultCount > 0 && (
+                      <span style={{ fontSize: "12px" }}>
+                        {adultCount} adulto{adultCount !== 1 ? "s" : ""} × {formatARS(adultPrice)}
+                      </span>
+                    )}
+                    {teenCount > 0 && (
+                      <span style={{ fontSize: "12px" }}>
+                        {teenCount} adolescente{teenCount !== 1 ? "s" : ""} × {formatARS(teenPrice)}
+                      </span>
+                    )}
+                    {childCount > 0 && (
+                      <span style={{ fontSize: "12px" }}>
+                        {childCount} niño{childCount !== 1 ? "s" : ""} × {formatARS(childPrice)}
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
             )}

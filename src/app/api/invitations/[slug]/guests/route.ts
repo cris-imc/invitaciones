@@ -36,9 +36,12 @@ export async function GET(
             return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
         }
 
+        // Alfabético, igual que en "Gestionar pagos". Antes iba por fecha de
+        // carga: las dos pestañas mostraban a la misma gente en distinto orden y
+        // era fácil creer que se estaba tocando una familia y ser otra.
         const guests = await prisma.guest.findMany({
             where: { invitationId: invitation.id },
-            orderBy: { createdAt: "desc" }
+            orderBy: { name: "asc" }
         });
 
         return NextResponse.json(guests);

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { resolveCardPayment } from "@/lib/card-payments";
+import { resolveCardPayment, resolveGuestPaymentView } from "@/lib/card-payments";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 import { ElegantTemplate } from "@/components/templates/ElegantTemplate";
 import { ElegantTemplateGreen } from "@/components/templates/ElegantTemplateGreen";
@@ -561,6 +561,12 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 paymentStatus: guest
                     ? resolveCardPayment(guest, validInvitation as never).status
                     : undefined,
+                // Lo que realmente va a pagar, con los precios propios que el
+                // anfitrión le puso a cada lugar ya aplicados. La plantilla no
+                // puede calcularlo: sólo conoce los precios generales.
+                paymentView: guest
+                    ? resolveGuestPaymentView(guest, validInvitation as never)
+                    : null,
             } as any;
 
             if (validInvitation.templateTipo === 'NEON') {
