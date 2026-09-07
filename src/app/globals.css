@@ -953,8 +953,8 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   }
   .l-nav-links{ display:none; }
   .l-hamburger{ display:flex; }
-  .l-hero{ grid-template-columns:1fr; padding:96px 20px 8px; gap:32px; }
-  .l-hero h1{ font-size:39px; }
+  .l-hero{ grid-template-columns:1fr; padding:86px 20px 8px; gap:32px; }
+  .l-hero h1{ font-size:34px; }
   .l-hero-ctas{ flex-wrap:wrap; }
   .l-strip-grid{ grid-template-columns:1fr; }
   .l-steps{ padding:8px 20px 44px; }
