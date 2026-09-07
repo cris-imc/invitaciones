@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
         attendingAdults: true,
         attendingTeens: true,
         attendingChildren: true,
-        paidSeatPrices: true,
+        seatDetails: true,
         receivedAmount: true,
         hostNotes: true,
         dietaryRestrictions: true,
@@ -68,17 +68,8 @@ export async function GET(request: NextRequest) {
         const p = resolveCardPayment(g, invitation);
         return {
           ...g,
+          ...p,
           paymentStatus: p.status,
-          seats: p.seats,
-          paidSeats: p.paidSeats,
-          paidSeatPrices: p.paidSeatPrices,
-          paidAmount: p.paidAmount,
-          pendingAmount: p.pendingAmount,
-          totalAmount: p.totalAmount,
-          surplus: p.surplus,
-          receivedAmount: p.receivedAmount,
-          onAccount: p.onAccount,
-          missingAmount: p.missingAmount,
         };
       })
     );

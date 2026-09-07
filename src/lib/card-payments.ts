@@ -1,22 +1,24 @@
 /**
- * Pago de la tarjeta por CUPO.
+ * Pago de la tarjeta, LUGAR POR LUGAR.
  *
- * Una tarjeta agrupa a varias personas (2 adultos, 1 adolescente, 1 niño). El
- * anfitrión va marcando qué lugares quedaron saldados, y de ahí sale todo: el
- * estado, lo recaudado y lo que falta.
+ * Una tarjeta agrupa a varias personas (2 adultos, 1 adolescente, 1 niño) y cada
+ * lugar se maneja por separado: se marca pago de a uno, y puede tener un precio
+ * propio distinto del global de la invitación.
  *
- * Dos reglas, que son las que definen el modelo:
+ * Tres reglas definen el modelo:
  *
- *   1. Lo que se pagó queda pagado. Cada lugar guarda el precio que regía cuando
- *      se marcó, y ese número no se recalcula nunca. Un aumento posterior no le
+ *   1. Lo que se pagó queda pagado. Al marcar un lugar se guarda el precio que
+ *      regía en ese momento y no se recalcula nunca. Un aumento posterior no le
  *      llega.
- *   2. Lo pendiente sigue el precio vigente. Los lugares que todavía no se
- *      pagaron se valúan con el precio de hoy, así que un aumento los alcanza.
+ *   2. Lo pendiente sigue el precio vigente, así que un aumento sí alcanza a los
+ *      lugares que todavía no se pagaron.
+ *   3. Un lugar puede tener precio propio. Sirve para no cobrarle a un chico de
+ *      una familia puntual, o hacerle un precio especial, sin tocar el precio
+ *      global ni eximir la tarjeta entera.
  *
- * El precio se guarda lugar por lugar (`Guest.paidSeatPrices`) y no como un
- * total por franja. Con un total había que promediar: si un cupo se pagó a
- * $3.000 y otro a $9.000, desmarcar uno devolvía $6.000, que no es lo que se
- * cobró por ninguno de los dos.
+ * Se guarda lugar por lugar y no un total por franja porque el total obliga a
+ * promediar: si un niño se cobró a $3.000 y otro a $9.000, desmarcar uno tenía
+ * que devolver $6.000, que no es lo que se cobró por ninguno de los dos.
  */
 
 export type CardPaymentStatus = "PENDING" | "PARTIAL" | "PAID" | "EXEMPT";
@@ -40,9 +42,9 @@ export const BRACKETS = ["adults", "teens", "children"] as const;
 export type Bracket = (typeof BRACKETS)[number];
 
 export const BRACKET_LABELS: Record<Bracket, { one: string; many: string }> = {
-  adults: { one: "adulto", many: "adultos" },
-  teens: { one: "adolescente", many: "adolescentes" },
-  children: { one: "niño", many: "niños" },
+  adults: { one: "Adulto", many: "Adultos" },
+  teens: { one: "Adolescente", many: "Adolescentes" },
+  children: { one: "Niño", many: "Niños" },
 };
 
 export interface InvitationPrices {
@@ -52,38 +54,72 @@ export interface InvitationPrices {
   precioNino?: number | null;
 }
 
-/** Lo que necesita el cálculo de un invitado guardado. */
 export interface StoredCardPayment {
   attendingCount?: number | null;
   attendingAdults?: number | null;
   attendingTeens?: number | null;
   attendingChildren?: number | null;
-  /** JSON con el precio de cada lugar pago, por franja. Ver Guest.paidSeatPrices. */
-  paidSeatPrices?: string | null;
+  /** JSON con el detalle de cada lugar. Ver Guest.seatDetails. */
+  seatDetails?: string | null;
   isExempt?: boolean | null;
   paymentStatus?: string | null;
   /** Registro del anfitrión: plata realmente recibida. Ver `onAccount`. */
   receivedAmount?: number | null;
 }
 
-/** Precio de cada lugar pago, por franja. */
-export type SeatPrices = Record<Bracket, number[]>;
+/**
+ * Cómo se guarda cada lugar. Formato compacto porque va serializado:
+ *   o = precio propio de este lugar (null: usa el precio global de su franja)
+ *   p = lo que se cobró al marcarlo pago (null: todavía no está pago)
+ */
+interface StoredSeat {
+  o: number | null;
+  p: number | null;
+}
 
-export function parseSeatPrices(raw?: string | null): SeatPrices {
-  const empty: SeatPrices = { adults: [], teens: [], children: [] };
-  if (!raw) return empty;
+type StoredSeats = Record<Bracket, StoredSeat[]>;
+
+/** Un lugar ya resuelto, listo para mostrar. */
+export interface Seat {
+  bracket: Bracket;
+  index: number;
+  /** "Adulto 2", "Niño 1" */
+  label: string;
+  /** Precio propio, si el anfitrión se lo puso. null = sigue el global. */
+  override: number | null;
+  paid: boolean;
+  /** Lo que vale hoy: lo cobrado si está pago, o el precio que le corresponde. */
+  price: number;
+}
+
+const emptySeats = (): StoredSeats => ({ adults: [], teens: [], children: [] });
+
+function parseSeats(raw?: string | null): StoredSeats {
+  if (!raw) return emptySeats();
   try {
-    const p = JSON.parse(raw) as Partial<Record<Bracket, unknown>>;
-    const clean = (v: unknown) =>
-      Array.isArray(v) ? v.map((n) => Math.max(0, Number(n) || 0)) : [];
-    return { adults: clean(p.adults), teens: clean(p.teens), children: clean(p.children) };
+    const parsed = JSON.parse(raw) as Partial<Record<Bracket, unknown>>;
+    const clean = (v: unknown): StoredSeat[] =>
+      Array.isArray(v)
+        ? v.map((s) => {
+            const seat = (s ?? {}) as Partial<StoredSeat>;
+            return {
+              o: seat.o == null ? null : Math.max(0, Number(seat.o) || 0),
+              p: seat.p == null ? null : Math.max(0, Number(seat.p) || 0),
+            };
+          })
+        : [];
+    return {
+      adults: clean(parsed.adults),
+      teens: clean(parsed.teens),
+      children: clean(parsed.children),
+    };
   } catch {
-    return empty;
+    return emptySeats();
   }
 }
 
-export function serializeSeatPrices(prices: SeatPrices): string {
-  return JSON.stringify(prices);
+function serializeSeats(seats: StoredSeats): string {
+  return JSON.stringify(seats);
 }
 
 /**
@@ -104,7 +140,7 @@ export function resolvePrices(invitation: InvitationPrices): Record<Bracket, num
  * Cupos confirmados por franja. Un invitado sin desglose -- registros viejos, o
  * RSVP anteriores a los precios diferenciados -- cuenta todo como adultos.
  */
-export function resolveSeats(guest: StoredCardPayment): Record<Bracket, number> {
+export function resolveSeatCounts(guest: StoredCardPayment): Record<Bracket, number> {
   const adults = Math.max(0, guest.attendingAdults ?? 0);
   const teens = Math.max(0, guest.attendingTeens ?? 0);
   const children = Math.max(0, guest.attendingChildren ?? 0);
@@ -115,54 +151,34 @@ export function resolveSeats(guest: StoredCardPayment): Record<Bracket, number> 
 }
 
 /**
- * Precios de los lugares pagos, recortados a los cupos confirmados: si el
- * invitado baja la cantidad de personas después de pagar, sobran lugares
- * saldados y ese excedente pasa a ser plata a favor. Se conservan los primeros,
- * que son los que se pagaron antes.
+ * Ajusta la lista guardada a los cupos confirmados. Si el invitado sumó gente,
+ * los lugares nuevos entran vacíos; si restó, los que sobran se descartan (lo
+ * que se hubiera cobrado por ellos queda como plata a favor).
  */
-export function resolvePaidSeatPrices(guest: StoredCardPayment): SeatPrices {
-  const seats = resolveSeats(guest);
-  const stored = parseSeatPrices(guest.paidSeatPrices);
-  return {
-    adults: stored.adults.slice(0, seats.adults),
-    teens: stored.teens.slice(0, seats.teens),
-    children: stored.children.slice(0, seats.children),
-  };
-}
-
-/** Cuántos lugares están pagos por franja. */
-export function resolvePaidSeats(guest: StoredCardPayment): Record<Bracket, number> {
-  const p = resolvePaidSeatPrices(guest);
-  return { adults: p.adults.length, teens: p.teens.length, children: p.children.length };
-}
-
-/**
- * Precio exacto que se devuelve al desmarcar un lugar de esta franja: el del
- * ÚLTIMO que se marcó, que es el que se está deshaciendo. Nada de promedios --
- * cada lugar conserva lo que se cobró por él.
- */
-export function refundForSeat(guest: StoredCardPayment, bracket: Bracket): number {
-  const list = resolvePaidSeatPrices(guest)[bracket];
-  return list.length > 0 ? list[list.length - 1] : 0;
+function alignSeats(stored: StoredSeats, counts: Record<Bracket, number>): StoredSeats {
+  const out = emptySeats();
+  for (const b of BRACKETS) {
+    const list = stored[b].slice(0, counts[b]);
+    while (list.length < counts[b]) list.push({ o: null, p: null });
+    out[b] = list;
+  }
+  return out;
 }
 
 export interface ResolvedCardPayment {
-  seats: Record<Bracket, number>;
-  paidSeats: Record<Bracket, number>;
-  paidSeatPrices: SeatPrices;
+  seats: Seat[];
+  seatCounts: Record<Bracket, number>;
   totalSeats: number;
-  totalPaidSeats: number;
+  paidSeats: number;
   /** Plata efectivamente cobrada (histórica, al precio de cada momento). */
   paidAmount: number;
-  /** Lo que falta, valuado al precio vigente. */
+  /** Lo que falta, valuado al precio que le corresponde hoy a cada lugar. */
   pendingAmount: number;
-  /** Cobrado + pendiente. No es "cupos × precio de hoy". */
   totalAmount: number;
-  /** Cobrado de más, cuando se bajaron asistentes después de pagar. */
+  /** Cobrado por lugares que ya no existen (bajaron los asistentes). */
   surplus: number;
-  /** Lo que el anfitrión anotó como recibido (0 si no anotó nada). */
   receivedAmount: number;
-  /** Recibido por encima de los cupos marcados: queda a cuenta. */
+  /** Recibido por encima de lo marcado: queda a cuenta. */
   onAccount: number;
   /** Recibido por debajo de lo marcado: probablemente marcó de más. */
   missingAmount: number;
@@ -172,33 +188,48 @@ export interface ResolvedCardPayment {
 /** Tolerancia en pesos, para que un redondeo no genere un saldo de $0,003. */
 const EPSILON = 1;
 
-const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
-
 export function resolveCardPayment(
   guest: StoredCardPayment,
   invitation: InvitationPrices
 ): ResolvedCardPayment {
   const prices = resolvePrices(invitation);
-  const seats = resolveSeats(guest);
-  const stored = parseSeatPrices(guest.paidSeatPrices);
-  const paidSeatPrices = resolvePaidSeatPrices(guest);
-  const paidSeats = {
-    adults: paidSeatPrices.adults.length,
-    teens: paidSeatPrices.teens.length,
-    children: paidSeatPrices.children.length,
-  };
+  const seatCounts = resolveSeatCounts(guest);
+  const stored = parseSeats(guest.seatDetails);
+  const aligned = alignSeats(stored, seatCounts);
 
-  const totalSeats = seats.adults + seats.teens + seats.children;
-  const totalPaidSeats = paidSeats.adults + paidSeats.teens + paidSeats.children;
+  const seats: Seat[] = [];
+  let paidAmount = 0;
+  let pendingAmount = 0;
+  let paidSeats = 0;
 
-  const paidAmount = BRACKETS.reduce((t, b) => t + sum(paidSeatPrices[b]), 0);
-  // Lo cobrado por lugares que ya no existen (bajaron los asistentes).
-  const surplus = BRACKETS.reduce((t, b) => t + sum(stored[b].slice(paidSeats[b])), 0);
+  for (const b of BRACKETS) {
+    aligned[b].forEach((s, i) => {
+      const paid = s.p != null;
+      const price = paid ? (s.p as number) : s.o ?? prices[b];
+      if (paid) {
+        paidAmount += price;
+        paidSeats += 1;
+      } else {
+        pendingAmount += price;
+      }
+      seats.push({
+        bracket: b,
+        index: i,
+        label: `${BRACKET_LABELS[b].one} ${i + 1}`,
+        override: s.o,
+        paid,
+        price,
+      });
+    });
+  }
 
-  const pendingAmount = BRACKETS.reduce(
-    (t, b) => t + (seats[b] - paidSeats[b]) * prices[b],
+  // Lo cobrado por lugares que ya no existen: bajaron los asistentes.
+  const surplus = BRACKETS.reduce(
+    (t, b) => t + stored[b].slice(seatCounts[b]).reduce((n, s) => n + (s.p ?? 0), 0),
     0
   );
+
+  const totalSeats = seatCounts.adults + seatCounts.teens + seatCounts.children;
 
   // Solo la marca isExempt decide. Mirar también paymentStatus dejaba el estado
   // pegado: al escribir se resuelve con el guest ya guardado, cuyo paymentStatus
@@ -206,9 +237,9 @@ export function resolveCardPayment(
   const isExempt = Boolean(guest.isExempt);
   const status: CardPaymentStatus = isExempt
     ? "EXEMPT"
-    : totalSeats > 0 && totalPaidSeats >= totalSeats
+    : totalSeats > 0 && paidSeats >= totalSeats
       ? "PAID"
-      : totalPaidSeats > 0
+      : paidSeats > 0
         ? "PARTIAL"
         : "PENDING";
 
@@ -217,10 +248,9 @@ export function resolveCardPayment(
 
   return {
     seats,
-    paidSeats,
-    paidSeatPrices,
+    seatCounts,
     totalSeats,
-    totalPaidSeats,
+    paidSeats,
     paidAmount,
     pendingAmount: pendingAmount >= EPSILON ? pendingAmount : 0,
     totalAmount: paidAmount + pendingAmount,
@@ -232,34 +262,66 @@ export function resolveCardPayment(
   };
 }
 
-/**
- * Cómo quedan los lugares pagos al marcar o desmarcar.
- *
- * Los que se suman entran al precio VIGENTE. Los que se sacan salen por el
- * final -- el último que se marcó es el que se está deshaciendo -- y se llevan
- * exactamente lo que se había cobrado por ellos.
- */
-export function applyPaidSeats(
-  guest: StoredCardPayment,
-  invitation: InvitationPrices,
-  next: Partial<Record<Bracket, number>>
-): { paidSeatPrices: string } {
-  const prices = resolvePrices(invitation);
-  const seats = resolveSeats(guest);
-  const current = resolvePaidSeatPrices(guest);
-
-  const out: SeatPrices = { adults: [], teens: [], children: [] };
-  for (const b of BRACKETS) {
-    const target = clamp(next[b] ?? current[b].length, 0, seats[b]);
-    const list = current[b].slice(0, target);
-    while (list.length < target) list.push(prices[b]);
-    out[b] = list;
-  }
-  return { paidSeatPrices: serializeSeatPrices(out) };
+/** Cambio sobre un lugar puntual. */
+export interface SeatChange {
+  bracket: Bracket;
+  index: number;
+  /** Marcar o desmarcar como pago. */
+  paid?: boolean;
+  /** Precio propio del lugar. `null` lo devuelve al precio global. */
+  override?: number | null;
 }
 
-export function computeBalance(pendingAmount: number): number {
-  return pendingAmount >= EPSILON ? pendingAmount : 0;
+/**
+ * Aplica un cambio sobre un lugar.
+ *
+ * Marcarlo pago congela el precio que le corresponde en ese momento (el propio
+ * si tiene, si no el global). Desmarcarlo lo suelta, y si más adelante se vuelve
+ * a marcar se cobra al precio que rija entonces.
+ */
+export function applySeatChange(
+  guest: StoredCardPayment,
+  invitation: InvitationPrices,
+  change: SeatChange
+): { seatDetails: string } {
+  const prices = resolvePrices(invitation);
+  const counts = resolveSeatCounts(guest);
+  const seats = alignSeats(parseSeats(guest.seatDetails), counts);
+
+  const list = seats[change.bracket];
+  const seat = list[change.index];
+  if (!seat) return { seatDetails: serializeSeats(seats) };
+
+  if (change.override !== undefined) {
+    seat.o = change.override == null ? null : Math.max(0, Number(change.override) || 0);
+    // Si ya estaba pago, cambiar su precio corrige lo cobrado por ese lugar: es
+    // el anfitrión diciendo cuánto valía en realidad.
+    if (seat.p != null) seat.p = seat.o ?? prices[change.bracket];
+  }
+
+  if (change.paid !== undefined) {
+    seat.p = change.paid ? seat.o ?? prices[change.bracket] : null;
+  }
+
+  return { seatDetails: serializeSeats(seats) };
+}
+
+/** Marca o desmarca TODOS los lugares. Los atajos del panel pasan por acá. */
+export function applyAllSeats(
+  guest: StoredCardPayment,
+  invitation: InvitationPrices,
+  paid: boolean
+): { seatDetails: string } {
+  const prices = resolvePrices(invitation);
+  const counts = resolveSeatCounts(guest);
+  const seats = alignSeats(parseSeats(guest.seatDetails), counts);
+
+  for (const b of BRACKETS) {
+    for (const seat of seats[b]) {
+      seat.p = paid ? seat.o ?? prices[b] : null;
+    }
+  }
+  return { seatDetails: serializeSeats(seats) };
 }
 
 export function formatARS(n: number): string {
@@ -268,8 +330,4 @@ export function formatARS(n: number): string {
     currency: "ARS",
     minimumFractionDigits: 0,
   }).format(n);
-}
-
-function clamp(n: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, Math.round(Number(n) || 0)));
 }

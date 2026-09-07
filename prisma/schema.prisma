@@ -314,14 +314,18 @@ model Guest {
   // cupo y no se recalculan nunca ("lo que se pago queda pagado"). Los cupos que
   // siguen pendientes se valuan al precio vigente, asi que un aumento posterior
   // solo los alcanza a ellos. Ver src/lib/card-payments.ts.
-  // El precio con el que quedo pago CADA lugar, por franja. JSON:
-  // {"adults":[10000,15000],"teens":[],"children":[3000]}
+  // Detalle de CADA lugar de la tarjeta, por franja. JSON:
+  // {"adults":[{"o":null,"p":10000},{"o":null,"p":null}],"children":[{"o":0,"p":null}]}
+  //   o = precio propio de ese lugar (null: usa el precio global de su franja)
+  //   p = lo que se cobro al marcarlo pago (null: todavia no esta pago)
   //
-  // Se guarda lugar por lugar y no un total por franja porque el total obliga a
-  // promediar: si un cupo se pago a $3.000 y otro a $9.000, desmarcar uno tenia
-  // que devolver $6.000, que no es lo que se cobro por ninguno de los dos. Con
-  // la lista, cada lugar conserva su precio exacto.
-  paidSeatPrices         String?
+  // Lugar por lugar y no un total por franja: el total obliga a promediar, y si
+  // un cupo se pago a $3.000 y otro a $9.000, desmarcar uno devolvia $6.000, que
+  // no es lo que se cobro por ninguno. El precio propio ("o") sirve para no
+  // cobrarle a alguien puntual de una familia, o hacerle un precio especial, sin
+  // tocar el precio global ni eximir la tarjeta entera. Aplica a cualquier
+  // franja, no solo a ninos.
+  seatDetails            String?
   // Plata que el anfitrion dice haber recibido, para su propio control. Es
   // independiente de los cupos marcados: si una familia de 4 paga dos tarjetas
   // pero entrega de mas, aca queda el monto real y la diferencia se muestra como

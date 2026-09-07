@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Info, ChevronUp, ChevronDown, Download, Minus, Plus, NotebookPen } from "lucide-react";
+import { Info, ChevronUp, ChevronDown, Download, NotebookPen, ListChecks, Undo2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import {
   formatARS,
   type Bracket,
   type CardPaymentStatus,
+  type Seat,
 } from "@/lib/card-payments";
 
 interface Guest {
@@ -35,8 +36,10 @@ interface Guest {
   // Resuelto por el servidor (GET /api/guests) con src/lib/card-payments.ts. El
   // panel no vuelve a calcular precios: así lo que ve el anfitrión y lo que se
   // guarda no pueden discrepar.
-  seats: Record<Bracket, number>;
-  paidSeats: Record<Bracket, number>;
+  seats: Seat[];
+  seatCounts: Record<Bracket, number>;
+  totalSeats: number;
+  paidSeats: number;
   paidAmount: number;
   pendingAmount: number;
   totalAmount: number;
@@ -46,9 +49,6 @@ interface Guest {
   receivedAmount: number;
   onAccount: number;
   missingAmount: number;
-  // Precio de cada lugar pago, por franja: para decir el monto exacto que se
-  // descuenta al desmarcar uno, sin promediar.
-  paidSeatPrices?: Record<Bracket, number[]>;
   /** Anotaciones privadas del anfitrión. El invitado nunca las ve. */
   hostNotes?: string | null;
   isExempt?: boolean;
@@ -145,8 +145,11 @@ export function GuestListWithPayment({
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showPaymentInfo, setShowPaymentInfo] = useState(true);
   const [page, setPage] = useState(1);
-  // Fila con el desplegable de cupos abierto, y el error que devolvió el server.
-  const [openSeatsFor, setOpenSeatsFor] = useState<string | null>(null);
+  // Invitado cuyo detalle de pago está abierto en el modal, y el error que
+  // devolvió el server para esa fila.
+  const [detailFor, setDetailFor] = useState<string | null>(null);
+  // Precio propio que se está editando: "bracket-index" -> texto tipeado.
+  const [priceDraft, setPriceDraft] = useState<Record<string, string>>({});
   const [rowError, setRowError] = useState<{ guestId: string; message: string } | null>(null);
   // Modal de anotaciones: invitado abierto y lo tipeado, sin guardar hasta que
   // el anfitrión confirme.
@@ -160,9 +163,7 @@ export function GuestListWithPayment({
   >(null);
   const [showPriceHelp, setShowPriceHelp] = useState(false);
   // Aviso antes de desmarcar un lugar concreto del desplegable.
-  const [seatConfirm, setSeatConfirm] = useState<
-    { guestId: string; bracket: Bracket } | null
-  >(null);
+  const [seatConfirm, setSeatConfirm] = useState<{ guestId: string; seat: Seat } | null>(null);
   const isMobile = useIsMobile();
 
   const openNotes = (guest: Guest) => {
@@ -207,7 +208,7 @@ export function GuestListWithPayment({
     guestId: string,
     payload:
       | { status: string }
-      | { seats: Partial<Record<Bracket, number>> }
+      | { seat: { bracket: Bracket; index: number; paid?: boolean; override?: number | null } }
       | { receivedAmount: number; notes?: string | null }
   ) => {
     setUpdatingId(guestId);
@@ -227,26 +228,7 @@ export function GuestListWithPayment({
         return;
       }
       setGuests((prev) =>
-        prev.map((g) =>
-          g.id === guestId
-            ? {
-                ...g,
-                paymentStatus: data.paymentStatus,
-                isExempt: data.isExempt ?? g.isExempt,
-                paidSeats: data.paidSeats ?? g.paidSeats,
-                seats: data.seats ?? g.seats,
-                paidAmount: data.paidAmount ?? g.paidAmount,
-                pendingAmount: data.pendingAmount ?? g.pendingAmount,
-                totalAmount: data.totalAmount ?? g.totalAmount,
-                surplus: data.surplus ?? g.surplus,
-                receivedAmount: data.receivedAmount ?? g.receivedAmount,
-                onAccount: data.onAccount ?? g.onAccount,
-                missingAmount: data.missingAmount ?? g.missingAmount,
-                hostNotes: data.hostNotes !== undefined ? data.hostNotes : g.hostNotes,
-                paidSeatPrices: data.paidSeatPrices ?? g.paidSeatPrices,
-              }
-            : g
-        )
+        prev.map((g) => (g.id === guestId ? { ...g, ...data, paymentStatus: data.paymentStatus } : g))
       );
       onPaymentChange?.(guestId, data.paymentStatus);
     } catch {
@@ -264,7 +246,7 @@ export function GuestListWithPayment({
    * borra trabajo del anfitrion y no se puede deshacer, asi que se avisa antes.
    */
   const requestPaymentChange = (guest: Guest, newStatus: string) => {
-    const marked = BRACKETS.reduce((n, b) => n + (guest.paidSeats?.[b] ?? 0), 0);
+    const marked = guest.paidSeats ?? 0;
     if ((newStatus === "PENDING" || newStatus === "EXEMPT") && marked > 0) {
       setClearConfirm({ guest, status: newStatus, marked });
       return;
@@ -272,42 +254,17 @@ export function GuestListWithPayment({
     handlePaymentChange(guest.id, newStatus);
   };
 
-  /** Suma o resta un cupo pago de una franja, sin pasarse de los confirmados. */
-  const changeSeat = (guest: Guest, bracket: Bracket, delta: number) => {
-    const next = Math.min(
-      guest.seats?.[bracket] ?? 0,
-      Math.max(0, (guest.paidSeats?.[bracket] ?? 0) + delta)
-    );
-    return patchPayment(guest.id, { seats: { ...guest.paidSeats, [bracket]: next } });
-  };
+  /** Marca o desmarca un lugar puntual. */
+  const setSeatPaid = (guestId: string, seat: Seat, paid: boolean) =>
+    patchPayment(guestId, { seat: { bracket: seat.bracket, index: seat.index, paid } });
 
-  /**
-   * Cuánto se descuenta al desmarcar un lugar: el precio exacto del último que
-   * se marcó en esa franja, que es el que se está deshaciendo. Nada de
-   * promedios -- si un niño entró a $3.000 y otro a $9.000, devuelve el que
-   * corresponde y no $6.000.
-   */
-  const seatRefund = (guest: Guest, bracket: Bracket) => {
-    const list = guest.paidSeatPrices?.[bracket] ?? [];
-    return list.length > 0 ? list[list.length - 1] : 0;
-  };
+  /** Precio propio de un lugar. null lo devuelve al precio global de su franja. */
+  const setSeatPrice = (guestId: string, seat: Seat, override: number | null) =>
+    patchPayment(guestId, { seat: { bracket: seat.bracket, index: seat.index, override } });
 
-  /**
-   * Desmarcar borra el precio congelado de ese lugar: si despues se vuelve a
-   * marcar, se cobra al precio vigente. Con un aumento de por medio eso cambia
-   * plata, asi que se avisa antes.
-   */
-  const requestSeatRemoval = (guest: Guest, bracket: Bracket) => {
-    setSeatConfirm({ guestId: guest.id, bracket });
-  };
-
-  // El invitado se resuelve contra el estado vivo, no contra una copia guardada
-  // al abrir: si no, el monto del modal se quedaba con el del primer fetch.
-  const seatConfirmGuest = seatConfirm
-    ? guests.find((g) => g.id === seatConfirm.guestId) ?? null
-    : null;
-  const seatConfirmRefund =
-    seatConfirmGuest && seatConfirm ? seatRefund(seatConfirmGuest, seatConfirm.bracket) : 0;
+  // El invitado del modal se resuelve contra el estado vivo, no contra una copia
+  // guardada al abrir: si no, los montos se quedaban con los del primer fetch.
+  const detailGuest = detailFor ? guests.find((g) => g.id === detailFor) ?? null : null;
 
   const filtered = guests.filter((g) => {
     const matchAttendance = attendanceFilter === "all" || g.status === attendanceFilter;
@@ -393,8 +350,8 @@ export function GuestListWithPayment({
         const pago = confirmado
           ? PAYMENT_STATUS_LABELS[g.paymentStatus as CardPaymentStatus] ?? g.paymentStatus
           : "—";
-        const paidSeats = BRACKETS.reduce((n, b) => n + (g.paidSeats?.[b] ?? 0), 0);
-        const totalSeats = BRACKETS.reduce((n, b) => n + (g.seats?.[b] ?? 0), 0);
+        const paidSeats = g.paidSeats ?? 0;
+        const totalSeats = g.totalSeats ?? 0;
         const exento = g.paymentStatus === "EXEMPT";
 
         return [
@@ -593,9 +550,8 @@ export function GuestListWithPayment({
       ) : (
         <div>
           {paginated.map((guest) => {
-            const seatsOpen = openSeatsFor === guest.id;
-            const paidSeatsCount = BRACKETS.reduce((n, b) => n + (guest.paidSeats?.[b] ?? 0), 0);
-            const totalSeatsCount = BRACKETS.reduce((n, b) => n + (guest.seats?.[b] ?? 0), 0);
+            const paidSeatsCount = guest.paidSeats ?? 0;
+            const totalSeatsCount = guest.totalSeats ?? 0;
             return (
             // Mismo lenguaje que las tarjetas de "Gestionar invitados": borde,
             // esquinas redondeadas y separación entre una y otra. Nada de
@@ -677,7 +633,7 @@ export function GuestListWithPayment({
                         key={s}
                         onClick={() =>
                           s === "PARTIAL"
-                            ? setOpenSeatsFor(seatsOpen ? null : guest.id)
+                            ? setDetailFor(guest.id)
                             : requestPaymentChange(guest, s)
                         }
                         disabled={updatingId === guest.id}
@@ -702,12 +658,11 @@ export function GuestListWithPayment({
 
                   {hasPrices && !guest.isExempt && totalSeatsCount > 0 && (
                     <button
-                      onClick={() => setOpenSeatsFor(seatsOpen ? null : guest.id)}
-                      aria-expanded={seatsOpen}
+                      onClick={() => setDetailFor(guest.id)}
                       className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted/60"
                     >
-                      {seatsOpen ? <ChevronUp className="w-3.5 h-3.5" strokeWidth={2} /> : <ChevronDown className="w-3.5 h-3.5" strokeWidth={2} />}
-                      {seatsOpen ? "Ocultar detalles" : "Ver detalles"}
+                      <ListChecks className="w-3.5 h-3.5" strokeWidth={1.75} />
+                      Ver detalles
                     </button>
                   )}
 
@@ -750,75 +705,6 @@ export function GuestListWithPayment({
               </div>
             )}
 
-            {/* Desplegable: qué cupos de cada franja están pagos */}
-            {seatsOpen && hasPrices && (
-              <div style={{ padding: "0 0 16px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                {BRACKETS.filter((b) => (guest.seats?.[b] ?? 0) > 0).map((b) => {
-                  const total = guest.seats[b];
-                  const paid = guest.paidSeats?.[b] ?? 0;
-                  const label = total === 1 ? BRACKET_LABELS[b].one : BRACKET_LABELS[b].many;
-                  return (
-                    <div key={b} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-                      <span style={{ fontSize: "12.5px", color: "#555", textTransform: "capitalize" }}>{label}</span>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        <button
-                          onClick={() => requestSeatRemoval(guest, b)}
-                          disabled={updatingId === guest.id || paid <= 0}
-                          aria-label={`Quitar un ${BRACKET_LABELS[b].one} pago`}
-                          style={stepperBtn(paid <= 0 || updatingId === guest.id)}
-                        >
-                          <Minus className="w-3.5 h-3.5" />
-                        </button>
-                        <span style={{ fontSize: "12.5px", fontWeight: 700, minWidth: "56px", textAlign: "center", color: paid === total ? PAYMENT_STATUS_COLORS.PAID : "#555" }}>
-                          {paid} de {total}
-                        </span>
-                        <button
-                          onClick={() => changeSeat(guest, b, 1)}
-                          disabled={updatingId === guest.id || paid >= total}
-                          aria-label={`Marcar un ${BRACKET_LABELS[b].one} como pago`}
-                          style={stepperBtn(paid >= total || updatingId === guest.id)}
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
-                  <span>Cupos marcados: <b className="text-foreground">{formatARS(guest.paidAmount)}</b></span>
-                  {guest.pendingAmount > 0 && (
-                    <span>Falta marcar: <b className="text-foreground">{formatARS(guest.pendingAmount)}</b></span>
-                  )}
-                  <span>Total: {formatARS(guest.totalAmount)}</span>
-                  {guest.surplus > 0 && (
-                    <span><b className="text-foreground">{formatARS(guest.surplus)}</b> a favor</span>
-                  )}
-                </div>
-
-                {/* El monto recibido y las notas viven en el modal del botón de
-                    anotaciones, para no llenar la fila de campos. */}
-                {/* Este bloque es OTRO eje: no es lo que debe el invitado, es el
-                    cuadre del registro propio del anfitrión. Va rotulado como
-                    tal porque decir "falta" en los dos lados se lee como una
-                    contradicción. */}
-                {/* Solo si hay un monto anotado: con notas nada más, el rótulo
-                    quedaba solo y sin nada debajo. Que haya notas ya se ve en el
-                    botón de Anotaciones, que se tinta. */}
-                {guest.receivedAmount > 0 && (
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2.5 text-xs text-muted-foreground">
-                    <span className="font-medium uppercase tracking-wide opacity-70">Tu registro</span>
-                    <span>recibiste <b className="text-foreground">{formatARS(guest.receivedAmount)}</b></span>
-                    {guest.onAccount > 0 && (
-                      <span>· <b className="text-foreground">{formatARS(guest.onAccount)}</b> más de lo que marcaste, queda a cuenta</span>
-                    )}
-                    {guest.missingAmount > 0 && (
-                      <span>· <b className="text-foreground">{formatARS(guest.missingAmount)}</b> menos de lo que marcaste</span>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
             </div>
             );
           })}
@@ -873,6 +759,132 @@ export function GuestListWithPayment({
         </div>
       )}
 
+      {/* Detalle de pago, lugar por lugar. Va en modal y no desplegado en la
+          fila porque con varias personas se comprimía todo entre un invitado y
+          el siguiente. Acá cada lugar tiene su tilde de pago y su precio. */}
+      <Dialog open={!!detailFor} onOpenChange={(open) => !open && setDetailFor(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{detailGuest?.name}</DialogTitle>
+            <DialogDescription>
+              Marcá qué lugares están pagos. Podés darle a cualquiera un precio propio
+              distinto del general.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[50vh] space-y-1 overflow-y-auto">
+            {detailGuest?.seats.map((seat) => {
+              const key = `${seat.bracket}-${seat.index}`;
+              const draft = priceDraft[key];
+              return (
+                <div key={key} className="flex items-center gap-3 rounded-lg border px-3 py-2">
+                  <input
+                    type="checkbox"
+                    checked={seat.paid}
+                    disabled={updatingId === detailGuest.id}
+                    onChange={(e) => {
+                      if (!e.target.checked) {
+                        setSeatConfirm({ guestId: detailGuest.id, seat });
+                      } else {
+                        setSeatPaid(detailGuest.id, seat, true);
+                      }
+                    }}
+                    aria-label={`${seat.label} pago`}
+                    className="h-4 w-4 shrink-0 accent-current"
+                  />
+                  <span className={`flex-1 text-sm ${seat.paid ? "text-muted-foreground line-through" : ""}`}>
+                    {seat.label}
+                  </span>
+                  {seat.override != null && !seat.paid && (
+                    <span className="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      precio propio
+                    </span>
+                  )}
+                  <Input
+                    value={draft !== undefined ? draft : String(Math.round(seat.price))}
+                    onChange={(e) =>
+                      setPriceDraft((d) => ({ ...d, [key]: sanitizeAmountInput(e.target.value) }))
+                    }
+                    onBlur={(e) => {
+                      setPriceDraft((d) => {
+                        const next = { ...d };
+                        delete next[key];
+                        return next;
+                      });
+                      const n = parseAmountInput(e.target.value);
+                      if (!Number.isFinite(n) || n < 0) return;
+                      if (Math.abs(n - seat.price) < 1) return;
+                      setSeatPrice(detailGuest.id, seat, n);
+                    }}
+                    inputMode="decimal"
+                    aria-label={`Precio de ${seat.label}`}
+                    className="h-8 w-28 text-right text-sm"
+                  />
+                  {seat.override != null && (
+                    <button
+                      type="button"
+                      onClick={() => setSeatPrice(detailGuest.id, seat, null)}
+                      title="Volver al precio general"
+                      aria-label={`Volver ${seat.label} al precio general`}
+                      className="shrink-0 rounded-full border p-1 text-muted-foreground transition-colors hover:bg-muted/60"
+                    >
+                      <Undo2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {detailGuest && (
+            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
+              <span>
+                {detailGuest.paidSeats} de {detailGuest.totalSeats} pagos
+              </span>
+              <span>
+                Cobrado: <b className="text-foreground">{formatARS(detailGuest.paidAmount)}</b>
+              </span>
+              {detailGuest.pendingAmount > 0 && (
+                <span>
+                  Falta marcar: <b className="text-foreground">{formatARS(detailGuest.pendingAmount)}</b>
+                </span>
+              )}
+              <span>Total: {formatARS(detailGuest.totalAmount)}</span>
+              {detailGuest.surplus > 0 && (
+                <span>
+                  <b className="text-foreground">{formatARS(detailGuest.surplus)}</b> a favor
+                </span>
+              )}
+            </div>
+          )}
+
+          {detailGuest && detailGuest.receivedAmount > 0 && (
+            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
+              <span className="font-medium uppercase tracking-wide opacity-70">Tu registro</span>
+              <span>
+                recibiste <b className="text-foreground">{formatARS(detailGuest.receivedAmount)}</b>
+              </span>
+              {detailGuest.onAccount > 0 && (
+                <span>
+                  · <b className="text-foreground">{formatARS(detailGuest.onAccount)}</b> más de lo que
+                  marcaste, queda a cuenta
+                </span>
+              )}
+              {detailGuest.missingAmount > 0 && (
+                <span>
+                  · <b className="text-foreground">{formatARS(detailGuest.missingAmount)}</b> menos de lo
+                  que marcaste
+                </span>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button onClick={() => setDetailFor(null)}>Listo</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Explica por qué el total de una tarjeta puede no ser "personas × precio
           de hoy". Es la duda que aparece apenas el anfitrión cambia un precio. */}
       <Dialog open={showPriceHelp} onOpenChange={setShowPriceHelp}>
@@ -914,14 +926,14 @@ export function GuestListWithPayment({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              ¿Desmarcar un {seatConfirm ? BRACKET_LABELS[seatConfirm.bracket].one : ""}?
+              ¿Desmarcar {seatConfirm?.seat.label}?
             </DialogTitle>
             <DialogDescription asChild>
               <div className="space-y-3 text-sm">
                 <p>
-                  Ese lugar de <strong>{seatConfirmGuest?.name}</strong> deja de estar pago
-                  {seatConfirmRefund > 0 ? (
-                    <> y se descuentan <strong>{formatARS(seatConfirmRefund)}</strong> de lo cobrado</>
+                  Ese lugar deja de estar pago
+                  {seatConfirm && seatConfirm.seat.price > 0 ? (
+                    <> y se descuentan <strong>{formatARS(seatConfirm.seat.price)}</strong> de lo cobrado</>
                   ) : null}
                   .
                 </p>
@@ -940,9 +952,7 @@ export function GuestListWithPayment({
             <Button
               variant="destructive"
               onClick={() => {
-                if (seatConfirmGuest && seatConfirm) {
-                  changeSeat(seatConfirmGuest, seatConfirm.bracket, -1);
-                }
+                if (seatConfirm) setSeatPaid(seatConfirm.guestId, seatConfirm.seat, false);
                 setSeatConfirm(null);
               }}
             >
