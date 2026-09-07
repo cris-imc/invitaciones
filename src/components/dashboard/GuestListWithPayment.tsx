@@ -593,53 +593,42 @@ export function GuestListWithPayment({
         )}
       </div>
 
-      {/* Orden de la lista. Va aparte de los pills porque no filtra: cambia
-          cómo se muestra lo mismo. Por defecto suben los que deben, que es a
-          quiénes hay que ir a buscar. */}
-      <div className="mb-3 flex items-center justify-end gap-2">
-        <label htmlFor="inv-orden" className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-          Ordenar por
-        </label>
-        <select
-          id="inv-orden"
-          value={effectiveSort}
-          onChange={(e) => setSortBy(e.target.value as SortBy)}
-          className="h-8 rounded-full border bg-transparent px-3 text-xs font-medium transition-colors hover:bg-muted/60"
-        >
-          {(Object.keys(SORT_LABELS) as SortBy[])
-            .filter((s) => s !== "debt" || canSortByDebt)
-            .map((s) => (
-              <option key={s} value={s}>
-                {SORT_LABELS[s]}
-              </option>
-            ))}
-        </select>
-      </div>
+      {/* Orden y descarga comparten renglón: ninguno de los dos filtra la lista
+          y separados se comían dos líneas enteras arriba de los invitados. El
+          texto del botón es corto para que en celular entre al lado del select. */}
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <label
+            htmlFor="inv-orden"
+            className="hidden shrink-0 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground sm:block"
+          >
+            Ordenar por
+          </label>
+          <select
+            id="inv-orden"
+            value={effectiveSort}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
+            aria-label="Ordenar la lista"
+            className="h-8 min-w-0 rounded-full border bg-transparent px-3 text-xs font-medium transition-colors hover:bg-muted/60"
+          >
+            {(Object.keys(SORT_LABELS) as SortBy[])
+              .filter((s) => s !== "debt" || canSortByDebt)
+              .map((s) => (
+                <option key={s} value={s}>
+                  {SORT_LABELS[s]}
+                </option>
+              ))}
+          </select>
+        </div>
 
-      {/* Descarga discreta de la lista */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "12px" }}>
         <button
           onClick={handleExportExcel}
           disabled={guests.length === 0}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "6px 10px",
-            borderRadius: "999px",
-            border: "1px solid #ddd",
-            background: "transparent",
-            color: "#777",
-            fontSize: "11.5px",
-            fontWeight: 600,
-            cursor: guests.length === 0 ? "default" : "pointer",
-            opacity: guests.length === 0 ? 0.4 : 1,
-            fontFamily: "var(--font-body)",
-          }}
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[11.5px] font-semibold text-muted-foreground transition-colors hover:bg-muted/60 disabled:cursor-default disabled:opacity-40"
           aria-label="Descargar lista completa de invitados en Excel"
         >
           <Download size={13} />
-          Descargar lista (Excel)
+          Excel
         </button>
       </div>
 

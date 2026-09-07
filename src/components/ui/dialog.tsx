@@ -27,6 +27,48 @@ const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 /**
+ * Cuánto del viewport de layout queda tapado por abajo, y cuánto alto hay
+ * realmente visible.
+ *
+ * En iOS la barra de herramientas de Safari se dibuja *encima* del viewport de
+ * layout: un `position: fixed; bottom: 0` queda por debajo de ella y el pie del
+ * modal se ve cortado. `visualViewport` es lo único que reporta el alto que el
+ * usuario ve de verdad, y además se achica cuando aparece el teclado, así que
+ * sirve para las dos cosas.
+ *
+ * Devuelve `null` mientras no haga falta corregir nada (desktop, o navegadores
+ * donde el fixed ya cae donde corresponde), para no pisar el CSS sin motivo.
+ */
+function useVisualViewportFit() {
+  const [fit, setFit] = React.useState<{ bottom: number; maxHeight: number } | null>(null);
+
+  React.useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const update = () => {
+      // La hoja pegada abajo sólo existe en la variante angosta; en desktop el
+      // modal va centrado y no hay nada que corregir.
+      if (window.innerWidth >= 640) return setFit(null);
+      const tapado = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      setFit({ bottom: tapado, maxHeight: Math.round(vv.height) });
+    };
+
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, []);
+
+  return fit;
+}
+
+/**
  * En celular es una hoja que sube desde abajo; en desktop, el modal centrado de
  * siempre.
  *
@@ -42,11 +84,24 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, style, onOpenAutoFocus, ...props }, ref) => {
+  const fit = useVisualViewportFit();
+  return (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      style={fit ? { bottom: fit.bottom, maxHeight: fit.maxHeight, ...style } : style}
+      onOpenAutoFocus={(event) => {
+        onOpenAutoFocus?.(event);
+        if (event.defaultPrevented) return;
+        // Radix enfoca el primer control del modal. En celular eso levanta el
+        // teclado apenas se abre y tapa medio modal antes de que el usuario
+        // haya decidido escribir. El foco entra igual al panel -- hace falta
+        // para Escape y para los lectores de pantalla -- pero no a un campo.
+        event.preventDefault();
+        (event.currentTarget as HTMLElement | null)?.focus();
+      }}
       className={cn(
         "inv-dialog-sheet fixed z-[100] flex flex-col gap-4 border bg-background shadow-lg",
         // Celular: hoja al ras de abajo. El padding de abajo respeta la barra de
@@ -78,7 +133,8 @@ const DialogContent = React.forwardRef<
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
-))
+  );
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 /**
