@@ -192,7 +192,11 @@ export function MarmolYOroTemplateBronce({ invitation, guest, isPersonalized = f
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
   const ceremoniaMapUrl = String(invitation.ceremoniaMapUrl ?? "");
-  const LUGAR_PANEL_COUNT = ceremoniaHabilitada ? 4 : 3;
+  // Sin link de mapa, el panel "Cómo llegar" no tendría a dónde mandar: se
+  // saca, y el conteo de paneles baja con él para que la numeración siga
+  // cerrando (01/03 y no 01/04 con un panel que no está).
+  const hayComoLlegar = Boolean(mapUrl);
+  const LUGAR_PANEL_COUNT = (ceremoniaHabilitada ? 3 : 2) + (hayComoLlegar ? 1 : 0);
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
 
@@ -879,22 +883,24 @@ export function MarmolYOroTemplateBronce({ invitation, guest, isPersonalized = f
                 <div className="myo-seguir">SEGUÍ BAJANDO <span className="myo-side-hint">→</span></div>
               </div>
 
-              <div data-tone="light" className="myo-panel myo-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
-                <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="myo-route-svg">
-                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#8A5A2E" strokeWidth={1.6} />
-                  <circle cx={282} cy={40} r={5} fill="#8A5A2E" />
-                </svg>
-                <div className="myo-panel-block">
-                  <span className="myo-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                  <span className="myo-panel-title-sm">Cómo llegar</span>
-                  {direccion && <span className="myo-mini-label">{direccion}</span>}
-                  {mapUrl && (
-                    <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="myo-link-cta">
-                      ABRIR EN MAPAS →
-                    </a>
-                  )}
+              {hayComoLlegar && (
+                <div data-tone="light" className="myo-panel myo-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
+                  <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="myo-route-svg">
+                    <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#8A5A2E" strokeWidth={1.6} />
+                    <circle cx={282} cy={40} r={5} fill="#8A5A2E" />
+                  </svg>
+                  <div className="myo-panel-block">
+                    <span className="myo-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
+                    <span className="myo-panel-title-sm">Cómo llegar</span>
+                    {direccion && <span className="myo-mini-label">{direccion}</span>}
+                    {mapUrl && (
+                      <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="myo-link-cta">
+                        ABRIR EN MAPAS →
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div data-tone="dark" className="myo-panel myo-panel--center" style={{ background: "#121010", color: "#F4F1EA" }}>
                 <div className="myo-medallion myo-medallion--lg">

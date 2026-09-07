@@ -174,7 +174,11 @@ export function BabyShowerTemplate({ invitation, guest, isPersonalized = false }
   // StepCeremonia.tsx nunca se muestra para ese tipo (ver
   // wizard-steps-config.ts), así que a diferencia de Guest Pass VIP no hay
   // panel de Ceremonia separado: "El lugar" tiene siempre 3 paneles fijos.
-  const LUGAR_PANEL_COUNT = 3;
+  // Sin link de mapa, el panel "Cómo llegar" no tendría a dónde mandar: se
+  // saca, y el conteo de paneles baja con él para que la numeración siga
+  // cerrando (01/03 y no 01/04 con un panel que no está).
+  const hayComoLlegar = Boolean(mapUrl);
+  const LUGAR_PANEL_COUNT = 2 + (hayComoLlegar ? 1 : 0);
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
 
@@ -834,22 +838,24 @@ export function BabyShowerTemplate({ invitation, guest, isPersonalized = false }
                 <div className="bbs-seguir">SEGUÍ BAJANDO <span className="bbs-side-hint">→</span></div>
               </div>
 
-              <div data-tone="light" className="bbs-panel bbs-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
-                <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="bbs-route-svg">
-                  <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#7A5C82" strokeWidth={1.6} />
-                  <circle cx={282} cy={40} r={5} fill="#7A5C82" />
-                </svg>
-                <div className="bbs-panel-block">
-                  <span className="bbs-mini-label">02 / {LUGAR_PANEL_COUNT}</span>
-                  <span className="bbs-panel-title-sm">Cómo llegar</span>
-                  {direccion && <span className="bbs-mini-label">{direccion}</span>}
-                  {mapUrl && (
-                    <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bbs-link-cta">
-                      ABRIR EN MAPAS →
-                    </a>
-                  )}
+              {hayComoLlegar && (
+                <div data-tone="light" className="bbs-panel bbs-panel--end" style={{ background: "#E4DFD3", color: "#14141B" }}>
+                  <svg viewBox="0 0 300 500" preserveAspectRatio="none" className="bbs-route-svg">
+                    <path ref={routeRef} d="M18 468 C 130 400, 54 262, 152 220 S 254 140, 282 40" fill="none" stroke="#7A5C82" strokeWidth={1.6} />
+                    <circle cx={282} cy={40} r={5} fill="#7A5C82" />
+                  </svg>
+                  <div className="bbs-panel-block">
+                    <span className="bbs-mini-label">02 / {LUGAR_PANEL_COUNT}</span>
+                    <span className="bbs-panel-title-sm">Cómo llegar</span>
+                    {direccion && <span className="bbs-mini-label">{direccion}</span>}
+                    {mapUrl && (
+                      <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bbs-link-cta">
+                        ABRIR EN MAPAS →
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div data-tone="dark" className="bbs-panel bbs-panel--center" style={{ background: "#191420", color: "#F4F1EA" }}>
                 <div className="bbs-medallion bbs-medallion--lg">
