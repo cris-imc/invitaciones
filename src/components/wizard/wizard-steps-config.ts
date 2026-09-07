@@ -3,6 +3,7 @@ import { StepEventType } from "./StepEventType";
 import { StepBasicInfo } from "./StepBasicInfo";
 import { StepDetails } from "./StepDetails";
 import { StepHeroImages } from "./StepHeroImages";
+import { StepStorytellingScroll } from "./StepStorytellingScroll";
 import { StepGallery } from "./StepGallery";
 import { StepMusic } from "./StepMusic";
 import { StepTrivia } from "./StepTrivia";
@@ -79,6 +80,8 @@ export function getWizardSteps({
         // narrativa, ver AnimatedCoverPhoto.tsx), así que el paso ahora se
         // muestra para las dos colecciones. StepHeroImages.tsx decide
         // internamente qué campos pedir según isStorytellingTemplate.
+        // Sólo Storytelling: es el único que tiene paneles que recorrer.
+        ...(storytelling ? [{ component: StepStorytellingScroll, label: "Recorrido" }] : []),
         { component: StepHeroImages, label: "Portada" },
         ...(!storytelling ? [{ component: StepTypography, label: "Tipografía" }] : []),
         { component: StepBasicInfo, label: "Información Básica" },

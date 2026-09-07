@@ -160,6 +160,10 @@ export function CumpleanosJardinTemplateAzulado({ invitation, guest, isPersonali
   const lugarNombre = String(invitation.lugarNombre ?? "");
   const direccion = String(invitation.direccion ?? "");
   const mapUrl = String(invitation.mapUrl ?? "");
+  // Recorrido de los paneles: de costado (la sección se fija y pasan en
+  // horizontal mientras se baja) o apilados, que se recorren bajando como
+  // el resto de la invitación. Lo elige el anfitrión en el wizard.
+  const scrollVertical = Boolean(invitation.storytellingScrollVertical);
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
@@ -545,6 +549,8 @@ export function CumpleanosJardinTemplateAzulado({ invitation, guest, isPersonali
 
         // scroll horizontal pineado
         pans.forEach((pan, pi) => {
+          // Apilados: el recorrido lo hace el scroll de la página, no el JS.
+          if (pan.dataset.scroll === "vertical") return;
           const strip = pan.querySelector<HTMLElement>("[data-strip]");
           if (!strip) return;
           const n = strip.children.length;
@@ -803,7 +809,7 @@ export function CumpleanosJardinTemplateAzulado({ invitation, guest, isPersonali
           </section>
         )}
 
-        <div data-pan="1" data-screen-label="El lugar" className="cpj-pan">
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="cpj-pan">
           <div className="cpj-pan-sticky">
             <div data-strip="1" className="cpj-strip">
               <div id="details" data-tone="light" className="cpj-panel cpj-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
@@ -835,7 +841,7 @@ export function CumpleanosJardinTemplateAzulado({ invitation, guest, isPersonali
                     ))}
                   </div>
                 )}
-                <div className="cpj-seguir">SEGUÍ BAJANDO <span className="cpj-side-hint">→</span></div>
+                <div className="cpj-seguir">SEGUÍ BAJANDO <span className="cpj-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -1936,6 +1942,13 @@ const GP_CSS = `
   .cpj-strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform; }
   .cpj-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; gap: 22px; }
   .cpj-panel--between { justify-content: space-between; }
+  /* Recorrido apilado: la seccion deja de fijarse y el riel deja de ser un
+     riel -- los mismos paneles, con el mismo diseno, pasan a ir uno abajo
+     del otro y se recorren bajando. */
+  .cpj-pan[data-scroll="vertical"] { height: auto; }
+  .cpj-pan[data-scroll="vertical"] .cpj-pan-sticky { position: static; height: auto; overflow: visible; }
+  .cpj-pan[data-scroll="vertical"] .cpj-strip { position: static; display: block; width: 100%; transform: none !important; }
+  .cpj-pan[data-scroll="vertical"] .cpj-panel { height: calc(var(--vh, 1vh) * 100); }
   .cpj-panel--end { justify-content: flex-end; }
   .cpj-panel--center { align-items: center; justify-content: center; text-align: center; }
   .cpj-panel--gap { gap: clamp(14px, 2.4vh, 22px); padding: clamp(52px, 9vh, 84px) max(24px, calc((100vw - 600px) / 2)) clamp(62px, 11vh, 100px); }

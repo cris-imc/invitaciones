@@ -135,6 +135,10 @@ export function CineAbstractoXvTemplate({ invitation, guest, isPersonalized = fa
   const lugarNombre = String(invitation.lugarNombre ?? "");
   const direccion = String(invitation.direccion ?? "");
   const mapUrl = String(invitation.mapUrl ?? "");
+  // Recorrido de los paneles: de costado (la sección se fija y pasan en
+  // horizontal mientras se baja) o apilados, que se recorren bajando como
+  // el resto de la invitación. Lo elige el anfitrión en el wizard.
+  const scrollVertical = Boolean(invitation.storytellingScrollVertical);
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
@@ -514,6 +518,8 @@ export function CineAbstractoXvTemplate({ invitation, guest, isPersonalized = fa
         }
 
         pans.forEach((pan, pi) => {
+          // Apilados: el recorrido lo hace el scroll de la página, no el JS.
+          if (pan.dataset.scroll === "vertical") return;
           const strip = pan.querySelector<HTMLElement>("[data-strip]");
           if (!strip) return;
           const n = strip.children.length;
@@ -765,7 +771,7 @@ export function CineAbstractoXvTemplate({ invitation, guest, isPersonalized = fa
         </section>
         )}
 
-        <div data-pan="1" data-screen-label="Cuándo y dónde" className="cxv-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="cxv-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="cxv-pan-sticky">
             <div data-strip="1" className="cxv-strip">
               {ceremoniaHabilitada && (
@@ -790,7 +796,7 @@ export function CineAbstractoXvTemplate({ invitation, guest, isPersonalized = fa
                       ABRIR EN MAPAS →
                     </a>
                   )}
-                  <div className="cxv-seguir">SEGUÍ BAJANDO <span className="cxv-side-hint">→</span></div>
+                  <div className="cxv-seguir">SEGUÍ BAJANDO <span className="cxv-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
@@ -823,7 +829,7 @@ export function CineAbstractoXvTemplate({ invitation, guest, isPersonalized = fa
                     ))}
                   </div>
                 )}
-                <div className="cxv-seguir">SEGUÍ BAJANDO <span className="cxv-side-hint">→</span></div>
+                <div className="cxv-seguir">SEGUÍ BAJANDO <span className="cxv-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -1905,6 +1911,13 @@ const CXV_CSS = `
   .cxv-strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform; }
   .cxv-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; gap: 22px; }
   .cxv-panel--between { justify-content: space-between; }
+  /* Recorrido apilado: la seccion deja de fijarse y el riel deja de ser un
+     riel -- los mismos paneles, con el mismo diseno, pasan a ir uno abajo
+     del otro y se recorren bajando. */
+  .cxv-pan[data-scroll="vertical"] { height: auto; }
+  .cxv-pan[data-scroll="vertical"] .cxv-pan-sticky { position: static; height: auto; overflow: visible; }
+  .cxv-pan[data-scroll="vertical"] .cxv-strip { position: static; display: block; width: 100%; transform: none !important; }
+  .cxv-pan[data-scroll="vertical"] .cxv-panel { height: calc(var(--vh, 1vh) * 100); }
   .cxv-panel--end { justify-content: flex-end; }
   .cxv-panel--center { align-items: center; justify-content: center; text-align: center; }
   .cxv-panel--gap { gap: clamp(14px, 2.4vh, 22px); padding: clamp(52px, 9vh, 84px) max(24px, calc((100vw - 600px) / 2)) clamp(62px, 11vh, 100px); }
