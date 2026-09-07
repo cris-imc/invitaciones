@@ -69,14 +69,9 @@ function useVisualViewportFit() {
 }
 
 /**
- * En celular es una hoja que sube desde abajo; en desktop, el modal centrado de
- * siempre.
- *
- * Un modal centrado en un celular queda lejos del pulgar, con las esquinas
- * colgando en el aire y sin techo: si el contenido crece, se va de la pantalla y
- * los botones del pie quedan abajo de todo. La hoja arranca desde el borde por
- * el que aparece, ocupa el ancho completo y tiene alto máximo, así que el modal
- * siempre mide lo mismo y lo que sobra se desliza adentro.
+ * Un panel centrado, del alto que pida su contenido y con un techo a partir del
+ * cual lo de adentro se desliza. Es lo que se espera de un modal y lo que se ve
+ * igual en celular y en escritorio.
  *
  * El alto va en `svh` y no en `vh` porque en mobile `vh` mide la pantalla sin la
  * barra del navegador: con la barra visible, el pie del modal queda tapado.
@@ -85,16 +80,21 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     /**
-     * "sheet" (por defecto) sube desde abajo en celular: sirve cuando el modal
-     * es largo o se trabaja adentro un rato. "centered" lo deja en el medio en
-     * cualquier pantalla, que es lo que piden los modales cortos -- un avisito
-     * de confirmar o un formulario de dos campos se ve raro pegado abajo.
+     * Cómo se planta el modal en celular. En desktop los tres son iguales: un
+     * panel centrado.
+     *
+     * - "centered" (por defecto): en el medio, con aire a los costados y alto
+     *   según el contenido, hasta un techo a partir del cual scrollea.
+     * - "sheet": sube desde el borde inferior. Queda pegado abajo, que en
+     *   pantallas altas deja el contenido lejos de la vista.
      */
     variant?: "sheet" | "centered";
   }
->(({ className, children, style, onOpenAutoFocus, variant = "sheet", ...props }, ref) => {
-  const sheetFit = useVisualViewportFit();
-  const fit = variant === "sheet" ? sheetFit : null;
+>(({ className, children, style, onOpenAutoFocus, variant = "centered", ...props }, ref) => {
+  const viewportFit = useVisualViewportFit();
+  // Las dos variantes que tocan el borde inferior necesitan saber cuánto tapan
+  // la barra del navegador y el teclado; la centrada flota en el medio y no.
+  const fit = variant === "centered" ? null : viewportFit;
   return (
   <DialogPortal>
     <DialogOverlay />
@@ -114,22 +114,18 @@ const DialogContent = React.forwardRef<
       className={cn(
         variant === "sheet" ? "inv-dialog-sheet" : "inv-dialog-centered",
         "fixed z-[100] flex flex-col gap-4 border bg-background shadow-lg",
-        variant === "sheet"
-          ? [
-              // Celular: hoja al ras de abajo. El padding de abajo respeta la
-              // barra de gestos del sistema, que si no se come el último botón.
-              "inset-x-0 bottom-0 max-h-[88svh] rounded-t-2xl px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3",
-              // Desktop: centrado, con techo para que un modal largo no se
-              // estire mas alla de la ventana.
-              "sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:max-h-[85vh] sm:w-full sm:max-w-lg",
-              "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg sm:p-6",
-            ]
-          : [
-              // Centrado en cualquier pantalla. En celular deja aire a los
-              // costados en vez de ir de borde a borde.
-              "left-1/2 top-1/2 max-h-[85svh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2",
-              "rounded-2xl p-5 sm:rounded-lg sm:p-6",
-            ],
+        variant === "sheet" && [
+          // Celular: hoja al ras de abajo. El padding de abajo respeta la barra
+          // de gestos del sistema, que si no se come el último botón.
+          "inset-x-0 bottom-0 max-h-[88svh] rounded-t-2xl px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3",
+          "sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:max-h-[85vh] sm:w-full sm:max-w-lg",
+          "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg sm:p-6",
+        ],
+        variant === "centered" && [
+          // En el medio, con aire a los costados en vez de ir de borde a borde.
+          "left-1/2 top-1/2 max-h-[85svh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2",
+          "rounded-2xl p-5 sm:rounded-lg sm:p-6",
+        ],
         // Los modales que no separan su cuerpo con <DialogBody> scrollean
         // enteros: siguen andando sin tocarlos, solo que ahora con techo.
         "overflow-y-auto overscroll-contain has-[[data-dialog-body]]:overflow-hidden",
