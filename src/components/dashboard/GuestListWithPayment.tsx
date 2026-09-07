@@ -940,10 +940,12 @@ export function GuestListWithPayment({
           fila porque con varias personas se comprimía todo entre un invitado y
           el siguiente. Acá cada lugar tiene su tilde de pago y su precio. */}
       <Dialog open={!!detailFor} onOpenChange={(open) => !open && setDetailFor(null)}>
-        {/* Se acomoda a cuanta gente tenga la tarjeta: con dos lugares es un
-            modal chico, y recien al pasarse del techo del panel la lista empieza
-            a deslizarse adentro. El resumen y el boton quedan fijos igual. */}
-        <DialogContent>
+        {/* Alto fijo a proposito: mide lo mismo con una tarjeta de dos lugares
+            que con una de doce. Es el unico modal que se abre una y otra vez
+            para distintos invitados, y si cambiara de alto cada vez, el resumen
+            y el boton "Listo" saltarian de lugar en la pantalla entre uno y
+            otro. Lo que sobra se desliza dentro de la lista. */}
+        <DialogContent className="h-[80svh] sm:h-[min(85vh,34rem)]">
           <DialogHeader>
             <DialogTitle>{detailGuest?.name}</DialogTitle>
             <DialogDescription>
