@@ -941,7 +941,7 @@ export function VintageEditorialTemplatePlataAntigua({ invitation, guest, isPers
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="vte-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="vte-pan">
           <div className="vte-pan-sticky">
             <div data-strip="1" className="vte-strip">
               {photoPages.map((page, pageIndex) => (

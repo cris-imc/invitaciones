@@ -915,7 +915,7 @@ export function CumpleanosTerrazaTemplateEsmeralda({ invitation, guest, isPerson
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="cpt-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="cpt-pan">
           <div className="cpt-pan-sticky">
             <div data-strip="1" className="cpt-strip">
               {photoPages.map((page, pageIndex) => (

@@ -960,7 +960,7 @@ export function CineAbstractoTemplate({ invitation, guest, isPersonalized = fals
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="cab-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="cab-pan">
           <div className="cab-pan-sticky">
             <div data-strip="1" className="cab-strip">
               {photoPages.map((page, pageIndex) => (

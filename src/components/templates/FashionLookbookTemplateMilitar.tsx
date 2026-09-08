@@ -911,7 +911,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="flb-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="flb-pan">
           <div className="flb-pan-sticky">
             <div data-strip="1" className="flb-strip">
               {photoPages.map((page, pageIndex) => (

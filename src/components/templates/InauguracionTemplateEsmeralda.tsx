@@ -912,7 +912,7 @@ export function InauguracionTemplateEsmeralda({ invitation, guest, isPersonalize
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="ing-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="ing-pan">
           <div className="ing-pan-sticky">
             <div data-strip="1" className="ing-strip">
               {photoPages.map((page, pageIndex) => (

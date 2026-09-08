@@ -915,7 +915,7 @@ export function BautismoTemplateRosa({ invitation, guest, isPersonalized = false
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="bts-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bts-pan">
           <div className="bts-pan-sticky">
             <div data-strip="1" className="bts-strip">
               {photoPages.map((page, pageIndex) => (

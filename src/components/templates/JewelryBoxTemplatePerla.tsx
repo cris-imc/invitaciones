@@ -898,7 +898,7 @@ export function JewelryBoxTemplatePerla({ invitation, guest, isPersonalized = fa
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="jwb-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="jwb-pan">
           <div className="jwb-pan-sticky">
             <div data-strip="1" className="jwb-strip">
               {photoPages.map((page, pageIndex) => (

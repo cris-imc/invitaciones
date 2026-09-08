@@ -915,7 +915,7 @@ export function PaseVipTemplateRubi({ invitation, guest, isPersonalized = false 
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="pvp-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="pvp-pan">
           <div className="pvp-pan-sticky">
             <div data-strip="1" className="pvp-strip">
               {photoPages.map((page, pageIndex) => (

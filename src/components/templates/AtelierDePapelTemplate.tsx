@@ -950,7 +950,7 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="adp-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="adp-pan">
           <div className="adp-pan-sticky">
             <div data-strip="1" className="adp-strip">
               {photoPages.map((page, pageIndex) => (

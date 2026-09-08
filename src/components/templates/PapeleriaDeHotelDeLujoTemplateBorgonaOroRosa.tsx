@@ -941,7 +941,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="phl-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="phl-pan">
           <div className="phl-pan-sticky">
             <div data-strip="1" className="phl-strip">
               {photoPages.map((page, pageIndex) => (

@@ -915,7 +915,7 @@ export function InfantilJurasicoTemplateMarron({ invitation, guest, isPersonaliz
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="ifj-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="ifj-pan">
           <div className="ifj-pan-sticky">
             <div data-strip="1" className="ifj-strip">
               {photoPages.map((page, pageIndex) => (

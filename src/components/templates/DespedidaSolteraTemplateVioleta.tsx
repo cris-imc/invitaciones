@@ -915,7 +915,7 @@ export function DespedidaSolteraTemplateVioleta({ invitation, guest, isPersonali
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="dps-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="dps-pan">
           <div className="dps-pan-sticky">
             <div data-strip="1" className="dps-strip">
               {photoPages.map((page, pageIndex) => (

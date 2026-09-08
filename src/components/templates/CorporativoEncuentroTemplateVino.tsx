@@ -915,7 +915,7 @@ export function CorporativoEncuentroTemplateVino({ invitation, guest, isPersonal
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="cpe-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="cpe-pan">
           <div className="cpe-pan-sticky">
             <div data-strip="1" className="cpe-strip">
               {photoPages.map((page, pageIndex) => (

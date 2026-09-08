@@ -919,7 +919,7 @@ export function InfantilSafariTemplateAmarillo({ invitation, guest, isPersonaliz
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="ifs-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="ifs-pan">
           <div className="ifs-pan-sticky">
             <div data-strip="1" className="ifs-strip">
               {photoPages.map((page, pageIndex) => (

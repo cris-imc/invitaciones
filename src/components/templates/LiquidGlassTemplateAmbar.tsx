@@ -966,7 +966,7 @@ export function LiquidGlassTemplateAmbar({ invitation, guest, isPersonalized = f
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="lqg-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="lqg-pan">
           <div className="lqg-pan-sticky">
             <div data-strip="1" className="lqg-strip">
               {photoPages.map((page, pageIndex) => (

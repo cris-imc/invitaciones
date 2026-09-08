@@ -961,7 +961,7 @@ export function MarmolYOroTemplateBronce({ invitation, guest, isPersonalized = f
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="myo-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="myo-pan">
           <div className="myo-pan-sticky">
             <div data-strip="1" className="myo-strip">
               {photoPages.map((page, pageIndex) => (

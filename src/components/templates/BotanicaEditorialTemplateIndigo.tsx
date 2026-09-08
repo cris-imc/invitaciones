@@ -953,7 +953,7 @@ export function BotanicaEditorialTemplateIndigo({ invitation, guest, isPersonali
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="bte-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bte-pan">
           <div className="bte-pan-sticky">
             <div data-strip="1" className="bte-strip">
               {photoPages.map((page, pageIndex) => (

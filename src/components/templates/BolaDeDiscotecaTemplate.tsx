@@ -909,7 +909,7 @@ export function BolaDeDiscotecaTemplate({ invitation, guest, isPersonalized = fa
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="bdd-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bdd-pan">
           <div className="bdd-pan-sticky">
             <div data-strip="1" className="bdd-strip">
               {photoPages.map((page, pageIndex) => (

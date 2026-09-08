@@ -932,7 +932,7 @@ export function GuestPassVipTemplateEsmeralda({ invitation, guest, isPersonalize
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="gpv-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="gpv-pan">
           <div className="gpv-pan-sticky">
             <div data-strip="1" className="gpv-strip">
               {photoPages.map((page, pageIndex) => (
