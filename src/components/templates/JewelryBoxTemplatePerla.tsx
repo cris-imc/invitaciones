@@ -28,6 +28,7 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1046,7 +1047,7 @@ export function JewelryBoxTemplatePerla({ invitation, guest, isPersonalized = fa
           <span data-xin="1" data-dist="-60" className="jwb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="jwb-final-card">
             <div className="jwb-medallion jwb-medallion--final">
-              <JwbMedallion label="15" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="jwbArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <JwbMedallion label="15" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="jwbArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="jwb-mini-label jwb-accent-serif-2">PIEZA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="jwb-final-names">{namesTitle}</span>
@@ -1771,7 +1772,7 @@ function JwbCoverHalf({
       <div className="jwb-sparkle" style={{ left: "76%", top: "32%", width: 4, height: 4, animationDelay: ".8s" }} />
       <div className="jwb-cover-content">
         <div className="jwb-cover-top-row">
-          <span>PIEZA Nº {passNumber}</span><span className="jwb-accent-serif-2">ADMIT ONE</span>
+          <span>PIEZA Nº {passNumber}</span><span className="jwb-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="jwb-cover-center">
           <span ref={kickerRef} className="jwb-cover-kicker">{kickerText}</span>

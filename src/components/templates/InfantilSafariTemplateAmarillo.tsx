@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1067,7 +1068,7 @@ export function InfantilSafariTemplateAmarillo({ invitation, guest, isPersonaliz
           <span data-xin="1" data-dist="-60" className="ifs-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="ifs-final-card">
             <div className="ifs-medallion ifs-medallion--final">
-              <InfantilSafariTemplateAmarilloMedallionCmp label="SF" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="ifsArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <InfantilSafariTemplateAmarilloMedallionCmp label="SF" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="ifsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="ifs-mini-label ifs-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="ifs-final-names">{namesTitle}</span>
@@ -1822,7 +1823,7 @@ function InfantilSafariTemplateAmarilloCoverHalf({
       <div className="ifs-cover-texture" />
       <div className="ifs-cover-content">
         <div className="ifs-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="ifs-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="ifs-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="ifs-cover-center">
           <span ref={kickerRef} className="ifs-cover-kicker">{kickerText}</span>

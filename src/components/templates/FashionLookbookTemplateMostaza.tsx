@@ -28,6 +28,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1059,7 +1060,7 @@ export function FashionLookbookTemplateMostaza({ invitation, guest, isPersonaliz
           <span data-xin="1" data-dist="-60" className="flb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LOOK</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="flb-final-card">
             <div className="flb-medallion flb-medallion--final">
-              <FlbMedallion main="15" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="flbArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCompacta} · `} spin="reverse" />
+              <FlbMedallion main="15" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="flbArc3" arcText={textoArco(namesTitle, fechaCompacta)} spin="reverse" />
             </div>
             <span className="flb-mini-label flb-accent-plain">LOOK Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="flb-final-names">{namesTitle}</span>

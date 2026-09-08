@@ -28,6 +28,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1053,7 +1054,7 @@ export function PrincesaTemplateAzulMedianoche({ invitation, guest, isPersonaliz
           <span data-xin="1" data-dist="-60" className="prc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU TIARA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="prc-final-card">
             <div className="prc-medallion prc-medallion--final">
-              <TiaraMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="prcArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <TiaraMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="prcArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="prc-mini-label prc-accent-serif-2">TIARA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="prc-final-names">{namesTitle}</span>
@@ -1790,7 +1791,7 @@ function PrcCoverHalf({
       <div className="prc-sparkle" style={{ left: "76%", top: "32%", width: 4, height: 4, animationDelay: ".8s" }} />
       <div className="prc-cover-content">
         <div className="prc-cover-top-row">
-          <span>TIARA Nº {passNumber}</span><span className="prc-accent-serif-2">ADMIT ONE</span>
+          <span>TIARA Nº {passNumber}</span><span className="prc-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="prc-cover-center">
           <span ref={kickerRef} className="prc-cover-kicker">{kickerText}</span>

@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1060,7 +1061,7 @@ export function InauguracionTemplateAzul({ invitation, guest, isPersonalized = f
           <span data-xin="1" data-dist="-60" className="ing-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="ing-final-card">
             <div className="ing-medallion ing-medallion--final">
-              <IngMedallionCmp label="GA" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bbsArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <IngMedallionCmp label="GA" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bbsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="ing-mini-label ing-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="ing-final-names">{namesTitle}</span>
@@ -1815,7 +1816,7 @@ function IngCoverHalf({
       <div className="ing-cover-texture" />
       <div className="ing-cover-content">
         <div className="ing-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="ing-accent-serif-2">ADMIT TWO</span>
+          <span>PASE Nº {passNumber}</span><span className="ing-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="ing-cover-center">
           <span ref={kickerRef} className="ing-cover-kicker">{kickerText}</span>

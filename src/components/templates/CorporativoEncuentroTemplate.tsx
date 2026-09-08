@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1063,7 +1064,7 @@ export function CorporativoEncuentroTemplate({ invitation, guest, isPersonalized
           <span data-xin="1" data-dist="-60" className="cpe-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cpe-final-card">
             <div className="cpe-medallion cpe-medallion--final">
-              <CpeMedallionCmp label="EQ" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cpeArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <CpeMedallionCmp label="EQ" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cpeArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="cpe-mini-label cpe-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="cpe-final-names">{namesTitle}</span>
@@ -1818,7 +1819,7 @@ function CpeCoverHalf({
       <div className="cpe-cover-texture" />
       <div className="cpe-cover-content">
         <div className="cpe-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="cpe-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="cpe-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cpe-cover-center">
           <span ref={kickerRef} className="cpe-cover-kicker">{kickerText}</span>

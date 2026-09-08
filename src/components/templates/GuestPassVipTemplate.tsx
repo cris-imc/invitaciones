@@ -33,6 +33,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -733,7 +734,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
           />
 
           <div data-drift="-70" className="gpv-medallion gpv-medallion--corner">
-            <Medallion label="VIP" sub="ACCESO" arcId="gpArc1" arcText="ADMIT TWO · GUEST PASS · " spin="normal" />
+            <Medallion label="VIP" sub="ACCESO" arcId="gpArc1" arcText="ALL ACCESS · GUEST PASS · " spin="normal" />
           </div>
         </section>
 
@@ -1084,7 +1085,7 @@ export function GuestPassVipTemplate({ invitation, guest, isPersonalized = false
           <span data-xin="1" data-dist="-60" className="gpv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="gpv-final-card">
             <div className="gpv-medallion gpv-medallion--final">
-              <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="gpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="gpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="gpv-mini-label gpv-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="gpv-final-names">
@@ -1841,7 +1842,7 @@ function CoverHalf({
       <div className="gpv-cover-sunburst" />
       <div className="gpv-cover-content">
         <div className="gpv-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="gpv-accent-serif-2">ADMIT TWO</span>
+          <span>PASE Nº {passNumber}</span><span className="gpv-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="gpv-cover-center">
           <span ref={kickerRef} className="gpv-cover-kicker">{kickerText}</span>

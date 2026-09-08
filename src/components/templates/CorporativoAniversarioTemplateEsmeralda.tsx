@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1063,7 +1064,7 @@ export function CorporativoAniversarioTemplateEsmeralda({ invitation, guest, isP
           <span data-xin="1" data-dist="-60" className="cpa-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cpa-final-card">
             <div className="cpa-medallion cpa-medallion--final">
-              <CpaMedallionCmp label="10" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cpaArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <CpaMedallionCmp label="10" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cpaArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="cpa-mini-label cpa-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="cpa-final-names">{namesTitle}</span>
@@ -1818,7 +1819,7 @@ function CpaCoverHalf({
       <div className="cpa-cover-texture" />
       <div className="cpa-cover-content">
         <div className="cpa-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="cpa-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="cpa-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cpa-cover-center">
           <span ref={kickerRef} className="cpa-cover-kicker">{kickerText}</span>

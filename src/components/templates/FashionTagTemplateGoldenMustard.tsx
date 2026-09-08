@@ -30,6 +30,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1052,7 +1053,7 @@ export function FashionTagTemplateGoldenMustard({ invitation, guest, isPersonali
           <span data-xin="1" data-dist="-60" className="ftg-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ETIQUETA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="ftg-final-card">
             <div className="ftg-medallion ftg-medallion--final">
-              <FtgMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="ftgArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <FtgMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="ftgArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="ftg-mini-label ftg-accent-dark">ETIQUETA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="ftg-final-names">{namesTitle}</span>
@@ -1773,7 +1774,7 @@ function FtgCoverHalf({
       <div className="ftg-cover-grain" />
       <div className="ftg-cover-content">
         <div className="ftg-cover-top-row">
-          <span>ETIQUETA Nº {passNumber}</span><span className="ftg-accent-dark">ADMIT ONE</span>
+          <span>ETIQUETA Nº {passNumber}</span><span className="ftg-accent-dark">ALL ACCESS</span>
         </div>
         <div className="ftg-cover-center">
           <span ref={kickerRef} className="ftg-cover-kicker">{kickerText}</span>

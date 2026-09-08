@@ -41,6 +41,7 @@ import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -715,7 +716,7 @@ export function PaseVipTemplate({ invitation, guest, isPersonalized = false }: P
           />
 
           <div data-drift="-70" className="pvp-medallion pvp-medallion--corner">
-            <PvpMedallion label="VIP" sub="ACCESO" arcId="pvpArc1" arcText="ADMIT ONE · MIS QUINCE · " spin="normal" />
+            <PvpMedallion label="VIP" sub="ACCESO" arcId="pvpArc1" arcText="ALL ACCESS · MIS QUINCE · " spin="normal" />
           </div>
         </section>
 
@@ -1057,7 +1058,7 @@ export function PaseVipTemplate({ invitation, guest, isPersonalized = false }: P
           <span data-xin="1" data-dist="-60" className="pvp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="pvp-final-card">
             <div className="pvp-medallion pvp-medallion--final">
-              <PvpMedallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="pvpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <PvpMedallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="pvpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="pvp-mini-label pvp-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="pvp-final-names">{namesTitle}</span>
@@ -1783,7 +1784,7 @@ function PvpCoverHalf({
       <div className="pvp-cover-grid" />
       <div className="pvp-cover-content">
         <div className="pvp-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="pvp-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="pvp-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="pvp-cover-center">
           <span ref={kickerRef} className="pvp-cover-kicker">{kickerText}</span>

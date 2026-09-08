@@ -35,6 +35,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -130,7 +131,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
   const namesTitle = isCasamiento
     ? (novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda"))
     : (nombreQuinceanera || String(invitation.nombreEvento ?? "Mis quince"));
-  const admitLabel = isCasamiento ? "ADMIT TWO" : "ADMIT ONE";
+  const admitLabel = isCasamiento ? "ALL ACCESS" : "ALL ACCESS";
 
   // "Saludar por nombre del invitado/familia" (Administrar > Gestionar
   // invitados): si está activo, la portada saluda con el nombre del
@@ -753,7 +754,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
           />
 
           <div data-drift="-70" className="bcw-medallion bcw-medallion--corner">
-            <Medallion label="VIP" sub="ACCESO" arcId="bcwArc1" arcText={isCasamiento ? "NOS CASAMOS · EDICIÓN ÚNICA · " : "ADMIT ONE · MIS QUINCE · "} spin="normal" />
+            <Medallion label="VIP" sub="ACCESO" arcId="bcwArc1" arcText={isCasamiento ? "NOS CASAMOS · EDICIÓN ÚNICA · " : "ALL ACCESS · MIS QUINCE · "} spin="normal" />
           </div>
         </section>
 
@@ -1105,7 +1106,7 @@ export function BlackAndWhiteTemplateNegativo({ invitation, guest, isPersonalize
           <span data-xin="1" data-dist="-60" className="bcw-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bcw-final-card">
             <div className="bcw-medallion bcw-medallion--final">
-              <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bcwArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bcwArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="bcw-mini-label bcw-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="bcw-final-names">

@@ -50,6 +50,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1115,7 +1116,7 @@ export function EncajeContemporaneoTemplateGrisPiedra({ invitation, guest, isPer
           <span data-xin="1" data-dist="-60" className="enc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="enc-final-card">
             <div className="enc-medallion enc-medallion--final">
-              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="encArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaArc} · `} spin="reverse" />
+              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="encArc3" arcText={textoArco(namesTitle, fechaArc)} spin="reverse" />
             </div>
             <span className="enc-mini-label enc-accent-rust">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="enc-final-names">
@@ -1871,7 +1872,7 @@ function CoverHalf({
       <div data-weave="1" className="enc-cover-weave" />
       <div className="enc-cover-content">
         <div className="enc-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="enc-accent-rust">ADMIT TWO</span>
+          <span>PASE Nº {passNumber}</span><span className="enc-accent-rust">ALL ACCESS</span>
         </div>
         <div className="enc-cover-center">
           <span ref={kickerRef} className="enc-cover-kicker">{kickerText}</span>

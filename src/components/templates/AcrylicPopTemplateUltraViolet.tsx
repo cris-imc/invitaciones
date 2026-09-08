@@ -27,6 +27,7 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -709,7 +710,7 @@ export function AcrylicPopTemplateUltraViolet({ invitation, guest, isPersonalize
           />
 
           <div data-drift="-70" className="acp-medallion acp-medallion--corner">
-            <AcpMedallion sub="ACCESO" arcId="acpArc1" arcText="MIS 15 · ADMIT ONE · " spin="normal" />
+            <AcpMedallion sub="ACCESO" arcId="acpArc1" arcText="MIS 15 · ALL ACCESS · " spin="normal" />
           </div>
         </section>
 
@@ -1058,7 +1059,7 @@ export function AcrylicPopTemplateUltraViolet({ invitation, guest, isPersonalize
           <span data-xin="1" data-dist="-60" className="acp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="acp-final-card">
             <div className="acp-medallion acp-medallion--final">
-              <AcpMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="acpArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <AcpMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="acpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="acp-mini-label acp-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="acp-final-names">{namesTitle}</span>
@@ -1794,7 +1795,7 @@ function AcpCoverHalf({
       <div className="acp-cover-spots" />
       <div className="acp-cover-content">
         <div className="acp-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="acp-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="acp-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="acp-cover-center">
           <span ref={kickerRef} className="acp-cover-kicker">{kickerText}</span>

@@ -27,7 +27,7 @@
  * Terminología propia de esta plantilla: el "pase" de Guest Pass VIP se
  * llama "pieza" acá (Mármol y Oro = una pieza de mármol tallada una sola
  * vez), reflejando el copy real del mockup ("PIEZA Nº 014", "GUARDÁ TU
- * PIEZA", "ADMIT TWO").
+ * PIEZA", "ALL ACCESS").
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -38,6 +38,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -761,7 +762,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           />
 
           <div data-drift="-70" className="myo-medallion myo-medallion--corner">
-            <Medallion label={initials} sub="ACCESO" arcId="myoArc1" arcText="ADMIT TWO · MÁRMOL &amp; ORO · " spin="normal" />
+            <Medallion label={initials} sub="ACCESO" arcId="myoArc1" arcText="ALL ACCESS · MÁRMOL &amp; ORO · " spin="normal" />
           </div>
         </section>
 
@@ -1109,7 +1110,7 @@ export function MarmolYOroTemplateEsmeralda({ invitation, guest, isPersonalized 
           <span data-xin="1" data-dist="-60" className="myo-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="myo-final-card">
             <div className="myo-medallion myo-medallion--final">
-              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="myoArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="myoArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="myo-mini-label myo-accent-serif-2">PIEZA Nº {pieceNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="myo-final-names">
@@ -1861,7 +1862,7 @@ function CoverHalf({
       <div className="myo-cover-marble" />
       <div className="myo-cover-content">
         <div className="myo-cover-top-row">
-          <span>PIEZA Nº {pieceNumber}</span><span className="myo-accent-serif-2">ADMIT TWO</span>
+          <span>PIEZA Nº {pieceNumber}</span><span className="myo-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="myo-cover-center">
           <span ref={kickerRef} className="myo-cover-kicker">{kickerText}</span>

@@ -27,6 +27,7 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1044,7 +1045,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
           <span data-xin="1" data-dist="-60" className="cne-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU CORONA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cne-final-card">
             <div className="cne-medallion cne-medallion--final">
-              <CoronaMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cneArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <CoronaMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cneArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="cne-mini-label cne-accent-serif-2">CORONA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="cne-final-names">{namesTitle}</span>
@@ -1766,7 +1767,7 @@ function CneCoverHalf({
       <div className="cne-cover-lattice" />
       <div className="cne-cover-content">
         <div className="cne-cover-top-row">
-          <span>CORONA Nº {passNumber}</span><span className="cne-accent-serif-2">ADMIT ONE</span>
+          <span>CORONA Nº {passNumber}</span><span className="cne-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cne-cover-center">
           <span ref={kickerRef} className="cne-cover-kicker">{kickerText}</span>

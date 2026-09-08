@@ -28,6 +28,7 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -704,7 +705,7 @@ export function Crystal3dTemplate({ invitation, guest, isPersonalized = false }:
           />
 
           <div data-drift="-70" className="c3d-medallion c3d-medallion--corner">
-            <C3dFacetGem arcId="c3dArc0" arcText="MIS 15 · ADMIT ONE · " />
+            <C3dFacetGem arcId="c3dArc0" arcText="MIS 15 · ALL ACCESS · " />
           </div>
         </section>
 
@@ -1063,7 +1064,7 @@ export function Crystal3dTemplate({ invitation, guest, isPersonalized = false }:
                 sub={confirmed ? "CONFIRMADO" : "PENDIENTE"}
                 subAccent="cyan"
                 arcId="c3dArc3"
-                arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `}
+                arcText={textoArco(namesTitle, fechaCorta)}
               />
             </div>
             <span className="c3d-mini-label c3d-accent-cyan">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
@@ -1817,7 +1818,7 @@ function C3dCoverHalf({
       <div className="c3d-cover-facets" />
       <div className="c3d-cover-content">
         <div className="c3d-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="c3d-accent-cyan">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="c3d-accent-cyan">ALL ACCESS</span>
         </div>
         <div className="c3d-cover-center">
           <span ref={kickerRef} className="c3d-cover-kicker">{kickerText}</span>

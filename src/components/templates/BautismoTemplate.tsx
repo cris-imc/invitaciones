@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1063,7 +1064,7 @@ export function BautismoTemplate({ invitation, guest, isPersonalized = false }: 
           <span data-xin="1" data-dist="-60" className="bts-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bts-final-card">
             <div className="bts-medallion bts-medallion--final">
-              <BtsMedallionCmp label="LL" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="btsArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <BtsMedallionCmp label="LL" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="btsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="bts-mini-label bts-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="bts-final-names">{namesTitle}</span>
@@ -1818,7 +1819,7 @@ function BtsCoverHalf({
       <div className="bts-cover-texture" />
       <div className="bts-cover-content">
         <div className="bts-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="bts-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="bts-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="bts-cover-center">
           <span ref={kickerRef} className="bts-cover-kicker">{kickerText}</span>

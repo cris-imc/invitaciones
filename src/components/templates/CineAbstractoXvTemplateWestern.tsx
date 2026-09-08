@@ -31,6 +31,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1054,7 +1055,7 @@ export function CineAbstractoXvTemplateWestern({ invitation, guest, isPersonaliz
           <span data-xin="1" data-dist="-60" className="cxv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cxv-final-card">
             <div className="cxv-medallion cxv-medallion--final">
-              <CxvMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cxvArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <CxvMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cxvArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="cxv-mini-label cxv-accent-serif-2">ENTRADA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="cxv-final-names">{namesTitle}</span>
@@ -1797,7 +1798,7 @@ function CxvCoverHalf({
       </div>
       <div className="cxv-cover-content">
         <div className="cxv-cover-top-row">
-          <span>ENTRADA Nº {passNumber}</span><span className="cxv-accent-serif-2">ADMIT ONE</span>
+          <span>ENTRADA Nº {passNumber}</span><span className="cxv-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cxv-cover-center">
           <span ref={kickerRef} className="cxv-cover-kicker">{kickerText}</span>

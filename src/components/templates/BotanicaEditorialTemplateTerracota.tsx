@@ -26,6 +26,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1101,7 +1102,7 @@ export function BotanicaEditorialTemplateTerracota({ invitation, guest, isPerson
           <span data-xin="1" data-dist="-60" className="bte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bte-final-card">
             <div className="bte-medallion bte-medallion--final">
-              <BteMedallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bteArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <BteMedallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bteArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="bte-mini-label bte-accent-dark-2">LÁMINA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="bte-final-names">
@@ -1838,7 +1839,7 @@ function BteCoverHalf({
       <div className="bte-cover-linen" />
       <div className="bte-cover-content">
         <div className="bte-cover-top-row">
-          <span>LÁMINA Nº {passNumber}</span><span className="bte-accent-dark-2">ADMIT TWO</span>
+          <span>LÁMINA Nº {passNumber}</span><span className="bte-accent-dark-2">ALL ACCESS</span>
         </div>
         <div className="bte-cover-center">
           <span ref={kickerRef} className="bte-cover-kicker">{kickerText}</span>

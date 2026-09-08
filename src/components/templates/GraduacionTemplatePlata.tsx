@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1063,7 +1064,7 @@ export function GraduacionTemplatePlata({ invitation, guest, isPersonalized = fa
           <span data-xin="1" data-dist="-60" className="grd-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="grd-final-card">
             <div className="grd-medallion grd-medallion--final">
-              <GrdMedallionCmp label="GR" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="grdArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <GrdMedallionCmp label="GR" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="grdArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="grd-mini-label grd-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="grd-final-names">{namesTitle}</span>
@@ -1818,7 +1819,7 @@ function GrdCoverHalf({
       <div className="grd-cover-texture" />
       <div className="grd-cover-content">
         <div className="grd-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="grd-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="grd-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="grd-cover-center">
           <span ref={kickerRef} className="grd-cover-kicker">{kickerText}</span>

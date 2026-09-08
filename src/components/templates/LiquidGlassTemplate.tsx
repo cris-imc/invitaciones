@@ -49,6 +49,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1108,7 +1109,7 @@ export function LiquidGlassTemplate({ invitation, guest, isPersonalized = false 
           <span data-xin="1" data-dist="-60" className="lqg-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PANEL</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="lqg-final-card">
             <div className="lqg-medallion lqg-medallion--final">
-              <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="lqgArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" size={30} />
+              <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="lqgArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" size={30} />
             </div>
             <span className="lqg-mini-label lqg-accent-navy-solid">PANEL Nº {panelNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="lqg-final-names">
@@ -1863,7 +1864,7 @@ function CoverHalf({
       <div className="lqg-cover-glasspane" />
       <div className="lqg-cover-content">
         <div className="lqg-cover-top-row">
-          <span>PANEL Nº {panelNumber}</span><span className="lqg-accent-navy-solid" style={{ color: "#6FA8C9" }}>ADMIT TWO</span>
+          <span>PANEL Nº {panelNumber}</span><span className="lqg-accent-navy-solid" style={{ color: "#6FA8C9" }}>ALL ACCESS</span>
         </div>
         <div className="lqg-cover-center">
           <span ref={kickerRef} className="lqg-cover-kicker">{kickerText}</span>

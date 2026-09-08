@@ -5,7 +5,7 @@
  *
  * Portado 1:1 desde el diseño "Bola de Discoteca" (Colección Storytelling,
  * mis quince años: club nocturno, negro casi puro + neones cian/magenta/
- * amarillo, Archivo Black + IBM Plex Mono, pase de acceso "ADMIT ONE" en vez
+ * amarillo, Archivo Black + IBM Plex Mono, pase de acceso "ALL ACCESS" en vez
  * de tiara, luces de bola de espejos barriendo la portada, scroll horizontal
  * "pineado" para Cuándo y dónde / Álbum, riel lateral de progreso y portada
  * que se abre en dos mitades). Misma arquitectura que PrincesaTemplate.tsx /
@@ -28,6 +28,7 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -711,7 +712,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
           />
 
           <div data-drift="-70" className="bdd-medallion bdd-medallion--corner">
-            <BddMedallion mainText="15" subLabel="ACCESO" arcId="bddArc1" arcText="MIS 15 · ADMIT ONE · " spin="normal" />
+            <BddMedallion mainText="15" subLabel="ACCESO" arcId="bddArc1" arcText="MIS 15 · ALL ACCESS · " spin="normal" />
           </div>
         </section>
 
@@ -1057,7 +1058,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
           <span data-xin="1" data-dist="-60" className="bdd-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bdd-final-card">
             <div className="bdd-medallion bdd-medallion--final">
-              <BddMedallion mainText="15" subLabel={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bddArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <BddMedallion mainText="15" subLabel={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bddArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="bdd-mini-label bdd-accent-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="bdd-final-names">{namesTitle}</span>
@@ -1186,7 +1187,7 @@ function BddDots({ count = 3 }: { count?: number }) {
 
 // Medallón de pase de acceso: anillo cian/magenta girando + disco central
 // oscuro con el "15" (o el texto de sector) en Archivo Black + arco de texto
-// en SVG rotando alrededor -- reproduce 1:1 el pase "ADMIT ONE" del mockup
+// en SVG rotando alrededor -- reproduce 1:1 el pase "ALL ACCESS" del mockup
 // (a diferencia de la tiara de PrincesaTemplate, acá el centro es tipografía,
 // no un ícono).
 function BddMedallion({
@@ -1785,7 +1786,7 @@ function BddCoverHalf({
       <div className="bdd-discolight" />
       <div className="bdd-cover-content">
         <div className="bdd-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="bdd-accent-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="bdd-accent-2">ALL ACCESS</span>
         </div>
         <div className="bdd-cover-center">
           <span ref={kickerRef} className="bdd-cover-kicker">{kickerText}</span>

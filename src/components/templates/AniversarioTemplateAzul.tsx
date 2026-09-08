@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1066,7 +1067,7 @@ export function AniversarioTemplateAzul({ invitation, guest, isPersonalized = fa
           <span data-xin="1" data-dist="-60" className="anv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="anv-final-card">
             <div className="anv-medallion anv-medallion--final">
-              <AniversarioTemplateAzulMedallionCmp label="20" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="anvArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <AniversarioTemplateAzulMedallionCmp label="20" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="anvArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="anv-mini-label anv-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="anv-final-names">{namesTitle}</span>
@@ -1821,7 +1822,7 @@ function AniversarioTemplateAzulCoverHalf({
       <div className="anv-cover-texture" />
       <div className="anv-cover-content">
         <div className="anv-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="anv-accent-serif-2">ADMIT TWO</span>
+          <span>PASE Nº {passNumber}</span><span className="anv-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="anv-cover-center">
           <span ref={kickerRef} className="anv-cover-kicker">{kickerText}</span>

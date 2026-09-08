@@ -34,6 +34,7 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1092,7 +1093,7 @@ export function CeramicaEditorialTemplate({ invitation, guest, isPersonalized = 
           <span data-xin="1" data-dist="-60" className="cme-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cme-final-card">
             <div className="cme-medallion cme-medallion--final">
-              <CmeMedallion label={monograma} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cmeArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <CmeMedallion label={monograma} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cmeArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="cme-mini-label cme-accent-serif-2">PIEZA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="cme-final-names">
@@ -1849,7 +1850,7 @@ function CmeCoverHalf({
       <div className="cme-cover-glaze" />
       <div className="cme-cover-content">
         <div className="cme-cover-top-row">
-          <span>PIEZA Nº {passNumber}</span><span className="cme-accent-serif-2">ADMIT TWO</span>
+          <span>PIEZA Nº {passNumber}</span><span className="cme-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cme-cover-center">
           <span ref={kickerRef} className="cme-cover-kicker">{kickerText}</span>

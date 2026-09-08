@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1063,7 +1064,7 @@ export function CumpleanosCocktailTemplate({ invitation, guest, isPersonalized =
           <span data-xin="1" data-dist="-60" className="cpc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cpc-final-card">
             <div className="cpc-medallion cpc-medallion--final">
-              <CPCMedallionCmp label="40" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bbsArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <CPCMedallionCmp label="40" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bbsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="cpc-mini-label cpc-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="cpc-final-names">{namesTitle}</span>
@@ -1818,7 +1819,7 @@ function CPCCoverHalf({
       <div className="cpc-cover-texture" />
       <div className="cpc-cover-content">
         <div className="cpc-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="cpc-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="cpc-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cpc-cover-center">
           <span ref={kickerRef} className="cpc-cover-kicker">{kickerText}</span>

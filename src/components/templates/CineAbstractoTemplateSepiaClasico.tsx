@@ -32,6 +32,7 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -767,7 +768,7 @@ export function CineAbstractoTemplateSepiaClasico({ invitation, guest, isPersona
           />
 
           <div data-drift="-70" className="cab-medallion cab-medallion--corner">
-            <CabMedallion label="35mm" sub="ACCESO" arcId="cabArc1" arcText="ADMIT TWO · CINE ABSTRACTO · " spin="normal" />
+            <CabMedallion label="35mm" sub="ACCESO" arcId="cabArc1" arcText="ALL ACCESS · CINE ABSTRACTO · " spin="normal" />
           </div>
         </section>
 
@@ -1114,7 +1115,7 @@ export function CineAbstractoTemplateSepiaClasico({ invitation, guest, isPersona
           <span data-xin="1" data-dist="-60" className="cab-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cab-final-card">
             <div className="cab-medallion cab-medallion--final">
-              <CabMedallion label="35mm" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cabArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <CabMedallion label="35mm" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cabArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="cab-mini-label cab-accent-serif-2">ENTRADA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="cab-final-names">
@@ -1881,7 +1882,7 @@ function CabCoverHalf({
       <div className="cab-cover-sprockets cab-cover-sprockets--bottom" />
       <div className="cab-cover-content">
         <div className="cab-cover-top-row">
-          <span>ENTRADA Nº {passNumber}</span><span className="cab-accent-serif-2">ADMIT TWO</span>
+          <span>ENTRADA Nº {passNumber}</span><span className="cab-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cab-cover-center">
           <span ref={kickerRef} className="cab-cover-kicker">{kickerText}</span>

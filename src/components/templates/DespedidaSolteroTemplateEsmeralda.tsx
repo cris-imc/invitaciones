@@ -41,6 +41,7 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { textoArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -1063,7 +1064,7 @@ export function DespedidaSolteroTemplateEsmeralda({ invitation, guest, isPersona
           <span data-xin="1" data-dist="-60" className="dpo-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="dpo-final-card">
             <div className="dpo-medallion dpo-medallion--final">
-              <DpoMedallionCmp label="DS" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="dpoArc3" arcText={`${namesTitle.toUpperCase()} · ${fechaCorta} · `} spin="reverse" />
+              <DpoMedallionCmp label="DS" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="dpoArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="dpo-mini-label dpo-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
             <span className="dpo-final-names">{namesTitle}</span>
@@ -1818,7 +1819,7 @@ function DpoCoverHalf({
       <div className="dpo-cover-texture" />
       <div className="dpo-cover-content">
         <div className="dpo-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="dpo-accent-serif-2">ADMIT ONE</span>
+          <span>PASE Nº {passNumber}</span><span className="dpo-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="dpo-cover-center">
           <span ref={kickerRef} className="dpo-cover-kicker">{kickerText}</span>
