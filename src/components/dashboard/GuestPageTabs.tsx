@@ -283,8 +283,13 @@ export function GuestPageTabs({
           {tab === "precio" && pagoTarjetaHabilitado && (
             <div className="bg-card border rounded-lg p-4 md:p-6 max-w-lg">
               <h2 className="text-xl font-semibold mb-4">Actualizar Precio de Tarjeta</h2>
+              {/* No prometer el cartel de "¡Valor Actualizado!": la fecha del
+                  cambio se guarda (Invitation.regaloMontoUpdatedAt) y viaja hasta
+                  la invitación, pero ninguna plantilla la muestra todavía. */}
               <p className="text-muted-foreground text-sm mb-6">
-                Modifica rápidamente el valor por persona. Al cambiarlo aquí, aparecerá un indicador animado de &quot;¡Valor Actualizado!&quot; en la invitación de forma automática por 72 horas.
+                Modificá el valor por persona. El cambio se ve en la invitación apenas
+                la abren, y alcanza sólo a los lugares que todavía no marcaste como
+                pagos: lo ya cobrado queda al precio de ese momento.
               </p>
               <QuickEditPrice
                 invitationId={invitationId}
