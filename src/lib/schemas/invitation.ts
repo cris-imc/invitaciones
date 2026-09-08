@@ -74,6 +74,8 @@ export const designSchema = z.object({
     fontBody: z.string().optional().default("space-grotesk"),
     countdownStyle: z.string().optional().default("clasico"),
     albumStyle: z.string().optional().default("carrusel"),
+    // Solo lo usan las plantillas de la Colección Storytelling.
+    storytellingScrollVertical: z.boolean().optional().default(false),
     imagenCelebremosJuntos: z.string().optional(),
 });
 

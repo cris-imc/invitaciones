@@ -295,6 +295,7 @@ export async function POST(request: NextRequest) {
                 fontBody: body.fontBody || 'space-grotesk',
                 countdownStyle: body.countdownStyle || 'clasico',
                 albumStyle: body.albumStyle || 'carrusel',
+                storytellingScrollVertical: Boolean(body.storytellingScrollVertical),
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',
@@ -554,6 +555,7 @@ export async function PUT(request: NextRequest) {
                 fontBody: body.fontBody || 'space-grotesk',
                 countdownStyle: body.countdownStyle || 'clasico',
                 albumStyle: body.albumStyle || 'carrusel',
+                storytellingScrollVertical: Boolean(body.storytellingScrollVertical),
                 temaColores: JSON.stringify({
                     colorPrincipal: body.colorPrincipal || '#000000',
                     tema: body.tema || 'moderno',

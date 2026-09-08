@@ -443,6 +443,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 tipografiaDisplay: true,
                 countdownStyle: true,
                 albumStyle: true,
+                storytellingScrollVertical: true,
                 portadaImagenDesktopEscala: true,
                 infoAdicionalSeccionHabilitada: true,
                 infoAlojamientoHabilitado: true,

@@ -164,6 +164,10 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
   const lugarNombre = String(invitation.lugarNombre ?? "");
   const direccion = String(invitation.direccion ?? "");
   const mapUrl = String(invitation.mapUrl ?? "");
+  // Recorrido de los paneles: de costado (la sección se fija y pasan en
+  // horizontal mientras se baja) o apilados, que se recorren bajando como
+  // el resto de la invitación. Lo elige el anfitrión en el wizard.
+  const scrollVertical = Boolean(invitation.storytellingScrollVertical);
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
@@ -560,6 +564,8 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
 
         // scroll horizontal pineado
         pans.forEach((pan, pi) => {
+          // Apilados: el recorrido lo hace el scroll de la página, no el JS.
+          if (pan.dataset.scroll === "vertical") return;
           const strip = pan.querySelector<HTMLElement>("[data-strip]");
           if (!strip) return;
           const n = strip.children.length;
@@ -815,7 +821,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
         </section>
         )}
 
-        <div data-pan="1" data-screen-label="El lugar" className="bcw-pan" style={ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="bcw-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="bcw-pan-sticky">
             <div data-strip="1" className="bcw-strip">
               {ceremoniaHabilitada && (
@@ -840,7 +846,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                       ABRIR EN MAPAS →
                     </a>
                   )}
-                  <div className="bcw-seguir">SEGUÍ BAJANDO <span className="bcw-side-hint">→</span></div>
+                  <div className="bcw-seguir">SEGUÍ BAJANDO <span className="bcw-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
@@ -873,7 +879,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                     ))}
                   </div>
                 )}
-                <div className="bcw-seguir">SEGUÍ BAJANDO <span className="bcw-side-hint">→</span></div>
+                <div className="bcw-seguir">SEGUÍ BAJANDO <span className="bcw-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -902,7 +908,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                 <span className="bcw-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
               </div>
             </div>
-            <Dots count={LUGAR_PANEL_COUNT} />
+            {!scrollVertical && <Dots count={LUGAR_PANEL_COUNT} />}
           </div>
         </div>
 
@@ -947,7 +953,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
           )}
         </section>
 
-        <div id="album" data-pan="1" data-screen-label="Álbum" className="bcw-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bcw-pan">
           <div className="bcw-pan-sticky">
             <div data-strip="1" className="bcw-strip">
               {photoPages.map((page, pageIndex) => (
@@ -1000,7 +1006,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                 </div>
               </div>
             </div>
-            <Dots count={photoPages.length + 1} />
+            {!scrollVertical && <Dots count={photoPages.length + 1} />}
           </div>
         </div>
 
@@ -1954,6 +1960,13 @@ const GP_CSS = `
   .bcw-strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform; }
   .bcw-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; gap: 22px; }
   .bcw-panel--between { justify-content: space-between; }
+  /* Recorrido apilado: la seccion deja de fijarse y el riel deja de ser un
+     riel -- los mismos paneles, con el mismo diseno, pasan a ir uno abajo
+     del otro y se recorren bajando. */
+  .bcw-pan[data-scroll="vertical"] { height: auto; }
+  .bcw-pan[data-scroll="vertical"] .bcw-pan-sticky { position: static; height: auto; overflow: visible; }
+  .bcw-pan[data-scroll="vertical"] .bcw-strip { position: static; display: block; width: 100%; transform: none !important; }
+  .bcw-pan[data-scroll="vertical"] .bcw-panel { height: calc(var(--vh, 1vh) * 100); }
   .bcw-panel--end { justify-content: flex-end; }
   .bcw-panel--center { align-items: center; justify-content: center; text-align: center; }
   .bcw-panel--gap { gap: clamp(14px, 2.4vh, 22px); padding: clamp(52px, 9vh, 84px) max(24px, calc((100vw - 600px) / 2)) clamp(62px, 11vh, 100px); }

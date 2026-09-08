@@ -118,6 +118,7 @@ function WizardContent({ invitation }: { invitation: any }) {
                 fontBody: invitation.fontBody || "space-grotesk",
                 countdownStyle: invitation.countdownStyle || "clasico",
                 albumStyle: invitation.albumStyle || "carrusel",
+                storytellingScrollVertical: Boolean(invitation.storytellingScrollVertical),
 
                 // Info Adicional
                 infoAdicionalSeccionHabilitada: Boolean(invitation.infoAdicionalSeccionHabilitada),

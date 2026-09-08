@@ -277,6 +277,12 @@ model Invitation {
   fontBody                     String?          @default("space-grotesk")
   countdownStyle               String?          @default("clasico")
   albumStyle                   String?          @default("carrusel")
+  // Cómo se recorren los paneles de "Cuándo y dónde" en las plantillas de la
+  // Colección Storytelling: en false (por defecto) la sección se fija en
+  // pantalla y los paneles pasan de costado mientras se baja; en true se
+  // apilan y se recorren bajando, como el resto de la invitación. No aplica a
+  // las plantillas flat, que no tienen esos paneles.
+  storytellingScrollVertical   Boolean          @default(false)
   createdAt                    DateTime         @default(now())
   updatedAt                    DateTime         @updatedAt
   ciudad                       String?
