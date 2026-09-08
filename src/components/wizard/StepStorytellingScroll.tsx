@@ -1,6 +1,7 @@
 "use client";
 
 import { useWizardStore } from "@/store/wizard-store";
+import { SaveStepButtons } from "./SaveStepButtons";
 
 /**
  * Cómo se recorren los paneles de "Cuándo y dónde" en la Colección
@@ -14,8 +15,8 @@ const OPCIONES = [
     {
         id: "lateral" as const,
         vertical: false,
-        titulo: "De costado",
-        detalle: "La sección se queda quieta y los paneles pasan de lado mientras se baja.",
+        titulo: "En zigzag",
+        detalle: "Se baja, los paneles del lugar pasan de costado, y se sigue bajando.",
     },
     {
         id: "vertical" as const,
@@ -69,27 +70,44 @@ export function StepStorytellingScroll() {
                                 transition: "all 0.15s",
                             }}
                         >
-                            {/* Un dibujito vale más que explicarlo: tres bloquecitos
-                                acomodados como van a quedar los paneles. */}
+                            {/* El dibujito es el recorrido en sí. El de costado no es
+                                lateral de punta a punta: se baja, los paneles del lugar
+                                pasan de lado, y se sigue bajando -- eso dibuja una Z
+                                parada. El otro es una sola bajada. */}
                             <div
                                 aria-hidden
                                 style={{
                                     display: "flex",
-                                    flexDirection: op.vertical ? "column" : "row",
-                                    gap: "4px",
+                                    flexDirection: "column",
+                                    alignItems: "flex-start",
+                                    gap: "3px",
                                     marginBottom: "10px",
+                                    width: "32px",
                                 }}
                             >
-                                {[0, 1, 2].map((i) => (
+                                {(op.vertical
+                                    ? [
+                                          { w: "26px", h: "7px", der: false },
+                                          { w: "26px", h: "7px", der: false },
+                                          { w: "26px", h: "7px", der: false },
+                                      ]
+                                    : [
+                                          // baja · cruza · baja
+                                          { w: "8px", h: "10px", der: false },
+                                          { w: "32px", h: "7px", der: false },
+                                          { w: "8px", h: "10px", der: true },
+                                      ]
+                                ).map((b, i) => (
                                     <span
                                         key={i}
                                         style={{
                                             display: "block",
-                                            width: op.vertical ? "26px" : "14px",
-                                            height: op.vertical ? "7px" : "22px",
-                                            borderRadius: "3px",
+                                            width: b.w,
+                                            height: b.h,
+                                            borderRadius: "2px",
                                             background: activa ? "var(--accent)" : "rgba(246,243,236,.22)",
-                                            opacity: i === 0 ? 1 : 0.55 - i * 0.12,
+                                            opacity: activa ? 1 : 0.9,
+                                            alignSelf: b.der ? "flex-end" : "flex-start",
                                         }}
                                     />
                                 ))}
@@ -111,6 +129,8 @@ export function StepStorytellingScroll() {
                     );
                 })}
             </div>
+
+            <SaveStepButtons isLastStep={false} />
         </div>
     );
 }
