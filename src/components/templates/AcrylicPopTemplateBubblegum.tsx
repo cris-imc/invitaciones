@@ -27,12 +27,13 @@ import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
-import { textoArco } from "@/lib/arc-text";
+import { textoArco, anilloArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
+import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 
 const acpPoppins = Poppins({
   subsets: ["latin"],
@@ -1086,7 +1087,7 @@ export function AcrylicPopTemplateBubblegum({ invitation, guest, isPersonalized 
         <span ref={railLabelRef} className="acp-rail-label">SAVE THE DATE</span>
       </div>
 
-      <div ref={coverRef} className="acp-cover">
+      <div ref={coverRef} className="acp-cover" style={{ "--esc": escalaTitulo(largoTitulo(showGuestNameInCover ? coverGuestName : namesTitle)) } as React.CSSProperties}>
         <div ref={topRef} className="acp-cover-half acp-cover-half--top">
           <AcpCoverHalf
             namesRef={namesRef}
@@ -1219,7 +1220,7 @@ function AcpMedallion({
             <path id={arcId} d="M50 50 m -38 0 a 38 38 0 1 1 76 0 a 38 38 0 1 1 -76 0" fill="none" />
           </defs>
           <text className="acp-medallion-arc-text">
-            <textPath href={`#${arcId}`}>{arcText}{arcText}</textPath>
+            <textPath href={`#${arcId}`} style={{ letterSpacing: `${anilloArco(arcText).espaciado}px` }}>{anilloArco(arcText).texto}</textPath>
           </text>
         </svg>
       )}
@@ -2053,7 +2054,7 @@ const ACP_CSS = `
   .acp-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
   .acp-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
   .acp-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
-  .acp-cover-names { margin: 0; font-family: var(--acp-poppins), sans-serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #FFFFFF; }
+  .acp-cover-names { margin: 0; font-family: var(--acp-poppins), sans-serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), calc(12.5vh * var(--esc, 1))); line-height: 0.86; letter-spacing: -0.02em; color: #FFFFFF; }
   .acp-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#FF4FC3, transparent); display: block; }
   .acp-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
   .acp-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }

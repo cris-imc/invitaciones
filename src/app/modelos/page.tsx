@@ -5,6 +5,7 @@ import { ModelosLazyLoader } from "@/components/modelos/ModelosLazyLoader";
 import { ModelosTabs } from "@/components/modelos/ModelosTabs";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { labelDeFamilia } from "@/lib/template-labels";
 
 // Landing 100% dinámica: en vez de una lista fija que hay que tocar por
 // código cada vez, muestra las invitaciones reales de UNA cuenta de prueba
@@ -24,18 +25,12 @@ import { prisma } from "@/lib/db";
 //   - cualquier otro slug en esa cuenta se ignora (no ensucia la landing si
 //     la cuenta de prueba también se usa para probar otras cosas)
 
-const FAMILIA_DISPLAY: Record<string, string> = {
-  BONVOYAGE: "Bon Voyage", CHIC: "Chic", CINE: "Cine", CIRCUITO: "Circuito",
-  CORPORATE: "Corporate", CRISTAL3D: "Cristal 3D", EDITORIAL: "Editorial",
-  ELEGANT: "Elegant", GARDENPARTY: "Garden Party", GOLDENDUSK: "Golden Dusk",
-  HOLOGRAMA: "Holograma", INFANTIL: "Infantil", JARDINSEDA: "Jardín Seda",
-  LOFTINDUSTRIAL: "Loft Industrial", LUZLUNA: "Luz de Luna", MODERNO: "Moderno",
-  NEON: "Neon", NORDICO: "Nórdico", ONIX: "Onix", PETALOS: "Pétalos",
-  RIVIERA: "Riviera", SEDA: "Seda",
-};
-
 function labelFor(inv: { templateTipo: string; temaColores: string; portadaImagenFondoDesktop: string | null }) {
-  const familia = FAMILIA_DISPLAY[inv.templateTipo] ?? inv.templateTipo;
+  // Antes había acá una lista propia que sólo tenía las 22 familias de la
+  // Colección Flat: las 36 de Storytelling caían al fallback y la landing
+  // mostraba la constante cruda ("GUESTPASSVIP"). Ahora sale de la misma
+  // fuente que usa el selector del wizard.
+  const familia = labelDeFamilia(inv.templateTipo);
   let colorPrincipal = "";
   try {
     colorPrincipal = JSON.parse(inv.temaColores ?? "{}")?.colorPrincipal ?? "";

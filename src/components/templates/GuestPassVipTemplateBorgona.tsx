@@ -33,12 +33,13 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
-import { textoArco } from "@/lib/arc-text";
+import { textoArco, anilloArco } from "@/lib/arc-text";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BankDetailsCard } from "@/components/invitation/v2/BankDetailsCard";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
+import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 
 const gpBodoni = Bodoni_Moda({
   subsets: ["latin"],
@@ -1110,7 +1111,7 @@ export function GuestPassVipTemplateBorgona({ invitation, guest, isPersonalized 
         <span ref={railLabelRef} className="gpv-rail-label">SAVE THE DATE</span>
       </div>
 
-      <div ref={coverRef} className="gpv-cover">
+      <div ref={coverRef} className="gpv-cover" style={{ "--esc": escalaTitulo(largoTitulo(showGuestNameInCover ? coverGuestName : namesTitle)) } as React.CSSProperties}>
         <div ref={topRef} className="gpv-cover-half gpv-cover-half--top">
           <CoverHalf
             namesRef={namesRef}
@@ -1245,7 +1246,7 @@ function Medallion({
             <path id={arcId} d="M50 50 m -38 0 a 38 38 0 1 1 76 0 a 38 38 0 1 1 -76 0" fill="none" />
           </defs>
           <text className="gpv-medallion-arc-text">
-            <textPath href={`#${arcId}`}>{arcText}{arcText}</textPath>
+            <textPath href={`#${arcId}`} style={{ letterSpacing: `${anilloArco(arcText).espaciado}px` }}>{anilloArco(arcText).texto}</textPath>
           </text>
         </svg>
       )}
@@ -2103,7 +2104,7 @@ const GP_CSS = `
   .gpv-cover-top-row { display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: 0.24em; color: #8A8577; }
   .gpv-cover-center { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 22px); text-align: center; }
   .gpv-cover-kicker { font-size: 9.5px; letter-spacing: 0.34em; color: #8A8577; }
-  .gpv-cover-names { margin: 0; font-family: var(--gp-bodoni), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), 12.5vh); line-height: 0.86; letter-spacing: -0.02em; color: #E9BFC7; }
+  .gpv-cover-names { margin: 0; font-family: var(--gp-bodoni), serif; font-weight: 400; font-size: min(clamp(48px, 16vw, 96px), calc(12.5vh * var(--esc, 1))); line-height: 0.86; letter-spacing: -0.02em; color: #E9BFC7; }
   .gpv-cover-rule { width: 1px; height: clamp(16px, 4vh, 44px); background: linear-gradient(#BE6774, transparent); display: block; }
   .gpv-cover-date { font-size: 11.5px; letter-spacing: 0.3em; color: #A8A292; white-space: nowrap; }
   .gpv-cover-bottom { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 22px); }
