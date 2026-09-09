@@ -22,8 +22,31 @@ import { useEffect } from "react";
  */
 export function ViewportHeightFix() {
   useEffect(() => {
+    // Adentro de un iframe hay que usar innerHeight y NO visualViewport: en
+    // iOS, visualViewport dentro de un iframe reporta el viewport de la página
+    // de arriba, no el del iframe. Como este componente vive en el layout
+    // raíz, corre también en /preview-plantilla -- que es lo que embeben el
+    // showcase de la landing, las miniaturas de /modelos y la vista previa del
+    // wizard --, así que ahí --vh terminaba con la altura del teléfono en vez
+    // de la del iframe. Cada sección de Storytelling mide
+    // `calc(var(--vh) * 100)`, así que la previsualización quedaba rota en
+    // iPhone y bien en Chrome de escritorio (donde visualViewport sí devuelve
+    // la altura del iframe).
+    //
+    // innerHeight dentro de un iframe devuelve la altura del iframe en todos
+    // los navegadores, y ahí no hay barra de direcciones ni teclado que
+    // compensar: el fix de visualViewport sólo hace falta en la página de
+    // arriba.
+    let enIframe = false;
+    try {
+      enIframe = window.self !== window.top;
+    } catch {
+      // Un iframe de otro origen tira al comparar; si pasa, es un iframe.
+      enIframe = true;
+    }
+
     const getHeight = () =>
-      typeof window !== "undefined" && window.visualViewport
+      typeof window !== "undefined" && window.visualViewport && !enIframe
         ? window.visualViewport.height
         : window.innerHeight;
 

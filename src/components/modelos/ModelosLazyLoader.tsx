@@ -2,31 +2,30 @@
 
 import { useEffect } from "react";
 
-// Concurrencia maxima de iframes cargando al mismo tiempo. Con 10
-// miniaturas (2 destacadas + 8) el navegador ya podria bancarse todas de
-// una, pero cada una es una pagina de Next.js entera (con su propio fetch
-// de datos, fuentes, imagenes) -- limitar igual evita que compitan entre si
-// y se sientan mas lentas de lo que son.
-const CONCURRENCY = 4;
-// Cuanto antes de que la miniatura entre en pantalla la empezamos a cargar.
-// A propósito chico (no varias pantallas de anticipación): cada miniatura
-// tiene su propio efecto de apertura de portada que arranca apenas carga --
-// si se precarga demasiado antes, el efecto ya terminó de jugarse fuera de
-// vista y el usuario nunca lo ve al llegar scrolleando hasta ahí.
-const PRELOAD_MARGIN_PX = 150;
-// A que distancia de la pantalla se suelta una miniatura que ya cargo.
-//
-// Antes no se soltaba ninguna: una vez cargada seguia viva (con su animacion
-// de portada corriendo) para el resto de la visita, asi que cuantas mas
-// miniaturas se listaran, mas pesaba la pagina -- y de ahi el techo practico
-// de 8 por pestaña. Soltando las que quedaron lejos, lo que cuesta deja de
-// depender de cuantas haya listadas y pasa a depender solo de cuantas se
-// esten viendo.
-//
-// Es holgado a proposito (bastante mas que el margen de precarga): asi una
-// miniatura apenas fuera de vista no se suelta y se recarga en loop mientras
-// el visitante hace pequeños ajustes de scroll.
-const RELEASE_MARGIN_PX = 1200;
+/**
+ * Cuántas miniaturas pueden estar cargadas al mismo tiempo.
+ *
+ * Cada una es una página de Next entera (con su propio fetch, sus fuentes y
+ * sus imágenes), así que lo caro es tenerlas vivas, no listarlas.
+ *
+ * El tope se cuenta mirando el DOM en cada pasada y no llevando un contador:
+ * la versión anterior tenía uno que se decrementaba dos veces por miniatura
+ * -- una en el evento `load` y otra en el setTimeout de seguridad, que
+ * dispara igual aunque el load ya haya corrido --, así que se iba a negativo
+ * y `active < CONCURRENCY` dejaba de limitar nada. Terminaban cargándose
+ * todas juntas y el navegador mataba la pestaña.
+ */
+const VIVAS_MAX = 4;
+
+/** Cuánto antes de entrar en pantalla se empieza a cargar una miniatura.
+ *  A propósito chico: cada portada tiene su efecto de apertura y, si se
+ *  precarga con mucha anticipación, el efecto ya se jugó fuera de vista. */
+const MARGEN_CARGA_PX = 150;
+
+/** A qué distancia se suelta una que ya cargó. Muy holgado respecto del margen
+ *  de carga, para que una miniatura parada justo en el borde no entre en un
+ *  ciclo de cargarse y soltarse con cada ajuste chico de scroll. */
+const MARGEN_SOLTAR_PX = 1200;
 
 // Un solo componente para todas las miniaturas (no un hook por tarjeta). Usa
 // scroll/resize + getBoundingClientRect en vez de IntersectionObserver a
@@ -35,85 +34,86 @@ const RELEASE_MARGIN_PX = 1200;
 // IntersectionObserver no disparaba aunque el elemento estuviera visible).
 export function ModelosLazyLoader() {
   useEffect(() => {
-    const queue: HTMLIFrameElement[] = [];
-    const seen = new Set<HTMLIFrameElement>();
-    let active = 0;
+    // "Cargada" se marca a mano y no se deduce de el.src: para soltar una hay
+    // que navegarla a about:blank (quitar el atributo no descarga el documento
+    // que ya se pintó), y entonces el.src queda con valor -- si el estado
+    // saliera de ahí, una miniatura soltada no volvería a cargarse nunca.
+    const estaCargada = (el: HTMLIFrameElement) => el.dataset.modeloCargada === "1";
 
-    const pump = () => {
-      while (active < CONCURRENCY && queue.length > 0) {
-        const el = queue.shift()!;
-        active++;
-        const src = el.getAttribute("data-modelo-src");
-        if (src) {
-          el.dataset.modeloCargada = "1";
-          el.src = src;
+    const revisar = () => {
+      const alto = window.innerHeight;
+      const centro = alto / 2;
+      const todas = Array.from(
+        document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]")
+      );
+
+      // Primero soltar lo que quedó lejos, para hacer lugar en el mismo pase.
+      for (const el of todas) {
+        if (!estaCargada(el)) continue;
+        const r = el.getBoundingClientRect();
+        if (r.bottom < -MARGEN_SOLTAR_PX || r.top > alto + MARGEN_SOLTAR_PX) {
+          delete el.dataset.modeloCargada;
+          el.src = "about:blank";
         }
-        const done = () => {
-          active--;
-          el.removeEventListener("load", done);
-          pump();
-        };
-        el.addEventListener("load", done);
-        // Red de seguridad: si el load nunca dispara (error de red, iframe
-        // bloqueado, etc.), no queremos que la cola entera se trabe.
-        setTimeout(done, 8000);
+      }
+
+      // El cupo sale de contar el DOM en cada pasada: no hay contador que
+      // pueda desincronizarse ni irse a negativo.
+      let cupo = VIVAS_MAX - todas.filter(estaCargada).length;
+      if (cupo <= 0) return;
+
+      // Las más cercanas al centro primero: son las que se están mirando.
+      const candidatas = todas
+        .filter((el) => {
+          if (estaCargada(el)) return false;
+          if (!el.getAttribute("data-modelo-src")) return false;
+          const r = el.getBoundingClientRect();
+          // Una miniatura sin tamaño no está en pantalla aunque su rect caiga
+          // dentro (pasa con las que quedan en un árbol montado pero oculto).
+          if (r.width < 2 || r.height < 2) return false;
+          return r.bottom > -MARGEN_CARGA_PX && r.top < alto + MARGEN_CARGA_PX;
+        })
+        .map((el) => {
+          const r = el.getBoundingClientRect();
+          return { el, dist: Math.abs(r.top + r.height / 2 - centro) };
+        })
+        .sort((a, b) => a.dist - b.dist);
+
+      for (const { el } of candidatas) {
+        if (cupo <= 0) break;
+        el.dataset.modeloCargada = "1";
+        el.src = el.getAttribute("data-modelo-src")!;
+        cupo--;
       }
     };
 
-    const checkVisible = () => {
-      const iframes = document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]");
-      iframes.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const alto = window.innerHeight;
+    revisar();
 
-        // Soltar lo que quedo lejos. Hay que navegarlo a about:blank: quitar
-        // el atributo src no descarga el documento que ya se pinto. Y hay que
-        // sacarlo de `seen`, o al volver a subir nunca se recargaria.
-        const lejos = rect.bottom < -RELEASE_MARGIN_PX || rect.top > alto + RELEASE_MARGIN_PX;
-        if (lejos) {
-          if (el.dataset.modeloCargada === "1") {
-            delete el.dataset.modeloCargada;
-            seen.delete(el);
-            el.src = "about:blank";
-          }
-          return;
-        }
-
-        // `el.src` no sirve para saber si ya cargo, porque una miniatura
-        // soltada queda con src="about:blank" -- de ahi la marca propia.
-        if (seen.has(el) || el.dataset.modeloCargada === "1") return;
-        const nearViewport =
-          rect.bottom > -PRELOAD_MARGIN_PX && rect.top < alto + PRELOAD_MARGIN_PX;
-        if (nearViewport) {
-          seen.add(el);
-          queue.push(el);
-        }
-      });
-      pump();
-    };
-
-    checkVisible();
-
-    // Sin un "ya terminamos, dejar de escuchar" -- las pestañas de
-    // /modelos (ModelosTabs) montan iframes nuevos al cambiar de pestaña,
-    // mucho después de que los de la primera pestaña ya hayan terminado de
-    // cargar. Cortar el listener ahí dejaba las miniaturas de las otras
-    // pestañas en negro para siempre (nunca se les asignaba `src`).
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
+    // Sin un "ya terminamos, dejar de escuchar": las pestañas de /modelos
+    // (ModelosTabs) montan iframes nuevos al cambiar de pestaña, mucho después
+    // de que los de la primera hayan terminado de cargar.
+    let pendiente = false;
+    const alScrollear = () => {
+      if (pendiente) return;
+      pendiente = true;
       requestAnimationFrame(() => {
-        checkVisible();
-        ticking = false;
+        revisar();
+        pendiente = false;
       });
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("scroll", alScrollear, { passive: true });
+    window.addEventListener("resize", alScrollear);
+
+    // Las miniaturas de una pestaña recién abierta son iframes que acaban de
+    // montarse y, sin scroll de por medio, ningún evento avisa.
+    const observador = new MutationObserver(alScrollear);
+    observador.observe(document.body, { childList: true, subtree: true });
+
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      observador.disconnect();
+      window.removeEventListener("scroll", alScrollear);
+      window.removeEventListener("resize", alScrollear);
     };
   }, []);
 

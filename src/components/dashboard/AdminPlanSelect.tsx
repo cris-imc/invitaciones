@@ -39,7 +39,7 @@ export function AdminPlanSelect({ invitationId, currentPlan }: { invitationId: s
                     crédito de altainvitacion al pie de la invitación. Por eso
                     aparece sólo acá y no en la landing, /register ni el panel
                     de suscripción del cliente. */}
-                <option value="DIAMOND_LIGHT">Diamond Light (regalo · con logo al pie)</option>
+                <option value="DIAMOND_LIGHT">Diamond Light</option>
                 <option value="ENTERPRISE">Enterprise</option>
             </select>
             {isPending && <span className="text-xs text-blue-500">Guardando...</span>}
