@@ -374,7 +374,7 @@ export default async function Home() {
               </div>
               <p className="text-xs font-semibold text-[var(--accent)] mb-1">{DIAMOND_DISCOUNT_PERCENTAGE}% OFF</p>
               <p className="text-xs text-zinc-400 mb-4">o 3 cuotas sin interés de {formatPrice(Math.round(diamondDiscountPrice / 3))}</p>
-              <p className="text-zinc-400 mb-6 text-sm">Todo Premium, más el Modo Live y la organización de mesas.</p>
+              <p className="text-zinc-400 mb-6 text-sm">Todo Premium, más el Modo Live, la organización de mesas y el control de ingreso.</p>
 
               <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
                 <li className="flex items-start gap-3">
@@ -392,6 +392,10 @@ export default async function Home() {
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span><strong className="text-white">Organización de mesas:</strong> armá el salón y asigná a cada familia su mesa, y cada invitado la ve en su invitación</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-white">Control de ingreso:</strong> escaneás el QR en la puerta y ves quién llegó y a qué mesa va</span>
                 </li>
               </ul>
               <Link href={diamondUrl} className="w-full mt-auto">

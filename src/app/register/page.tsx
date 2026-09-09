@@ -50,7 +50,7 @@ const PLAN_CARDS: {
       "Con Trivia",
       "Con sugerencias DJ",
     ],
-    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)", "Sin organización de mesas"],
+    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)", "Sin organización de mesas", "Sin control de ingreso por QR"],
   },
   {
     key: "DIAMOND",
@@ -63,6 +63,7 @@ const PLAN_CARDS: {
       "Con musica de fondo",
       "Con LIVE (fotos y mensajes en vivo)",
       "Con organización de mesas",
+      "Con control de ingreso por QR",
       "Con Trivia",
       "Con sugerencias DJ",
     ],

@@ -44,6 +44,7 @@ import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Doodles geométricos de trazo fino "editorial" -- minimalismo de lujo,
 // nada figurativo/recargado, coherentes con Bodoni + blanco roto.
@@ -1565,6 +1566,7 @@ export function EditorialTemplatePiedra({ invitation, guest, isPersonalized = fa
         )}
 
         <InfoAdicionalSection invitation={invitation} />
+        <QrDeIngreso guest={guest as never} />
 
         {musicaHabilitada && musicAudioElement}
 

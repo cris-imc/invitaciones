@@ -61,6 +61,7 @@ import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Doodles de trazo fino "noche estrellada" -- luna creciente, sparkle de 4
 // puntas, constelación de puntos conectados y voluta de nube/niebla nocturna.
@@ -1568,6 +1569,7 @@ export function LuzLunaTemplatePerlada({ invitation, guest, isPersonalized = fal
         )}
 
         <InfoAdicionalSection invitation={invitation} />
+        <QrDeIngreso guest={guest as never} />
 
         {musicaHabilitada && musicAudioElement}
 

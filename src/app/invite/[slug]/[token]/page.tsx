@@ -440,6 +440,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 templateTipo: true,
                 mostrarNombreInvitadoEnSaludo: true,
                 mesasHabilitadas: true,
+                escaneoHabilitado: true,
                 fontTitle: true,
                 fontBody: true,
                 tipografiaDisplay: true,
@@ -544,9 +545,21 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
     // entre dos mesas ve las dos, nunca quién va en cada una -- ese reparto es
     // del anfitrión. El plan se vuelve a verificar acá porque una invitación
     // puede haber bajado de categoría después de armar el salón.
-    const mesasDelInvitado =
+    const mesasActivas = Boolean(
         validInvitation.mesasHabilitadas &&
         canUseFeature(String(validInvitation.planTier ?? 'FREE') as PlanTier, 'tableAssignment')
+    );
+
+    // El QR de ingreso es una decisión aparte de mostrar las mesas: hay
+    // eventos que asignan mesas sin registrar quién llega, y otros que
+    // controlan la puerta aunque sea todo libre.
+    const escaneoActivo = Boolean(
+        validInvitation.escaneoHabilitado &&
+        canUseFeature(String(validInvitation.planTier ?? 'FREE') as PlanTier, 'tableAssignment')
+    );
+
+    const mesasDelInvitado =
+        mesasActivas
             ? (
                   await prisma.mesaLugar.findMany({
                       where: { guestId: guest.id },
@@ -582,6 +595,11 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 // muestra. Viaja adentro del invitado porque es donde las 361
                 // plantillas ya miran para armar la burbuja del pase.
                 mesas: mesasDelInvitado,
+                // Aparte de las mesas: el QR de ingreso se muestra aunque
+                // todavía no tenga mesa asignada. Si esperara a la asignación,
+                // el anfitrión no podría escanear a nadie hasta terminar de
+                // acomodar el salón, que es justo cuando más le sirve.
+                qrIngreso: escaneoActivo,
                 paymentStatus: guest
                     ? resolveCardPayment(guest, validInvitation as never).status
                     : undefined,

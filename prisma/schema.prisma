@@ -254,6 +254,10 @@ model Invitation {
   /// ingreso, aunque el plan lo permita. Es del anfitrión decidir si su evento
   /// tiene mesas asignadas o es libre.
   mesasHabilitadas             Boolean          @default(false)
+  /// Control de ingreso con QR en la puerta. Aparte de las mesas y no atado a
+  /// ellas: hay eventos que asignan mesas y reciben a la gente sin registrar
+  /// nada, y otros que quieren saber quién llegó aunque sea todo libre.
+  escaneoHabilitado            Boolean          @default(false)
   infoAdicionalSeccionHabilitada Boolean        @default(false)
   infoAlojamientoHabilitado    Boolean          @default(false)
   infoAlojamientoTexto         String?
@@ -346,6 +350,10 @@ model Guest {
   // Anotaciones privadas del anfitrion sobre este invitado (como pago, que
   // quedo pendiente, lo que sea). El invitado no las ve nunca.
   hostNotes              String?
+  /// Cuándo se escaneó su QR en la puerta. Es distinto de `status`: ese dice
+  /// si avisó que venía, esto dice que llegó. Mucha gente confirma y no va, y
+  /// alguna cae sin confirmar, así que mezclarlos perdería las dos cosas.
+  ingresoEn              DateTime?
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

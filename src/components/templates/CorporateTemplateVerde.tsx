@@ -38,6 +38,7 @@ import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Tipografía "Minimal Corporate" (Space Grotesk display + Sora texto), escopeada
 // solo a este componente vía CSS var override en el wrapper raíz.
@@ -1456,6 +1457,7 @@ export function CorporateTemplateVerde({ invitation, guest, isPersonalized = fal
         )}
 
         <InfoAdicionalSection invitation={invitation} />
+        <QrDeIngreso guest={guest as never} />
 
         {musicaHabilitada && musicAudioElement}
 

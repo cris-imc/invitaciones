@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Trash2, Users, X, Minus, RotateCcw, Loader2, GripVertical } from "lucide-react";
+import { Plus, Trash2, Users, X, Minus, RotateCcw, Loader2, GripVertical, ScanLine, ArrowLeft } from "lucide-react";
+import { EscanerIngreso } from "@/components/dashboard/mesas/EscanerIngreso";
 
 interface LugarApi {
   id: string;
@@ -138,6 +139,7 @@ export function MesasPanel({ slug }: Props) {
   const [mesas, setMesas] = useState<MesaApi[]>([]);
   const [invitados, setInvitados] = useState<InvitadoApi[]>([]);
   const [habilitadas, setHabilitadas] = useState(false);
+  const [escaneo, setEscaneo] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -147,6 +149,7 @@ export function MesasPanel({ slug }: Props) {
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const [busqueda, setBusqueda] = useState("");
   const [pagina, setPagina] = useState(0);
+  const [escaneando, setEscaneando] = useState(false);
 
   const lienzoRef = useRef<HTMLDivElement>(null);
   const fantasmaRef = useRef<HTMLDivElement>(null);
@@ -176,6 +179,7 @@ export function MesasPanel({ slug }: Props) {
       setMesas(data.mesas ?? []);
       setInvitados(data.invitados ?? []);
       setHabilitadas(Boolean(data.habilitadas));
+      setEscaneo(Boolean(data.escaneo));
     } finally {
       setCargando(false);
     }
@@ -304,6 +308,23 @@ export function MesasPanel({ slug }: Props) {
         nuevo
           ? "Listo: cada invitado va a ver su mesa en la portada de su invitación."
           : "Las mesas quedan sólo para vos. Los invitados no ven nada."
+      );
+    }
+  };
+
+  const alternarEscaneo = async () => {
+    const nuevo = !escaneo;
+    const r = await pedir(`/api/invitations/${slug}`, {
+      method: "PATCH",
+      body: JSON.stringify({ escaneoHabilitado: nuevo }),
+    });
+    if (r) {
+      setEscaneo(nuevo);
+      if (escaneando && !nuevo) setEscaneando(false);
+      mostrarAviso(
+        nuevo
+          ? "Listo: cada invitación termina con un QR y podés escanear en la puerta."
+          : "Sin control en la puerta: el QR desaparece de las invitaciones."
       );
     }
   };
@@ -464,6 +485,24 @@ export function MesasPanel({ slug }: Props) {
     );
   }
 
+  // El escáner ocupa la pantalla entera y esconde el plano: se usa parado en
+  // la puerta, con una mano, no mientras se acomoda el salón.
+  if (escaneando) {
+    return (
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={() => setEscaneando(false)}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver al salón
+        </button>
+        <EscanerIngreso slug={slug} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* ── Resumen + acciones ── */}
@@ -477,6 +516,20 @@ export function MesasPanel({ slug }: Props) {
           <Plus className="w-4 h-4" />
           Agregar mesa
         </button>
+
+        {/* Sólo cuando las mesas están activas: el QR de ingreso aparece en la
+            invitación bajo la misma condición, así que sin eso no habría nada
+            que escanear. */}
+        {escaneo && (
+          <button
+            type="button"
+            onClick={() => setEscaneando(true)}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 text-sm font-semibold px-4 py-2 transition-all hover:bg-white/10"
+          >
+            <ScanLine className="w-4 h-4" />
+            Escanear ingreso
+          </button>
+        )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground font-ui">
           <span>
@@ -525,8 +578,29 @@ export function MesasPanel({ slug }: Props) {
         <span className="min-w-0">
           <span className="block text-sm font-medium">Mostrarle la mesa a cada invitado</span>
           <span className="block text-xs text-muted-foreground">
-            Aparece en la portada de bienvenida de su invitación. Si una familia
-            quedó repartida, ve las dos mesas, sin el detalle de quién va en cada una.
+            Aparece en su pase, dentro de la invitación. Si una familia quedó
+            repartida, ve las dos mesas, sin el detalle de quién va en cada una.
+          </span>
+        </span>
+      </label>
+
+      {/* Aparte del anterior a propósito: son dos decisiones distintas. Hay
+          eventos que asignan mesas y reciben a la gente sin registrar nada, y
+          otros que quieren saber quién llegó aunque sea todo libre. */}
+      <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-card p-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={escaneo}
+          disabled={ocupado}
+          onChange={alternarEscaneo}
+          className="mt-0.5 w-4 h-4 accent-[var(--accent)] shrink-0"
+        />
+        <span className="min-w-0">
+          <span className="block text-sm font-medium">Controlar el ingreso con QR</span>
+          <span className="block text-xs text-muted-foreground">
+            Cada invitación termina con un QR. Lo escaneás en la puerta y ves
+            quiénes son, cuántos vienen y a qué mesa mandarlos. Queda registrado
+            quién llegó y a qué hora.
           </span>
         </span>
       </label>
@@ -554,7 +628,16 @@ export function MesasPanel({ slug }: Props) {
               setMesaAbierta(null);
             }}
             className="relative bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,.05),transparent_65%)] bg-black/25"
-            style={{ width: anchoPx, height: altoPx, minWidth: "100%" }}
+            // Sin mesas, el salón toma el ancho de la pantalla en vez de sus
+            // 880px: el cartel de "todavía no hay mesas" se centra respecto
+            // del lienzo, y en un teléfono ese centro caía fuera de lo que se
+            // ve, así que el texto aparecía corrido y cortado. Un salón vacío
+            // tampoco necesita ancho: no hay nada que acomodar todavía.
+            style={
+              mesas.length === 0
+                ? { width: "100%", height: Math.min(altoPx, 340) }
+                : { width: anchoPx, height: altoPx, minWidth: "100%" }
+            }
           >
             {mesas.length === 0 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center px-6 pointer-events-none">

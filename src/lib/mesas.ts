@@ -84,6 +84,7 @@ interface AccesoOk {
   ok: true;
   invitationId: string;
   mesasHabilitadas: boolean;
+  escaneoHabilitado: boolean;
 }
 interface AccesoError {
   ok: false;
@@ -100,7 +101,7 @@ export type Acceso = AccesoOk | AccesoError;
  */
 async function verificar(
   invitation:
-    | { id: string; userId: string; planTier: string; mesasHabilitadas: boolean }
+    | { id: string; userId: string; planTier: string; mesasHabilitadas: boolean; escaneoHabilitado: boolean }
     | null,
   session: { user?: { id?: string; role?: string | null } } | null
 ): Promise<Acceso> {
@@ -118,6 +119,7 @@ async function verificar(
     ok: true,
     invitationId: invitation.id,
     mesasHabilitadas: invitation.mesasHabilitadas,
+    escaneoHabilitado: invitation.escaneoHabilitado,
   };
 }
 
@@ -127,7 +129,7 @@ export async function accesoPorSlug(
 ): Promise<Acceso> {
   const invitation = await prisma.invitation.findUnique({
     where: { slug },
-    select: { id: true, userId: true, planTier: true, mesasHabilitadas: true },
+    select: { id: true, userId: true, planTier: true, mesasHabilitadas: true, escaneoHabilitado: true },
   });
   return verificar(invitation, session);
 }
@@ -140,7 +142,7 @@ export async function accesoPorMesa(
     where: { id: mesaId },
     select: {
       invitation: {
-        select: { id: true, userId: true, planTier: true, mesasHabilitadas: true },
+        select: { id: true, userId: true, planTier: true, mesasHabilitadas: true, escaneoHabilitado: true },
       },
     },
   });

@@ -42,6 +42,7 @@ import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Tipografía "Garden Party" (Fraunces itálica + Poppins), escopeada solo a
 // este componente vía CSS var override en el wrapper raíz.
@@ -1495,6 +1496,7 @@ export function GardenPartyTemplateLavanda({ invitation, guest, isPersonalized =
         )}
 
         <InfoAdicionalSection invitation={invitation} />
+        <QrDeIngreso guest={guest as never} />
 
         {musicaHabilitada && musicAudioElement}
 

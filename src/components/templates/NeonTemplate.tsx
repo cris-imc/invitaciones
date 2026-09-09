@@ -42,6 +42,7 @@ import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Doodles de trazo fino estilo "disco" (mockup neon.html) en vez de íconos
 // genéricos de librería -- coherentes con el resto del motivo decorativo.
@@ -1544,6 +1545,7 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
         )}
 
         <InfoAdicionalSection invitation={invitation} />
+        <QrDeIngreso guest={guest as never} />
 
         {musicaHabilitada && musicAudioElement}
 

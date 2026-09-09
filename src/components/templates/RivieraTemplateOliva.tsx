@@ -45,6 +45,7 @@ import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Doodles de trazo fino estilo "Riviera" (mockup Marina & Diego) en vez de
 // íconos genéricos de librería -- coherentes con el motivo decorativo
@@ -1567,6 +1568,7 @@ export function RivieraTemplateOliva({ invitation, guest, isPersonalized = false
         )}
 
         <InfoAdicionalSection invitation={invitation} />
+        <QrDeIngreso guest={guest as never} />
 
         {musicaHabilitada && musicAudioElement}
 

@@ -56,6 +56,7 @@ import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Doodles de trazo fino "editorial de seda" -- ribbon fluido, ramita de
 // laurel, pluma/quill y sparkle de 4 puntas. Neutros para 15 años/casamiento.
@@ -1555,6 +1556,7 @@ export function SedaTemplateNocturna({ invitation, guest, isPersonalized = false
         )}
 
         <InfoAdicionalSection invitation={invitation} />
+        <QrDeIngreso guest={guest as never} />
 
         {musicaHabilitada && musicAudioElement}
 

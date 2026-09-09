@@ -39,6 +39,7 @@ import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const cxvArchivoBlack = Archivo_Black({
   subsets: ["latin"],
@@ -1080,6 +1081,7 @@ export function CineAbstractoXvTemplateTecnicolor({ invitation, guest, isPersona
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
+          <QrDeIngreso guest={guest as never} />
           <div className="cxv-footer-credit">
             <LogoFooterCredit bgColor="transparent" />
           </div>

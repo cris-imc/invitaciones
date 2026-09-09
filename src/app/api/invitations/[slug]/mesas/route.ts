@@ -54,6 +54,7 @@ export async function GET(
     return NextResponse.json({
       mesas,
       habilitadas: acceso.mesasHabilitadas,
+      escaneo: acceso.escaneoHabilitado,
       invitados: guests.map((g) => ({ ...g, aSentar: lugaresQueOcupa(g) })),
     });
   } catch (error) {

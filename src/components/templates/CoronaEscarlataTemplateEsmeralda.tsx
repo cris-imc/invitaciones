@@ -36,6 +36,7 @@ import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const cnePlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -1079,6 +1080,7 @@ export function CoronaEscarlataTemplateEsmeralda({ invitation, guest, isPersonal
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
+          <QrDeIngreso guest={guest as never} />
           <div className="cne-footer-credit">
             <LogoFooterCredit bgColor="transparent" />
           </div>

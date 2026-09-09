@@ -37,6 +37,7 @@ import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitat
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const jwbCormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -1072,6 +1073,7 @@ export function JewelryBoxTemplateEsmeralda({ invitation, guest, isPersonalized 
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
+          <QrDeIngreso guest={guest as never} />
           <div className="jwb-footer-credit">
             <LogoFooterCredit bgColor="transparent" />
           </div>

@@ -270,6 +270,14 @@ export default function SubscriptionPage() {
                         )}
                         <span>Organización de mesas</span>
                       </li>
+                      <li className="flex items-center gap-2">
+                        {plan.features.tableAssignment ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <X className="w-4 h-4 text-gray-300" />
+                        )}
+                        <span>Control de ingreso por QR</span>
+                      </li>
                     </ul>
 
                     {isCurrent ? (

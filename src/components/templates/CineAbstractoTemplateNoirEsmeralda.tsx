@@ -40,6 +40,7 @@ import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
+import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 // Frank Ruhl Libre solo expone la variante "normal" en next/font/google
 // (aunque Google Fonts sirve itálica para esta familia) -- los usos en
@@ -1142,6 +1143,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
+          <QrDeIngreso guest={guest as never} />
           <div className="cab-footer-credit">
             <LogoFooterCredit bgColor="transparent" />
           </div>
