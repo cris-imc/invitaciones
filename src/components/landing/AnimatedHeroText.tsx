@@ -93,7 +93,9 @@ export function AnimatedHeroText() {
   const longestSuffix = SUFFIXES.reduce((a, b) => (b.length > a.length ? b : a));
 
   return (
-    <div className="grid w-full text-left">
+    // Centrado: el hero pasó a una sola columna. El `text-left` de antes tenía
+    // sentido cuando el texto compartía la fila con una foto al costado.
+    <div className="grid w-full text-center">
       <h1 className="leading-[1.1] invisible col-start-1 row-start-1" aria-hidden="true">
         <span>{PREFIX}</span>
         <em className="italic text-[var(--accent)]">{longestSuffix}</em>

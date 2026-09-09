@@ -113,7 +113,11 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
   );
 
   return (
-    <nav className="l-nav">
+    // El desenfoque va como clase de Tailwind y no en globals.css: escrito
+    // ahí como `backdrop-filter`, el procesador de CSS lo descarta y la barra
+    // queda sólo translúcida, sin esmerilar. El resto del estilo (fondo,
+    // borde, sticky) sí vive en .l-nav.
+    <nav className="l-nav backdrop-blur-xl backdrop-saturate-150">
       <div className="l-brand">
         <LandingLogo href="/" />
       </div>

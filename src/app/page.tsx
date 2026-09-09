@@ -30,8 +30,16 @@ export default async function Home() {
     "Hola, me interesa el plan Enterprise de Alta Invitación"
   )}`;
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[var(--ink)] p-0 md:p-6">
-      <div className="landing w-full max-w-[1180px]">
+    // PRUEBA (revertir = volver a `items-center justify-center ... p-0 md:p-6`):
+    // el md:p-6 dejaba aire alrededor de la tarjeta, y el centrado vertical
+    // sólo tenía sentido con ese marco. Sin él la página arranca pegada arriba
+    // y ocupa todo el ancho.
+    <div className="flex min-h-dvh justify-center bg-[var(--ink)]">
+      {/* Sin max-width acá: el límite pasó al contenido de cada sección
+          (ver `.landing > section > *` en globals.css), así las bandas de
+          fondo y el fondo animado del hero llegan hasta el borde de la
+          pantalla en vez de cortarse a 1180px. */}
+      <div className="landing w-full">
         {/* NAV */}
         <LandingNav registerUrl={registerUrl} isLoggedIn={Boolean(session)} />
 

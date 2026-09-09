@@ -891,10 +891,73 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
    ============================================================ */
 
 /* ---- LANDING ---- */
-.landing{background:var(--ink); border-radius:var(--r-l); overflow:hidden; border:1px solid var(--line);}
-.l-nav{display:flex; align-items:center; justify-content:space-between; padding:22px 34px; border-bottom:1px solid var(--line);}
+/* `overflow:clip` en vez de `hidden` para que el nav pegajoso funcione.
+   `hidden` convierte a este div en el ancestro de scroll del `position:sticky`
+   de adentro, y como este div no scrollea, el nav nunca se pega y se va con la
+   página. `clip` recorta igual (que es lo único que se buscaba acá, por las
+   esquinas redondeadas) pero no crea contenedor de scroll.
+
+   Se declaran las dos: un navegador que no entienda `clip` se queda con
+   `hidden` y pierde el nav pegajoso, no el recorte. */
+/* PRUEBA (revertir = devolver `border-radius:var(--r-l)` y
+   `border:1px solid var(--line)`): en desktop la landing era una tarjeta con
+   borde y esquinas redondeadas flotando sobre el fondo. Sin el marco la página
+   se lee más abierta y moderna, y además queda igual que en mobile, donde el
+   marco ya se sacaba. */
+.landing{background:var(--ink); overflow:hidden; overflow:clip;}
+
+/* Secciones a ancho completo, contenido contenido.
+   El límite de ancho estaba en .landing, así que TODO se cortaba a 1180px:
+   las bandas de fondo de las secciones y el fondo animado del hero terminaban
+   con un borde visible contra el fondo plano, y en una pantalla ancha eso se
+   lee como un error de maquetación. Ahora la sección ocupa todo el ancho y el
+   tope se aplica a lo que lleva adentro, que es lo único que hay que limitar
+   para que las líneas de texto no queden interminables.
+
+   Se excluyen los hijos posicionados en absoluto (el fondo del hero): esos
+   tienen que seguir cubriendo la sección entera. */
+.landing > section > *:not(.hero-fondo){ max-width:1180px; margin-inline:auto; }
+/* El nav se alinea con el resto por padding y no por max-width: la barra
+   esmerilada tiene que llegar de borde a borde, es el contenido el que se
+   alinea con las secciones. */
+/* Barra esmerilada. Se queda arriba al scrollear: sin eso el desenfoque no
+   tendría nada que desenfocar (el nav es lo primero de la página) y el efecto
+   no se vería nunca.
+
+   El fondo NO es muy transparente a propósito. Con la landing en oscuro y
+   texto claro, bajar mucho la opacidad hace que las opciones pierdan contraste
+   apenas pasa por debajo una foto clara o una portada. .72 deja ver que algo
+   se mueve atrás sin que el texto deje de leerse. */
+.l-nav{
+  display:flex; align-items:center; justify-content:space-between;
+  /* La barra llega de borde a borde; el contenido se alinea con las secciones
+     por padding, no con un max-width. Con max-width la barra esmerilada
+     quedaba corta y se veía el corte contra el fondo. */
+  padding-block:26px;
+  padding-inline:max(34px, calc((100% - 1180px) / 2));
+  border-bottom:1px solid var(--line);
+  position:sticky; top:0; z-index:60;
+  background:rgba(15,22,19,.72);
+  /* Una sombra suave hacia abajo despega la barra del contenido que le pasa
+     por debajo: sin ella, translúcida y sin borde propio, se confundía con la
+     página y le faltaba peso. */
+  box-shadow:0 8px 28px -12px rgba(0,0,0,.65);
+  /* El desenfoque NO va acá: escrito como `backdrop-filter` en este archivo,
+     el procesador de CSS lo descarta y la barra queda translúcida sin
+     esmerilar. Va como clase de Tailwind en LandingNav.tsx
+     (backdrop-blur-xl backdrop-saturate-150), que sí se genera. */
+}
+/* Sin backdrop-filter (Firefox con la opción apagada, navegadores viejos) no
+   hay desenfoque que compense la transparencia, así que el fondo vuelve a ser
+   opaco: antes que un efecto lindo va que se lean las opciones. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .l-nav{ background:var(--ink); }
+}
 .l-brand{display:flex; align-items:center; gap:10px; font-family:var(--font-ui); font-weight:700; font-size:16px; letter-spacing:.01em; color:var(--paper);}
-.l-nav-links{display:flex; gap:26px; font-family:var(--font-ui); font-size:13.5px; color:rgba(246,243,236,.6);}
+/* Sube de .6 a .82: sobre un fondo translúcido el 60% de opacidad quedaba
+   flojo. La sombra sutil no se ve como sombra, mantiene el borde de las letras
+   definido si por detrás pasa algo claro. */
+.l-nav-links{display:flex; gap:30px; font-family:var(--font-ui); font-size:14.5px; font-weight:500; color:rgba(246,243,236,.86); text-shadow:0 1px 2px rgba(8,10,9,.45);}
 .l-nav-links a:hover{color:var(--paper);}
 .l-cta{font-family:var(--font-ui); font-weight:600; font-size:13px; background:var(--accent); color:var(--ink); padding:10px 18px; border-radius:999px; border:none; cursor:pointer;}
 
@@ -977,7 +1040,15 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   .l-nav{
     padding:16px 18px; gap:10px;
     position:fixed; top:0; left:0; right:0; z-index:60;
-    background:var(--ink); border-bottom:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    /* Un punto más opaco que en desktop: en el teléfono el nav queda fijo
+       sobre el contenido todo el tiempo, así que el texto tiene que aguantar
+       que por debajo pase cualquier cosa. El desenfoque lo pone la clase de
+       Tailwind en LandingNav.tsx. */
+    background:rgba(15,22,19,.76);
+  }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .l-nav{ background:var(--ink); }
   }
   .l-nav-links{ display:none; }
   .l-hamburger{ display:flex; }
