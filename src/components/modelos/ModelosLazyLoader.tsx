@@ -14,6 +14,19 @@ const CONCURRENCY = 4;
 // si se precarga demasiado antes, el efecto ya terminó de jugarse fuera de
 // vista y el usuario nunca lo ve al llegar scrolleando hasta ahí.
 const PRELOAD_MARGIN_PX = 150;
+// A que distancia de la pantalla se suelta una miniatura que ya cargo.
+//
+// Antes no se soltaba ninguna: una vez cargada seguia viva (con su animacion
+// de portada corriendo) para el resto de la visita, asi que cuantas mas
+// miniaturas se listaran, mas pesaba la pagina -- y de ahi el techo practico
+// de 8 por pestaña. Soltando las que quedaron lejos, lo que cuesta deja de
+// depender de cuantas haya listadas y pasa a depender solo de cuantas se
+// esten viendo.
+//
+// Es holgado a proposito (bastante mas que el margen de precarga): asi una
+// miniatura apenas fuera de vista no se suelta y se recarga en loop mientras
+// el visitante hace pequeños ajustes de scroll.
+const RELEASE_MARGIN_PX = 1200;
 
 // Un solo componente para todas las miniaturas (no un hook por tarjeta). Usa
 // scroll/resize + getBoundingClientRect en vez de IntersectionObserver a
@@ -31,7 +44,10 @@ export function ModelosLazyLoader() {
         const el = queue.shift()!;
         active++;
         const src = el.getAttribute("data-modelo-src");
-        if (src) el.src = src;
+        if (src) {
+          el.dataset.modeloCargada = "1";
+          el.src = src;
+        }
         const done = () => {
           active--;
           el.removeEventListener("load", done);
@@ -47,10 +63,27 @@ export function ModelosLazyLoader() {
     const checkVisible = () => {
       const iframes = document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]");
       iframes.forEach((el) => {
-        if (seen.has(el) || el.src) return;
         const rect = el.getBoundingClientRect();
+        const alto = window.innerHeight;
+
+        // Soltar lo que quedo lejos. Hay que navegarlo a about:blank: quitar
+        // el atributo src no descarga el documento que ya se pinto. Y hay que
+        // sacarlo de `seen`, o al volver a subir nunca se recargaria.
+        const lejos = rect.bottom < -RELEASE_MARGIN_PX || rect.top > alto + RELEASE_MARGIN_PX;
+        if (lejos) {
+          if (el.dataset.modeloCargada === "1") {
+            delete el.dataset.modeloCargada;
+            seen.delete(el);
+            el.src = "about:blank";
+          }
+          return;
+        }
+
+        // `el.src` no sirve para saber si ya cargo, porque una miniatura
+        // soltada queda con src="about:blank" -- de ahi la marca propia.
+        if (seen.has(el) || el.dataset.modeloCargada === "1") return;
         const nearViewport =
-          rect.bottom > -PRELOAD_MARGIN_PX && rect.top < window.innerHeight + PRELOAD_MARGIN_PX;
+          rect.bottom > -PRELOAD_MARGIN_PX && rect.top < alto + PRELOAD_MARGIN_PX;
         if (nearViewport) {
           seen.add(el);
           queue.push(el);

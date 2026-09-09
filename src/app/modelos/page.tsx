@@ -25,6 +25,15 @@ import { labelDeFamilia } from "@/lib/template-labels";
 //   - cualquier otro slug en esa cuenta se ignora (no ensucia la landing si
 //     la cuenta de prueba también se usa para probar otras cosas)
 
+/**
+ * Cuántos modelos se listan por pestaña.
+ *
+ * Se puede subir: ModelosLazyLoader carga sólo las miniaturas que están cerca
+ * de la pantalla y suelta las que quedaron lejos, así que lo que cuesta no
+ * depende de cuántas se listen sino de cuántas se estén viendo a la vez.
+ */
+const MODELOS_POR_PESTANA = 8;
+
 function labelFor(inv: { templateTipo: string; temaColores: string; portadaImagenFondoDesktop: string | null }) {
   // Antes había acá una lista propia que sólo tenía las 22 familias de la
   // Colección Flat: las 36 de Storytelling caían al fallback y la landing
@@ -82,10 +91,10 @@ async function getModelos() {
       .map((m) => ({ slug: m.slug, label: labelFor(m) }));
 
   return {
-    xv: toItems("modelo-xv-", 8),
-    boda: toItems("modelo-boda-", 8),
-    evento: toItems("modelo-evento-", 8),
-    personalizado: toItems("personalizado-", 8),
+    xv: toItems("modelo-xv-", MODELOS_POR_PESTANA),
+    boda: toItems("modelo-boda-", MODELOS_POR_PESTANA),
+    evento: toItems("modelo-evento-", MODELOS_POR_PESTANA),
+    personalizado: toItems("personalizado-", MODELOS_POR_PESTANA),
   };
 }
 
