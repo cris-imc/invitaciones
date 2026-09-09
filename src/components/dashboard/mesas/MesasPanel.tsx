@@ -56,6 +56,9 @@ const COLUMNAS = [12, 31, 50, 69, 88];
 const FILA_ALTO = 18;
 const FILA_PRIMERA = 15;
 
+/** Cuántos invitados sin ubicar se listan por página. */
+const POR_PAGINA = 8;
+
 /**
  * Cómo se llama la mesa para el anfitrión. El alias manda si lo puso, porque
  * es con lo que él piensa el salón ("los primos van con los tíos"); el número
@@ -74,6 +77,22 @@ function rotulo(mesa: MesaApi): { titulo: string; secundario: string | null } {
 // 880x660.
 const SEPARACION_X = 15;
 const SEPARACION_Y = 17;
+
+// Un color por grupo DENTRO de cada mesa, no por familia en todo el salón:
+// lo que hay que poder ver de un vistazo es si una mesa está formada por
+// varios grupos o por uno solo. Empezando de nuevo en cada mesa, dos grupos
+// sentados juntos nunca pueden tocarle el mismo color por casualidad, y que
+// se repitan entre mesas distintas no molesta -- ahí no se comparan.
+const PALETA = [
+  "#E0B252", // el dorado de la marca, para el caso más común: mesa de un grupo
+  "#5BA8D4",
+  "#7ECF9A",
+  "#E08A6B",
+  "#B79BE0",
+  "#E0D06B",
+  "#6BD4C4",
+  "#E07BA8",
+];
 
 type Punto = { posX: number; posY: number };
 
@@ -126,6 +145,8 @@ export function MesasPanel({ slug }: Props) {
   const [mesaAbierta, setMesaAbierta] = useState<string | null>(null);
   const [espacio, setEspacio] = useState(1);
   const [arrastrando, setArrastrando] = useState<string | null>(null);
+  const [busqueda, setBusqueda] = useState("");
+  const [pagina, setPagina] = useState(0);
 
   const lienzoRef = useRef<HTMLDivElement>(null);
   const fantasmaRef = useRef<HTMLDivElement>(null);
@@ -206,6 +227,25 @@ export function MesasPanel({ slug }: Props) {
   const invitadoSel = seleccionado
     ? pendientes.find((p) => p.id === seleccionado) ?? null
     : null;
+
+  const filtrados = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    return q ? pendientes.filter((p) => p.name.toLowerCase().includes(q)) : pendientes;
+  }, [pendientes, busqueda]);
+
+  const paginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
+  // Al ir ubicando gente la lista se acorta, y la página en la que estabas
+  // puede dejar de existir: sin esto quedaría en blanco.
+  const paginaActual = Math.min(pagina, paginas - 1);
+  const visibles = filtrados.slice(paginaActual * POR_PAGINA, (paginaActual + 1) * POR_PAGINA);
+
+  useEffect(() => {
+    if (pagina !== paginaActual) setPagina(paginaActual);
+  }, [pagina, paginaActual]);
+
+  useEffect(() => {
+    setPagina(0);
+  }, [busqueda]);
 
   // El salón crece solo con la cantidad de mesas, además de lo que sume el
   // control de espacio: con 20 mesas en el lienzo de 8, nacen amontonadas.
@@ -497,9 +537,13 @@ export function MesasPanel({ slug }: Props) {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid gap-4 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_280px]">
         {/* ── El salón ── */}
-        <div className="overflow-auto max-h-[72vh] rounded-xl border border-white/10">
+        {/* `min-w-0` no es decorativo: sin él, en mobile la columna de la
+            grilla se dimensiona por su contenido -- el salón entero, que es
+            más ancho que el teléfono -- y el desborde se lo come toda la
+            página en vez de quedar contenido en este recuadro con scroll. */}
+        <div className="min-w-0 overflow-auto max-h-[72vh] rounded-xl border border-white/10">
           <div
             ref={lienzoRef}
             // Tocar el piso vacío suelta lo que estuviera elegido y cierra la
@@ -552,19 +596,39 @@ export function MesasPanel({ slug }: Props) {
             />
           ) : null}
 
-          <div className="rounded-xl border border-white/10 bg-card p-3">
-            <h3 className="text-sm font-semibold mb-1">Sin ubicar</h3>
+          <div className="min-w-0 rounded-xl border border-white/10 bg-card p-3">
+            <div className="flex items-baseline justify-between gap-2 mb-1">
+              <h3 className="text-sm font-semibold">Sin ubicar</h3>
+              <span className="text-xs text-muted-foreground shrink-0">
+                {pendientes.length}
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground mb-3">
               {invitadoSel
                 ? "Ahora tocá una mesa del salón."
-                : "Arrastrá una familia hasta la mesa, o tocala y después tocá la mesa."}
+                : "Arrastrá un invitado o familia hasta la mesa, o tocalo y después tocá la mesa."}
             </p>
+
+            {/* Con un evento chico sobra la lista sola; con 60 grupos, sin
+                buscador hay que scrollear a mano hasta encontrar a alguien. */}
+            {pendientes.length > POR_PAGINA && (
+              <input
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Buscar…"
+                className="w-full mb-2 rounded-lg bg-white/5 border border-white/10 px-2.5 py-1.5 text-sm focus:outline-none focus:border-[var(--accent)] placeholder:text-white/25"
+              />
+            )}
 
             {pendientes.length === 0 ? (
               <p className="text-xs text-emerald-400 py-2">Están todos ubicados.</p>
+            ) : visibles.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-2">
+                Nadie sin ubicar coincide con “{busqueda}”.
+              </p>
             ) : (
-              <ul className="space-y-1 max-h-[320px] overflow-y-auto pr-1">
-                {pendientes.map((p) => {
+              <ul className="space-y-1 pr-1">
+                {visibles.map((p) => {
                   const faltan = p.aSentar - p.ubicados;
                   const elegido = seleccionado === p.id;
                   return (
@@ -599,11 +663,38 @@ export function MesasPanel({ slug }: Props) {
                 })}
               </ul>
             )}
+
+            {/* Paginado y no una tira con scroll: con muchos invitados, la
+                tira obliga a recordar por dónde ibas cada vez que asignás uno
+                y la lista se reordena sola bajo el dedo. */}
+            {paginas > 1 && (
+              <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setPagina((p) => Math.max(0, p - 1))}
+                  disabled={paginaActual === 0}
+                  className="rounded-lg border border-white/15 px-2.5 py-1 text-xs hover:bg-white/10 disabled:opacity-30"
+                >
+                  ‹ Anterior
+                </button>
+                <span className="text-xs text-muted-foreground">
+                  {paginaActual + 1} de {paginas}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPagina((p) => Math.min(paginas - 1, p + 1))}
+                  disabled={paginaActual >= paginas - 1}
+                  className="rounded-lg border border-white/15 px-2.5 py-1 text-xs hover:bg-white/10 disabled:opacity-30"
+                >
+                  Siguiente ›
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Fantasma que sigue al dedo mientras se arrastra una familia. */}
+      {/* Fantasma que sigue al dedo mientras se arrastra un invitado. */}
       {arrastrado && (
         <div
           ref={fantasmaRef}
@@ -656,6 +747,15 @@ function MesaDibujo({
 
   const { titulo, secundario } = rotulo(mesa);
 
+  // Las sillas se pintan en orden: las primeras del primer grupo con su color,
+  // las siguientes del segundo, y las que sobran quedan grises. Así una mesa
+  // de un solo grupo se ve de un color y una mezclada se ve mezclada, que es
+  // justo lo que hay que poder distinguir de un vistazo.
+  const colorDeSilla: (string | undefined)[] = [];
+  mesa.lugares.forEach((l, i) => {
+    for (let n = 0; n < l.lugares; n++) colorDeSilla.push(PALETA[i % PALETA.length]);
+  });
+
   return (
     <div
       data-mesa-id={mesa.id}
@@ -668,7 +768,7 @@ function MesaDibujo({
       <div className="relative" style={{ width: ancho, height: alto }}>
         {/* sillas */}
         {Array.from({ length: mesa.sillas }).map((_, i) => {
-          const tomada = i < ocupadas;
+          const color = colorDeSilla[i];
           const estilo: React.CSSProperties = { position: "absolute" };
           if (redonda) {
             const ang = (i / mesa.sillas) * Math.PI * 2 - Math.PI / 2;
@@ -687,10 +787,8 @@ function MesaDibujo({
           return (
             <span
               key={i}
-              style={estilo}
-              className={`block w-2.5 h-2.5 rounded-full ${
-                tomada ? "bg-[var(--accent)]" : "bg-white/20"
-              }`}
+              style={{ ...estilo, background: color ?? "rgba(255,255,255,.2)" }}
+              className="block w-2.5 h-2.5 rounded-full"
             />
           );
         })}
@@ -870,13 +968,22 @@ function EditorMesa({
           <p className="text-xs text-muted-foreground/70 py-1">Todavía no hay nadie.</p>
         ) : (
           <ul className="space-y-1">
-            {mesa.lugares.map((l) => (
+            {mesa.lugares.map((l, i) => (
               <li
                 key={l.id}
                 className="flex items-center justify-between gap-2 rounded-lg bg-white/[0.04] px-2 py-1.5"
               >
-                <span className="min-w-0 truncate text-sm">
-                  {nombrePorId.get(l.guestId) ?? "Invitado"}
+                {/* El mismo color que sus sillas en el plano: sin esto hay que
+                    adivinar cuál de los grupos de la mesa es cada nombre. */}
+                <span className="flex items-center gap-2 min-w-0">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ background: PALETA[i % PALETA.length] }}
+                    aria-hidden="true"
+                  />
+                  <span className="min-w-0 truncate text-sm">
+                    {nombrePorId.get(l.guestId) ?? "Invitado"}
+                  </span>
                 </span>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button

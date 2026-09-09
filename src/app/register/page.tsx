@@ -50,7 +50,7 @@ const PLAN_CARDS: {
       "Con Trivia",
       "Con sugerencias DJ",
     ],
-    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)"],
+    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)", "Sin organización de mesas"],
   },
   {
     key: "DIAMOND",
@@ -62,6 +62,7 @@ const PLAN_CARDS: {
       `Hasta ${PLAN_LIMITS.DIAMOND.maxPhotos} fotos en el álbum`,
       "Con musica de fondo",
       "Con LIVE (fotos y mensajes en vivo)",
+      "Con organización de mesas",
       "Con Trivia",
       "Con sugerencias DJ",
     ],
