@@ -9,7 +9,7 @@ import { DeleteInvitationButton } from "./DeleteInvitationButton";
 import { AdminPlanSelect } from "./AdminPlanSelect";
 
 import { useRouter } from "next/navigation";
-import { Pencil, Eye, Users } from "lucide-react";
+import { Pencil, Eye, SlidersHorizontal } from "lucide-react";
 
 export function AdminInvitationRow({ invitation }: { invitation: any }) {
     const router = useRouter();
@@ -43,7 +43,18 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
     };
 
     return (
-        <div className="flex flex-col gap-3 bg-black/20 border border-[var(--ink-2)] rounded-xl p-4">
+        // El estado se distingue por la fila entera y no sólo por la etiqueta
+        // de la esquina: al desplegar un cliente con varias invitaciones hay
+        // que poder ver de un vistazo cuál está viva, y una etiqueta chica al
+        // final de una fila llena de botones no alcanza. La activa se ilumina;
+        // las demás se apagan.
+        <div
+            className={`flex flex-col gap-3 rounded-xl p-4 border border-l-4 transition-colors ${
+                status === "ACTIVA"
+                    ? "bg-emerald-500/[0.06] border-emerald-500/25 border-l-emerald-400"
+                    : "bg-black/30 border-[var(--ink-2)] border-l-white/15 opacity-65 hover:opacity-100"
+            }`}
+        >
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
                 <div className="min-w-0 flex-1">
                     <strong className="block truncate text-lg" title={invitation.nombreEvento}>{invitation.nombreEvento}</strong>
@@ -71,12 +82,24 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                     <button
                         onClick={() => router.push(`/dashboard/invitaciones/${invitation.slug}/guests`)}
                         className="px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                        title="Gestionar invitados y precios"
+                        title="Gestión del evento: invitados, pagos, precios, mesas, música y LIVE"
                     >
-                        <Users className="w-3.5 h-3.5" />
-                        <span>Invitados</span>
+                        {/* Decía "Invitados", pero lleva a la gestión completa del
+                            evento -- pagos, precios, mesas, música y LIVE -- así que
+                            prometía menos de lo que abre. */}
+                        <SlidersHorizontal className="w-3.5 h-3.5" />
+                        <span>Gestionar</span>
                     </button>
-                    <div className={`tag whitespace-nowrap shrink-0 ${status === "ACTIVA" ? "on" : "draft"}`}>
+                    <div
+                        className={`whitespace-nowrap shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider border flex items-center gap-1.5 ${
+                            status === "ACTIVA"
+                                ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40"
+                                : "bg-white/5 text-white/45 border-white/15"
+                        }`}
+                    >
+                        {status === "ACTIVA" && (
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                        )}
                         {status === "ACTIVA" ? "Activa" : status === "BORRADOR" ? "Borrador" : "Finalizada"}
                     </div>
                 </div>

@@ -134,9 +134,25 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                                         <p className="text-sm opacity-40">No tiene invitaciones creadas.</p>
                                     ) : (
                                         <div className="flex flex-col gap-2">
-                                            {client.invitations.map((inv: any) => (
-                                                <AdminInvitationRow key={inv.id} invitation={inv} />
-                                            ))}
+                                            {/* Cuántas están vivas, antes de la lista: con un cliente
+                                                que tiene ocho invitaciones, contar filas a ojo para
+                                                saber cuántas están activas es el trabajo que debería
+                                                hacer la pantalla. */}
+                                            <p className="text-xs text-white/45 mb-1">
+                                                {client.invitations.filter((i: any) => i.estado === "ACTIVA").length} activa
+                                                {client.invitations.filter((i: any) => i.estado === "ACTIVA").length === 1 ? "" : "s"}
+                                                {" de "}
+                                                {client.invitations.length}
+                                            </p>
+                                            {/* Las activas primero: son las que el cliente está usando
+                                                hoy y por las que suele escribir. */}
+                                            {[...client.invitations]
+                                                .sort((a: any, b: any) =>
+                                                    (a.estado === "ACTIVA" ? 0 : 1) - (b.estado === "ACTIVA" ? 0 : 1)
+                                                )
+                                                .map((inv: any) => (
+                                                    <AdminInvitationRow key={inv.id} invitation={inv} />
+                                                ))}
                                         </div>
                                     )}
                                 </div>
