@@ -48,6 +48,7 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
+import { BurbujaPase } from "@/components/templates/BurbujaPase";
 
 const btsDisplay = Cormorant_Garamond({
   subsets: ["latin"],
@@ -96,6 +97,7 @@ type GuestStatus = "PENDING" | "CONFIRMED" | "DECLINED";
 interface GuestRecord {
   id?: string;
   name?: string;
+  mesas?: string[] | null;
   uniqueToken?: string;
   expectedCount?: number;
   expectedAdults?: number;
@@ -870,6 +872,15 @@ export function BautismoTemplate({ invitation, guest, isPersonalized = false }: 
                   <BtsMedallionCmp label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PASE Nº ${passNumber}`} arcId="btsArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" title="Reservado" />
                 </div>
                 <span className="bts-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                {/* mesa-en-ubicacion */}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <span
+                    className="bts-mini-label"
+                    style={{ fontSize: "17px", letterSpacing: "0.16em", marginTop: "10px", color: "inherit" }}
+                  >
+                    {guest.mesas.join(" · ")}
+                  </span>
+                )}
               </div>
             </div>
             <BtsDots count={LUGAR_PANEL_COUNT} />
@@ -1157,6 +1168,12 @@ export function BautismoTemplate({ invitation, guest, isPersonalized = false }: 
       )}
 
       {musicaHabilitada && musicAudioElement}
+      {/* Burbuja del pase: nombre, lugares y mesa. Misma que en la
+          colección Flat, con el acento de esta variante. */}
+      {mounted && isPersonalized && guest && isCoverOpen && (
+        <BurbujaPase acento="#B7A97E" guest={guest} />
+      )}
+
       {mounted && musicaHabilitada && isCoverOpen && createPortal(
         <MusicToggleButton
           isPlaying={isMusicPlaying}

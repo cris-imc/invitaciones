@@ -71,6 +71,9 @@ const PATCHABLE_FIELDS = [
     "precioAdolescente",
     "regaloMonto",
     "mostrarNombreInvitadoEnSaludo",
+    // MesasPanel.tsx: el anfitrión decide si su evento tiene mesas asignadas.
+    // Prenderlo exige que el plan las incluya (se verifica más abajo).
+    "mesasHabilitadas",
 ] as const;
 
 // PATCH - Actualizar invitación (edición visual)
@@ -108,6 +111,18 @@ export async function PATCH(
                 return NextResponse.json(
                     { error: 'La fecha del evento no se puede modificar cuando faltan 30 días o menos por seguridad anti-fraude.' },
                     { status: 400 }
+                );
+            }
+        }
+
+        // Prender las mesas exige el plan. Apagarlas no: si una invitación
+        // bajó de plan, el anfitrión tiene que poder dejar de mostrarlas.
+        if (body.mesasHabilitadas === true && !isAdmin) {
+            const { canUseFeature } = await import("@/lib/plan-limits");
+            if (!canUseFeature(existing.planTier as never, "tableAssignment")) {
+                return NextResponse.json(
+                    { error: 'Las mesas están disponibles en Diamond' },
+                    { status: 403 }
                 );
             }
         }

@@ -55,6 +55,7 @@ import { CreditCard, Gift } from "lucide-react";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
+import { BurbujaPase } from "@/components/templates/BurbujaPase";
 
 const pvpBodoni = Bodoni_Moda({
   subsets: ["latin"],
@@ -103,6 +104,7 @@ type GuestStatus = "PENDING" | "CONFIRMED" | "DECLINED";
 interface GuestRecord {
   id?: string;
   name?: string;
+  mesas?: string[] | null;
   uniqueToken?: string;
   expectedCount?: number;
   expectedAdults?: number;
@@ -870,6 +872,15 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
                   <PvpMedallion title="SECTOR" label="Pista" sub="MESA VIP" arcId="pvpArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" />
                 </div>
                 <span className="pvp-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                {/* mesa-en-ubicacion */}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <span
+                    className="pvp-mini-label"
+                    style={{ fontSize: "17px", letterSpacing: "0.16em", marginTop: "10px", color: "inherit" }}
+                  >
+                    {guest.mesas.join(" · ")}
+                  </span>
+                )}
               </div>
             </div>
             <PvpDots count={LUGAR_PANEL_COUNT} />
@@ -1157,6 +1168,12 @@ export function PaseVipTemplateVioleta({ invitation, guest, isPersonalized = fal
       )}
 
       {musicaHabilitada && musicAudioElement}
+      {/* Burbuja del pase: nombre, lugares y mesa. Misma que en la
+          colección Flat, con el acento de esta variante. */}
+      {mounted && isPersonalized && guest && isCoverOpen && (
+        <BurbujaPase acento="#9B7FC4" guest={guest} />
+      )}
+
       {mounted && musicaHabilitada && isCoverOpen && createPortal(
         <MusicToggleButton
           isPlaying={isMusicPlaying}

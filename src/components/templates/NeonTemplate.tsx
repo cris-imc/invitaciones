@@ -139,6 +139,7 @@ interface NeonTemplateProps {
   guest?: {
     id: string;
     name: string;
+    mesas?: string[] | null;
     uniqueToken: string;
     status: string;
     attendingCount: number;
@@ -1093,6 +1094,9 @@ export function NeonTemplate({ invitation, guest, isPersonalized = false }: Neon
               <div className="flex flex-col text-left">
                 <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#39FFD0] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
                 <span className="text-[#FFFFFF] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
+                {guest.mesas && guest.mesas.length > 0 && (
+                  <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#39FFD0] leading-none mt-1.5" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{guest.mesas.join(" · ")}</span>
+                )}
               </div>
               <div className="flex flex-col items-end border-l border-[#39FFD0]/20 pl-3">
                 <span className="text-[#FFFFFF] font-bold text-sm leading-none">{guest.expectedCount}</span>

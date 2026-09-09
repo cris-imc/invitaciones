@@ -8,9 +8,11 @@ import { GuestListWithPayment } from "@/components/dashboard/GuestListWithPaymen
 import { SongModerationPanel } from "@/components/dashboard/SongModerationPanel";
 import { QuickEditPrice } from "@/components/dashboard/QuickEditPrice";
 import { LiveAdminPanel } from "@/components/dashboard/live/LiveAdminPanel";
+import { MesasPanel } from "@/components/dashboard/mesas/MesasPanel";
+import { canUseFeature, PlanTier } from "@/lib/plan-limits";
 import { Lock, Info, Camera } from "lucide-react";
 
-type Tab = "invitados" | "canciones" | "precio" | "agregar" | "live";
+type Tab = "invitados" | "canciones" | "precio" | "agregar" | "mesas" | "live";
 
 interface Props {
   invitationId: string;
@@ -32,6 +34,7 @@ const TAB_DESCRIPTIONS: Record<Tab, string> = {
   invitados: "Revisá quién confirmó asistencia y llevá el control exacto de los pagos...",
   precio: "Modificá el precio de la tarjeta y mantené informado a tus invitados...",
   canciones: "Aprobá o rechazá las canciones que sugieren para la fiesta...",
+  mesas: "Armá el salón, asigná una mesa a cada familia y repartí a las que no entran en una sola...",
   live: "Modo Fiesta: Proyectá fotos en vivo y moderá la pantalla gigante...",
 };
 
@@ -131,9 +134,20 @@ export function GuestPageTabs({
     { id: "agregar", label: "Gestionar invitados", highlight: "gold" },
     { id: "invitados", label: pagoTarjetaHabilitado ? "Gestionar pagos" : "Lista de invitados", highlight: "default" },
     ...(pagoTarjetaHabilitado ? [{ id: "precio" as Tab, label: "Gestionar precios", highlight: "default" as const }] : []),
+    { id: "mesas", label: "Mesas", highlight: "default" },
     { id: "canciones", label: "Música sugerida", highlight: "default" },
     { id: "live" as Tab, label: "LIVE", highlight: "live" },
   ];
+
+  // Contra plan-limits y no contra una lista de planes escrita a mano acá: la
+  // lista se olvidaba de Diamond Light (que tiene lo mismo que Diamond) y le
+  // dejaba LIVE bloqueado sin que nadie lo hubiera decidido.
+  const bloqueado = (id: Tab): boolean => {
+    if (id === "canciones") return planTier === "FREE";
+    if (id === "live") return !canUseFeature(planTier as PlanTier, "live");
+    if (id === "mesas") return !canUseFeature(planTier as PlanTier, "tableAssignment");
+    return false;
+  };
 
   return (
     <div>
@@ -157,9 +171,7 @@ export function GuestPageTabs({
           onScroll={checkScroll}
         >
           {tabs.map((t) => {
-            const hasLive = planTier === "DIAMOND" || planTier === "ENTERPRISE" || planTier === "ADMIN";
-            const isLocked =
-              t.id === "canciones" ? planTier === "FREE" : t.id === "live" ? !hasLive : false;
+            const isLocked = bloqueado(t.id);
 
             // Live tab: pulsing dot
             const tabLabel =
@@ -238,7 +250,9 @@ export function GuestPageTabs({
             className="fixed px-3 py-1.5 bg-black text-white text-xs rounded whitespace-nowrap z-[200] pointer-events-none"
             style={{ top: lockedTooltip.top - 8, left: lockedTooltip.left, transform: "translate(-50%, -100%)" }}
           >
-            {lockedTooltip.id === "live" ? "Disponible en Diamond" : "Disponible en Premium"}
+            {lockedTooltip.id === "live" || lockedTooltip.id === "mesas"
+              ? "Disponible en Diamond"
+              : "Disponible en Premium"}
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black" />
           </div>,
           document.body
@@ -272,6 +286,12 @@ export function GuestPageTabs({
                   (Number(precioNino) || 0) > 0
                 }
               />
+            </div>
+          )}
+          {tab === "mesas" && (
+            <div>
+              <h2 className="text-xl font-semibold mb-6">Mesas del salón</h2>
+              <MesasPanel slug={slug} />
             </div>
           )}
           {tab === "canciones" && (
@@ -331,9 +351,7 @@ export function GuestPageTabs({
       <nav className="adm-mobile-nav">
         <div className="adm-mobile-nav-inner">
           {tabs.map((t) => {
-            const hasLive = planTier === "DIAMOND" || planTier === "ENTERPRISE" || planTier === "ADMIN";
-            const isLocked =
-              t.id === "canciones" ? planTier === "FREE" : t.id === "live" ? !hasLive : false;
+            const isLocked = bloqueado(t.id);
             return (
               <button
                 key={t.id}
@@ -346,6 +364,7 @@ export function GuestPageTabs({
                   {t.id === "agregar" && "👥"}
                   {t.id === "invitados" && "✅"}
                   {t.id === "precio" && "💰"}
+                  {t.id === "mesas" && "🪑"}
                   {t.id === "canciones" && "🎵"}
                   {t.id === "live" && (liveActive ? "🟢" : "⭕")}
                 </span>
@@ -353,6 +372,7 @@ export function GuestPageTabs({
                   {t.id === "agregar" ? "Invitados" :
                    t.id === "invitados" ? "Lista" :
                    t.id === "precio" ? "Precio" :
+                   t.id === "mesas" ? "Mesas" :
                    t.id === "canciones" ? "Música" : "LIVE"}
                 </span>
               </button>

@@ -169,6 +169,7 @@ interface SedaTemplatePiedraProps {
   guest?: {
     id: string;
     name: string;
+    mesas?: string[] | null;
     uniqueToken: string;
     status: string;
     attendingCount: number;
@@ -1111,6 +1112,9 @@ export function SedaTemplatePiedra({ invitation, guest, isPersonalized = false }
               <div className="flex flex-col text-left">
                 <span className="text-[8px] font-semibold uppercase tracking-[0.2em] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))", color: 'var(--t-acc)' }}>Pase Especial</span>
                 <span className="font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif', color: 'var(--seda-ink)' }}>{guest.name}</span>
+                {guest.mesas && guest.mesas.length > 0 && (
+                  <span className="text-[8px] font-semibold uppercase tracking-[0.2em] leading-none mt-1.5" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))", color: 'var(--t-acc)' }}>{guest.mesas.join(" · ")}</span>
+                )}
               </div>
               <div className="flex flex-col items-end pl-3" style={{ borderLeft: '1px solid color-mix(in srgb, var(--t-acc) 20%, transparent)' }}>
                 <span className="font-bold text-sm leading-none" style={{ color: 'var(--seda-ink)' }}>{guest.expectedCount}</span>

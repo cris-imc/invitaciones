@@ -35,6 +35,7 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
+import { BurbujaPase } from "@/components/templates/BurbujaPase";
 
 const flbArchivo = Archivo_Black({
   subsets: ["latin"],
@@ -82,6 +83,7 @@ type GuestStatus = "PENDING" | "CONFIRMED" | "DECLINED";
 interface GuestRecord {
   id?: string;
   name?: string;
+  mesas?: string[] | null;
   uniqueToken?: string;
   expectedCount?: number;
   expectedAdults?: number;
@@ -866,6 +868,15 @@ export function FashionLookbookTemplateMostaza({ invitation, guest, isPersonaliz
                   <FlbMedallion kicker="SECTOR" main="Pasarela" sub="LOOK 04" subColor="#D9A430" arcId="flbArc2" arcText={`ACCESO VIP · LOOK Nº ${passNumber} · `} spin="reverse" />
                 </div>
                 <span className="flb-mini-label flb-mini-label--dark">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                {/* mesa-en-ubicacion */}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <span
+                    className="flb-mini-label flb-mini-label--dark"
+                    style={{ fontSize: "17px", letterSpacing: "0.16em", marginTop: "10px", color: "inherit" }}
+                  >
+                    {guest.mesas.join(" · ")}
+                  </span>
+                )}
               </div>
             </div>
             <FlbDots count={LUGAR_PANEL_COUNT} />
@@ -1155,6 +1166,12 @@ export function FashionLookbookTemplateMostaza({ invitation, guest, isPersonaliz
       )}
 
       {musicaHabilitada && musicAudioElement}
+      {/* Burbuja del pase: nombre, lugares y mesa. Misma que en la
+          colección Flat, con el acento de esta variante. */}
+      {mounted && isPersonalized && guest && isCoverOpen && (
+        <BurbujaPase acento="#D9A430" guest={guest} />
+      )}
+
       {mounted && musicaHabilitada && isCoverOpen && createPortal(
         <MusicToggleButton
           isPlaying={isMusicPlaying}

@@ -44,6 +44,7 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
+import { BurbujaPase } from "@/components/templates/BurbujaPase";
 
 const adpSerif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -92,6 +93,7 @@ type GuestStatus = "PENDING" | "CONFIRMED" | "DECLINED";
 interface GuestRecord {
   id?: string;
   name?: string;
+  mesas?: string[] | null;
   uniqueToken?: string;
   expectedCount?: number;
   expectedAdults?: number;
@@ -904,6 +906,15 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
                   <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`LÁMINA Nº ${laminaNumber}`} arcId="adpArc2" arcText={`ACCESO · LÁMINA Nº ${laminaNumber} · `} spin="reverse" title="Reservado" />
                 </div>
                 <span className="adp-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                {/* mesa-en-ubicacion */}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <span
+                    className="adp-mini-label"
+                    style={{ fontSize: "17px", letterSpacing: "0.16em", marginTop: "10px", color: "inherit" }}
+                  >
+                    {guest.mesas.join(" · ")}
+                  </span>
+                )}
               </div>
             </div>
             {!scrollVertical && <Dots count={LUGAR_PANEL_COUNT} />}
@@ -1194,6 +1205,12 @@ export function AtelierDePapelTemplate({ invitation, guest, isPersonalized = fal
       )}
 
       {musicaHabilitada && musicAudioElement}
+      {/* Burbuja del pase: nombre, lugares y mesa. Misma que en la
+          colección Flat, con el acento de esta variante. */}
+      {mounted && isPersonalized && guest && isCoverOpen && (
+        <BurbujaPase acento="#7A6852" guest={guest} />
+      )}
+
       {mounted && musicaHabilitada && isCoverOpen && createPortal(
         <MusicToggleButton
           isPlaying={isMusicPlaying}

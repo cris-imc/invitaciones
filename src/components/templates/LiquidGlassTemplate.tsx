@@ -56,6 +56,7 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
+import { BurbujaPase } from "@/components/templates/BurbujaPase";
 
 const lqgCormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -104,6 +105,7 @@ type GuestStatus = "PENDING" | "CONFIRMED" | "DECLINED";
 interface GuestRecord {
   id?: string;
   name?: string;
+  mesas?: string[] | null;
   uniqueToken?: string;
   expectedCount?: number;
   expectedAdults?: number;
@@ -914,6 +916,15 @@ export function LiquidGlassTemplate({ invitation, guest, isPersonalized = false 
                   <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PANEL Nº ${panelNumber}`} arcId="lqgArc2" arcText={`ACCESO VIP · PANEL Nº ${panelNumber} · `} spin="reverse" title="Reservado" size={32} />
                 </div>
                 <span className="lqg-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                {/* mesa-en-ubicacion */}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <span
+                    className="lqg-mini-label"
+                    style={{ fontSize: "17px", letterSpacing: "0.16em", marginTop: "10px", color: "inherit" }}
+                  >
+                    {guest.mesas.join(" · ")}
+                  </span>
+                )}
               </div>
             </div>
             {!scrollVertical && <Dots count={LUGAR_PANEL_COUNT} />}
@@ -1204,6 +1215,12 @@ export function LiquidGlassTemplate({ invitation, guest, isPersonalized = false 
       )}
 
       {musicaHabilitada && musicAudioElement}
+      {/* Burbuja del pase: nombre, lugares y mesa. Misma que en la
+          colección Flat, con el acento de esta variante. */}
+      {mounted && isPersonalized && guest && isCoverOpen && (
+        <BurbujaPase acento="#6FA8C9" guest={guest} />
+      )}
+
       {mounted && musicaHabilitada && isCoverOpen && createPortal(
         <MusicToggleButton
           isPlaying={isMusicPlaying}

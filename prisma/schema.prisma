@@ -249,6 +249,11 @@ model Invitation {
   triviaSubtitulo              String?
   triviaPreguntas              String?
   triviaBotonTexto             String?
+  /// Mesas asignadas. Apagado por defecto: no toda fiesta sienta a la gente, y
+  /// con esto en falso el invitado no ve ni la mesa en la portada ni el QR de
+  /// ingreso, aunque el plan lo permita. Es del anfitrión decidir si su evento
+  /// tiene mesas asignadas o es libre.
+  mesasHabilitadas             Boolean          @default(false)
   infoAdicionalSeccionHabilitada Boolean        @default(false)
   infoAlojamientoHabilitado    Boolean          @default(false)
   infoAlojamientoTexto         String?
@@ -295,6 +300,7 @@ model Invitation {
   rsvps                        RSVP[]
   songSuggestions              SongSuggestion[]
   liveSession                  LiveSession?
+  mesas                        Mesa[]
 }
 
 model Guest {
@@ -350,9 +356,66 @@ model Guest {
   updatedAt              DateTime         @updatedAt
   invitation             Invitation       @relation(fields: [invitationId], references: [id], onDelete: Cascade)
   songSuggestions        SongSuggestion[]
+  lugaresEnMesas         MesaLugar[]
 
   @@index([invitationId])
   @@index([uniqueToken])
+}
+
+/// Una mesa del salón.
+///
+/// `posX`/`posY` son la posición en el plano, en porcentaje del ancho y alto
+/// del lienzo (0-100) y no en píxeles: así el plano se ve igual en una pantalla
+/// de escritorio y en un celular, sin recalcular nada al cambiar de tamaño.
+model Mesa {
+  id           String     @id @default(cuid())
+  invitationId String
+  /// Lo que ve el invitado: "Mesa 4". Es la identidad de la mesa el día del
+  /// evento, la que va a estar en el cartelito arriba de la mesa.
+  numero       Int
+  /// Cómo la llama el anfitrión mientras organiza: "Primos", "Trabajo", "Los
+  /// de la facu". Es sólo para él. Al invitado no le dice nada -- leer
+  /// "Primos" en su invitación no le indica a dónde sentarse -- así que nunca
+  /// sale de la vista del anfitrión.
+  alias        String?
+  /// Cuántos lugares tiene. Es el tope contra el que se comparan las
+  /// asignaciones, pero no se valida en la base: el anfitrión puede dejar una
+  /// mesa pasada de gente mientras acomoda, y el panel se lo marca.
+  sillas       Int        @default(8)
+  /// REDONDA | RECTANGULAR
+  forma        String     @default("REDONDA")
+  posX         Float      @default(50)
+  posY         Float      @default(50)
+  orden        Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  lugares      MesaLugar[]
+
+  @@index([invitationId])
+}
+
+/// Cuántos lugares de un invitado se sientan en una mesa.
+///
+/// No es "invitado → mesa" sino "N lugares de este invitado → esta mesa",
+/// porque una familia puede quedar repartida: los Pérez, que son 6, pueden ir
+/// 4 en la mesa 3 y 2 en la mesa 4. Con una relación simple habría que elegir
+/// entre sentarlos juntos o no sentarlos, que es justo lo que no queríamos.
+///
+/// La suma de `lugares` de un invitado no puede pasar sus lugares esperados;
+/// eso se valida en la acción, no acá.
+model MesaLugar {
+  id      String @id @default(cuid())
+  mesaId  String
+  guestId String
+  lugares Int    @default(1)
+  mesa    Mesa   @relation(fields: [mesaId], references: [id], onDelete: Cascade)
+  guest   Guest  @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  /// Un invitado aparece una sola vez por mesa: si se le suman lugares en una
+  /// mesa donde ya está, se actualiza la fila en vez de crear otra.
+  @@unique([mesaId, guestId])
+  @@index([guestId])
 }
 
 model Album {

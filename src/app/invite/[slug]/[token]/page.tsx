@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { resolveCardPayment, resolveGuestPaymentView } from "@/lib/card-payments";
+import { canUseFeature, PlanTier } from "@/lib/plan-limits";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 import { ElegantTemplate } from "@/components/templates/ElegantTemplate";
 import { ElegantTemplateGreen } from "@/components/templates/ElegantTemplateGreen";
@@ -438,6 +439,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 rsvpDaysBeforeEvent: true,
                 templateTipo: true,
                 mostrarNombreInvitadoEnSaludo: true,
+                mesasHabilitadas: true,
                 fontTitle: true,
                 fontBody: true,
                 tipografiaDisplay: true,
@@ -537,6 +539,23 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         );
     }
 
+    // Las mesas de este invitado, para la burbuja del pase. Sólo los nombres y
+    // sólo si el anfitrión decidió mostrarlas: si una familia quedó repartida
+    // entre dos mesas ve las dos, nunca quién va en cada una -- ese reparto es
+    // del anfitrión. El plan se vuelve a verificar acá porque una invitación
+    // puede haber bajado de categoría después de armar el salón.
+    const mesasDelInvitado =
+        validInvitation.mesasHabilitadas &&
+        canUseFeature(String(validInvitation.planTier ?? 'FREE') as PlanTier, 'tableAssignment')
+            ? (
+                  await prisma.mesaLugar.findMany({
+                      where: { guestId: guest.id },
+                      select: { mesa: { select: { numero: true } } },
+                      orderBy: { mesa: { numero: 'asc' } },
+                  })
+              ).map((l) => `Mesa ${l.mesa.numero}`)
+            : [];
+
     let temaColoresObj = { colorPrincipal: 'default' };
     try {
         if (typeof validInvitation.temaColores === 'string') {
@@ -559,6 +578,10 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
             const guestRecord = {
                 ...guest,
                 orderNumber: guestOrderNumber,
+                // Los nombres de sus mesas, vacío si el anfitrión no las
+                // muestra. Viaja adentro del invitado porque es donde las 361
+                // plantillas ya miran para armar la burbuja del pase.
+                mesas: mesasDelInvitado,
                 paymentStatus: guest
                     ? resolveCardPayment(guest, validInvitation as never).status
                     : undefined,

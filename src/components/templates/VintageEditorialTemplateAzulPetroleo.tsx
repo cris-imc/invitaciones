@@ -40,6 +40,7 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { CreditCard, Gift } from "lucide-react";
 import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
+import { BurbujaPase } from "@/components/templates/BurbujaPase";
 
 const vtePlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -88,6 +89,7 @@ type GuestStatus = "PENDING" | "CONFIRMED" | "DECLINED";
 interface GuestRecord {
   id?: string;
   name?: string;
+  mesas?: string[] | null;
   uniqueToken?: string;
   expectedCount?: number;
   expectedAdults?: number;
@@ -896,6 +898,15 @@ export function VintageEditorialTemplateAzulPetroleo({ invitation, guest, isPers
                   <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`EDICIÓN Nº ${edicionNumero}`} arcId="vteArc2" arcText={`ACCESO VIP · EDICIÓN Nº ${edicionNumero} · `} spin="reverse" title="Reservado" />
                 </div>
                 <span className="vte-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                {/* mesa-en-ubicacion */}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <span
+                    className="vte-mini-label"
+                    style={{ fontSize: "17px", letterSpacing: "0.16em", marginTop: "10px", color: "inherit" }}
+                  >
+                    {guest.mesas.join(" · ")}
+                  </span>
+                )}
               </div>
             </div>
             {!scrollVertical && <Dots count={LUGAR_PANEL_COUNT} />}
@@ -1187,6 +1198,12 @@ export function VintageEditorialTemplateAzulPetroleo({ invitation, guest, isPers
       )}
 
       {musicaHabilitada && musicAudioElement}
+      {/* Burbuja del pase: nombre, lugares y mesa. Misma que en la
+          colección Flat, con el acento de esta variante. */}
+      {mounted && isPersonalized && guest && isCoverOpen && (
+        <BurbujaPase acento="#67A3B3" guest={guest} />
+      )}
+
       {mounted && musicaHabilitada && isCoverOpen && createPortal(
         <MusicToggleButton
           isPlaying={isMusicPlaying}

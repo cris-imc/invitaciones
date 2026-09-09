@@ -98,7 +98,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       whatsappReminders: false,
       dedicatedSupport: true,
       customDesign: false,
-      tableAssignment: false,
+      tableAssignment: true,
     },
   },
   // Mismo alcance que Diamond, pero conserva el crédito "Hecho con amor por
@@ -125,7 +125,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       whatsappReminders: false,
       dedicatedSupport: true,
       customDesign: false,
-      tableAssignment: false,
+      tableAssignment: true,
     },
   },
   ENTERPRISE: {
