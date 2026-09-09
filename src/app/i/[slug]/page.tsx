@@ -830,11 +830,13 @@ export default async function InvitationPage({
 
   const isFree = invitation.planTier === 'FREE';
 
+  // Igual que en /invite: el plan se marca acá y una regla en globals.css
+  // decide si el crédito al pie se ve (ver .credito-alta).
   return (
-    <>
+    <div data-plan-tier={String(invitation.planTier ?? 'FREE')}>
       {isFree && <FreePlanBanner />}
       {isFree && <FreePlanBannerSpacer />}
       {renderTemplate()}
-    </>
+    </div>
   );
 }

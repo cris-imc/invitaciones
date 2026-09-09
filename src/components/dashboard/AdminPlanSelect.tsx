@@ -34,6 +34,12 @@ export function AdminPlanSelect({ invitationId, currentPlan }: { invitationId: s
                 <option value="FREE">Gratis (20 inv)</option>
                 <option value="PREMIUM">Premium (Ilimitado)</option>
                 <option value="DIAMOND">Diamond (Ilimitado + LIVE)</option>
+                {/* Diamond Light no se comercializa: es para las cuentas de
+                    prueba regaladas. Tiene todo lo de Diamond pero conserva el
+                    crédito de altainvitacion al pie de la invitación. Por eso
+                    aparece sólo acá y no en la landing, /register ni el panel
+                    de suscripción del cliente. */}
+                <option value="DIAMOND_LIGHT">Diamond Light (regalo · con logo al pie)</option>
                 <option value="ENTERPRISE">Enterprise</option>
             </select>
             {isPending && <span className="text-xs text-blue-500">Guardando...</span>}

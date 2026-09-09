@@ -898,10 +898,38 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .l-nav-links a:hover{color:var(--paper);}
 .l-cta{font-family:var(--font-ui); font-weight:600; font-size:13px; background:var(--accent); color:var(--ink); padding:10px 18px; border-radius:999px; border:none; cursor:pointer;}
 
-.l-hero{padding:64px 34px 50px; display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center;}
-.l-hero h1{font-family:var(--font-display); font-weight:700; font-size:43px; line-height:1.08; margin:0 0 18px; color:var(--paper);}
+/* Hero a una sola columna y centrado: antes el texto competía con una foto al
+   costado. Sin foto, el titular ocupa el ancho y el fondo animado hace el
+   trabajo de ambientar. */
+.l-hero{position:relative; overflow:hidden; padding:104px 34px 88px; display:flex; flex-direction:column; align-items:center; text-align:center;}
+.l-hero > *{position:relative; z-index:1;}
+.l-hero h1{font-family:var(--font-display); font-weight:700; font-size:56px; line-height:1.06; margin:0 auto 20px; max-width:16ch; color:var(--paper);}
 .l-hero h1 em{font-style:italic; font-weight:500; color:var(--accent);}
-.l-hero-ctas{display:flex; gap:12px;}
+.l-hero-ctas{display:flex; gap:14px; align-items:center; justify-content:center; flex-wrap:wrap;}
+
+/* Fondo de fiesta, sólo CSS.
+   Dos capas: un resplandor tibio detrás del titular y unas luces que suben
+   despacio, como una guirnalda encendida. Todo con transform/opacity para que
+   lo componga la GPU y no cueste nada. */
+.hero-fondo{position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;}
+.hero-fondo::before{content:""; position:absolute; left:50%; top:38%; width:min(150%,1200px); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%;
+  background:radial-gradient(closest-side, rgba(199,154,75,.30), rgba(92,138,122,.12) 52%, transparent 74%); filter:blur(24px);}
+/* El halo alrededor de cada luz es lo que da la sensación de guirnalda
+   encendida: sin él son puntos planos y no se leen como luces. */
+.hero-fondo i{position:absolute; bottom:-12%; border-radius:50%; opacity:0;
+  background:radial-gradient(circle at 38% 34%, #FFF8E7, rgba(233,199,133,.95) 38%, rgba(199,154,75,0) 72%);
+  box-shadow:0 0 14px 4px rgba(199,154,75,.55), 0 0 34px 10px rgba(199,154,75,.22);
+  animation:heroSubir linear infinite;}
+@keyframes heroSubir{
+  0%{transform:translate3d(0,0,0) scale(.45); opacity:0;}
+  10%{opacity:1;}
+  75%{opacity:.75;}
+  100%{transform:translate3d(var(--dx,0px),-108vh,0) scale(1.15); opacity:0;}
+}
+/* Quien pidió menos movimiento ve el resplandor pero no las luces subiendo. */
+@media (prefers-reduced-motion: reduce){
+  .hero-fondo i{display:none;}
+}
 
 .hero-preview{background:var(--paper); border-radius:var(--r-l); padding:26px; color:var(--ink); position:relative;}
 .hero-preview .seal{border-color:#0F1613; margin-bottom:14px; width:38px; height:38px; border-radius:50%; border:1px solid #0F1613; display:flex; align-items:center; justify-content:center;}
@@ -953,8 +981,8 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   }
   .l-nav-links{ display:none; }
   .l-hamburger{ display:flex; }
-  .l-hero{ grid-template-columns:1fr; padding:86px 20px 8px; gap:32px; }
-  .l-hero h1{ font-size:30.6px; }
+  .l-hero{ padding:104px 20px 56px; }
+  .l-hero h1{ font-size:34px; max-width:14ch; }
   .l-hero-ctas{ flex-wrap:wrap; }
   .l-strip-grid{ grid-template-columns:1fr; }
   .l-steps{ padding:8px 20px 44px; }
@@ -2192,3 +2220,15 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 @media (prefers-reduced-motion: reduce) {
   .inv-dialog-centered[data-state] { animation-duration: 1ms }
 }
+
+/* Crédito "Hecho con amor por altainvitacion" al pie de la invitación.
+   Lo pintan las plantillas por su cuenta (LogoFooterCredit); acá se decide si
+   se ve, según el plan que la ruta del invitado marca en data-plan-tier.
+
+   Diamond y Enterprise lo ocultan: es parte de lo que se paga. Diamond Light
+   NO está en esta lista a propósito -- es el mismo plan pero regalado a
+   cuentas de prueba, y a cambio la invitación sigue mostrando de dónde salió.
+   Gratis y Premium tampoco: ahí el crédito se mantiene. */
+[data-plan-tier="DIAMOND"] .credito-alta,
+[data-plan-tier="ENTERPRISE"] .credito-alta,
+[data-plan-tier="ADMIN"] .credito-alta { display: none; }

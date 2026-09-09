@@ -21,8 +21,11 @@ const WHATSAPP_CONTACT_URL = `https://wa.me/5493517660000?text=${encodeURICompon
 // la URL actual sin navegar, y como esas páginas no tienen esos ids, el
 // click no hace nada visible. Con "/#ancla" Next.js navega a home y baja al
 // ancla sin importar desde qué página se haga click.
+// "Plantillas" apuntaba al showcase animado de la home, que muestra una
+// plantilla por vez. Desde que existe /modelos -- que es la página dedicada,
+// con pestañas por tipo de evento -- eran dos entradas para lo mismo y la
+// peor de las dos iba primera.
 const BASE_LINKS = [
-  { href: "/#plantillas", label: "Plantillas" },
   { href: "/modelos", label: "Ver modelos" },
   { href: "/#como-funciona", label: "Cómo funciona" },
   { href: "/#precios", label: "Precios" },

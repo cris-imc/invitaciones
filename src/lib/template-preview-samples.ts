@@ -115,7 +115,28 @@ const NEON_COLOR_TO_VESTIDO: Record<string, keyof typeof QUINCE_FOTOS_POR_COLOR>
   Rojo: "rojo",
 };
 
+// Las familias de la Colección Storytelling usan colorId "default", que no
+// está en ninguno de los mapas de arriba: sin esto todas caían al mismo
+// fallback y mostraban la misma chica de amarillo una y otra vez. Cada una
+// tiene su vestido, elegido para que peguen con su paleta.
+const STORYTELLING_TIPO_TO_VESTIDO: Record<string, keyof typeof QUINCE_FOTOS_POR_COLOR> = {
+  PRINCESA: "violeta",
+  ACRYLICPOP: "azul",
+  CORONAESCARLATA: "rojo",
+  JEWELRYBOX: "verde",
+  BOLADEDISCOTECA: "rosa",
+  FASHIONTAG: "azul",
+  FASHIONLOOKBOOK: "verde",
+  CINEABSTRACTOXV: "rojo",
+  CRYSTAL3D: "violeta",
+  PASEVIP: "rosa",
+};
+
 function getQuinceFotos(templateTipo: TemplateTipo, colorId: string): string[] {
+  const porFamilia = STORYTELLING_TIPO_TO_VESTIDO[templateTipo];
+  if (porFamilia && (!colorId || colorId === "default")) {
+    return QUINCE_FOTOS_POR_COLOR[porFamilia];
+  }
   const map = templateTipo === "MODERNO" ? MODERNO_COLOR_TO_VESTIDO
     : templateTipo === "NEON" ? NEON_COLOR_TO_VESTIDO
     : ELEGANT_COLOR_TO_VESTIDO;

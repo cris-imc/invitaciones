@@ -44,8 +44,7 @@ const PLAN_CARDS: {
     features: [
       "Invitados ilimitados",
       "Plantilla 100% personalizada",
-      "Gestión de invitados y pagos",
-      "Cuenta regresiva",
+      "Gestión de invitados y pagos",      "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.PREMIUM.maxPhotos} fotos en el álbum`,
       "Con musica de fondo",
       "Con Trivia",
@@ -59,8 +58,7 @@ const PLAN_CARDS: {
     features: [
       "Invitados ilimitados",
       "Plantilla 100% personalizada",
-      "Gestión de invitados y pagos",
-      "Cuenta regresiva",
+      "Gestión de invitados y pagos",      "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.DIAMOND.maxPhotos} fotos en el álbum`,
       "Con musica de fondo",
       "Con LIVE (fotos y mensajes en vivo)",

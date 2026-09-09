@@ -998,11 +998,17 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
 
     const isFree = validInvitation.planTier === 'FREE';
 
+    // El crédito "Hecho con amor por altainvitacion" al pie lo pintan las 361
+    // plantillas por su cuenta (LogoFooterCredit), muchas veces desde
+    // subcomponentes donde la invitación no está en scope. En vez de pasarles
+    // el plan a las 545 llamadas, se marca acá el contenedor y una sola regla
+    // en globals.css decide si se ve. Diamond lo oculta; Diamond Light -- que
+    // es el mismo plan regalado a cuentas de prueba -- lo conserva.
     return (
-        <>
+        <div data-plan-tier={String(validInvitation.planTier ?? 'FREE')}>
             {isFree && <FreePlanBanner />}
             {isFree && <FreePlanBannerSpacer />}
             {renderTemplate()}
-        </>
+        </div>
     );
 }

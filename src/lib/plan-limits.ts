@@ -1,4 +1,4 @@
-export type PlanTier = "FREE" | "PREMIUM" | "DIAMOND" | "ENTERPRISE" | "ADMIN";
+export type PlanTier = "FREE" | "PREMIUM" | "DIAMOND" | "DIAMOND_LIGHT" | "ENTERPRISE" | "ADMIN";
 
 export interface PlanFeatures {
   customMusic: boolean;
@@ -57,7 +57,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   },
   PREMIUM: {
     name: "Premium",
-    price: 50000,
+    price: 45000,
     maxInvitations: null, // unlimited
     maxGuests: null, // unlimited
     maxPhotos: 15,
@@ -80,7 +80,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   },
   DIAMOND: {
     name: "Diamond",
-    price: 90000,
+    price: 60000,
     maxInvitations: null, // unlimited
     maxGuests: null, // unlimited
     maxPhotos: 15,
@@ -94,6 +94,33 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       sharedAlbum: true,
       analytics: true,
       noWatermark: true,
+      qrCodes: false,
+      whatsappReminders: false,
+      dedicatedSupport: true,
+      customDesign: false,
+      tableAssignment: false,
+    },
+  },
+  // Mismo alcance que Diamond, pero conserva el crédito "Hecho con amor por
+  // altainvitacion" al pie. Es para las cuentas de prueba regaladas: tienen
+  // todo, y a cambio la invitación sigue mostrando de dónde salió. No se
+  // comercializa -- se asigna a mano desde el panel de admin.
+  DIAMOND_LIGHT: {
+    name: "Diamond Light",
+    price: 0,
+    maxInvitations: null, // unlimited
+    maxGuests: null, // unlimited
+    maxPhotos: 15,
+    maxLivePhotos: 200,
+    allowedTemplates: "all",
+    features: {
+      customMusic: true,
+      trivia: true,
+      live: true,
+      djSuggestions: true,
+      sharedAlbum: true,
+      analytics: true,
+      noWatermark: false,
       qrCodes: false,
       whatsappReminders: false,
       dedicatedSupport: true,
@@ -157,8 +184,14 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
 // El precio es la fuente de verdad (números redondos que se piden a
 // propósito); el porcentaje que se muestra en la UI se calcula a partir de
 // él, no al revés -- así nunca quedan desincronizados entre sí.
-export const PREMIUM_DISCOUNT_PRICE = 29000; // antes $50.000
-export const DIAMOND_DISCOUNT_PRICE = 40000; // antes $90.000
+// Los precios de lista bajaron (Premium 50.000 -> 45.000, Diamond 90.000 ->
+// 60.000) junto con los de oferta. El descuento anterior era de -42% y -56%
+// permanentes: un descuento de esa magnitud que nunca vence no se lee como
+// oferta sino como que el precio tachado es inventado, y termina restando
+// credibilidad en vez de sumar urgencia. Con -22% y -25% el tachado es
+// creíble y el precio final sigue siendo el más bajo del mercado.
+export const PREMIUM_DISCOUNT_PRICE = 35000; // antes $45.000
+export const DIAMOND_DISCOUNT_PRICE = 45000; // antes $60.000
 export const PREMIUM_DISCOUNT_PERCENTAGE = Math.round((1 - PREMIUM_DISCOUNT_PRICE / PLAN_LIMITS.PREMIUM.price) * 100);
 export const DIAMOND_DISCOUNT_PERCENTAGE = Math.round((1 - DIAMOND_DISCOUNT_PRICE / PLAN_LIMITS.DIAMOND.price) * 100);
 

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 interface ShowcaseItem {
   evento: "CASAMIENTO" | "QUINCE_ANOS";
-  tipo: "ELEGANT" | "MODERNO";
+  tipo: string;
   color: string;
   label: string;
 }
@@ -12,13 +12,20 @@ interface ShowcaseItem {
 // Curaduría de combinaciones evento/plantilla/color a mostrar en rotación.
 // Las fotos (vestido acorde al color) las resuelve automáticamente
 // getTemplatePreviewSample() dentro de /preview-plantilla.
+//
+// Se alterna Flat y Storytelling a propósito: antes rotaban sólo Elegant y
+// Moderno, así que el visitante veía dos familias de las 58 y ninguna de la
+// Colección Storytelling, que es la que no tiene equivalente en la
+// competencia. Van intercaladas para que dos vecinas nunca se parezcan.
 const ROTATION: ShowcaseItem[] = [
   { evento: "CASAMIENTO", tipo: "ELEGANT", color: "Green", label: "Boda · Elegant Verde" },
+  { evento: "CASAMIENTO", tipo: "GUESTPASSVIP", color: "default", label: "Boda · Guest Pass VIP" },
   { evento: "QUINCE_ANOS", tipo: "MODERNO", color: "Rojo", label: "15 Años · Moderno Rojo" },
+  { evento: "QUINCE_ANOS", tipo: "PRINCESA", color: "default", label: "15 Años · Princesa" },
   { evento: "CASAMIENTO", tipo: "MODERNO", color: "Azul", label: "Boda · Moderno Azul" },
+  { evento: "CASAMIENTO", tipo: "MARMOLYORO", color: "default", label: "Boda · Mármol y Oro" },
   { evento: "QUINCE_ANOS", tipo: "ELEGANT", color: "Pink", label: "15 Años · Elegant Rosa" },
-  { evento: "CASAMIENTO", tipo: "ELEGANT", color: "DarkYellow", label: "Boda · Elegant Dorado" },
-  { evento: "QUINCE_ANOS", tipo: "MODERNO", color: "Verde", label: "15 Años · Moderno Verde" },
+  { evento: "QUINCE_ANOS", tipo: "ACRYLICPOP", color: "default", label: "15 Años · Acrylic Pop" },
 ];
 
 // El iframe siempre se layoutea a un ancho de celular real para que

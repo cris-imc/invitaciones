@@ -174,9 +174,16 @@ export function LogoFooterCredit({
   // Va despues del ultimo bloque de contenido de la invitacion. Sin fondo
   // propio, este wrapper deja ver el crema/paper base de la "escena"
   // (.desktop-stage) en vez del color de la plantilla.
+  //
+  // La clase `credito-alta` existe para poder ocultarlo segun el plan: la
+  // ruta del invitado marca su contenedor con data-plan-tier y una sola regla
+  // en globals.css lo esconde en los planes que no llevan marca. Se resuelve
+  // asi y no con una prop porque este componente se llama desde 545 lugares
+  // en 361 plantillas, muchos dentro de subcomponentes donde la invitacion
+  // (y por lo tanto el plan) no esta en scope.
   return (
     <div
-      className={`flex justify-center pt-8 pb-8 max-[900px]:pb-24 ${className ?? ""}`}
+      className={`credito-alta flex justify-center pt-8 pb-8 max-[900px]:pb-24 ${className ?? ""}`}
       style={{ backgroundColor: bgColor }}
     >
       <div className="flex flex-col items-center gap-2 px-5 py-4">

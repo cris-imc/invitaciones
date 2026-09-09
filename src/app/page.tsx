@@ -5,7 +5,7 @@ import { AnimatedHeroText } from "@/components/landing/AnimatedHeroText";
 import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingLogo } from "@/components/ui/Logo";
-import { HeroParallaxPhoto } from "@/components/landing/HeroParallaxPhoto";
+import { HeroFondoFiesta } from "@/components/landing/HeroFondoFiesta";
 import { Settings2, Users, Radio, CalendarDays, MapPin, ListChecks, Gift, Images, Music, MessageCircleHeart, Rss } from "lucide-react";
 import { auth } from "@/auth";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
@@ -36,21 +36,36 @@ export default async function Home() {
         <LandingNav registerUrl={registerUrl} isLoggedIn={Boolean(session)} />
 
         <section className="l-hero">
-          <div>
-            <AnimatedHeroText />
-            <div className="l-hero-ctas font-ui">
-              <Link href={registerUrl}>
-                <Button className="rounded-full bg-[var(--accent)] text-[var(--ink)] transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--accent)]/20 px-6 font-ui">Empezar gratis</Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button variant="ghost" className="rounded-full border border-white/25 text-[var(--paper)] transition-all duration-200 hover:text-[var(--paper)] hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5 px-6 font-ui">Ingresar</Button>
-              </Link>
-            </div>
+          <HeroFondoFiesta />
+          <AnimatedHeroText />
+          <div className="l-hero-ctas font-ui">
+            <Link href={registerUrl}>
+              {/* El botón de empezar es el que tiene que llevarse la mirada:
+                  más grande que el resto de la página y con sombra propia. */}
+              <Button className="rounded-full bg-[var(--accent)] text-[var(--ink)] font-semibold text-base px-9 py-6 shadow-lg shadow-[var(--accent)]/25 transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--accent)]/35 font-ui">
+                Empezar gratis
+              </Button>
+            </Link>
+            {/* Ingresar baja a link de texto: es para quien ya es cliente, no
+                compite con la acción que importa. */}
+            <Link
+              href="/dashboard"
+              className="text-sm text-zinc-400 underline underline-offset-4 decoration-white/25 transition-colors hover:text-[var(--paper)] hover:decoration-white/60 font-ui"
+            >
+              Ya tengo cuenta
+            </Link>
           </div>
-          {/* En mobile no se muestra: la foto suelta quedaba colgada al lado
-              del texto. En desktop se mantiene, con un efecto parallax al
-              hacer scroll (ver HeroParallaxPhoto). */}
-          <HeroParallaxPhoto />
+          <p className="mt-5 text-xs sm:text-sm text-zinc-500 font-ui tracking-wide">
+            Gratis para empezar · Sin tarjeta · Pagás una vez, sin suscripción
+          </p>
+          {/* En píldora y no como una línea más de texto: las cuotas sin
+              interés son de las pocas cosas que se comparan de un vistazo
+              contra la competencia, y suelta entre otras frases grises no se
+              ve. */}
+          <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/45 bg-[var(--accent)]/10 px-4 py-2 text-xs sm:text-sm font-ui font-semibold tracking-wide text-[var(--accent)]">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+            Hasta 3 cuotas sin interés
+          </p>
         </section>
 
         {/* PLANTILLAS (showcase animado) */}
@@ -135,28 +150,35 @@ export default async function Home() {
             <h2 id="features-grid-title" className="text-3xl md:text-5xl font-display font-semibold mb-4 tracking-tight text-white">Todo lo que incluye tu invitación</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto px-6">
+            {/* Los dos primeros son los que ningún competidor tiene: seguir
+                quién pagó la tarjeta y la fiesta en vivo. Antes estaban
+                perdidos en el medio y al final de la grilla, compitiendo por
+                atención con "Música de fondo" -- que ofrece cualquiera. Van
+                primero y marcados. */}
             {[
-              { icon: <CalendarDays className="w-6 h-6" />, title: "Save the date", text: "Cuenta regresiva y botón para agendar la fecha directo en Google Calendar.", premium: false },
-              { icon: <MapPin className="w-6 h-6" />, title: "Ubicación e indicaciones", text: "Mapa, horarios y cómo llegar a la ceremonia y a la fiesta, todo en un lugar.", premium: false },
-              { icon: <ListChecks className="w-6 h-6" />, title: "Confirmación de asistencia", text: "RSVP en tiempo real: sabés quién confirmó sin tener que preguntar.", premium: false },
-              { icon: <Gift className="w-6 h-6" />, title: "Mesa de regalos y pagos", text: "Cuenta bancaria o cobro con tarjeta, sin comisiones sobre lo recaudado.", premium: false },
-              { icon: <Images className="w-6 h-6" />, title: "Álbum de fotos", text: "Compartí los momentos de la pareja antes de la fiesta y sumá los del evento.", premium: false },
-              { icon: <Music className="w-6 h-6" />, title: "Música de fondo", text: "La invitación suena con la canción que los identifica como pareja.", premium: false },
-              { icon: <MessageCircleHeart className="w-6 h-6" />, title: "Módulo social", text: "Sugerencias de canciones para el DJ y mensajes de cariño de los invitados.", premium: false },
-              { icon: <Rss className="w-6 h-6" />, title: "Modo LIVE", text: "Fotos y mensajes de invitados proyectados en vivo durante la fiesta.", premium: true },
+              { icon: <Gift className="w-6 h-6" />, title: "Quién pagó y quién debe", text: "Llevá la cuenta de la tarjeta invitado por invitado: precio por lugar, exentos y pagos parciales. El dinero va directo a vos.", premium: false, destacado: true },
+              { icon: <Rss className="w-6 h-6" />, title: "Modo LIVE", text: "Fotos y mensajes de tus invitados proyectados en vivo durante la fiesta.", premium: true, destacado: true },
+              { icon: <ListChecks className="w-6 h-6" />, title: "Confirmación de asistencia", text: "RSVP en tiempo real: sabés quién confirmó sin tener que preguntar.", premium: false, destacado: false },
+              { icon: <MessageCircleHeart className="w-6 h-6" />, title: "Módulo social", text: "Sugerencias de canciones para el DJ y mensajes de cariño de los invitados.", premium: false, destacado: false },
+              { icon: <CalendarDays className="w-6 h-6" />, title: "Save the date", text: "Cuenta regresiva y botón para agendar la fecha directo en Google Calendar.", premium: false, destacado: false },
+              { icon: <MapPin className="w-6 h-6" />, title: "Ubicación e indicaciones", text: "Mapa, horarios y cómo llegar a la ceremonia y a la fiesta, todo en un lugar.", premium: false, destacado: false },
+              { icon: <Images className="w-6 h-6" />, title: "Álbum de fotos", text: "Compartí los momentos de la pareja antes de la fiesta y sumá los del evento.", premium: false, destacado: false },
+              { icon: <Music className="w-6 h-6" />, title: "Música de fondo", text: "La invitación suena con la canción que los identifica como pareja.", premium: false, destacado: false },
             ].map((f) => (
               <div
                 key={f.title}
                 className={`rounded-2xl p-5 flex flex-col gap-3 relative ${
-                  f.premium
+                  f.destacado
                     ? "border border-[var(--accent)]/40 bg-gradient-to-b from-zinc-800/80 to-[var(--ink)] shadow-[0_0_30px_rgba(202,171,115,0.12)]"
                     : "bg-white/5 border border-white/8"
                 }`}
               >
-                {f.premium && (
+                {f.premium ? (
                   <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--accent)] text-[var(--ink)]">Diamond</span>
-                )}
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${f.premium ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-white/10 text-[var(--accent)]"}`}>
+                ) : f.destacado ? (
+                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[var(--accent)]/50 text-[var(--accent)]">Sólo acá</span>
+                ) : null}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${f.destacado ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-white/10 text-[var(--accent)]"}`}>
                   {f.icon}
                 </div>
                 <h3 className="font-semibold text-white text-sm leading-snug">{f.title}</h3>
@@ -246,7 +268,7 @@ export default async function Home() {
             <p className="kicker font-ui mx-auto mb-4">Precios Transparentes</p>
             <h2 className="text-3xl md:text-5xl font-display font-semibold mb-6 tracking-tight text-white">Elegí el plan para tu evento</h2>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto px-4">
-              Empezá completamente gratis o desbloqueá todas las funcionalidades con un único pago. Sin suscripciones.
+              Empezá completamente gratis o desbloqueá todas las funcionalidades con un único pago. Sin suscripciones, y hasta en 3 cuotas sin interés.
             </p>
           </div>
 
@@ -255,9 +277,9 @@ export default async function Home() {
             <div className="bg-[var(--ink)]/40 border border-[var(--ink-2)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
               <h3 className="text-xl font-semibold text-white mb-2">Gratis</h3>
               <div className="text-4xl font-display text-white mb-4">$0<span className="text-lg text-zinc-500 font-sans font-normal">/evento</span></div>
-              <p className="text-zinc-400 mb-6 flex-1 text-sm">Ideal para eventos íntimos y para probar la plataforma.</p>
+              <p className="text-zinc-400 mb-6 text-sm">Ideal para eventos íntimos y para probar la plataforma.</p>
 
-              <ul className="space-y-3 mb-6 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
                   <span>Invitaciones personalizables completas</span>
@@ -296,10 +318,13 @@ export default async function Home() {
                 <span className="text-4xl font-display text-white">{formatPrice(premiumDiscountPrice)}</span>
                 <span className="text-lg text-zinc-500 font-sans font-normal">/evento</span>
               </div>
-              <p className="text-xs font-semibold text-[var(--accent)] mb-4">{PREMIUM_DISCOUNT_PERCENTAGE}% OFF</p>
-              <p className="text-zinc-400 mb-6 flex-1 text-sm">Todas las herramientas interactivas, sin límite de invitados.</p>
+              <p className="text-xs font-semibold text-[var(--accent)] mb-1">{PREMIUM_DISCOUNT_PERCENTAGE}% OFF</p>
+              {/* La cuota se calcula desde el precio, no se escribe a mano: si
+                  mañana cambia el precio, este número lo sigue solo. */}
+              <p className="text-xs text-zinc-400 mb-4">o 3 cuotas sin interés de {formatPrice(Math.round(premiumDiscountPrice / 3))}</p>
+              <p className="text-zinc-400 mb-6 text-sm">Todas las herramientas interactivas, sin límite de invitados.</p>
 
-              <ul className="space-y-3 mb-6 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span className="font-medium text-white">Todo lo del plan Gratis, más:</span>
@@ -339,10 +364,11 @@ export default async function Home() {
                 <span className="text-4xl font-display text-white">{formatPrice(diamondDiscountPrice)}</span>
                 <span className="text-lg text-zinc-500 font-sans font-normal">/evento</span>
               </div>
-              <p className="text-xs font-semibold text-[var(--accent)] mb-4">{DIAMOND_DISCOUNT_PERCENTAGE}% OFF</p>
-              <p className="text-zinc-400 mb-6 flex-1 text-sm">Todo Premium, más el Modo Live para tu evento en vivo.</p>
+              <p className="text-xs font-semibold text-[var(--accent)] mb-1">{DIAMOND_DISCOUNT_PERCENTAGE}% OFF</p>
+              <p className="text-xs text-zinc-400 mb-4">o 3 cuotas sin interés de {formatPrice(Math.round(diamondDiscountPrice / 3))}</p>
+              <p className="text-zinc-400 mb-6 text-sm">Todo Premium, más el Modo Live para tu evento en vivo.</p>
 
-              <ul className="space-y-3 mb-6 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span className="font-medium text-white">Todo lo del plan Premium, más:</span>
@@ -365,9 +391,9 @@ export default async function Home() {
             <div className="bg-[var(--ink)]/40 border border-[var(--ink-2)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
               <h3 className="text-xl font-semibold text-white mb-2">Enterprise</h3>
               <div className="text-2xl font-display text-white mb-4">Precio a consultar</div>
-              <p className="text-zinc-400 mb-6 flex-1 text-sm">Para empresas o clientes que necesiten un diseño de plantilla a medida.</p>
+              <p className="text-zinc-400 mb-6 text-sm">Para empresas o clientes que necesiten un diseño de plantilla a medida.</p>
 
-              <ul className="space-y-3 mb-6 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
                   <span>Todo lo de Diamond</span>

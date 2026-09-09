@@ -50,6 +50,20 @@ export async function createCheckoutPreference(params: {
       ],
       external_reference: params.paymentId,
       payer: params.payerEmail ? { email: params.payerEmail } : undefined,
+      // Hasta 3 cuotas. Que además sean SIN INTERÉS no se decide acá: esto
+      // sólo fija el tope de cuotas que el comprador puede elegir. El costo
+      // financiero lo absorbe el vendedor y eso se activa desde el panel de
+      // Mercado Pago (Tu negocio > Costos > Cuotas sin interés). Si esa
+      // campaña no está activa, el comprador va a ver 3 cuotas igual, pero
+      // CON interés a su cargo.
+      //
+      // Se dejan afuera boleto/efectivo (rapipago, pagofacil): no admiten
+      // cuotas y además demoran hasta 3 días en acreditar, con la invitación
+      // esperando mientras tanto.
+      payment_methods: {
+        installments: 3,
+        excluded_payment_types: [{ id: "ticket" }, { id: "atm" }],
+      },
       back_urls: {
         success: `${params.baseUrl}/register/pago-exitoso`,
         pending: `${params.baseUrl}/register/pago-pendiente`,
