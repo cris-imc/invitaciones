@@ -292,6 +292,9 @@ import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { autoRejectStalePending } from "@/lib/live-cleanup";
 import { getInvitePhrase } from "@/lib/invitation-copy";
 import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
+import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
+import { ProveedorInvitacion } from "@/components/invitation/ContextoInvitacion";
+import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
 
 // Generate metadata for social sharing
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -438,6 +441,13 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 despedidaHabilitada: true,
                 despedidaFoto: true,
                 rsvpDaysBeforeEvent: true,
+                // El idioma y el país de la INVITACIÓN. Sin traerlos acá,
+                // `validInvitation.idioma` llega undefined y el proveedor cae
+                // al español: el link personalizado -- el que realmente
+                // reciben los invitados -- se veía en español aunque la
+                // invitación estuviera en inglés o portugués.
+                idioma: true,
+                pais: true,
                 templateTipo: true,
                 mostrarNombreInvitadoEnSaludo: true,
                 mesasHabilitadas: true,
@@ -1046,12 +1056,24 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
     // el plan a las 545 llamadas, se marca acá el contenedor y una sola regla
     // en globals.css decide si se ve. Diamond lo oculta; Diamond Light -- que
     // es el mismo plan regalado a cuentas de prueba -- lo conserva.
+        // El idioma de la INVITACIÓN, que pisa al del anfitrión para todo
+        // este subárbol: una boda en São Paulo manda su convite en portugués
+        // aunque el invitado tenga el navegador en inglés, y si un tío
+        // argentino lo abre lo tiene que ver igual que todos los demás.
+    const idiomaInvitacion = esIdiomaValido(validInvitation.idioma)
+        ? validInvitation.idioma
+        : idiomaSegunPais(validInvitation.pais);
+
     return (
-        <div data-plan-tier={String(validInvitation.planTier ?? 'FREE')}>
-            {isFree && <FreePlanBanner />}
-            {isFree && <FreePlanBannerSpacer />}
-            {renderTemplate()}
-            <RegistrarApertura token={guest?.uniqueToken} />
-        </div>
+        <ProveedorIdioma idioma={idiomaInvitacion} pais={validInvitation.pais}>
+            <ProveedorInvitacion datos={validInvitation}>
+                <div data-plan-tier={String(validInvitation.planTier ?? 'FREE')}>
+                    {isFree && <FreePlanBanner />}
+                    {isFree && <FreePlanBannerSpacer />}
+                    {renderTemplate()}
+                    <RegistrarApertura token={guest?.uniqueToken} />
+                </div>
+            </ProveedorInvitacion>
+        </ProveedorIdioma>
     );
 }

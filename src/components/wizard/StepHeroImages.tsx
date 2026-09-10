@@ -8,11 +8,11 @@ import { useToast } from "@/components/ui/Toast";
 import { Info, ChevronDown, ChevronUp, AlertTriangle, X } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { isStorytellingTemplate } from "./wizard-steps-config";
-
-const CINEMATICO_TIP = "Probá los dos: con foto (efecto cinemático) y sin foto (fondo decorativo propio de la plantilla).";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function StepHeroImages() {
     const { data, setData, nextStep } = useWizardStore();
+    const t = useTextos();
     const { showToast } = useToast();
     const [showInfo, setShowInfo] = useState(false);
     const [showMissingImageError, setShowMissingImageError] = useState(false);
@@ -54,7 +54,7 @@ export function StepHeroImages() {
     const handleNext = () => {
         if (!storytelling && !data.portadaImagenFondo) {
             setShowMissingImageError(true);
-            showToast("Cargá la imagen de portada mobile antes de continuar.", "error");
+            showToast(t("wizard.portadaFotos.faltaImagen"), "error");
             return;
         }
         setShowMissingImageError(false);
@@ -64,9 +64,9 @@ export function StepHeroImages() {
     return (
         <div className="space-y-6">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">Fotos de Portada y Fondo</h2>
+                <h2 className="text-2xl font-bold">{t("wizard.portadaFotos.titulo")}</h2>
                 <p className="text-muted-foreground text-sm">
-                    Imágenes de fondo principales que vestirán la presentación de tu tarjeta.
+                    {t("wizard.portadaFotos.subtitulo")}
                 </p>
             </div>
 
@@ -79,7 +79,7 @@ export function StepHeroImages() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Para qué sirven las Fotos de Portada y Fondo?</span>
+                        <span>{t("wizard.portadaFotos.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -89,8 +89,8 @@ export function StepHeroImages() {
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
                         {storytelling
-                            ? "El Recorte celular y el Recorte PC son opcionales. Si cargás alguno, reemplaza el fondo decorativo original -- tanto en la tapa como en la foto principal que se ve dentro de la invitación, debajo de \"Guardá la fecha\" (son las mismas 2 fotos en los dos lugares). Si no cargás ninguno, no aparece foto de fondo en ningún lado: la invitación se ve tal cual la plantilla que elegiste, sin cambios."
-                            : "La Portada Invitación es la que se ve como foto de portada de la invitación (obligatoria, todas las plantillas la usan). La Portada de bienvenida es opcional: si cargás una foto ahí, reemplaza el fondo original de la portada de bienvenida por esa foto. Si la dejás vacía, la portada se ve tal cual la plantilla que elegiste, sin cambios."}
+                            ? t("wizard.portadaFotos.infoStorytelling")
+                            : t("wizard.portadaFotos.infoFlat")}
                     </div>
                 )}
             </div>
@@ -105,8 +105,8 @@ export function StepHeroImages() {
                     (4/5) a propósito: son el mismo tipo de foto vertical de
                     portada, así los dos recortes quedan a la misma altura
                     en esta grilla en vez de desalineados. */}
-                <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-white/10">
-                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm block min-h-[2.5rem]">{storytelling ? "Recorte PC" : "Portada de bienvenida"}</Label>
+                <div className="space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border border-[var(--line)]">
+                    <Label htmlFor="heroImagenFondoDesktop" className="font-semibold text-sm block min-h-[2.5rem]">{storytelling ? t("wizard.portadaFotos.recortePc") : t("wizard.portadaFotos.portadaBienvenida")}</Label>
                     <div className="relative">
                         <ImageUploader
                             currentImage={data.portadaImagenFondoDesktop}
@@ -125,12 +125,12 @@ export function StepHeroImages() {
                                 <div className="absolute -top-1.5 left-6 w-3 h-3 bg-amber-950 border-l border-t border-amber-500/50 rotate-45" />
                                 <div className="relative flex items-start gap-1.5 rounded-lg border border-amber-500/50 bg-amber-950 text-amber-100 shadow-xl px-3 py-2.5 text-xs leading-relaxed">
                                     <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-400" />
-                                    <span className="flex-1">{CINEMATICO_TIP}</span>
+                                    <span className="flex-1">{t("wizard.portadaFotos.tipCinematico")}</span>
                                     <button
                                         type="button"
                                         onClick={() => setShowCinematicoTip(false)}
                                         className="shrink-0 text-amber-400/70 hover:text-amber-200 transition-colors"
-                                        aria-label="Cerrar"
+                                        aria-label={t("comun.cerrar")}
                                     >
                                         <X className="w-3.5 h-3.5" />
                                     </button>
@@ -140,14 +140,14 @@ export function StepHeroImages() {
                     </div>
                     <p className="text-xs text-muted-foreground leading-normal">
                         {storytelling
-                            ? "Opcional. Si la cargás, reemplaza el fondo decorativo original en pantallas anchas -- tanto en la tapa como en la foto principal de adentro de la invitación."
-                            : "Si cargás una foto acá, reemplaza el fondo original de la portada de bienvenida por esta foto."}
+                            ? t("wizard.portadaFotos.ayudaPcStorytelling")
+                            : t("wizard.portadaFotos.ayudaPcFlat")}
                     </p>
                 </div>
 
                 {/* Hero Background Image Mobile */}
-                <div className={`space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border ${showMissingImageError && !data.portadaImagenFondo ? 'border-red-500/60' : 'border-white/10'}`}>
-                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm block min-h-[2.5rem]">{storytelling ? "Recorte celular" : "Portada Invitación *"}</Label>
+                <div className={`space-y-2.5 p-4 rounded-2xl bg-[var(--ink-2)] border ${showMissingImageError && !data.portadaImagenFondo ? 'border-red-500/60' : 'border-[var(--line)]'}`}>
+                    <Label htmlFor="heroImagenFondo" className="font-semibold text-sm block min-h-[2.5rem]">{storytelling ? t("wizard.portadaFotos.recorteCelular") : t("wizard.portadaFotos.portadaInvitacion")}</Label>
                     <ImageUploader
                         currentImage={data.portadaImagenFondo}
                         onImageUploaded={(url: string) => { setData({ portadaImagenFondo: url }); setShowMissingImageError(false); }}
@@ -156,13 +156,13 @@ export function StepHeroImages() {
                     />
                     <p className="text-xs text-muted-foreground leading-normal">
                         {storytelling
-                            ? "Opcional. Si la cargás, reemplaza el fondo decorativo original en mobile -- tanto en la tapa como en la foto principal de adentro de la invitación, debajo de \"Guardá la fecha\"."
-                            : "Se verá como foto de portada de la invitación. Obligatoria: todos los templates la usan como imagen principal."}
+                            ? t("wizard.portadaFotos.ayudaCelularStorytelling")
+                            : t("wizard.portadaFotos.ayudaCelularFlat")}
                     </p>
                     {showMissingImageError && !data.portadaImagenFondo && (
                         <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
                             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                            <span>Esta imagen es obligatoria para poder continuar.</span>
+                            <span>{t("wizard.portadaFotos.obligatoria")}</span>
                         </div>
                     )}
                 </div>

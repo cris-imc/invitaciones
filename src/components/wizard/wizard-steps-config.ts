@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { ClaveTexto } from "@/lib/i18n/texto";
 import { StepEventType } from "./StepEventType";
 import { StepBasicInfo } from "./StepBasicInfo";
 import { StepDetails } from "./StepDetails";
@@ -19,7 +20,17 @@ import { StepInfoAdicional } from "./StepInfoAdicional";
 
 export interface WizardStepDef {
     component: ComponentType;
+    /**
+     * Identificador interno del paso. NO se traduce ni se muestra: hay dos
+     * lugares que lo comparan por texto -- EditWizardContainer.tsx (para
+     * saltar a "Plantilla" desde "?step=design") y WizardLivePreview.tsx
+     * (para saber a qué sección de la invitación hacer scroll). Si se
+     * tradujera, la preview dejaría de seguir al paso y el salto directo
+     * al paso de plantilla se rompería en inglés y portugués.
+     */
     label: string;
+    /** El nombre que ve el anfitrión, ya en su idioma. */
+    clave: ClaveTexto;
 }
 
 // Plantillas de la "Colección Storytelling" (Guest Pass VIP y las que se
@@ -69,11 +80,11 @@ export function getWizardSteps({
 }): WizardStepDef[] {
     const storytelling = isStorytellingTemplate(templateTipo);
     return [
-        ...(!isEditing || isAdmin ? [{ component: StepEventType, label: "Tipo de Evento" }] : []),
+        ...(!isEditing || isAdmin ? [{ component: StepEventType, label: "Tipo de Evento", clave: "wizard.pasos.tipoDeEvento" as const }] : []),
         // La Plantilla se elige primero: además de que la Colección
         // Storytelling se salta portada/tipografía por completo, así la
         // preview ya sabe desde el arranque qué flujo seguir.
-        { component: StepDesign, label: "Plantilla" },
+        { component: StepDesign, label: "Plantilla", clave: "wizard.pasos.plantilla" as const },
         // Antes se saltaba por completo para Storytelling (esa colección no
         // elige tipografía/countdown/álbum desde el wizard) -- pero SÍ puede
         // usar fotos reales (portada de bienvenida + foto principal
@@ -81,12 +92,12 @@ export function getWizardSteps({
         // muestra para las dos colecciones. StepHeroImages.tsx decide
         // internamente qué campos pedir según isStorytellingTemplate.
         // Sólo Storytelling: es el único que tiene paneles que recorrer.
-        ...(storytelling ? [{ component: StepStorytellingScroll, label: "Recorrido" }] : []),
-        { component: StepHeroImages, label: "Portada" },
-        ...(!storytelling ? [{ component: StepTypography, label: "Tipografía" }] : []),
-        { component: StepBasicInfo, label: "Información Básica" },
-        ...(!storytelling ? [{ component: StepCountdownStyle, label: "Countdown" }] : []),
-        { component: StepPhrase, label: "Frase" },
+        ...(storytelling ? [{ component: StepStorytellingScroll, label: "Recorrido", clave: "wizard.pasos.recorrido" as const }] : []),
+        { component: StepHeroImages, label: "Portada", clave: "wizard.pasos.portada" as const },
+        ...(!storytelling ? [{ component: StepTypography, label: "Tipografía", clave: "wizard.pasos.tipografia" as const }] : []),
+        { component: StepBasicInfo, label: "Información Básica", clave: "wizard.pasos.informacionBasica" as const },
+        ...(!storytelling ? [{ component: StepCountdownStyle, label: "Countdown", clave: "wizard.pasos.countdown" as const }] : []),
+        { component: StepPhrase, label: "Frase", clave: "wizard.pasos.frase" as const },
         // Orden Salón/Ceremonia: en las plantillas Flat el salón se pregunta
         // primero. En Guest Pass VIP (y el resto de Storytelling) el panel
         // "El lugar" muestra la Ceremonia ANTES que el Salón cuando está
@@ -94,15 +105,15 @@ export function getWizardSteps({
         // en el orden de siempre, se cargarían los datos en el orden
         // contrario al que después se ven en la tarjeta. Para Storytelling se
         // invierte el orden de estos dos pasos para que coincidan.
-        ...(isCasamiento && storytelling ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
-        { component: StepDetails, label: "Detalles del Salón" },
-        ...(isCasamiento && !storytelling ? [{ component: StepCeremonia, label: "Ceremonia / Civil" }] : []),
-        { component: StepCronograma, label: "Cronograma" },
-        { component: StepGallery, label: "Galería" },
-        ...(hasGallery && !storytelling ? [{ component: StepAlbumStyle, label: "Álbum" }] : []),
-        { component: StepMusic, label: "Música" },
-        { component: StepBankDetails, label: "Regalo (CBU)" },
-        { component: StepTrivia, label: "Trivia" },
-        { component: StepInfoAdicional, label: "Info Adicional" },
+        ...(isCasamiento && storytelling ? [{ component: StepCeremonia, label: "Ceremonia / Civil", clave: "wizard.pasos.ceremonia" as const }] : []),
+        { component: StepDetails, label: "Detalles del Salón", clave: "wizard.pasos.detallesSalon" as const },
+        ...(isCasamiento && !storytelling ? [{ component: StepCeremonia, label: "Ceremonia / Civil", clave: "wizard.pasos.ceremonia" as const }] : []),
+        { component: StepCronograma, label: "Cronograma", clave: "wizard.pasos.cronograma" as const },
+        { component: StepGallery, label: "Galería", clave: "wizard.pasos.galeria" as const },
+        ...(hasGallery && !storytelling ? [{ component: StepAlbumStyle, label: "Álbum", clave: "wizard.pasos.album" as const }] : []),
+        { component: StepMusic, label: "Música", clave: "wizard.pasos.musica" as const },
+        { component: StepBankDetails, label: "Regalo (CBU)", clave: "wizard.pasos.regalo" as const },
+        { component: StepTrivia, label: "Trivia", clave: "wizard.pasos.trivia" as const },
+        { component: StepInfoAdicional, label: "Info Adicional", clave: "wizard.pasos.infoAdicional" as const },
     ];
 }

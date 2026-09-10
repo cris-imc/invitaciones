@@ -18,9 +18,11 @@ import { X, Info, ChevronDown, ChevronUp, AlertCircle, ImageOff } from "lucide-r
 import { SaveStepButtons } from "./SaveStepButtons";
 import { PLAN_LIMITS, type PlanTier } from "@/lib/plan-limits";
 import { useSession } from "next-auth/react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function StepGallery() {
     const { data, setData, usePremiumCredit, useDiamondCredit, nextStep } = useWizardStore();
+    const t = useTextos();
     const { data: session } = useSession();
     const [showInfo, setShowInfo] = useState(false);
     const [showRedWarning, setShowRedWarning] = useState(false);
@@ -84,9 +86,9 @@ export function StepGallery() {
     return (
         <div className="space-y-6">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">Galería de Fotos</h2>
+                <h2 className="text-2xl font-bold">{t("wizard.galeria.titulo")}</h2>
                 <p className="text-muted-foreground text-sm">
-                    Subí tus mejores fotos para lucir en la invitación.
+                    {t("wizard.galeria.subtitulo")}
                 </p>
             </div>
 
@@ -99,7 +101,7 @@ export function StepGallery() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Cómo funciona la Galería de Fotos?</span>
+                        <span>{t("wizard.galeria.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -108,13 +110,13 @@ export function StepGallery() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        Las fotos que subas aquí conformarán un carrusel interactivo continuo en la tarjeta. Se recomienda subir fotos en formato cuadrado u horizontal para asegurar una visualización óptima en celulares.
+                        {t("wizard.galeria.infoTexto")}
                     </div>
                 )}
             </div>
 
             <div className="space-y-4 max-w-2xl mx-auto">
-                <div className="flex items-center space-x-2.5 p-4 rounded-xl bg-[var(--ink-2)] border border-white/10">
+                <div className="flex items-center space-x-2.5 p-4 rounded-xl bg-[var(--ink-2)] border border-[var(--line)]">
                     <Checkbox
                         id="galeriaPrincipalHabilitada"
                         checked={data.galeriaPrincipalHabilitada}
@@ -124,7 +126,7 @@ export function StepGallery() {
                         }}
                     />
                     <Label htmlFor="galeriaPrincipalHabilitada" className="text-sm font-semibold cursor-pointer">
-                        Mostrar galería de fotos en la tarjeta
+                        {t("wizard.galeria.mostrar")}
                     </Label>
                 </div>
 
@@ -139,7 +141,7 @@ export function StepGallery() {
                             >
                                 <div className="flex items-center gap-2 font-bold text-rose-300 text-sm">
                                     <AlertCircle className="w-4.5 h-4.5 shrink-0 text-rose-400" />
-                                    <span>Importante sobre la selección de fotos</span>
+                                    <span>{t("wizard.galeria.avisoTitulo")}</span>
                                 </div>
                                 <div className="text-rose-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                                     {showRedWarning ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -148,19 +150,19 @@ export function StepGallery() {
 
                             {showRedWarning && (
                                 <div className="px-4 pb-4 pt-1 border-t border-rose-500/25 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                                    Las fotos deben seleccionarse <strong>una a una</strong>. Al subir cada imagen, el sistema te permitirá ajustar y elegir el encuadre exacto en <strong>formato cuadrado (1:1)</strong> para que se adapte perfectamente al carrusel.
+                                    {t("wizard.galeria.avisoTexto")}
                                 </div>
                             )}
                         </div>
 
                         {isAnonymous && (
                             <div className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
-                                Podés cargar hasta {maxPhotos} fotos para probar (Premium o Diamond). Si al crear tu cuenta elegís Gratis, la invitación va a mostrar solo las primeras {freeMaxPhotos}.
+                                {t("wizard.galeria.avisoAnonimo", { max: maxPhotos ?? 0, gratis: freeMaxPhotos })}
                             </div>
                         )}
 
                         <div className="space-y-2 pt-1">
-                            <Label className="text-sm font-medium">Agregar nueva foto (de a una)</Label>
+                            <Label className="text-sm font-medium">{t("wizard.galeria.agregarFoto")}</Label>
                             {limitReached ? (
                                 <button
                                     type="button"
@@ -168,7 +170,7 @@ export function StepGallery() {
                                     className="w-full min-h-[140px] rounded-xl border-2 border-dashed border-amber-500/40 bg-amber-500/5 flex flex-col items-center justify-center gap-2 text-amber-300 text-sm p-6"
                                 >
                                     <ImageOff className="w-6 h-6" />
-                                    <span className="font-medium">Llegaste al límite de fotos de tu plan</span>
+                                    <span className="font-medium">{t("wizard.galeria.limiteAlcanzado")}</span>
                                 </button>
                             ) : (
                                 <ImageUploader
@@ -178,7 +180,7 @@ export function StepGallery() {
                             )}
                             {showNoPhotosError && (
                                 <p className="text-sm text-destructive font-medium">
-                                    Subí al menos una foto o destildá &quot;Mostrar galería de fotos&quot; para continuar.
+                                    {t("wizard.galeria.sinFotos")}
                                 </p>
                             )}
                         </div>
@@ -186,25 +188,27 @@ export function StepGallery() {
                         {galeriaPrincipal.length > 0 && (
                             <div className="space-y-2 pt-2">
                                 <Label className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-                                    Fotos agregadas ({galeriaPrincipal.length}{maxPhotos !== null ? `/${maxPhotos}` : ''})
+                                    {maxPhotos !== null
+                                        ? t("wizard.galeria.fotosAgregadasDeMax", { cantidad: galeriaPrincipal.length, max: maxPhotos })
+                                        : t("wizard.galeria.fotosAgregadas", { cantidad: galeriaPrincipal.length })}
                                 </Label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     {galeriaPrincipal.map((url: string, index: number) => (
-                                        <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden border border-white/15 shadow-md">
+                                        <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden border border-[var(--campo-borde)] shadow-md">
                                             <img
                                                 src={url}
-                                                alt={`Foto ${index + 1}`}
+                                                alt={t("wizard.galeria.altFoto", { numero: index + 1 })}
                                                 className="w-full h-full object-cover"
                                             />
                                             {isAnonymous && index >= freeMaxPhotos && (
                                                 <span className="absolute bottom-2 left-2 text-[9px] uppercase tracking-wide font-bold text-amber-300 bg-black/70 border border-amber-500/40 rounded-full px-2 py-0.5">
-                                                    Premium o Diamond
+                                                    {t("wizard.galeria.premiumODiamond")}
                                                 </span>
                                             )}
                                             <button
                                                 type="button"
                                                 onClick={() => removePhoto(index)}
-                                                aria-label="Eliminar foto"
+                                                aria-label={t("wizard.galeria.eliminarFoto")}
                                                 className="absolute top-2 right-2 bg-destructive/90 hover:bg-destructive text-white rounded-full p-1.5 shadow-lg"
                                             >
                                                 <X className="w-4 h-4" />
@@ -225,23 +229,19 @@ export function StepGallery() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <ImageOff className="w-5 h-5 text-amber-500" />
-                            Llegaste al límite de fotos
+                            {t("wizard.galeria.limiteTitulo")}
                         </DialogTitle>
                         <DialogDescription className="pt-2">
-                            {isAnonymous ? (
-                                <>
-                                    Podés cargar hasta <strong>{maxPhotos} fotos</strong> para probar (Premium o Diamond). Recordá que si elegís Gratis al crear tu cuenta, la invitación va a mostrar solo las primeras {freeMaxPhotos}.
-                                </>
-                            ) : (
-                                <>
-                                    Tu plan {PLAN_LIMITS[effectivePlanTier].name} permite hasta{" "}
-                                    <strong>{maxPhotos} fotos</strong> en el álbum. Actualizá tu plan para agregar más.
-                                </>
-                            )}
+                            {isAnonymous
+                                ? t("wizard.galeria.limiteAnonimo", { max: maxPhotos ?? 0, gratis: freeMaxPhotos })
+                                : t("wizard.galeria.limitePlan", {
+                                    plan: PLAN_LIMITS[effectivePlanTier].name,
+                                    max: maxPhotos ?? 0,
+                                })}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button onClick={() => setShowLimitModal(false)}>Entendido</Button>
+                        <Button onClick={() => setShowLimitModal(false)}>{t("wizard.entendido")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

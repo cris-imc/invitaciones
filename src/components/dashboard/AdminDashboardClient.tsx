@@ -65,7 +65,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                         placeholder="Buscar cliente por nombre o email..."
                         value={searchTerm}
                         onChange={handleSearch}
-                        className="pl-10 h-12 w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 rounded-xl"
+                        className="pl-10 h-12 w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] rounded-xl"
                     />
                 </div>
                 <CreateUserButton />
@@ -83,7 +83,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                                     className="flex items-center gap-2 flex-wrap cursor-pointer flex-1 min-w-0"
                                     onClick={() => toggleClient(client.id)}
                                 >
-                                    <div className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors shrink-0">
+                                    <div className="p-2 bg-[var(--tinte-1)] rounded-lg hover:bg-[var(--tinte-2)] transition-colors shrink-0">
                                         {isExpanded ? <ChevronUp className="w-5 h-5 opacity-70" /> : <ChevronDown className="w-5 h-5 opacity-70" />}
                                     </div>
                                     <div className="min-w-0">
@@ -92,7 +92,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                                         </h3>
                                         <span className="text-sm opacity-50 font-normal truncate block">{client.email}</span>
                                     </div>
-                                    <div className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-[10px] font-medium opacity-70 shrink-0">
+                                    <div className="ml-2 px-2 py-0.5 bg-[var(--tinte-2)] rounded-full text-[10px] font-medium opacity-70 shrink-0">
                                         {client.invitations.length} invitaciones
                                     </div>
                                     {premiumEnUso > 0 && (
@@ -112,7 +112,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="bg-white/5 hover:bg-white/10 text-white/80 border-white/10"
+                                            className="bg-[var(--tinte-1)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-strong)] border-[var(--line)]"
                                         >
                                             <BarChart2 className="w-4 h-4 mr-2" />
                                             Ver detalle
@@ -129,7 +129,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                             </div>
                             
                             {isExpanded && (
-                                <div className="mt-6 pt-6 border-t border-white/10">
+                                <div className="mt-6 pt-6 border-t border-[var(--line)]">
                                     {client.invitations.length === 0 ? (
                                         <p className="text-sm opacity-40">No tiene invitaciones creadas.</p>
                                     ) : (
@@ -138,7 +138,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                                                 que tiene ocho invitaciones, contar filas a ojo para
                                                 saber cuántas están activas es el trabajo que debería
                                                 hacer la pantalla. */}
-                                            <p className="text-xs text-white/45 mb-1">
+                                            <p className="text-xs text-[var(--shell-fg-faint)] mb-1">
                                                 {client.invitations.filter((i: any) => i.estado === "ACTIVA").length} activa
                                                 {client.invitations.filter((i: any) => i.estado === "ACTIVA").length === 1 ? "" : "s"}
                                                 {" de "}
@@ -172,7 +172,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                         <Button 
                             variant="outline" 
                             size="sm" 
-                            className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                            className="bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--foreground)]"
                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                             disabled={currentPage === 1}
                         >
@@ -184,7 +184,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
                         <Button 
                             variant="outline" 
                             size="sm"
-                            className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                            className="bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--foreground)]"
                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                             disabled={currentPage === totalPages}
                         >
@@ -195,7 +195,7 @@ export function AdminDashboardClient({ clients, admins = [], isSuperUser = false
             </div>
 
             {isSuperUser && (
-                <div className="mt-10 pt-8 border-t border-white/10">
+                <div className="mt-10 pt-8 border-t border-[var(--line)]">
                     <div className="flex items-center gap-2 mb-4">
                         <ShieldCheck className="w-4 h-4 text-purple-400" />
                         <h3 className="font-bold text-lg">Administradores</h3>

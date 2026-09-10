@@ -14,19 +14,23 @@ import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton"
 import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
 import { HelpMenu } from "@/components/dashboard/HelpMenu";
 import { LandingLogo } from "@/components/ui/Logo";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { isAdmin } from "@/lib/roles";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { ClaveTexto } from "@/lib/i18n/texto";
 
+// El `id` es lo que identifica a cada item en los filtros de abajo: el título
+// visible ahora cambia con el idioma y no sirve para comparar.
 const allSidebarItems = [
-    { title: "Inicio", href: "/dashboard", icon: Home },
-    { title: "Inactivas", href: "/dashboard/invitaciones", icon: Archive },
-    { title: "Mis Datos", href: "/dashboard/perfil", icon: User },
-    { title: "Descuentos", href: "/dashboard/descuentos", icon: Percent },
-    { title: "Registros", href: "/dashboard/registros", icon: BarChart3 },
-];
+    { id: "inicio", texto: "panel.sidebar.inicio", href: "/dashboard", icon: Home },
+    { id: "inactivas", texto: "panel.sidebar.inactivas", href: "/dashboard/invitaciones", icon: Archive },
+    { id: "misDatos", texto: "panel.sidebar.misDatos", href: "/dashboard/perfil", icon: User },
+    { id: "descuentos", texto: "panel.sidebar.descuentos", href: "/dashboard/descuentos", icon: Percent },
+    { id: "registros", texto: "panel.sidebar.registros", href: "/dashboard/registros", icon: BarChart3 },
+] satisfies { id: string; texto: ClaveTexto; href: string; icon: typeof Home }[];
 
 export function Sidebar() {
     const pathname = usePathname();
+    const t = useTextos();
     const { data: session } = useSession();
     const isAuthenticated = Boolean(session?.user);
     const role = session?.user?.role || "CLIENT";
@@ -76,9 +80,9 @@ export function Sidebar() {
     // sin nada que dependa de una cuenta real (Inactivas, Mis Datos, cerrar
     // sesión, la botonera mobile entera).
     const sidebarItems = allSidebarItems.filter(item => {
-        if (isAdmin(role)) return item.title === "Inicio" || item.title === "Mis Datos" || item.title === "Descuentos" || item.title === "Registros";
-        if (!isAuthenticated) return item.title === "Inicio";
-        return item.title !== "Descuentos" && item.title !== "Registros";
+        if (isAdmin(role)) return item.id === "inicio" || item.id === "misDatos" || item.id === "descuentos" || item.id === "registros";
+        if (!isAuthenticated) return item.id === "inicio";
+        return item.id !== "descuentos" && item.id !== "registros";
     });
 
     const handleNavClick = (e: React.MouseEvent, href: string, originalOnClick?: () => void) => {
@@ -131,24 +135,19 @@ export function Sidebar() {
                         onClick={(e) => handleNavClick(e, href, onClick)}
                     >
                         <b><item.icon className="w-4 h-4" /></b>
-                        {item.title}
+                        {t(item.texto)}
                     </Link>
                 );
             })}
 
             <HelpMenu variant="desktop" />
 
-            {/* Selector de tema: sin gate de sesión, también lo puede usar
-                quien está en el wizard público sin cuenta todavía. */}
-            <div className="mt-4 px-2 flex items-center justify-center">
-                <ThemeToggle />
-            </div>
 
             {isAuthenticated && (
                 <div className="mt-2 px-2">
                     <button onClick={handleSignOut} className="sidebar-signout-btn w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold">
                         <LogOut className="w-4 h-4" />
-                        Cerrar Sesión
+                        {t("panel.sidebar.cerrarSesion")}
                     </button>
                 </div>
             )}
@@ -160,19 +159,19 @@ export function Sidebar() {
             <Dialog open={showWarning} onOpenChange={setShowWarning}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{isNewInvitation ? "¿Salir sin terminar?" : "Cambios sin guardar"}</DialogTitle>
+                        <DialogTitle>{isNewInvitation ? t("panel.sidebar.salirSinTerminar") : t("panel.sidebar.cambiosSinGuardar")}</DialogTitle>
                         <DialogDescription>
                             {isNewInvitation
-                                ? "Todavía no creaste la invitación. Si salís ahora vas a perder todo lo que cargaste hasta acá."
-                                : "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que querés salir sin aplicar los cambios?"}
+                                ? t("panel.sidebar.salirNuevaDetalle")
+                                : t("panel.sidebar.salirEdicionDetalle")}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowWarning(false)}>
-                            Cancelar
+                            {t("comun.cancelar")}
                         </Button>
                         <Button variant="destructive" onClick={proceedNavigation}>
-                            {isNewInvitation ? "Salir y perder los cambios" : "Salir sin guardar"}
+                            {isNewInvitation ? t("panel.sidebar.salirYPerder") : t("panel.sidebar.salirSinGuardar")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -198,7 +197,6 @@ export function Sidebar() {
                             <LandingLogo className="h-[50px] w-auto" />
                         </div>
                         <div className="flex items-center gap-2">
-                            <ThemeToggle />
                             <HelpMenu variant="mobile" />
                         </div>
                     </header>
@@ -213,10 +211,10 @@ export function Sidebar() {
                                 href="/dashboard/descuentos"
                                 className={`p-bottom-nav-item ${pathname === "/dashboard/descuentos" ? "active" : ""}`}
                                 onClick={(e) => handleNavClick(e, "/dashboard/descuentos")}
-                                aria-label="Descuentos"
+                                aria-label={t("panel.sidebar.descuentos")}
                             >
                                 <Percent className="w-5 h-5" />
-                                <span>Desc.</span>
+                                <span>{t("panel.sidebar.descuentosCorto")}</span>
                             </Link>
                         ) : (
                             <NewInvitationButton
@@ -226,9 +224,9 @@ export function Sidebar() {
                                 planTier={session?.user?.planTier}
                                 hasFreeInvitation={hasFreeInvitation}
                                 renderTrigger={(onClick) => (
-                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nueva invitación">
+                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label={t("panel.sidebar.nuevaInvitacion")}>
                                         <Plus className="w-5 h-5" style={{ color: "var(--accent)" }} />
-                                        <span>Nueva</span>
+                                        <span>{t("panel.sidebar.nuevaCorto")}</span>
                                     </button>
                                 )}
                             />
@@ -237,9 +235,9 @@ export function Sidebar() {
                         {isAdmin(role) ? (
                             <CreateUserButton
                                 renderTrigger={(onClick) => (
-                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label="Nuevo Usuario">
+                                    <button onClick={onClick} className="p-bottom-nav-item" aria-label={t("panel.sidebar.nuevoUsuario")}>
                                         <UserPlus className="w-5 h-5" />
-                                        <span>Alta</span>
+                                        <span>{t("panel.sidebar.nuevoUsuarioCorto")}</span>
                                     </button>
                                 )}
                             />
@@ -248,10 +246,10 @@ export function Sidebar() {
                                 href="/dashboard/invitaciones"
                                 className={`p-bottom-nav-item ${pathname === "/dashboard/invitaciones" ? "active" : ""}`}
                                 onClick={(e) => handleNavClick(e, "/dashboard/invitaciones")}
-                                aria-label="Inactivas"
+                                aria-label={t("panel.sidebar.inactivas")}
                             >
                                 <Archive className="w-5 h-5" />
-                                <span>Inactivas</span>
+                                <span>{t("panel.sidebar.inactivas")}</span>
                             </Link>
                         )}
 
@@ -259,12 +257,12 @@ export function Sidebar() {
                             href="/dashboard"
                             className={`p-bottom-nav-home-wrap ${pathname === "/dashboard" ? "active" : ""}`}
                             onClick={(e) => handleNavClick(e, "/dashboard")}
-                            aria-label="Ir a Inicio"
+                            aria-label={t("panel.sidebar.irAInicio")}
                         >
                             <span className="p-bottom-nav-home">
                                 <Home className="w-5 h-5" />
                             </span>
-                            <span>Inicio</span>
+                            <span>{t("panel.sidebar.inicio")}</span>
                         </Link>
 
                         {isAdmin(role) ? (
@@ -272,26 +270,26 @@ export function Sidebar() {
                                 href="/dashboard/registros"
                                 className={`p-bottom-nav-item ${pathname === "/dashboard/registros" ? "active" : ""}`}
                                 onClick={(e) => handleNavClick(e, "/dashboard/registros")}
-                                aria-label="Registros"
+                                aria-label={t("panel.sidebar.registros")}
                             >
                                 <BarChart3 className="w-5 h-5" />
-                                <span>Reg.</span>
+                                <span>{t("panel.sidebar.registrosCorto")}</span>
                             </Link>
                         ) : (
                             <Link
                                 href="/dashboard/perfil"
                                 className={`p-bottom-nav-item ${pathname === "/dashboard/perfil" ? "active" : ""}`}
                                 onClick={(e) => handleNavClick(e, "/dashboard/perfil")}
-                                aria-label="Mis Datos"
+                                aria-label={t("panel.sidebar.misDatos")}
                             >
                                 <User className="w-5 h-5" />
-                                <span>Datos</span>
+                                <span>{t("panel.sidebar.misDatosCorto")}</span>
                             </Link>
                         )}
 
-                        <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label="Cerrar sesión">
+                        <button onClick={handleSignOut} className="p-bottom-nav-item" aria-label={t("panel.sidebar.cerrarSesion")}>
                             <LogOut className="w-5 h-5 text-red-500" />
-                            <span>Salir</span>
+                            <span>{t("panel.sidebar.salirCorto")}</span>
                         </button>
                     </div>
                     )}

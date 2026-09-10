@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 function TypewriterText({ text }: { text: string }) {
     const [displayText, setDisplayText] = useState("");
@@ -36,37 +37,41 @@ function TypewriterText({ text }: { text: string }) {
 
 export function StepPhrase() {
     const { data, setData } = useWizardStore();
+    const t = useTextos();
     const [showInfo, setShowInfo] = useState(false);
 
     const tipo = data.type || "OTRO";
     const phraseHelp =
         tipo === "CASAMIENTO"
-            ? "Una frase que refleje la historia de ustedes dos."
+            ? t("wizard.frase.ayudaCasamiento")
             : tipo === "QUINCE_ANOS"
-            ? "Una frase que la quinceañera quiera compartir."
-            : "Una frase institucional o de bienvenida para el evento.";
+            ? t("wizard.frase.ayudaQuince")
+            : t("wizard.frase.ayudaOtro");
 
     const phrasePlaceholder =
         tipo === "CASAMIENTO"
-            ? "Ej: 'Lo mejor de la vida es compartirla con quien amás...'"
+            ? t("wizard.frase.placeholderCasamiento")
             : tipo === "QUINCE_ANOS"
-            ? "Ej: 'Este es el comienzo del resto de mi vida...'"
-            : "Ej: 'Bienvenidos a nuestra celebración. Gracias por estar aquí.'";
+            ? t("wizard.frase.placeholderQuince")
+            : t("wizard.frase.placeholderOtro");
 
+    // Las frases sugeridas también viajan por el diccionario: son texto que
+    // ofrecemos nosotros, no algo que escribió el anfitrión, y ofrecerlas en
+    // español a alguien que arma la invitación en inglés no le sirve de nada.
     const WEDDING_PHRASES = [
-        "El amor no consiste en mirarse el uno al otro, sino en mirar juntos en la misma dirección.",
-        "Unimos nuestras vidas para siempre, porque juntos todo es mejor.",
-        "Donde hay amor, hay vida. ¡Y queremos celebrar la nuestra con vos!",
-        "Lo mejor de la vida es compartirla con quien amás... y con quienes te aman.",
-        "Hoy comienza la mejor de nuestras aventuras."
+        t("wizard.frase.casamiento1"),
+        t("wizard.frase.casamiento2"),
+        t("wizard.frase.casamiento3"),
+        t("wizard.frase.casamiento4"),
+        t("wizard.frase.casamiento5"),
     ];
 
     const QUINCE_PHRASES = [
-        "Este es el comienzo del resto de mi vida. ¡Gracias por acompañarme!",
-        "Hay momentos inolvidables que se atesoran en el corazón para siempre.",
-        "Dejo atrás mi niñez para comenzar a vivir mis sueños.",
-        "Celebro la magia de crecer, rodeada del amor de mi familia y amigos.",
-        "Una noche mágica, un recuerdo eterno. ¡Acompáñame a festejar mis 15!"
+        t("wizard.frase.quince1"),
+        t("wizard.frase.quince2"),
+        t("wizard.frase.quince3"),
+        t("wizard.frase.quince4"),
+        t("wizard.frase.quince5"),
     ];
 
     const suggestedPhrases = tipo === "CASAMIENTO" ? WEDDING_PHRASES : tipo === "QUINCE_ANOS" ? QUINCE_PHRASES : [];
@@ -77,7 +82,7 @@ export function StepPhrase() {
     return (
         <div className="space-y-6">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">Frase Personalizada</h2>
+                <h2 className="text-2xl font-bold">{t("wizard.frase.titulo")}</h2>
                 <p className="text-muted-foreground text-sm">
                     {phraseHelp}
                 </p>
@@ -92,7 +97,7 @@ export function StepPhrase() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Cómo se muestra la Frase Personalizada?</span>
+                        <span>{t("wizard.frase.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -101,15 +106,15 @@ export function StepPhrase() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        Esta frase o poema se desplegará como cita destacada en el cuerpo de la invitación. Podés redactar tu propio mensaje sentimental o elegir una de nuestras sugerencias predefinidas listas para usar.
+                        {t("wizard.frase.infoTexto")}
                     </div>
                 )}
             </div>
 
-            <div className="space-y-4 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl max-w-2xl mx-auto">
+            <div className="space-y-4 bg-[var(--ink-2)] border border-[var(--line)] p-5 rounded-2xl max-w-2xl mx-auto">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="enablePhrase" className="text-base font-semibold cursor-pointer">
-                        Habilitar Frase Personalizada
+                        {t("wizard.frase.habilitar")}
                     </Label>
                     <Switch
                         id="enablePhrase"
@@ -119,10 +124,10 @@ export function StepPhrase() {
                 </div>
 
                 {data.frasePersonalizadaHabilitada && (
-                    <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-200">
+                    <div className="space-y-4 pt-4 border-t border-[var(--line)] animate-in fade-in duration-200">
                         {suggestedPhrases.length > 0 && (
                             <div className="space-y-3">
-                                <Label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Elegí una frase o escribí la tuya:</Label>
+                                <Label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">{t("wizard.frase.elegiOEscribi")}</Label>
                                 <div className="grid gap-2">
                                     {suggestedPhrases.map((phrase, idx) => (
                                         <button
@@ -135,7 +140,7 @@ export function StepPhrase() {
                                             className={`text-left text-sm p-3 rounded-xl border transition-all duration-200 ${
                                                 !customPhrase && phraseValue === phrase
                                                     ? "bg-amber-500/25 border-amber-400 text-amber-200 shadow-sm"
-                                                    : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                                    : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)]"
                                             }`}
                                         >
                                             "{phrase}"
@@ -147,24 +152,24 @@ export function StepPhrase() {
                                         className={`text-left text-sm p-3 rounded-xl border transition-all duration-200 ${
                                             customPhrase
                                                 ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
-                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300 font-semibold"
+                                                : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)] font-semibold"
                                         }`}
                                     >
-                                        <TypewriterText text="Escribir mi propia frase..." />
+                                        <TypewriterText text={t("wizard.frase.escribirPropia")} />
                                     </button>
                                 </div>
                             </div>
                         )}
 
                         {(customPhrase || suggestedPhrases.length === 0) && (
-                            <div className="space-y-2 pt-4 mt-2 border-t border-white/10 animate-in fade-in zoom-in-95">
-                                <Label htmlFor="phraseText" className="text-sm font-medium">Tu Frase Personalizada</Label>
+                            <div className="space-y-2 pt-4 mt-2 border-t border-[var(--line)] animate-in fade-in zoom-in-95">
+                                <Label htmlFor="phraseText" className="text-sm font-medium">{t("wizard.frase.tuFrase")}</Label>
                                 <Textarea
                                     id="phraseText"
                                     placeholder={phrasePlaceholder}
                                     value={phraseValue}
                                     onChange={(e) => setData({ frasePersonalizadaTexto: e.target.value.replace(/[\r\n]+/g, " ") })}
-                                    className="min-h-[110px] resize-none text-base bg-[var(--ink)] border border-white/15 rounded-xl p-3"
+                                    className="min-h-[110px] resize-none text-base bg-[var(--ink)] border border-[var(--campo-borde)] rounded-xl p-3"
                                     maxLength={300}
                                 />
                                 <p className="text-xs text-muted-foreground text-right">

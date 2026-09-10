@@ -13,15 +13,17 @@ import { useToast } from "@/components/ui/Toast";
 import { saveInvitationFromWizard, SaveInvitationError } from "@/lib/save-invitation";
 import { savePendingWizardInvitation } from "@/lib/pending-wizard-invitation";
 import { WizardPlanLimitDialog } from "./WizardPlanLimitDialog";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { ClaveTexto } from "@/lib/i18n/texto";
 
 interface InfoField {
     key: "alojamiento" | "estacionamiento" | "transporte" | "adicional";
     habilitadoField: "infoAlojamientoHabilitado" | "infoEstacionamientoHabilitado" | "infoTransporteHabilitado" | "infoAdicionalHabilitado";
     textField: "infoAlojamientoTexto" | "infoEstacionamientoTexto" | "infoTransporteTexto" | "infoAdicionalTexto";
     icon: typeof BedDouble;
-    title: string;
-    description: string;
-    placeholder: string;
+    title: ClaveTexto;
+    description: ClaveTexto;
+    placeholder: ClaveTexto;
 }
 
 const FIELDS: InfoField[] = [
@@ -30,41 +32,42 @@ const FIELDS: InfoField[] = [
         habilitadoField: "infoAlojamientoHabilitado",
         textField: "infoAlojamientoTexto",
         icon: BedDouble,
-        title: "Alojamiento",
-        description: "Hoteles o alojamientos recomendados cerca del evento",
-        placeholder: "Ej: Hotel Los Álamos, a 5 min del salón. Mencioná \"Casamiento [apellido]\" para la tarifa preferencial.",
+        title: "wizard.infoAdicional.alojamiento",
+        description: "wizard.infoAdicional.alojamientoDetalle",
+        placeholder: "wizard.infoAdicional.alojamientoPlaceholder",
     },
     {
         key: "estacionamiento",
         habilitadoField: "infoEstacionamientoHabilitado",
         textField: "infoEstacionamientoTexto",
         icon: CircleParking,
-        title: "Estacionamiento",
-        description: "Dónde estacionar y si el lugar tiene cochera propia",
-        placeholder: "Ej: El salón cuenta con cochera propia gratuita para los invitados.",
+        title: "wizard.infoAdicional.estacionamiento",
+        description: "wizard.infoAdicional.estacionamientoDetalle",
+        placeholder: "wizard.infoAdicional.estacionamientoPlaceholder",
     },
     {
         key: "transporte",
         habilitadoField: "infoTransporteHabilitado",
         textField: "infoTransporteTexto",
         icon: Bus,
-        title: "Transporte",
-        description: "Traslados organizados, remises recomendadas, etc.",
-        placeholder: "Ej: Vamos a organizar un traslado en combi desde la iglesia hasta el salón, saliendo a las 20:30.",
+        title: "wizard.infoAdicional.transporte",
+        description: "wizard.infoAdicional.transporteDetalle",
+        placeholder: "wizard.infoAdicional.transportePlaceholder",
     },
     {
         key: "adicional",
         habilitadoField: "infoAdicionalHabilitado",
         textField: "infoAdicionalTexto",
         icon: Info,
-        title: "Datos Adicionales",
-        description: "Cualquier otra cosa que tus invitados necesiten saber",
-        placeholder: "Ej: El evento es al aire libre, te recomendamos llevar un abrigo liviano para la noche.",
+        title: "wizard.infoAdicional.adicional",
+        description: "wizard.infoAdicional.adicionalDetalle",
+        placeholder: "wizard.infoAdicional.adicionalPlaceholder",
     },
 ];
 
 export function StepInfoAdicional() {
     const { data, setData } = useWizardStore();
+    const t = useTextos();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
     const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
     const themeConfig = useWizardStore((state) => state.themeConfig);
@@ -104,18 +107,23 @@ export function StepInfoAdicional() {
                 setShowPlanLimitDialog(true);
                 return;
             }
-            showToast(`Error al crear la invitación: ${error instanceof Error ? error.message : 'Error desconocido'}`, "error");
+            showToast(
+                t("wizard.infoAdicional.errorCrear", {
+                    mensaje: error instanceof Error ? error.message : t("wizard.infoAdicional.errorDesconocido"),
+                }),
+                "error"
+            );
             setIsCreating(false);
         }
     };
 
     const handleCreate = async () => {
         if (missingText) {
-            showToast("Completá el texto de las secciones que activaste, o desactivalas.", "error");
+            showToast(t("wizard.infoAdicional.faltaTexto"), "error");
             return;
         }
         if (overLimitField) {
-            showToast(`El texto de "${overLimitField.title}" se pasó del límite -- acortalo para poder continuar.`, "error");
+            showToast(t("wizard.infoAdicional.avisoExceso", { seccion: t(overLimitField.title) }), "error");
             return;
         }
         if (!session?.user) {
@@ -155,22 +163,21 @@ export function StepInfoAdicional() {
             });
             const responseData = await res.json();
             if (!res.ok || !responseData.checkoutUrl) {
-                throw new Error(responseData.error || "Error al iniciar el pago");
+                throw new Error(responseData.error || t("wizard.infoAdicional.errorPago"));
             }
             useWizardStore.getState().setDirty(false);
             window.location.href = responseData.checkoutUrl;
         } catch (error) {
-            showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
+            showToast(error instanceof Error ? error.message : t("wizard.infoAdicional.errorPago"), "error");
         }
     };
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">¿Qué necesitás que sepan tus invitados?</h2>
+                <h2 className="text-2xl font-bold">{t("wizard.infoAdicional.titulo")}</h2>
                 <p className="text-muted-foreground text-sm">
-                    Datos prácticos como alojamiento, estacionamiento o transporte -- van a aparecer en un botón
-                    aparte dentro de la invitación, así no se mezclan con el resto del contenido.
+                    {t("wizard.infoAdicional.subtitulo")}
                 </p>
             </div>
 
@@ -179,11 +186,10 @@ export function StepInfoAdicional() {
                     <Info className="w-4.5 h-4.5 shrink-0 text-amber-400 mt-0.5" />
                     <div className="min-w-0">
                         <Label htmlFor="enable-info-adicional" className="text-base font-semibold text-amber-100 cursor-pointer">
-                            Mostrar esta sección en la invitación
+                            {t("wizard.infoAdicional.interruptor")}
                         </Label>
                         <p className="text-xs text-amber-200/80">
-                            Es el interruptor general: si está apagado, el botón "¿Qué necesitás saber?" no aparece
-                            aunque hayas cargado información abajo -- podés dejar todo preparado y activarlo cuando quieras.
+                            {t("wizard.infoAdicional.interruptorAyuda")}
                         </p>
                     </div>
                 </div>
@@ -202,7 +208,7 @@ export function StepInfoAdicional() {
                 const Icon = field.icon;
 
                 return (
-                    <div key={field.key} className="space-y-4 bg-[var(--ink-2)] border border-white/10 p-5 rounded-2xl shadow-sm">
+                    <div key={field.key} className="space-y-4 bg-[var(--ink-2)] border border-[var(--line)] p-5 rounded-2xl shadow-sm">
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2.5 min-w-0">
                                 <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
@@ -210,9 +216,9 @@ export function StepInfoAdicional() {
                                 </div>
                                 <div className="min-w-0">
                                     <Label htmlFor={`enable-${field.key}`} className="flex items-center gap-2 text-base font-semibold cursor-pointer">
-                                        {field.title}
+                                        {t(field.title)}
                                     </Label>
-                                    <p className="text-xs text-muted-foreground">{field.description}</p>
+                                    <p className="text-xs text-muted-foreground">{t(field.description)}</p>
                                 </div>
                             </div>
                             <Switch
@@ -223,9 +229,9 @@ export function StepInfoAdicional() {
                         </div>
 
                         {isActive && (
-                            <div className="space-y-1.5 pt-4 border-t border-white/10 animate-in fade-in duration-200">
+                            <div className="space-y-1.5 pt-4 border-t border-[var(--line)] animate-in fade-in duration-200">
                                 <div className="flex justify-between items-center h-5">
-                                    <Label htmlFor={`text-${field.key}`} className="text-xs font-medium">Texto que van a ver tus invitados</Label>
+                                    <Label htmlFor={`text-${field.key}`} className="text-xs font-medium">{t("wizard.infoAdicional.textoInvitados")}</Label>
                                     <span className={`text-[10px] font-mono ${isOverLimit ? "text-red-400 font-bold" : "text-muted-foreground"}`}>
                                         {text.length}/{maxLength}
                                     </span>
@@ -237,7 +243,7 @@ export function StepInfoAdicional() {
                                     criterio que X/Twitter). */}
                                 <Textarea
                                     id={`text-${field.key}`}
-                                    placeholder={field.placeholder}
+                                    placeholder={t(field.placeholder)}
                                     value={text}
                                     rows={3}
                                     className={isOverLimit ? "border-red-500 focus-visible:ring-red-500" : undefined}
@@ -245,7 +251,7 @@ export function StepInfoAdicional() {
                                 />
                                 {isOverLimit && (
                                     <p className="text-xs text-red-400">
-                                        Te pasaste por {text.length - maxLength} caracteres -- acortá el texto para poder continuar.
+                                        {t("wizard.infoAdicional.exceso", { cantidad: text.length - maxLength })}
                                     </p>
                                 )}
                             </div>

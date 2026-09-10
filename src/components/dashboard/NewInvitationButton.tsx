@@ -15,6 +15,7 @@ import { Gift, Sparkles, Diamond, ChevronRight } from "lucide-react";
 import { NoCreditsDialog } from "./NoCreditsDialog";
 import { useToast } from "@/components/ui/Toast";
 import { PLAN_FEATURE_HIGHLIGHTS } from "@/lib/plan-limits";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalInvitations, planTier, hasFreeInvitation = false, autoOpen = false, renderTrigger }: { premiumCredits: number, diamondCredits?: number, totalInvitations: number, planTier?: string, hasFreeInvitation?: boolean, autoOpen?: boolean, renderTrigger?: (onClick: () => void) => React.ReactNode }) {
     const [open, setOpen] = useState(autoOpen);
@@ -23,6 +24,7 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
     const [isPaying, setIsPaying] = useState(false);
     const router = useRouter();
     const { showToast } = useToast();
+    const t = useTextos();
     const setUsePremiumCredit = useWizardStore((state) => state.setUsePremiumCredit);
     const setUseDiamondCredit = useWizardStore((state) => state.setUseDiamondCredit);
     const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'DIAMOND' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
@@ -75,11 +77,11 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
             });
             const responseData = await res.json();
             if (!res.ok || !responseData.checkoutUrl) {
-                throw new Error(responseData.error || "Error al iniciar el pago");
+                throw new Error(responseData.error || t("panel.nueva.errorPago"));
             }
             window.location.href = responseData.checkoutUrl;
         } catch (error) {
-            showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
+            showToast(error instanceof Error ? error.message : t("panel.nueva.errorPago"), "error");
             setIsPaying(false);
         }
     };
@@ -88,16 +90,16 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
         <>
             {renderTrigger ? renderTrigger(handleNewClick) : (
                 <Button onClick={handleNewClick} className="l-cta text-ink bg-accent hover:bg-accent/90 border-none rounded-full px-6">
-                    + Nueva invitación
+                    {t("panel.nueva.boton")}
                 </Button>
             )}
 
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Elegí tu tipo de invitación</DialogTitle>
+                        <DialogTitle>{t("panel.nueva.titulo")}</DialogTitle>
                         <DialogDescription className="pt-1">
-                            ¿Qué tipo de invitación querés crear?
+                            {t("panel.nueva.detalle")}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -116,7 +118,7 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                                     <Gift className="w-5 h-5 text-muted-foreground" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-sm">Crear Gratis</p>
+                                    <p className="font-semibold text-sm">{t("panel.nueva.crearGratis")}</p>
                                     <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                                         {PLAN_FEATURE_HIGHLIGHTS.FREE.map((f) => (
                                             <li key={f}>• {f}</li>
@@ -136,7 +138,7 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                                 <Sparkles className="w-5 h-5 text-yellow-500" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm text-yellow-500">Usar Crédito Premium</p>
+                                <p className="font-semibold text-sm text-yellow-500">{t("panel.nueva.usarPremium")}</p>
                                 <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                                     {PLAN_FEATURE_HIGHLIGHTS.PREMIUM.map((f) => (
                                         <li key={f}>• {f}</li>
@@ -144,8 +146,8 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                                 </ul>
                                 <p className="text-xs text-yellow-500/80 font-medium mt-1">
                                     {hasUnlimitedPremium
-                                        ? "Invitaciones premium ilimitadas por tu plan"
-                                        : `${premiumCredits} ${premiumCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}`}
+                                        ? t("panel.nueva.ilimitadas")
+                                        : t(premiumCredits === 1 ? "panel.nueva.unCredito" : "panel.nueva.variosCreditos", { cantidad: premiumCredits })}
                                 </p>
                             </div>
                             <ChevronRight className="w-4 h-4 text-yellow-500/60 shrink-0" />
@@ -160,7 +162,7 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                                 <Diamond className="w-5 h-5 text-[#67e8f9]" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm text-[#67e8f9]">Usar Crédito Diamond</p>
+                                <p className="font-semibold text-sm text-[#67e8f9]">{t("panel.nueva.usarDiamond")}</p>
                                 <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                                     {PLAN_FEATURE_HIGHLIGHTS.DIAMOND.map((f) => (
                                         <li key={f}>• {f}</li>
@@ -168,8 +170,8 @@ export function NewInvitationButton({ premiumCredits, diamondCredits = 0, totalI
                                 </ul>
                                 <p className="text-xs text-[#67e8f9]/80 font-medium mt-1">
                                     {hasUnlimitedPremium
-                                        ? "Invitaciones premium ilimitadas por tu plan"
-                                        : `${diamondCredits} ${diamondCredits === 1 ? 'crédito disponible' : 'créditos disponibles'}`}
+                                        ? t("panel.nueva.ilimitadas")
+                                        : t(diamondCredits === 1 ? "panel.nueva.unCredito" : "panel.nueva.variosCreditos", { cantidad: diamondCredits })}
                                 </p>
                             </div>
                             <ChevronRight className="w-4 h-4 text-[#67e8f9]/60 shrink-0" />

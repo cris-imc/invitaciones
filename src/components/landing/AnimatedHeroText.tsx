@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-
-const PREFIX = "No somos solo una invitación digital. ";
-const SUFFIXES = [
-  "Somos un link personal para cada invitado.",
-  "Somos una invitación en tiempo real.",
-  "Con LIVE tu fiesta se anima.",
-];
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function AnimatedHeroText() {
+  const t = useTextos();
+  const PREFIX = t("landing.hero.prefijo");
+  // Memoizado porque el efecto que tipea lo tiene como dependencia: un array
+  // nuevo en cada render reiniciaría la animación sola.
+  const SUFFIXES = useMemo(
+    () => [t("landing.hero.frase1"), t("landing.hero.frase2"), t("landing.hero.frase3")],
+    [t]
+  );
+
   const [currentText, setCurrentText] = useState("");
   const [suffixIndex, setSuffixIndex] = useState(0);
   const [phase, setPhase] = useState<"typing" | "pausing" | "deleting">("typing");
@@ -41,7 +44,7 @@ export function AnimatedHeroText() {
     }
 
     return () => clearTimeout(timeout);
-  }, [currentText, phase, suffixIndex]);
+  }, [currentText, phase, suffixIndex, PREFIX, SUFFIXES]);
 
   // "LIVE" tiene tratamiento propio dentro del texto tipeado: verde de
   // marca, brillo pulsante ("encendido") y el ™ de marca -- en vez de

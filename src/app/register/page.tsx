@@ -9,7 +9,9 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/Toast";
 import Link from "next/link";
-import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft, Tag, Radio } from "lucide-react";
+import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft, Tag, Radio, Globe } from "lucide-react";
+import { SelectorPais } from "@/components/ui/SelectorPais";
+import type { CodigoPais } from "@/lib/paises";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
@@ -17,6 +19,7 @@ import { PagoPorTransferencia } from "@/components/pagos/PagoPorTransferencia";
 import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 import { setPendingWizardDesiredCredit } from "@/lib/pending-wizard-invitation";
+import { costumbresDe } from "@/lib/costumbres-por-pais";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
 
@@ -82,7 +85,7 @@ function planPriceLabel(plan: PlanType): string {
 export default function RegisterPage() {
   if (!REGISTRATION_ENABLED) {
     return (
-      <div className="min-h-dvh py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative text-[var(--on-ink)]">
+      <div className="pantalla-auth min-h-dvh py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative text-[var(--on-ink)]">
         <Link href="/" className="absolute top-6 left-6 md:top-12 md:left-12 flex items-center gap-2 text-sm text-[var(--paper)] opacity-70 hover:opacity-100 transition-opacity">
           <ChevronLeft className="w-4 h-4" />
           Volver al inicio
@@ -117,6 +120,7 @@ function RegisterForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("DIAMOND");
 
+
   const fromWizard = searchParams?.get("from") === "wizard";
 
   useEffect(() => {
@@ -137,7 +141,17 @@ function RegisterForm() {
     confirmPassword: "",
     phoneAreaCode: "",
     phoneNumber: "",
+    // Argentina de arranque: es de donde viene la enorme mayoría de las
+    // cuentas. Igual es obligatorio elegirlo, así que se puede cambiar.
+    pais: "AR" as CodigoPais,
   });
+
+  // Qué medios de pago corresponden al país elegido. Fuera de Argentina
+  // sólo PayPal: una cuenta común de Mercado Pago Argentina no puede
+  // cobrarle a alguien de otro país, y la transferencia va a un CBU
+  // argentino que no le sirve a nadie de afuera.
+  const medios = costumbresDe(formData.pais).mediosDePago;
+  const porMercadoPago = medios.includes("mercadopago");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   // Código de descuento: se valida en vivo contra el servidor (botón
@@ -236,6 +250,7 @@ function RegisterForm() {
           planTier: selectedPlan,
           phoneAreaCode: normalizeDigits(formData.phoneAreaCode),
           phoneNumber: normalizeDigits(formData.phoneNumber),
+          pais: formData.pais,
           acceptedTerms,
           discountCode: appliedDiscount?.code,
         }),
@@ -259,7 +274,12 @@ function RegisterForm() {
           setPendingWizardDesiredCredit(selectedPlan === "DIAMOND" ? "DIAMOND" : "PREMIUM");
         }
         hapticoExito();
-        showToast("¡Cuenta creada! Redirigiendo a Mercado Pago...", "success");
+        showToast(
+          data.proveedor === "paypal"
+            ? "¡Cuenta creada! Redirigiendo a PayPal..."
+            : "¡Cuenta creada! Redirigiendo a Mercado Pago...",
+          "success"
+        );
         window.location.href = data.checkoutUrl;
         return;
       }
@@ -483,7 +503,7 @@ function RegisterForm() {
                           setDiscountInput(e.target.value);
                           setDiscountError(null);
                         }}
-                        className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl uppercase"
+                        className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl uppercase"
                       />
                       <Button
                         type="button"
@@ -516,7 +536,7 @@ function RegisterForm() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
-                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                   />
                 </div>
 
@@ -532,8 +552,24 @@ function RegisterForm() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
-                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="pais" className="flex items-center gap-2 mb-2 opacity-80">
+                    <Globe className="w-4 h-4" />
+                    País
+                  </Label>
+                  <SelectorPais
+                    id="pais"
+                    valor={formData.pais}
+                    onCambio={(pais) => setFormData({ ...formData, pais })}
+                    className="border-none"
+                  />
+                  <p className="text-xs opacity-50 mt-1.5">
+                    Define en qué moneda cobrás y qué datos bancarios te vamos a pedir para que tus invitados te transfieran.
+                  </p>
                 </div>
 
                 <div>
@@ -551,7 +587,7 @@ function RegisterForm() {
                       onChange={(e) => setFormData({ ...formData, phoneAreaCode: normalizeDigits(e.target.value) })}
                       maxLength={4}
                       required
-                      className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                      className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                     />
                     <Input
                       id="phoneNumber"
@@ -562,7 +598,7 @@ function RegisterForm() {
                       onChange={(e) => setFormData({ ...formData, phoneNumber: normalizeDigits(e.target.value) })}
                       maxLength={8}
                       required
-                      className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                      className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                     />
                   </div>
                   <p className="text-xs opacity-50 mt-1.5">
@@ -582,7 +618,7 @@ function RegisterForm() {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     minLength={PASSWORD_MIN_LENGTH}
-                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                   />
                 </div>
 
@@ -598,7 +634,7 @@ function RegisterForm() {
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
                     minLength={PASSWORD_MIN_LENGTH}
-                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                    className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                   />
                 </div>
 
@@ -633,12 +669,16 @@ function RegisterForm() {
                     ? "Creando cuenta..."
                     : selectedPlan === "FREE"
                     ? "Crear cuenta"
-                    : "Continuar a Mercado Pago"}
+                    : porMercadoPago
+                    ? "Continuar a Mercado Pago"
+                    : "Continuar a PayPal"}
                 </Button>
 
-                {/* Sólo cuando hay algo que pagar: en el plan gratis no hay
-                    transferencia que hacer y sería una distracción. */}
-                {selectedPlan !== "FREE" && (
+                {/* Sólo cuando hay algo que pagar y sólo donde sirve: la
+                    transferencia es a una cuenta bancaria argentina, así que
+                    fuera de Argentina no es una opción. En el plan gratis no
+                    hay nada que transferir y sería una distracción. */}
+                {selectedPlan !== "FREE" && medios.includes("transferencia") && (
                   <PagoPorTransferencia concepto="tu plan" className="mt-1" />
                 )}
 

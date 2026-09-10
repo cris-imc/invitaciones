@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { MoreHorizontal, Calendar, MapPin, Pencil, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface InvitationCardProps {
     invitation: {
@@ -37,6 +38,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const router = useRouter();
+    const t = useTextos();
 
     const getDisplayTitle = () => {
         const getFirstName = (fullName: string | null | undefined) => {
@@ -72,7 +74,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
             setShowDeleteDialog(false);
         } catch (error) {
             console.error('Error deleting invitation:', error);
-            alert('Error al eliminar la invitación');
+            alert(t("panel.tarjeta.errorEliminar"));
             setIsDeleting(false);
         }
     };
@@ -82,7 +84,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
             <Card className="overflow-hidden">
                 <div className="flex flex-col md:flex-row">
                     <div className="w-full md:w-48 h-32 md:h-auto bg-muted flex items-center justify-center text-muted-foreground">
-                        <span className="text-sm">Preview</span>
+                        <span className="text-sm">{t("panel.tarjeta.vistaPrevia")}</span>
                     </div>
                     <div className="flex-1">
                         <CardHeader>
@@ -105,7 +107,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                             <CardDescription className="flex flex-col sm:flex-row gap-4 mt-2">
                                 <div className="flex items-center gap-1.5">
                                     <Calendar className="w-4 h-4" />
-                                    {new Date(invitation.fechaEvento).toLocaleDateString('es-AR', {
+                                    {new Date(invitation.fechaEvento).toLocaleDateString(t("panel.localeFecha"), {
                                         day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC'
                                     })}
                                 </div>
@@ -121,13 +123,13 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                             <div className="flex gap-4">
                                 <div className="flex flex-col">
                                     <span className="text-2xl font-bold">{invitation._count?.guests || 0}</span>
-                                    <span className="text-xs text-muted-foreground">Confirmados</span>
+                                    <span className="text-xs text-muted-foreground">{t("panel.tarjeta.confirmados")}</span>
                                 </div>
                                 <div className="w-px h-10 bg-secondary" />
                                 <div className="flex gap-2 items-center flex-wrap">
                                     <Link href={`/invitation/${invitation.slug}`}>
                                         <Button variant="outline" size="sm" className="h-9">
-                                            Ver Invitación
+                                            {t("panel.tarjeta.verInvitacion")}
                                         </Button>
                                     </Link>
                                     <Button
@@ -137,7 +139,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                         onClick={() => router.push(`/dashboard/invitaciones/editar/${invitation.id}`)}
                                     >
                                         <Pencil className="w-3 h-3" />
-                                        Editar
+                                        {t("comun.editar")}
                                     </Button>
                                     <Link href={`/dashboard/invitaciones/${invitation.slug}/guests`}>
                                         <Button
@@ -146,7 +148,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                             className="h-9 gap-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
                                         >
                                             <Users className="w-3 h-3" />
-                                            Invitados
+                                            {t("panel.tarjeta.invitados")}
                                         </Button>
                                     </Link>
                                     <Button
@@ -156,7 +158,7 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                         onClick={() => setShowDeleteDialog(true)}
                                     >
                                         <Trash2 className="w-3 h-3" />
-                                        Eliminar
+                                        {t("comun.eliminar")}
                                     </Button>
                                 </div>
                             </div>
@@ -170,10 +172,9 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                 <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
                     <div className="bg-background rounded-lg shadow-lg max-w-md w-full p-6 space-y-4">
                         <div className="space-y-2">
-                            <h2 className="text-xl font-semibold">¿Eliminar invitación?</h2>
+                            <h2 className="text-xl font-semibold">{t("panel.tarjeta.eliminarTitulo")}</h2>
                             <p className="text-muted-foreground">
-                                Esta acción no se puede deshacer. Se eliminará permanentemente la invitación
-                                <span className="font-semibold"> "{invitation.nombreEvento}"</span> y todos los datos asociados.
+                                {t("panel.tarjeta.eliminarDetalle", { nombre: `"${invitation.nombreEvento}"` })}
                             </p>
                         </div>
                         <div className="flex gap-3 justify-end">
@@ -182,14 +183,14 @@ export function InvitationCard({ invitation }: InvitationCardProps) {
                                 onClick={() => setShowDeleteDialog(false)}
                                 disabled={isDeleting}
                             >
-                                Cancelar
+                                {t("comun.cancelar")}
                             </Button>
                             <Button
                                 variant="destructive"
                                 onClick={handleDelete}
                                 disabled={isDeleting}
                             >
-                                {isDeleting ? 'Eliminando...' : 'Eliminar'}
+                                {isDeleting ? t("panel.tarjeta.eliminando") : t("comun.eliminar")}
                             </Button>
                         </div>
                     </div>

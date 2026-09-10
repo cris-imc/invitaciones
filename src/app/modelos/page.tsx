@@ -6,6 +6,7 @@ import { ModelosTabs } from "@/components/modelos/ModelosTabs";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { labelDeFamilia } from "@/lib/template-labels";
+import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 
 // Landing 100% dinámica: en vez de una lista fija que hay que tocar por
 // código cada vez, muestra las invitaciones reales de UNA cuenta de prueba
@@ -99,7 +100,11 @@ async function getModelos() {
 }
 
 export default async function ModelosPage() {
-  const [session, { xv, boda, evento, personalizado }] = await Promise.all([auth(), getModelos()]);
+  const [session, { xv, boda, evento, personalizado }, t] = await Promise.all([
+    auth(),
+    getModelos(),
+    textosDelAnfitrion(),
+  ]);
   const registerUrl = session ? "/dashboard?new=true" : "/register";
   const hasTabbedModelos = xv.length > 0 || boda.length > 0 || evento.length > 0 || personalizado.length > 0;
 
@@ -115,14 +120,12 @@ export default async function ModelosPage() {
             padding-top suficiente -- el kicker "Modelos reales" quedaba
             tapado atras del nav fijo. */}
         <section className="text-center px-6 pt-24 pb-10 md:pt-20 md:pb-14">
-          <p className="kicker font-ui mx-auto mb-4">Modelos reales</p>
-          <h1 className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-white mb-4">
-            Mirá cómo ven la invitación <em className="italic text-[var(--accent)]">tus invitados</em>
+          <p className="kicker font-ui mx-auto mb-4">{t("landing.modelos.kicker")}</p>
+          <h1 className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-[var(--foreground)] mb-4">
+            {t("landing.modelos.tituloAntes")} <em className="italic text-[var(--accent)]">{t("landing.modelos.tituloDestacado")}</em>
           </h1>
-          <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-            Invitaciones reales, con nombre, salón, mapa y fecha de verdad —
-            tocá cualquiera para abrirla completa, tal cual la va a ver cada
-            invitado.
+          <p className="text-[var(--shell-fg-mid)] text-lg max-w-2xl mx-auto">
+            {t("landing.modelos.bajada")}
           </p>
         </section>
 
@@ -132,23 +135,22 @@ export default async function ModelosPage() {
           </section>
         ) : (
           <section className="px-6 pb-16 text-center">
-            <p className="text-zinc-500 max-w-md mx-auto">
-              Estamos preparando los modelos. Volvé pronto para ver ejemplos
-              reales.
+            <p className="text-[var(--shell-fg-soft)] max-w-md mx-auto">
+              {t("landing.modelos.vacio")}
             </p>
           </section>
         )}
 
         <section className="text-center px-6 pb-20">
-          <p className="text-2xl md:text-3xl font-display font-semibold text-white max-w-2xl mx-auto mb-3">
-            Y un montón más de <em className="italic text-[var(--accent)]">posibilidades</em>
+          <p className="text-2xl md:text-3xl font-display font-semibold text-[var(--foreground)] max-w-2xl mx-auto mb-3">
+            {t("landing.modelos.masAntes")} <em className="italic text-[var(--accent)]">{t("landing.modelos.masDestacado")}</em>
           </p>
-          <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-6">
-            Una variedad de tipografías, colores y efectos: combinalos como quieras.
+          <p className="text-[var(--shell-fg-mid)] text-lg max-w-2xl mx-auto mb-6">
+            {t("landing.modelos.masBajada")}
           </p>
           <Link href={registerUrl}>
             <Button className="rounded-full bg-[var(--accent)] text-[var(--ink)] transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--accent)]/20 px-8 py-6 text-base font-ui">
-              Crear mi invitación
+              {t("landing.modelos.cta")}
             </Button>
           </Link>
         </section>

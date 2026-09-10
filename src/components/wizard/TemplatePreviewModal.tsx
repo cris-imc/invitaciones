@@ -12,6 +12,7 @@ import { Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isStorytellingTemplate } from "./wizard-steps-config";
 import { labelDeFamilia } from "@/lib/template-labels";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 import {
   MODERNO_COLORS,
   ELEGANT_COLORS,
@@ -371,11 +372,12 @@ export function TemplatePreviewModal({
   currentData,
   onConfirm,
 }: TemplatePreviewModalProps) {
+  const t = useTextos();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl w-[95vw] h-[88vh] p-0 gap-0 flex flex-col overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b shrink-0">
-          <DialogTitle>Elegí tu plantilla</DialogTitle>
+          <DialogTitle>{t("wizard.modalPlantillas.titulo")}</DialogTitle>
         </DialogHeader>
 
         {open && (
@@ -414,6 +416,7 @@ function TemplatePreviewModalBody({
   onOpenChange,
   onConfirm,
 }: TemplatePreviewModalBodyProps) {
+  const t = useTextos();
   const [activeTab, setActiveTab] = useState<TemplateTipo>(initialTemplateTipo);
   const [previewColor, setPreviewColor] = useState(initialColor || "default");
   const [previewLoading, setPreviewLoading] = useState(true);
@@ -509,7 +512,7 @@ function TemplatePreviewModalBody({
           {canScrollTabsLeft && (
             <button
               type="button"
-              aria-label="Ver plantillas anteriores"
+              aria-label={t("wizard.modalPlantillas.anteriores")}
               onClick={() => tabsScrollRef.current?.scrollBy({ left: -240, behavior: "smooth" })}
               className="absolute left-6 top-4 bottom-0 w-10 md:w-14 bg-gradient-to-r from-background to-transparent z-10 flex items-center justify-start cursor-pointer"
             >
@@ -519,7 +522,7 @@ function TemplatePreviewModalBody({
           {canScrollTabsRight && (
             <button
               type="button"
-              aria-label="Ver más plantillas"
+              aria-label={t("wizard.modalPlantillas.siguientes")}
               onClick={() => tabsScrollRef.current?.scrollBy({ left: 240, behavior: "smooth" })}
               className="absolute right-6 top-4 bottom-0 w-10 md:w-14 bg-gradient-to-l from-background to-transparent z-10 flex items-center justify-end cursor-pointer"
             >
@@ -628,7 +631,7 @@ function TemplatePreviewModalBody({
                 <iframe
                   ref={iframeRef}
                   src={previewSrc}
-                  title="Vista previa de la plantilla"
+                  title={t("wizard.modalPlantillas.tituloIframe")}
                   style={{
                     width: MOBILE_VIEWPORT_WIDTH,
                     height: MOBILE_VIEWPORT_WIDTH * MOBILE_ASPECT_RATIO,
@@ -642,14 +645,14 @@ function TemplatePreviewModalBody({
 
         <div className="flex items-center justify-end md:justify-between px-6 py-4 border-t shrink-0 bg-background">
           <p className="hidden md:block text-xs text-muted-foreground">
-            Vista previa real con contenido de ejemplo. Tus fotos y datos se verán así de organizados.
+            {t("wizard.modalPlantillas.pie")}
           </p>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {t("comun.cancelar")}
             </Button>
             <Button onClick={() => onConfirm(activeTab, previewColor)}>
-              Elegir esta plantilla
+              {t("wizard.modalPlantillas.elegir")}
             </Button>
           </div>
         </div>

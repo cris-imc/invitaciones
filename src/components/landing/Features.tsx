@@ -43,7 +43,7 @@ const features = [
 
 export function Features() {
     return (
-        <section id="features" className="py-20 bg-slate-50 dark:bg-slate-900/50">
+        <section id="features" className="py-20 bg-[var(--ink-2)]">
             <div className="container px-4 md:px-6 mx-auto">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">

@@ -7,11 +7,14 @@ import { GuestStatsBar } from "@/components/dashboard/GuestStatsBar";
 import { GuestPageTabs } from "@/components/dashboard/GuestPageTabs";
 import { getEventStatus } from "@/lib/expiration";
 import { isAdmin } from "@/lib/roles";
+import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
+import { textosDelAnfitrion } from "@/lib/i18n/servidor";
+import type { Traductor } from "@/lib/i18n/texto";
 
 // Prueba visual: leyenda animada de estado (en vivo / desconectado) junto al
 // título de "Gestión del Evento". El evento deja de estar "en vivo" una vez
 // pasado (POST_EVENT/EXPIRED, ver getEventStatus) -- ahi el icono se apaga.
-function LiveStatusBadge({ live, size = "sm", className }: { live: boolean; size?: "xs" | "sm"; className?: string }) {
+function LiveStatusBadge({ live, size = "sm", className, t }: { live: boolean; size?: "xs" | "sm"; className?: string; t: Traductor }) {
   const textSize = size === "xs" ? "text-[9px]" : "text-[10px]";
 
   if (live) {
@@ -23,17 +26,17 @@ function LiveStatusBadge({ live, size = "sm", className }: { live: boolean; size
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
         </span>
-        Datos en tiempo real
+        {t("panel.evento.enVivo")}
       </span>
     );
   }
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 ${textSize} font-mono uppercase tracking-wider text-white/30 ${className ?? ""}`}
+      className={`inline-flex items-center gap-1.5 ${textSize} font-mono uppercase tracking-wider text-[var(--shell-fg-faint)] ${className ?? ""}`}
     >
-      <span className="inline-flex rounded-full h-2 w-2 bg-white/25" />
-      Desconectado
+      <span className="inline-flex rounded-full h-2 w-2 bg-[var(--shell-fg-faint)]" />
+      {t("panel.evento.desconectado")}
     </span>
   );
 }
@@ -52,19 +55,23 @@ export default async function GuestManagementPage({ params }: { params: Promise<
 
   const eventStatus = getEventStatus(invitation.fechaEvento);
   const isLive = eventStatus === "PRE_EVENT" || eventStatus === "EVENT_DAY";
+  const t = await textosDelAnfitrion();
 
   return (
     <div className="p-4 md:p-8 space-y-6">
       {/* ── Breadcrumb ── */}
       <div className="flex items-center justify-between gap-3">
         <div className="adm-breadcrumb">
-          <a href="/dashboard">Inicio</a>
+          <a href="/dashboard">{t("panel.evento.migaInicio")}</a>
           <span>›</span>
-          <span>Administrar</span>
+          <span>{t("panel.evento.migaAdministrar")}</span>
         </div>
         {/* Mobile/tablet: alineado con el breadcrumb, justificado a la derecha */}
-        <div className="xl:hidden shrink-0">
-          <LiveStatusBadge live={isLive} size="xs" />
+        <div className="flex items-center gap-3 shrink-0">
+          <PreferenciasUsuario />
+          <div className="xl:hidden">
+            <LiveStatusBadge live={isLive} size="xs" t={t} />
+          </div>
         </div>
       </div>
 
@@ -73,14 +80,14 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         {/* Title */}
         <div className="min-w-0 flex-1">
           <p className="adm-breadcrumb" style={{ marginBottom: 4 }}>
-            Gestión del Evento
+            {t("panel.evento.gestionDelEvento")}
           </p>
           <h1 className="adm-title min-w-0" style={{ marginBottom: 0 }}>
             {invitation.nombreEvento}
           </h1>
           {/* Desktop: debajo del título */}
           <div className="hidden xl:block mt-2">
-            <LiveStatusBadge live={isLive} />
+            <LiveStatusBadge live={isLive} t={t} />
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { BackLink } from "@/components/ui/BackLink";
 import { isAdmin, ROLE_LABELS } from "@/lib/roles";
 import { getEventLabel, getEventEmoji } from "@/lib/invitation-card-helpers";
+import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 const PLAN_LABEL: Record<string, string> = { FREE: "Gratis", PREMIUM: "Premium", DIAMOND: "Diamond", ADMIN: "Admin", ENTERPRISE: "Enterprise" };
 
@@ -51,6 +52,7 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
                     <h2>{client.name}</h2>
                     <p>{client.email}</p>
                 </div>
+                <PreferenciasUsuario />
             </div>
 
             <div className="p-stats">
@@ -73,14 +75,14 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
             </div>
 
             {/* ── Últimos 3 logins ── */}
-            <div className="rounded-xl border border-white/10 p-5">
+            <div className="rounded-xl border border-[var(--line)] p-5">
                 <h3 className="text-sm font-semibold mb-4 opacity-80">Últimos 3 inicios de sesión</h3>
                 {last3Logins.length === 0 ? (
                     <p className="text-sm opacity-40">Todavía no hay logueos registrados para esta cuenta.</p>
                 ) : (
                     <div className="space-y-2">
                         {last3Logins.map((login) => (
-                            <div key={login.id} className="flex items-center justify-between text-sm border-b border-white/5 last:border-0 py-1.5">
+                            <div key={login.id} className="flex items-center justify-between text-sm border-b border-[var(--campo-borde-suave)] last:border-0 py-1.5">
                                 <span className="opacity-70">
                                     {new Date(login.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric", timeZone: "America/Argentina/Buenos_Aires" })}
                                 </span>
@@ -99,10 +101,10 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
                 {client.invitations.length === 0 ? (
                     <p className="text-sm opacity-40">No tiene invitaciones creadas.</p>
                 ) : (
-                    <div className="overflow-x-auto rounded-xl border border-white/10">
+                    <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="text-left text-white/50 border-b border-white/10">
+                                <tr className="text-left text-[var(--shell-fg-soft)] border-b border-[var(--line)]">
                                     <th className="py-2.5 px-4 font-medium">Evento</th>
                                     <th className="py-2.5 px-4 font-medium">Tipo</th>
                                     <th className="py-2.5 px-4 font-medium">Plan</th>
@@ -112,7 +114,7 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
                             </thead>
                             <tbody>
                                 {client.invitations.map((inv) => (
-                                    <tr key={inv.id} className="border-b border-white/5 last:border-0">
+                                    <tr key={inv.id} className="border-b border-[var(--campo-borde-suave)] last:border-0">
                                         <td className="py-2.5 px-4">{inv.nombreEvento}</td>
                                         <td className="py-2.5 px-4">{getEventEmoji(inv.tipo)} {getEventLabel(inv.tipo)}</td>
                                         <td className="py-2.5 px-4">{PLAN_LABEL[inv.planTier] || inv.planTier}</td>

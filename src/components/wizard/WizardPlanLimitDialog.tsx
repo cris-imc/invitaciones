@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { NoCreditsDialog } from "@/components/dashboard/NoCreditsDialog";
 import { PLAN_FEATURE_HIGHLIGHTS } from "@/lib/plan-limits";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface Credits {
     premiumCredits: number;
@@ -29,8 +30,8 @@ export function WizardPlanLimitDialog({
     onOpenChange,
     onUseCredit,
     onPayMercadoPago,
-    title = "Llegaste al límite del plan Gratis",
-    description = "Ya tenés una invitación Gratis activa -- elegí Premium o Diamond para crear esta.",
+    title,
+    description,
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -39,6 +40,13 @@ export function WizardPlanLimitDialog({
     title?: string;
     description?: string;
 }) {
+    const t = useTextos();
+    // El título y la descripción por defecto salen del diccionario, no de un
+    // valor por defecto del parámetro: un valor por defecto se evalúa antes de
+    // que exista el traductor. Los otros usos (ver EventShareCard.tsx) siguen
+    // pasando los suyos.
+    const tituloVisible = title ?? t("wizard.limitePlan.titulo");
+    const descripcionVisible = description ?? t("wizard.limitePlan.descripcion");
     const [credits, setCredits] = useState<Credits | null>(null);
     const [showNoCredits, setShowNoCredits] = useState<null | "PREMIUM" | "DIAMOND">(null);
     const [confirmTier, setConfirmTier] = useState<null | "PREMIUM" | "DIAMOND">(null);
@@ -96,9 +104,15 @@ export function WizardPlanLimitDialog({
                     {confirmTier ? (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Confirmar uso de crédito {confirmTier === "DIAMOND" ? "Diamond" : "Premium"}</DialogTitle>
+                                <DialogTitle>{t("wizard.limitePlan.confirmarTitulo", { plan: confirmTier === "DIAMOND" ? "Diamond" : "Premium" })}</DialogTitle>
                                 <DialogDescription className="pt-1">
-                                    Tenés {confirmTier === "DIAMOND" ? credits?.diamondCredits : credits?.premiumCredits} crédito{(confirmTier === "DIAMOND" ? credits?.diamondCredits : credits?.premiumCredits) === 1 ? "" : "s"} {confirmTier === "DIAMOND" ? "Diamond" : "Premium"} disponible{(confirmTier === "DIAMOND" ? credits?.diamondCredits : credits?.premiumCredits) === 1 ? "" : "s"}. Al confirmar, se va a usar uno para convertir esta invitación -- no se te va a cobrar nada.
+                                    {(() => {
+                                        const cantidad = (confirmTier === "DIAMOND" ? credits?.diamondCredits : credits?.premiumCredits) ?? 0;
+                                        const plan = confirmTier === "DIAMOND" ? "Diamond" : "Premium";
+                                        return cantidad === 1
+                                            ? t("wizard.limitePlan.confirmarUno", { plan })
+                                            : t("wizard.limitePlan.confirmarVarios", { cantidad, plan });
+                                    })()}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="flex gap-2.5 mt-2">
@@ -108,7 +122,7 @@ export function WizardPlanLimitDialog({
                                     disabled={isConfirmingCredit}
                                     className="flex-1 h-10 rounded-xl border border-border text-sm font-semibold hover:bg-muted/50 transition-colors disabled:opacity-50"
                                 >
-                                    Cancelar
+                                    {t("comun.cancelar")}
                                 </button>
                                 <button
                                     type="button"
@@ -116,16 +130,16 @@ export function WizardPlanLimitDialog({
                                     disabled={isConfirmingCredit}
                                     className={`flex-1 h-10 rounded-xl text-sm font-bold transition-colors disabled:opacity-50 ${confirmTier === "DIAMOND" ? "bg-[#67e8f9] text-black hover:opacity-90" : "bg-yellow-500 text-black hover:opacity-90"}`}
                                 >
-                                    Confirmar y usar crédito
+                                    {t("wizard.limitePlan.confirmarUsar")}
                                 </button>
                             </div>
                         </>
                     ) : (
                         <>
                             <DialogHeader>
-                                <DialogTitle>{title}</DialogTitle>
+                                <DialogTitle>{tituloVisible}</DialogTitle>
                                 <DialogDescription className="pt-1">
-                                    {description}
+                                    {descripcionVisible}
                                 </DialogDescription>
                             </DialogHeader>
 
@@ -139,14 +153,18 @@ export function WizardPlanLimitDialog({
                                         <Sparkles className="w-5 h-5 text-yellow-500" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-sm text-yellow-500">Usar Premium</p>
+                                        <p className="font-semibold text-sm text-yellow-500">{t("wizard.limitePlan.usarPremium")}</p>
                                         <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                                             {PLAN_FEATURE_HIGHLIGHTS.PREMIUM.map((f) => (
                                                 <li key={f}>• {f}</li>
                                             ))}
                                         </ul>
                                         <p className="text-xs text-yellow-500/80 font-medium mt-1">
-                                            {credits ? `${credits.premiumCredits} ${credits.premiumCredits === 1 ? "crédito disponible" : "créditos disponibles"}` : "Consultando créditos..."}
+                                            {credits
+                                                ? credits.premiumCredits === 1
+                                                    ? t("wizard.limitePlan.creditoUno")
+                                                    : t("wizard.limitePlan.creditosVarios", { cantidad: credits.premiumCredits })
+                                                : t("wizard.limitePlan.consultando")}
                                         </p>
                                     </div>
                                 </button>
@@ -160,14 +178,18 @@ export function WizardPlanLimitDialog({
                                         <Diamond className="w-5 h-5 text-[#67e8f9]" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-sm text-[#67e8f9]">Usar Diamond</p>
+                                        <p className="font-semibold text-sm text-[#67e8f9]">{t("wizard.limitePlan.usarDiamond")}</p>
                                         <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                                             {PLAN_FEATURE_HIGHLIGHTS.DIAMOND.map((f) => (
                                                 <li key={f}>• {f}</li>
                                             ))}
                                         </ul>
                                         <p className="text-xs text-[#67e8f9]/80 font-medium mt-1">
-                                            {credits ? `${credits.diamondCredits} ${credits.diamondCredits === 1 ? "crédito disponible" : "créditos disponibles"}` : "Consultando créditos..."}
+                                            {credits
+                                                ? credits.diamondCredits === 1
+                                                    ? t("wizard.limitePlan.creditoUno")
+                                                    : t("wizard.limitePlan.creditosVarios", { cantidad: credits.diamondCredits })
+                                                : t("wizard.limitePlan.consultando")}
                                         </p>
                                     </div>
                                 </button>

@@ -107,7 +107,11 @@ function FormLabel({
         // de la semántica --font-mono: esta última, pese a estar bien
         // declarada en globals.css, no resuelve en runtime dentro de este
         // árbol (ver nota en docs/PLAN_CORRECCIONES_WIZARD.md).
-        "[font-family:var(--font-space-mono)] text-[10px] uppercase tracking-[0.08em] text-white/50",
+        // El color va por token y no como text-white/50: en modo claro ese
+        // blanco al 50% sobre crema deja la etiqueta invisible. En oscuro
+        // --shell-fg-soft vale exactamente rgba(paper,.5), así que la
+        // etiqueta se ve igual que antes.
+        "[font-family:var(--font-space-mono)] text-[10px] uppercase tracking-[0.08em] text-[var(--shell-fg-soft)]",
         "data-[error=true]:text-destructive",
         className
       )}

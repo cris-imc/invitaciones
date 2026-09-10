@@ -1,0 +1,111 @@
+import type { ConCualquierTexto } from "./forma";
+
+/**
+ * Textos que aparecen en todos lados: botones de acción, estados, unidades.
+ *
+ * Este módulo es el único que puede usar CUALQUIER área. Los demás módulos
+ * son de un área sola y no se importan entre sí -- así cada uno se puede
+ * traducir y revisar por separado sin arrastrar al resto.
+ */
+const es = {
+  guardar: "Guardar",
+  guardando: "Guardando…",
+  guardado: "Guardado",
+  cancelar: "Cancelar",
+  volver: "Volver",
+  siguiente: "Siguiente",
+  anterior: "Anterior",
+  continuar: "Continuar",
+  cerrar: "Cerrar",
+  borrar: "Borrar",
+  eliminar: "Eliminar",
+  editar: "Editar",
+  agregar: "Agregar",
+  copiar: "Copiar",
+  copiado: "¡Copiado!",
+  compartir: "Compartir",
+  descargar: "Descargar",
+  cargando: "Cargando…",
+  buscar: "Buscar…",
+  si: "Sí",
+  no: "No",
+  ver: "Ver",
+  aceptar: "Aceptar",
+  confirmar: "Confirmar",
+  reintentar: "Reintentar",
+  opcional: "Opcional",
+  obligatorio: "Obligatorio",
+  ninguno: "Ninguno",
+  todos: "Todos",
+  error: "Ocurrió un error. Probá de nuevo.",
+} as const;
+
+export type Comun = ConCualquierTexto<typeof es>;
+
+const en: Comun = {
+  guardar: "Save",
+  guardando: "Saving…",
+  guardado: "Saved",
+  cancelar: "Cancel",
+  volver: "Back",
+  siguiente: "Next",
+  anterior: "Previous",
+  continuar: "Continue",
+  cerrar: "Close",
+  borrar: "Delete",
+  eliminar: "Remove",
+  editar: "Edit",
+  agregar: "Add",
+  copiar: "Copy",
+  copiado: "Copied!",
+  compartir: "Share",
+  descargar: "Download",
+  cargando: "Loading…",
+  buscar: "Search…",
+  si: "Yes",
+  no: "No",
+  ver: "View",
+  aceptar: "OK",
+  confirmar: "Confirm",
+  reintentar: "Try again",
+  opcional: "Optional",
+  obligatorio: "Required",
+  ninguno: "None",
+  todos: "All",
+  error: "Something went wrong. Please try again.",
+};
+
+const pt: Comun = {
+  guardar: "Salvar",
+  guardando: "Salvando…",
+  guardado: "Salvo",
+  cancelar: "Cancelar",
+  volver: "Voltar",
+  siguiente: "Próximo",
+  anterior: "Anterior",
+  continuar: "Continuar",
+  cerrar: "Fechar",
+  borrar: "Excluir",
+  eliminar: "Remover",
+  editar: "Editar",
+  agregar: "Adicionar",
+  copiar: "Copiar",
+  copiado: "Copiado!",
+  compartir: "Compartilhar",
+  descargar: "Baixar",
+  cargando: "Carregando…",
+  buscar: "Buscar…",
+  si: "Sim",
+  no: "Não",
+  ver: "Ver",
+  aceptar: "OK",
+  confirmar: "Confirmar",
+  reintentar: "Tentar de novo",
+  opcional: "Opcional",
+  obligatorio: "Obrigatório",
+  ninguno: "Nenhum",
+  todos: "Todos",
+  error: "Algo deu errado. Tente de novo.",
+};
+
+export const comun = { es, en, pt };

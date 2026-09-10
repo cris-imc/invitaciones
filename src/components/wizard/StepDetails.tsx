@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { MapPin, Clock, Info, ChevronDown, ChevronUp, Shirt } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function StepDetails() {
     const { data, setData, nextStep } = useWizardStore();
+    const t = useTextos();
     const [showInfo, setShowInfo] = useState(false);
 
     const form = useForm<z.infer<typeof detailsSchema>>({
@@ -43,7 +45,13 @@ export function StepDetails() {
     const direccionValue = form.watch("direccion") || "";
     const lugarNombreOverLimit = lugarNombreValue.length > LUGAR_NOMBRE_MAX_LENGTH;
     const direccionOverLimit = direccionValue.length > DIRECCION_MAX_LENGTH;
-    const predefinedOptions = ["Elegante", "Elegante Sport", "Casual", "Formal", "De Gala"];
+    const predefinedOptions = [
+        t("wizard.salon.vestimenta1"),
+        t("wizard.salon.vestimenta2"),
+        t("wizard.salon.vestimenta3"),
+        t("wizard.salon.vestimenta4"),
+        t("wizard.salon.vestimenta5"),
+    ];
     
     const [isCustomMode, setIsCustomMode] = useState(() => {
         const code = data.portadaDressCode;
@@ -58,8 +66,8 @@ export function StepDetails() {
     return (
         <div className="space-y-6">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">Detalles de la Fiesta</h2>
-                <p className="text-muted-foreground text-sm">¿Dónde y a qué hora será la celebración?</p>
+                <h2 className="text-2xl font-bold">{t("wizard.salon.titulo")}</h2>
+                <p className="text-muted-foreground text-sm">{t("wizard.salon.subtitulo")}</p>
             </div>
 
             {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
@@ -71,7 +79,7 @@ export function StepDetails() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Cómo configurar la Ubicación del Salón?</span>
+                        <span>{t("wizard.salon.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -80,7 +88,7 @@ export function StepDetails() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        Ingresá el nombre del salón o quinta, la dirección física y la URL del enlace a Google Maps. Tus invitados dispondrán de un botón interactivo <strong>&quot;Cómo llegar&quot;</strong> que abrirá la ubicación directamente en el GPS de su celular.
+                        {t("wizard.salon.infoTexto")}
                     </div>
                 )}
             </div>
@@ -93,7 +101,7 @@ export function StepDetails() {
                         render={({ field }) => (
                             <FormItem>
                                 <div className="flex justify-between items-center h-5">
-                                    <FormLabel>Nombre del Lugar / Salón</FormLabel>
+                                    <FormLabel>{t("wizard.salon.lugarNombre")}</FormLabel>
                                     <span className={`text-[10px] font-mono ${lugarNombreOverLimit ? "text-red-400 font-bold" : "text-muted-foreground"}`}>
                                         {lugarNombreValue.length}/{LUGAR_NOMBRE_MAX_LENGTH}
                                     </span>
@@ -104,14 +112,14 @@ export function StepDetails() {
                                         marcamos en rojo el contador y bloqueamos "Siguiente"
                                         (validación de detailsSchema) hasta que lo acorten. */}
                                     <Input
-                                        placeholder="Ej: Salón Los Olivos"
+                                        placeholder={t("wizard.salon.lugarPlaceholder")}
                                         className={lugarNombreOverLimit ? "border-red-500 focus-visible:ring-red-500" : undefined}
                                         {...field}
                                     />
                                 </FormControl>
                                 {lugarNombreOverLimit && (
                                     <p className="text-xs text-red-400">
-                                        Te pasaste por {lugarNombreValue.length - LUGAR_NOMBRE_MAX_LENGTH} caracteres -- acortá el nombre para poder continuar.
+                                        {t("wizard.salon.excesoNombre", { cantidad: lugarNombreValue.length - LUGAR_NOMBRE_MAX_LENGTH })}
                                     </p>
                                 )}
                                 <FormMessage />
@@ -125,7 +133,7 @@ export function StepDetails() {
                         render={({ field }) => (
                             <FormItem className="flex flex-col justify-end">
                                 <div className="flex justify-between items-center h-5">
-                                    <FormLabel>Dirección Completa</FormLabel>
+                                    <FormLabel>{t("wizard.salon.direccion")}</FormLabel>
                                     <span className={`text-[10px] font-mono ${direccionOverLimit ? "text-red-400 font-bold" : "text-muted-foreground"}`}>
                                         {direccionValue.length}/{DIRECCION_MAX_LENGTH}
                                     </span>
@@ -135,14 +143,14 @@ export function StepDetails() {
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                         <Input
                                             className={`pl-9 ${direccionOverLimit ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                                            placeholder="Calle 123, Ciudad"
+                                            placeholder={t("wizard.salon.direccionPlaceholder")}
                                             {...field}
                                         />
                                     </div>
                                 </FormControl>
                                 {direccionOverLimit && (
                                     <p className="text-xs text-red-400">
-                                        Te pasaste por {direccionValue.length - DIRECCION_MAX_LENGTH} caracteres -- acortá la dirección para poder continuar.
+                                        {t("wizard.salon.excesoDireccion", { cantidad: direccionValue.length - DIRECCION_MAX_LENGTH })}
                                     </p>
                                 )}
                                 <FormMessage />
@@ -156,7 +164,7 @@ export function StepDetails() {
                             name="hora"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col justify-end">
-                                    <FormLabel>Horario</FormLabel>
+                                    <FormLabel>{t("wizard.salon.horario")}</FormLabel>
                                     <FormControl>
                                         <div className="relative">
                                             <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
@@ -178,9 +186,9 @@ export function StepDetails() {
                             name="mapUrl"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col justify-end">
-                                    <FormLabel>Enlace Google Maps (Opcional)</FormLabel>
+                                    <FormLabel>{t("wizard.salon.mapa")}</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Pegá el link que copiaste de Google Maps" {...field} />
+                                        <Input placeholder={t("wizard.salon.mapaPlaceholder")} {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -188,19 +196,19 @@ export function StepDetails() {
                         />
                     </div>
                     <p className="text-xs text-muted-foreground -mt-2">
-                        Vale cualquier link de Google Maps (el de "Compartir" o el de la barra de direcciones).
+                        {t("wizard.salon.mapaAyuda")}
                     </p>
 
                     <div className="pt-4 border-t border-border/50">
                         <div className="flex items-center gap-2 mb-4">
                             <Shirt className="w-5 h-5 text-primary" />
-                            <h3 className="font-semibold text-lg">Código de Vestimenta</h3>
+                            <h3 className="font-semibold text-lg">{t("wizard.salon.vestimenta")}</h3>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-4">Se mostrará en la portada de bienvenida de forma sobria.</p>
+                        <p className="text-sm text-muted-foreground mb-4">{t("wizard.salon.vestimentaAyuda")}</p>
                         
                         <div className="space-y-4">
                             <FormItem>
-                                <FormLabel className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Opciones de Vestimenta</FormLabel>
+                                <FormLabel className="text-xs font-semibold text-amber-400 uppercase tracking-wider">{t("wizard.salon.vestimentaOpciones")}</FormLabel>
                                 <div className="flex flex-wrap gap-2 pt-2">
                                     {predefinedOptions.map((option) => (
                                         <button
@@ -213,7 +221,7 @@ export function StepDetails() {
                                             className={`text-sm px-4 py-2 rounded-full border transition-all duration-200 ${
                                                 !isCustomMode && currentDressCode === option
                                                     ? "bg-amber-500/25 border-amber-400 text-amber-200 shadow-sm font-medium"
-                                                    : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                                    : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)]"
                                             }`}
                                         >
                                             {option}
@@ -228,10 +236,10 @@ export function StepDetails() {
                                         className={`text-sm px-4 py-2 rounded-full border transition-all duration-200 ${
                                             isCustomMode
                                                 ? "bg-amber-500/25 border-amber-400 text-amber-200 shadow-sm font-semibold"
-                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                                : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)]"
                                         }`}
                                     >
-                                        Personalizado...
+                                        {t("wizard.salon.vestimentaPersonalizado")}
                                     </button>
                                 </div>
                             </FormItem>
@@ -242,9 +250,9 @@ export function StepDetails() {
                                     name="portadaDressCode"
                                     render={({ field }) => (
                                         <FormItem className="animate-in fade-in slide-in-from-top-2 duration-200">
-                                            <FormLabel>Especifíca tu Dress Code</FormLabel>
+                                            <FormLabel>{t("wizard.salon.vestimentaEspecifica")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Ej: Total White, Disfraz, etc." maxLength={20} {...field} />
+                                                <Input placeholder={t("wizard.salon.vestimentaPlaceholder")} maxLength={20} {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

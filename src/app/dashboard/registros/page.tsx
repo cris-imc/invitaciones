@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { BackLink } from "@/components/ui/BackLink";
 import { isAdmin } from "@/lib/roles";
+import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 const DAYS = 14;
 
@@ -83,6 +84,7 @@ export default async function RegistrosPage() {
                     <h2>Registros y actividad</h2>
                     <p>Cuentas nuevas, tarjetas creadas y logueos de los últimos {DAYS} días.</p>
                 </div>
+                <PreferenciasUsuario />
             </div>
 
             <div className="p-stats">
@@ -105,7 +107,7 @@ export default async function RegistrosPage() {
 
             {/* ── Info general: cuentas por tipo y tarjetas por plan ── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="rounded-xl border border-white/10 p-5">
+                <div className="rounded-xl border border-[var(--line)] p-5">
                     <h3 className="text-sm font-semibold mb-4 opacity-80">Cuentas por tipo</h3>
                     <div className="space-y-2">
                         {usersByRole.map((r) => (
@@ -117,7 +119,7 @@ export default async function RegistrosPage() {
                     </div>
                 </div>
 
-                <div className="rounded-xl border border-white/10 p-5">
+                <div className="rounded-xl border border-[var(--line)] p-5">
                     <h3 className="text-sm font-semibold mb-4 opacity-80">Tarjetas por plan</h3>
                     <div className="space-y-2">
                         {invitationsByPlan.map((p) => (
@@ -131,10 +133,10 @@ export default async function RegistrosPage() {
             </div>
 
             {/* ── Últimos logueos (general, todas las cuentas) ── */}
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="text-left text-white/50 border-b border-white/10">
+                        <tr className="text-left text-[var(--shell-fg-soft)] border-b border-[var(--line)]">
                             <th className="py-2.5 px-4 font-medium">Cuenta</th>
                             <th className="py-2.5 px-4 font-medium">Tipo</th>
                             <th className="py-2.5 px-4 font-medium">Fecha y hora</th>
@@ -142,7 +144,7 @@ export default async function RegistrosPage() {
                     </thead>
                     <tbody>
                         {latestLogins.map((login) => (
-                            <tr key={login.id} className="border-b border-white/5 last:border-0">
+                            <tr key={login.id} className="border-b border-[var(--campo-borde-suave)] last:border-0">
                                 <td className="py-2.5 px-4">
                                     <div className="font-medium">{login.user.name}</div>
                                     <div className="text-xs opacity-50">{login.user.email}</div>
@@ -162,10 +164,10 @@ export default async function RegistrosPage() {
                 </table>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="text-left text-white/50 border-b border-white/10">
+                        <tr className="text-left text-[var(--shell-fg-soft)] border-b border-[var(--line)]">
                             <th className="py-2.5 px-4 font-medium">Fecha</th>
                             <th className="py-2.5 px-4 font-medium">Registros</th>
                             <th className="py-2.5 px-4 font-medium">Tarjetas</th>
@@ -174,7 +176,7 @@ export default async function RegistrosPage() {
                     </thead>
                     <tbody>
                         {[...days].reverse().map((day) => (
-                            <tr key={day} className="border-b border-white/5 last:border-0">
+                            <tr key={day} className="border-b border-[var(--campo-borde-suave)] last:border-0">
                                 <td className="py-2.5 px-4 font-mono text-xs opacity-70 whitespace-nowrap">
                                     {new Date(`${day}T00:00:00`).toLocaleDateString("es-AR", { day: "2-digit", month: "short" })}
                                 </td>

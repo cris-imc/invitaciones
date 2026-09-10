@@ -4,36 +4,46 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { updateUserProfile, updateUserPhone } from "@/app/actions/user";
+import { updateUserProfile, updateUserPhone, updateUserPais } from "@/app/actions/user";
 import { useToast } from "@/components/ui/Toast";
-import { User, Mail, Phone, Loader2 } from "lucide-react";
+import { User, Mail, Phone, Globe, Loader2 } from "lucide-react";
 import { normalizeDigits } from "@/lib/phone";
+import { SelectorPais } from "@/components/ui/SelectorPais";
+import type { CodigoPais } from "@/lib/paises";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function ProfileForm({
     initialName,
     email,
     initialPhoneAreaCode,
     initialPhoneNumber,
+    initialPais,
 }: {
     initialName: string;
     email: string;
     initialPhoneAreaCode: string;
     initialPhoneNumber: string;
+    initialPais: CodigoPais;
 }) {
     const { update } = useSession();
+    const t = useTextos();
     const [name, setName] = useState(initialName);
     const [phoneAreaCode, setPhoneAreaCode] = useState(initialPhoneAreaCode);
     const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber);
+    const [pais, setPais] = useState<CodigoPais>(initialPais);
     const [isLoading, setIsLoading] = useState(false);
     const { showToast } = useToast();
 
     const isDirty =
-        name !== initialName || phoneAreaCode !== initialPhoneAreaCode || phoneNumber !== initialPhoneNumber;
+        name !== initialName ||
+        phoneAreaCode !== initialPhoneAreaCode ||
+        phoneNumber !== initialPhoneNumber ||
+        pais !== initialPais;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) {
-            showToast("El nombre no puede estar vacío", "error");
+            showToast(t("panel.perfil.nombreVacio"), "error");
             return;
         }
 
@@ -42,7 +52,7 @@ export function ProfileForm({
             if (name !== initialName) {
                 const res = await updateUserProfile(name);
                 if (!res.success) {
-                    showToast(res.error || "Error al actualizar el perfil", "error");
+                    showToast(res.error || t("panel.perfil.errorPerfil"), "error");
                     setIsLoading(false);
                     return;
                 }
@@ -51,16 +61,25 @@ export function ProfileForm({
             if (phoneAreaCode !== initialPhoneAreaCode || phoneNumber !== initialPhoneNumber) {
                 const res = await updateUserPhone(phoneAreaCode, phoneNumber);
                 if (!res.success) {
-                    showToast(res.error || "Error al actualizar el teléfono", "error");
+                    showToast(res.error || t("panel.perfil.errorTelefono"), "error");
                     setIsLoading(false);
                     return;
                 }
                 await update({ hasPhone: true });
             }
 
-            showToast("Perfil actualizado correctamente", "success");
+            if (pais !== initialPais) {
+                const res = await updateUserPais(pais);
+                if (!res.success) {
+                    showToast(res.error || t("panel.perfil.errorPais"), "error");
+                    setIsLoading(false);
+                    return;
+                }
+            }
+
+            showToast(t("panel.perfil.guardado"), "success");
         } catch (error) {
-            showToast("Ocurrió un error inesperado", "error");
+            showToast(t("panel.perfil.errorInesperado"), "error");
         } finally {
             setIsLoading(false);
         }
@@ -70,60 +89,76 @@ export function ProfileForm({
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                    <label className="text-sm font-medium text-[var(--shell-fg-strong)] flex items-center gap-2">
                         <User className="w-4 h-4 opacity-50" />
-                        Nombre Completo
+                        {t("panel.perfil.nombreCompleto")}
                     </label>
                     <Input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="h-12 bg-black/40 border-white/10 text-white rounded-xl focus-visible:ring-indigo-500"
-                        placeholder="Tu nombre"
+                        className="h-12 bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)] rounded-xl focus-visible:ring-indigo-500"
+                        placeholder={t("panel.perfil.tuNombre")}
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                    <label className="text-sm font-medium text-[var(--shell-fg-strong)] flex items-center gap-2">
                         <Mail className="w-4 h-4 opacity-50" />
-                        Correo Electrónico
+                        {t("panel.perfil.correo")}
                     </label>
                     <Input
                         type="email"
                         value={email}
                         disabled
-                        className="h-12 bg-black/20 border-white/5 text-white/50 rounded-xl cursor-not-allowed"
+                        className="h-12 bg-[var(--tinte-1)] border-[var(--campo-borde-suave)] text-[var(--shell-fg-soft)] rounded-xl cursor-not-allowed"
                     />
-                    <p className="text-xs text-white/40 mt-1">El correo electrónico no puede ser modificado por seguridad.</p>
+                    <p className="text-xs text-[var(--shell-fg-soft)] mt-1">{t("panel.perfil.correoNota")}</p>
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                    <label htmlFor="pais" className="text-sm font-medium text-[var(--shell-fg-strong)] flex items-center gap-2">
+                        <Globe className="w-4 h-4 opacity-50" />
+                        {t("panel.perfil.pais")}
+                    </label>
+                    <SelectorPais
+                        id="pais"
+                        valor={pais}
+                        onCambio={setPais}
+                        className="bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)] focus-visible:ring-indigo-500"
+                    />
+                    <p className="text-xs text-[var(--shell-fg-soft)] mt-1">
+                        {t("panel.perfil.paisNota")}
+                    </p>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-[var(--shell-fg-strong)] flex items-center gap-2">
                         <Phone className="w-4 h-4 opacity-50" />
-                        Teléfono
+                        {t("panel.perfil.telefono")}
                     </label>
                     <div className="grid grid-cols-[100px_1fr] gap-2">
                         <Input
                             type="tel"
                             inputMode="numeric"
-                            placeholder="Cód. área"
+                            placeholder={t("panel.perfil.codigoArea")}
                             maxLength={4}
                             value={phoneAreaCode}
                             onChange={(e) => setPhoneAreaCode(normalizeDigits(e.target.value))}
-                            className="h-12 bg-black/40 border-white/10 text-white rounded-xl focus-visible:ring-indigo-500"
+                            className="h-12 bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)] rounded-xl focus-visible:ring-indigo-500"
                         />
                         <Input
                             type="tel"
                             inputMode="numeric"
-                            placeholder="Número"
+                            placeholder={t("panel.perfil.numero")}
                             maxLength={8}
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(normalizeDigits(e.target.value))}
-                            className="h-12 bg-black/40 border-white/10 text-white rounded-xl focus-visible:ring-indigo-500"
+                            className="h-12 bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)] rounded-xl focus-visible:ring-indigo-500"
                         />
                     </div>
-                    <p className="text-xs text-white/40 mt-1">
-                        Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234)
+                    <p className="text-xs text-[var(--shell-fg-soft)] mt-1">
+                        {t("panel.perfil.telefonoNota")}
                     </p>
                 </div>
             </div>
@@ -133,7 +168,7 @@ export function ProfileForm({
                 disabled={isLoading || !isDirty}
                 className="w-full sm:w-auto h-12 px-8 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-medium transition-colors"
             >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Guardar Cambios"}
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : t("panel.perfil.guardarCambios")}
             </Button>
         </form>
     );

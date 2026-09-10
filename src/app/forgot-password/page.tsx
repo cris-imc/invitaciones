@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-dvh py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative">
+    <div className="pantalla-auth min-h-dvh py-12 px-4 flex items-center justify-center bg-[var(--ink)] relative">
       <Link href="/login" className="absolute top-6 left-6 md:top-12 md:left-12 flex items-center gap-2 text-sm text-[var(--paper)] opacity-70 hover:opacity-100 transition-opacity">
         <ChevronLeft className="w-4 h-4" />
         Volver a iniciar sesión
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
+                  className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                 />
               </div>
 

@@ -65,26 +65,26 @@ export function EditUserButton({ userId, initialName, initialEmail, initialPhone
             </Button>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="bg-black/90 border-white/10 text-white">
+                <DialogContent className="bg-[var(--card)] border-[var(--line)] text-[var(--foreground)]">
                     <DialogHeader>
                         <DialogTitle>Editar Usuario</DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)] flex items-center gap-2">
                                 <User className="w-4 h-4" /> Nombre
                             </label>
                             <Input
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 placeholder="Nombre del usuario"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)] flex items-center gap-2">
                                 <Mail className="w-4 h-4" /> Correo Electrónico
                             </label>
                             <Input
@@ -94,13 +94,13 @@ export function EditUserButton({ userId, initialName, initialEmail, initialPhone
                                 data-lpignore="true"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 placeholder="usuario@email.com"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)] flex items-center gap-2">
                                 <Phone className="w-4 h-4" /> Teléfono
                             </label>
                             <div className="grid grid-cols-[100px_1fr] gap-2">
@@ -111,7 +111,7 @@ export function EditUserButton({ userId, initialName, initialEmail, initialPhone
                                     maxLength={4}
                                     value={phoneAreaCode}
                                     onChange={(e) => setPhoneAreaCode(normalizeDigits(e.target.value))}
-                                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                    className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 />
                                 <Input
                                     type="tel"
@@ -120,14 +120,14 @@ export function EditUserButton({ userId, initialName, initialEmail, initialPhone
                                     maxLength={8}
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(normalizeDigits(e.target.value))}
-                                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                    className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 />
                             </div>
-                            <p className="text-[10px] text-white/40">Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234). Dejar ambos vacíos para borrar el teléfono.</p>
+                            <p className="text-[10px] text-[var(--shell-fg-faint)]">Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234). Dejar ambos vacíos para borrar el teléfono.</p>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)] flex items-center gap-2">
                                 <Lock className="w-4 h-4" /> Nueva Contraseña
                             </label>
                             <PasswordInput
@@ -136,16 +136,16 @@ export function EditUserButton({ userId, initialName, initialEmail, initialPhone
                                 data-lpignore="true"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 placeholder="Dejar en blanco para no cambiar"
                                 minLength={PASSWORD_MIN_LENGTH}
                             />
-                            <p className="text-[10px] text-white/40">Si ingresás una contraseña (mínimo 8 caracteres, con una mayúscula y un número), se sobreescribirá la actual y se le pedirá cambiarla al iniciar sesión.</p>
+                            <p className="text-[10px] text-[var(--shell-fg-faint)]">Si ingresás una contraseña (mínimo 8 caracteres, con una mayúscula y un número), se sobreescribirá la actual y se le pedirá cambiarla al iniciar sesión.</p>
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setOpen(false)} className="text-white/70">
+                        <Button variant="ghost" onClick={() => setOpen(false)} className="text-[var(--shell-fg-mid)]">
                             Cancelar
                         </Button>
                         <Button

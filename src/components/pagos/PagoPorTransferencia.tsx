@@ -64,7 +64,7 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
     <button
       type="button"
       onClick={() => copiar(que)}
-      className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors"
+      className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-[var(--campo-borde)] px-2.5 py-1.5 text-xs font-semibold hover:bg-[var(--tinte-2)] transition-colors"
     >
       {copiado === que ? (
         <>
@@ -90,11 +90,11 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
       </button>
 
       {abierto && (
-        <div className="mt-1 rounded-xl border border-white/15 bg-black/20 p-3 space-y-2.5 text-left">
+        <div className="mt-1 rounded-xl border border-[var(--line)] bg-[var(--tinte-1)] p-3 space-y-2.5 text-left">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Alias</p>
-              <p className="text-base font-semibold truncate">{DATOS_TRANSFERENCIA.alias}</p>
+              <p className="text-base font-semibold truncate text-[var(--foreground)]">{DATOS_TRANSFERENCIA.alias}</p>
             </div>
             <BotonCopiar que="alias" />
           </div>
@@ -102,7 +102,7 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">CBU</p>
-              <p className="text-sm font-mono tracking-tight">
+              <p className="text-sm font-mono tracking-tight text-[var(--foreground)]">
                 {cbuLegible(DATOS_TRANSFERENCIA.cbu)}
               </p>
             </div>
@@ -121,7 +121,7 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
 
           {/* Qué pasa después, dicho antes de transferir. Sin esto la persona
               transfiere y se queda esperando que algo se active solo. */}
-          <p className="text-xs text-muted-foreground leading-relaxed pt-1 border-t border-white/10">
+          <p className="text-xs text-muted-foreground leading-relaxed pt-1 border-t border-[var(--line)]">
             Después de transferir, mandanos el comprobante y activamos
             {concepto ? ` ${concepto}` : " tu plan"} a mano. No es automático como
             Mercado Pago, así que puede demorar un rato.

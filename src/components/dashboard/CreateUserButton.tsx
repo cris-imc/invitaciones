@@ -73,29 +73,29 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
             )}
 
             <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
-                <DialogContent className="bg-black/90 border-white/10 text-white">
+                <DialogContent className="bg-[var(--card)] border-[var(--line)] text-[var(--foreground)]">
                     <DialogHeader>
                         <DialogTitle>Dar de alta un usuario</DialogTitle>
-                        <DialogDescription className="text-white/50">
+                        <DialogDescription className="text-[var(--shell-fg-soft)]">
                             Crea la cuenta manualmente, sin pasar por el registro público.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)] flex items-center gap-2">
                                 <User className="w-4 h-4" /> Nombre
                             </label>
                             <Input
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 placeholder="Nombre del usuario"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)] flex items-center gap-2">
                                 <Mail className="w-4 h-4" /> Correo Electrónico
                             </label>
                             <Input
@@ -105,13 +105,13 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                                 data-lpignore="true"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 placeholder="usuario@email.com"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70 flex items-center gap-2">
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)] flex items-center gap-2">
                                 <Lock className="w-4 h-4" /> Contraseña
                             </label>
                             <PasswordInput
@@ -120,7 +120,7 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                                 data-lpignore="true"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 placeholder="Mínimo 8 caracteres, con una mayúscula y un número"
                                 minLength={PASSWORD_MIN_LENGTH}
                             />
@@ -128,19 +128,19 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
 
                         {canCreateAdmin && (
                             <div className="space-y-2">
-                                <label className="text-xs font-medium text-white/70">Tipo de perfil</label>
+                                <label className="text-xs font-medium text-[var(--shell-fg-mid)]">Tipo de perfil</label>
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
                                         onClick={() => setRole("CLIENT")}
-                                        className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${role === "CLIENT" ? "bg-white/15 border-white/30 text-white" : "bg-white/5 border-white/10 text-white/50"}`}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${role === "CLIENT" ? "bg-[var(--tinte-3)] border-[var(--campo-borde)] text-[var(--foreground)]" : "bg-[var(--tinte-1)] border-[var(--line)] text-[var(--shell-fg-soft)]"}`}
                                     >
                                         Cliente
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setRole("ADMIN")}
-                                        className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${role === "ADMIN" ? "bg-purple-500/20 border-purple-400/40 text-purple-300" : "bg-white/5 border-white/10 text-white/50"}`}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${role === "ADMIN" ? "bg-purple-500/20 border-purple-400/40 text-purple-300" : "bg-[var(--tinte-1)] border-[var(--line)] text-[var(--shell-fg-soft)]"}`}
                                     >
                                         Admin
                                     </button>
@@ -150,26 +150,26 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
 
                         {role === "CLIENT" && (
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70">Plan inicial</label>
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)]">Plan inicial</label>
                             <div className="flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setPlanTier("FREE")}
-                                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "FREE" ? "bg-white/15 border-white/30 text-white" : "bg-white/5 border-white/10 text-white/50"}`}
+                                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "FREE" ? "bg-[var(--tinte-3)] border-[var(--campo-borde)] text-[var(--foreground)]" : "bg-[var(--tinte-1)] border-[var(--line)] text-[var(--shell-fg-soft)]"}`}
                                 >
                                     Gratis
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setPlanTier("PREMIUM")}
-                                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "PREMIUM" ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-400" : "bg-white/5 border-white/10 text-white/50"}`}
+                                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "PREMIUM" ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-400" : "bg-[var(--tinte-1)] border-[var(--line)] text-[var(--shell-fg-soft)]"}`}
                                 >
                                     Premium (1 crédito)
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setPlanTier("DIAMOND")}
-                                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "DIAMOND" ? "bg-cyan-500/20 border-cyan-400/40 text-cyan-300" : "bg-white/5 border-white/10 text-white/50"}`}
+                                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-colors ${planTier === "DIAMOND" ? "bg-cyan-500/20 border-cyan-400/40 text-cyan-300" : "bg-[var(--tinte-1)] border-[var(--line)] text-[var(--shell-fg-soft)]"}`}
                                 >
                                     Diamond (1 crédito)
                                 </button>
@@ -179,7 +179,7 @@ export function CreateUserButton({ renderTrigger }: { renderTrigger?: (onClick: 
                     </div>
 
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setOpen(false)} className="text-white/70">
+                        <Button variant="ghost" onClick={() => setOpen(false)} className="text-[var(--shell-fg-mid)]">
                             Cancelar
                         </Button>
                         <Button

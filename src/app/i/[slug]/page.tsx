@@ -288,6 +288,9 @@ import { InfantilTemplateMenta } from "@/components/templates/InfantilTemplateMe
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { autoRejectStalePending } from "@/lib/live-cleanup";
 import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
+import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
+import { ProveedorInvitacion } from "@/components/invitation/ContextoInvitacion";
+import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
 
 // ── Helpers ──────────────────────────────────────────────────────
 async function getInvitation(slug: string) {
@@ -832,11 +835,23 @@ export default async function InvitationPage({
 
   // Igual que en /invite: el plan se marca acá y una regla en globals.css
   // decide si el crédito al pie se ve (ver .credito-alta).
+  // El idioma de la INVITACIÓN, que pisa al del anfitrión para todo este
+  // subárbol. Esta ruta es el link público, el que más se abre: sin esto,
+  // un convite de São Paulo se veía en el idioma que tuviera configurado
+  // quien lo abriera, en vez del que eligió quien lo mandó.
+  const idiomaInvitacion = esIdiomaValido(invitation.idioma)
+    ? invitation.idioma
+    : idiomaSegunPais(invitation.pais);
+
   return (
-    <div data-plan-tier={String(invitation.planTier ?? 'FREE')}>
-      {isFree && <FreePlanBanner />}
-      {isFree && <FreePlanBannerSpacer />}
-      {renderTemplate()}
-    </div>
+    <ProveedorIdioma idioma={idiomaInvitacion} pais={invitation.pais}>
+      <ProveedorInvitacion datos={invitation}>
+        <div data-plan-tier={String(invitation.planTier ?? 'FREE')}>
+          {isFree && <FreePlanBanner />}
+          {isFree && <FreePlanBannerSpacer />}
+          {renderTemplate()}
+        </div>
+      </ProveedorInvitacion>
+    </ProveedorIdioma>
   );
 }

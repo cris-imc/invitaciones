@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
 import { Camera, CameraOff, Loader2, RotateCcw } from "lucide-react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface MesaDelInvitado {
   numero: number;
@@ -38,6 +39,7 @@ const MS_ENTRE_LECTURAS = 100;
 const MS_MOSTRANDO = 4500;
 
 export function EscanerIngreso({ slug }: Props) {
+  const t = useTextos();
   const videoRef = useRef<HTMLVideoElement>(null);
   const lienzoRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -67,7 +69,7 @@ export function EscanerIngreso({ slug }: Props) {
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           setResultado(null);
-          setNoEncontrado(data.error || "No pude leer ese código");
+          setNoEncontrado(data.error || t("panel.escaner.noPudeLeer"));
         } else {
           setNoEncontrado(null);
           setResultado(data);
@@ -80,14 +82,14 @@ export function EscanerIngreso({ slug }: Props) {
           ultimoRef.current = "";
         }, MS_MOSTRANDO);
       } catch {
-        setNoEncontrado("No pude leer ese código");
+        setNoEncontrado(t("panel.escaner.noPudeLeer"));
         ultimoRef.current = "";
       } finally {
         ocupadoRef.current = false;
         setConsultando(false);
       }
     },
-    [slug]
+    [slug, t]
   );
 
   const apagar = useCallback(() => {
@@ -114,14 +116,14 @@ export function EscanerIngreso({ slug }: Props) {
       const nombre = (e as { name?: string })?.name;
       setError(
         nombre === "NotAllowedError"
-          ? "El navegador no dio permiso para usar la cámara. Habilitalo y volvé a intentar."
+          ? t("panel.escaner.sinPermiso")
           : nombre === "NotFoundError"
-          ? "No encontré ninguna cámara en este dispositivo."
-          : "No pude abrir la cámara."
+          ? t("panel.escaner.sinCamara")
+          : t("panel.escaner.noPudeAbrir")
       );
       setEncendida(false);
     }
-  }, []);
+  }, [t]);
 
   // Apagar la cámara al salir de la pantalla, siempre: dejarla prendida en
   // segundo plano gasta batería y deja la luz encendida sin motivo.
@@ -179,14 +181,14 @@ export function EscanerIngreso({ slug }: Props) {
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
             <Camera className="w-8 h-8 text-white/25" />
             <p className="text-sm text-muted-foreground">
-              Apuntá al QR que cada invitado tiene al final de su invitación.
+              {t("panel.escaner.apuntaAlQr")}
             </p>
             <button
               type="button"
               onClick={encender}
               className="rounded-full bg-[var(--accent)] text-[var(--ink)] text-sm font-semibold px-4 py-2 hover:brightness-110"
             >
-              Encender la cámara
+              {t("panel.escaner.encenderCamara")}
             </button>
           </div>
         )}
@@ -216,10 +218,10 @@ export function EscanerIngreso({ slug }: Props) {
                 {resultado.rechazado ? (
                   <>
                     <span className="text-2xl font-bold tracking-wide text-red-300">
-                      RECHAZADO
+                      {t("panel.escaner.rechazado")}
                     </span>
                     <span className="text-sm text-red-200/90 leading-snug max-w-[15rem]">
-                      {resultado.motivo}. Contactar al anfitrión.
+                      {t("panel.escaner.contactarAnfitrion", { motivo: resultado.motivo ?? "" })}
                     </span>
                   </>
                 ) : (
@@ -229,25 +231,27 @@ export function EscanerIngreso({ slug }: Props) {
                     }`}
                   >
                     {resultado.yaHabiaEntrado
-                      ? `Ya había entrado ${new Date(resultado.ingresoEn).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}`
-                      : "Ingreso registrado"}
+                      ? t("panel.escaner.yaHabiaEntrado", {
+                          hora: new Date(resultado.ingresoEn).toLocaleTimeString(t("panel.localeFecha"), { hour: "2-digit", minute: "2-digit" }),
+                        })
+                      : t("panel.escaner.ingresoRegistrado")}
                   </span>
                 )}
 
                 <span className="text-xl font-semibold leading-tight">{resultado.nombre}</span>
 
                 <span className="text-sm text-white/60">
-                  {resultado.personas} {resultado.personas === 1 ? "persona" : "personas"}
-                  {!resultado.confirmo && " · sin confirmar"}
+                  {t(resultado.personas === 1 ? "panel.escaner.unaPersona" : "panel.escaner.variasPersonas", { cantidad: resultado.personas })}
+                  {!resultado.confirmo && t("panel.escaner.sinConfirmar")}
                 </span>
 
                 {resultado.desglose && (
                   <span className="text-xs text-white/45">
                     {[
-                      resultado.desglose.adultos > 0 && `${resultado.desglose.adultos} adultos`,
+                      resultado.desglose.adultos > 0 && t("panel.escaner.adultos", { cantidad: resultado.desglose.adultos }),
                       resultado.desglose.adolescentes > 0 &&
-                        `${resultado.desglose.adolescentes} adolescentes`,
-                      resultado.desglose.ninos > 0 && `${resultado.desglose.ninos} niños`,
+                        t("panel.escaner.adolescentes", { cantidad: resultado.desglose.adolescentes }),
+                      resultado.desglose.ninos > 0 && t("panel.escaner.ninos", { cantidad: resultado.desglose.ninos }),
                     ]
                       .filter(Boolean)
                       .join(" · ")}
@@ -255,16 +259,16 @@ export function EscanerIngreso({ slug }: Props) {
                 )}
 
                 {resultado.mesas.length === 0 ? (
-                  <span className="mt-2 text-base text-amber-300">Sin mesa asignada</span>
+                  <span className="mt-2 text-base text-amber-300">{t("panel.escaner.sinMesa")}</span>
                 ) : (
                   <div className="mt-2 space-y-0.5">
                     {resultado.mesas.map((m) => (
                       <div key={m.numero} className="text-2xl font-bold text-[var(--accent)] leading-tight">
-                        Mesa {m.numero}
+                        {t("panel.mesas.mesaNumero", { numero: m.numero })}
                         {resultado.mesas.length > 1 && (
                           <span className="text-sm font-normal text-white/60">
                             {" "}
-                            · {m.lugares} {m.lugares === 1 ? "lugar" : "lugares"}
+                            · {t(m.lugares === 1 ? "panel.escaner.unLugar" : "panel.escaner.variosLugares", { cantidad: m.lugares })}
                           </span>
                         )}
                       </div>
@@ -308,7 +312,7 @@ export function EscanerIngreso({ slug }: Props) {
             className="inline-flex items-center gap-2 rounded-full border border-white/20 text-sm px-4 py-2 hover:bg-white/10"
           >
             <CameraOff className="w-4 h-4" />
-            Apagar
+            {t("panel.escaner.apagar")}
           </button>
           <button
             type="button"
@@ -320,7 +324,7 @@ export function EscanerIngreso({ slug }: Props) {
             className="inline-flex items-center gap-2 rounded-full border border-white/20 text-sm px-4 py-2 hover:bg-white/10"
           >
             <RotateCcw className="w-4 h-4" />
-            Escanear otro
+            {t("panel.escaner.escanearOtro")}
           </button>
         </div>
       )}

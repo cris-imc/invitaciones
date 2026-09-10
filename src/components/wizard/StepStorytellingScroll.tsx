@@ -2,6 +2,8 @@
 
 import { useWizardStore } from "@/store/wizard-store";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { ClaveTexto } from "@/lib/i18n/texto";
 
 /**
  * Cómo se recorren los paneles de "Cuándo y dónde" en la Colección
@@ -11,23 +13,24 @@ import { SaveStepButtons } from "./SaveStepButtons";
  * El diseño de los paneles es el mismo en los dos modos -- lo único que cambia
  * es hacia dónde se avanza.
  */
-const OPCIONES = [
+const OPCIONES: { id: "lateral" | "vertical"; vertical: boolean; titulo: ClaveTexto; detalle: ClaveTexto }[] = [
     {
-        id: "lateral" as const,
+        id: "lateral",
         vertical: false,
-        titulo: "En zigzag",
-        detalle: "Se baja, los paneles del lugar pasan de costado, y se sigue bajando.",
+        titulo: "wizard.recorrido.zigzagTitulo",
+        detalle: "wizard.recorrido.zigzagDetalle",
     },
     {
-        id: "vertical" as const,
+        id: "vertical",
         vertical: true,
-        titulo: "Hacia abajo",
-        detalle: "Los paneles van uno abajo del otro, como el resto de la invitación.",
+        titulo: "wizard.recorrido.abajoTitulo",
+        detalle: "wizard.recorrido.abajoDetalle",
     },
 ];
 
 export function StepStorytellingScroll() {
     const { data, setData } = useWizardStore();
+    const t = useTextos();
     const esVertical = Boolean(data.storytellingScrollVertical);
 
     return (
@@ -37,17 +40,16 @@ export function StepStorytellingScroll() {
                     className="text-[10px] uppercase tracking-[0.1em] font-bold mb-2"
                     style={{ color: "var(--accent)", fontFamily: "var(--font-mono)" }}
                 >
-                    Recorrido
+                    {t("wizard.recorrido.etiqueta")}
                 </p>
                 <h2
                     className="text-2xl font-bold mb-1"
                     style={{ fontFamily: "var(--font-display)", color: "var(--paper)" }}
                 >
-                    ¿Cómo se recorre el lugar?
+                    {t("wizard.recorrido.titulo")}
                 </h2>
-                <p style={{ fontSize: "12.5px", color: "rgba(246,243,236,.5)", lineHeight: 1.5 }}>
-                    Los paneles del salón, cómo llegar y la ubicación se ven igual en los dos
-                    casos. Lo que cambia es hacia dónde avanzan cuando el invitado scrollea.
+                <p style={{ fontSize: "12.5px", color: "var(--shell-fg-soft)", lineHeight: 1.5 }}>
+                    {t("wizard.recorrido.subtitulo")}
                 </p>
             </div>
 
@@ -66,7 +68,7 @@ export function StepStorytellingScroll() {
                                 padding: "16px 14px",
                                 cursor: "pointer",
                                 textAlign: "left",
-                                background: activa ? "rgba(199,154,75,.08)" : "rgba(246,243,236,.03)",
+                                background: activa ? "rgba(199,154,75,.08)" : "var(--tinte-1)",
                                 transition: "all 0.15s",
                             }}
                         >
@@ -105,7 +107,7 @@ export function StepStorytellingScroll() {
                                             width: b.w,
                                             height: b.h,
                                             borderRadius: "2px",
-                                            background: activa ? "var(--accent)" : "rgba(246,243,236,.22)",
+                                            background: activa ? "var(--accent)" : "var(--tinte-4)",
                                             opacity: activa ? 1 : 0.9,
                                             alignSelf: b.der ? "flex-end" : "flex-start",
                                         }}
@@ -120,10 +122,10 @@ export function StepStorytellingScroll() {
                                     marginBottom: "3px",
                                 }}
                             >
-                                {op.titulo}
+                                {t(op.titulo)}
                             </div>
-                            <div style={{ fontSize: "11.5px", color: "rgba(246,243,236,.5)", lineHeight: 1.45 }}>
-                                {op.detalle}
+                            <div style={{ fontSize: "11.5px", color: "var(--shell-fg-soft)", lineHeight: 1.45 }}>
+                                {t(op.detalle)}
                             </div>
                         </button>
                     );

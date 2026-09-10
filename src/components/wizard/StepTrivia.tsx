@@ -12,10 +12,26 @@ import { useSession } from "next-auth/react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { cn } from "@/lib/utils";
 import { isAdmin as isAdminRole } from "@/lib/roles";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { Traductor } from "@/lib/i18n/texto";
 
-const PREDEFINED_TITULOS_CASAMIENTO = ["¿Cuánto Nos Conocés?", "Trivia de los Novios", "¿Qué Tanto Sabés de Nosotros?"];
-const PREDEFINED_TITULOS_QUINCE = ["¿Cuánto Me Conocés?", "Trivia de mis 15", "¿Qué Tanto Sabés de Mí?"];
-const PREDEFINED_TITULOS_OTRO = ["Trivia del Festejo", "¿Cuánto Sabés?", "Pon a Prueba tu Memoria"];
+const titulosSugeridos = (t: Traductor, tipo: string | undefined) => {
+    if (tipo === "CASAMIENTO") {
+        return [t("wizard.trivia.casamiento1"), t("wizard.trivia.casamiento2"), t("wizard.trivia.casamiento3")];
+    }
+    if (tipo === "QUINCE_ANOS") {
+        return [t("wizard.trivia.quince1"), t("wizard.trivia.quince2"), t("wizard.trivia.quince3")];
+    }
+    return [t("wizard.trivia.otro1"), t("wizard.trivia.otro2"), t("wizard.trivia.otro3")];
+};
+
+/** De quién habla la trivia, según el tipo de evento. */
+const sujetoDelEvento = (t: Traductor, tipo: string | undefined) =>
+    tipo === "CASAMIENTO"
+        ? t("wizard.trivia.sujetoPareja")
+        : tipo === "QUINCE_ANOS"
+        ? t("wizard.trivia.sujetoQuinceanera")
+        : t("wizard.trivia.sujetoAgasajado");
 
 interface TriviaQuestion {
     pregunta: string;
@@ -25,6 +41,7 @@ interface TriviaQuestion {
 
 export function StepTrivia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
+    const t = useTextos();
     const { showToast } = useToast();
     const usePremiumCredit = useWizardStore((state) => state.usePremiumCredit);
     const useDiamondCredit = useWizardStore((state) => state.useDiamondCredit);
@@ -64,10 +81,8 @@ export function StepTrivia() {
     // formulario en blanco sin motivo.
     const [showAddForm, setShowAddForm] = useState(() => preguntas.length === 0);
 
-    const tituloOptions =
-        data.type === 'CASAMIENTO' ? PREDEFINED_TITULOS_CASAMIENTO :
-        data.type === 'QUINCE_ANOS' ? PREDEFINED_TITULOS_QUINCE :
-        PREDEFINED_TITULOS_OTRO;
+    const tituloOptions = titulosSugeridos(t, data.type ?? undefined);
+    const sujeto = sujetoDelEvento(t, data.type ?? undefined);
 
     const [isCustomTitulo, setIsCustomTitulo] = useState(() => {
         if (!data.triviaTitulo) return false;
@@ -100,9 +115,9 @@ export function StepTrivia() {
                 opciones: ["", "", "", ""],
                 respuestaCorrecta: 0,
             });
-            showToast("Pregunta agregada.", "success");
+            showToast(t("wizard.trivia.avisoAgregada"), "success");
         } else {
-            showToast("Debes completar la pregunta y todas las opciones.", "error");
+            showToast(t("wizard.trivia.avisoCompletar"), "error");
         }
     };
 
@@ -112,10 +127,7 @@ export function StepTrivia() {
 
     const handleEditQuestion = (index: number) => {
         if (isPendingPartial) {
-            showToast(
-                "Tenés una pregunta a medio completar en el formulario. Completala o borrá el texto antes de editar otra.",
-                "error"
-            );
+            showToast(t("wizard.trivia.avisoPendienteEditar"), "error");
             return;
         }
 
@@ -138,17 +150,14 @@ export function StepTrivia() {
 
     const handleFinishAdding = () => {
         if (isPendingPartial) {
-            showToast(
-                "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
-                "error"
-            );
+            showToast(t("wizard.trivia.avisoPendiente"), "error");
             return;
         }
 
         if (isPendingComplete) {
             setPreguntas([...preguntas, currentQuestion]);
             setCurrentQuestion({ pregunta: "", opciones: ["", "", "", ""], respuestaCorrecta: 0 });
-            showToast("Pregunta guardada.", "success");
+            showToast(t("wizard.trivia.avisoGuardada"), "success");
         }
         
         setShowAddForm(false);
@@ -156,10 +165,7 @@ export function StepTrivia() {
 
     const handleNext = () => {
         if (isPendingPartial) {
-            showToast(
-                "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
-                "error"
-            );
+            showToast(t("wizard.trivia.avisoPendiente"), "error");
             return;
         }
 
@@ -167,11 +173,11 @@ export function StepTrivia() {
         if (isPendingComplete) {
             finalPreguntas.push(currentQuestion);
             setCurrentQuestion({ pregunta: "", opciones: ["", "", "", ""], respuestaCorrecta: 0 });
-            showToast("Se agregó tu última pregunta antes de continuar.", "success");
+            showToast(t("wizard.trivia.avisoUltima"), "success");
         }
 
         if (data.triviaHabilitada && finalPreguntas.length === 0) {
-            showToast("Agregá al menos una pregunta a la Trivia, o deshabilitá la sección.", "error");
+            showToast(t("wizard.trivia.avisoSinPreguntas"), "error");
             return;
         }
 
@@ -183,9 +189,9 @@ export function StepTrivia() {
     return (
         <div className="space-y-6">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">Quiz / Trivia</h2>
+                <h2 className="text-2xl font-bold">{t("wizard.trivia.titulo")}</h2>
                 <p className="text-muted-foreground text-sm">
-                    Crea un juego divertido para que tus invitados demuestren cuánto conocen sobre {data.type === 'CASAMIENTO' ? 'la pareja' : 'la quinceañera'}
+                    {t("wizard.trivia.subtitulo", { sujeto })}
                 </p>
             </div>
 
@@ -198,7 +204,7 @@ export function StepTrivia() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Cómo funciona el Quiz o Juego de Trivia?</span>
+                        <span>{t("wizard.trivia.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showTriviaInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -207,7 +213,7 @@ export function StepTrivia() {
 
                 {showTriviaInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        El juego de Trivia permite a tus invitados responder preguntas divertidas sobre {data.type === 'CASAMIENTO' ? 'la pareja' : data.type === 'QUINCE_ANOS' ? 'la quinceañera' : 'el agasajado'} directamente desde la tarjeta digital. Podés cargar preguntas con opciones múltiples, marcar la respuesta correcta y desafiar a tus amigos y familiares a demostrar cuánto los conocen durante la fiesta.
+                        {t("wizard.trivia.infoTexto", { sujeto })}
                     </div>
                 )}
             </div>
@@ -215,7 +221,7 @@ export function StepTrivia() {
             <div className="space-y-4">
                 {rawLocked && isAdmin && (
                     <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
-                        👑 <strong>Modo Administrador:</strong> Esta función está en Plan Gratis para el cliente, pero tenés permiso Admin para activarla y cargar preguntas.
+                        👑 <strong>{t("wizard.plan.modoAdmin")}</strong> {t("wizard.trivia.modoAdminTexto")}
                     </div>
                 )}
 
@@ -227,18 +233,18 @@ export function StepTrivia() {
                         onCheckedChange={(checked) => setData({ triviaHabilitada: Boolean(checked) })}
                     />
                     <Label htmlFor="triviaHabilitada" className={`flex items-center gap-2 ${isLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
-                        Activar Quiz/Trivia
+                        {t("wizard.trivia.activar")}
                         {isLocked && <Lock className="w-4 h-4 text-red-400" />}
                     </Label>
                     {isLocked && (
                         <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                            Disponible en Premium
+                            {t("wizard.plan.disponibleEnPremium")}
                             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
                         </div>
                     )}
                     {showPremiumOnlyBadge && (
                         <span className="text-[10px] uppercase tracking-wide font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5 whitespace-nowrap">
-                            Solo en Premium o Diamond
+                            {t("wizard.plan.soloPremiumODiamond")}
                         </span>
                     )}
                 </div>
@@ -248,7 +254,7 @@ export function StepTrivia() {
                         {/* Configuración básica */}
                         <div className="space-y-4 border border-[var(--ink-2)] p-4 rounded-lg bg-[var(--ink-2)]">
                             <div className="space-y-2">
-                                <Label htmlFor="triviaTitulo">Título</Label>
+                                <Label htmlFor="triviaTitulo">{t("wizard.trivia.tituloCampo")}</Label>
                                 <div className="flex flex-wrap gap-2">
                                     {tituloOptions.map((opt) => (
                                         <button
@@ -262,7 +268,7 @@ export function StepTrivia() {
                                                 "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
                                                 data.triviaTitulo === opt && !isCustomTitulo
                                                     ? "bg-amber-500 text-white border-amber-600"
-                                                    : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                                    : "bg-[var(--ink)] text-[var(--shell-fg-mid)] hover:text-[var(--foreground)] border border-[var(--line)] hover:border-[var(--campo-borde)]"
                                             )}
                                         >
                                             {opt}
@@ -280,10 +286,10 @@ export function StepTrivia() {
                                             "px-3 py-1.5 rounded-full text-sm font-medium transition-all",
                                             isCustomTitulo
                                                 ? "bg-amber-500 text-white border-amber-600"
-                                                : "bg-[var(--ink)] text-white/70 hover:text-white border border-white/10 hover:border-white/20"
+                                                : "bg-[var(--ink)] text-[var(--shell-fg-mid)] hover:text-[var(--foreground)] border border-[var(--line)] hover:border-[var(--campo-borde)]"
                                         )}
                                     >
-                                        Personalizado
+                                        {t("wizard.trivia.personalizado")}
                                     </button>
                                 </div>
                                 {isCustomTitulo && (
@@ -291,7 +297,7 @@ export function StepTrivia() {
                                         id="triviaTitulo"
                                         value={data.triviaTitulo || ""}
                                         onChange={(e) => setData({ triviaTitulo: e.target.value })}
-                                        placeholder="Escribí un título personalizado"
+                                        placeholder={t("wizard.trivia.tituloPlaceholder")}
                                         className="mt-2"
                                     />
                                 )}
@@ -301,7 +307,7 @@ export function StepTrivia() {
                         {/* Lista de preguntas existentes */}
                         {preguntas.length > 0 && (
                             <div className="space-y-2">
-                                <h3 className="font-semibold">Preguntas agregadas ({preguntas.length})</h3>
+                                <h3 className="font-semibold">{t("wizard.trivia.preguntasAgregadas", { cantidad: preguntas.length })}</h3>
                                 <div className="space-y-2">
                                     {preguntas.map((q, index) => (
                                         <div
@@ -355,12 +361,12 @@ export function StepTrivia() {
                                 className="w-full border-dashed h-11 border-amber-500/40 hover:bg-amber-500/10 text-amber-300"
                             >
                                 <Plus className="w-4 h-4 mr-2" />
-                                Agregar nueva pregunta
+                                {t("wizard.trivia.agregarNueva")}
                             </Button>
                         ) : (
                         <div className="border border-[var(--ink-2)] p-4 rounded-lg space-y-4 bg-yellow-500/10">
                             <div className="flex items-center justify-between">
-                                <h3 className="font-semibold text-yellow-500">Agregar nueva pregunta</h3>
+                                <h3 className="font-semibold text-yellow-500">{t("wizard.trivia.agregarNueva")}</h3>
                                 {!hasPendingContent && (
                                     <Button
                                         type="button"
@@ -369,25 +375,25 @@ export function StepTrivia() {
                                         onClick={() => setShowAddForm(false)}
                                         className="h-7 px-2 text-xs text-muted-foreground"
                                     >
-                                        Cancelar
+                                        {t("comun.cancelar")}
                                     </Button>
                                 )}
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="pregunta">Pregunta</Label>
+                                <Label htmlFor="pregunta">{t("wizard.trivia.pregunta")}</Label>
                                 <Input
                                     id="pregunta"
                                     value={currentQuestion.pregunta}
                                     onChange={(e) =>
                                         setCurrentQuestion({ ...currentQuestion, pregunta: e.target.value })
                                     }
-                                    placeholder="¿Cuál es el lugar favorito de la quinceañera?"
+                                    placeholder={t("wizard.trivia.preguntaPlaceholder")}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Opciones de respuesta</Label>
+                                <Label>{t("wizard.trivia.opciones")}</Label>
                                 {currentQuestion.opciones.map((opcion, index) => (
                                     <div key={index} className="flex items-center gap-2">
                                         <span className="w-8 text-sm font-medium">
@@ -400,7 +406,7 @@ export function StepTrivia() {
                                                 newOpciones[index] = e.target.value;
                                                 setCurrentQuestion({ ...currentQuestion, opciones: newOpciones });
                                             }}
-                                            placeholder={`Opción ${String.fromCharCode(65 + index)}`}
+                                            placeholder={t("wizard.trivia.opcionPlaceholder", { letra: String.fromCharCode(65 + index) })}
                                         />
                                         <Checkbox
                                             checked={currentQuestion.respuestaCorrecta === index}
@@ -408,7 +414,7 @@ export function StepTrivia() {
                                                 setCurrentQuestion({ ...currentQuestion, respuestaCorrecta: index })
                                             }
                                         />
-                                        <span className="text-xs text-muted-foreground">Correcta</span>
+                                        <span className="text-xs text-muted-foreground">{t("wizard.trivia.correcta")}</span>
                                     </div>
                                 ))}
                             </div>
@@ -416,7 +422,7 @@ export function StepTrivia() {
                             {isPendingPartial && (
                                 <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
                                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                                    <span>Esta pregunta está a medio completar. Completá la pregunta y las 4 opciones, o borrá el texto para descartarla, antes de continuar.</span>
+                                    <span>{t("wizard.trivia.pendienteAviso")}</span>
                                 </div>
                             )}
 
@@ -428,7 +434,7 @@ export function StepTrivia() {
                                     className="flex-1"
                                 >
                                     <Plus className="w-4 h-4 mr-2" />
-                                    Agregar y cargar otra
+                                    {t("wizard.trivia.agregarYOtra")}
                                 </Button>
                                 <Button
                                     type="button"
@@ -436,7 +442,7 @@ export function StepTrivia() {
                                     className="flex-1"
                                 >
                                     <Check className="w-4 h-4 mr-2" />
-                                    Listo, cerrar
+                                    {t("wizard.trivia.listoCerrar")}
                                 </Button>
                             </div>
                         </div>

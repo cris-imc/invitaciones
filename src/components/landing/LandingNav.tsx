@@ -7,41 +7,44 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { LandingLogo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { SelectorPais } from "@/components/i18n/SelectorPais";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface LandingNavProps {
   registerUrl: string;
   isLoggedIn: boolean;
 }
 
-const WHATSAPP_CONTACT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent(
-  "Hola, quiero conocer más sobre las invitaciones de altainvitacion.com"
-)}`;
-
-// Con "/" adelante (no solo "#ancla"): LandingNav se usa en /modelos y otras
-// páginas además de la home -- un href="#ancla" ahí solo cambia el hash de
-// la URL actual sin navegar, y como esas páginas no tienen esos ids, el
-// click no hace nada visible. Con "/#ancla" Next.js navega a home y baja al
-// ancla sin importar desde qué página se haga click.
-// "Plantillas" apuntaba al showcase animado de la home, que muestra una
-// plantilla por vez. Desde que existe /modelos -- que es la página dedicada,
-// con pestañas por tipo de evento -- eran dos entradas para lo mismo y la
-// peor de las dos iba primera.
-const BASE_LINKS = [
-  { href: "/modelos", label: "Ver modelos" },
-  { href: "/#como-funciona", label: "Cómo funciona" },
-  { href: "/#precios", label: "Precios" },
-  { href: WHATSAPP_CONTACT_URL, label: "Contacto", external: true },
-];
-
 export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const t = useTextos();
+
+  const whatsappContactUrl = `https://wa.me/5493517660000?text=${encodeURIComponent(
+    t("landing.nav.whatsapp")
+  )}`;
+
+  // Con "/" adelante (no solo "#ancla"): LandingNav se usa en /modelos y otras
+  // páginas además de la home -- un href="#ancla" ahí solo cambia el hash de
+  // la URL actual sin navegar, y como esas páginas no tienen esos ids, el
+  // click no hace nada visible. Con "/#ancla" Next.js navega a home y baja al
+  // ancla sin importar desde qué página se haga click.
+  // "Plantillas" apuntaba al showcase animado de la home, que muestra una
+  // plantilla por vez. Desde que existe /modelos -- que es la página dedicada,
+  // con pestañas por tipo de evento -- eran dos entradas para lo mismo y la
+  // peor de las dos iba primera.
+  const BASE_LINKS = [
+    { href: "/modelos", label: t("landing.verModelos") },
+    { href: "/#como-funciona", label: t("landing.comoFunciona") },
+    { href: "/#precios", label: t("landing.precios") },
+    { href: whatsappContactUrl, label: t("landing.contacto"), external: true },
+  ];
 
   // Logueado: agrega "Inicio" (vuelve al dashboard) al ppio de los links,
   // tanto en la barra de escritorio como en el drawer mobile. Deslogueado,
   // no tiene sentido mostrarlo (no hay a dónde volver todavía).
   const LINKS = isLoggedIn
-    ? [{ href: "/dashboard", label: "Inicio" }, ...BASE_LINKS]
+    ? [{ href: "/dashboard", label: t("landing.nav.inicio") }, ...BASE_LINKS]
     : BASE_LINKS;
 
   // El drawer se porta a document.body: PageTransition envuelve toda la app
@@ -61,7 +64,7 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
           <div className="l-brand" style={{ margin: 0 }}>
             <LandingLogo href="/" />
           </div>
-          <button type="button" className="l-hamburger" onClick={() => setOpen(false)} aria-label="Cerrar menú">
+          <button type="button" className="l-hamburger" onClick={() => setOpen(false)} aria-label={t("landing.cerrarMenu")}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -86,33 +89,31 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
           {isLoggedIn ? (
             <>
               <Link href={registerUrl} onClick={() => setOpen(false)}>
-                <button className="l-cta">Crear invitación</button>
+                <button className="l-cta">{t("landing.crearInvitacion")}</button>
               </Link>
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="l-drawer-secondary-btn w-full rounded-full text-sm font-semibold py-2.5"
               >
-                Cerrar sesión
+                {t("landing.cerrarSesion")}
               </button>
             </>
           ) : (
             <>
               <Link href="/register" onClick={() => setOpen(false)}>
-                <button className="l-cta">Registrarse</button>
+                <button className="l-cta">{t("landing.registrarse")}</button>
               </Link>
               <Link href="/login" onClick={() => setOpen(false)}>
                 <button className="l-drawer-secondary-btn w-full rounded-full text-sm font-semibold py-2.5">
-                  Ingresar
+                  {t("landing.ingresar")}
                 </button>
               </Link>
             </>
           )}
         </div>
 
-        <div className="px-3 pt-2 pb-1 flex items-center justify-center">
-          <ThemeToggle />
-        </div>
+
       </div>
     </>
   );
@@ -140,27 +141,30 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
         ))}
       </div>
 
-      <ThemeToggle className="theme-toggle-btn hidden md:flex" />
+      <div className="l-nav-acciones">
+        {isLoggedIn && (
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="l-drawer-secondary-btn hidden md:block rounded-full text-sm font-semibold py-2 px-4"
+          >
+            {t("landing.cerrarSesion")}
+          </button>
+        )}
 
-      {isLoggedIn && (
-        <button
-          type="button"
-          onClick={() => signOut({ callbackUrl: "/" })}
-          className="l-drawer-secondary-btn hidden md:block rounded-full text-sm font-semibold py-2 px-4"
-        >
-          Cerrar sesión
+        <Link href={registerUrl} className="hidden md:block">
+          <button className="l-cta">{t("landing.crearInvitacion")}</button>
+        </Link>
+
+        <div className="l-nav-preferencias">
+          <SelectorPais />
+          <ThemeToggle />
+        </div>
+
+        <button type="button" className="l-hamburger" onClick={() => setOpen(true)} aria-label={t("landing.abrirMenu")}>
+          <Menu className="w-5 h-5" />
         </button>
-      )}
-
-      <Link href={registerUrl} className="hidden md:block">
-        <button className="l-cta">Crear invitación</button>
-      </Link>
-
-      <ThemeToggle className="theme-toggle-btn flex md:hidden" />
-
-      <button type="button" className="l-hamburger" onClick={() => setOpen(true)} aria-label="Abrir menú">
-        <Menu className="w-5 h-5" />
-      </button>
+      </div>
 
       {mounted && createPortal(drawer, document.body)}
     </nav>

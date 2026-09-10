@@ -71,3 +71,18 @@ export function idiomaSegunNavegador(acceptLanguage: string | null): Idioma {
 
   return IDIOMA_POR_DEFECTO;
 }
+
+/**
+ * El idioma con el que arranca una invitación según el país del anfitrión.
+ *
+ * Es un valor inicial, no una regla: el anfitrión lo puede cambiar. Un
+ * argentino que se casa en Miami puede querer su invitación en inglés, y un
+ * brasileño en Argentina puede quererla en portugués. Pero pedirle el idioma
+ * a alguien que ya dijo de qué país es sería preguntarle dos veces lo mismo
+ * al 95% de la gente.
+ */
+export function idiomaSegunPais(pais: string | null | undefined): Idioma {
+  if (pais === "BR") return "pt";
+  if (pais === "US") return "en";
+  return "es";
+}

@@ -52,7 +52,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
             className={`flex flex-col gap-3 rounded-xl p-4 border border-l-4 transition-colors ${
                 status === "ACTIVA"
                     ? "bg-emerald-500/[0.06] border-emerald-500/25 border-l-emerald-400"
-                    : "bg-black/30 border-[var(--ink-2)] border-l-white/15 opacity-65 hover:opacity-100"
+                    : "bg-[var(--tinte-1)] border-[var(--line)] border-l-[var(--campo-borde)] opacity-65 hover:opacity-100"
             }`}
         >
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
@@ -73,7 +73,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                     </button>
                     <button
                         onClick={() => window.open(`/invitation/${invitation.slug}`, '_blank')}
-                        className="px-3 py-1.5 rounded-lg bg-white/10 text-white border border-white/15 hover:bg-white/20 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-[var(--tinte-2)] text-[var(--foreground)] border border-[var(--line)] hover:bg-[var(--tinte-4)] text-xs font-semibold flex items-center gap-1.5 transition-colors"
                         title="Ver invitación pública"
                     >
                         <Eye className="w-3.5 h-3.5" />
@@ -94,7 +94,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                         className={`whitespace-nowrap shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider border flex items-center gap-1.5 ${
                             status === "ACTIVA"
                                 ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40"
-                                : "bg-white/5 text-white/45 border-white/15"
+                                : "bg-[var(--tinte-1)] text-[var(--shell-fg-soft)] border-[var(--line)]"
                         }`}
                     >
                         {status === "ACTIVA" && (
@@ -105,7 +105,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                 </div>
             </div>
             
-            <div className="flex items-center justify-between gap-4 flex-wrap bg-black/10 p-2 rounded-lg">
+            <div className="flex items-center justify-between gap-4 flex-wrap bg-[var(--tinte-1)] p-2 rounded-lg">
                 <div className="flex items-center gap-4 flex-wrap">
                     <AdminPlanSelect invitationId={invitation.id} currentPlan={invitation.planTier} />
                     
@@ -116,7 +116,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                             value={maxLivePhotos}
                             onChange={(e) => setMaxLivePhotos(e.target.value)}
                             placeholder="Según plan"
-                            className="w-24 h-8 text-sm bg-[var(--ink)] border-none text-[var(--on-ink)] placeholder:text-white/30"
+                            className="w-24 h-8 text-sm bg-[var(--ink)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)]"
                         />
                     </div>
                     

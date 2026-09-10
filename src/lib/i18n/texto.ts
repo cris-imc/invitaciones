@@ -1,5 +1,6 @@
-import { DICCIONARIOS, type Diccionario } from "./diccionario";
+import { DICCIONARIOS, type Diccionario } from "./diccionario/index";
 import { IDIOMA_POR_DEFECTO, type Idioma } from "./idiomas";
+import { sobrescritura } from "./sobrescrituras";
 
 /**
  * Todas las claves posibles, como "panel.mesas.agregarMesa".
@@ -48,11 +49,19 @@ function reemplazar(texto: string, valores?: Record<string, string | number>): s
  * cruda: un texto en español dentro de una pantalla en inglés se lee mal, pero
  * "panel.mesas.agregarMesa" en un botón no se lee de ninguna manera.
  */
-export function traductorDe(idioma: Idioma) {
+/**
+ * @param pais El país de quien lee -- el del anfitrión en el panel, el de la
+ * invitación cuando la ve un invitado. Hay textos que cambian por país y no
+ * por idioma: en Estados Unidos no se festejan los quince sino los Sweet 16,
+ * y una invitación argentina escrita en inglés sigue siendo una quinceañera.
+ * Ver sobrescrituras.ts.
+ */
+export function traductorDe(idioma: Idioma, pais?: string | null) {
   const dic = DICCIONARIOS[idioma] ?? DICCIONARIOS[IDIOMA_POR_DEFECTO];
 
   return function t(clave: ClaveTexto, valores?: Record<string, string | number>): string {
     const texto =
+      sobrescritura(pais, idioma, clave) ??
       buscar(dic, clave) ??
       buscar(DICCIONARIOS[IDIOMA_POR_DEFECTO], clave);
 

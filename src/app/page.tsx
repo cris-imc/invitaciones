@@ -9,10 +9,51 @@ import { HeroFondoFiesta } from "@/components/landing/HeroFondoFiesta";
 import { Settings2, Users, Radio, CalendarDays, MapPin, ListChecks, Gift, Images, Music, MessageCircleHeart, Rss, Armchair, ScanLine, Eye } from "lucide-react";
 import { auth } from "@/auth";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
-import { FAQ_ITEMS } from "@/lib/faq-data";
+import { textosDelAnfitrion } from "@/lib/i18n/servidor";
+import type { ClaveTexto } from "@/lib/i18n/texto";
+import { headers } from "next/headers";
+import { paisSegunCabeceras } from "@/lib/pais-visitante";
+import { costumbresDeVisitante } from "@/lib/costumbres-por-pais";
+import { precioDePlan, precioConDescuento, formatearPrecio } from "@/lib/precios-por-pais";
+import { idiomaDelAnfitrion } from "@/lib/i18n/servidor";
+
+
+// El orden de las preguntas es el de la sección: las claves viven en el
+// diccionario (landing.faq) y acá sólo se dice cuáles se muestran y en qué
+// orden.
+const FAQ_CLAVES = [
+  "sinDiseno",
+  "proceso",
+  "editar",
+  "compartir",
+  "limite",
+  "planes",
+  "cambiarPlan",
+  "celular",
+  "otrosEventos",
+  "costoGratis",
+  "cantidadConfirmada",
+] as const;
 
 export default async function Home() {
   const session = await auth();
+  const t = await textosDelAnfitrion();
+
+  // De qué país es quien mira, para no prometerle cosas que en su país no
+  // existen. Ante la duda no se promete nada: prometer de menos se corrige
+  // cuando se registra y dice de dónde es; prometer de más se descubre en
+  // el checkout, que es el peor momento posible.
+  const cabeceras = await headers();
+  const paisVisitante = paisSegunCabeceras((n) => cabeceras.get(n));
+  const costumbres = costumbresDeVisitante(paisVisitante);
+  const cuotas = costumbres.cuotasSinInteres;
+
+  // Pesos en Argentina, dólares en el resto. No es una conversión: son
+  // precios propios, para que el precio internacional no quede atado a la
+  // inflación argentina ni cambie de número todos los días (ver
+  // precios-por-pais.ts).
+  const idioma = await idiomaDelAnfitrion();
+  const precio = (valor: Parameters<typeof formatearPrecio>[0]) => formatearPrecio(valor, idioma);
   // "Empezar gratis"/"Crear cuenta gratis": para un visitante sin cuenta va
   // directo al wizard (/dashboard/invitaciones/crear) sin pasar por
   // /register antes -- ni esa ruta ni el layout de /dashboard exigen sesión
@@ -24,11 +65,12 @@ export default async function Home() {
   const registerUrl = session ? "/dashboard?new=true" : "/dashboard/invitaciones/crear";
   const premiumUrl = session ? "/dashboard?new=true&plan=premium" : "/register?plan=premium";
   const diamondUrl = session ? "/dashboard?new=true&plan=diamond" : "/register?plan=diamond";
-  const premiumDiscountPrice = PREMIUM_DISCOUNT_PRICE;
-  const diamondDiscountPrice = DIAMOND_DISCOUNT_PRICE;
+  const premiumConDescuento = precioConDescuento("PREMIUM", paisVisitante);
+  const diamondConDescuento = precioConDescuento("DIAMOND", paisVisitante);
   const whatsappEnterpriseUrl = `https://wa.me/5493517660000?text=${encodeURIComponent(
-    "Hola, me interesa el plan Enterprise de Alta Invitación"
+    t("landing.planes.enterprise.whatsapp")
   )}`;
+  const ejemploRealUrl = "https://altainvitacion.com/invite/nos-casamos-1786233859965/864f7d5912140fecee1eca69fd5dd17b";
   return (
     // PRUEBA (revertir = volver a `items-center justify-center ... p-0 md:p-6`):
     // el md:p-6 dejaba aire alrededor de la tarjeta, y el centrado vertical
@@ -50,30 +92,36 @@ export default async function Home() {
             <Link href={registerUrl}>
               {/* El botón de empezar es el que tiene que llevarse la mirada:
                   más grande que el resto de la página y con sombra propia. */}
-              <Button className="rounded-full bg-[var(--accent)] text-[var(--ink)] font-semibold text-base px-9 py-6 shadow-lg shadow-[var(--accent)]/25 transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--accent)]/35 font-ui">
-                Empezar gratis
+              <Button className="rounded-full bg-[var(--accent)] text-[var(--accent-foreground)] font-semibold text-base px-9 py-6 shadow-lg shadow-[var(--accent)]/25 transition-all duration-200 hover:bg-[var(--accent)]/90 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--accent)]/35 font-ui">
+                {t("landing.empezarGratis")}
               </Button>
             </Link>
             {/* Ingresar baja a link de texto: es para quien ya es cliente, no
                 compite con la acción que importa. */}
             <Link
               href="/dashboard"
-              className="text-sm text-zinc-400 underline underline-offset-4 decoration-white/25 transition-colors hover:text-[var(--paper)] hover:decoration-white/60 font-ui"
+              className="text-sm text-[var(--shell-fg-mid)] underline underline-offset-4 decoration-[var(--tinte-4)] transition-colors hover:text-[var(--foreground)] hover:decoration-[var(--foreground)]/60 font-ui"
             >
-              Ya tengo cuenta
+              {t("landing.yaTengoCuenta")}
             </Link>
           </div>
-          <p className="mt-5 text-xs sm:text-sm text-zinc-500 font-ui tracking-wide">
-            Gratis para empezar · Sin tarjeta · Pagás una vez, sin suscripción
+          <p className="mt-5 text-xs sm:text-sm text-[var(--shell-fg-soft)] font-ui tracking-wide">
+            {t("landing.gratisParaEmpezar")}
           </p>
           {/* En píldora y no como una línea más de texto: las cuotas sin
               interés son de las pocas cosas que se comparan de un vistazo
               contra la competencia, y suelta entre otras frases grises no se
-              ve. */}
-          <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/45 bg-[var(--accent)]/10 px-4 py-2 text-xs sm:text-sm font-ui font-semibold tracking-wide text-[var(--accent)]">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
-            Hasta 3 cuotas sin interés
-          </p>
+              ve.
+
+              Sólo donde existen: es una campaña de Mercado Pago Argentina.
+              Mostrárselo a un colombiano es prometerle una forma de pago que
+              no va a estar cuando llegue al checkout. */}
+          {cuotas && (
+            <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/45 bg-[var(--accent)]/10 px-4 py-2 text-xs sm:text-sm font-ui font-semibold tracking-wide text-[var(--accent)]">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+              {t("landing.cuotasSinInteres", { cuotas })}
+            </p>
+          )}
         </section>
 
         {/* PLANTILLAS (showcase animado) */}
@@ -82,14 +130,14 @@ export default async function Home() {
         {/* SECCIÓN 1 — Collage "Así es tu invitación" */}
         <section id="asi-es-tu-invitacion" className="py-20 md:py-28 border-t" style={{ borderColor: 'var(--line)', background: 'var(--ink-2)' }} aria-labelledby="breakdown-title">
           <div className="text-center mb-10 px-6">
-            <p className="kicker font-ui mx-auto mb-4">Todo en un solo link</p>
-            <h2 id="breakdown-title" className="text-3xl md:text-5xl font-display font-semibold mb-4 tracking-tight text-white">Así es tu invitación</h2>
-            <p className="text-zinc-400 text-lg max-w-xl mx-auto">Portada, cuenta regresiva, ubicación, RSVP, álbum y regalos — todo lo que tus invitados necesitan, en un vistazo.</p>
+            <p className="kicker font-ui mx-auto mb-4">{t("landing.collage.kicker")}</p>
+            <h2 id="breakdown-title" className="text-3xl md:text-5xl font-display font-semibold mb-4 tracking-tight text-[var(--foreground)]">{t("landing.collage.titulo")}</h2>
+            <p className="text-[var(--shell-fg-mid)] text-lg max-w-xl mx-auto">{t("landing.collage.bajada")}</p>
           </div>
           <div className="max-w-4xl mx-auto px-6">
             <Image
               src="/collage-invitacion.png"
-              alt="Desglose de las partes de una invitación digital de Alta Invitación: portada, cuenta regresiva, ubicación, RSVP, álbum de fotos y mesa de regalos"
+              alt={t("landing.collage.alt")}
               width={1200}
               height={900}
               className="w-full h-auto object-contain rounded-2xl"
@@ -98,12 +146,12 @@ export default async function Home() {
           </div>
           <div className="text-center mt-10">
             <a
-              href="https://altainvitacion.com/invite/nos-casamos-1786233859965/864f7d5912140fecee1eca69fd5dd17b"
+              href={ejemploRealUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-white/25 text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-[var(--campo-borde)] text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-[var(--tinte-2)] hover:border-[var(--foreground)]/40 hover:-translate-y-0.5"
             >
-              Mirá un ejemplo real →
+              {t("landing.verInvitacionReal")} →
             </a>
           </div>
         </section>
@@ -112,38 +160,38 @@ export default async function Home() {
         <section className="l-strip px-6 py-16 md:px-8 md:py-24" id="caracteristicas" style={{ background: "var(--ink-2)" }}>
           <div className="max-w-2xl mx-auto space-y-10">
             <div className="text-center">
-              <p className="text-[var(--accent)] font-ui uppercase tracking-widest text-sm font-semibold mb-2">Todo en uno</p>
-              <h2 className="text-4xl lg:text-5xl font-display text-white leading-tight">Mucho más que una invitación</h2>
+              <p className="text-[var(--accent)] font-ui uppercase tracking-widest text-sm font-semibold mb-2">{t("landing.strip.kicker")}</p>
+              <h2 className="text-4xl lg:text-5xl font-display text-[var(--foreground)] leading-tight">{t("landing.strip.titulo")}</h2>
             </div>
 
             <div className="space-y-8">
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--tinte-2)] flex items-center justify-center shrink-0">
                   <Settings2 className="w-6 h-6 text-[var(--accent)]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Plantilla 100% Personalizable</h3>
-                  <p className="text-zinc-400">Adaptá colores, tipografías, fotos y estructura. Ya sea una boda, un 15 o un evento corporativo, el diseño se ajusta a tu estilo.</p>
+                  <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">{t("landing.strip.personalizable.titulo")}</h3>
+                  <p className="text-[var(--shell-fg-mid)]">{t("landing.strip.personalizable.detalle")}</p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--tinte-2)] flex items-center justify-center shrink-0">
                   <Users className="w-6 h-6 text-[var(--accent)]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Gestión de Invitados y Pagos</h3>
-                  <p className="text-zinc-400">Recibí confirmaciones (RSVP) al instante, administrá accesos y configurá tu mesa de regalos o cuenta bancaria sin comisiones.</p>
+                  <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">{t("landing.strip.gestion.titulo")}</h3>
+                  <p className="text-[var(--shell-fg-mid)]">{t("landing.strip.gestion.detalle")}</p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--tinte-2)] flex items-center justify-center shrink-0">
                   <Radio className="w-6 h-6 text-[var(--accent)]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Con LIVE tu fiesta se anima</h3>
-                  <p className="text-zinc-400">Tus invitados pueden subir fotos y dejar mensajes desde sus teléfonos durante la fiesta. Todo se proyecta y queda guardado de recuerdo.</p>
+                  <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">{t("landing.strip.live.titulo")}</h3>
+                  <p className="text-[var(--shell-fg-mid)]">{t("landing.strip.live.detalle")}</p>
                 </div>
               </div>
             </div>
@@ -154,8 +202,8 @@ export default async function Home() {
         {/* SECCIÓN 2 — Grilla de 8 características */}
         <section className="py-20 md:py-28 border-t" style={{ borderColor: 'var(--line)' }} aria-labelledby="features-grid-title">
           <div className="text-center mb-12 px-6">
-            <p className="kicker font-ui mx-auto mb-4">Incluido en tu invitación</p>
-            <h2 id="features-grid-title" className="text-3xl md:text-5xl font-display font-semibold mb-4 tracking-tight text-white">Todo lo que incluye tu invitación</h2>
+            <p className="kicker font-ui mx-auto mb-4">{t("landing.caracteristicas.kicker")}</p>
+            <h2 id="features-grid-title" className="text-3xl md:text-5xl font-display font-semibold mb-4 tracking-tight text-[var(--foreground)]">{t("landing.caracteristicas.titulo")}</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto px-6">
             {/* Los dos primeros son los que ningún competidor tiene: seguir
@@ -164,36 +212,36 @@ export default async function Home() {
                 atención con "Música de fondo" -- que ofrece cualquiera. Van
                 primero y marcados. */}
             {[
-              { icon: <Gift className="w-6 h-6" />, title: "Quién pagó y quién debe", text: "Llevá la cuenta de la tarjeta invitado por invitado: precio por lugar, exentos y pagos parciales. El dinero va directo a vos.", premium: false, destacado: true },
-              { icon: <Rss className="w-6 h-6" />, title: "Modo LIVE", text: "Fotos y mensajes de tus invitados proyectados en vivo durante la fiesta.", premium: true, destacado: true },
-              { icon: <Armchair className="w-6 h-6" />, title: "Organización de mesas", text: "Armá el salón, asigná cada familia a su mesa y repartí a las que no entran en una sola. Cada invitado ve la suya en su invitación.", premium: true, destacado: true },
-              { icon: <ScanLine className="w-6 h-6" />, title: "Control de ingreso", text: "Cada invitación termina con un QR. Lo escaneás en la puerta y ves quiénes son, cuántos vienen y a qué mesa mandarlos.", premium: true, destacado: true },
-              { icon: <Eye className="w-6 h-6" />, title: "Quién abrió la invitación", text: "Sabés a quién le llegó y a quién conviene volver a escribirle, antes de insistir a ciegas por WhatsApp.", premium: true, destacado: true },
-              { icon: <ListChecks className="w-6 h-6" />, title: "Confirmación de asistencia", text: "RSVP en tiempo real: sabés quién confirmó sin tener que preguntar.", premium: false, destacado: false },
-              { icon: <MessageCircleHeart className="w-6 h-6" />, title: "Módulo social", text: "Sugerencias de canciones para el DJ y mensajes de cariño de los invitados.", premium: false, destacado: false },
-              { icon: <CalendarDays className="w-6 h-6" />, title: "Save the date", text: "Cuenta regresiva y botón para agendar la fecha directo en Google Calendar.", premium: false, destacado: false },
-              { icon: <MapPin className="w-6 h-6" />, title: "Ubicación e indicaciones", text: "Mapa, horarios y cómo llegar a la ceremonia y a la fiesta, todo en un lugar.", premium: false, destacado: false },
-              { icon: <Images className="w-6 h-6" />, title: "Álbum de fotos", text: "Compartí los momentos de la pareja antes de la fiesta y sumá los del evento.", premium: false, destacado: false },
-              { icon: <Music className="w-6 h-6" />, title: "Música de fondo", text: "La invitación suena con la canción que los identifica como pareja.", premium: false, destacado: false },
+              { clave: "pagos", icon: <Gift className="w-6 h-6" />, premium: false, destacado: true },
+              { clave: "live", icon: <Rss className="w-6 h-6" />, premium: true, destacado: true },
+              { clave: "mesas", icon: <Armchair className="w-6 h-6" />, premium: true, destacado: true },
+              { clave: "ingreso", icon: <ScanLine className="w-6 h-6" />, premium: true, destacado: true },
+              { clave: "aperturas", icon: <Eye className="w-6 h-6" />, premium: true, destacado: true },
+              { clave: "rsvp", icon: <ListChecks className="w-6 h-6" />, premium: false, destacado: false },
+              { clave: "social", icon: <MessageCircleHeart className="w-6 h-6" />, premium: false, destacado: false },
+              { clave: "saveTheDate", icon: <CalendarDays className="w-6 h-6" />, premium: false, destacado: false },
+              { clave: "ubicacion", icon: <MapPin className="w-6 h-6" />, premium: false, destacado: false },
+              { clave: "album", icon: <Images className="w-6 h-6" />, premium: false, destacado: false },
+              { clave: "musica", icon: <Music className="w-6 h-6" />, premium: false, destacado: false },
             ].map((f) => (
               <div
-                key={f.title}
+                key={f.clave}
                 className={`rounded-2xl p-5 flex flex-col gap-3 relative ${
                   f.destacado
-                    ? "border border-[var(--accent)]/40 bg-gradient-to-b from-zinc-800/80 to-[var(--ink)] shadow-[0_0_30px_rgba(202,171,115,0.12)]"
-                    : "bg-white/5 border border-white/8"
+                    ? "border border-[var(--accent)]/40 bg-gradient-to-b from-[var(--tinte-3)] to-[var(--background)] shadow-[0_0_30px_rgba(202,171,115,0.12)]"
+                    : "bg-[var(--tinte-1)] border border-[var(--line)]"
                 }`}
               >
                 {f.premium ? (
                   <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--accent)] text-[var(--ink)]">Diamond</span>
                 ) : f.destacado ? (
-                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[var(--accent)]/50 text-[var(--accent)]">Sólo acá</span>
+                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[var(--accent)]/50 text-[var(--accent)]">{t("landing.caracteristicas.soloAca")}</span>
                 ) : null}
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${f.destacado ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-white/10 text-[var(--accent)]"}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${f.destacado ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-[var(--tinte-2)] text-[var(--accent)]"}`}>
                   {f.icon}
                 </div>
-                <h3 className="font-semibold text-white text-sm leading-snug">{f.title}</h3>
-                <p className="text-zinc-400 text-xs leading-relaxed">{f.text}</p>
+                <h3 className="font-semibold text-[var(--foreground)] text-sm leading-snug">{t(`landing.caracteristicas.${f.clave}.titulo` as ClaveTexto)}</h3>
+                <p className="text-[var(--shell-fg-mid)] text-xs leading-relaxed">{t(`landing.caracteristicas.${f.clave}.detalle` as ClaveTexto)}</p>
               </div>
             ))}
           </div>
@@ -201,31 +249,22 @@ export default async function Home() {
 
         {/* STEPS (CÓMO FUNCIONA) */}
         <section className="l-steps" id="como-funciona">
-          <p className="kicker">Cómo funciona</p>
+          <p className="kicker">{t("landing.comoFunciona")}</p>
           <div className="l-steps-grid">
             <div className="step">
-              <p className="n">Elegís</p>
-              <h4>Una plantilla para tu evento</h4>
-              <p>
-                Boda, cumpleaños, bautismo o lo que estés celebrando: cada una
-                trae su propio tono, tipografía y estructura.
-              </p>
+              <p className="n">{t("landing.pasos.elegis.n")}</p>
+              <h4>{t("landing.pasos.elegis.titulo")}</h4>
+              <p>{t("landing.pasos.elegis.detalle")}</p>
             </div>
             <div className="step">
-              <p className="n">Personalizás</p>
-              <h4>Nombres, fecha, lugar y mensaje</h4>
-              <p>
-                Wizard guiado paso a paso. Vista previa en vivo, igual a como la
-                va a ver cada invitado en su teléfono.
-              </p>
+              <p className="n">{t("landing.pasos.personalizas.n")}</p>
+              <h4>{t("landing.pasos.personalizas.titulo")}</h4>
+              <p>{t("landing.pasos.personalizas.detalle")}</p>
             </div>
             <div className="step">
-              <p className="n">Compartís</p>
-              <h4>Un link, listo para enviar</h4>
-              <p>
-                RSVP, mapa y módulo social incluidos. Vas viendo las
-                confirmaciones a medida que entran.
-              </p>
+              <p className="n">{t("landing.pasos.compartis.n")}</p>
+              <h4>{t("landing.pasos.compartis.titulo")}</h4>
+              <p>{t("landing.pasos.compartis.detalle")}</p>
             </div>
           </div>
         </section>
@@ -233,12 +272,12 @@ export default async function Home() {
         {/* SECCIÓN 3 — Video explicativo */}
         <section className="py-20 md:py-28 border-t" style={{ borderColor: 'var(--line)', background: 'var(--ink-2)' }} aria-labelledby="video-title">
           <div className="text-center mb-10 px-6">
-            <p className="kicker font-ui mx-auto mb-4">En minutos, no en horas</p>
-            <h2 id="video-title" className="text-3xl md:text-5xl font-display font-semibold mb-4 tracking-tight text-white">Mirá cómo funciona</h2>
-            <p className="text-zinc-400 text-lg max-w-xl mx-auto">De la idea a tu invitación lista, en minutos.</p>
+            <p className="kicker font-ui mx-auto mb-4">{t("landing.video.kicker")}</p>
+            <h2 id="video-title" className="text-3xl md:text-5xl font-display font-semibold mb-4 tracking-tight text-[var(--foreground)]">{t("landing.video.titulo")}</h2>
+            <p className="text-[var(--shell-fg-mid)] text-lg max-w-xl mx-auto">{t("landing.video.bajada")}</p>
           </div>
           <div className="max-w-3xl mx-auto px-6">
-            <div className="rounded-2xl overflow-hidden shadow-[0_10px_50px_rgba(0,0,0,0.5)] border border-white/10">
+            <div className="rounded-2xl overflow-hidden shadow-[0_10px_50px_rgba(0,0,0,0.5)] border border-[var(--line)]">
               {/* Mobile video */}
               <video
                 src="/video-demo-mobile.mp4"
@@ -247,7 +286,7 @@ export default async function Home() {
                 preload="metadata"
                 className="w-full block md:hidden"
               >
-                Tu navegador no soporta video HTML5.
+                {t("landing.video.sinSoporte")}
               </video>
               {/* Desktop video */}
               <video
@@ -257,18 +296,18 @@ export default async function Home() {
                 preload="metadata"
                 className="w-full hidden md:block"
               >
-                Tu navegador no soporta video HTML5.
+                {t("landing.video.sinSoporte")}
               </video>
             </div>
           </div>
           <div className="text-center mt-10">
             <a
-              href="https://altainvitacion.com/invite/nos-casamos-1786233859965/864f7d5912140fecee1eca69fd5dd17b"
+              href={ejemploRealUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-white/25 text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-[var(--campo-borde)] text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-[var(--tinte-2)] hover:border-[var(--foreground)]/40 hover:-translate-y-0.5"
             >
-              Mirá un ejemplo real →
+              {t("landing.verInvitacionReal")} →
             </a>
           </div>
         </section>
@@ -276,149 +315,149 @@ export default async function Home() {
         {/* PRECIOS */}
         <section id="precios" className="py-20 md:py-32 border-t" style={{ borderColor: 'var(--line)' }}>
           <div className="text-center mb-16">
-            <p className="kicker font-ui mx-auto mb-4">Precios Transparentes</p>
-            <h2 className="text-3xl md:text-5xl font-display font-semibold mb-6 tracking-tight text-white">Elegí el plan para tu evento</h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto px-4">
-              Empezá completamente gratis o desbloqueá todas las funcionalidades con un único pago. Sin suscripciones, y hasta en 3 cuotas sin interés.
+            <p className="kicker font-ui mx-auto mb-4">{t("landing.planes.kicker")}</p>
+            <h2 className="text-3xl md:text-5xl font-display font-semibold mb-6 tracking-tight text-[var(--foreground)]">{t("landing.planes.titulo")}</h2>
+            <p className="text-[var(--shell-fg-mid)] text-lg max-w-2xl mx-auto px-4">
+              {cuotas ? t("landing.planes.bajada", { cuotas }) : t("landing.planes.bajadaSinCuotas")}
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-6 items-stretch">
             {/* Gratis */}
-            <div className="bg-[var(--ink)]/40 border border-[var(--ink-2)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
-              <h3 className="text-xl font-semibold text-white mb-2">Gratis</h3>
-              <div className="text-4xl font-display text-white mb-4">$0<span className="text-lg text-zinc-500 font-sans font-normal">/evento</span></div>
-              <p className="text-zinc-400 mb-6 text-sm">Ideal para eventos íntimos y para probar la plataforma.</p>
+            <div className="bg-[var(--card)] border border-[var(--line)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
+              <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">{t("landing.planes.gratis.nombre")}</h3>
+              <div className="text-4xl font-display text-[var(--foreground)] mb-4">$0<span className="text-lg text-[var(--shell-fg-soft)] font-sans font-normal">{t("landing.planes.porEvento")}</span></div>
+              <p className="text-[var(--shell-fg-mid)] mb-6 text-sm">{t("landing.planes.gratis.detalle")}</p>
 
-              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-[var(--shell-fg-strong)] text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Invitaciones personalizables completas</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Gestión de confirmaciones (RSVP)</span>
+                  <span>{t("landing.planes.gratis.personalizables")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Hasta 20 invitados</span>
+                  <span>{t("landing.planes.gratis.rsvp")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Álbum de fotos (hasta {PLAN_LIMITS.FREE.maxPhotos} fotos)</span>
+                  <span>{t("landing.planes.gratis.invitados", { max: PLAN_LIMITS.FREE.maxGuests ?? 0 })}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>{t("landing.planes.gratis.album", { fotos: PLAN_LIMITS.FREE.maxPhotos ?? 0 })}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin gestión de pagos</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.pagos")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin función LIVE</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.live")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Con marca de agua de altainvitacion</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.marcaAgua")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin organización de mesas</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.mesas")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin control de ingreso</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.ingreso")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin ver quién abrió la invitación</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.aperturas")}</span>
                 </li>
               </ul>
               <Link href={registerUrl} className="w-full mt-auto">
-                <Button className="w-full rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 py-6 border border-zinc-700 font-sans">Crear cuenta gratis</Button>
+                <Button className="w-full rounded-xl bg-[var(--tinte-3)] text-[var(--foreground)] hover:bg-[var(--tinte-4)] py-6 border border-[var(--line)] font-sans">{t("landing.planes.gratis.cta")}</Button>
               </Link>
             </div>
 
             {/* Premium */}
-            <div className="bg-[var(--ink)]/40 border border-[var(--ink-2)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
-              <h3 className="text-xl font-semibold text-white mb-2">Premium</h3>
+            <div className="bg-[var(--card)] border border-[var(--line)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
+              <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">Premium</h3>
               <div className="mb-1 flex items-baseline gap-2 flex-wrap">
-                <span className="text-base text-zinc-500 font-sans line-through">{formatPrice(PLAN_LIMITS.PREMIUM.price)}</span>
-                <span className="text-4xl font-display text-white">{formatPrice(premiumDiscountPrice)}</span>
-                <span className="text-lg text-zinc-500 font-sans font-normal">/evento</span>
+                <span className="text-base text-[var(--shell-fg-soft)] font-sans line-through">{precio(precioDePlan("PREMIUM", paisVisitante))}</span>
+                <span className="text-4xl font-display text-[var(--foreground)]">{precio(premiumConDescuento)}</span>
+                <span className="text-lg text-[var(--shell-fg-soft)] font-sans font-normal">{t("landing.planes.porEvento")}</span>
               </div>
-              <p className="text-xs font-semibold text-[var(--accent)] mb-1">{PREMIUM_DISCOUNT_PERCENTAGE}% OFF</p>
+              <p className="text-xs font-semibold text-[var(--accent)] mb-1">{t("landing.planes.descuento", { porcentaje: PREMIUM_DISCOUNT_PERCENTAGE })}</p>
               {/* La cuota se calcula desde el precio, no se escribe a mano: si
                   mañana cambia el precio, este número lo sigue solo. */}
-              <p className="text-xs text-zinc-400 mb-4">o 3 cuotas sin interés de {formatPrice(Math.round(premiumDiscountPrice / 3))}</p>
-              <p className="text-zinc-400 mb-6 text-sm">Todas las herramientas interactivas, sin límite de invitados.</p>
+              {cuotas && <p className="text-xs text-[var(--shell-fg-mid)] mb-4">{t("landing.planes.cuotas", { cuotas, monto: precio({ ...premiumConDescuento, monto: Math.round(premiumConDescuento.monto / cuotas) }) })}</p>}
+              <p className="text-[var(--shell-fg-mid)] mb-6 text-sm">{t("landing.planes.premium.detalle")}</p>
 
-              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-[var(--shell-fg-strong)] text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span className="font-medium text-white">Todo lo del plan Gratis, más:</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Invitados ilimitados</strong> y sin restricciones</span>
+                  <span className="font-medium text-[var(--foreground)]">{t("landing.planes.premium.todoGratis")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Álbum de fotos premium</strong> (hasta {PLAN_LIMITS.PREMIUM.maxPhotos} fotos)</span>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.premium.ilimitados.titulo")}</strong> {t("landing.planes.premium.ilimitados.detalle")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Música de fondo, trivias y sugerencias de DJ</span>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.premium.album.titulo")}</strong> {t("landing.planes.premium.album.detalle", { fotos: PLAN_LIMITS.PREMIUM.maxPhotos ?? 0 })}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Gestión de pagos:</strong> cuentas bancarias para regalos y cobro de tarjetas/entradas</span>
+                  <span>{t("landing.planes.premium.musica")}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.premium.pagos.titulo")}</strong> {t("landing.planes.premium.pagos.detalle")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin función LIVE (exclusiva de Diamond)</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.liveDiamond")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Con marca de agua de altainvitacion</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.marcaAgua")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin organización de mesas</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.mesas")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin control de ingreso</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.ingreso")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>Sin ver quién abrió la invitación</span>
+                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>{t("landing.planes.sin.aperturas")}</span>
                 </li>
               </ul>
               <Link href={premiumUrl} className="w-full mt-auto">
-                <Button className="w-full rounded-xl bg-zinc-700 text-white hover:bg-zinc-600 py-6 font-semibold font-sans">Elegir Premium</Button>
+                <Button className="w-full rounded-xl bg-[var(--tinte-4)] text-[var(--foreground)] hover:bg-[var(--foreground)]/25 py-6 font-semibold font-sans">{t("landing.planes.premium.cta")}</Button>
               </Link>
             </div>
 
             {/* Diamond */}
-            <div className="bg-gradient-to-b from-zinc-800/80 to-[var(--ink)] border border-[var(--accent)]/40 rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1 shadow-[0_0_40px_rgba(202,171,115,0.15)] lg:scale-105 lg:-translate-y-1">
-              <div className="absolute top-0 right-0 bg-[var(--accent)] text-[var(--ink)] text-xs font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider font-sans">Recomendado</div>
+            <div className="bg-gradient-to-b from-[var(--tinte-3)] to-[var(--background)] border border-[var(--accent)]/40 rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1 shadow-[0_0_40px_rgba(202,171,115,0.15)] lg:scale-105 lg:-translate-y-1">
+              <div className="absolute top-0 right-0 bg-[var(--accent)] text-[var(--ink)] text-xs font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider font-sans">{t("landing.planes.recomendado")}</div>
               <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">Diamond</h3>
               <div className="mb-1 flex items-baseline gap-2 flex-wrap">
-                <span className="text-base text-zinc-500 font-sans line-through">{formatPrice(PLAN_LIMITS.DIAMOND.price)}</span>
-                <span className="text-4xl font-display text-white">{formatPrice(diamondDiscountPrice)}</span>
-                <span className="text-lg text-zinc-500 font-sans font-normal">/evento</span>
+                <span className="text-base text-[var(--shell-fg-soft)] font-sans line-through">{precio(precioDePlan("DIAMOND", paisVisitante))}</span>
+                <span className="text-4xl font-display text-[var(--foreground)]">{precio(diamondConDescuento)}</span>
+                <span className="text-lg text-[var(--shell-fg-soft)] font-sans font-normal">{t("landing.planes.porEvento")}</span>
               </div>
-              <p className="text-xs font-semibold text-[var(--accent)] mb-1">{DIAMOND_DISCOUNT_PERCENTAGE}% OFF</p>
-              <p className="text-xs text-zinc-400 mb-4">o 3 cuotas sin interés de {formatPrice(Math.round(diamondDiscountPrice / 3))}</p>
-              <p className="text-zinc-400 mb-6 text-sm">Todo Premium, más el Modo Live, la organización de mesas y el control de ingreso.</p>
+              <p className="text-xs font-semibold text-[var(--accent)] mb-1">{t("landing.planes.descuento", { porcentaje: DIAMOND_DISCOUNT_PERCENTAGE })}</p>
+              {cuotas && <p className="text-xs text-[var(--shell-fg-mid)] mb-4">{t("landing.planes.cuotas", { cuotas, monto: precio({ ...diamondConDescuento, monto: Math.round(diamondConDescuento.monto / cuotas) }) })}</p>}
+              <p className="text-[var(--shell-fg-mid)] mb-6 text-sm">{t("landing.planes.diamond.detalle")}</p>
 
-              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-[var(--shell-fg-strong)] text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span className="font-medium text-white">Todo lo del plan Premium, más:</span>
+                  <span className="font-medium text-[var(--foreground)]">{t("landing.planes.diamond.todoPremium")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Interacción LIVE:</strong> proyección de fotos en vivo en tu fiesta (hasta {PLAN_LIMITS.DIAMOND.maxLivePhotos} fotos)</span>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.live.titulo")}</strong> {t("landing.planes.diamond.live.detalle", { fotos: PLAN_LIMITS.DIAMOND.maxLivePhotos ?? 0 })}</span>
                 </li>
                 {/* El álbum no se repite acá: Diamond tiene el mismo límite que
                     Premium y la tarjeta ya arranca diciendo "todo lo del plan
@@ -426,48 +465,48 @@ export default async function Home() {
                     Diamond pareciera más larga de lo que realmente es. */}
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Organización de mesas:</strong> armá el salón y asigná a cada familia su mesa, y cada invitado la ve en su invitación</span>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.mesas.titulo")}</strong> {t("landing.planes.diamond.mesas.detalle")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Control de ingreso:</strong> escaneás el QR en la puerta y ves quién llegó y a qué mesa va</span>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.ingreso.titulo")}</strong> {t("landing.planes.diamond.ingreso.detalle")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Quién abrió la invitación:</strong> sabés a quién le llegó y a quién volver a escribirle</span>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.aperturas.titulo")}</strong> {t("landing.planes.diamond.aperturas.detalle")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-white">Sin marca de agua:</strong> la invitación es tuya, sin nuestro logo al pie</span>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.sinMarca.titulo")}</strong> {t("landing.planes.diamond.sinMarca.detalle")}</span>
                 </li>
               </ul>
               <Link href={diamondUrl} className="w-full mt-auto">
-                <Button className="w-full rounded-xl bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 py-6 font-semibold font-sans">Elegir Diamond</Button>
+                <Button className="w-full rounded-xl bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 py-6 font-semibold font-sans">{t("landing.planes.diamond.cta")}</Button>
               </Link>
             </div>
 
             {/* Enterprise */}
-            <div className="bg-[var(--ink)]/40 border border-[var(--ink-2)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
-              <h3 className="text-xl font-semibold text-white mb-2">Enterprise</h3>
-              <div className="text-2xl font-display text-white mb-4">Precio a consultar</div>
-              <p className="text-zinc-400 mb-6 text-sm">Para empresas o clientes que necesiten un diseño de plantilla a medida.</p>
+            <div className="bg-[var(--card)] border border-[var(--line)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
+              <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">Enterprise</h3>
+              <div className="text-2xl font-display text-[var(--foreground)] mb-4">{t("landing.planes.enterprise.precio")}</div>
+              <p className="text-[var(--shell-fg-mid)] mb-6 text-sm">{t("landing.planes.enterprise.detalle")}</p>
 
-              <ul className="space-y-3 mb-6 flex-1 text-zinc-300 text-sm">
+              <ul className="space-y-3 mb-6 flex-1 text-[var(--shell-fg-strong)] text-sm">
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Todo lo de Diamond</span>
+                  <span>{t("landing.planes.enterprise.todoDiamond")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Diseño de plantilla 100% a medida</span>
+                  <span>{t("landing.planes.enterprise.diseno")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Asesor dedicado</span>
+                  <span>{t("landing.planes.enterprise.asesor")}</span>
                 </li>
               </ul>
               <Link href={whatsappEnterpriseUrl} target="_blank" rel="noopener noreferrer" className="w-full mt-auto">
-                <Button className="w-full rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 py-6 border border-zinc-700 font-sans">Consultar</Button>
+                <Button className="w-full rounded-xl bg-[var(--tinte-3)] text-[var(--foreground)] hover:bg-[var(--tinte-4)] py-6 border border-[var(--line)] font-sans">{t("landing.planes.enterprise.cta")}</Button>
               </Link>
             </div>
           </div>
@@ -477,17 +516,17 @@ export default async function Home() {
         <section id="faq" className="py-20 md:py-28 border-t" style={{ borderColor: 'var(--line)' }} aria-labelledby="faq-title">
           <div className="max-w-2xl mx-auto px-6">
             <div className="text-center mb-12">
-              <p className="kicker font-ui mx-auto mb-4">Preguntas frecuentes</p>
-              <h2 id="faq-title" className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-white">¿Tenés dudas?</h2>
+              <p className="kicker font-ui mx-auto mb-4">{t("landing.faq.kicker")}</p>
+              <h2 id="faq-title" className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-[var(--foreground)]">{t("landing.faq.titulo")}</h2>
             </div>
             <div className="space-y-0 divide-y" style={{ borderColor: 'var(--line)' }}>
-              {FAQ_ITEMS.map((item) => (
-                <details key={item.q} className="group py-5">
-                  <summary className="flex justify-between items-center cursor-pointer list-none text-white font-semibold text-sm md:text-base gap-4 hover:text-[var(--accent)] transition-colors">
-                    {item.q}
+              {FAQ_CLAVES.map((clave) => (
+                <details key={clave} className="group py-5">
+                  <summary className="flex justify-between items-center cursor-pointer list-none text-[var(--foreground)] font-semibold text-sm md:text-base gap-4 hover:text-[var(--accent)] transition-colors">
+                    {t(`landing.faq.${clave}.q` as ClaveTexto)}
                     <span className="text-[var(--accent)] text-xl shrink-0 transition-transform duration-200 group-open:rotate-45">+</span>
                   </summary>
-                  <p className="mt-3 text-zinc-400 text-sm leading-relaxed">{item.a}</p>
+                  <p className="mt-3 text-[var(--shell-fg-mid)] text-sm leading-relaxed">{t(`landing.faq.${clave}.a` as ClaveTexto)}</p>
                 </details>
               ))}
             </div>
@@ -502,22 +541,22 @@ export default async function Home() {
               <div className="flex items-center gap-2">
                 <LandingLogo href="" src="/landing/logo-blanco-v2.png" className="h-4 w-auto" />
               </div>
-              <small className="text-zinc-500">Hecho para bodas, cumpleaños, eventos y todo lo que se celebra</small>
+              <small className="text-[var(--shell-fg-soft)]">{t("landing.hechoPara")}</small>
             </div>
 
             {/* Accesos rápidos */}
-            <nav aria-label="Accesos rápidos" className="flex flex-col gap-2">
-              <small className="text-zinc-500 uppercase tracking-widest text-[10px] font-semibold mb-1">Accesos rápidos</small>
+            <nav aria-label={t("landing.accesosRapidos")} className="flex flex-col gap-2">
+              <small className="text-[var(--shell-fg-soft)] uppercase tracking-widest text-[10px] font-semibold mb-1">{t("landing.accesosRapidos")}</small>
               <div className="flex flex-row flex-wrap gap-x-4 gap-y-2">
                 {[
-                  { href: "#plantillas", label: "Plantillas" },
-                  { href: "/modelos", label: "Ver modelos" },
-                  { href: "#asi-es-tu-invitacion", label: "Así es tu invitación" },
-                  { href: "#como-funciona", label: "Cómo funciona" },
-                  { href: "#precios", label: "Precios" },
-                  { href: "#faq", label: "Preguntas frecuentes" },
+                  { href: "#plantillas", label: t("landing.pie.links.plantillas") },
+                  { href: "/modelos", label: t("landing.verModelos") },
+                  { href: "#asi-es-tu-invitacion", label: t("landing.pie.links.asiEsTuInvitacion") },
+                  { href: "#como-funciona", label: t("landing.comoFunciona") },
+                  { href: "#precios", label: t("landing.precios") },
+                  { href: "#faq", label: t("landing.pie.links.preguntasFrecuentes") },
                 ].map((l) => (
-                  <a key={l.href} href={l.href} className="text-zinc-400 text-xs hover:text-white transition-colors">{l.label}</a>
+                  <a key={l.href} href={l.href} className="text-[var(--shell-fg-mid)] text-xs hover:text-[var(--foreground)] transition-colors">{l.label}</a>
                 ))}
               </div>
             </nav>
@@ -526,10 +565,10 @@ export default async function Home() {
           {/* Botón de arrepentimiento */}
           <div className="w-full text-center pb-2">
             <a
-              href={`mailto:altainvitacion@gmail.com?subject=${encodeURIComponent("Botón de arrepentimiento")}&body=${encodeURIComponent("Nombre completo:\nEmail de contratación:\nFecha de contratación:\nPlan contratado:\nMotivo (opcional):")}`}
-              className="text-xs text-zinc-500 underline underline-offset-2 hover:text-zinc-300 transition-colors"
+              href={`mailto:altainvitacion@gmail.com?subject=${encodeURIComponent(t("landing.pie.arrepentimiento.asunto"))}&body=${encodeURIComponent(t("landing.pie.arrepentimiento.cuerpo"))}`}
+              className="text-xs text-[var(--shell-fg-soft)] underline underline-offset-2 hover:text-[var(--shell-fg-strong)] transition-colors"
             >
-              Botón de arrepentimiento
+              {t("landing.pie.arrepentimiento.enlace")}
             </a>
           </div>
         </div>

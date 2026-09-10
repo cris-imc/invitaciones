@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface ShowcaseItem {
   evento: "CASAMIENTO" | "QUINCE_ANOS";
   tipo: string;
   color: string;
-  label: string;
+  /** El nombre de la familia de plantillas, que es de marca y no se traduce. */
+  familia: string;
+  /** El color, cuando la plantilla tiene variante de color. */
+  colorClave?: "verde" | "rojo" | "azul" | "rosa";
 }
 
 // Curaduría de combinaciones evento/plantilla/color a mostrar en rotación.
@@ -18,14 +22,14 @@ interface ShowcaseItem {
 // Colección Storytelling, que es la que no tiene equivalente en la
 // competencia. Van intercaladas para que dos vecinas nunca se parezcan.
 const ROTATION: ShowcaseItem[] = [
-  { evento: "CASAMIENTO", tipo: "ELEGANT", color: "Green", label: "Boda · Elegant Verde" },
-  { evento: "CASAMIENTO", tipo: "GUESTPASSVIP", color: "default", label: "Boda · Guest Pass VIP" },
-  { evento: "QUINCE_ANOS", tipo: "MODERNO", color: "Rojo", label: "15 Años · Moderno Rojo" },
-  { evento: "QUINCE_ANOS", tipo: "PRINCESA", color: "default", label: "15 Años · Princesa" },
-  { evento: "CASAMIENTO", tipo: "MODERNO", color: "Azul", label: "Boda · Moderno Azul" },
-  { evento: "CASAMIENTO", tipo: "MARMOLYORO", color: "default", label: "Boda · Mármol y Oro" },
-  { evento: "QUINCE_ANOS", tipo: "ELEGANT", color: "Pink", label: "15 Años · Elegant Rosa" },
-  { evento: "QUINCE_ANOS", tipo: "ACRYLICPOP", color: "default", label: "15 Años · Acrylic Pop" },
+  { evento: "CASAMIENTO", tipo: "ELEGANT", color: "Green", familia: "Elegant", colorClave: "verde" },
+  { evento: "CASAMIENTO", tipo: "GUESTPASSVIP", color: "default", familia: "Guest Pass VIP" },
+  { evento: "QUINCE_ANOS", tipo: "MODERNO", color: "Rojo", familia: "Moderno", colorClave: "rojo" },
+  { evento: "QUINCE_ANOS", tipo: "PRINCESA", color: "default", familia: "Princesa" },
+  { evento: "CASAMIENTO", tipo: "MODERNO", color: "Azul", familia: "Moderno", colorClave: "azul" },
+  { evento: "CASAMIENTO", tipo: "MARMOLYORO", color: "default", familia: "Mármol y Oro" },
+  { evento: "QUINCE_ANOS", tipo: "ELEGANT", color: "Pink", familia: "Elegant", colorClave: "rosa" },
+  { evento: "QUINCE_ANOS", tipo: "ACRYLICPOP", color: "default", familia: "Acrylic Pop" },
 ];
 
 // El iframe siempre se layoutea a un ancho de celular real para que
@@ -50,6 +54,7 @@ const HOLD_AFTER_OPEN_MS = 4200;
 const OPEN_FALLBACK_MS = 4600;
 
 export function TemplateShowcase() {
+  const t = useTextos();
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -152,20 +157,25 @@ export function TemplateShowcase() {
 
   const item = ROTATION[index];
   const previewSrc = `/preview-plantilla?evento=${item.evento}&tipo=${item.tipo}&color=${encodeURIComponent(item.color)}&scroll=1&portada=${COVER_HOLD_MS}`;
+  // El pie de la vitrina se arma por partes ("Boda · Elegant Verde"): el tipo
+  // de evento y el color se traducen, el nombre de la familia no.
+  const evento = t(item.evento === "CASAMIENTO" ? "landing.showcase.evento.boda" : "landing.showcase.evento.quince");
+  const color = item.colorClave ? ` ${t(`landing.showcase.color.${item.colorClave}`)}` : "";
+  const label = `${evento} · ${item.familia}${color}`;
 
   return (
-    <section id="plantillas" className="l-plantillas relative py-20 md:py-28 px-6 border-t border-zinc-900 overflow-hidden">
+    <section id="plantillas" className="l-plantillas relative py-20 md:py-28 px-6 border-t border-[var(--line)] overflow-hidden">
       <div
         className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--accent)]/10 rounded-full blur-[120px] pointer-events-none"
         aria-hidden="true"
       />
       <div className="relative max-w-5xl mx-auto flex flex-col items-center text-center">
-        <p className="kicker mb-3">Plantillas</p>
-        <h2 className="text-3xl md:text-5xl font-serif text-white leading-tight mb-4 max-w-xl">
-          Un diseño para cada celebración
+        <p className="kicker mb-3">{t("landing.showcase.kicker")}</p>
+        <h2 className="text-3xl md:text-5xl font-serif text-[var(--foreground)] leading-tight mb-4 max-w-xl">
+          {t("landing.showcase.titulo")}
         </h2>
-        <p className="text-zinc-400 max-w-lg mb-12">
-          Bodas y 15 años, en distintos estilos y colores. Así se ve tu invitación en el celular de cada invitado.
+        <p className="text-[var(--shell-fg-mid)] max-w-lg mb-12">
+          {t("landing.showcase.bajada")}
         </p>
 
         <div className="relative">
@@ -193,7 +203,7 @@ export function TemplateShowcase() {
               <iframe
                 ref={iframeRef}
                 src={previewSrc}
-                title="Vista previa de plantillas"
+                title={t("landing.showcase.tituloIframe")}
                 tabIndex={-1}
                 style={{
                   width: MOBILE_VIEWPORT_WIDTH,
@@ -207,10 +217,10 @@ export function TemplateShowcase() {
         </div>
 
         <p
-          className="mt-8 text-sm font-medium text-zinc-300 tracking-wide"
+          className="mt-8 text-sm font-medium text-[var(--shell-fg-strong)] tracking-wide"
           style={{ opacity: visible ? 1 : 0, transition: `opacity ${FADE_MS}ms ease-in-out` }}
         >
-          {item.label}
+          {label}
         </p>
       </div>
     </section>

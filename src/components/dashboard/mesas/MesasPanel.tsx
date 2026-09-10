@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Trash2, Users, X, Minus, RotateCcw, Loader2, GripVertical, ScanLine, ArrowLeft } from "lucide-react";
 import { EscanerIngreso } from "@/components/dashboard/mesas/EscanerIngreso";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { Traductor } from "@/lib/i18n/texto";
 
 interface LugarApi {
   id: string;
@@ -73,10 +75,10 @@ const VELOCIDAD_MAX_PX = 18;
  * queda al lado, chico, porque es lo que va a leer el invitado y tiene que
  * poder cruzar una cosa con la otra de un vistazo.
  */
-function rotulo(mesa: MesaApi): { titulo: string; secundario: string | null } {
+function rotulo(mesa: MesaApi, t: Traductor): { titulo: string; secundario: string | null } {
   return mesa.alias
-    ? { titulo: mesa.alias, secundario: `MESA ${mesa.numero}` }
-    : { titulo: `Mesa ${mesa.numero}`, secundario: null };
+    ? { titulo: mesa.alias, secundario: t("panel.mesas.mesaNumeroCorto", { numero: mesa.numero }) }
+    : { titulo: t("panel.mesas.mesaNumero", { numero: mesa.numero }), secundario: null };
 }
 
 // Cuánto tienen que separarse los centros de dos mesas para no pisarse, en
@@ -143,6 +145,7 @@ function cunaLibre(mesas: MesaApi[]): Punto {
 }
 
 export function MesasPanel({ slug }: Props) {
+  const t = useTextos();
   const [mesas, setMesas] = useState<MesaApi[]>([]);
   const [invitados, setInvitados] = useState<InvitadoApi[]>([]);
   const [habilitadas, setHabilitadas] = useState(false);
@@ -223,7 +226,7 @@ export function MesasPanel({ slug }: Props) {
       const res = await fetch(`/api/invitations/${slug}/mesas`);
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        mostrarAviso(data.error || "No se pudieron cargar las mesas");
+        mostrarAviso(data.error || t("panel.mesas.errorCargar"));
         return;
       }
       const data = await res.json();
@@ -234,7 +237,7 @@ export function MesasPanel({ slug }: Props) {
     } finally {
       setCargando(false);
     }
-  }, [slug, mostrarAviso]);
+  }, [slug, mostrarAviso, t]);
 
   useEffect(() => {
     cargar();
@@ -353,18 +356,18 @@ export function MesasPanel({ slug }: Props) {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          mostrarAviso(data.error || "No se pudo guardar");
+          mostrarAviso(data.error || t("panel.mesas.errorGuardar"));
           return null;
         }
         return data;
       } catch {
-        mostrarAviso("No se pudo guardar");
+        mostrarAviso(t("panel.mesas.errorGuardar"));
         return null;
       } finally {
         setOcupado(false);
       }
     },
-    [mostrarAviso]
+    [mostrarAviso, t]
   );
 
   const alternarHabilitadas = async () => {
@@ -375,11 +378,7 @@ export function MesasPanel({ slug }: Props) {
     });
     if (r) {
       setHabilitadas(nuevo);
-      mostrarAviso(
-        nuevo
-          ? "Listo: cada invitado va a ver su mesa en la portada de su invitación."
-          : "Las mesas quedan sólo para vos. Los invitados no ven nada."
-      );
+      mostrarAviso(t(nuevo ? "panel.mesas.mesasVisibles" : "panel.mesas.mesasOcultas"));
     }
   };
 
@@ -392,11 +391,7 @@ export function MesasPanel({ slug }: Props) {
     if (r) {
       setEscaneo(nuevo);
       if (escaneando && !nuevo) setEscaneando(false);
-      mostrarAviso(
-        nuevo
-          ? "Listo: cada invitación termina con un QR y podés escanear en la puerta."
-          : "Sin control en la puerta: el QR desaparece de las invitaciones."
-      );
+      mostrarAviso(t(nuevo ? "panel.mesas.qrActivado" : "panel.mesas.qrDesactivado"));
     }
   };
 
@@ -441,7 +436,7 @@ export function MesasPanel({ slug }: Props) {
     const libres = Math.max(0, mesa.sillas - ocupacion(mesa));
     const faltan = quien.aSentar - quien.ubicados;
     if (libres === 0) {
-      mostrarAviso(`${rotulo(mesa).titulo} ya está completa. Agrandala o elegí otra.`);
+      mostrarAviso(t("panel.mesas.mesaCompleta", { mesa: rotulo(mesa, t).titulo }));
       return;
     }
     const yaAca = mesa.lugares.find((l) => l.guestId === quien.id)?.lugares ?? 0;
@@ -450,7 +445,12 @@ export function MesasPanel({ slug }: Props) {
     if (r) {
       if (suman < faltan) {
         mostrarAviso(
-          `${quien.name}: ${suman} en ${rotulo(mesa).titulo}, quedan ${faltan - suman} por ubicar.`
+          t("panel.mesas.entraronParte", {
+            nombre: quien.name,
+            ubicados: suman,
+            mesa: rotulo(mesa, t).titulo,
+            faltan: faltan - suman,
+          })
         );
       }
       setSeleccionado(null);
@@ -553,7 +553,7 @@ export function MesasPanel({ slug }: Props) {
     return (
       <div className="flex items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="w-5 h-5 animate-spin mr-2" />
-        Armando el salón…
+        {t("panel.mesas.armandoSalon")}
       </div>
     );
   }
@@ -569,7 +569,7 @@ export function MesasPanel({ slug }: Props) {
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" />
-          Volver al salón
+          {t("panel.mesas.volverAlSalon")}
         </button>
         <EscanerIngreso slug={slug} />
       </div>
@@ -587,7 +587,7 @@ export function MesasPanel({ slug }: Props) {
           className="inline-flex items-center gap-2 rounded-full bg-[var(--accent)] text-[var(--ink)] text-sm font-semibold px-4 py-2 transition-all hover:brightness-110 disabled:opacity-50"
         >
           <Plus className="w-4 h-4" />
-          Agregar mesa
+          {t("panel.mesas.agregarMesa")}
         </button>
 
         {/* Sólo cuando las mesas están activas: el QR de ingreso aparece en la
@@ -600,29 +600,29 @@ export function MesasPanel({ slug }: Props) {
             className="inline-flex items-center gap-2 rounded-full border border-white/20 text-sm font-semibold px-4 py-2 transition-all hover:bg-white/10"
           >
             <ScanLine className="w-4 h-4" />
-            Escanear ingreso
+            {t("panel.mesas.escanearIngreso")}
           </button>
         )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground font-ui">
+          <span>{t("panel.mesas.ubicados", { hechos: totales.ubicados, total: totales.aSentar })}</span>
           <span>
-            <strong className="text-foreground">{totales.ubicados}</strong> de{" "}
-            {totales.aSentar} ubicados
-          </span>
-          <span>
-            {mesas.length} {mesas.length === 1 ? "mesa" : "mesas"} · {totales.sillas} lugares
+            {t(mesas.length === 1 ? "panel.mesas.unaMesa" : "panel.mesas.variasMesas", {
+              cantidad: mesas.length,
+              lugares: totales.sillas,
+            })}
           </span>
         </div>
 
         {/* Espacio del salón */}
         <div className="ml-auto flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground mr-1">Espacio</span>
+          <span className="text-xs text-muted-foreground mr-1">{t("panel.mesas.espacio")}</span>
           <button
             type="button"
             onClick={() => setEspacio((z) => Math.max(ESPACIO_MIN, +(z - ESPACIO_PASO).toFixed(2)))}
             disabled={espacio <= ESPACIO_MIN}
             className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-            aria-label="Achicar el salón"
+            aria-label={t("panel.mesas.achicarSalon")}
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
@@ -631,7 +631,7 @@ export function MesasPanel({ slug }: Props) {
             onClick={() => setEspacio((z) => Math.min(ESPACIO_MAX, +(z + ESPACIO_PASO).toFixed(2)))}
             disabled={espacio >= ESPACIO_MAX}
             className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-            aria-label="Agrandar el salón"
+            aria-label={t("panel.mesas.agrandarSalon")}
           >
             <Plus className="w-3.5 h-3.5" />
           </button>
@@ -649,10 +649,9 @@ export function MesasPanel({ slug }: Props) {
           className="mt-0.5 w-4 h-4 accent-[var(--accent)] shrink-0"
         />
         <span className="min-w-0">
-          <span className="block text-sm font-medium">Mostrarle la mesa a cada invitado</span>
+          <span className="block text-sm font-medium">{t("panel.mesas.mostrarLaMesa")}</span>
           <span className="block text-xs text-muted-foreground">
-            Aparece en su pase, dentro de la invitación. Si una familia quedó
-            repartida, ve las dos mesas, sin el detalle de quién va en cada una.
+            {t("panel.mesas.mostrarLaMesaDetalle")}
           </span>
         </span>
       </label>
@@ -669,11 +668,9 @@ export function MesasPanel({ slug }: Props) {
           className="mt-0.5 w-4 h-4 accent-[var(--accent)] shrink-0"
         />
         <span className="min-w-0">
-          <span className="block text-sm font-medium">Controlar el ingreso con QR</span>
+          <span className="block text-sm font-medium">{t("panel.mesas.controlarIngreso")}</span>
           <span className="block text-xs text-muted-foreground">
-            Cada invitación termina con un QR. Lo escaneás en la puerta y ves
-            quiénes son, cuántos vienen y a qué mesa mandarlos. Queda registrado
-            quién llegó y a qué hora.
+            {t("panel.mesas.controlarIngresoDetalle")}
           </span>
         </span>
       </label>
@@ -719,8 +716,7 @@ export function MesasPanel({ slug }: Props) {
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center px-6 pointer-events-none">
                 <Users className="w-7 h-7 text-white/20" />
                 <p className="text-sm text-muted-foreground max-w-xs">
-                  Todavía no hay mesas. Agregá la primera y arrastrala para armar el
-                  salón como va a estar el día del evento.
+                  {t("panel.mesas.salonVacio")}
                 </p>
               </div>
             )}
@@ -729,6 +725,7 @@ export function MesasPanel({ slug }: Props) {
               <MesaDibujo
                 key={m.id}
                 mesa={m}
+                t={t}
                 ocupadas={ocupacion(m)}
                 abierta={mesaAbierta === m.id}
                 resaltada={eligiendo}
@@ -745,6 +742,7 @@ export function MesasPanel({ slug }: Props) {
           {mesa ? (
             <EditorMesa
               mesa={mesa}
+              t={t}
               ocupadas={ocupacion(mesa)}
               infoPorId={infoPorId}
               ocupado={ocupado}
@@ -757,15 +755,13 @@ export function MesasPanel({ slug }: Props) {
 
           <div className="min-w-0 rounded-xl border border-white/10 bg-card p-3">
             <div className="flex items-baseline justify-between gap-2 mb-1">
-              <h3 className="text-sm font-semibold">Sin ubicar</h3>
+              <h3 className="text-sm font-semibold">{t("panel.mesas.sinUbicar")}</h3>
               <span className="text-xs text-muted-foreground shrink-0">
                 {pendientes.length}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mb-3">
-              {invitadoSel
-                ? "Ahora tocá una mesa del salón."
-                : "Arrastrá un invitado o familia hasta la mesa, o tocalo y después tocá la mesa."}
+              {t(invitadoSel ? "panel.mesas.ahoraTocaUnaMesa" : "panel.mesas.comoUbicar")}
             </p>
 
             {/* Destildado por defecto: lo sano es ubicar sobre confirmados.
@@ -780,7 +776,7 @@ export function MesasPanel({ slug }: Props) {
                 className="mt-0.5 w-3.5 h-3.5 accent-[var(--accent)] shrink-0"
               />
               <span className="text-xs text-muted-foreground leading-snug">
-                Mostrar también los que no confirmaron
+                {t("panel.mesas.mostrarNoConfirmados")}
               </span>
             </label>
 
@@ -790,7 +786,7 @@ export function MesasPanel({ slug }: Props) {
               <input
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar…"
+                placeholder={t("comun.buscar")}
                 className="w-full mb-2 rounded-lg bg-white/5 border border-white/10 px-2.5 py-1.5 text-sm focus:outline-none focus:border-[var(--accent)] placeholder:text-white/25"
               />
             )}
@@ -801,15 +797,14 @@ export function MesasPanel({ slug }: Props) {
               // ubicados" sería mentir.
               totales.aSentar === 0 ? (
                 <p className="text-xs text-muted-foreground py-2">
-                  Todavía no confirmó nadie. Si querés ir adelantando, tildá la
-                  opción de arriba para ubicar también a los que no contestaron.
+                  {t("panel.mesas.nadieConfirmoTodavia")}
                 </p>
               ) : (
-                <p className="text-xs text-emerald-400 py-2">Están todos ubicados.</p>
+                <p className="text-xs text-emerald-400 py-2">{t("panel.mesas.todosUbicados")}</p>
               )
             ) : visibles.length === 0 ? (
               <p className="text-xs text-muted-foreground py-2">
-                Nadie sin ubicar coincide con “{busqueda}”.
+                {t("panel.mesas.sinCoincidencias", { busqueda })}
               </p>
             ) : (
               <ul className="space-y-1 pr-1">
@@ -845,7 +840,7 @@ export function MesasPanel({ slug }: Props) {
                                 elegido ? "text-[var(--ink)]/60" : "text-amber-400/80"
                               }`}
                             >
-                              sin confirmar
+                              {t("panel.mesas.sinConfirmar")}
                             </span>
                           )}
                         </span>
@@ -854,7 +849,7 @@ export function MesasPanel({ slug }: Props) {
                             elegido ? "text-[var(--ink)]/70" : "text-muted-foreground"
                           }`}
                         >
-                          {p.ubicados > 0 ? `faltan ${faltan}` : faltan}
+                          {p.ubicados > 0 ? t("panel.mesas.faltan", { cantidad: faltan }) : faltan}
                         </span>
                       </button>
                     </li>
@@ -874,10 +869,10 @@ export function MesasPanel({ slug }: Props) {
                   disabled={paginaActual === 0}
                   className="rounded-lg border border-white/15 px-2.5 py-1 text-xs hover:bg-white/10 disabled:opacity-30"
                 >
-                  ‹ Anterior
+                  {t("panel.mesas.anteriorCorto")}
                 </button>
                 <span className="text-xs text-muted-foreground">
-                  {paginaActual + 1} de {paginas}
+                  {t("panel.mesas.deTotal", { actual: paginaActual + 1, total: paginas })}
                 </span>
                 <button
                   type="button"
@@ -885,7 +880,7 @@ export function MesasPanel({ slug }: Props) {
                   disabled={paginaActual >= paginas - 1}
                   className="rounded-lg border border-white/15 px-2.5 py-1 text-xs hover:bg-white/10 disabled:opacity-30"
                 >
-                  Siguiente ›
+                  {t("panel.mesas.siguienteCorto")}
                 </button>
               </div>
             )}
@@ -910,6 +905,7 @@ export function MesasPanel({ slug }: Props) {
 // ── Dibujo de una mesa ─────────────────────────────────────────────
 function MesaDibujo({
   mesa,
+  t,
   ocupadas,
   abierta,
   resaltada,
@@ -918,6 +914,7 @@ function MesaDibujo({
   onPointerUp,
 }: {
   mesa: MesaApi;
+  t: Traductor;
   ocupadas: number;
   abierta: boolean;
   resaltada: boolean;
@@ -944,7 +941,7 @@ function MesaDibujo({
     ? "border-emerald-400/70"
     : "border-white/25";
 
-  const { titulo, secundario } = rotulo(mesa);
+  const { titulo, secundario } = rotulo(mesa, t);
 
   // Las sillas se pintan en orden: las primeras del primer grupo con su color,
   // las siguientes del segundo, y las que sobran quedan grises. Así una mesa
@@ -1022,6 +1019,7 @@ function MesaDibujo({
 // ── Editor de una mesa ─────────────────────────────────────────────
 function EditorMesa({
   mesa,
+  t,
   ocupadas,
   infoPorId,
   ocupado,
@@ -1031,6 +1029,7 @@ function EditorMesa({
   onLugares,
 }: {
   mesa: MesaApi;
+  t: Traductor;
   ocupadas: number;
   infoPorId: Map<string, InvitadoApi>;
   ocupado: boolean;
@@ -1085,13 +1084,13 @@ function EditorMesa({
             a decir el cartel de la mesa. El alias es un apodo para organizarte
             y no sale de esta pantalla. */}
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold">Mesa {mesa.numero}</div>
+          <div className="text-sm font-semibold">{t("panel.mesas.mesaNumero", { numero: mesa.numero })}</div>
           <input
             value={alias}
             onChange={(e) => setAlias(e.target.value)}
             onBlur={() => alias !== (mesa.alias ?? "") && onCambiar({ alias })}
             maxLength={40}
-            placeholder="Apodo para vos (ej: Primos)"
+            placeholder={t("panel.mesas.apodo")}
             className="w-full mt-1 bg-transparent border-b border-white/15 text-xs text-muted-foreground focus:outline-none focus:border-[var(--accent)] focus:text-foreground pb-1 placeholder:text-white/25"
           />
         </div>
@@ -1099,7 +1098,7 @@ function EditorMesa({
           type="button"
           onClick={onCerrar}
           className="shrink-0 text-muted-foreground hover:text-foreground"
-          aria-label="Cerrar"
+          aria-label={t("comun.cerrar")}
         >
           <X className="w-4 h-4" />
         </button>
@@ -1107,14 +1106,14 @@ function EditorMesa({
 
       {/* sillas */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Lugares</span>
+        <span className="text-xs text-muted-foreground">{t("panel.mesas.lugares")}</span>
         <div className="flex items-center gap-2">
           <button
             type="button"
             disabled={ocupado || mesa.sillas <= 2}
             onClick={() => onCambiar({ sillas: mesa.sillas - 1 })}
             className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-            aria-label="Quitar un lugar"
+            aria-label={t("panel.mesas.quitarLugar")}
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
@@ -1124,7 +1123,7 @@ function EditorMesa({
             disabled={ocupado || mesa.sillas >= 20}
             onClick={() => onCambiar({ sillas: mesa.sillas + 1 })}
             className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-            aria-label="Agregar un lugar"
+            aria-label={t("panel.mesas.agregarLugar")}
           >
             <Plus className="w-3.5 h-3.5" />
           </button>
@@ -1133,7 +1132,7 @@ function EditorMesa({
 
       {/* forma */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Forma</span>
+        <span className="text-xs text-muted-foreground">{t("panel.mesas.forma")}</span>
         <div className="flex rounded-full border border-white/15 p-0.5">
           {(["REDONDA", "RECTANGULAR"] as const).map((f) => (
             <button
@@ -1147,7 +1146,7 @@ function EditorMesa({
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {f === "REDONDA" ? "Redonda" : "Rectangular"}
+              {t(f === "REDONDA" ? "panel.mesas.redonda" : "panel.mesas.rectangular")}
             </button>
           ))}
         </div>
@@ -1155,16 +1154,15 @@ function EditorMesa({
 
       {excedida && (
         <p className="text-xs text-red-400">
-          Hay {ocupadas} personas para {mesa.sillas} lugares. Agrandá la mesa o pasá a
-          alguien a otra.
+          {t("panel.mesas.excedida", { personas: ocupadas, lugares: mesa.sillas })}
         </p>
       )}
 
       {/* quiénes están sentados */}
       <div>
-        <h4 className="text-xs text-muted-foreground mb-1.5">En esta mesa</h4>
+        <h4 className="text-xs text-muted-foreground mb-1.5">{t("panel.mesas.enEstaMesa")}</h4>
         {mesa.lugares.length === 0 ? (
-          <p className="text-xs text-muted-foreground/70 py-1">Todavía no hay nadie.</p>
+          <p className="text-xs text-muted-foreground/70 py-1">{t("panel.mesas.nadieEnLaMesa")}</p>
         ) : (
           <ul className="space-y-1">
             {mesa.lugares.map((l, i) => (
@@ -1181,7 +1179,7 @@ function EditorMesa({
                     aria-hidden="true"
                   />
                   <span className="min-w-0 truncate text-sm">
-                    {infoPorId.get(l.guestId)?.name ?? "Invitado"}
+                    {infoPorId.get(l.guestId)?.name ?? t("panel.mesas.invitado")}
                     {/* Estaba confirmado cuando lo sentaste y después se dio de
                         baja. Sigue ocupando sillas hasta que lo saques, y sin
                         este aviso quedarían lugares reservados para gente que
@@ -1189,7 +1187,7 @@ function EditorMesa({
                     {infoPorId.get(l.guestId) &&
                       infoPorId.get(l.guestId)!.status !== "CONFIRMED" && (
                         <span className="block text-[10px] text-amber-400 leading-tight">
-                          ya no está confirmado
+                          {t("panel.mesas.yaNoConfirmado")}
                         </span>
                       )}
                   </span>
@@ -1206,7 +1204,7 @@ function EditorMesa({
                         disabled={ocupado}
                         onClick={() => onLugares(l.guestId, l.lugares - 1)}
                         className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-                        aria-label="Un lugar menos en esta mesa"
+                        aria-label={t("panel.mesas.unLugarMenos")}
                       >
                         <Minus className="w-3 h-3" />
                       </button>
@@ -1216,7 +1214,7 @@ function EditorMesa({
                         disabled={ocupado}
                         onClick={() => onLugares(l.guestId, l.lugares + 1)}
                         className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-                        aria-label="Un lugar más en esta mesa"
+                        aria-label={t("panel.mesas.unLugarMas")}
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -1227,7 +1225,7 @@ function EditorMesa({
                     disabled={ocupado}
                     onClick={() => onLugares(l.guestId, 0)}
                     className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center text-muted-foreground hover:text-red-400 hover:border-red-400/40 disabled:opacity-40"
-                    aria-label="Sacar de esta mesa"
+                    aria-label={t("panel.mesas.sacarDeLaMesa")}
                   >
                     <RotateCcw className="w-3 h-3" />
                   </button>
@@ -1247,14 +1245,14 @@ function EditorMesa({
             onClick={onBorrar}
             className="flex-1 rounded-full bg-red-500/90 text-white text-xs font-semibold py-2 hover:bg-red-500 disabled:opacity-50"
           >
-            Sí, borrar {rotulo(mesa).titulo}
+            {t("panel.mesas.siBorrar", { mesa: rotulo(mesa, t).titulo })}
           </button>
           <button
             type="button"
             onClick={() => setConfirmaBorrar(false)}
             className="rounded-full border border-white/20 text-xs px-3 py-2 hover:bg-white/10"
           >
-            No
+            {t("comun.no")}
           </button>
         </div>
       ) : (
@@ -1264,7 +1262,7 @@ function EditorMesa({
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-red-400"
         >
           <Trash2 className="w-3.5 h-3.5" />
-          Borrar mesa
+          {t("panel.mesas.borrarMesa")}
         </button>
       )}
     </div>

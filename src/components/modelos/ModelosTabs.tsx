@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ModeloThumbnail } from "./ModeloThumbnail";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface Item {
   slug: string;
@@ -10,16 +11,16 @@ interface Item {
 
 type TabId = "personalizado" | "xv" | "boda" | "evento";
 
-const TAB_LABELS: Record<TabId, string> = {
-  xv: "XV",
-  boda: "Boda",
-  evento: "Evento",
-  personalizado: "Personalizado",
-};
-
 const TAB_ORDER: TabId[] = ["boda", "xv", "evento", "personalizado"];
 
 export function ModelosTabs({ xv, boda, evento, personalizado }: { xv: Item[]; boda: Item[]; evento: Item[]; personalizado: Item[] }) {
+  const t = useTextos();
+  const TAB_LABELS: Record<TabId, string> = {
+    xv: t("landing.modelos.tabs.xv"),
+    boda: t("landing.modelos.tabs.boda"),
+    evento: t("landing.modelos.tabs.evento"),
+    personalizado: t("landing.modelos.tabs.personalizado"),
+  };
   const byTab: Record<TabId, Item[]> = { personalizado, xv, boda, evento };
   const visibleTabs = TAB_ORDER.filter((id) => byTab[id].length > 0);
   const [active, setActive] = useState<TabId>(visibleTabs[0] ?? "xv");
@@ -43,12 +44,12 @@ export function ModelosTabs({ xv, boda, evento, personalizado }: { xv: Item[]; b
       <div className="flex justify-center items-center gap-6 sm:gap-10 mb-10 flex-wrap">
         {visibleTabs.map((id, i) => (
           <div key={id} className="flex items-center gap-6 sm:gap-10">
-            {i > 0 && <span className="h-3 w-px bg-white/15" aria-hidden="true" />}
+            {i > 0 && <span className="h-3 w-px bg-[var(--line)]" aria-hidden="true" />}
             <button
               type="button"
               onClick={() => setActive(id)}
               className={`relative pb-2 text-xs sm:text-sm font-ui uppercase tracking-[0.18em] transition-colors ${
-                active === id ? "text-[var(--accent)]" : "text-zinc-500 hover:text-zinc-300"
+                active === id ? "text-[var(--accent)]" : "text-[var(--shell-fg-soft)] hover:text-[var(--shell-fg-strong)]"
               }`}
             >
               {TAB_LABELS[id]}

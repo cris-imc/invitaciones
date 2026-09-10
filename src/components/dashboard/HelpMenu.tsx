@@ -13,14 +13,14 @@ function HelpMenuItems() {
                 href={WHATSAPP_HELP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm text-[var(--popover-foreground)]/80 hover:bg-white/5 hover:text-[var(--popover-foreground)] transition-colors"
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm text-[var(--popover-foreground)]/80 hover:bg-[var(--tinte-1)] hover:text-[var(--popover-foreground)] transition-colors"
             >
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp
             </a>
             <Link
                 href="/dashboard/faq"
-                className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm text-[var(--popover-foreground)]/80 hover:bg-white/5 hover:text-[var(--popover-foreground)] transition-colors"
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm text-[var(--popover-foreground)]/80 hover:bg-[var(--tinte-1)] hover:text-[var(--popover-foreground)] transition-colors"
             >
                 <CircleHelp className="w-4 h-4" />
                 Preguntas frecuentes

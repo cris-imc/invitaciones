@@ -7,9 +7,11 @@ import { WizardLivePreview } from "./WizardLivePreview";
 import { WizardMobilePreviewSheet } from "./WizardMobilePreviewSheet";
 import { getWizardSteps } from "./wizard-steps-config";
 import { isAdmin as isAdminRole } from "@/lib/roles";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function WizardSteps() {
     const { currentStep, data } = useWizardStore();
+    const t = useTextos();
     const { data: session } = useSession();
     const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
 
@@ -44,9 +46,9 @@ export function WizardSteps() {
                             <>
                                 <div className="wiz-step-lbl">
                                     <span style={{ color: "var(--accent)", fontWeight: 700 }}>
-                                        PASO {currentStep + 1}
+                                        {t("wizard.nav.paso", { numero: currentStep + 1 })}
                                     </span>
-                                    {" · "}{steps[currentStep].label}
+                                    {" · "}{t(steps[currentStep].clave)}
                                 </div>
                                 <div className="wiz-progress-track">
                                     <div
@@ -58,7 +60,7 @@ export function WizardSteps() {
                         )}
                         {!showProgress && (
                             <div className="wiz-step-lbl">
-                                Creá tu invitación
+                                {t("wizard.nav.creaTuInvitacion")}
                             </div>
                         )}
                     </div>

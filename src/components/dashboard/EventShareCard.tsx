@@ -8,20 +8,22 @@ import Link from "next/link";
 import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
 import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
 import { useToast } from "@/components/ui/Toast";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
-function TypewriterText() {
-  const text = "Previsualizá tu diseño o editá los detalles...";
+function TypewriterText({ texto }: { texto: string }) {
+  const text = texto;
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
     let i = 0;
+    setDisplayed("");
     const interval = setInterval(() => {
       setDisplayed(text.slice(0, i));
       i++;
       if (i > text.length) clearInterval(interval);
     }, 45); // Velocidad de escritura
     return () => clearInterval(interval);
-  }, []);
+  }, [text]);
 
   return (
     <span className="font-medium text-xs sm:text-sm text-slate-600 dark:text-slate-300">
@@ -48,6 +50,7 @@ interface EventShareCardProps {
 export function EventShareCard({ slug, eventName, invitationId, planTier }: EventShareCardProps) {
   const router = useRouter();
   const { showToast } = useToast();
+  const t = useTextos();
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
 
   const upgradeWithCredit = async (tier: "PREMIUM" | "DIAMOND") => {
@@ -58,11 +61,11 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
         body: JSON.stringify({ planTier: tier }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Error al actualizar el plan");
-      showToast(`¡Listo! Tu invitación ya es ${tier === "DIAMOND" ? "Diamond" : "Premium"}.`, "success");
+      if (!res.ok) throw new Error(data.error || t("panel.compartir.errorPlan"));
+      showToast(t(tier === "DIAMOND" ? "panel.compartir.listoDiamond" : "panel.compartir.listoPremium"), "success");
       router.refresh();
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Error al actualizar el plan", "error");
+      showToast(error instanceof Error ? error.message : t("panel.compartir.errorPlan"), "error");
     }
   };
 
@@ -77,10 +80,10 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
         body: JSON.stringify({ planTier: tier }),
       });
       const data = await res.json();
-      if (!res.ok || !data.checkoutUrl) throw new Error(data.error || "Error al iniciar el pago");
+      if (!res.ok || !data.checkoutUrl) throw new Error(data.error || t("panel.compartir.errorPago"));
       window.location.href = data.checkoutUrl;
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
+      showToast(error instanceof Error ? error.message : t("panel.compartir.errorPago"), "error");
     }
   };
 
@@ -117,7 +120,7 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
             </span>
             <div className="flex-1 truncate min-w-0">
-              <TypewriterText />
+              <TypewriterText texto={t("panel.compartir.tipeando")} />
             </div>
           </div>
 
@@ -126,7 +129,7 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
           <div className="flex flex-row items-center gap-2 shrink-0 w-full sm:w-auto">
             <Link href={`/i/${slug}`} target="_blank" className="flex-1 sm:flex-none sm:w-auto inline-flex items-center justify-center h-9 px-4 gap-2 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700">
                 <Eye className="w-3.5 h-3.5" />
-                <span>Ver ejemplo</span>
+                <span>{t("panel.compartir.verEjemplo")}</span>
             </Link>
 
             {invitationId && (
@@ -134,13 +137,13 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
                 <Link href={`/dashboard/invitaciones/editar/${invitationId}`} className="flex-1 sm:flex-none sm:w-auto">
                   <Button size="sm" className="w-full h-9 px-5 rounded-full gap-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm border-0">
                     <Pencil className="w-3.5 h-3.5" />
-                    Editar invitación
+                    {t("panel.compartir.editarInvitacion")}
                   </Button>
                 </Link>
                 {MOSTRAR_CAMBIAR_PLANTILLA && (
                   <Link href={`/dashboard/invitaciones/editar/${invitationId}?step=design`} className="w-full sm:w-auto">
                     <Button size="sm" className="w-full h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm btn-color-cycle">
-                      Cambiar Plantilla
+                      {t("panel.compartir.cambiarPlantilla")}
                     </Button>
                   </Link>
                 )}
@@ -158,8 +161,8 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
           <div className="flex items-start gap-2.5 min-w-0">
             <Sparkles className="w-4.5 h-4.5 text-yellow-500 shrink-0 mt-0.5" />
             <div className="min-w-0">
-              <p className="text-sm font-semibold">Esta invitación está en plan Gratis</p>
-              <p className="text-xs text-muted-foreground">Convertila a Premium o Diamond para sumar música, trivia, gestión de pagos y el Modo LIVE.</p>
+              <p className="text-sm font-semibold">{t("panel.compartir.esGratis")}</p>
+              <p className="text-xs text-muted-foreground">{t("panel.compartir.esGratisDetalle")}</p>
             </div>
           </div>
           <Button
@@ -167,7 +170,7 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
             onClick={() => setShowUpgradeDialog(true)}
             className="w-full sm:w-auto shrink-0 h-9 px-4 rounded-full gap-2 text-xs font-bold shadow-sm bg-gradient-to-r from-yellow-500 to-[#67e8f9] hover:opacity-90 text-black border-0"
           >
-            Habilitar Premium/Diamond
+            {t("panel.compartir.habilitar")}
           </Button>
         </div>
       )}
@@ -177,8 +180,8 @@ export function EventShareCard({ slug, eventName, invitationId, planTier }: Even
         onOpenChange={setShowUpgradeDialog}
         onUseCredit={upgradeWithCredit}
         onPayMercadoPago={payMercadoPagoForUpgrade}
-        title="Habilitar funciones Premium/Diamond"
-        description="Convertí esta invitación de Gratis a Premium o Diamond sin perder nada de lo que ya cargaste."
+        title={t("panel.compartir.habilitarTitulo")}
+        description={t("panel.compartir.habilitarDetalle")}
       />
     </div>
   );

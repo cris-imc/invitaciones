@@ -157,12 +157,12 @@ export function GuestPageTabs({
       <div className="adm-tabs-container mt-5 md:mt-6">
         {canScrollLeft && (
           <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[var(--ink)] to-transparent pointer-events-none z-10 flex items-center justify-start pl-2">
-            <span className="text-white/40 font-ui text-lg tracking-[-2px] animate-pulse" style={{ animationDuration: '2.5s' }}>‹‹</span>
+            <span className="text-[var(--shell-fg-faint)] font-ui text-lg tracking-[-2px] animate-pulse" style={{ animationDuration: '2.5s' }}>‹‹</span>
           </div>
         )}
         {canScrollRight && (
           <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[var(--ink)] to-transparent pointer-events-none z-10 flex items-center justify-end pr-2">
-            <span className="text-white/40 font-ui text-lg tracking-[-2px] animate-pulse" style={{ animationDuration: '2.5s' }}>››</span>
+            <span className="text-[var(--shell-fg-faint)] font-ui text-lg tracking-[-2px] animate-pulse" style={{ animationDuration: '2.5s' }}>››</span>
           </div>
         )}
         <div 
@@ -336,7 +336,7 @@ export function GuestPageTabs({
             />
           )}
           {tab === "live" && (
-            <div className="bg-card border border-white/10 rounded-lg p-4 md:p-6">
+            <div className="bg-card border border-[var(--line)] rounded-lg p-4 md:p-6">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                 LIVE
                 <Camera className="w-5 h-5 text-muted-foreground" strokeWidth={1.75} />

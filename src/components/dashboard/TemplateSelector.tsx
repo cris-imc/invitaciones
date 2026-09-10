@@ -111,7 +111,7 @@ export function TemplateSelector({ value, onChange, eventType }: TemplateSelecto
                             </div>
 
                             {/* Render only active tab content */}
-                            <div className="flex-1 overflow-y-auto p-6 mt-0 bg-gradient-to-b from-slate-50 to-white">
+                            <div className="flex-1 overflow-y-auto p-6 mt-0 bg-gradient-to-b from-[var(--tinte-1)] to-[var(--background)]">
                                 {filteredTemplates.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
                                         {filteredTemplates.map((template) => (
@@ -119,8 +119,8 @@ export function TemplateSelector({ value, onChange, eventType }: TemplateSelecto
                                                 key={template.id}
                                                 onClick={() => handleSelect(template.id)}
                                                 className={cn(
-                                                    "group relative flex flex-col text-left rounded-xl border-2 transition-all overflow-hidden bg-white hover:border-primary/50 hover:shadow-xl hover:-translate-y-1",
-                                                    value === template.id ? "border-primary shadow-lg ring-4 ring-primary/20 scale-[1.02]" : "border-slate-200 shadow-sm"
+                                                    "group relative flex flex-col text-left rounded-xl border-2 transition-all overflow-hidden bg-[var(--card)] hover:border-primary/50 hover:shadow-xl hover:-translate-y-1",
+                                                    value === template.id ? "border-primary shadow-lg ring-4 ring-primary/20 scale-[1.02]" : "border-[var(--line)] shadow-sm"
                                                 )}
                                             >
                                                 {/* Color Pattern Preview */}
@@ -192,8 +192,8 @@ export function TemplateSelector({ value, onChange, eventType }: TemplateSelecto
             </div>
 
             {/* Active Selection Preview Card */}
-            <div className="flex items-center gap-4 p-4 border rounded-xl bg-slate-50/50">
-                <div className="h-16 w-16 rounded-lg flex items-center justify-center bg-white border shadow-sm text-3xl shrink-0">
+            <div className="flex items-center gap-4 p-4 border border-[var(--line)] rounded-xl bg-[var(--tinte-1)]">
+                <div className="h-16 w-16 rounded-lg flex items-center justify-center bg-[var(--card)] border border-[var(--line)] shadow-sm text-3xl shrink-0">
                     {selectedTemplate.icon}
                 </div>
                 <div className="flex-1 min-w-0">

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useFormState } from "react-hook-form";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 function FormTracker({ form, onDirtyChange }: { form: any, onDirtyChange: (d: boolean) => void }) {
     const { isDirty } = useFormState({ control: form.control });
@@ -18,6 +19,7 @@ function FormTracker({ form, onDirtyChange }: { form: any, onDirtyChange: (d: bo
 
 export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating, disableSave }: { form?: any, onNext?: () => void, isLastStep?: boolean, onCreate?: () => void, isCreating?: boolean, disableSave?: boolean }) {
     const { prevStep, nextStep, currentStep, setDirty, setData, data } = useWizardStore();
+    const t = useTextos();
     const router = useRouter();
     const [showWarning, setShowWarning] = useState(false);
     const { saveChanges, isSaving, isEditing } = useSaveStep(form);
@@ -71,19 +73,17 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
             <Dialog open={showWarning} onOpenChange={setShowWarning}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{isEditing ? "Cambios sin guardar" : "¿Salir sin terminar?"}</DialogTitle>
+                        <DialogTitle>{isEditing ? t("wizard.nav.avisoCambiosTitulo") : t("wizard.nav.avisoSalirTitulo")}</DialogTitle>
                         <DialogDescription>
-                            {isEditing
-                                ? "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que querés salir sin aplicar los cambios?"
-                                : "Todavía no creaste la invitación. Si salís ahora vas a perder todo lo que cargaste hasta acá."}
+                            {isEditing ? t("wizard.nav.avisoCambiosTexto") : t("wizard.nav.avisoSalirTexto")}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowWarning(false)}>
-                            Cancelar
+                            {t("comun.cancelar")}
                         </Button>
                         <Button variant="destructive" onClick={proceedBack}>
-                            {isEditing ? "Salir sin guardar" : "Salir y perder los cambios"}
+                            {isEditing ? t("wizard.nav.salirSinGuardar") : t("wizard.nav.salirYPerder")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -100,7 +100,7 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                                 className="w-full border-orange-500/50 text-orange-500 hover:bg-orange-500/10 gap-2 font-medium"
                             >
                                 <LogOut className="w-4 h-4" />
-                                Salir
+                                {t("wizard.nav.salir")}
                             </Button>
                         </Link>
                         <Link href={`/i/${useWizardStore.getState().data.slug}`} target="_blank" className="flex-1 sm:flex-none">
@@ -110,7 +110,7 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                                 className="w-full border-amber-500/50 text-amber-500 hover:bg-amber-500/10 gap-2 font-medium"
                             >
                                 <Eye className="w-4 h-4" />
-                                Ver cambios
+                                {t("wizard.nav.verCambios")}
                             </Button>
                         </Link>
                     </div>
@@ -124,7 +124,7 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                         onClick={handleBackClick} 
                         className="shrink-0"
                     >
-                        Atrás
+                        {t("wizard.nav.atras")}
                     </Button>
                 
                     <div className="flex justify-end gap-2 sm:gap-3 w-full">
@@ -132,17 +132,17 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                             <Button 
                                 type="button" 
                                 variant={isDirty ? "default" : "secondary"}
-                                className={isDirty ? "bg-amber-500 hover:bg-amber-600 text-black font-semibold flex-1 sm:flex-none" : "flex-1 sm:flex-none"}
+                                className={isDirty ? "bg-amber-500 hover:bg-amber-600 text-black font-semibold flex-1 sm:flex-none" : "flex-1 sm:flex-none disabled:opacity-100 disabled:text-[var(--shell-fg-soft)]"}
                                 onClick={handleSaveClick}
                                 disabled={isSaving || !isDirty || disableSave}
                             >
                             {isSaving ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Guardando...
+                                    {t("comun.guardando")}
                                 </>
                             ) : (
-                                'Aplicar cambios'
+                                t("wizard.nav.aplicarCambios")
                             )}
                             </Button>
                         )}
@@ -157,10 +157,10 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                                     {isCreating ? (
                                         <>
                                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                            Creando...
+                                            {t("wizard.nav.creando")}
                                         </>
                                     ) : (
-                                        'Crear Invitación'
+                                        t("wizard.nav.crearInvitacion")
                                     )}
                                 </Button>
                             )
@@ -170,8 +170,8 @@ export function SaveStepButtons({ form, onNext, isLastStep, onCreate, isCreating
                                 className={isEditing ? "flex-1 sm:flex-none" : undefined}
                                 onClick={onNext ? onNext : (!form ? nextStep : undefined)}
                             >
-                                <span className="sm:hidden">Siguiente</span>
-                                <span className="hidden sm:inline">Siguiente Paso</span>
+                                <span className="sm:hidden">{t("comun.siguiente")}</span>
+                                <span className="hidden sm:inline">{t("wizard.nav.siguientePaso")}</span>
                             </Button>
                         )}
                     </div>

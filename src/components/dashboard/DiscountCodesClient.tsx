@@ -92,10 +92,10 @@ export function DiscountCodesClient({ codes }: { codes: DiscountCodeRow[] }) {
                 </Button>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto rounded-xl border border-[var(--line)]">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="text-left text-white/50 border-b border-white/10">
+                        <tr className="text-left text-[var(--shell-fg-soft)] border-b border-[var(--line)]">
                             <th className="py-2.5 px-4 font-medium">Código</th>
                             <th className="py-2.5 px-4 font-medium">Descuento</th>
                             <th className="py-2.5 px-4 font-medium">Usos</th>
@@ -107,13 +107,13 @@ export function DiscountCodesClient({ codes }: { codes: DiscountCodeRow[] }) {
                     <tbody>
                         {rows.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="py-6 px-4 text-center text-white/40">
+                                <td colSpan={6} className="py-6 px-4 text-center text-[var(--shell-fg-faint)]">
                                     Todavía no creaste ningún código.
                                 </td>
                             </tr>
                         )}
                         {rows.map((row) => (
-                            <tr key={row.id} className="border-b border-white/5 last:border-0">
+                            <tr key={row.id} className="border-b border-[var(--line-soft)] last:border-0">
                                 <td className="py-2.5 px-4 font-mono">{row.code}</td>
                                 <td className="py-2.5 px-4">{row.percentage}% OFF</td>
                                 <td className="py-2.5 px-4">{row.usedCount}</td>
@@ -121,7 +121,7 @@ export function DiscountCodesClient({ codes }: { codes: DiscountCodeRow[] }) {
                                     {new Date(row.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" })}
                                 </td>
                                 <td className="py-2.5 px-4">
-                                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.enabled ? "bg-green-500/15 text-green-400" : "bg-white/10 text-white/40"}`}>
+                                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.enabled ? "bg-green-500/15 text-green-400" : "bg-[var(--tinte-2)] text-[var(--shell-fg-soft)]"}`}>
                                         {row.enabled ? "Habilitado" : "Deshabilitado"}
                                     </span>
                                 </td>
@@ -131,7 +131,7 @@ export function DiscountCodesClient({ codes }: { codes: DiscountCodeRow[] }) {
                                         size="sm"
                                         disabled={togglingId === row.id}
                                         onClick={() => handleToggle(row)}
-                                        className="text-white/70 hover:text-white"
+                                        className="text-[var(--shell-fg-mid)] hover:text-[var(--foreground)]"
                                     >
                                         {togglingId === row.id ? <Loader2 className="w-4 h-4 animate-spin" /> : row.enabled ? "Deshabilitar" : "Habilitar"}
                                     </Button>
@@ -143,41 +143,41 @@ export function DiscountCodesClient({ codes }: { codes: DiscountCodeRow[] }) {
             </div>
 
             <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
-                <DialogContent className="bg-black/90 border-white/10 text-white">
+                <DialogContent className="bg-[var(--card)] border-[var(--line)] text-[var(--foreground)]">
                     <DialogHeader>
                         <DialogTitle>Crear código de descuento</DialogTitle>
-                        <DialogDescription className="text-white/50">
+                        <DialogDescription className="text-[var(--shell-fg-soft)]">
                             El % se aplica extra sobre el precio de Premium/Diamond que el cliente ya vería.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70">Código</label>
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)]">Código</label>
                             <Input
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 uppercase"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)] uppercase"
                                 placeholder="Ej: PROMO30"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-medium text-white/70">Porcentaje de descuento</label>
+                            <label className="text-xs font-medium text-[var(--shell-fg-mid)]">Porcentaje de descuento</label>
                             <Input
                                 type="number"
                                 min={1}
                                 max={100}
                                 value={percentage}
                                 onChange={(e) => setPercentage(e.target.value)}
-                                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                                className="bg-[var(--tinte-1)] border-[var(--line)] text-[var(--foreground)] placeholder:text-[var(--shell-fg-faint)]"
                                 placeholder="Ej: 30"
                             />
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setOpen(false)} className="text-white/70">
+                        <Button variant="ghost" onClick={() => setOpen(false)} className="text-[var(--shell-fg-mid)]">
                             Cancelar
                         </Button>
                         <Button

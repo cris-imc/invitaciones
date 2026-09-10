@@ -2,23 +2,25 @@
 
 import { useWizardStore } from "@/store/wizard-store";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { ClaveTexto, Traductor } from "@/lib/i18n/texto";
 
-const COUNTDOWN_STYLE_OPTIONS: { id: string; label: string; description: string }[] = [
-    { id: "clasico", label: "Clásico", description: "Bloques con número grande" },
-    { id: "minimalista", label: "Minimalista", description: "Solo los días, en una línea" },
-    { id: "capsulas", label: "Cápsulas", description: "Dígitos en píldoras de color" },
-    { id: "flip", label: "Flip / Separado", description: "Tarjetas con separador ':'" },
+const COUNTDOWN_STYLE_OPTIONS: { id: string; label: ClaveTexto; description: ClaveTexto }[] = [
+    { id: "clasico", label: "wizard.countdown.clasico", description: "wizard.countdown.clasicoDetalle" },
+    { id: "minimalista", label: "wizard.countdown.minimalista", description: "wizard.countdown.minimalistaDetalle" },
+    { id: "capsulas", label: "wizard.countdown.capsulas", description: "wizard.countdown.capsulasDetalle" },
+    { id: "flip", label: "wizard.countdown.flip", description: "wizard.countdown.flipDetalle" },
 ];
 
 // Preview chico y autocontenido de cada estilo, con valores fijos (o
 // derivados de la fecha real si ya está cargada) — no reusa el componente
 // público Countdown.tsx para no arrastrar su timer/CSS de sección completa
 // dentro de una tarjeta angosta del wizard.
-function MiniPreview({ styleId, days }: { styleId: string; days: number }) {
+function MiniPreview({ styleId, days, t }: { styleId: string; days: number; t: Traductor }) {
     const boxes = [
-        { label: "Días", value: String(days) },
-        { label: "Hs", value: "08" },
-        { label: "Min", value: "24" },
+        { label: t("wizard.countdown.dias"), value: String(days) },
+        { label: t("wizard.countdown.horas"), value: "08" },
+        { label: t("wizard.countdown.minutos"), value: "24" },
     ];
 
     if (styleId === "minimalista") {
@@ -26,7 +28,7 @@ function MiniPreview({ styleId, days }: { styleId: string; days: number }) {
             <div style={{ textAlign: "center" }}>
                 <p style={{ fontFamily: "var(--font-cormorant), serif", fontSize: 28, color: "var(--paper)", lineHeight: 1 }}>{days}</p>
                 <p style={{ fontFamily: "var(--font-mono)", fontSize: 8, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 4 }}>
-                    días restantes
+                    {t("wizard.countdown.diasRestantes")}
                 </p>
             </div>
         );
@@ -74,6 +76,7 @@ function MiniPreview({ styleId, days }: { styleId: string; days: number }) {
 
 export function StepCountdownStyle() {
     const { data, setData } = useWizardStore();
+    const t = useTextos();
     const selected = data.countdownStyle || "clasico";
 
     const days = data.fecha
@@ -87,16 +90,16 @@ export function StepCountdownStyle() {
                     className="text-[10px] uppercase tracking-[0.1em] font-bold mb-2"
                     style={{ color: "var(--accent)", fontFamily: "var(--font-mono)" }}
                 >
-                    Countdown
+                    {t("wizard.countdown.etiqueta")}
                 </p>
                 <h2
                     className="text-2xl font-bold mb-1"
                     style={{ fontFamily: "var(--font-display)", color: "var(--paper)" }}
                 >
-                    Elegí el estilo de la cuenta regresiva
+                    {t("wizard.countdown.titulo")}
                 </h2>
-                <p style={{ fontSize: "12.5px", color: "rgba(246,243,236,.5)", lineHeight: 1.5 }}>
-                    Así se va a ver el countdown en tu invitación pública.
+                <p style={{ fontSize: "12.5px", color: "var(--shell-fg-soft)", lineHeight: 1.5 }}>
+                    {t("wizard.countdown.subtitulo")}
                 </p>
             </div>
 
@@ -120,7 +123,7 @@ export function StepCountdownStyle() {
                                 padding: "16px 10px",
                                 cursor: "pointer",
                                 textAlign: "center",
-                                background: isActive ? "rgba(199,154,75,.08)" : "rgba(246,243,236,.03)",
+                                background: isActive ? "rgba(199,154,75,.08)" : "var(--tinte-1)",
                                 transition: "all 0.15s",
                                 position: "relative",
                             }}
@@ -147,27 +150,27 @@ export function StepCountdownStyle() {
                                 </span>
                             )}
                             <div style={{ marginBottom: 10 }}>
-                                <MiniPreview styleId={option.id} days={days} />
+                                <MiniPreview styleId={option.id} days={days} t={t} />
                             </div>
                             <p
                                 style={{
                                     fontFamily: "var(--font-mono)",
                                     fontSize: "9px",
-                                    color: "rgba(246,243,236,.35)",
+                                    color: "var(--shell-fg-faint)",
                                     letterSpacing: "0.05em",
                                 }}
                             >
-                                {option.label}
+                                {t(option.label)}
                             </p>
                             <p
                                 style={{
                                     fontFamily: "var(--font-mono)",
                                     fontSize: "8px",
-                                    color: "rgba(246,243,236,.22)",
+                                    color: "var(--shell-fg-faint)",
                                     marginTop: "2px",
                                 }}
                             >
-                                {option.description}
+                                {t(option.description)}
                             </p>
                         </button>
                     );

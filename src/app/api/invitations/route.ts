@@ -7,6 +7,7 @@ import { checkAndCleanupIfExpired, isEventDateLocked } from '@/lib/expiration-se
 import { slugify } from '@/lib/slugify';
 import { resolveGoogleMapsShortLink } from '@/lib/google-maps';
 import { isAdmin as isAdminRole } from '@/lib/roles';
+import { esCodigoPais } from '@/lib/paises';
 
 // GET - Obtener invitaciones del usuario o invitación pública por slug
 export async function GET(request: NextRequest) {
@@ -126,6 +127,22 @@ export async function POST(request: NextRequest) {
         if (body.mapUrl) {
             body.mapUrl = await resolveGoogleMapsShortLink(body.mapUrl);
         }
+
+        // El país viaja de la cuenta a la invitación, no al revés: es el del
+        // anfitrión, y de él dependen la moneda y los datos bancarios que le
+        // pide el wizard. Queda copiado en la invitación (no leído del usuario
+        // cada vez) para que cambiar el país del perfil más adelante no le
+        // cambie los datos bancarios a una invitación ya publicada.
+        const usuario = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { pais: true },
+        });
+        const paisDelPerfil = usuario?.pais;
+        // body.pais sólo pisa al del perfil si es un país que manejamos: el
+        // wizard público lo manda cuando el anfitrión lo eligió ahí mismo.
+        const paisInvitacion = esCodigoPais(body.pais)
+            ? body.pais
+            : (esCodigoPais(paisDelPerfil) ? paisDelPerfil : 'AR');
 
         let invitationPlanTier = 'FREE';
         const hasUnlimitedPremium = planTier === 'PREMIUM' || planTier === 'DIAMOND' || planTier === 'ENTERPRISE' || planTier === 'ADMIN';
@@ -264,6 +281,7 @@ export async function POST(request: NextRequest) {
                 return tx.invitation.create({
             data: {
                 userId,
+                pais: paisInvitacion,
                 planTier: invitationPlanTier, // Asignar el plan correspondiente
                 premiumCreditSpent: willSpendCredit,
                 diamondCreditSpent: willSpendDiamondCredit,
@@ -369,6 +387,7 @@ export async function POST(request: NextRequest) {
                 regaloMostrarDatos: body.regaloMostrarDatos,
                 regaloCbu: body.regaloCbu,
                 regaloAlias: body.regaloAlias,
+                regaloDatosBancarios: body.regaloDatosBancarios,
                 regaloBanco: body.regaloBanco,
                 regaloTitular: body.regaloTitular,
                 regaloMonto: body.regaloMonto ? parseFloat(body.regaloMonto) : null,
@@ -380,6 +399,7 @@ export async function POST(request: NextRequest) {
                 pagoTarjetaMostrarDatos: body.pagoTarjetaMostrarDatos,
                 pagoTarjetaCbu: body.pagoTarjetaCbu,
                 pagoTarjetaAlias: body.pagoTarjetaAlias,
+                pagoTarjetaDatosBancarios: body.pagoTarjetaDatosBancarios,
                 pagoTarjetaBanco: body.pagoTarjetaBanco,
                 pagoTarjetaTitular: body.pagoTarjetaTitular,
                 pagoTarjetaMonto: body.pagoTarjetaMonto ? parseFloat(body.pagoTarjetaMonto) : null,
@@ -624,6 +644,7 @@ export async function PUT(request: NextRequest) {
                 regaloMostrarDatos: body.regaloMostrarDatos,
                 regaloCbu: body.regaloCbu,
                 regaloAlias: body.regaloAlias,
+                regaloDatosBancarios: body.regaloDatosBancarios,
                 regaloBanco: body.regaloBanco,
                 regaloTitular: body.regaloTitular,
                 regaloMonto: newRegaloMonto,
@@ -635,6 +656,7 @@ export async function PUT(request: NextRequest) {
                 pagoTarjetaMostrarDatos: body.pagoTarjetaMostrarDatos,
                 pagoTarjetaCbu: body.pagoTarjetaCbu,
                 pagoTarjetaAlias: body.pagoTarjetaAlias,
+                pagoTarjetaDatosBancarios: body.pagoTarjetaDatosBancarios,
                 pagoTarjetaBanco: body.pagoTarjetaBanco,
                 pagoTarjetaTitular: body.pagoTarjetaTitular,
                 pagoTarjetaMonto: body.pagoTarjetaMonto !== undefined ? (body.pagoTarjetaMonto ? parseFloat(body.pagoTarjetaMonto) : null) : undefined,

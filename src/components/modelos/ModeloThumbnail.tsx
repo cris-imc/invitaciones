@@ -28,7 +28,7 @@ export function ModeloThumbnail({ slug, label }: ModeloThumbnailProps) {
       href={`/preview/${slug}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-black"
+      className="group block rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-[var(--card)]"
       style={{ width: BOX_WIDTH }}
     >
       <div className="relative overflow-hidden bg-neutral-900" style={{ width: BOX_WIDTH, height: BOX_HEIGHT }}>
@@ -52,8 +52,8 @@ export function ModeloThumbnail({ slug, label }: ModeloThumbnailProps) {
         />
         <div className="absolute inset-0 ring-1 ring-inset ring-white/10 group-hover:ring-white/25 transition-all" />
       </div>
-      <div className="px-3 py-2.5 bg-[#15131B] text-center">
-        <span className="text-[11px] sm:text-xs font-medium tracking-wide text-[#F6F3EC]">
+      <div className="px-3 py-2.5 bg-[var(--card)] text-center">
+        <span className="text-[11px] sm:text-xs font-medium tracking-wide text-[var(--foreground)]">
           {label}
         </span>
       </div>

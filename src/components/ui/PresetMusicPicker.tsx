@@ -63,7 +63,7 @@ export function PresetMusicPicker({ selectedUrl, onSelect }: PresetMusicPickerPr
                                 "group flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1.5 border cursor-pointer transition-colors",
                                 isSelected
                                     ? "border-primary bg-primary/15"
-                                    : "border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-800/60"
+                                    : "border-[var(--line)] bg-[var(--tinte-1)] hover:border-[var(--campo-borde)] hover:bg-[var(--tinte-2)]"
                             )}
                         >
                             <button
@@ -75,18 +75,18 @@ export function PresetMusicPicker({ selectedUrl, onSelect }: PresetMusicPickerPr
                                 className={cn(
                                     "shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors",
                                     isPreviewing
-                                        ? "bg-primary text-white"
-                                        : "bg-slate-800 text-slate-300 group-hover:text-primary"
+                                        ? "bg-primary text-[var(--accent-foreground)]"
+                                        : "bg-[var(--tinte-3)] text-[var(--shell-fg-mid)] group-hover:text-primary"
                                 )}
                             >
                                 {isPreviewing ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
                             </button>
 
                             <div className="min-w-0 flex-1">
-                                <p className={cn("text-xs font-medium truncate", isSelected ? "text-white" : "text-slate-200")}>
+                                <p className={cn("text-xs font-medium truncate", isSelected ? "text-[var(--foreground)]" : "text-[var(--shell-fg-strong)]")}>
                                     {song.title}
                                 </p>
-                                <p className="text-[10px] text-slate-500 truncate">{song.artist}</p>
+                                <p className="text-[10px] text-[var(--shell-fg-faint)] truncate">{song.artist}</p>
                             </div>
 
                             {isSelected && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}

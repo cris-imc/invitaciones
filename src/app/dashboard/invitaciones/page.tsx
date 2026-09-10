@@ -9,6 +9,8 @@ import { getStripClass, getEventEmoji, getEventLabel } from "@/lib/invitation-ca
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
+import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 
 async function getInvitations() {
     const session = await auth().catch(() => null);
@@ -60,6 +62,7 @@ async function getInvitations() {
 
 export default async function InvitacionesPage() {
     const { invitations, dbUser, hasFreeInvitation } = await getInvitations();
+    const t = await textosDelAnfitrion();
     const hasUnlimitedPremium =
         dbUser?.planTier === 'PREMIUM' || dbUser?.planTier === 'DIAMOND' || dbUser?.planTier === 'ADMIN' || dbUser?.planTier === 'ENTERPRISE';
 
@@ -67,17 +70,20 @@ export default async function InvitacionesPage() {
         <>
             <div className="p-topbar">
                 <div>
-                    <h2>Invitaciones Inactivas</h2>
+                    <h2>{t("panel.inactivas.titulo")}</h2>
                     <p>
-                        Invitaciones en borrador, finalizadas, o que ya vencieron (3 meses después del evento).
+                        {t("panel.inactivas.detalle")}
                         {dbUser && hasUnlimitedPremium && (
                             <span className="text-yellow-500 font-semibold ml-2 block sm:inline mt-2 sm:mt-0">
-                                Invitaciones Premium: ilimitadas por tu plan.
+                                {t("panel.creditos.ilimitadas")}
                             </span>
                         )}
                     </p>
                 </div>
-                <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} diamondCredits={dbUser?.diamondCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} hasFreeInvitation={hasFreeInvitation} />
+                <div className="p-topbar-acciones">
+                    <PreferenciasUsuario />
+                    <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} diamondCredits={dbUser?.diamondCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} hasFreeInvitation={hasFreeInvitation} />
+                </div>
             </div>
 
             {/* Créditos remanentes */}
@@ -85,12 +91,12 @@ export default async function InvitacionesPage() {
                 <div className="flex flex-wrap gap-2 mb-4" style={{ fontFamily: "var(--font-mono)" }}>
                     {(dbUser.premiumCredits || 0) > 0 && (
                         <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-                            {dbUser.premiumCredits} crédito{dbUser.premiumCredits === 1 ? "" : "s"} Premium disponible{dbUser.premiumCredits === 1 ? "" : "s"}
+                            {t(dbUser.premiumCredits === 1 ? "panel.creditos.premiumUno" : "panel.creditos.premiumVarios", { cantidad: dbUser.premiumCredits })}
                         </span>
                     )}
                     {(dbUser.diamondCredits || 0) > 0 && (
                         <span className="text-[11px] uppercase tracking-wide px-2.5 py-1 rounded-full bg-[#67e8f9]/10 text-[#67e8f9] border border-[#67e8f9]/20">
-                            {dbUser.diamondCredits} crédito{dbUser.diamondCredits === 1 ? "" : "s"} Diamond disponible{dbUser.diamondCredits === 1 ? "" : "s"}
+                            {t(dbUser.diamondCredits === 1 ? "panel.creditos.diamondUno" : "panel.creditos.diamondVarios", { cantidad: dbUser.diamondCredits })}
                         </span>
                     )}
                 </div>
@@ -107,7 +113,7 @@ export default async function InvitacionesPage() {
                         // cuando el evento ya venció por fecha (ver filtro arriba) --
                         // nunca debe mostrar "Activa" acá, sino "Finalizada".
                         const statusLabel =
-                            inv.estado === "BORRADOR" ? "Borrador" : "Finalizada";
+                            inv.estado === "BORRADOR" ? t("panel.inactivas.borrador") : t("panel.inactivas.finalizada");
 
                         return (
                             <div className="m-inv-card" key={inv.id}>
@@ -125,7 +131,7 @@ export default async function InvitacionesPage() {
                                     <div className="m-card-meta">
                                         <span className="m-meta-row">
                                             📅{" "}
-                                            {new Date(inv.fechaEvento).toLocaleDateString("es-AR", {
+                                            {new Date(inv.fechaEvento).toLocaleDateString(t("panel.localeFecha"), {
                                                 day: "2-digit",
                                                 month: "long",
                                                 year: "numeric",
@@ -142,7 +148,7 @@ export default async function InvitacionesPage() {
                                     <div className="m-card-confirmed">
                                         <div className="m-card-confirmed-dot" />
                                         <span>
-                                            {inv._count.guests} / {maxGuestsStr} confirmadas
+                                            {t("panel.inactivas.confirmadas", { confirmadas: inv._count.guests, tope: maxGuestsStr })}
                                         </span>
                                     </div>
 
@@ -160,7 +166,7 @@ export default async function InvitacionesPage() {
                                             }`}
                                         >
                                             {inv.planTier === "FREE"
-                                                ? "Gratis"
+                                                ? t("panel.inactivas.planGratis")
                                                 : inv.planTier === "DIAMOND"
                                                 ? "◆ Diamond"
                                                 : inv.planTier === "ENTERPRISE"
@@ -177,21 +183,21 @@ export default async function InvitacionesPage() {
                                                 className="m-btn-ghost flex-1 h-9"
                                             >
                                                 <Eye className="w-3.5 h-3.5" />
-                                                Ver
+                                                {t("comun.ver")}
                                             </Link>
                                             <Link
                                                 href={`/dashboard/invitaciones/editar/${inv.id}`}
                                                 className="m-btn-ghost flex-1 h-9"
                                             >
                                                 <Pencil className="w-3.5 h-3.5" />
-                                                Editar
+                                                {t("comun.editar")}
                                             </Link>
                                         </div>
                                         <Link
                                             href={`/dashboard/invitaciones/${inv.slug}/guests`}
                                             className="bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_15px_rgba(245,158,11,0.3)] inline-flex items-center justify-center h-[40px] px-4 text-xs font-semibold rounded-lg transition-colors w-full mt-2"
                                         >
-                                            Administrar →
+                                            {t("panel.inactivas.administrar")}
                                         </Link>
                                         <div className="flex items-center justify-center w-full mt-2">
                                             <DeleteInvitationButton invitationId={inv.id} />
@@ -203,7 +209,7 @@ export default async function InvitacionesPage() {
                     })
                 ) : (
                     <div className="stat text-center p-10 flex flex-col items-center justify-center border-dashed col-span-full">
-                        <p className="text-muted-foreground font-ui">No tenés invitaciones inactivas. Las vas a encontrar acá cuando queden en borrador, finalicen, o venzan 3 meses después del evento.</p>
+                        <p className="text-muted-foreground font-ui">{t("panel.inactivas.vacio")}</p>
                     </div>
                 )}
             </div>

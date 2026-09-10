@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/Toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus, Info, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 const ICON_OPTIONS = [
     { value: "Heart", label: "Corazón", Icon: Heart },
@@ -28,6 +29,7 @@ interface CronogramaEvent {
 
 export function StepCronograma() {
     const { data, setData, nextStep } = useWizardStore();
+    const t = useTextos();
     const { showToast } = useToast();
     const [showInfo, setShowInfo] = useState(false);
     const [attemptedNext, setAttemptedNext] = useState(false);
@@ -74,7 +76,7 @@ export function StepCronograma() {
     const handleNext = () => {
         if (incompleteIndexes.length > 0) {
             setAttemptedNext(true);
-            showToast("Completá la hora y el título de todas las etapas del cronograma antes de continuar.", "error");
+            showToast(t("wizard.cronograma.faltanDatos"), "error");
             return;
         }
 
@@ -114,11 +116,11 @@ export function StepCronograma() {
         <div className="space-y-6">
             <div className="text-center space-y-1">
                 <h2 className="text-2xl font-bold">
-                    Cronograma del Evento
-                    <span className="text-base font-normal text-muted-foreground ml-2">(Opcional)</span>
+                    {t("wizard.cronograma.titulo")}
+                    <span className="text-base font-normal text-muted-foreground ml-2">{t("wizard.cronograma.opcional")}</span>
                 </h2>
                 <p className="text-muted-foreground text-sm">
-                    Definí los momentos principales de tu celebración
+                    {t("wizard.cronograma.subtitulo")}
                 </p>
             </div>
 
@@ -131,7 +133,7 @@ export function StepCronograma() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Cómo funciona el Cronograma?</span>
+                        <span>{t("wizard.cronograma.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -140,7 +142,7 @@ export function StepCronograma() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        El cronograma organiza y comunica las distintas etapas de tu fiesta (ej: Recepción, Cena, Brindis, Baile). Podés personalizar los horarios, editar los títulos e iconos de cada momento, agregar nuevas etapas o eliminar las que no necesites.
+                        {t("wizard.cronograma.infoTexto")}
                     </div>
                 )}
             </div>
@@ -149,10 +151,10 @@ export function StepCronograma() {
                 {events.map((event, index) => {
                     const isIncomplete = attemptedNext && (!event.time.trim() || !event.title.trim());
                     return (
-                    <div key={index} className={`p-4 border rounded-xl space-y-3 bg-[var(--ink-2)] shadow-sm ${isIncomplete ? 'border-red-500/60' : 'border-white/10'}`}>
+                    <div key={index} className={`p-4 border rounded-xl space-y-3 bg-[var(--ink-2)] shadow-sm ${isIncomplete ? 'border-red-500/60' : 'border-[var(--line)]'}`}>
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-                                Etapa #{index + 1}
+                                {t("wizard.cronograma.etapa", { numero: index + 1 })}
                             </span>
                             <Button
                                 type="button"
@@ -162,13 +164,13 @@ export function StepCronograma() {
                                 className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 px-2"
                             >
                                 <Trash2 className="w-4 h-4 mr-1" />
-                                <span className="text-xs">Eliminar</span>
+                                <span className="text-xs">{t("comun.eliminar")}</span>
                             </Button>
                         </div>
 
                         <div className="grid md:grid-cols-[1fr_3fr] gap-3">
                             <div className="space-y-1">
-                                <Label className="text-xs">Hora</Label>
+                                <Label className="text-xs">{t("wizard.cronograma.hora")}</Label>
                                 <div className="relative">
                                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
                                     <Input
@@ -183,10 +185,10 @@ export function StepCronograma() {
                             </div>
 
                             <div className="space-y-1">
-                                <Label className="text-xs">Actividad / Momento</Label>
+                                <Label className="text-xs">{t("wizard.cronograma.actividad")}</Label>
                                 <Input
                                     type="text"
-                                    placeholder="Ej: Recepción / Cena"
+                                    placeholder={t("wizard.cronograma.actividadPlaceholder")}
                                     value={event.title}
                                     onChange={(e) => updateEvent(index, "title", e.target.value)}
                                     required
@@ -196,7 +198,7 @@ export function StepCronograma() {
                         {isIncomplete && (
                             <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
                                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                                <span>Completá la hora y el título de esta etapa, o eliminala.</span>
+                                <span>{t("wizard.cronograma.etapaIncompleta")}</span>
                             </div>
                         )}
                     </div>
@@ -210,7 +212,7 @@ export function StepCronograma() {
                     className="w-full border-dashed h-11 border-amber-500/40 hover:bg-amber-500/10 text-amber-300"
                 >
                     <Plus className="w-4 h-4 mr-2" />
-                    Agregar Etapa al Cronograma
+                    {t("wizard.cronograma.agregar")}
                 </Button>
             </div>
 
@@ -221,19 +223,20 @@ export function StepCronograma() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-red-500">
                             <AlertTriangle className="w-5 h-5 shrink-0" />
-                            La primera etapa empieza antes que el evento
+                            {t("wizard.cronograma.errorHoraTitulo")}
                         </DialogTitle>
                         <DialogDescription>
-                            Tu evento empieza a las <strong>{data.hora}</strong>, pero la primera etapa del
-                            cronograma ({events[0]?.title || "Etapa #1"}) está cargada a las{" "}
-                            <strong>{events[0]?.time}</strong>, antes de esa hora.
+                            {t("wizard.cronograma.errorHoraTexto", {
+                                hora: data.hora ?? "",
+                                etapa: events[0]?.title || t("wizard.cronograma.etapa", { numero: 1 }),
+                                horaEtapa: events[0]?.time ?? "",
+                            })}
                             <br /><br />
-                            Revisá el horario del evento en el paso &quot;Detalles de la Fiesta&quot;, o ajustá la
-                            hora de esta etapa para que no sea anterior al inicio del evento.
+                            {t("wizard.cronograma.errorHoraAyuda")}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button onClick={() => setShowTimeError(false)}>Entendido</Button>
+                        <Button onClick={() => setShowTimeError(false)}>{t("wizard.entendido")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -138,7 +138,7 @@ export function ClientInvitationsGrid({ invitations }: { invitations: any[] }) {
                     <Button
                         variant="outline"
                         size="sm"
-                        className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                        className="bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--foreground)]"
                         onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
                     >
@@ -150,7 +150,7 @@ export function ClientInvitationsGrid({ invitations }: { invitations: any[] }) {
                     <Button
                         variant="outline"
                         size="sm"
-                        className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                        className="bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--foreground)]"
                         onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
                     >

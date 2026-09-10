@@ -2,11 +2,13 @@
 
 import { useWizardStore } from "@/store/wizard-store";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { ClaveTexto } from "@/lib/i18n/texto";
 
-const ALBUM_STYLE_OPTIONS: { id: string; label: string; description: string }[] = [
-    { id: "carrusel", label: "Carrusel", description: "Fotos deslizando en una tira horizontal" },
-    { id: "solapadas", label: "Solapadas", description: "Fotos apiladas, con marco y sombra" },
-    { id: "carrusel-polaroid", label: "Carrusel Polaroid", description: "Carrusel con cada foto enmarcada tipo instantánea" },
+const ALBUM_STYLE_OPTIONS: { id: string; label: ClaveTexto; description: ClaveTexto }[] = [
+    { id: "carrusel", label: "wizard.album.carrusel", description: "wizard.album.carruselDetalle" },
+    { id: "solapadas", label: "wizard.album.solapadas", description: "wizard.album.solapadasDetalle" },
+    { id: "carrusel-polaroid", label: "wizard.album.polaroid", description: "wizard.album.polaroidDetalle" },
 ];
 
 // Preview chico y autocontenido de cada estilo -- no reusa los componentes
@@ -82,6 +84,7 @@ function MiniPreview({ styleId }: { styleId: string }) {
 
 export function StepAlbumStyle() {
     const { data, setData } = useWizardStore();
+    const t = useTextos();
     const selected = data.albumStyle || "carrusel";
 
     return (
@@ -91,16 +94,16 @@ export function StepAlbumStyle() {
                     className="text-[10px] uppercase tracking-[0.1em] font-bold mb-2"
                     style={{ color: "var(--accent)", fontFamily: "var(--font-mono)" }}
                 >
-                    Álbum
+                    {t("wizard.album.etiqueta")}
                 </p>
                 <h2
                     className="text-2xl font-bold mb-1"
                     style={{ fontFamily: "var(--font-display)", color: "var(--paper)" }}
                 >
-                    Elegí el estilo del álbum de fotos
+                    {t("wizard.album.titulo")}
                 </h2>
-                <p style={{ fontSize: "12.5px", color: "rgba(246,243,236,.5)", lineHeight: 1.5 }}>
-                    Así se van a ver las fotos que cargaste en la Galería, dentro de tu invitación pública.
+                <p style={{ fontSize: "12.5px", color: "var(--shell-fg-soft)", lineHeight: 1.5 }}>
+                    {t("wizard.album.subtitulo")}
                 </p>
             </div>
 
@@ -124,7 +127,7 @@ export function StepAlbumStyle() {
                                 padding: "16px 10px",
                                 cursor: "pointer",
                                 textAlign: "center",
-                                background: isActive ? "rgba(199,154,75,.08)" : "rgba(246,243,236,.03)",
+                                background: isActive ? "rgba(199,154,75,.08)" : "var(--tinte-1)",
                                 transition: "all 0.15s",
                                 position: "relative",
                             }}
@@ -157,21 +160,21 @@ export function StepAlbumStyle() {
                                 style={{
                                     fontFamily: "var(--font-mono)",
                                     fontSize: "9px",
-                                    color: "rgba(246,243,236,.35)",
+                                    color: "var(--shell-fg-faint)",
                                     letterSpacing: "0.05em",
                                 }}
                             >
-                                {option.label}
+                                {t(option.label)}
                             </p>
                             <p
                                 style={{
                                     fontFamily: "var(--font-mono)",
                                     fontSize: "8px",
-                                    color: "rgba(246,243,236,.22)",
+                                    color: "var(--shell-fg-faint)",
                                     marginTop: "2px",
                                 }}
                             >
-                                {option.description}
+                                {t(option.description)}
                             </p>
                         </button>
                     );
@@ -183,14 +186,14 @@ export function StepAlbumStyle() {
                     style={{
                         fontSize: "12px",
                         lineHeight: 1.5,
-                        color: "rgba(246,243,236,.55)",
-                        background: "rgba(246,243,236,.04)",
+                        color: "var(--shell-fg-soft)",
+                        background: "var(--tinte-1)",
                         border: "1px solid var(--line)",
                         borderRadius: "var(--r-s)",
                         padding: "10px 12px",
                     }}
                 >
-                    Este estilo muestra hasta 8 fotos de tu Galería, repartidas en dos bloques a lo largo de la invitación (pensado para una selección destacada, no para el álbum completo).
+                    {t("wizard.album.avisoSolapadas")}
                 </p>
             )}
 

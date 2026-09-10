@@ -86,46 +86,46 @@ export function QuickEditPrice({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 border-[var(--ink-2)] text-[var(--on-ink)] hover:bg-[var(--ink-2)] bg-transparent w-full sm:w-auto mt-2 sm:mt-0" onClick={(e) => e.stopPropagation()}>
+                <Button variant="outline" size="sm" className="gap-2 border-[var(--campo-borde)] text-[var(--foreground)] hover:bg-[var(--tinte-2)] bg-transparent w-full sm:w-auto mt-2 sm:mt-0" onClick={(e) => e.stopPropagation()}>
                     <Coins className="w-4 h-4 text-green-500" />
                     Actualizar Precios
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-[var(--ink-2)] text-[var(--on-ink)] border-none" onClick={(e) => e.stopPropagation()}>
+            <DialogContent className="sm:max-w-md bg-[var(--card)] text-[var(--foreground)] border-none" onClick={(e) => e.stopPropagation()}>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Coins className="w-5 h-5 text-green-500" />
                         Actualizar Valores de Tarjeta
                     </DialogTitle>
-                    <DialogDescription className="text-[var(--on-ink)]/70 pt-2">
+                    <DialogDescription className="text-[var(--shell-fg-mid)] pt-2">
                         Modificá rápidamente los montos por categoría que deben abonar tus invitados.
                     </DialogDescription>
                 </DialogHeader>
                 
                 <div className="my-4 space-y-4">
                     <div>
-                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Valor Adulto ($):</label>
+                        <label className="text-sm font-medium mb-2 block text-[var(--shell-fg-strong)]">Valor Adulto ($):</label>
                         <Input 
                             type="number" 
                             min="0"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                            className="bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)]"
                         />
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-2 block text-[var(--on-ink)]/80">Valor Adolescente ($):</label>
+                        <label className="text-sm font-medium mb-2 block text-[var(--shell-fg-strong)]">Valor Adolescente ($):</label>
                         <Input 
                             type="number" 
                             min="0"
                             placeholder="Opcional"
                             value={precioAdolescente}
                             onChange={(e) => setPrecioAdolescente(e.target.value)}
-                            className="bg-[var(--ink)] border-none text-[var(--on-ink)]"
+                            className="bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)]"
                         />
                     </div>
                     <div className="relative group">
-                        <label className="text-sm font-medium mb-2 flex items-center gap-2 text-[var(--on-ink)]/80">
+                        <label className="text-sm font-medium mb-2 flex items-center gap-2 text-[var(--shell-fg-strong)]">
                             Valor Niño ($):
                             {planTier === 'FREE' && <Lock className="w-3.5 h-3.5 text-red-400" />}
                         </label>
@@ -136,7 +136,7 @@ export function QuickEditPrice({
                             value={precioNino}
                             onChange={(e) => setPrecioNino(e.target.value)}
                             disabled={planTier === 'FREE'}
-                            className="bg-[var(--ink)] border-none text-[var(--on-ink)] disabled:opacity-50"
+                            className="bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)] disabled:opacity-50"
                         />
                         {planTier === 'FREE' && (
                             <div className="absolute -top-10 left-16 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
@@ -153,7 +153,7 @@ export function QuickEditPrice({
                         variant="outline"
                         onClick={() => setOpen(false)}
                         disabled={isSaving}
-                        className="bg-transparent border-[var(--on-ink)]/20 text-[var(--on-ink)] hover:bg-[var(--on-ink)]/10"
+                        className="bg-transparent border-[var(--campo-borde)] text-[var(--foreground)] hover:bg-[var(--tinte-2)]"
                     >
                         Cancelar
                     </Button>

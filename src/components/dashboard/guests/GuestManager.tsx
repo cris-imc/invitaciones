@@ -62,10 +62,11 @@ import {
 } from "lucide-react";
 import { hapticoConfirmar, hapticoDeshacer, hapticoError } from "@/lib/haptics";
 import { useToast } from "@/components/ui/Toast";
-import { getInvitePhrase } from "@/lib/invitation-copy";
 import { PLAN_LIMITS, canUseFeature, PlanTier } from "@/lib/plan-limits";
 import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
 import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import type { ClaveTexto, Traductor } from "@/lib/i18n/texto";
 
 // Burbuja animada del primer invitado (y su halo en "Copiar Link"). Se
 // descartó como causa del bug de scroll extra en Chrome-iOS (persistía con
@@ -90,9 +91,9 @@ const DESDE_QUE_SE_MIDE = new Date("2026-09-10T00:00:00Z");
  * que entrar a la invitación. Sin esto, un evento entero con invitados
  * confirmados de antes aparecería como que nadie abrió nada.
  */
-function aperturaDe(guest: Guest): { abrio: boolean; detalle: string } {
+function aperturaDe(guest: Guest, t: Traductor): { abrio: boolean; detalle: string } {
   const fmt = (d: string) =>
-    new Date(d).toLocaleString("es-AR", {
+    new Date(d).toLocaleString(t("panel.localeFecha"), {
       day: "2-digit",
       month: "2-digit",
       hour: "2-digit",
@@ -100,24 +101,46 @@ function aperturaDe(guest: Guest): { abrio: boolean; detalle: string } {
     });
 
   if (guest.abiertaEn) {
-    const veces = (guest.aperturas ?? 0) > 1 ? ` · ${guest.aperturas} veces en total` : "";
-    return { abrio: true, detalle: `Abrió por primera vez el ${fmt(guest.abiertaEn)}${veces}` };
+    const veces = guest.aperturas ?? 0;
+    return {
+      abrio: true,
+      detalle:
+        veces > 1
+          ? t("panel.invitados.abrioVeces", { fecha: fmt(guest.abiertaEn), veces })
+          : t("panel.invitados.abrioPrimeraVez", { fecha: fmt(guest.abiertaEn) }),
+    };
   }
   if (guest.responseDate) {
-    return { abrio: true, detalle: `Contestó el ${fmt(guest.responseDate)}, así que la abrió` };
+    return { abrio: true, detalle: t("panel.invitados.contestoAsiQueAbrio", { fecha: fmt(guest.responseDate) }) };
   }
   // De los cargados antes de que esto se midiera no hay registro. Igual se
   // muestra "Sin abrir", porque es lo accionable -- a esa persona le vas a
   // volver a escribir de todos modos -- pero el detalle lo aclara, para que
   // nadie tome por confirmado algo que en realidad no se sabe.
   if (new Date(guest.createdAt) < DESDE_QUE_SE_MIDE) {
-    return {
-      abrio: false,
-      detalle:
-        "Sin registro: este invitado se cargó antes de que se empezara a medir la apertura. Puede haberla abierto sin que quedara constancia.",
-    };
+    return { abrio: false, detalle: t("panel.invitados.sinRegistroDeApertura") };
   }
-  return { abrio: false, detalle: "Todavía no abrió su invitación" };
+  return { abrio: false, detalle: t("panel.invitados.todaviaNoAbrio") };
+}
+
+/**
+ * Cómo se nombra el evento dentro del mensaje de WhatsApp.
+ *
+ * Es la versión traducible de `getInvitePhrase`: el mensaje entero sale en el
+ * idioma del anfitrión, y pegarle una frase fija en español dejaría un
+ * "You're invited to nuestro casamiento".
+ */
+function fraseDelEvento(tipo: string | null | undefined): ClaveTexto {
+  switch (tipo) {
+    case "CASAMIENTO":
+      return "panel.invitados.fraseCasamiento";
+    case "QUINCE_ANOS":
+      return "panel.invitados.fraseQuince";
+    case "ANIVERSARIO":
+      return "panel.invitados.fraseAniversario";
+    default:
+      return "panel.invitados.fraseEvento";
+  }
 }
 
 interface Guest {
@@ -172,6 +195,7 @@ function QuantityStepper({
   min = 0,
   max = 20,
   ariaLabel,
+  t,
   disabled = false,
 }: {
   value: number;
@@ -179,6 +203,7 @@ function QuantityStepper({
   min?: number;
   max?: number;
   ariaLabel: string;
+  t: Traductor;
   disabled?: boolean;
 }) {
   return (
@@ -187,7 +212,7 @@ function QuantityStepper({
         type="button"
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={disabled || value <= min}
-        aria-label={`Restar ${ariaLabel}`}
+        aria-label={t("panel.invitados.restar", { que: ariaLabel })}
         className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-muted-foreground/30 text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
       >
         <Minus className="w-4 h-4" />
@@ -197,7 +222,7 @@ function QuantityStepper({
         type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={disabled || value >= max}
-        aria-label={`Sumar ${ariaLabel}`}
+        aria-label={t("panel.invitados.sumar", { que: ariaLabel })}
         className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-muted-foreground/30 text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:pointer-events-none transition-colors"
       >
         <Plus className="w-4 h-4" />
@@ -221,6 +246,7 @@ interface GuestManagerProps {
 
 export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino, tipo, initialMostrarNombreInvitadoEnSaludo = false }: GuestManagerProps) {
   const router = useRouter();
+  const t = useTextos();
   const [guests, setGuests] = useState<Guest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpEnabled, setRsvpEnabled] = useState(initialRsvpEnabled);
@@ -329,7 +355,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   // Save price from modal
   const handleSavePrice = async () => {
     const val = parseFloat(priceModalValue);
-    if (isNaN(val) || val <= 0) { showToast("Ingresá un monto válido", "error"); return; }
+    if (isNaN(val) || val <= 0) { showToast(t("panel.invitados.montoInvalido"), "error"); return; }
     setIsSavingPrice(true);
     try {
       const body: Record<string, number> = {};
@@ -360,9 +386,9 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         if (priceModal.category === 'child') setEditChildrenEnabled(true);
       }
       setPriceModal(m => ({ ...m, open: false }));
-      showToast("Precio guardado correctamente", "success");
+      showToast(t("panel.invitados.precioGuardado"), "success");
     } catch {
-      showToast("Error al guardar el precio", "error");
+      showToast(t("panel.invitados.errorPrecio"), "error");
     } finally {
       setIsSavingPrice(false);
     }
@@ -379,10 +405,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         body: JSON.stringify({ mostrarNombreInvitadoEnSaludo: checked }),
       });
       if (!res.ok) throw new Error("Error al guardar");
-      showToast("Preferencia guardada", "success");
+      showToast(t("panel.invitados.preferenciaGuardada"), "success");
     } catch {
       setMostrarNombreInvitadoEnSaludo(previous);
-      showToast("Error al guardar la preferencia", "error");
+      showToast(t("panel.invitados.errorPreferencia"), "error");
     } finally {
       setIsSavingSaludo(false);
     }
@@ -492,7 +518,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       setNewIndividualCategory('adult');
       setNewGuestType(null);
       setAddGuestOpen(false);
-      showToast("Invitado agregado exitosamente", "success");
+      showToast(t("panel.invitados.agregado"), "success");
       return;
     }
 
@@ -505,7 +531,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       setPendingGuestPayload(payload);
       setShowGuestLimitUpgrade(true);
     } else {
-      showToast(data.error || "Error al agregar invitado", "error");
+      showToast(data.error || t("panel.invitados.errorAgregar"), "error");
     }
   };
 
@@ -536,7 +562,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       await submitNewGuest(payload);
     } catch (error) {
       console.error(error);
-      showToast("Error de conexión", "error");
+      showToast(t("panel.invitados.errorConexion"), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -553,8 +579,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         body: JSON.stringify({ planTier: tier }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Error al actualizar el plan");
-      showToast(`¡Listo! Tu invitación ya es ${tier === "DIAMOND" ? "Diamond" : "Premium"}.`, "success");
+      if (!res.ok) throw new Error(data.error || t("panel.compartir.errorPlan"));
+      showToast(t(tier === "DIAMOND" ? "panel.compartir.listoDiamond" : "panel.compartir.listoPremium"), "success");
       setShowGuestLimitUpgrade(false);
       router.refresh();
       if (pendingGuestPayload) {
@@ -563,7 +589,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         await submitNewGuest(payload);
       }
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Error al actualizar el plan", "error");
+      showToast(error instanceof Error ? error.message : t("panel.compartir.errorPlan"), "error");
     }
   };
 
@@ -579,10 +605,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         body: JSON.stringify({ planTier: tier }),
       });
       const data = await res.json();
-      if (!res.ok || !data.checkoutUrl) throw new Error(data.error || "Error al iniciar el pago");
+      if (!res.ok || !data.checkoutUrl) throw new Error(data.error || t("panel.compartir.errorPago"));
       window.location.href = data.checkoutUrl;
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Error al iniciar el pago", "error");
+      showToast(error instanceof Error ? error.message : t("panel.compartir.errorPago"), "error");
     }
   };
 
@@ -641,14 +667,14 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         setGuests(
           guests.map((g) => (g.id === updatedGuest.id ? updatedGuest : g)),
         );
-        showToast("Invitado actualizado exitosamente", "success");
+        showToast(t("panel.invitados.actualizado"), "success");
         setGuestToEdit(null);
       } else {
-        showToast("Error al actualizar invitado", "error");
+        showToast(t("panel.invitados.errorActualizar"), "error");
       }
     } catch (error) {
       console.error(error);
-      showToast("Error de conexión", "error");
+      showToast(t("panel.invitados.errorConexion"), "error");
     } finally {
       setIsEditSubmitting(false);
     }
@@ -665,12 +691,12 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       });
       if (res.ok) {
         setGuests(guests.filter((g) => g.id !== guestToDelete.id));
-        showToast("Invitado eliminado", "success");
+        showToast(t("panel.invitados.eliminado"), "success");
       }
     } catch (error) {
       console.error(error);
       hapticoError();
-      showToast("Error al eliminar", "error");
+      showToast(t("panel.invitados.errorEliminar"), "error");
     } finally {
       setGuestToDelete(null);
     }
@@ -679,7 +705,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const copyLink = (token: string) => {
     const url = `${window.location.origin}/invite/${slug}/${token}`;
     navigator.clipboard.writeText(url);
-    showToast("¡Enlace copiado! Compártelo con el invitado.", "success");
+    showToast(t("panel.invitados.enlaceCopiado"), "success");
   };
 
   // Filter and Pagination
@@ -719,7 +745,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         <Card className="md:col-span-1 min-w-0">
           <CardHeader>
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <CardTitle>Agregar Invitados</CardTitle>
+              <CardTitle>{t("panel.invitados.agregarTitulo")}</CardTitle>
               {freePlanLimit !== null && (
                 <span
                   className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
@@ -728,22 +754,22 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       : "text-muted-foreground border-border bg-muted/40"
                   }`}
                 >
-                  {totalPeopleExpected}/{freePlanLimit} personas
+                  {t("panel.invitados.cupo", { personas: totalPeopleExpected, tope: freePlanLimit })}
                 </span>
               )}
             </div>
             <CardDescription>
-              Genera un enlace único para cada invitado/a.
+              {t("panel.invitados.enlaceUnico")}
             </CardDescription>
             <div className="flex items-center justify-between gap-3 pt-3 mt-1 border-t min-w-0">
               <div className="flex items-center gap-1.5 min-w-0 flex-1">
                 <Label htmlFor="mostrarNombreInvitado" className="text-sm font-normal text-muted-foreground cursor-pointer min-w-0">
-                  Saludar por nombre del invitado/familia
+                  {t("panel.invitados.saludarPorNombre")}
                 </Label>
                 <button
                   type="button"
                   onClick={() => setShowSaludoHelp(true)}
-                  aria-label="Qué hace este interruptor"
+                  aria-label={t("panel.invitados.queHaceEsteInterruptor")}
                   className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-muted-foreground/50 text-[9px] font-bold leading-none text-muted-foreground transition-colors hover:bg-muted/60"
                 >
                   ?
@@ -768,11 +794,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
                   <Plus className="w-5 h-5" />
                 </span>
-                <span className="font-medium">Agrega un invitado</span>
+                <span className="font-medium">{t("panel.invitados.agregarInvitado")}</span>
               </button>
             ) : newGuestType === null ? (
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">¿Qué tipo de invitación querés crear?</p>
+                <p className="text-sm text-muted-foreground">{t("panel.invitados.queTipoDeInvitacion")}</p>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -780,7 +806,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     className="flex flex-col items-center gap-2 py-6 px-3 rounded-xl border-2 border-muted-foreground/20 hover:border-primary hover:bg-primary/5 transition-colors text-sm font-medium"
                   >
                     <UserPlus className="w-6 h-6" />
-                    Individual
+                    {t("panel.invitados.individual")}
                   </button>
                   <div className="relative group">
                     <button
@@ -791,13 +817,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     >
                       <Users className="w-6 h-6" />
                       <span className="flex items-center gap-1.5">
-                        Familia/Grupo
+                        {t("panel.invitados.familiaOGrupo")}
                         {planTier === 'FREE' && <Lock className="w-3.5 h-3.5 text-red-400" />}
                       </span>
                     </button>
                     {planTier === 'FREE' && (
                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                        Disponible en Premium
+                        {t("panel.invitados.disponibleEnPremium")}
                         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
                       </div>
                     )}
@@ -808,7 +834,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   onClick={() => setAddGuestOpen(false)}
                   className="text-xs text-muted-foreground hover:text-foreground underline"
                 >
-                  Cancelar
+                  {t("comun.cancelar")}
                 </button>
               </div>
             ) : (
@@ -821,41 +847,41 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 className="inline-flex items-center gap-1.5 rounded-full border border-muted-foreground/40 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted/60"
               >
                 <ChevronLeft className="w-3.5 h-3.5" strokeWidth={2} />
-                Cambiar tipo de invitación
+                {t("panel.invitados.cambiarTipo")}
               </button>
 
               {newGuestType === "FAMILY" ? (
                 <div className="space-y-2">
-                  <Label htmlFor="guestApellido">Nombre del Grupo/Familia</Label>
+                  <Label htmlFor="guestApellido">{t("panel.invitados.nombreDelGrupo")}</Label>
                   <Input
                     id="guestApellido"
-                    placeholder="Ej: Pérez, o Amigos del Trabajo"
+                    placeholder={t("panel.invitados.ejemploGrupo")}
                     value={newGuestApellido}
                     onChange={(e) => setNewGuestApellido(e.target.value)}
                     maxLength={40}
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    Se va a mostrar como <strong>&quot;{newGuestApellido || "..."}&quot;</strong>.
+                    {t("panel.invitados.seVaAMostrarComo")} <strong>&quot;{newGuestApellido || "..."}&quot;</strong>.
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="guestNombre">Nombre</Label>
+                    <Label htmlFor="guestNombre">{t("panel.invitados.nombre")}</Label>
                     <Input
                       id="guestNombre"
-                      placeholder="Ej: Juan"
+                      placeholder={t("panel.invitados.ejemploNombre")}
                       value={newGuestNombre}
                       onChange={(e) => setNewGuestNombre(e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="guestApellidoIndividual">Apellido</Label>
+                    <Label htmlFor="guestApellidoIndividual">{t("panel.invitados.apellido")}</Label>
                     <Input
                       id="guestApellidoIndividual"
-                      placeholder="Ej: García"
+                      placeholder={t("panel.invitados.ejemploApellido")}
                       value={newGuestApellido}
                       onChange={(e) => setNewGuestApellido(e.target.value)}
                       required
@@ -867,14 +893,14 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
               {/* INDIVIDUAL: selector adulto/adolescente */}
               {newGuestType === "INDIVIDUAL" && (
                 <div className="space-y-2 pt-1">
-                  <Label className="text-sm text-muted-foreground">Categoría</Label>
+                  <Label className="text-sm text-muted-foreground">{t("panel.invitados.categoria")}</Label>
                   <div className="flex gap-3">
                   <button
                       type="button"
                       onClick={() => setNewIndividualCategory('adult')}
                       className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${newIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                     >
-                      <span>Adulto</span>
+                      <span>{t("panel.invitados.adulto")}</span>
                       {pagoTarjetaHabilitado && currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
                     </button>
                     <button
@@ -882,7 +908,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       onClick={() => setNewIndividualCategory('teen')}
                       className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all ${newIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                     >
-                      <span>Adolescente</span>
+                      <span>{t("panel.invitados.adolescente")}</span>
                       {pagoTarjetaHabilitado && currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
                     </button>
                   </div>
@@ -896,8 +922,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <div className="flex items-center justify-between mb-2">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
-                        Adultos
-                        {pagoTarjetaHabilitado && (currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
+                        {t("panel.invitados.adultos")}
+                        {pagoTarjetaHabilitado && (currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">{t("panel.invitados.sinPrecio")}</span>)}
                       </Label>
                       <Switch
                         checked={newAdultsEnabled}
@@ -905,7 +931,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       />
                     </div>
                     {newAdultsEnabled && (
-                      <QuantityStepper value={newGuestAdultCount} onChange={setNewGuestAdultCount} min={1} max={20} ariaLabel="adultos" />
+                      <QuantityStepper value={newGuestAdultCount} onChange={setNewGuestAdultCount} min={1} max={20} ariaLabel={t("panel.invitados.adultos")} t={t} />
                     )}
                   </div>
 
@@ -914,8 +940,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <div className="flex items-center justify-between mb-2">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
-                        Adolescentes
-                        {pagoTarjetaHabilitado && (currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
+                        {t("panel.invitados.adolescentes")}
+                        {pagoTarjetaHabilitado && (currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">{t("panel.invitados.sinPrecio")}</span>)}
                       </Label>
                       <Switch
                         checked={newTeensEnabled}
@@ -923,7 +949,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       />
                     </div>
                     {newTeensEnabled && (
-                      <QuantityStepper value={newGuestTeenCount} onChange={setNewGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" />
+                      <QuantityStepper value={newGuestTeenCount} onChange={setNewGuestTeenCount} min={0} max={20} ariaLabel={t("panel.invitados.adolescentes")} t={t} />
                     )}
                   </div>
 
@@ -932,8 +958,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <div className="flex items-center justify-between mb-2">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Users className="w-4 h-4" />
-                        Niños
-                        {pagoTarjetaHabilitado && (currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
+                        {t("panel.invitados.ninos")}
+                        {pagoTarjetaHabilitado && (currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">{t("panel.invitados.sinPrecio")}</span>)}
                       </Label>
                       <Switch
                         checked={newChildrenEnabled}
@@ -941,7 +967,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       />
                     </div>
                     {newChildrenEnabled && (
-                      <QuantityStepper value={newGuestChildCount} onChange={setNewGuestChildCount} min={0} max={20} ariaLabel="niños" />
+                      <QuantityStepper value={newGuestChildCount} onChange={setNewGuestChildCount} min={0} max={20} ariaLabel={t("panel.invitados.ninos")} t={t} />
                     )}
                   </div>
                 </div>
@@ -959,13 +985,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     htmlFor="newGuestIsExempt"
                     className="text-sm text-muted-foreground"
                   >
-                    Exento de pago
+                    {t("panel.invitados.exentoDePago")}
                   </Label>
                 </div>
               )}
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Agregando..." : "Agregar a la lista"}
+                {isSubmitting ? t("panel.invitados.agregando") : t("panel.invitados.agregarALaLista")}
               </Button>
             </form>
             )}
@@ -976,9 +1002,9 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         <Card className="md:col-span-2 min-w-0">
           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <CardTitle>Lista de Invitados</CardTitle>
+              <CardTitle>{t("panel.invitados.listaDeInvitados")}</CardTitle>
               <CardDescription>
-                Gestiona tus invitados y comparte sus enlaces.
+                {t("panel.invitados.gestionaTusInvitados")}
               </CardDescription>
             </div>
             {/* La cruz para vaciar la busqueda es propia y no la nativa de
@@ -988,7 +1014,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
             <div className="relative w-full sm:w-64">
               <Input
                 type="text"
-                placeholder="Buscar invitado..."
+                placeholder={t("panel.invitados.buscarInvitado")}
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -1003,7 +1029,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     setSearchQuery("");
                     setCurrentPage(1);
                   }}
-                  aria-label="Borrar la búsqueda"
+                  aria-label={t("panel.invitados.borrarLaBusqueda")}
                   className="absolute right-1 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
                 >
                   <X className="h-4 w-4" strokeWidth={2} />
@@ -1013,24 +1039,27 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-center py-8">Cargando invitados...</div>
+              <div className="text-center py-8">{t("panel.invitados.cargandoInvitados")}</div>
             ) : filteredGuests.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed rounded-lg text-muted-foreground">
                 <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p>
-                  {searchQuery
-                    ? "No se encontraron invitados que coincidan con tu búsqueda."
-                    : "Aún no has agregado invitados."}
+                  {t(searchQuery ? "panel.invitados.sinResultados" : "panel.invitados.sinInvitados")}
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
                 {paginatedGuests.map((guest) => {
                   const guestUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/invite/${slug}/${guest.uniqueToken}`;
-                  const waGreeting = guest.type === "FAMILY" ? `familia ${guest.name}` : guest.name;
-                  const waEstas = guest.type === "FAMILY" ? "Están invitados" : "Estás invitado/a";
+                  const waGreeting = guest.type === "FAMILY" ? t("panel.invitados.waSaludoGrupo", { nombre: guest.name }) : guest.name;
+                  const waEstas = t(guest.type === "FAMILY" ? "panel.invitados.waEstanInvitados" : "panel.invitados.waEstasInvitado");
                   const waMsg = encodeURIComponent(
-                    `¡Hola ${waGreeting}! 🎉 ${waEstas} a ${getInvitePhrase(tipo)}. Entrá a tu invitación personal para ver todos los detalles y confirmar tu asistencia:\n${guestUrl}`,
+                    t("panel.invitados.waMensaje", {
+                      saludo: waGreeting,
+                      estas: waEstas,
+                      evento: t(fraseDelEvento(tipo)),
+                      enlace: guestUrl,
+                    }),
                   );
                   const waHref = `https://wa.me/?text=${waMsg}`;
 
@@ -1049,12 +1078,12 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             <span className="flex items-center shrink-0">
                               {/* "Grupal" y no "Familia": un grupo puede ser los
                                   compañeros de trabajo o los amigos del club. */}
-                              <Users className="w-3 h-3 mr-1" /> Grupal (
-                              {guest.expectedCount})
+                              <Users className="w-3 h-3 mr-1" />{" "}
+                              {t("panel.invitados.grupalCon", { cantidad: guest.expectedCount })}
                             </span>
                           ) : (
                             <span className="flex items-center shrink-0">
-                              <Users className="w-3 h-3 mr-1" /> Individual
+                              <Users className="w-3 h-3 mr-1" /> {t("panel.invitados.individual")}
                             </span>
                           )}
                           {guest.isExempt && (
@@ -1062,7 +1091,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                               variant="outline"
                               className="text-[10px] h-4 leading-3 border-green-200 text-green-700 bg-green-50 uppercase tracking-wider shrink-0"
                             >
-                              Exento
+                              {t("panel.invitados.exento")}
                             </Badge>
                           )}
                         </div>
@@ -1078,12 +1107,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         {guest.ingresoEn && (
                           <div className="flex items-center text-xs mt-1 text-emerald-600 dark:text-emerald-400">
                             <LogIn className="w-3 h-3 mr-1 shrink-0" />
-                            Llegó{" "}
-                            {new Date(guest.ingresoEn).toLocaleString("es-AR", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit",
+                            {t("panel.invitados.llego", {
+                              fecha: new Date(guest.ingresoEn).toLocaleString(t("panel.localeFecha"), {
+                                day: "2-digit",
+                                month: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }),
                             })}
                           </div>
                         )}
@@ -1098,7 +1128,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             title={guest.ingresoMotivo ?? undefined}
                           >
                             <XCircle className="w-3 h-3 mr-1 shrink-0" />
-                            Rechazado en la puerta
+                            {t("panel.invitados.rechazadoEnLaPuerta")}
                             {guest.ingresoMotivo && (
                               <span className="ml-1 opacity-75 truncate">· {guest.ingresoMotivo}</span>
                             )}
@@ -1106,7 +1136,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         )}
 
                         {verApertura && (() => {
-                          const visto = aperturaDe(guest);
+                          const visto = aperturaDe(guest, t);
                           return (
                             <div
                               className={`flex items-center text-xs mt-1 ${
@@ -1121,7 +1151,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                               ) : (
                                 <EyeOff className="w-3 h-3 mr-1 shrink-0" />
                               )}
-                              {visto.abrio ? "Abrió la invitación" : "Sin abrir"}
+                              {t(visto.abrio ? "panel.invitados.abrio" : "panel.invitados.sinAbrir")}
                             </div>
                           );
                         })()}
@@ -1135,7 +1165,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             href={waHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            title="Enviar WhatsApp"
+                            title={t("panel.invitados.enviarWhatsapp")}
                             className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white shadow-sm transition-colors"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
@@ -1145,7 +1175,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 hover:bg-blue-500/20"
-                            title="Editar"
+                            title={t("comun.editar")}
                             onClick={() => handleEditClick(guest)}
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -1155,7 +1185,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         {/* Fila de abajo (mobile): el estado solo a la izquierda, Copiar + Eliminar a la derecha.
                             En desktop pasa a ser el primer bloque (izquierda a derecha: estado, luego Copiar/Eliminar, luego WhatsApp/Editar). */}
                         <div className="flex items-center justify-between gap-1.5 sm:order-1">
-                          <StatusBadge status={guest.status} />
+                          <StatusBadge status={guest.status} t={t} />
 
                           <div className="flex items-center gap-1.5">
                           <div className="relative">
@@ -1165,12 +1195,12 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           <Button
                             size="sm"
                             className={`relative h-8 px-3 rounded-full text-xs gap-1.5 font-semibold border-0 shadow-sm bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white transition-shadow duration-300 ${isHintActive ? "ring-2 ring-amber-300 shadow-[0_0_10px_2px_rgba(251,191,36,0.6)]" : ""}`}
-                            title="Copiar enlace personalizado"
+                            title={t("panel.invitados.copiarEnlace")}
                             onClick={() => copyLink(guest.uniqueToken)}
                           >
                             <LinkIcon className="w-3.5 h-3.5" />
-                            <span className="sm:hidden">Copiar</span>
-                            <span className="hidden sm:inline">Copiar Link</span>
+                            <span className="sm:hidden">{t("panel.invitados.copiar")}</span>
+                            <span className="hidden sm:inline">{t("panel.invitados.copiarLink")}</span>
                           </Button>
 
                           {isFirstGuestHintCandidate && hintMounted && (
@@ -1181,14 +1211,14 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                                 type="button"
                                 onClick={dismissFirstGuestHint}
                                 className="absolute top-1.5 right-1.5 text-amber-400/70 hover:text-amber-200"
-                                title="Cerrar"
+                                title={t("comun.cerrar")}
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
                               <p className="pr-5 leading-relaxed flex items-start gap-2">
                                 <Info className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
                                 <span>
-                                  <strong className="text-amber-300">¡Así se comparte!</strong> Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.
+                                  <strong className="text-amber-300">{t("panel.invitados.asiSeComparte")}</strong> {t("panel.invitados.asiSeComparteDetalle")}
                                 </span>
                               </p>
                               {/* Flecha apuntando hacia abajo (mobile: burbuja arriba del botón) */}
@@ -1203,7 +1233,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20 hover:text-red-600"
-                          title="Eliminar"
+                          title={t("comun.eliminar")}
                           onClick={() => setGuestToDelete(guest)}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1223,10 +1253,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                     >
-                      Anterior
+                      {t("comun.anterior")}
                     </Button>
                     <span className="text-sm text-muted-foreground px-2">
-                      Página {currentPage} de {totalPages}
+                      {t("panel.invitados.pagina", { actual: currentPage, total: totalPages })}
                     </span>
                     <Button
                       variant="outline"
@@ -1236,7 +1266,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                       }
                       disabled={currentPage === totalPages}
                     >
-                      Siguiente
+                      {t("comun.siguiente")}
                     </Button>
                   </div>
                 )}
@@ -1251,33 +1281,32 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       <Dialog open={showSaludoHelp} onOpenChange={setShowSaludoHelp}>
         <DialogContent variant="centered">
           <DialogHeader>
-            <DialogTitle>Saludar por nombre</DialogTitle>
+            <DialogTitle>{t("panel.invitados.saludarTitulo")}</DialogTitle>
             <DialogDescription asChild>
               <div className="space-y-3 text-sm">
-                <p>Cambia cómo arranca la invitación que abre cada invitado.</p>
+                <p>{t("panel.invitados.saludarQueCambia")}</p>
                 <p>
-                  <strong>Activado:</strong> lo saluda por su nombre —{" "}
-                  <em>&ldquo;Hola, Familia Juárez&rdquo;</em>. Cada uno ve el suyo, porque el
-                  enlace es personal.
+                  <strong>{t("panel.invitados.saludarActivado")}</strong>{" "}
+                  {t("panel.invitados.saludarActivadoDetalle")}
                 </p>
                 <p>
-                  <strong>Desactivado:</strong> en lugar del nombre del invitado muestra{" "}
-                  {tipo === "CASAMIENTO"
-                    ? "el nombre de los novios"
-                    : tipo === "QUINCE_ANOS"
-                      ? "el nombre de la quinceañera"
-                      : "el nombre del evento"}
-                  , igual para todos.
+                  <strong>{t("panel.invitados.saludarDesactivado")}</strong>{" "}
+                  {t("panel.invitados.saludarDesactivadoDetalle", {
+                    que: t(
+                      tipo === "CASAMIENTO"
+                        ? "panel.invitados.saludarNombreNovios"
+                        : tipo === "QUINCE_ANOS"
+                          ? "panel.invitados.saludarNombreQuinceanera"
+                          : "panel.invitados.saludarNombreEvento"
+                    ),
+                  })}
                 </p>
-                <p className="text-xs">
-                  Vale para todos los invitados a la vez, y podés cambiarlo cuando quieras: la
-                  próxima vez que alguien abra su enlace ya lo ve aplicado.
-                </p>
+                <p className="text-xs">{t("panel.invitados.saludarNota")}</p>
               </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => setShowSaludoHelp(false)}>Entendido</Button>
+            <Button onClick={() => setShowSaludoHelp(false)}>{t("panel.invitados.entendido")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1288,19 +1317,17 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       >
         <DialogContent variant="centered">
           <DialogHeader>
-            <DialogTitle>¿Eliminar invitado?</DialogTitle>
+            <DialogTitle>{t("panel.invitados.eliminarTitulo")}</DialogTitle>
             <DialogDescription>
-              Estás a punto de eliminar a <strong>{guestToDelete?.name}</strong>{" "}
-              de la lista de invitados. Esta acción no se puede deshacer y el
-              enlace de la invitación dejará de funcionar para ellos.
+              {t("panel.invitados.eliminarDetalle", { nombre: guestToDelete?.name ?? "" })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setGuestToDelete(null)}>
-              Cancelar
+              {t("comun.cancelar")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteGuest}>
-              Eliminar Invitado
+              {t("panel.invitados.eliminarInvitado")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1312,19 +1339,17 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
       >
         <DialogContent variant="centered" className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Editar Invitado</DialogTitle>
+            <DialogTitle>{t("panel.invitados.editarTitulo")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-4">
             {guestAlreadyConfirmed && (
               <div className="flex items-start gap-2.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>
-                  Este invitado ya confirmó asistencia. Podés aumentar la cantidad de invitados para que después pueda entrar a su link y sumar más gente. Si en cambio la reducís por debajo de lo que ya confirmó, su respuesta se reinicia y va a tener que volver a confirmar.
-                </span>
+                <span>{t("panel.invitados.yaConfirmoAviso")}</span>
               </div>
             )}
             <div className="space-y-2">
-              <Label>Tipo de Invitación</Label>
+              <Label>{t("panel.invitados.tipoDeInvitacion")}</Label>
               <div className="flex gap-4">
                 <div className="flex items-center space-x-2">
                   <input
@@ -1335,7 +1360,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     onChange={() => setEditGuestType("INDIVIDUAL")}
                     className="accent-primary"
                   />
-                  <Label htmlFor="edit-individual">Individual</Label>
+                  <Label htmlFor="edit-individual">{t("panel.invitados.individual")}</Label>
                 </div>
                 <div className={`flex items-center space-x-2 relative group${planTier === 'FREE' ? ' opacity-50' : ''}`}>
                   <input
@@ -1348,13 +1373,13 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     className="accent-primary"
                   />
                   <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier === 'FREE' ? ' cursor-not-allowed' : ''}`}>
-                      Familia/Grupo
+                      {t("panel.invitados.familiaOGrupo")}
                       {planTier === 'FREE' && <Lock className="w-4 h-4 text-red-400" />}
                   </Label>
 
                   {planTier === 'FREE' && (
                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                        Disponible en Premium
+                        {t("panel.invitados.disponibleEnPremium")}
                         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
                       </div>
                   )}
@@ -1364,36 +1389,36 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
             {editGuestType === "FAMILY" ? (
               <div className="space-y-2">
-                <Label htmlFor="editGuestApellido">Nombre del Grupo/Familia</Label>
+                <Label htmlFor="editGuestApellido">{t("panel.invitados.nombreDelGrupo")}</Label>
                 <Input
                   id="editGuestApellido"
-                  placeholder="Ej: Pérez, o Amigos del Trabajo"
+                  placeholder={t("panel.invitados.ejemploGrupo")}
                   value={editGuestApellido}
                   onChange={(e) => setEditGuestApellido(e.target.value)}
                   maxLength={40}
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Se va a mostrar como <strong>&quot;{editGuestApellido || "..."}&quot;</strong>.
+                  {t("panel.invitados.seVaAMostrarComo")} <strong>&quot;{editGuestApellido || "..."}&quot;</strong>.
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="editGuestNombre">Nombre</Label>
+                  <Label htmlFor="editGuestNombre">{t("panel.invitados.nombre")}</Label>
                   <Input
                     id="editGuestNombre"
-                    placeholder="Ej: Juan"
+                    placeholder={t("panel.invitados.ejemploNombre")}
                     value={editGuestNombre}
                     onChange={(e) => setEditGuestNombre(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="editGuestApellidoIndividual">Apellido</Label>
+                  <Label htmlFor="editGuestApellidoIndividual">{t("panel.invitados.apellido")}</Label>
                   <Input
                     id="editGuestApellidoIndividual"
-                    placeholder="Ej: García"
+                    placeholder={t("panel.invitados.ejemploApellido")}
                     value={editGuestApellido}
                     onChange={(e) => setEditGuestApellido(e.target.value)}
                     required
@@ -1405,14 +1430,14 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
             {/* INDIVIDUAL: selector adulto/adolescente */}
             {editGuestType === "INDIVIDUAL" && (
               <div className="space-y-2 pt-1">
-                <Label className="text-sm text-muted-foreground">Categoría</Label>
+                <Label className="text-sm text-muted-foreground">{t("panel.invitados.categoria")}</Label>
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setEditIndividualCategory('adult')}
                     className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-50 disabled:pointer-events-none ${editIndividualCategory === 'adult' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                   >
-                    <span>Adulto</span>
+                    <span>{t("panel.invitados.adulto")}</span>
                     {pagoTarjetaHabilitado && currentAdultPrice ? <span className="text-xs opacity-70 mt-0.5">${currentAdultPrice}</span> : null}
                   </button>
                   <button
@@ -1420,7 +1445,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     onClick={() => setEditIndividualCategory('teen')}
                     className={`flex-1 flex flex-col items-center py-2 px-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-50 disabled:pointer-events-none ${editIndividualCategory === 'teen' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40'}`}
                   >
-                    <span>Adolescente</span>
+                    <span>{t("panel.invitados.adolescente")}</span>
                     {pagoTarjetaHabilitado && currentPrecioAdolescente ? <span className="text-xs opacity-70 mt-0.5">${currentPrecioAdolescente}</span> : null}
                   </button>
                 </div>
@@ -1434,8 +1459,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      Adultos
-                      {pagoTarjetaHabilitado && (currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
+                      {t("panel.invitados.adultos")}
+                      {pagoTarjetaHabilitado && (currentAdultPrice ? <span className="text-xs text-muted-foreground">(${currentAdultPrice})</span> : <span className="text-xs text-orange-400">{t("panel.invitados.sinPrecio")}</span>)}
                     </Label>
                     <Switch
                       checked={editAdultsEnabled}
@@ -1443,7 +1468,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     />
                   </div>
                   {editAdultsEnabled && (
-                    <QuantityStepper value={editGuestAdultCount} onChange={setEditGuestAdultCount} min={1} max={20} ariaLabel="adultos" />
+                    <QuantityStepper value={editGuestAdultCount} onChange={setEditGuestAdultCount} min={1} max={20} ariaLabel={t("panel.invitados.adultos")} t={t} />
                   )}
                 </div>
 
@@ -1452,8 +1477,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      Adolescentes
-                      {pagoTarjetaHabilitado && (currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
+                      {t("panel.invitados.adolescentes")}
+                      {pagoTarjetaHabilitado && (currentPrecioAdolescente ? <span className="text-xs text-muted-foreground">(${currentPrecioAdolescente})</span> : <span className="text-xs text-orange-400">{t("panel.invitados.sinPrecio")}</span>)}
                     </Label>
                     <Switch
                       checked={editTeensEnabled}
@@ -1461,7 +1486,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     />
                   </div>
                   {editTeensEnabled && (
-                    <QuantityStepper value={editGuestTeenCount} onChange={setEditGuestTeenCount} min={0} max={20} ariaLabel="adolescentes" />
+                    <QuantityStepper value={editGuestTeenCount} onChange={setEditGuestTeenCount} min={0} max={20} ariaLabel={t("panel.invitados.adolescentes")} t={t} />
                   )}
                 </div>
 
@@ -1470,8 +1495,8 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   <div className="flex items-center justify-between mb-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      Niños
-                      {pagoTarjetaHabilitado && (currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">Sin precio</span>)}
+                      {t("panel.invitados.ninos")}
+                      {pagoTarjetaHabilitado && (currentPrecioNino ? <span className="text-xs text-muted-foreground">(${currentPrecioNino})</span> : <span className="text-xs text-orange-400">{t("panel.invitados.sinPrecio")}</span>)}
                     </Label>
                     <Switch
                       checked={editChildrenEnabled}
@@ -1479,7 +1504,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     />
                   </div>
                   {editChildrenEnabled && (
-                    <QuantityStepper value={editGuestChildCount} onChange={setEditGuestChildCount} min={0} max={20} ariaLabel="niños" />
+                    <QuantityStepper value={editGuestChildCount} onChange={setEditGuestChildCount} min={0} max={20} ariaLabel={t("panel.invitados.ninos")} t={t} />
                   )}
                 </div>
               </div>
@@ -1490,10 +1515,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
               <div className="flex items-center justify-between pt-2">
                 <div className="space-y-0.5">
                   <Label htmlFor="edit-exempt" className="font-medium">
-                    Exento de pago
+                    {t("panel.invitados.exentoDePago")}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    El invitado no tendrá que abonar tarjeta.
+                    {t("panel.invitados.exentoDePagoDetalle")}
                   </p>
                 </div>
                 <Switch
@@ -1510,10 +1535,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 variant="outline"
                 onClick={() => setGuestToEdit(null)}
               >
-                Cancelar
+                {t("comun.cancelar")}
               </Button>
               <Button type="submit" disabled={isEditSubmitting}>
-                {isEditSubmitting ? "Guardando..." : "Guardar Cambios"}
+                {isEditSubmitting ? t("comun.guardando") : t("panel.perfil.guardarCambios")}
               </Button>
             </DialogFooter>
           </form>
@@ -1525,19 +1550,19 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         <DialogContent variant="centered" className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              {priceModal.category === 'adult' ? '💰 Precio Adulto' : priceModal.category === 'teen' ? '🎓 Precio Adolescente' : '👶 Precio Niño'}
+              {t(priceModal.category === 'adult' ? "panel.invitados.precioAdulto" : priceModal.category === 'teen' ? "panel.invitados.precioAdolescente" : "panel.invitados.precioNino")}
             </DialogTitle>
             <DialogDescription>
-              No hay precio configurado para esta categoría. Ingresá el monto para habilitarla.
+              {t("panel.invitados.sinPrecioDetalle")}
             </DialogDescription>
           </DialogHeader>
           <div className="py-3">
-            <Label className="text-sm mb-2 block">Monto ($)</Label>
+            <Label className="text-sm mb-2 block">{t("panel.invitados.monto")}</Label>
             <Input
               type="number"
               min="0"
               step="0.01"
-              placeholder="Ej: 5000"
+              placeholder={t("panel.invitados.ejemploMonto")}
               value={priceModalValue}
               onChange={(e) => setPriceModalValue(e.target.value)}
               autoFocus
@@ -1545,10 +1570,10 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setPriceModal(m => ({ ...m, open: false }))} disabled={isSavingPrice}>
-              Cancelar
+              {t("comun.cancelar")}
             </Button>
             <Button onClick={handleSavePrice} disabled={isSavingPrice}>
-              {isSavingPrice ? "Guardando..." : "Guardar y Habilitar"}
+              {isSavingPrice ? t("comun.guardando") : t("panel.invitados.guardarYHabilitar")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1562,31 +1587,31 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
         }}
         onUseCredit={upgradeAndRetryAddGuest}
         onPayMercadoPago={payMercadoPagoForGuestLimitUpgrade}
-        title="Llegaste al límite de invitados del plan Gratis"
-        description="El plan Gratis admite hasta 20 personas -- pasate a Premium o Diamond para seguir agregando invitados sin perder los que ya cargaste."
+        title={t("panel.invitados.limiteTitulo")}
+        description={t("panel.invitados.limiteDetalle")}
       />
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, t }: { status: string; t: Traductor }) {
   switch (status) {
     case "CONFIRMED":
       return (
         <div className="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs font-medium border border-green-100">
-          <CheckCircle className="w-3 h-3" /> Confirmado
+          <CheckCircle className="w-3 h-3" /> {t("panel.invitados.confirmado")}
         </div>
       );
     case "DECLINED":
       return (
         <div className="flex items-center gap-1 text-red-600 bg-red-50 px-2 py-1 rounded-full text-xs font-medium border border-red-100">
-          <XCircle className="w-3 h-3" /> No asistirá
+          <XCircle className="w-3 h-3" /> {t("panel.invitados.noAsistira")}
         </div>
       );
     default:
       return (
         <div className="flex items-center gap-1 text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full text-xs font-medium border border-yellow-100">
-          <Clock className="w-3 h-3" /> Pendiente
+          <Clock className="w-3 h-3" /> {t("panel.invitados.pendiente")}
         </div>
       );
   }

@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useWizardStore } from "@/store/wizard-store";
 import { getWizardSteps, isStorytellingTemplate } from "./wizard-steps-config";
 import { isAdmin as isAdminRole } from "@/lib/roles";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 // Corrección 1 (docs/correcciones.md): preview del wizard con fidelidad
 // real — reemplaza al mockup de teléfono inventado (WizardPreviewPane) por
@@ -24,6 +25,7 @@ const LIVE_DATA_DEBOUNCE_MS = 200;
 
 export function WizardLivePreview() {
     const { data, themeConfig, currentStep } = useWizardStore();
+    const t = useTextos();
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const frameBoxRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
@@ -257,7 +259,7 @@ export function WizardLivePreview() {
                 <iframe
                     ref={iframeRef}
                     src={previewSrc}
-                    title="Vista previa de tu invitación"
+                    title={t("wizard.vistaPrevia")}
                     tabIndex={-1}
                     style={{
                         width: MOBILE_VIEWPORT_WIDTH,

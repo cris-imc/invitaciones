@@ -5,6 +5,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { TITLE_FONT_OPTIONS, BODY_FONT_OPTIONS, type FontOption } from "@/lib/typography-map";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 function FontGrid({
     options,
@@ -40,7 +41,7 @@ function FontGrid({
                             textAlign: "center",
                             background: isActive
                                 ? "rgba(199,154,75,.08)"
-                                : "rgba(246,243,236,.03)",
+                                : "var(--tinte-1)",
                             transition: "all 0.15s",
                             position: "relative",
                         }}
@@ -85,7 +86,7 @@ function FontGrid({
                             style={{
                                 fontFamily: "var(--font-mono)",
                                 fontSize: "9px",
-                                color: "rgba(246,243,236,.35)",
+                                color: "var(--shell-fg-faint)",
                                 letterSpacing: "0.05em",
                             }}
                         >
@@ -100,16 +101,19 @@ function FontGrid({
 
 export function StepTypography() {
     const { data, setData } = useWizardStore();
+    const t = useTextos();
     const selectedTitle = data.fontTitle || "fraunces";
     const selectedBody = data.fontBody || "space-grotesk";
+    // El nombre real que cargó el anfitrión manda; sólo el relleno de muestra
+    // (cuando todavía no cargó nada) sale del diccionario.
     const getPreviewName = () => {
         if (data.type === "CASAMIENTO") {
-            return data.nombreNovia || "María";
+            return data.nombreNovia || t("wizard.tipografia.muestraNombre");
         }
         if (data.type === "QUINCE_ANOS") {
-            return data.nombreQuinceanera || "Mis 15 Años";
+            return data.nombreQuinceanera || t("wizard.tipografia.muestraQuince");
         }
-        return data.nombreEvento || "Nombre del Evento";
+        return data.nombreEvento || t("wizard.tipografia.muestraEvento");
     };
     
     const previewName = getPreviewName();
@@ -129,16 +133,16 @@ export function StepTypography() {
                     className="text-[10px] uppercase tracking-[0.1em] font-bold mb-2"
                     style={{ color: "var(--accent)", fontFamily: "var(--font-mono)" }}
                 >
-                    Tipografía
+                    {t("wizard.tipografia.etiqueta")}
                 </p>
                 <h2
                     className="text-2xl font-bold mb-1"
                     style={{ fontFamily: "var(--font-display)", color: "var(--paper)" }}
                 >
-                    Elegí la tipografía
+                    {t("wizard.tipografia.titulo")}
                 </h2>
-                <p style={{ fontSize: "12.5px", color: "rgba(246,243,236,.5)", lineHeight: 1.5 }}>
-                    Define el carácter visual de tu invitación. Podés cambiarla después.
+                <p style={{ fontSize: "12.5px", color: "var(--shell-fg-soft)", lineHeight: 1.5 }}>
+                    {t("wizard.tipografia.subtitulo")}
                 </p>
             </div>
 
@@ -150,10 +154,10 @@ export function StepTypography() {
                         fontSize: "10px",
                         textTransform: "uppercase",
                         letterSpacing: "0.08em",
-                        color: "rgba(246,243,236,.5)",
+                        color: "var(--shell-fg-soft)",
                     }}
                 >
-                    Títulos
+                    {t("wizard.tipografia.titulos")}
                 </p>
                 <FontGrid
                     options={visibleTitleOptions}
@@ -168,13 +172,13 @@ export function StepTypography() {
                             onClick={() => setModalTitleOpen(true)}
                             className="text-xs font-medium opacity-70 hover:opacity-100 transition-opacity flex items-center justify-center w-full py-1"
                         >
-                            Ver más tipografías
+                            {t("wizard.tipografia.verMas")}
                         </button>
                         <Dialog open={modalTitleOpen} onOpenChange={setModalTitleOpen}>
                             <DialogContent className="max-w-4xl w-[95vw] max-h-[85vh] overflow-y-auto">
                                 <DialogHeader>
-                                    <DialogTitle>Elegí la tipografía de los Títulos</DialogTitle>
-                                    <DialogDescription>Todas las tipografías disponibles para tus títulos.</DialogDescription>
+                                    <DialogTitle>{t("wizard.tipografia.modalTitulos")}</DialogTitle>
+                                    <DialogDescription>{t("wizard.tipografia.modalTitulosDesc")}</DialogDescription>
                                 </DialogHeader>
                                 <div className="py-4">
                                     <FontGrid
@@ -201,15 +205,15 @@ export function StepTypography() {
                         fontSize: "10px",
                         textTransform: "uppercase",
                         letterSpacing: "0.08em",
-                        color: "rgba(246,243,236,.5)",
+                        color: "var(--shell-fg-soft)",
                     }}
                 >
-                    Texto
+                    {t("wizard.tipografia.texto")}
                 </p>
                 <FontGrid
                     options={visibleBodyOptions}
                     selectedId={selectedBody}
-                    previewText="Abrir invitación"
+                    previewText={t("wizard.tipografia.muestraTexto")}
                     onSelect={(id) => setData({ fontBody: id })}
                 />
                 {BODY_FONT_OPTIONS.length > 4 && (
@@ -219,19 +223,19 @@ export function StepTypography() {
                             onClick={() => setModalBodyOpen(true)}
                             className="text-xs font-medium opacity-70 hover:opacity-100 transition-opacity flex items-center justify-center w-full py-1"
                         >
-                            Ver más tipografías
+                            {t("wizard.tipografia.verMas")}
                         </button>
                         <Dialog open={modalBodyOpen} onOpenChange={setModalBodyOpen}>
                             <DialogContent className="max-w-4xl w-[95vw] max-h-[85vh] overflow-y-auto">
                                 <DialogHeader>
-                                    <DialogTitle>Elegí la tipografía del Texto</DialogTitle>
-                                    <DialogDescription>Todas las tipografías disponibles para tus textos.</DialogDescription>
+                                    <DialogTitle>{t("wizard.tipografia.modalTexto")}</DialogTitle>
+                                    <DialogDescription>{t("wizard.tipografia.modalTextoDesc")}</DialogDescription>
                                 </DialogHeader>
                                 <div className="py-4">
                                     <FontGrid
                                         options={BODY_FONT_OPTIONS}
                                         selectedId={selectedBody}
-                                        previewText="Abrir invitación"
+                                        previewText={t("wizard.tipografia.muestraTexto")}
                                         onSelect={(id) => {
                                             setData({ fontBody: id });
                                             setModalBodyOpen(false);

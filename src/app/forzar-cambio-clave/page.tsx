@@ -45,14 +45,14 @@ export default function ForzarCambioClavePage() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-black px-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-900/50 p-8 shadow-xl backdrop-blur-sm">
+    <div className="pantalla-auth flex min-h-dvh items-center justify-center bg-[var(--background)] px-4">
+      <div className="w-full max-w-md rounded-2xl border border-[var(--line)] bg-[var(--card)] p-8 shadow-xl backdrop-blur-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 mb-4">
             <Lock className="h-8 w-8 text-amber-500" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Cambio de Contraseña Requerido</h1>
-          <p className="text-sm text-zinc-400">
+          <h1 className="text-2xl font-bold text-[var(--foreground)] mb-2">Cambio de Contraseña Requerido</h1>
+          <p className="text-sm text-[var(--shell-fg-mid)]">
             Tu cuenta fue creada o modificada por un administrador. Por seguridad, debes establecer una nueva contraseña para continuar.
           </p>
         </div>
@@ -60,23 +60,23 @@ export default function ForzarCambioClavePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Nueva Contraseña</label>
+              <label className="text-sm font-medium text-[var(--shell-fg-strong)]">Nueva Contraseña</label>
               <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={PASSWORD_MIN_LENGTH}
-                className="bg-black border-white/10"
+                className="bg-[var(--background)] border-[var(--line)]"
               />
-              <p className="text-xs text-zinc-500">Mínimo 8 caracteres, con al menos una mayúscula y un número</p>
+              <p className="text-xs text-[var(--shell-fg-soft)]">Mínimo 8 caracteres, con al menos una mayúscula y un número</p>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Confirmar Nueva Contraseña</label>
+              <label className="text-sm font-medium text-[var(--shell-fg-strong)]">Confirmar Nueva Contraseña</label>
               <PasswordInput 
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="bg-black border-white/10"
+                className="bg-[var(--background)] border-[var(--line)]"
               />
             </div>
           </div>

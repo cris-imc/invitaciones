@@ -12,21 +12,23 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Switch } from "@/components/ui/switch";
 import { Church, MapPin, Clock, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function StepCeremonia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
+    const t = useTextos();
     const [showInfo, setShowInfo] = useState(false);
 
     const ceremoniaSchemaValidated = ceremoniaSchema.superRefine((values, ctx) => {
         if (!values.ceremoniaHabilitada) return;
         if (!values.ceremoniaNombre?.trim()) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaNombre'], message: 'El nombre del lugar es obligatorio' });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaNombre'], message: t("wizard.ceremonia.errorNombre") });
         }
         if (!values.ceremoniaDireccion?.trim()) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaDireccion'], message: 'La dirección es obligatoria' });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaDireccion'], message: t("wizard.ceremonia.errorDireccion") });
         }
         if (!values.ceremoniaHora?.trim()) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaHora'], message: 'El horario es obligatorio' });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ceremoniaHora'], message: t("wizard.ceremonia.errorHora") });
         }
     });
 
@@ -34,7 +36,7 @@ export function StepCeremonia() {
         resolver: zodResolver(ceremoniaSchemaValidated),
         defaultValues: {
             ceremoniaHabilitada: data.ceremoniaHabilitada ?? false,
-            ceremoniaTitulo: data.ceremoniaTitulo || "Ceremonia Religiosa / Civil",
+            ceremoniaTitulo: data.ceremoniaTitulo || t("wizard.ceremonia.titulo"),
             ceremoniaNombre: data.ceremoniaNombre || "",
             ceremoniaDireccion: data.ceremoniaDireccion || "",
             ceremoniaHora: data.ceremoniaHora || "",
@@ -66,9 +68,9 @@ export function StepCeremonia() {
                 <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center mb-3">
                     <Church className="w-6 h-6 text-accent" />
                 </div>
-                <h2 className="text-2xl font-bold">Ceremonia Religiosa / Civil</h2>
+                <h2 className="text-2xl font-bold">{t("wizard.ceremonia.titulo")}</h2>
                 <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                    Si la ceremonia o el matrimonio civil se realiza en una ubicación o fecha/hora distinta al salón de fiesta, activa esta sección.
+                    {t("wizard.ceremonia.subtitulo")}
                 </p>
             </div>
 
@@ -81,7 +83,7 @@ export function StepCeremonia() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Cuándo activar la sección de Ceremonia?</span>
+                        <span>{t("wizard.ceremonia.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -90,7 +92,7 @@ export function StepCeremonia() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        Activá esta sección únicamente si la misa, bendición de anillos o firma en el registro civil ocurre en una ubicación, iglesia o templo distinto del salón donde será la fiesta principal. Podrás ingresar la dirección, horario propio y mapa interactivo.
+                        {t("wizard.ceremonia.infoTexto")}
                     </div>
                 )}
             </div>
@@ -101,13 +103,13 @@ export function StepCeremonia() {
                         control={form.control}
                         name="ceremoniaHabilitada"
                         render={({ field }) => (
-                            <FormItem className="flex items-center justify-between p-4 border border-white/20 rounded-xl bg-[var(--ink-2)]">
+                            <FormItem className="flex items-center justify-between p-4 border border-[var(--campo-borde)] rounded-xl bg-[var(--ink-2)]">
                                 <div className="space-y-0.5">
                                     <FormLabel className="text-base font-semibold">
-                                        ¿Agregar ubicación de Iglesia / Civil?
+                                        {t("wizard.ceremonia.activar")}
                                     </FormLabel>
                                     <p className="text-xs text-muted-foreground">
-                                        (Opcional - Actívalo si la ceremonia es en otro lugar)
+                                        {t("wizard.ceremonia.activarAyuda")}
                                     </p>
                                 </div>
                                 <FormControl>
@@ -121,17 +123,17 @@ export function StepCeremonia() {
                     />
 
                     {ceremoniaHabilitada && (
-                        <div className="space-y-4 p-5 border border-white/10 rounded-2xl bg-[var(--ink)]/40">
+                        <div className="space-y-4 p-5 border border-[var(--line)] rounded-2xl bg-[var(--ink)]/40">
                             <FormField
                                 control={form.control}
                                 name="ceremoniaTitulo"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Título de la Sección</FormLabel>
+                                        <FormLabel>{t("wizard.ceremonia.tituloSeccion")}</FormLabel>
                                         <FormControl>
                                             <Input
-                                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
-                                                placeholder="Ej: Ceremonia Religiosa, Registro Civil, Boda"
+                                                className="bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl"
+                                                placeholder={t("wizard.ceremonia.tituloSeccionPlaceholder")}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -145,11 +147,11 @@ export function StepCeremonia() {
                                 name="ceremoniaNombre"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Nombre de la Iglesia / Registro Civil / Lugar</FormLabel>
+                                        <FormLabel>{t("wizard.ceremonia.nombreLugar")}</FormLabel>
                                         <FormControl>
                                             <Input
-                                                className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
-                                                placeholder="Ej: Parroquia Nuestra Señora del Carmen"
+                                                className="bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl"
+                                                placeholder={t("wizard.ceremonia.nombreLugarPlaceholder")}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -164,13 +166,13 @@ export function StepCeremonia() {
                                     name="ceremoniaDireccion"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Dirección</FormLabel>
+                                            <FormLabel>{t("wizard.ceremonia.direccion")}</FormLabel>
                                             <FormControl>
                                                 <div className="relative">
                                                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                                     <Input
-                                                        className="pl-9 bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl"
-                                                        placeholder="Ej: Av. Santa Fe 1234"
+                                                        className="pl-9 bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl"
+                                                        placeholder={t("wizard.ceremonia.direccionPlaceholder")}
                                                         {...field}
                                                     />
                                                 </div>
@@ -185,13 +187,13 @@ export function StepCeremonia() {
                                     name="ceremoniaHora"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Horario de la Ceremonia</FormLabel>
+                                            <FormLabel>{t("wizard.ceremonia.hora")}</FormLabel>
                                             <FormControl>
                                                 <div className="relative">
                                                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
                                                     <Input
                                                         type="time"
-                                                        className="pl-9 bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl [&::-webkit-calendar-picker-indicator]:hidden cursor-pointer"
+                                                        className="pl-9 bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl [&::-webkit-calendar-picker-indicator]:hidden cursor-pointer"
                                                         onClick={(e) => "showPicker" in e.currentTarget && typeof e.currentTarget.showPicker === 'function' && e.currentTarget.showPicker()}
                                                         {...field}
                                                     />

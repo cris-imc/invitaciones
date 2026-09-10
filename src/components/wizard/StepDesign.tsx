@@ -73,6 +73,7 @@ import {
 } from "./TemplatePreviewModal";
 import { Wand2, Sparkles, LayoutGrid } from "lucide-react";
 import { isStorytellingTemplate } from "./wizard-steps-config";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     ELEGANT: "Elegant",
@@ -207,6 +208,7 @@ type Collection = "FLAT" | "STORYTELLING";
 
 export function StepDesign() {
     const { data, setData, setThemeConfig, themeConfig, usePremiumCredit, setDirty } = useWizardStore();
+    const t = useTextos();
     const [isCreating, setIsCreating] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
     const selectedTemplate = data.templateTipo || "ORIGINAL";
@@ -272,11 +274,11 @@ export function StepDesign() {
     return (
         <div className="space-y-8">
             <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">Selecciona tu Plantilla</h2>
+                <h2 className="text-2xl font-bold mb-2">{t("wizard.plantilla.titulo")}</h2>
                 <p className="text-muted-foreground">
                     {isDesignEvent
-                        ? 'Elegí el estilo y la gama de colores para tu invitación'
-                        : 'Elige el estilo que mejor represente tu evento'}
+                        ? t("wizard.plantilla.subtituloDiseno")
+                        : t("wizard.plantilla.subtituloOtro")}
                 </p>
             </div>
 
@@ -296,7 +298,7 @@ export function StepDesign() {
                             }`}
                         >
                             <LayoutGrid className="w-4 h-4 text-muted-foreground" />
-                            Colección Flat
+                            {t("wizard.plantilla.coleccionFlat")}
                         </button>
 
                         {/* Guest Pass VIP (Casamiento), Princesa (Quince Años) y Baby Shower y
@@ -313,10 +315,10 @@ export function StepDesign() {
                                 }`}
                             >
                                 <span className="absolute -top-2 -right-2 text-[9px] font-bold tracking-wider uppercase bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full shadow-sm">
-                                    Nuevas
+                                    {t("wizard.plantilla.nuevas")}
                                 </span>
                                 <Sparkles className="w-4 h-4 text-muted-foreground shrink-0" />
-                                <span>Colección Storytelling</span>
+                                <span>{t("wizard.plantilla.coleccionStorytelling")}</span>
                             </button>
                         )}
                     </div>
@@ -332,18 +334,18 @@ export function StepDesign() {
                                     }}
                                 />
                                 <div className="text-left">
-                                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Plantilla actual</p>
+                                    <p className="text-xs uppercase tracking-wide text-muted-foreground">{t("wizard.plantilla.plantillaActual")}</p>
                                     <p className="font-semibold">{TEMPLATE_TIPO_LABEL[currentTemplateTipo]}</p>
                                     <p className="text-sm text-muted-foreground">{currentColorOption?.name}</p>
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-sm text-muted-foreground">Todavía no elegiste una plantilla</p>
+                            <p className="text-sm text-muted-foreground">{t("wizard.plantilla.sinPlantilla")}</p>
                         )}
 
                         <Button type="button" size="lg" className="gap-2" onClick={() => setPreviewOpen(true)}>
                             <Wand2 className="w-4 h-4" />
-                            {collection === "STORYTELLING" ? "Ver Modelos Storytelling" : "Ver Modelos Flat"}
+                            {collection === "STORYTELLING" ? t("wizard.plantilla.verModelosStorytelling") : t("wizard.plantilla.verModelosFlat")}
                         </Button>
 
                         <TemplatePreviewModal
@@ -373,8 +375,8 @@ export function StepDesign() {
                     {selectedTemplate === "PARALLAX" && (
                         <div className="space-y-2 border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-r-lg">
                             <Label htmlFor="imagenCelebremosJuntos">
-                                Imagen "Celebremos Juntos"
-                                <span className="text-xs text-muted-foreground ml-2">(Solo para Parallax)</span>
+                                {t("wizard.plantilla.imagenCelebremos")}
+                                <span className="text-xs text-muted-foreground ml-2">{t("wizard.plantilla.soloParallax")}</span>
                             </Label>
                             <ImageUploader
                                 currentImage={data.imagenCelebremosJuntos}
@@ -382,7 +384,7 @@ export function StepDesign() {
                                 aspectRatio={3 / 4}
                             />
                             <p className="text-xs text-muted-foreground">
-                                Esta imagen aparecerá en la mitad derecha de la pantalla con efecto parallax.
+                                {t("wizard.plantilla.ayudaParallax")}
                             </p>
                         </div>
                     )}

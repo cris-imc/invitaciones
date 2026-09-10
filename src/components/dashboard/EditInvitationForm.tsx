@@ -272,7 +272,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                                 value={formData.fecha}
                                                 onChange={(e) => handleInputChange('fecha', e.target.value)}
                                                 disabled={isLocked}
-                                                className="w-full p-2 border rounded-md disabled:bg-slate-100 disabled:cursor-not-allowed dark:disabled:bg-slate-800"
+                                                className="w-full p-2 border rounded-md disabled:bg-[var(--tinte-2)] disabled:cursor-not-allowed"
                                                 required
                                             />
                                             {rawLocked && !isAdmin && (
@@ -301,8 +301,8 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         </div>
 
                         {/* Configuración de Sugerencia de Música */}
-                        <div className="border p-4 rounded-lg bg-slate-50">
-                            <h3 className="font-semibold mb-4 text-slate-800 flex items-center gap-2">
+                        <div className="border p-4 rounded-lg bg-[var(--tinte-1)]">
+                            <h3 className="font-semibold mb-4 text-[var(--foreground)] flex items-center gap-2">
                                 <span className="text-xl">🎵</span>
                                 Sugerencia de Canciones
                             </h3>
@@ -313,7 +313,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                         checked={formData.sugerenciaMusicaHabilitada && invitation.planTier !== "FREE"}
                                         disabled={invitation.planTier === "FREE"}
                                         onChange={(e) => handleInputChange('sugerenciaMusicaHabilitada', e.target.checked)}
-                                        className="rounded border-gray-300"
+                                        className="rounded border-[var(--campo-borde)]"
                                     />
                                     <span className="text-sm font-medium flex items-center gap-2">
                                         Permitir a los invitados sugerir canciones
@@ -471,7 +471,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         </div>
 
                         {/* Portada */}
-                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                        <div className="space-y-4 border p-4 rounded-lg bg-[var(--tinte-1)]">
                             <h3 className="font-semibold text-lg border-b pb-2">Portada de Bienvenida</h3>
                             <div className="space-y-4">
                                 <div className="space-y-2">
@@ -535,7 +535,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         </div>
 
                         {/* Música */}
-                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                        <div className="space-y-4 border p-4 rounded-lg bg-[var(--tinte-1)]">
                             <div className="flex items-center space-x-2 relative group w-fit">
                                     <Checkbox
                                         id="musicaHabilitada"
@@ -555,7 +555,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                     )}
                                 </div>
                             {formData.musicaHabilitada && invitation.planTier !== "FREE" && (
-                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                <div className="space-y-4 pl-6 border-l-2 border-[var(--line)] ml-1">
                                     <MusicUploader
                                         currentMusicUrl={formData.musicaUrl}
                                         onMusicUploaded={(url) => handleInputChange('musicaUrl', url)}
@@ -565,7 +565,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         </div>
 
                         {/* Galería Simple (Edición rápida) */}
-                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                        <div className="space-y-4 border p-4 rounded-lg bg-[var(--tinte-1)]">
                             <div className="flex items-center space-x-2">
                                 <Checkbox
                                     id="galeriaPrincipalHabilitada"
@@ -575,7 +575,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                 <Label htmlFor="galeriaPrincipalHabilitada" className="font-semibold cursor-pointer">Galería de Fotos ({formData.galeriaPrincipalFotos.length})</Label>
                             </div>
                             {formData.galeriaPrincipalHabilitada && (
-                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                <div className="space-y-4 pl-6 border-l-2 border-[var(--line)] ml-1">
                                     <p className="text-xs text-muted-foreground">Para editar la galería completa, usa el Wizard completo (próximamente) o sube nuevas fotos aquí para reemplazar.</p>
                                     <ImageUploader
                                         currentImage=""
@@ -608,7 +608,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         </div>
 
                         {/* Quiz/Trivia Section */}
-                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                        <div className="space-y-4 border p-4 rounded-lg bg-[var(--tinte-1)]">
                             <div className="flex items-center space-x-2 relative group w-fit">
                                     <Checkbox
                                         id="triviaHabilitada"
@@ -628,7 +628,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                     )}
                                 </div>
                             {formData.triviaHabilitada && invitation.planTier !== "FREE" && (
-                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                <div className="space-y-4 pl-6 border-l-2 border-[var(--line)] ml-1">
                                     <p className="text-sm text-muted-foreground mb-3">
                                         Edita las preguntas del quiz (formato JSON)
                                     </p>
@@ -656,7 +656,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                         </div>
 
                         {/* Regalo/Datos Bancarios Section */}
-                        <div className="space-y-4 border p-4 rounded-lg bg-slate-50">
+                        <div className="space-y-4 border p-4 rounded-lg bg-[var(--tinte-1)]">
                             <div className="flex items-center space-x-2">
                                 <Checkbox
                                     id="regaloHabilitado"
@@ -668,7 +668,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                 </Label>
                             </div>
                             {formData.regaloHabilitado && (
-                                <div className="space-y-4 pl-6 border-l-2 border-slate-200 ml-1">
+                                <div className="space-y-4 pl-6 border-l-2 border-[var(--line)] ml-1">
                                     <div className="space-y-2">
                                         <Label htmlFor="regaloTitulo">Título</Label>
                                         <Input

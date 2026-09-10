@@ -15,13 +15,20 @@ import { CalendarIcon, Lock, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { isEventDateLocked } from "@/lib/expiration";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { es, enUS, ptBR } from "date-fns/locale";
 import { useSession } from "next-auth/react";
 import { isAdmin as isAdminRole } from "@/lib/roles";
 import { SaveStepButtons } from "./SaveStepButtons";
+import { useIdioma } from "@/components/i18n/ProveedorIdioma";
+
+// El formato largo de fecha ("12 de marzo de 2027") lo arma date-fns, no el
+// diccionario: el nombre del mes y el orden de las partes cambian con el
+// idioma y no hay forma de escribirlos como texto fijo.
+const LOCALES_FECHA = { es, en: enUS, pt: ptBR } as const;
 
 export function StepBasicInfo() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
+    const { t, idioma } = useIdioma();
     const [showInfo, setShowInfo] = useState(false);
     const { data: session } = useSession();
     const isAdmin = isAdminRole(session?.user?.role) || session?.user?.planTier === "ADMIN";
@@ -61,8 +68,8 @@ export function StepBasicInfo() {
     return (
         <div className="space-y-6">
             <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold">Información Básica</h2>
-                <p className="text-muted-foreground text-sm">Contanos los detalles principales del evento.</p>
+                <h2 className="text-2xl font-bold">{t("wizard.basicos.titulo")}</h2>
+                <p className="text-muted-foreground text-sm">{t("wizard.basicos.subtitulo")}</p>
             </div>
 
             {/* Caja informativa de Usabilidad (Collapsible - Minimizada por defecto) */}
@@ -74,7 +81,7 @@ export function StepBasicInfo() {
                 >
                     <div className="flex items-center gap-2.5 font-semibold text-amber-300 text-sm">
                         <Info className="w-4.5 h-4.5 shrink-0 text-amber-400" />
-                        <span>¿Para qué sirve la Información Básica?</span>
+                        <span>{t("wizard.basicos.infoTitulo")}</span>
                     </div>
                     <div className="text-amber-400 opacity-80 hover:opacity-100 transition-opacity shrink-0">
                         {showInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -83,7 +90,7 @@ export function StepBasicInfo() {
 
                 {showInfo && (
                     <div className="px-4 pb-4 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 animate-in fade-in duration-200">
-                        Esta información establece los cimientos de tu invitación: el nombre del evento, la fecha de celebración y los nombres de los agasajados. Con estos datos se calcula la cuenta regresiva, se encabeza la portada y se organiza la agenda de tus invitados.
+                        {t("wizard.basicos.infoTexto")}
                     </div>
                 )}
             </div>
@@ -118,10 +125,10 @@ export function StepBasicInfo() {
                             return (
                                 <FormItem className="flex flex-col">
                                     <FormLabel className="flex items-center justify-between">
-                                        <span>Fecha del Evento</span>
+                                        <span>{t("wizard.basicos.fecha")}</span>
                                         {showLockStatus && (
                                             <span className={`text-xs flex items-center gap-1 font-semibold ${isAdmin ? 'text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                                                <Lock className="w-3 h-3" /> {isAdmin ? "👑 Desbloqueado (Admin)" : "Bloqueada (30d)"}
+                                                <Lock className="w-3 h-3" /> {isAdmin ? `👑 ${t("wizard.basicos.desbloqueadoAdmin")}` : t("wizard.basicos.bloqueada30d")}
                                             </span>
                                         )}
                                     </FormLabel>
@@ -132,14 +139,14 @@ export function StepBasicInfo() {
                                                     variant={"outline"}
                                                     disabled={isDateLocked}
                                                     className={cn(
-                                                        "w-full pl-3 text-left font-normal bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl hover:bg-[var(--ink-2)]/80 hover:text-[var(--on-ink)] disabled:opacity-60 disabled:cursor-not-allowed",
-                                                        !field.value && "text-white/30"
+                                                        "w-full pl-3 text-left font-normal bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl hover:bg-[var(--ink-2)]/80 hover:text-[var(--on-ink)] disabled:opacity-60 disabled:cursor-not-allowed",
+                                                        !field.value && "text-[var(--shell-fg-faint)]"
                                                     )}
                                                 >
                                                     {field.value ? (
-                                                        format(field.value, "PPP", { locale: es })
+                                                        format(field.value, "PPP", { locale: LOCALES_FECHA[idioma] })
                                                     ) : (
-                                                        <span>Selecciona una fecha</span>
+                                                        <span>{t("wizard.basicos.elegirFecha")}</span>
                                                     )}
                                                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                 </Button>
@@ -148,6 +155,7 @@ export function StepBasicInfo() {
                                         {!isDateLocked && (
                                             <PopoverContent className="w-auto p-0" align="start">
                                                 <Calendar
+                                                    locale={LOCALES_FECHA[idioma]}
                                                     mode="single"
                                                     selected={field.value}
                                                     onSelect={field.onChange}
@@ -161,12 +169,12 @@ export function StepBasicInfo() {
                                     </Popover>
                                     {showLockStatus && !isAdmin && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400">
-                                            Fecha bloqueada por seguridad. Faltan 30 días o menos para la fecha del evento.
+                                            {t("wizard.basicos.fechaBloqueadaTexto")}
                                         </p>
                                     )}
                                     {showLockStatus && isAdmin && (
                                         <p className="text-xs text-green-400 font-medium">
-                                            👑 Habilitado por rol Administrador: tenés permiso para editar la fecha aunque falten menos de 30 días.
+                                            {t("wizard.basicos.fechaAdminTexto")}
                                         </p>
                                     )}
                                     <FormMessage />
@@ -180,16 +188,16 @@ export function StepBasicInfo() {
                         name="ciudad"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Ciudad / Localidad del Evento</FormLabel>
+                                <FormLabel>{t("wizard.basicos.ciudad")}</FormLabel>
                                 <FormControl>
                                     <Input
-                                        className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] placeholder:text-white/30 h-12 rounded-xl"
-                                        placeholder="Ej: Buenos Aires, Rosario, Mendoza..."
+                                        className="bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
+                                        placeholder={t("wizard.basicos.ciudadPlaceholder")}
                                         {...field}
                                     />
                                 </FormControl>
                                 <p className="text-xs text-muted-foreground">
-                                    Aparecerá junto a la fecha en la tarjeta de bienvenida de tus invitados.
+                                    {t("wizard.basicos.ciudadAyuda")}
                                 </p>
                                 <FormMessage />
                             </FormItem>

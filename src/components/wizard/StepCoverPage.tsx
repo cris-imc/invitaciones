@@ -154,7 +154,7 @@ export function StepCoverPage() {
                                         className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
                                             !customKicker && d.portadaKicker === preset
                                                 ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
-                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                                : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)]"
                                         }`}
                                     >
                                         {preset}
@@ -177,7 +177,7 @@ export function StepCoverPage() {
                             {customKicker && (
                                 <Input
                                     id="portadaKicker"
-                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
+                                    className="bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
                                     placeholder="Escribí tu propio encabezado..."
                                     value={d.portadaKicker || ""}
                                     onChange={(e) => setData({ portadaKicker: e.target.value })}
@@ -213,7 +213,7 @@ export function StepCoverPage() {
                                     className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
                                         !customDress && !d.portadaDressCode
                                             ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
-                                            : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                            : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)]"
                                     }`}
                                 >
                                     Ninguno
@@ -229,7 +229,7 @@ export function StepCoverPage() {
                                         className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
                                             !customDress && d.portadaDressCode === preset
                                                 ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
-                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                                : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)]"
                                         }`}
                                     >
                                         {preset}
@@ -253,7 +253,7 @@ export function StepCoverPage() {
                                 <Input
                                     id="portadaDressCode"
                                     disabled={!dresscodeHabilitado}
-                                    className={`bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95 transition-opacity ${!dresscodeHabilitado ? "opacity-40" : ""}`}
+                                    className={`bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95 transition-opacity ${!dresscodeHabilitado ? "opacity-40" : ""}`}
                                     placeholder="Ej: Total Black / Fiesta de Disfraces"
                                     value={d.portadaDressCode || ""}
                                     onChange={(e) => setData({ portadaDressCode: e.target.value })}
@@ -277,7 +277,7 @@ export function StepCoverPage() {
                                         className={`text-xs px-3 py-2 rounded-xl border transition-all duration-200 ${
                                             !customBoton && (d.portadaTextoBoton || "Abrir invitación") === preset
                                                 ? "bg-amber-500/25 border-amber-400 text-amber-200 font-semibold shadow-sm"
-                                                : "bg-white/5 border-white/10 hover:bg-white/10 text-slate-300"
+                                                : "bg-[var(--tinte-1)] border-[var(--line)] hover:bg-[var(--tinte-2)] text-[var(--shell-fg-mid)]"
                                         }`}
                                     >
                                         {preset}
@@ -300,7 +300,7 @@ export function StepCoverPage() {
                             {customBoton && (
                                 <Input
                                     id="portadaTextoBoton"
-                                    className="bg-[var(--ink-2)] border border-white/20 text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
+                                    className="bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
                                     placeholder="Ej: Ingresar a la fiesta"
                                     value={d.portadaTextoBoton || ""}
                                     onChange={(e) => setData({ portadaTextoBoton: e.target.value })}

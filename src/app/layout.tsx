@@ -5,6 +5,8 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ViewportHeightFix } from "@/components/ViewportHeightFix";
 import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2, Sora, Dancing_Script, Playfair_Display, Great_Vibes, Merriweather, Lora, DM_Sans, Cinzel, Parisienne, Sacramento, Abril_Fatface, Prata, Montserrat, Open_Sans, Nunito, Lato } from 'next/font/google';
 import localFont from 'next/font/local';
+import { idiomaDelAnfitrion, paisDelAnfitrion } from "@/lib/i18n/servidor";
+import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
 
 const fraunces = Fraunces({ style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
@@ -68,18 +70,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+// Pasa a ser async para poder resolver el idioma del anfitrión en el
+// servidor. Se hace acá y no al hidratar para que el HTML llegue ya en el
+// idioma correcto: si se decidiera en el cliente, la primera pintura saldría
+// en español y cambiaría a la vista -- el mismo parpadeo que el script de
+// tema de abajo evita para los colores.
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const idioma = await idiomaDelAnfitrion();
+  // El país, para los textos que cambian por país y no por idioma (ver
+  // sobrescrituras.ts: en Estados Unidos son Sweet 16, no quince).
+  const pais = await paisDelAnfitrion();
+
   return (
     // suppressHydrationWarning: el script de abajo corre antes de que React
     // hidrate y puede agregar data-tema="claro" a este elemento. Sin este
     // flag, React compara ese atributo (puesto por el script) contra el HTML
     // que mandó el servidor (que nunca lo tiene) y tira un warning de
     // hidratación en <html> -- el mismo patrón que usa next-themes.
-    <html lang="es" className={`${allFonts}`} suppressHydrationWarning>
+    <html lang={idioma} className={`${allFonts}`} suppressHydrationWarning>
       <head>
         {/* Evita el "flash" de tema equivocado: si no hiciéramos esto, la
             página siempre pintaría oscuro primero (el default de globals.css)
@@ -99,7 +111,9 @@ export default function RootLayout({
         <ViewportHeightFix />
         <AuthProvider>
           <ToastProvider>
-            {children}
+            <ProveedorIdioma idioma={idioma} pais={pais}>
+              {children}
+            </ProveedorIdioma>
           </ToastProvider>
         </AuthProvider>
       </body>

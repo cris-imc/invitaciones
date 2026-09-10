@@ -12,6 +12,9 @@ import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplat
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
+import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
+import { ProveedorInvitacion } from "@/components/invitation/ContextoInvitacion";
+import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
 
 async function getInvitation(slug: string) {
     const invitation = await prisma.invitation.findUnique({
@@ -59,6 +62,10 @@ async function getInvitation(slug: string) {
             regaloMensaje: true,
             regaloMostrarDatos: true,
             regaloBanco: true,
+            pais: true,
+            idioma: true,
+            regaloDatosBancarios: true,
+            pagoTarjetaDatosBancarios: true,
             regaloCbu: true,
             regaloAlias: true,
             regaloTitular: true,
@@ -163,11 +170,21 @@ export default async function InvitationPage({ params }: { params: Promise<{ slu
 
     const isFree = invitation.planTier === 'FREE';
 
+        // El idioma de la INVITACIÓN, que pisa al del anfitrión para todo
+        // este subárbol: una boda en São Paulo manda su convite en portugués
+        // aunque el invitado tenga el navegador en inglés, y si un tío
+        // argentino lo abre lo tiene que ver igual que todos los demás.
+    const idiomaInvitacion = esIdiomaValido(invitation.idioma)
+        ? invitation.idioma
+        : idiomaSegunPais(invitation.pais);
+
     return (
-        <>
-            {isFree && <FreePlanBanner />}
-            {isFree && <FreePlanBannerSpacer />}
-            {renderTemplate()}
-        </>
+        <ProveedorIdioma idioma={idiomaInvitacion} pais={invitation.pais}>
+            <ProveedorInvitacion datos={invitation}>
+                {isFree && <FreePlanBanner />}
+                {isFree && <FreePlanBannerSpacer />}
+                {renderTemplate()}
+            </ProveedorInvitacion>
+        </ProveedorIdioma>
     );
 }
