@@ -73,7 +73,11 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       djSuggestions: true,
       sharedAlbum: true,
       analytics: true,
-      noWatermark: true,
+      // El crédito al pie se mantiene en Premium: sacarlo es de Diamond en
+      // adelante (ver la regla de .credito-alta en globals.css, que es la que
+      // realmente lo oculta). Decía true y la página de planes le prometía a
+      // Premium algo que el producto no hacía.
+      noWatermark: false,
       qrCodes: false,
       whatsappReminders: false,
       dedicatedSupport: true,

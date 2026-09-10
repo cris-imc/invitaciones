@@ -315,6 +315,22 @@ export default async function Home() {
                   <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>Sin función LIVE</span>
                 </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Con marca de agua de altainvitacion</span>
+                </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Sin organización de mesas</span>
+                </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Sin control de ingreso</span>
+                </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Sin ver quién abrió la invitación</span>
+                </li>
               </ul>
               <Link href={registerUrl} className="w-full mt-auto">
                 <Button className="w-full rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 py-6 border border-zinc-700 font-sans">Crear cuenta gratis</Button>
@@ -360,6 +376,22 @@ export default async function Home() {
                   <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>Sin función LIVE (exclusiva de Diamond)</span>
                 </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Con marca de agua de altainvitacion</span>
+                </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Sin organización de mesas</span>
+                </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Sin control de ingreso</span>
+                </li>
+                <li className="flex items-start gap-3 opacity-50">
+                  <span className="text-red-400 font-bold w-5 text-center flex-shrink-0">✕</span>
+                  <span>Sin ver quién abrió la invitación</span>
+                </li>
               </ul>
               <Link href={premiumUrl} className="w-full mt-auto">
                 <Button className="w-full rounded-xl bg-zinc-700 text-white hover:bg-zinc-600 py-6 font-semibold font-sans">Elegir Premium</Button>
@@ -403,6 +435,10 @@ export default async function Home() {
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span><strong className="text-white">Quién abrió la invitación:</strong> sabés a quién le llegó y a quién volver a escribirle</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-white">Sin marca de agua:</strong> la invitación es tuya, sin nuestro logo al pie</span>
                 </li>
               </ul>
               <Link href={diamondUrl} className="w-full mt-auto">
