@@ -3,35 +3,33 @@
 import { useState } from "react";
 import { Copy, Check, Landmark } from "lucide-react";
 
-/**
- * Los datos para transferir. Escritos una sola vez: aparecen en seis lugares
- * distintos del flujo de pago, y un alias tipeado seis veces es un alias que
- * tarde o temprano queda desactualizado en cinco.
- */
-export const DATOS_TRANSFERENCIA = {
-  alias: "altainvitacion",
-  cbu: "0270199420058344630049",
-  banco: "Banco Supervielle",
-  titular: "Cristian Iván Martínez Calderón",
-};
-
-/**
- * El CBU en grupos de cuatro, sólo para mostrarlo. Veintidós dígitos seguidos
- * son imposibles de verificar a ojo, y verificarlos es exactamente lo que hay
- * que hacer antes de transferir. Lo que se copia son los dígitos pelados.
- */
-function cbuLegible(cbu: string): string {
-  return cbu.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
-}
-
 const WHATSAPP_COMPROBANTE = `https://wa.me/5493517660000?text=${encodeURIComponent(
   "Hola! Te paso el comprobante de la transferencia para activar mi plan."
 )}`;
+
+interface CobroDelPais {
+  titular: string;
+  banco: string;
+  datos: { etiqueta: string; valor: string; copiable: boolean }[];
+}
 
 interface Props {
   /** Qué está pagando, para que el mensaje diga algo concreto. */
   concepto?: string;
   className?: string;
+}
+
+/**
+ * Agrupa de a cuatro para poder leerlo y compararlo con el resumen del banco.
+ * Veintidós dígitos seguidos son imposibles de verificar de un vistazo.
+ *
+ * Sólo cuando es puro número o número con espacios (un CBU, una CLABE, un
+ * IBAN): un alias o una llave Bre-B se muestran tal cual. Y lo que se COPIA
+ * es siempre el valor original, sin los espacios de adorno.
+ */
+function enGrupos(valor: string): string {
+  if (!/^[A-Za-z]{0,2}[\d\s]+$/.test(valor)) return valor;
+  return valor.replace(/\s+/g, "").replace(/(.{4})(?=.)/g, "$1 ").trim();
 }
 
 /**
@@ -44,15 +42,37 @@ interface Props {
  */
 export function PagoPorTransferencia({ concepto, className }: Props) {
   const [abierto, setAbierto] = useState(false);
-  // Cuál se copió, para que el "Copiado" salga en el botón correcto.
-  const [copiado, setCopiado] = useState<"alias" | "cbu" | null>(null);
+  // Qué etiqueta se copió, para que el "Copiado" salga en el botón correcto.
+  const [copiado, setCopiado] = useState<string | null>(null);
+  const [cobro, setCobro] = useState<CobroDelPais | null>(null);
+  const [cargando, setCargando] = useState(false);
 
-  const copiar = async (que: "alias" | "cbu") => {
+  // Los datos salen del servidor -- variables de entorno, ver lib/cobro.ts --
+  // y no del bundle, así que cambiar un número de cuenta en Railway tiene
+  // efecto sin volver a construir la app. Se piden al desplegar el panel y no
+  // al montar: la mayoría de la gente paga con Mercado Pago y nunca lo abre.
+  const alternar = () => {
+    const seAbre = !abierto;
+    setAbierto(seAbre);
+    if (!seAbre || cobro || cargando) return;
+
+    setCargando(true);
+    fetch("/api/cobro")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (j?.disponible) setCobro({ titular: j.titular, banco: j.banco, datos: j.datos });
+      })
+      .catch(() => {
+        // Sin datos no se muestra la sección: media cuenta bancaria en
+        // pantalla es peor que ninguna.
+      })
+      .finally(() => setCargando(false));
+  };
+
+  const copiar = async (etiqueta: string, valor: string) => {
     try {
-      await navigator.clipboard.writeText(
-        que === "alias" ? DATOS_TRANSFERENCIA.alias : DATOS_TRANSFERENCIA.cbu
-      );
-      setCopiado(que);
+      await navigator.clipboard.writeText(valor);
+      setCopiado(etiqueta);
       window.setTimeout(() => setCopiado(null), 2000);
     } catch {
       // Sin portapapeles (contexto no seguro, permisos): el dato está a la
@@ -60,13 +80,13 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
     }
   };
 
-  const BotonCopiar = ({ que }: { que: "alias" | "cbu" }) => (
+  const BotonCopiar = ({ etiqueta, valor }: { etiqueta: string; valor: string }) => (
     <button
       type="button"
-      onClick={() => copiar(que)}
+      onClick={() => copiar(etiqueta, valor)}
       className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-[var(--campo-borde)] px-2.5 py-1.5 text-xs font-semibold hover:bg-[var(--tinte-2)] transition-colors"
     >
-      {copiado === que ? (
+      {copiado === etiqueta ? (
         <>
           <Check className="w-3.5 h-3.5 text-emerald-400" /> Copiado
         </>
@@ -82,41 +102,45 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
     <div className={className}>
       <button
         type="button"
-        onClick={() => setAbierto((v) => !v)}
+        onClick={alternar}
         className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
       >
         <Landmark className="w-4 h-4" />
         {abierto ? "Ocultar datos para transferir" : "Prefiero pagar por transferencia"}
       </button>
 
-      {abierto && (
-        <div className="mt-1 rounded-xl border border-[var(--line)] bg-[var(--tinte-1)] p-3 space-y-2.5 text-left">
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Alias</p>
-              <p className="text-base font-semibold truncate text-[var(--foreground)]">{DATOS_TRANSFERENCIA.alias}</p>
-            </div>
-            <BotonCopiar que="alias" />
-          </div>
+      {abierto && cargando && !cobro && (
+        <p className="mt-1 text-xs text-muted-foreground text-center py-3">Buscando los datos...</p>
+      )}
 
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">CBU</p>
-              <p className="text-sm font-mono tracking-tight text-[var(--foreground)]">
-                {cbuLegible(DATOS_TRANSFERENCIA.cbu)}
-              </p>
+      {abierto && !cargando && !cobro && (
+        <p className="mt-1 text-xs text-muted-foreground text-center py-3">
+          Por ahora no tenemos transferencia para tu país. Podés pagar con los otros medios.
+        </p>
+      )}
+
+      {abierto && cobro && (
+        <div className="mt-1 rounded-xl border border-[var(--line)] bg-[var(--tinte-1)] p-3 space-y-2.5 text-left">
+          {cobro.datos.map((d) => (
+            <div key={d.etiqueta} className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{d.etiqueta}</p>
+                <p className="text-sm font-mono tracking-tight text-[var(--foreground)] break-all">
+                  {enGrupos(d.valor)}
+                </p>
+              </div>
+              {d.copiable && <BotonCopiar etiqueta={d.etiqueta} valor={d.valor} />}
             </div>
-            <BotonCopiar que="cbu" />
-          </div>
+          ))}
 
           <div>
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Banco</p>
-            <p className="text-sm">{DATOS_TRANSFERENCIA.banco}</p>
+            <p className="text-sm">{cobro.banco}</p>
           </div>
 
           <div>
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Titular</p>
-            <p className="text-sm">{DATOS_TRANSFERENCIA.titular}</p>
+            <p className="text-sm">{cobro.titular}</p>
           </div>
 
           {/* Qué pasa después, dicho antes de transferir. Sin esto la persona

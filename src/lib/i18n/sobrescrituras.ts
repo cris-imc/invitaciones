@@ -33,38 +33,22 @@ import type { Idioma } from "./idiomas";
  */
 type Sobrescrituras = Partial<Record<Idioma, Record<string, string>>>;
 
-const ESTADOS_UNIDOS: Sobrescrituras = {
-  en: {
-    "landing.showcase.bajada":
-      "Weddings and Sweet 16s, in all kinds of styles and colors. This is how your invitation looks on each guest's phone.",
-    "landing.showcase.evento.quince": "Sweet 16",
-    "landing.strip.personalizable.detalle":
-      "Change colors, fonts, photos and layout. Wedding, Sweet 16 or corporate event, the design follows your style.",
-    "landing.faq.otrosEventos.a":
-      "Yes, we have templates for weddings, Sweet 16s, birthdays and other events, each with its own style, typography and structure.",
-    "landing.modelos.tabs.xv": "Sweet 16",
-    "panel.invitados.fraseQuince": "my sweet sixteen",
-    "wizard.tipoEvento.quince": "Sweet 16",
-    "wizard.tipoEvento.quince1": "My Sweet 16",
-    "wizard.tipoEvento.quince2": "My Sweet Sixteen",
-    "wizard.tipoEvento.quince3": "My 16!",
-    "wizard.tipoEvento.placeholderQuince": "E.g. My Sweet 16",
-    "wizard.tipografia.muestraQuince": "My Sweet 16",
-    "wizard.frase.quince5":
-      "One magical night, a memory for life. Come celebrate my Sweet 16 with me!",
-    "wizard.trivia.quince2": "My Sweet 16 Trivia",
-    "invitacion.evento.misQuinceAnos": "My Sweet 16",
-    "invitacion.evento.misQuince": "My Sweet 16",
-    // El número grande de la portada y el del medallón del pase. Las
-    // plantillas de la familia de quince lo dibujan como texto, así que
-    // alcanza con sobrescribirlo -- no hay que rehacer ningún diseño.
-    "invitacion.evento.edadQuince": "16",
-  },
-};
-
-const POR_PAIS: Partial<Record<CodigoPais, Sobrescrituras>> = {
-  US: ESTADOS_UNIDOS,
-};
+/**
+ * HOY NO HAY NINGUNA SOBRESCRITURA, y es una decisión, no un olvido.
+ *
+ * Acá vivía el caso del Sweet 16: en Estados Unidos, en inglés, los quince
+ * pasaban a ser un Sweet 16 -- otro nombre, otra edad y otro número en la
+ * portada. Se sacó porque el público de Estados Unidos para este producto es
+ * la comunidad hispana, que festeja los quince igual que en el resto de
+ * Latinoamérica. Mostrarle "Sweet 16" a una familia que está organizando unos
+ * quince era cambiarle la fiesta.
+ *
+ * El mecanismo queda porque el problema que resuelve es real y va a volver
+ * apenas haya un país que llame distinto a algo (o si algún día se apunta
+ * también al público angloparlante de Estados Unidos): sumar un país es
+ * agregarle una entrada a este objeto.
+ */
+const POR_PAIS: Partial<Record<CodigoPais, Sobrescrituras>> = {};
 
 /** El texto propio de ese país para esa clave, si lo hay. */
 export function sobrescritura(
