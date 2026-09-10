@@ -1228,7 +1228,7 @@ function C3dFacetGem({ arcId, arcText }: { arcId: string; arcText: string }) {
     <>
       <div className="c3d-facet-gem" />
       <div className="c3d-facet-core">
-        <span className="c3d-facet-num">15</span>
+        <span className="c3d-facet-num">{tx("invitacion.evento.edadQuince")}</span>
         <span className="c3d-facet-sub">{tx("invitacion.pase.acceso").toUpperCase()}</span>
       </div>
       <svg viewBox="0 0 100 100" className="c3d-facet-arc">
@@ -1262,6 +1262,7 @@ function C3dMedallion({
   arcText: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React.
   const [ringDuration] = useState(() => 18 + Math.random() * 4);
@@ -1270,7 +1271,7 @@ function C3dMedallion({
       <div className="c3d-medallion-ring" style={{ background: ringGradient, animation: `gpRing ${ringDuration}s linear infinite` }} />
       <div className="c3d-medallion-core">
         {topLabel && <span className="c3d-medallion-sub">{topLabel}</span>}
-        <span className={compact ? "c3d-medallion-num-sm" : "c3d-medallion-num"}>15</span>
+        <span className={compact ? "c3d-medallion-num-sm" : "c3d-medallion-num"}>{tx("invitacion.evento.edadQuince")}</span>
         {sub && (
           <span className={`c3d-medallion-sub ${subAccent === "lavender" ? "c3d-medallion-sub--lavender" : "c3d-medallion-sub--cyan"}`}>
             {sub}

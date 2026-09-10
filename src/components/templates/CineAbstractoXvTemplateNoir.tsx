@@ -1222,6 +1222,7 @@ function CxvMedallion({
   spin: "normal" | "reverse" | "none";
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React.
   const [ringDuration] = useState(() => 18 + Math.random() * 4);
@@ -1229,7 +1230,7 @@ function CxvMedallion({
     <>
       <div className="cxv-medallion-ring" style={{ animation: spin === "none" ? "none" : `gpRing ${ringDuration}s linear infinite` }} />
       <div className="cxv-medallion-core">
-        <span className={compact ? "cxv-medallion-num-sm" : "cxv-medallion-num"}>15</span>
+        <span className={compact ? "cxv-medallion-num-sm" : "cxv-medallion-num"}>{tx("invitacion.evento.edadQuince")}</span>
         {sub && <span className="cxv-medallion-sub">{sub}</span>}
       </div>
       {arcId && (

@@ -702,7 +702,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
 
       <div ref={scrollerRef} data-scroller="1" className="flb-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="flb-section">
-          <span className="flb-watermark" aria-hidden="true">15</span>
+          <span className="flb-watermark" aria-hidden="true">{tx("invitacion.evento.edadQuince")}</span>
           <div className="flb-grid-overlay" />
           <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="flb-date-stack" style={{ position: "relative" }}>
@@ -725,7 +725,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
           />
 
           <div data-drift="-70" className="flb-medallion flb-medallion--corner">
-            <FlbMedallion main="15" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="flbArc1" arcText={tx("invitacion.sabor.arcoLookbook").toUpperCase()} spin="normal" />
+            <FlbMedallion main={tx("invitacion.evento.edadQuince")} sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="flbArc1" arcText={tx("invitacion.sabor.arcoLookbook").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -1078,7 +1078,7 @@ export function FashionLookbookTemplate({ invitation, guest, isPersonalized = fa
           <span data-xin="1" data-dist="-60" className="flb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LOOK</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="flb-final-card">
             <div className="flb-medallion flb-medallion--final">
-              <FlbMedallion main="15" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="flbArc3" arcText={textoArco(namesTitle, fechaCompacta)} spin="reverse" />
+              <FlbMedallion main={tx("invitacion.evento.edadQuince")} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="flbArc3" arcText={textoArco(namesTitle, fechaCompacta)} spin="reverse" />
             </div>
             <span className="flb-mini-label flb-accent-plain">{tx("invitacion.pase.numeroLookAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="flb-final-names">{namesTitle}</span>
@@ -1518,7 +1518,7 @@ function FlbRsvpCard({
 
       <div ref={stubRef} className="flb-stub">
         <div ref={sealRef} className="flb-seal">
-          <FlbMedallion main="15" arcId="" arcText="" spin="none" compact />
+          <FlbMedallion main={tx("invitacion.evento.edadQuince")} arcId="" arcText="" spin="none" compact />
         </div>
         <div className="flb-stub-body">
           <div className="flb-stub-top">
@@ -1826,7 +1826,7 @@ function FlbCoverHalf({
           <AnimatedCoverPhoto photoSrc={photoDesktop} tint={false} effect="enfoque" scrimColorRgb="245,242,237" />
         </div>
       )}
-      <span className="flb-cover-numeral">15</span>
+      <span className="flb-cover-numeral">{tx("invitacion.evento.edadQuince")}</span>
       <div className="flb-cover-grid" />
       <div className="flb-cover-content">
         <div className="flb-cover-top-row">

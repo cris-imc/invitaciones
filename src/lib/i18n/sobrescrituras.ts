@@ -18,6 +18,19 @@ import type { Idioma } from "./idiomas";
  * país es Estados Unidos.
  */
 
+/**
+ * Las sobrescrituras cuelgan de PAÍS + IDIOMA, y que dependan también del
+ * idioma no es un detalle de implementación: es lo que hace que el caso
+ * difícil salga bien.
+ *
+ * En Estados Unidos pasan las dos cosas. Una familia latina festeja la
+ * quinceañera de su hija, en español y con el 15; y una familia
+ * angloparlante festeja el Sweet 16, en inglés y con el 16. El país solo no
+ * alcanza para distinguirlas -- el idioma que eligió el anfitrión sí.
+ *
+ * Por eso US + inglés dice Sweet 16, y US + español sigue diciendo
+ * quinceañera. Las dos son correctas, cada una para quien la manda.
+ */
 type Sobrescrituras = Partial<Record<Idioma, Record<string, string>>>;
 
 const ESTADOS_UNIDOS: Sobrescrituras = {
@@ -42,6 +55,10 @@ const ESTADOS_UNIDOS: Sobrescrituras = {
     "wizard.trivia.quince2": "My Sweet 16 Trivia",
     "invitacion.evento.misQuinceAnos": "My Sweet 16",
     "invitacion.evento.misQuince": "My Sweet 16",
+    // El número grande de la portada y el del medallón del pase. Las
+    // plantillas de la familia de quince lo dibujan como texto, así que
+    // alcanza con sobrescribirlo -- no hay que rehacer ningún diseño.
+    "invitacion.evento.edadQuince": "16",
   },
 };
 
