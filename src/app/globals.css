@@ -59,6 +59,34 @@
   --paper-2: #EAE4D4;
   --line: rgba(246, 243, 236, .12);
   --line-soft: rgba(15, 22, 19, .1);
+  /* Borde de los campos de formulario. Existe aparte de --line porque un
+     input pide un borde mas marcado que una separacion entre bloques: tiene
+     que leerse como "aca se escribe". Antes estaba escrito a mano
+     (border-white/20), que en modo claro es blanco sobre crema, o sea
+     invisible: el campo quedaba sin borde. */
+  --campo-borde: rgba(246, 243, 236, .20);
+  --campo-borde-suave: rgba(246, 243, 236, .10);
+  /* Velos sobre el fondo, para tarjetas y bloques que hoy estan escritos a
+     mano como bg-white/5, bg-white/10, etc. En oscuro el velo es claro;
+     en claro es oscuro. Existen como tokens y no como utilidades sueltas
+     porque bg-white/10 sobre crema es blanco sobre blanco: no se ve nada,
+     y es la razon por la que quedaban islas ilegibles. */
+  --tinte-1: rgba(246, 243, 236, .05);
+  --tinte-2: rgba(246, 243, 236, .08);
+  --tinte-3: rgba(246, 243, 236, .12);
+  --tinte-4: rgba(246, 243, 236, .18);
+
+  /* Aviso (lo que hoy esta escrito como ambar de Tailwind). El ambar
+     claro funciona sobre tinta y es ilegible sobre crema: amber-200 da
+     1.12:1 y amber-300 1.30:1 sobre el papel. Por eso el aviso necesita
+     un tono propio por tema y no una constante. */
+  --aviso-texto: #FCD34D;
+  /* El cian de Diamond. Es color de marca, pero como texto sobre crema da
+     1.31:1 -- ilegible. En claro se baja la luminosidad manteniendo el
+     matiz, igual criterio que con el dorado. */
+  --diamante: #67e8f9;
+  --info-texto: #C4B5FD;
+  --aviso-borde: rgba(245, 158, 11, .45);
   --accent: #C79A4B;
   --accent-2: #5C8A7A;
   --danger: #C0604A;
@@ -179,15 +207,19 @@
   --ring:               var(--accent);
 
   /* â”€â”€ Variables de la InvitaciÃ³n actual activa (Default fallback) â”€â”€ */
-  --t-ink:       var(--ink);
-  --t-ink2:      var(--ink-2);
-  --t-paper:     var(--paper);
-  --t-paper2:    var(--paper-2);
-  --t-acc:       var(--accent);
-  --t-acc2:      var(--accent-2);
-  --t-onink:     var(--paper);
-  --t-onpaper:   var(--ink);
-  --t-hair:      var(--line);
+  /* Valores fijos, y no var(--ink) etc: esto es el fallback de la PALETA DE
+     LA INVITACION, que no sigue el tema del panel. Escrito con las variables
+     del shell, un anfitrion con el modo claro puesto veia la preview de su
+     invitacion invertida, porque en claro --ink pasa a ser el crema. */
+  --t-ink:       #0F1613;
+  --t-ink2:      #182420;
+  --t-paper:     #F6F3EC;
+  --t-paper2:    #EAE4D4;
+  --t-acc:       #C79A4B;
+  --t-acc2:      #5C8A7A;
+  --t-onink:     #F6F3EC;
+  --t-onpaper:   #0F1613;
+  --t-hair:      rgba(246, 243, 236, .12);
   --t-font-d:    var(--font-display);
 }
 
@@ -205,41 +237,77 @@
    AA. Mismo criterio para --accent-2 y --danger. Los ratios exactos están
    documentados en el reporte de este cambio. */
 :root[data-tema="claro"] {
-  --background: var(--paper);         /* #F6F3EC -- crema cálido, no blanco */
-  --foreground: var(--ink);
-  --card: #FBF8F1;                    /* un toque más claro que --paper: da profundidad sin blanco puro */
-  --card-foreground: var(--ink);
+  /* Los tokens base CAMBIAN DE ROL, no se agrega una capa nueva encima.
+     --ink es "el fondo del shell" y --paper "el texto del shell": en claro
+     eso es crema y tinta, en oscuro al revés. Como el shell ya usa esos dos
+     nombres en 124 lugares, cambiarlos acá alcanza para que la landing y el
+     panel entero acompañen, en vez de dejar islas oscuras sueltas.
+
+     Se puede hacer porque NINGUNA plantilla de invitación los usa: cada una
+     tiene sus propias variables --t-*. Verificado sobre los 365 archivos. */
+  --ink: #F6F3EC;                     /* crema cálido, no blanco puro: papel, no pantalla */
+  --ink-2: #EEE9DC;                   /* la banda alterna, apenas más tostada */
+  --paper: #0F1613;                   /* la tinta -> 16.56:1 sobre el crema */
+  --paper-2: #2A302C;
+  --on-ink: #0F1613;
+
+  /* De acá para abajo, las mismas expresiones que en oscuro: al haber
+     cambiado el rol de los tokens base, se resuelven solas. */
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --card: #FBF8F1;                    /* un toque más claro que el fondo: da profundidad sin blanco puro */
+  --card-foreground: var(--paper);
   --popover: #FBF8F1;
-  --popover-foreground: var(--ink);
+  --popover-foreground: var(--paper);
   --primary: var(--accent);
-  --primary-foreground: var(--paper);
-  --secondary: var(--paper-2);
-  --secondary-foreground: var(--ink);
-  --muted: var(--paper-2);
-  --muted-foreground: #60635F;        /* --ink mezclado 65% sobre --paper -> 5.50:1 */
-  --accent-shadcn: var(--ink);
+  --primary-foreground: var(--ink);
+  --secondary: #E6E0D0;
+  --secondary-foreground: var(--paper);
+  --muted: #E6E0D0;
+  --muted-foreground: #60635F;        /* tinta al 65% sobre crema -> 5.50:1 */
+  --accent-shadcn: #E6E0D0;
   --accent-shadcn-foreground: var(--paper);
-  --destructive: #974735;             /* --danger oscurecido -> 5.80:1 sobre --paper */
-  --destructive-foreground: var(--paper);
+  --destructive: #974735;             /* el rojo oscurecido -> 5.80:1 */
+  --destructive-foreground: #F6F3EC;
   --border: rgba(15,22,19,.14);
   --input: rgba(15,22,19,.14);
   --ring: var(--accent);
 
   --line: rgba(15,22,19,.14);
   --line-soft: rgba(15,22,19,.08);
+  --campo-borde: rgba(15,22,19,.20);
+  --campo-borde-suave: rgba(15,22,19,.12);
+  --tinte-1: rgba(15,22,19,.035);
+  --tinte-2: rgba(15,22,19,.055);
+  --tinte-3: rgba(15,22,19,.09);
+  --tinte-4: rgba(15,22,19,.14);
+  --aviso-texto: #7A4F06;             /* mismo matiz ambar, luminosidad al piso -> 6.43:1 sobre crema */
+  --aviso-borde: rgba(122, 79, 6, .40);
+  --diamante: #155E75;                /* mismo cian, oscurecido -> 6.56:1 sobre crema */
+  --info-texto: #4C3F8A;              /* violeta oscurecido -> 7.94:1 sobre crema */
 
-  --accent: #7C5D27;                  /* dorado oscurecido (misma tonalidad, L 53%→32%) -> 5.49:1 sobre --paper */
-  --accent-2: #416257;                /* salvia oscurecida -> 6.09:1 */
+  --accent: #7C5D27;                  /* el dorado de marca da 2.32:1 sobre crema: ilegible. Mismo matiz, luminosidad 53%->32% -> 5.49:1 */
+  --accent-2: #2A3F39;                /* salvia, oscurecida dos pasos mas a pedido -> 10.14:1 sobre crema */
   --danger: #974735;
-  --accent-foreground: var(--paper);  /* el dorado oscuro ya no admite texto oscuro encima (3.02:1); pide texto claro (5.49:1) */
+  --accent-foreground: #F6F3EC;       /* el dorado oscuro no admite texto oscuro encima (3.02:1); pide texto claro */
 
-  --shell-fg-strong: #3D423E;         /* --ink @ 80% -> 9.26:1 */
-  --shell-fg-mid:    #545854;         /* --ink @ 70% -> 6.53:1 */
-  --shell-fg-soft:   #60635F;         /* --ink @ 65% -> 5.50:1 */
-  --shell-fg-faint:  #777975;         /* --ink @ 55% -> 3.97:1 (etiquetas decorativas, mismo criterio que ya usaba el tema oscuro para éstas) */
+  --shell-fg-strong: #3D423E;         /* 9.26:1 */
+  --shell-fg-mid:    #545854;         /* 6.53:1 */
+  --shell-fg-soft:   #60635F;         /* 5.50:1 */
+  --shell-fg-faint:  #777975;         /* 3.97:1, sólo etiquetas decorativas */
   --shell-tint-rgb:  15 22 19;
   --nav-bg-rgb:      246 243 236;
 }
+
+/* El desplegable de un <select> lo dibuja el sistema operativo, no la pagina:
+   las clases de Tailwind no llegan ahi. `color-scheme` es lo unico que le
+   avisa al navegador de que lado esta el tema, si no pinta las opciones
+   claras y sobre el shell oscuro quedan blanco sobre blanco.
+   Va como clase y no en :root a proposito: las plantillas de invitacion
+   tienen su propio tema (--t-*), ajeno al del shell, y ponerlo global les
+   cambiaria los controles nativos a todas. */
+.campo-nativo { color-scheme: dark; }
+:root[data-tema="claro"] .campo-nativo { color-scheme: light; }
 
 /* --------------------------------------------------
    2. TEMAS DE INVITACIÃ“N
@@ -1032,11 +1100,30 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .l-nav{ background:var(--background); }
 }
+/* Los controles de la derecha del nav, en un solo hijo. .l-nav es
+   space-between sobre sus hijos DIRECTOS: con cada boton suelto, agregar
+   uno mas repartia el ancho de nuevo y descolocaba todo. Agrupados, .l-nav
+   tiene siempre tres hijos -- marca, links, acciones -- y no se mueve. */
+.l-nav-acciones{
+  display:flex; align-items:center; gap:10px; flex-shrink:0;
+}
+@media (max-width:900px){ .l-nav-acciones{ gap:7px; } }
+/* Idioma y tema, al extremo derecho de la barra. Separados del CTA por un
+   filete: son preferencias de quien mira, no acciones del producto, y
+   mezclados con los botones se leen como una opcion mas del sitio. */
+.l-nav-preferencias{
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+  margin-left:4px; padding-left:12px; border-left:1px solid var(--line);
+}
+@media (max-width:900px){
+  .l-nav-preferencias{ margin-left:0; padding-left:0; border-left:none; gap:6px; }
+}
 .l-brand{display:flex; align-items:center; gap:10px; font-family:var(--font-ui); font-weight:700; font-size:16px; letter-spacing:.01em; color:var(--foreground);}
 /* Sube de .6 a .82: sobre un fondo translúcido el 60% de opacidad quedaba
    flojo. La sombra sutil no se ve como sombra, mantiene el borde de las letras
    definido si por detrás pasa algo claro. */
 .l-nav-links{display:flex; gap:30px; font-family:var(--font-ui); font-size:14.5px; font-weight:500; color:var(--shell-fg-strong); text-shadow:0 1px 2px rgba(8,10,9,.45);}
+:root[data-tema="claro"] .l-nav-links{ text-shadow:none; }
 .l-nav-links a:hover{color:var(--foreground);}
 .l-cta{font-family:var(--font-ui); font-weight:600; font-size:13px; background:var(--accent); color:var(--accent-foreground); padding:10px 18px; border-radius:999px; border:none; cursor:pointer;}
 
@@ -1062,7 +1149,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .l-hero{position:relative; overflow:hidden; padding:104px 34px 88px; display:flex; flex-direction:column; align-items:center; text-align:center; background:var(--ink);}
 .l-hero > *{position:relative; z-index:1;}
 .l-hero h1{font-family:var(--font-display); font-weight:700; font-size:56px; line-height:1.06; margin:0 auto 20px; max-width:16ch; color:var(--paper);}
-.l-hero h1 em{font-style:italic; font-weight:500; color:var(--accent-dark);}
+.l-hero h1 em{font-style:italic; font-weight:500; color:var(--accent);}
 .l-hero-ctas{display:flex; gap:14px; align-items:center; justify-content:center; flex-wrap:wrap;}
 
 /* Fondo de fiesta, sólo CSS.
@@ -1078,6 +1165,23 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   background:radial-gradient(circle at 38% 34%, #FFF8E7, rgba(233,199,133,.95) 38%, rgba(199,154,75,0) 72%);
   box-shadow:0 0 14px 4px rgba(199,154,75,.55), 0 0 34px 10px rgba(199,154,75,.22);
   animation:heroSubir linear infinite;}
+/* En claro, las mismas luces no funcionan: un punto que brilla necesita
+   oscuridad alrededor, y sobre crema el halo desaparece y quedan manchas
+   sucias. Se convierten en confeti -- círculos llenos, sin resplandor, en el
+   dorado ya oscurecido -- que sí se lee sobre papel. El movimiento es el
+   mismo, así que la sensación de fiesta se mantiene. */
+:root[data-tema="claro"] .hero-fondo::before{
+  background:radial-gradient(closest-side, rgba(124,93,39,.14), rgba(65,98,87,.07) 52%, transparent 74%);
+}
+:root[data-tema="claro"] .hero-fondo i{
+  background:radial-gradient(circle at 38% 34%, rgba(124,93,39,.62), rgba(124,93,39,.34) 46%, rgba(124,93,39,0) 74%);
+  box-shadow:none;
+}
+/* Una de cada tres en salvia, para que el confeti no sea monocromo. */
+:root[data-tema="claro"] .hero-fondo i:nth-child(3n){
+  background:radial-gradient(circle at 38% 34%, rgba(65,98,87,.55), rgba(65,98,87,.3) 46%, rgba(65,98,87,0) 74%);
+}
+
 @keyframes heroSubir{
   0%{transform:translate3d(0,0,0) scale(.45); opacity:0;}
   10%{opacity:1;}
@@ -1210,6 +1314,15 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 
 .p-main{padding:26px 30px 40px;}
 .p-topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;}
+/* Idioma y tema en la barra superior del panel, a la izquierda del boton
+   de accion. Van ahi y no en el sidebar porque es donde la gente busca
+   sus preferencias: arriba a la derecha. */
+.p-preferencias{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.p-topbar-acciones{ display:flex; align-items:center; gap:12px; flex-shrink:0; }
+/* Idioma y tema se montan una sola vez por pantalla, en la cabecera de
+   cada una: el sidebar ya no lleva copia -- NavLinks se dibuja dos veces
+   (escritorio y cajon mobile) y el cajon vive en un portal fuera de
+   .panel, asi que desde CSS no habia forma de apagar solo una. */
 .p-topbar h2{font-family:var(--font-display); font-weight:700; font-size:24px; margin:0; color:var(--foreground);}
 .p-topbar p{margin:4px 0 0; font-size:13px; color:var(--shell-fg-mid);}
 
@@ -1392,7 +1505,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .theme-chips{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 8px; -webkit-overflow-scrolling:touch;}
 .theme-chips::-webkit-scrollbar{height:4px;}
 .theme-chips::-webkit-scrollbar-thumb{background:var(--line); border-radius:6px;}
-.theme-chips button{flex:0 0 auto; font-family:var(--font-ui); font-size:12.5px; font-weight:600; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:transparent; color:rgba(246,243,236,.55); cursor:pointer; white-space:nowrap;}
+.theme-chips button{flex:0 0 auto; font-family:var(--font-ui); font-size:12.5px; font-weight:600; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--shell-fg-soft); cursor:pointer; white-space:nowrap;}
 .theme-chips button.active{background:var(--paper); color:var(--ink); border-color:var(--paper);}
 
 #inv-stage{border-radius:var(--r-l); overflow:hidden; border:1px solid var(--line);}
@@ -1665,7 +1778,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   height: 40px;
   width: 4px;
   border-radius: var(--radius-pill);
-  background: rgba(246,243,236,.25);
+  background: var(--tinte-4);
 }
 /* Gesto de apertura automático (ver WizardMobilePreviewSheet.tsx): flechitas
    semitransparentes que aparecen solo al principio y a mitad del wizard,
@@ -1680,7 +1793,7 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 .wiz-mobile-sheet-hint-icon {
   width: 22px;
   height: 22px;
-  color: rgba(246,243,236,.55);
+  color: var(--shell-fg-soft);
   animation: wiz-hint-bounce 1.1s ease-in-out infinite;
 }
 @keyframes wiz-hint-bounce {
@@ -2431,3 +2544,225 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 [data-plan-tier="DIAMOND"] .credito-alta,
 [data-plan-tier="ENTERPRISE"] .credito-alta,
 [data-plan-tier="ADMIN"] .credito-alta { display: none; }
+
+/* Los dos logos se dibujan siempre y el CSS elige: hacerlo en JavaScript
+   llegaría tarde y se vería un parpadeo del logo equivocado al cargar. */
+:root[data-tema="claro"] .logo-para-oscuro{ display:none; }
+:root:not([data-tema="claro"]) .logo-para-claro{ display:none; }
+
+/* --------------------------------------------------
+   Interruptor de tema
+   --------------------------------------------------
+   Riel con perilla, no un botón con un ícono: un botón que muestra una luna
+   no dice si estás en oscuro o si al tocarlo vas a oscuro, y la mitad de la
+   gente entiende lo contrario. Acá los dos íconos están a la vista y la
+   perilla dice cuál está activo. */
+/* Sin `display` a proposito, igual que .theme-toggle-btn: esta hoja no
+   esta dentro de @layer, asi que cualquier display escrito aca le gana a
+   las utilidades de Tailwind (md:hidden, hidden md:flex) sin importar la
+   especificidad -- ni :where() alcanza. El display lo pone el componente.
+   Es lo que hacia aparecer DOS interruptores a la vez. */
+.tema-switch{
+  align-items:center; justify-content:center;
+  background:none; border:none; padding:0; cursor:pointer;
+}
+.tema-switch-riel{
+  position:relative; display:inline-flex; align-items:center; gap:2px;
+  width:56px; height:28px; padding:0 6px; border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(var(--shell-tint-rgb) / .07);
+  transition:background 200ms ease, border-color 200ms ease;
+}
+.tema-switch:hover .tema-switch-riel{ background:rgba(var(--shell-tint-rgb) / .13); }
+.tema-switch-icono{
+  position:relative; z-index:1; flex:1;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--shell-fg-mid);
+  transition:color 200ms ease;
+}
+/* El ícono que está bajo la perilla se oscurece para que se lea sobre ella. */
+.tema-switch-perilla{
+  position:absolute; top:2px; left:2px; z-index:0;
+  width:22px; height:22px; border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 1px 4px rgba(0,0,0,.25);
+  transition:transform 220ms cubic-bezier(.4,0,.2,1);
+}
+.tema-switch-perilla.a-la-derecha{ transform:translateX(26px); }
+/* En claro la perilla queda sobre el sol (izquierda); en oscuro sobre la luna. */
+:root[data-tema="claro"] .tema-switch-icono:first-of-type,
+:root:not([data-tema="claro"]) .tema-switch-icono:last-of-type{
+  color:var(--accent-foreground);
+}
+@media (prefers-reduced-motion: reduce){
+  .tema-switch-perilla{ transition:none; }
+}
+
+/* --------------------------------------------------
+   Selector de idioma
+   -------------------------------------------------- */
+.selector-idioma{ position:relative; display:inline-flex; }
+.selector-idioma-boton{
+  display:inline-flex; align-items:center; gap:5px;
+  height:28px; padding:0 10px; border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(var(--shell-tint-rgb) / .07);
+  color:var(--shell-fg-mid);
+  font-family:var(--font-ui); font-size:11px; font-weight:600; letter-spacing:.06em;
+  cursor:pointer; transition:background 200ms ease, color 200ms ease;
+}
+.selector-idioma-boton:hover{ background:rgba(var(--shell-tint-rgb) / .13); color:var(--paper); }
+/* Cubre la pantalla por detrás del menú: cerrar tocando afuera sin dejar un
+   oyente colgado en el documento. */
+.selector-idioma-fuera{ position:fixed; inset:0; z-index:60; }
+.selector-idioma-lista{
+  position:absolute; top:calc(100% + 6px); right:0; z-index:61;
+  min-width:150px; margin:0; padding:4px; list-style:none;
+  border-radius:12px; border:1px solid var(--line);
+  background:var(--card); box-shadow:0 10px 30px -12px rgba(0,0,0,.5);
+}
+.selector-idioma-opcion{
+  width:100%; display:flex; align-items:center; gap:8px;
+  padding:7px 9px; border:none; border-radius:8px; background:none;
+  color:var(--foreground); font-family:var(--font-ui); font-size:13px;
+  text-align:left; cursor:pointer; transition:background 150ms ease;
+}
+.selector-idioma-opcion:hover{ background:rgba(var(--shell-tint-rgb) / .09); }
+.selector-idioma-opcion.elegida{ color:var(--accent); font-weight:600; }
+.selector-idioma-sigla{
+  flex-shrink:0; width:26px; font-size:10px; font-weight:700; letter-spacing:.08em;
+  color:var(--shell-fg-soft);
+}
+.selector-idioma-opcion.elegida .selector-idioma-sigla{ color:var(--accent); }
+
+/* --------------------------------------------------
+   Ámbar de Tailwind en modo claro
+   --------------------------------------------------
+   Hay ~350 usos de `text-amber-*` / `text-yellow-*` repartidos por el panel,
+   el wizard y la landing: avisos, chips seleccionados, "Invitaciones Premium:
+   ilimitadas". Todos se eligieron mirando el tema oscuro, donde un amarillo
+   claro sobre tinta se lee bien. Sobre el crema del modo claro no se lee
+   nada: amber-200 da 1.12:1, amber-300 1.30:1, yellow-500 1.73:1 -- por
+   debajo incluso del mínimo de un borde decorativo.
+
+   Se corrige acá y no en los 350 lugares porque es una sola decisión ("qué
+   color tiene un aviso en este tema"), no 350. Esta hoja no está dentro de
+   @layer, así que le gana a las utilidades de Tailwind sin !important.
+
+   Va limitado al shell (.panel, .landing, .pantalla-auth) A PROPÓSITO: las
+   plantillas de invitación comparten el <html> con el panel, así que una
+   regla global les cambiaría los amarillos a las 365 cuando el anfitrión
+   tiene el modo claro puesto -- y la invitación no sigue el tema del panel,
+   la ve el invitado como la diseñó el anfitrión.
+
+   Los fondos ámbar NO se tocan: `bg-amber-500` sólido es un botón y sobre
+   crema sigue funcionando; `bg-amber-500/10` es un lavado pálido que hace de
+   fondo del aviso y con el texto ya corregido queda por encima de 6:1. */
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) [class*="text-amber-"],
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) [class*="text-yellow-"] {
+  color: var(--aviso-texto);
+}
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) [class*="border-amber-"],
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) [class*="border-yellow-"] {
+  border-color: var(--aviso-borde);
+}
+
+/* --------------------------------------------------
+   Cian de Diamond y verdes claros, en modo claro
+   --------------------------------------------------
+   `#67e8f9` es el color de marca del plan Diamond: 24 usos en 5 archivos del
+   panel y el wizard. Como texto sobre crema da 1.31:1. El selector va por el
+   atributo `class` y no por la clase escapada porque Tailwind genera
+   `.text-\[\#67e8f9\]`, y de paso así también alcanza a las variantes con
+   opacidad (`text-[#67e8f9]/80`), que son clases distintas.
+
+   El FONDO sólido no se toca: `bg-[#67e8f9] text-black` es un botón, y sobre
+   crema sigue leyéndose. Los lavados (`bg-[#67e8f9]/15`) tampoco: son fondo,
+   no texto. */
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) [class*="text-[#67e8f9]"] {
+  color: var(--diamante);
+}
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) [class*="border-[#67e8f9]"] {
+  border-color: var(--diamante);
+}
+
+/* Mismo problema, menos usos: los verdes y cianes claros de Tailwind que se
+   eligieron contra el fondo oscuro (emerald-300/400, cyan-300/400). */
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) :is(
+  [class*="text-emerald-300"], [class*="text-emerald-400"],
+  [class*="text-cyan-300"], [class*="text-cyan-400"],
+  [class*="text-teal-300"], [class*="text-teal-400"]
+) {
+  color: var(--accent-2);
+}
+
+/* --------------------------------------------------
+   Selección de texto
+   --------------------------------------------------
+   Sin regla propia, el navegador pinta el fondo de selección con su azul de
+   sistema pero respeta el `color` que ya tenga el texto. Sobre un párrafo en
+   gris claro eso da gris sobre azul, que no se lee -- y es peor en modo
+   claro, donde los textos secundarios son más suaves todavía.
+
+   Se define con los tokens del tema para que la selección acompañe al tema
+   en vez de traer el azul del sistema operativo.
+
+   Las plantillas de invitación quedan afuera a propósito: comparten el
+   <html> con el panel y cada una tiene su propia paleta. */
+:is(.panel, .landing, .pantalla-auth) ::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* --------------------------------------------------
+   El resto de la paleta clara de Tailwind, en modo claro
+   --------------------------------------------------
+   Mismo problema que el ámbar y que el cian de Diamond: los tonos 100 a 400
+   de Tailwind se eligieron mirando el tema oscuro, donde un rojo pálido sobre
+   tinta se lee bien. Sobre crema no: rose-200 da 1.27:1 y red-400 2.50:1 --
+   por eso el aviso rojo de la galería de fotos se veía como una mancha rosa
+   sin texto.
+
+   Cada familia cae al token semántico que le corresponde, así el modo claro
+   tiene una sola paleta y no doce. Los FONDOS no se tocan: son lavados con
+   opacidad que siguen funcionando de fondo, y el problema era el texto.
+
+   Limitado al shell por la misma razón que las otras reglas: las plantillas
+   de invitación comparten el <html> y tienen su propia paleta. */
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) :is(
+  [class*="text-rose-100"], [class*="text-rose-200"], [class*="text-rose-300"], [class*="text-rose-400"],
+  [class*="text-red-100"], [class*="text-red-200"], [class*="text-red-300"], [class*="text-red-400"],
+  [class*="text-pink-200"], [class*="text-pink-300"], [class*="text-pink-400"]
+) {
+  color: var(--danger);
+}
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) :is(
+  [class*="text-green-200"], [class*="text-green-300"], [class*="text-green-400"],
+  [class*="text-lime-300"], [class*="text-lime-400"]
+) {
+  color: var(--accent-2);
+}
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) :is(
+  [class*="text-orange-200"], [class*="text-orange-300"], [class*="text-orange-400"]
+) {
+  color: var(--aviso-texto);
+}
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) :is(
+  [class*="text-purple-200"], [class*="text-purple-300"], [class*="text-purple-400"],
+  [class*="text-violet-300"], [class*="text-violet-400"],
+  [class*="text-indigo-200"], [class*="text-indigo-300"], [class*="text-indigo-400"],
+  [class*="text-blue-200"], [class*="text-blue-300"], [class*="text-blue-400"],
+  [class*="text-sky-300"], [class*="text-sky-400"]
+) {
+  color: var(--info-texto);
+}
+/* Los bordes de esas mismas familias, que sobre crema quedan casi invisibles. */
+:root[data-tema="claro"] :is(.panel, .landing, .pantalla-auth) :is(
+  [class*="border-rose-"], [class*="border-red-"], [class*="border-pink-"]
+) {
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+}
+
+/* La sigla del país, más angosta ahora que la bandera hace el trabajo de
+   identificar de un vistazo. */
+.selector-idioma-lista .selector-idioma-sigla{ width:22px; }

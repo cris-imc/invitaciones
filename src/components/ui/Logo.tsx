@@ -99,12 +99,36 @@ export function LandingLogo({
    * de fijar una altura -- para cajas angostas como el brand del sidebar. */
   fullWidth?: boolean;
 }) {
-  const content = (
-    <img
-      src={src}
-      alt="altainvitacion.com"
-      className={className ?? (fullWidth ? "w-full h-auto block" : "h-10 md:h-12 w-auto")}
-    />
+  const clases = className ?? (fullWidth ? "w-full h-auto block" : "h-10 md:h-12 w-auto");
+
+  // El logo blanco desaparece sobre crema. Se dibujan los dos y el CSS muestra
+  // el que corresponde (ver .logo-para-* en globals.css): así no hace falta
+  // saber el tema en JavaScript, que llegaría tarde y produciría un parpadeo
+  // del logo equivocado al cargar.
+  //
+  // El par TIENE que ser el mismo lockup: hay dos, uno apilado (1451x526) y
+  // uno horizontal (2253x223). Mezclarlos hacía que en claro el logo se viera
+  // deformado, porque el alto fijo del contenedor está pensado para una sola
+  // de las dos proporciones. `logo-negro.png` se generó desde el blanco
+  // apilado invirtiendo sólo los píxeles neutros, para que el dorado de marca
+  // quede igual (ver el comentario de --accent en globals.css).
+  const PAR_OSCURO_CLARO: Record<string, string> = {
+    "/landing/logo-blanco.png": "/landing/logo-negro.png",
+    "/landing/logo-blanco-v2.png": "/landing/logo-negro-v2.png",
+  };
+
+  // Si no hay par para este archivo, es un logo de fondo propio -- el pie de
+  // cada invitación, la pantalla del modo LIVE -- donde el tema del panel no
+  // tiene nada que ver: va uno solo, tal cual lo pidieron.
+  const paraClaro = PAR_OSCURO_CLARO[src];
+
+  const content = paraClaro ? (
+    <>
+      <img src={src} alt="altainvitacion.com" className={`${clases} logo-para-oscuro`} />
+      <img src={paraClaro} alt="altainvitacion.com" className={`${clases} logo-para-claro`} aria-hidden="true" />
+    </>
+  ) : (
+    <img src={src} alt="altainvitacion.com" className={clases} />
   );
 
   const wrapperClassName = fullWidth ? "flex items-center w-full" : "flex items-center";

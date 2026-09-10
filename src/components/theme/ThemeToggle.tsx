@@ -53,15 +53,32 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     setTema(next);
   };
 
+  const enClaro = tema === "claro";
+
+  // Un switch y no un botón con un ícono: un botón que muestra una luna no
+  // dice si estás en oscuro o si al tocarlo vas a oscuro -- las dos lecturas
+  // son razonables y la mitad de la gente entiende la contraria. Un riel con
+  // la perilla de un lado muestra el ESTADO, y los dos íconos a la vista
+  // muestran las dos opciones.
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={enClaro}
       onClick={toggle}
-      aria-label={tema === "claro" ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
-      title={tema === "claro" ? "Modo oscuro" : "Modo claro"}
-      className={className ?? "theme-toggle-btn flex"}
+      aria-label={enClaro ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
+      title={enClaro ? "Modo oscuro" : "Modo claro"}
+      className={`tema-switch inline-flex ${className ?? ""}`}
     >
-      {tema === "claro" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+      <span className="tema-switch-riel">
+        <span className="tema-switch-icono" aria-hidden="true">
+          <Sun className="w-3 h-3" />
+        </span>
+        <span className="tema-switch-icono" aria-hidden="true">
+          <Moon className="w-3 h-3" />
+        </span>
+        <span className={`tema-switch-perilla ${enClaro ? "" : "a-la-derecha"}`} aria-hidden="true" />
+      </span>
     </button>
   );
 }
