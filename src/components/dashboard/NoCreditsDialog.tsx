@@ -9,6 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { PagoPorTransferencia } from "@/components/pagos/PagoPorTransferencia";
 
 const WHATSAPP_SUPPORT_URL = `https://wa.me/5493517660000?text=${encodeURIComponent("Hola! Quiero comprar créditos premium para crear una invitación")}`;
 
@@ -56,6 +57,7 @@ export function NoCreditsDialog({
                     >
                         {isPaying ? "Redirigiendo a Mercado Pago..." : "Pagar con Mercado Pago"}
                     </Button>
+                    <PagoPorTransferencia concepto="tu crédito" />
                     {onCreateFree && (
                         <Button type="button" variant="outline" className="w-full" onClick={onCreateFree}>
                             Crear Gratis

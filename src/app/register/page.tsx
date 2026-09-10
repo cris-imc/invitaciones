@@ -13,6 +13,7 @@ import { Diamond, Mail, Lock, User, Phone, Check, ChevronLeft, Tag, Radio } from
 import { Checkbox } from "@/components/ui/checkbox";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
+import { PagoPorTransferencia } from "@/components/pagos/PagoPorTransferencia";
 import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 import { setPendingWizardDesiredCredit } from "@/lib/pending-wizard-invitation";
@@ -634,6 +635,12 @@ function RegisterForm() {
                     ? "Crear cuenta"
                     : "Continuar a Mercado Pago"}
                 </Button>
+
+                {/* Sólo cuando hay algo que pagar: en el plan gratis no hay
+                    transferencia que hacer y sería una distracción. */}
+                {selectedPlan !== "FREE" && (
+                  <PagoPorTransferencia concepto="tu plan" className="mt-1" />
+                )}
 
                 <div className="text-center pt-4">
                   <p className="opacity-70">

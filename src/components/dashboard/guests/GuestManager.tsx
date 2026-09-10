@@ -58,6 +58,7 @@ import {
   ChevronLeft,
   Eye,
   EyeOff,
+  LogIn,
 } from "lucide-react";
 import { hapticoConfirmar, hapticoDeshacer, hapticoError } from "@/lib/haptics";
 import { useToast } from "@/components/ui/Toast";
@@ -139,6 +140,7 @@ interface Guest {
   abiertaEn?: string | null;
   aperturas?: number;
   responseDate?: string | null;
+  ingresoEn?: string | null;
   ingresoRechazado?: boolean;
   ingresoMotivo?: string | null;
 }
@@ -1070,6 +1072,22 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             WhatsApp, y es distinta de haber confirmado: se puede
                             abrir la invitación y no contestar. Mezclada entre las
                             otras etiquetas se perdía. */}
+                        {/* Llegó y a qué hora. Se registraba en cada escaneo
+                            pero no se veía en ningún lado: terminada la fiesta
+                            no había forma de saber quién había venido. */}
+                        {guest.ingresoEn && (
+                          <div className="flex items-center text-xs mt-1 text-emerald-600 dark:text-emerald-400">
+                            <LogIn className="w-3 h-3 mr-1 shrink-0" />
+                            Llegó{" "}
+                            {new Date(guest.ingresoEn).toLocaleString("es-AR", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
+                        )}
+
                         {/* Rechazado en la puerta. Queda para el día después:
                             es la conversación pendiente con esa familia, y sin
                             esto la pantalla del escáner lo decía y se lo
