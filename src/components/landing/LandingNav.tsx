@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { LandingLogo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 interface LandingNavProps {
   registerUrl: string;
@@ -90,7 +91,7 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="w-full rounded-full border border-white/25 text-paper text-sm font-semibold py-2.5 transition-all hover:bg-white/10 hover:border-white/40"
+                className="l-drawer-secondary-btn w-full rounded-full text-sm font-semibold py-2.5"
               >
                 Cerrar sesión
               </button>
@@ -101,12 +102,16 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
                 <button className="l-cta">Registrarse</button>
               </Link>
               <Link href="/login" onClick={() => setOpen(false)}>
-                <button className="w-full rounded-full border border-white/25 text-paper text-sm font-semibold py-2.5 transition-all hover:bg-white/10 hover:border-white/40">
+                <button className="l-drawer-secondary-btn w-full rounded-full text-sm font-semibold py-2.5">
                   Ingresar
                 </button>
               </Link>
             </>
           )}
+        </div>
+
+        <div className="px-3 pt-2 pb-1 flex items-center justify-center">
+          <ThemeToggle />
         </div>
       </div>
     </>
@@ -135,11 +140,13 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
         ))}
       </div>
 
+      <ThemeToggle className="theme-toggle-btn hidden md:flex" />
+
       {isLoggedIn && (
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="hidden md:block rounded-full border border-white/25 text-paper text-sm font-semibold py-2 px-4 transition-all hover:bg-white/10 hover:border-white/40"
+          className="l-drawer-secondary-btn hidden md:block rounded-full text-sm font-semibold py-2 px-4"
         >
           Cerrar sesión
         </button>
@@ -148,6 +155,8 @@ export function LandingNav({ registerUrl, isLoggedIn }: LandingNavProps) {
       <Link href={registerUrl} className="hidden md:block">
         <button className="l-cta">Crear invitación</button>
       </Link>
+
+      <ThemeToggle className="theme-toggle-btn flex md:hidden" />
 
       <button type="button" className="l-hamburger" onClick={() => setOpen(true)} aria-label="Abrir menú">
         <Menu className="w-5 h-5" />
