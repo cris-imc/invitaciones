@@ -11,9 +11,15 @@ import path from "path";
  * 3. "public/uploads" (comportamiento de siempre, para desarrollo local).
  */
 export function getUploadsDir(...segments: string[]): string {
+  // El `turbopackIgnore` es para el trazado de dependencias del build, no
+  // para la ejecución: al ver un path.join() armado con variables de entorno,
+  // el tracer no puede saber qué se lee y termina metiendo TODO el proyecto
+  // --public/ incluido, cientos de MB de fondos, música y fotos-- adentro del
+  // bundle del servidor. En producción los archivos viven en el Volume, que
+  // no es parte del bundle, así que no hay nada que trazar.
   const base =
     process.env.UPLOADS_DIR ||
     process.env.RAILWAY_VOLUME_MOUNT_PATH ||
-    path.join(process.cwd(), "public", "uploads");
-  return path.join(base, ...segments);
+    path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads");
+  return path.join(/*turbopackIgnore: true*/ base, ...segments);
 }
