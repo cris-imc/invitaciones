@@ -65,7 +65,12 @@ export const PAISES: Record<CodigoPais, DefinicionPais> = {
                 clave: "cbu",
                 etiqueta: "CBU o CVU",
                 placeholder: "0000003100010000000001",
-                obligatorio: true,
+                // En Argentina el alias reemplaza al CBU/CVU para transferir: pedir
+                // los dos sí o sí dejaría afuera a las invitaciones ya publicadas que
+                // sólo cargaron el alias, y sus links ya están en manos de los
+                // invitados. Ninguno de los dos es obligatorio por separado; que haya
+                // al menos uno lo exige el formulario (ver StepBankDetails.tsx).
+                obligatorio: false,
                 validacion: { tipo: "digitos", longitud: 22 },
                 ayuda:
                     "El CBU (Clave Bancaria Uniforme) identifica una cuenta bancaria; el CVU (Clave Virtual Uniforme) identifica una cuenta en una billetera virtual como Mercado Pago o Ualá. Ambos tienen 22 números.",
@@ -379,3 +384,13 @@ export function validarCampoBancario(campo: CampoBancario, valorCrudo: string): 
             return validarRutChileno(valor);
     }
 }
+
+/** Si un valor cualquiera (de la base, de un formulario) es un país que manejamos. */
+export function esCodigoPais(v: unknown): v is CodigoPais {
+    return typeof v === "string" && v in PAISES;
+}
+
+/** Los países, en orden alfabético, para armar un selector. */
+export const PAISES_ORDENADOS: DefinicionPais[] = Object.values(PAISES).sort((a, b) =>
+    a.nombre.localeCompare(b.nombre, "es")
+);

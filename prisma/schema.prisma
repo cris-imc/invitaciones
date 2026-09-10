@@ -22,6 +22,7 @@ model User {
   subscriptionEndDate   DateTime?
   premiumCredits        Int          @default(0)
   diamondCredits        Int          @default(0)
+  pais                  String       @default("AR")
   phoneAreaCode         String?
   phoneNumber           String?
   mercadoPagoCustomerId String?      @unique
@@ -104,7 +105,14 @@ model Payment {
   status         String
   paymentMethod  String?
   planTier       String
+  // Qué procesador cobró: "mercadopago" o "paypal". Los identificadores
+  // quedan en columnas separadas y no en una sola genérica a propósito: hay
+  // pagos vivos con mercadoPagoId cargado, y renombrar esa columna en una
+  // base que se sincroniza en cada deploy con --accept-data-loss es la clase
+  // de cambio que se lleva puestos los datos.
+  proveedor      String        @default("mercadopago")
   mercadoPagoId  String?       @unique
+  paypalOrderId  String?       @unique
   createdAt      DateTime      @default(now())
   discountCodeId String?
   discountAmount Float?
@@ -225,6 +233,10 @@ model Invitation {
   regaloTitulo                 String?
   regaloMensaje                String?
   regaloMostrarDatos           Boolean          @default(false)
+  pais                         String           @default("AR")
+  idioma                       String           @default("es")
+  regaloDatosBancarios         String?
+  pagoTarjetaDatosBancarios    String?
   regaloAlias                  String?
   regaloCvu                    String?
   regaloCbu                    String?
