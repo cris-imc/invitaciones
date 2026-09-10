@@ -140,6 +140,54 @@ por definir:
 **Lo que se sabe:** Mercado Pago opera en Argentina, Brasil, Chile, Colombia,
 México, Perú y Uruguay. De la lista, sólo Estados Unidos queda afuera.
 
+**RESPONDIDO (septiembre 2026, documentación oficial de Mercado Pago).**
+
+Existe un producto que hace exactamente esto y se llama **Cross Border**:
+
+> "cobrar de manera local pero retirar los fondos en una cuenta bancaria en otro país"
+
+Cómo funciona:
+
+- **El comprador paga en SU moneda local**, con sus medios de pago locales y
+  con la financiación que ofrece Mercado Pago en su país. Un mexicano paga en
+  pesos mexicanos y ve sus cuotas; un brasileño paga en reales. Esto es mejor
+  de lo que se esperaba: no es "tarjeta internacional con recargo", es un
+  cobro local de verdad.
+- **El vendedor retira en dólares** a una cuenta bancaria de otro país. Hoy
+  **sólo USD**.
+- **No es autogestionado.** La cuenta la tiene que crear el equipo de Mercado
+  Pago con una configuración especial. Se pide a **crm_regionales@mercadopago.com**,
+  con datos de la empresa, datos bancarios (SWIFT/routing, número de cuenta,
+  banco) y documentación de la habilitación comercial.
+- En la API hay que mandar `"counter_currency": { "currency_id": "USD" }` en
+  todos los medios de pago.
+
+**Lo que esto implica para el producto:**
+
+1. Una cuenta común de Mercado Pago Argentina **no sirve** para cobrarle a
+   otros países. Mercado Pago no convierte monedas: si se manda una preferencia
+   en ARS a un comprador mexicano, le cobra ese número en pesos argentinos. El
+   código hoy tiene `currency_id: "ARS"` fijo -- ver `src/lib/mercadopago.ts`
+   y `src/app/api/user/buy-credit/route.ts`.
+2. Hace falta **una cuenta bancaria en el exterior que reciba dólares**. Acá
+   entra lo del PREX con cuenta en Uruguay que él mencionó: es justo el tipo
+   de destino que este producto necesita. Falta confirmar con PREX que acepte
+   una acreditación de este tipo.
+3. Los precios en dólares del producto (`src/lib/precios-por-pais.ts`) quedan
+   alineados con esto: se cobra local, se liquida en dólares.
+
+**Lo que todavía hay que preguntarles a ellos, ahora con la pregunta correcta:**
+
+1. Comisión de Cross Border comparada con un cobro local argentino.
+2. Si aceptan como destino una cuenta tipo PREX/Payoneer o exigen una cuenta
+   bancaria a nombre de la empresa.
+3. Requisitos de habilitación comercial para una empresa argentina.
+4. Plazo de acreditación.
+
+---
+
+### La pregunta original, para referencia
+
 **Lo que hay que preguntarle a Mercado Pago, textual:**
 
 1. ¿Una cuenta de vendedor argentina puede cobrar a compradores de México,
