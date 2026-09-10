@@ -56,6 +56,8 @@ import {
   X,
   Info,
   ChevronLeft,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { hapticoConfirmar, hapticoDeshacer, hapticoError } from "@/lib/haptics";
 import { useToast } from "@/components/ui/Toast";
@@ -86,6 +88,8 @@ interface Guest {
   isExempt: boolean;
   invitationId: string;
   createdAt: string;
+  abiertaEn?: string | null;
+  aperturas?: number;
 }
 
 function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido: string): string {
@@ -991,6 +995,25 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                           ) : (
                             <span className="flex items-center shrink-0">
                               <Users className="w-3 h-3 mr-1" /> Individual
+                            </span>
+                          )}
+                          {/* Si abrió su invitación o todavía no. Es la pregunta
+                              que uno se hace antes de volver a mandar el link
+                              por WhatsApp, y es distinta de haber confirmado:
+                              se puede abrir y no contestar. */}
+                          {guest.abiertaEn ? (
+                            <span
+                              className="flex items-center shrink-0 text-emerald-600 dark:text-emerald-400"
+                              title={`Abrió por primera vez el ${new Date(guest.abiertaEn).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}${(guest.aperturas ?? 0) > 1 ? ` · ${guest.aperturas} veces en total` : ""}`}
+                            >
+                              <Eye className="w-3 h-3 mr-1" /> Abrió
+                            </span>
+                          ) : (
+                            <span
+                              className="flex items-center shrink-0 opacity-60"
+                              title="Todavía no abrió su invitación"
+                            >
+                              <EyeOff className="w-3 h-3 mr-1" /> Sin abrir
                             </span>
                           )}
                           {guest.isExempt && (

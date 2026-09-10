@@ -354,6 +354,17 @@ model Guest {
   /// si avisó que venía, esto dice que llegó. Mucha gente confirma y no va, y
   /// alguna cae sin confirmar, así que mezclarlos perdería las dos cosas.
   ingresoEn              DateTime?
+  /// Cuándo abrió su invitación por primera vez, cuándo la última, y cuántas
+  /// veces. Sirve para lo que todo anfitrión pregunta antes de insistir por
+  /// WhatsApp: "¿le habrá llegado?". Distinto de confirmar: se puede abrir y
+  /// no contestar, que es justamente el caso que hay que poder ver.
+  ///
+  /// Lo marca el navegador del invitado, no el servidor al renderizar: si no,
+  /// la vista previa que arma WhatsApp al pegar el link contaría como que la
+  /// abrió, y el anfitrión vería "abierta" antes de que nadie la tocara.
+  abiertaEn              DateTime?
+  ultimaAperturaEn       DateTime?
+  aperturas              Int              @default(0)
   message                String?
   responseDate           DateTime?
   dietaryRestrictions    String?

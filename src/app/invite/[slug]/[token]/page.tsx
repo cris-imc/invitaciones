@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { resolveCardPayment, resolveGuestPaymentView } from "@/lib/card-payments";
 import { canUseFeature, PlanTier } from "@/lib/plan-limits";
+import { RegistrarApertura } from "@/components/invitation/RegistrarApertura";
 import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
 import { ElegantTemplate } from "@/components/templates/ElegantTemplate";
 import { ElegantTemplateGreen } from "@/components/templates/ElegantTemplateGreen";
@@ -1050,6 +1051,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
             {isFree && <FreePlanBanner />}
             {isFree && <FreePlanBannerSpacer />}
             {renderTemplate()}
+            <RegistrarApertura token={guest?.uniqueToken} />
         </div>
     );
 }
