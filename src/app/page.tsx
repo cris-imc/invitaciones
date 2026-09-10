@@ -239,13 +239,15 @@ export default async function Home() {
           </div>
           <div className="max-w-3xl mx-auto px-6">
             <div className="rounded-2xl overflow-hidden shadow-[0_10px_50px_rgba(0,0,0,0.5)] border border-white/10">
-              {/* `preload="none"` + poster: antes los dos videos pedían sus
-                  metadatos apenas cargaba la landing (el oculto también --
-                  `display:none` no evita la descarga), y el primer fotograma
-                  del video es negro, así que la sección se veía como un
-                  rectángulo vacío hasta que alguien apretaba play. Ahora se
-                  muestra una portada de 10 KB y el video sólo se baja si lo
-                  reproducen. */}
+              {/* `preload="none"`: antes los dos videos pedían sus metadatos
+                  apenas cargaba la landing (el oculto también -- `display:none`
+                  no evita la descarga). Ahora no se baja nada hasta que le den
+                  play.
+                  El poster es negro sólido a propósito, del mismo tamaño que
+                  cada video: es el reposo que se eligió para la sección, y
+                  puesto como imagen (1,4 KB) en vez de dejar el atributo vacío
+                  porque sin poster cada navegador resuelve distinto -- algunos
+                  pintan negro y otros dejan ver el fondo de la página. */}
               {/* Mobile video */}
               <video
                 src="/video-demo-mobile.mp4"
