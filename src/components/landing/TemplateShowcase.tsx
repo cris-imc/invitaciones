@@ -33,22 +33,49 @@ const ROTATION: ShowcaseItem[] = [
 const MOBILE_VIEWPORT_WIDTH = 390;
 const MOBILE_ASPECT_RATIO = 19 / 9;
 
-const HOLD_MS = 4500;
 const FADE_MS = 700;
-const SCROLL_DELAY_MS = 1700;
+// Cuánto se sostiene la portada de bienvenida dentro del iframe antes de que
+// se autoabra sola (se lo pasamos al preview por query string).
+const COVER_HOLD_MS = 1300;
+// A partir de que la invitación se ABRE (no de que el iframe está listo):
+// cuánto se espera para el paseo de scroll y cuánto se la deja en pantalla.
+// El fundido tiene que arrancar bastante después de que termine la animación
+// de apertura (~1.1s en las plantillas de Storytelling), si no la apertura se
+// ve cortada por la mitad y parece que se rompió.
+const SCROLL_AFTER_OPEN_MS = 1600;
+const HOLD_AFTER_OPEN_MS = 4200;
+// Red de seguridad: una plantilla sin portada que abrir nunca avisa
+// "template-preview-opened". Se cuenta igual desde que el iframe avisó que
+// está listo para que la rotación no se quede clavada.
+const OPEN_FALLBACK_MS = 4600;
 
 export function TemplateShowcase() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const frameBoxRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // El alto del iframe NO sale de MOBILE_ASPECT_RATIO: ese aspecto lo cumple
+  // la caja del marco entera (borde incluido, box-sizing: border-box), así
+  // que el hueco interior queda un poco más alto de lo que da la proporción
+  // -- escalando 390 x (390 * 19/9) sobraban ~18px de negro abajo de la
+  // pantalla del celular. Se deriva del alto real del hueco para que el
+  // iframe lo llene exacto.
+  const [frame, setFrame] = useState({
+    scale: 1,
+    height: MOBILE_VIEWPORT_WIDTH * MOBILE_ASPECT_RATIO,
+  });
 
   useEffect(() => {
     const box = frameBoxRef.current;
     if (!box) return;
-    const update = () => setScale(box.clientWidth / MOBILE_VIEWPORT_WIDTH);
+    const update = () => {
+      const scale = box.clientWidth / MOBILE_VIEWPORT_WIDTH;
+      setFrame({
+        scale,
+        height: scale > 0 ? box.clientHeight / scale : MOBILE_VIEWPORT_WIDTH * MOBILE_ASPECT_RATIO,
+      });
+    };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(box);
@@ -61,23 +88,34 @@ export function TemplateShowcase() {
       timersRef.current = [];
     };
 
-    const onMessage = (event: MessageEvent) => {
-      if (event.source !== iframeRef.current?.contentWindow) return;
-      if (event.data?.type !== "template-preview-ready") return;
+    // El iframe avisa "listo" MÁS DE UNA VEZ por plantilla (una apenas monta
+    // y otra cuando ya tiene la portada armada; en dev, además, React monta
+    // dos veces). Antes cada aviso reiniciaba todos los tiempos, así que la
+    // cuenta terminaba arrancando desde el último y la invitación quedaba
+    // abierta apenas unas décimas antes del fundido: la apertura se veía
+    // cortada por la mitad. Sólo cuenta el primero de cada plantilla.
+    let started = false;
+    // Idem para la apertura: sólo se programa el resto de la secuencia una vez.
+    let opened = false;
 
-      clearTimers();
-      timersRef.current.push(setTimeout(() => setVisible(true), 50));
+    const runAfterOpen = () => {
+      if (opened) return;
+      opened = true;
 
-      // Scroll suave hacia abajo para mostrar que hay más contenido, como
-      // si un visitante estuviera recorriendo la invitación.
+      // Paseo hacia abajo para mostrar que hay más contenido, como si un
+      // visitante estuviera recorriendo la invitación. Va DESPUÉS de la
+      // apertura: si se scrollea con la portada todavía puesta, al abrirse
+      // la invitación ya aparece por la mitad (se saltea el hero) y se ve
+      // como un salto raro. Y lo scrollea el propio preview, porque las
+      // plantillas de Storytelling no mueven `window` sino su contenedor
+      // interno (ver showcase-scroll en /preview-plantilla).
       timersRef.current.push(
         setTimeout(() => {
-          const win = iframeRef.current?.contentWindow;
-          const doc = iframeRef.current?.contentDocument;
-          const scrollHeight = doc?.documentElement.scrollHeight ?? 1400;
-          const target = Math.min(650, Math.max(320, scrollHeight * 0.32));
-          win?.scrollTo({ top: target, behavior: "smooth" });
-        }, SCROLL_DELAY_MS)
+          iframeRef.current?.contentWindow?.postMessage(
+            { type: "showcase-scroll" },
+            window.location.origin
+          );
+        }, SCROLL_AFTER_OPEN_MS)
       );
 
       // Fundido a negro y avance a la siguiente plantilla de la rotación.
@@ -87,8 +125,22 @@ export function TemplateShowcase() {
           timersRef.current.push(
             setTimeout(() => setIndex((i) => (i + 1) % ROTATION.length), FADE_MS)
           );
-        }, HOLD_MS)
+        }, HOLD_AFTER_OPEN_MS)
       );
+    };
+
+    const onMessage = (event: MessageEvent) => {
+      if (event.source !== iframeRef.current?.contentWindow) return;
+
+      if (event.data?.type === "template-preview-opened") {
+        runAfterOpen();
+        return;
+      }
+      if (event.data?.type !== "template-preview-ready" || started) return;
+
+      started = true;
+      timersRef.current.push(setTimeout(() => setVisible(true), 50));
+      timersRef.current.push(setTimeout(runAfterOpen, OPEN_FALLBACK_MS));
     };
 
     window.addEventListener("message", onMessage);
@@ -99,7 +151,7 @@ export function TemplateShowcase() {
   }, [index]);
 
   const item = ROTATION[index];
-  const previewSrc = `/preview-plantilla?evento=${item.evento}&tipo=${item.tipo}&color=${encodeURIComponent(item.color)}&scroll=1`;
+  const previewSrc = `/preview-plantilla?evento=${item.evento}&tipo=${item.tipo}&color=${encodeURIComponent(item.color)}&scroll=1&portada=${COVER_HOLD_MS}`;
 
   return (
     <section id="plantillas" className="l-plantillas relative py-20 md:py-28 px-6 border-t border-zinc-900 overflow-hidden">
@@ -130,8 +182,8 @@ export function TemplateShowcase() {
             <div
               style={{
                 width: MOBILE_VIEWPORT_WIDTH,
-                height: MOBILE_VIEWPORT_WIDTH * MOBILE_ASPECT_RATIO,
-                transform: `scale(${scale})`,
+                height: frame.height,
+                transform: `scale(${frame.scale})`,
                 transformOrigin: "top left",
                 opacity: visible ? 1 : 0,
                 transition: `opacity ${FADE_MS}ms ease-in-out`,
@@ -145,7 +197,7 @@ export function TemplateShowcase() {
                 tabIndex={-1}
                 style={{
                   width: MOBILE_VIEWPORT_WIDTH,
-                  height: MOBILE_VIEWPORT_WIDTH * MOBILE_ASPECT_RATIO,
+                  height: frame.height,
                   border: 0,
                   pointerEvents: "none",
                 }}

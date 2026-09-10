@@ -187,6 +187,29 @@ function scrollToElementWithinPreview(element: HTMLElement) {
   window.scrollTo({ top: top > 0 ? top : 0, behavior: "smooth" });
 }
 
+// El showcase de la landing (TemplateShowcase.tsx) pide "un paso" de scroll
+// para mostrar que la invitación sigue más abajo. No puede hacerlo él mismo
+// con iframe.contentWindow.scrollTo(): las plantillas de la Colección
+// Storytelling no scrollean la ventana (ver getStorytellingScroller arriba),
+// así que ese scrollTo no movía nada y esas plantillas se veían siempre
+// clavadas en la primera sección. Acá adentro sí sabemos cuál es el
+// contenedor que scrollea en cada familia.
+function scrollShowcaseTour() {
+  const scroller = getStorytellingScroller();
+  if (scroller) {
+    // Las secciones de Storytelling ocupan una pantalla completa cada una:
+    // avanzar exactamente una deja la siguiente encuadrada, en vez de cortar
+    // una sección por la mitad.
+    const max = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+    scroller.scrollTo({ top: Math.min(scroller.clientHeight, max), behavior: "smooth" });
+    return;
+  }
+  const doc = document.documentElement;
+  const max = Math.max(0, doc.scrollHeight - window.innerHeight);
+  const target = Math.min(650, Math.max(320, doc.scrollHeight * 0.32));
+  window.scrollTo({ top: Math.min(target, max), behavior: "smooth" });
+}
+
 function scrollToBottomWithinPreview() {
   const scroller = getStorytellingScroller();
   if (scroller) {
@@ -210,6 +233,12 @@ function PreviewPlantillaContent() {
   // poder hacer scroll para mostrar más contenido de la plantilla en vez de
   // quedarse fijo en la portada.
   const scrollable = params.get("scroll") === "1";
+  // Cuánto se sostiene la portada de bienvenida antes de autoabrirla. El
+  // wizard/modal se toman su tiempo (el usuario está mirando esa pantalla y
+  // nada más), pero el showcase de la landing tiene un turno corto por
+  // plantilla: si la portada se queda 3s, la invitación abierta se ve menos
+  // de medio segundo antes del fundido y la apertura parece cortada.
+  const coverHoldMs = Number(params.get("portada")) || 3000;
 
   const componentsMap = COMPONENTS_BY_TIPO[tipo];
   const Template = componentsMap[color] ?? componentsMap.default;
@@ -265,6 +294,8 @@ function PreviewPlantillaContent() {
           setLiveInvitation(event.data.invitation ?? {});
           setShowCoverOnly(Boolean(event.data.showCoverOnly));
           setHasFirstContact(true);
+      } else if (event.data?.type === "showcase-scroll") {
+          scrollShowcaseTour();
       } else if (event.data?.type === "wizard-scroll-to") {
           const sectionId = event.data.section;
           if (!sectionId) return;
@@ -421,7 +452,11 @@ function PreviewPlantillaContent() {
       // se alcance a ver (antes pasaba a la parte superior casi instantáneo).
       openTimeout = setTimeout(() => {
         btn.click();
-      }, 3000);
+        // El padre necesita saber CUÁNDO se abrió, no solo que el iframe
+        // estaba listo: el showcase de la landing cuenta desde acá el rato
+        // que deja la invitación abierta antes de pasar a la siguiente.
+        window.parent.postMessage({ type: "template-preview-opened" }, window.location.origin);
+      }, coverHoldMs);
       return true;
     };
 
@@ -446,7 +481,7 @@ function PreviewPlantillaContent() {
       observer.disconnect();
       clearTimeout(timeout);
     };
-  }, [evento, tipo, color, scrollable, showCoverOnly, hasFirstContact]);
+  }, [evento, tipo, color, scrollable, showCoverOnly, hasFirstContact, coverHoldMs]);
 
   return <Template invitation={displayInvitation} guest={null} isPersonalized={false} />;
 }
