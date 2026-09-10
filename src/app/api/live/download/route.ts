@@ -7,7 +7,7 @@ import fs from "fs";
 import { Readable } from "stream";
 import { getUploadsDir } from "@/lib/uploads";
 import { isAdmin } from "@/lib/roles";
-import { buildWatermarkedJpegBuffer } from "@/lib/liveWatermarkServer";
+import { buildWatermarkedJpegStream } from "@/lib/liveWatermarkServer";
 
 export async function GET(req: Request) {
     try {
@@ -67,8 +67,44 @@ export async function GET(req: Request) {
 
         archive.pipe(stream);
 
-        for (const item of items) {
-            if (item.fileUrl) {
+        // El armado del ZIP NO se espera acá: la respuesta se devuelve enseguida
+        // (más abajo) y el navegador empieza a bajar mientras esto va sumando
+        // fotos. Antes se recorrían las 200 fotos, se apilaban todas en memoria
+        // y recién entonces se mandaba el primer byte: un evento grande eran
+        // ~400 MB de pico, suficiente para que el contenedor se quede sin
+        // memoria y se lleve puesta la app entera.
+
+        // Espera a que el archivador termine de consumir la entrada recién
+        // encolada antes de preparar la siguiente. Sin esto se construyen las
+        // 200 tuberías de sharp de una, y la memoria termina PEOR que con
+        // buffers (medido: 489 MB contra 363 MB con 40 fotos). Encolando de a
+        // una, el pico se mantiene plano sin importar cuántas fotos haya.
+        //
+        // También corta si se cae la salida: si quien descarga cancela a mitad,
+        // sin esto el bucle se quedaría esperando un "entry" que ya no va a
+        // llegar, reteniendo la foto en curso para siempre.
+        const esperarEntrada = () =>
+            new Promise<void>((resolve, reject) => {
+                const limpiar = () => {
+                    archive.off("entry", ok);
+                    archive.off("error", fallo);
+                    stream.off("close", cortado);
+                };
+                const ok = () => { limpiar(); resolve(); };
+                const fallo = (e: unknown) => { limpiar(); reject(e); };
+                const cortado = () => { limpiar(); reject(new Error("descarga cancelada")); };
+                archive.once("entry", ok);
+                archive.once("error", fallo);
+                stream.once("close", cortado);
+            });
+
+        const armarZip = async () => {
+            for (const item of items) {
+                // Si ya nadie está del otro lado, no tiene sentido seguir
+                // procesando fotos.
+                if (stream.destroyed) return;
+                if (!item.fileUrl) continue;
+
                 // Extraemos el nombre del archivo de la URL (ej: /uploads/123.jpg -> 123.jpg)
                 const urlPath = item.fileUrl.split('?')[0];
                 const fileName = urlPath.replace("/uploads/", "");
@@ -83,8 +119,7 @@ export async function GET(req: Request) {
                     // resuelto server-side con sharp porque no hay Canvas/Image
                     // del navegador disponibles en esta ruta.
                     try {
-                        const watermarked = await buildWatermarkedJpegBuffer(filePath);
-                        archive.append(watermarked, { name: fileName });
+                        archive.append(await buildWatermarkedJpegStream(filePath), { name: fileName });
                     } catch (err) {
                         console.error("[live download] fallo watermark, se usa original:", err);
                         archive.file(filePath, { name: fileName });
@@ -92,28 +127,24 @@ export async function GET(req: Request) {
                 } else {
                     archive.file(filePath, { name: fileName });
                 }
-            }
-        }
 
-        archive.finalize();
+                await esperarEntrada();
+            }
+            await archive.finalize();
+        };
+
+        armarZip().catch((err) => {
+            // Una cancelación del cliente no es un fallo que valga la pena
+            // registrar como error: es el caso normal de alguien que cierra
+            // la pestaña a mitad de la descarga.
+            if (stream.destroyed) return;
+            console.error("[live download] fallo armando el zip:", err);
+            stream.destroy(err);
+        });
 
         const filename = `fotos-live-${invitation.nombreEvento || "evento"}.zip`.replace(/[^a-zA-Z0-9.\-]/g, "_");
 
-        function iteratorToStream(iterator: AsyncIterable<any>) {
-            const it = iterator[Symbol.asyncIterator]();
-            return new ReadableStream({
-                async pull(controller) {
-                    const { value, done } = await it.next();
-                    if (done) {
-                        controller.close();
-                    } else {
-                        controller.enqueue(new Uint8Array(value));
-                    }
-                },
-            });
-        }
-
-        const webStream = iteratorToStream(stream);
+        const webStream = Readable.toWeb(stream) as unknown as ReadableStream<Uint8Array>;
 
         return new NextResponse(webStream as any, {
             headers: {
