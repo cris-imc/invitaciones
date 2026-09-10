@@ -10,9 +10,19 @@ import { Copy, Check, Landmark } from "lucide-react";
  */
 export const DATOS_TRANSFERENCIA = {
   alias: "altainvitacion",
+  cbu: "0270199420058344630049",
   banco: "Banco Supervielle",
   titular: "Cristian Iván Martínez Calderón",
 };
+
+/**
+ * El CBU en grupos de cuatro, sólo para mostrarlo. Veintidós dígitos seguidos
+ * son imposibles de verificar a ojo, y verificarlos es exactamente lo que hay
+ * que hacer antes de transferir. Lo que se copia son los dígitos pelados.
+ */
+function cbuLegible(cbu: string): string {
+  return cbu.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+}
 
 const WHATSAPP_COMPROBANTE = `https://wa.me/5493517660000?text=${encodeURIComponent(
   "Hola! Te paso el comprobante de la transferencia para activar mi plan."
@@ -34,18 +44,39 @@ interface Props {
  */
 export function PagoPorTransferencia({ concepto, className }: Props) {
   const [abierto, setAbierto] = useState(false);
-  const [copiado, setCopiado] = useState(false);
+  // Cuál se copió, para que el "Copiado" salga en el botón correcto.
+  const [copiado, setCopiado] = useState<"alias" | "cbu" | null>(null);
 
-  const copiarAlias = async () => {
+  const copiar = async (que: "alias" | "cbu") => {
     try {
-      await navigator.clipboard.writeText(DATOS_TRANSFERENCIA.alias);
-      setCopiado(true);
-      window.setTimeout(() => setCopiado(false), 2000);
+      await navigator.clipboard.writeText(
+        que === "alias" ? DATOS_TRANSFERENCIA.alias : DATOS_TRANSFERENCIA.cbu
+      );
+      setCopiado(que);
+      window.setTimeout(() => setCopiado(null), 2000);
     } catch {
-      // Sin portapapeles (contexto no seguro, permisos): el alias está a la
+      // Sin portapapeles (contexto no seguro, permisos): el dato está a la
       // vista igual, así que no hay nada que avisar.
     }
   };
+
+  const BotonCopiar = ({ que }: { que: "alias" | "cbu" }) => (
+    <button
+      type="button"
+      onClick={() => copiar(que)}
+      className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors"
+    >
+      {copiado === que ? (
+        <>
+          <Check className="w-3.5 h-3.5 text-emerald-400" /> Copiado
+        </>
+      ) : (
+        <>
+          <Copy className="w-3.5 h-3.5" /> Copiar
+        </>
+      )}
+    </button>
+  );
 
   return (
     <div className={className}>
@@ -65,21 +96,17 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Alias</p>
               <p className="text-base font-semibold truncate">{DATOS_TRANSFERENCIA.alias}</p>
             </div>
-            <button
-              type="button"
-              onClick={copiarAlias}
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors"
-            >
-              {copiado ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Copiado
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" /> Copiar
-                </>
-              )}
-            </button>
+            <BotonCopiar que="alias" />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">CBU</p>
+              <p className="text-sm font-mono tracking-tight">
+                {cbuLegible(DATOS_TRANSFERENCIA.cbu)}
+              </p>
+            </div>
+            <BotonCopiar que="cbu" />
           </div>
 
           <div>
