@@ -693,10 +693,11 @@ function RegisterForm() {
                     : "Continuar a PayPal"}
                 </Button>
 
-                {/* Sólo cuando hay algo que pagar y sólo donde sirve: la
-                    transferencia es a una cuenta bancaria argentina, así que
-                    fuera de Argentina no es una opción. En el plan gratis no
-                    hay nada que transferir y sería una distracción. */}
+                {/* Sólo cuando hay algo que pagar: en el plan gratis no hay
+                    nada que transferir y sería una distracción. Ya no está
+                    limitada a Argentina -- hay una cuenta local por país (ver
+                    lib/cobro.ts) --, pero se sigue consultando `medios` porque
+                    la lista de cada país es la que manda. */}
                 {selectedPlan !== "FREE" && medios.includes("transferencia") && (
                   <PagoPorTransferencia concepto="tu plan" className="mt-1" />
                 )}

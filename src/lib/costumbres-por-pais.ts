@@ -63,19 +63,26 @@ const ARGENTINA: CostumbresDelPais = {
 // docs/PLAN-INTERNACIONAL.md).
 //
 // Sin cuotas: las cuotas sin interés son una campaña de Mercado Pago
-// Argentina y no existen en un cobro por PayPal.
-const SIN_RESOLVER: CostumbresDelPais = {
+// Argentina y no existen ni en PayPal ni en una transferencia.
+//
+// La TRANSFERENCIA sí va, y es un cambio: antes estaba sólo en Argentina
+// porque la única cuenta cargada era argentina y no le servía a nadie de
+// afuera. Ahora hay una cuenta local en cada país (ver lib/cobro.ts), así que
+// un colombiano transfiere a una cuenta colombiana. Es importante que esté:
+// PayPal no tiene la penetración que tiene en Estados Unidos en el resto de
+// los países de la lista, y sin transferencia se pierde esa venta.
+const FUERA_DE_ARGENTINA: CostumbresDelPais = {
   cuotasSinInteres: null,
-  mediosDePago: ["paypal"],
+  mediosDePago: ["paypal", "transferencia"],
 };
 
 const POR_PAIS: Record<CodigoPais, CostumbresDelPais> = {
   AR: ARGENTINA,
-  UY: SIN_RESOLVER,
-  CO: SIN_RESOLVER,
-  MX: SIN_RESOLVER,
-  ES: SIN_RESOLVER,
-  US: SIN_RESOLVER,
+  UY: FUERA_DE_ARGENTINA,
+  CO: FUERA_DE_ARGENTINA,
+  MX: FUERA_DE_ARGENTINA,
+  ES: FUERA_DE_ARGENTINA,
+  US: FUERA_DE_ARGENTINA,
 };
 
 export function costumbresDe(pais: CodigoPais): CostumbresDelPais {
@@ -86,11 +93,13 @@ export function costumbresDe(pais: CodigoPais): CostumbresDelPais {
  * Lo que corresponde mostrarle a alguien de quien todavía no sabemos el país
  * (un visitante anónimo en la landing).
  *
- * Es lo mismo que "sin resolver", y a propósito: ante la duda no se promete
- * nada. Prometer de menos se corrige cuando se registra y dice de dónde es;
- * prometer de más se descubre en el checkout, que es el peor momento posible.
+ * Es lo mismo que fuera de Argentina, y a propósito: ante la duda no se
+ * promete nada que pueda no cumplirse. Prometer de menos se corrige cuando se
+ * registra y dice de dónde es; prometer de más -- unas cuotas sin interés que
+ * después no están -- se descubre en el checkout, que es el peor momento
+ * posible.
  */
-export const ANTE_LA_DUDA: CostumbresDelPais = SIN_RESOLVER;
+export const ANTE_LA_DUDA: CostumbresDelPais = FUERA_DE_ARGENTINA;
 
 export function costumbresDeVisitante(pais: CodigoPais | null): CostumbresDelPais {
   return pais ? costumbresDe(pais) : ANTE_LA_DUDA;

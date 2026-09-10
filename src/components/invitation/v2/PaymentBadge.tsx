@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useTextos, useFormatoDeMoneda } from "@/components/i18n/ProveedorIdioma";
 
 interface PaymentBadgeProps {
   paymentStatus: "PENDING" | "EXEMPT" | "PAID";
-  amount?: number;          // monto por persona en ARS
+  amount?: number;          // monto por persona, en la moneda del país de la invitación
   precioNino?: number;
   precioAdolescente?: number;
   attendingCount?: number;  // cantidad de personas confirmadas (legacy)
@@ -33,6 +33,9 @@ export function PaymentBadge({
   titular,
 }: PaymentBadgeProps) {
   const tx = useTextos();
+  // Al tope y no más abajo: los hooks tienen que llamarse siempre, y este
+  // componente devuelve temprano en varios estados.
+  const formatearMonto = useFormatoDeMoneda();
   const [copied, setCopied] = useState(false);
 
   if (paymentStatus === "PAID") {
@@ -79,11 +82,10 @@ export function PaymentBadge({
 
   const total = (amount * adults) + (teenPrice * teens) + (childPrice * children);
 
-  const formattedTotal = new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-  }).format(total);
+  // La moneda sale del país de LA INVITACIÓN, no de un peso argentino fijo:
+  // un anfitrión español que cobra 50 € veía "$ 50", que es otro número y otra
+  // plata. Ver useFormatoDeMoneda / lib/i18n/moneda.ts.
+  const formattedTotal = formatearMonto(total);
 
   const handleCopyAlias = async () => {
     if (!alias) return;

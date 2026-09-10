@@ -32,19 +32,59 @@ const PRECIOS_USD_CON_DESCUENTO: Record<"PREMIUM" | "DIAMOND", number> = {
   DIAMOND: 39,
 };
 
+/**
+ * RECARGO POR COMISIÓN DE COBRO, en la moneda de cada país.
+ *
+ * En España y Estados Unidos el banco que recibe se queda con una comisión
+ * fija por operación, así que el precio de lista la incluye en vez de
+ * comérsela. Va acá y no sumado a mano en cada pantalla porque el precio se
+ * muestra en seis lugares distintos, y uno que se olvide es una venta cobrada
+ * de menos.
+ *
+ * ATENCIÓN: son montos comerciales, no técnicos. Se cambian acá.
+ */
+const RECARGO_POR_COMISION: Partial<Record<CodigoPais, number>> = {
+  ES: 3,
+  US: 3,
+};
+
+/**
+ * Precio de lista en euros, para España.
+ *
+ * ATENCIÓN: hoy son los mismos números que en dólares, y eso es un valor
+ * provisorio puesto para que el mecanismo funcione, NO un precio decidido. Un
+ * euro no vale un dólar. Hay que fijarlos a mano igual que los de arriba.
+ */
+const PRECIOS_EUR: Record<PlanTier, number> = { ...PRECIOS_USD };
+const PRECIOS_EUR_CON_DESCUENTO: Record<"PREMIUM" | "DIAMOND", number> = {
+  ...PRECIOS_USD_CON_DESCUENTO,
+};
+
 export interface PrecioMostrable {
   monto: number;
-  moneda: "ARS" | "USD";
+  moneda: "ARS" | "USD" | "EUR";
 }
 
 export function esArgentina(pais: CodigoPais | null): boolean {
   return pais === "AR";
 }
 
+/** España cobra en euros: es su moneda y cobrarle en dólares es un costo de cambio para el cliente. */
+function esEuro(pais: CodigoPais | null): boolean {
+  return pais === "ES";
+}
+
+/** El recargo del país, o cero. El plan gratis nunca lleva recargo. */
+function recargoDe(pais: CodigoPais | null, monto: number): number {
+  if (monto === 0) return 0;
+  return (pais && RECARGO_POR_COMISION[pais]) ?? 0;
+}
+
 export function precioDePlan(planTier: PlanTier, pais: CodigoPais | null): PrecioMostrable {
-  return esArgentina(pais)
-    ? { monto: PLAN_LIMITS[planTier].price, moneda: "ARS" }
-    : { monto: PRECIOS_USD[planTier], moneda: "USD" };
+  if (esArgentina(pais)) return { monto: PLAN_LIMITS[planTier].price, moneda: "ARS" };
+
+  const base = esEuro(pais) ? PRECIOS_EUR[planTier] : PRECIOS_USD[planTier];
+  return { monto: base + recargoDe(pais, base), moneda: esEuro(pais) ? "EUR" : "USD" };
 }
 
 export function precioConDescuento(
@@ -55,7 +95,9 @@ export function precioConDescuento(
     const monto = planTier === "PREMIUM" ? PREMIUM_DISCOUNT_PRICE : DIAMOND_DISCOUNT_PRICE;
     return { monto, moneda: "ARS" };
   }
-  return { monto: PRECIOS_USD_CON_DESCUENTO[planTier], moneda: "USD" };
+
+  const base = esEuro(pais) ? PRECIOS_EUR_CON_DESCUENTO[planTier] : PRECIOS_USD_CON_DESCUENTO[planTier];
+  return { monto: base + recargoDe(pais, base), moneda: esEuro(pais) ? "EUR" : "USD" };
 }
 
 /**
@@ -71,7 +113,14 @@ export function formatearPrecio(precio: PrecioMostrable, idioma: string): string
   // Para el español se usa es-AR y no es-419: el genérico escribe "USD 39" y
   // el argentino "US$ 39", que es como se escribe en toda Latinoamérica y
   // coincide con lo que ya sale en portugués.
-  const regional = precio.moneda === "ARS" ? "es-AR" : idioma === "en" ? "en-US" : idioma === "pt" ? "pt-BR" : "es-AR";
+  // El euro se escribe a la española ("39 €", con el símbolo detrás); el resto
+  // sigue como estaba.
+  const regional =
+    precio.moneda === "EUR" ? "es-ES"
+    : precio.moneda === "ARS" ? "es-AR"
+    : idioma === "en" ? "en-US"
+    : idioma === "pt" ? "pt-BR"
+    : "es-AR";
   return new Intl.NumberFormat(regional, {
     style: "currency",
     currency: precio.moneda,

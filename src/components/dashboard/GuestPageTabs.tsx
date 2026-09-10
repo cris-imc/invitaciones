@@ -16,6 +16,8 @@ type Tab = "invitados" | "canciones" | "precio" | "agregar" | "mesas" | "live";
 
 interface Props {
   invitationId: string;
+  /** El país de la invitación: de él sale la moneda de los montos. */
+  pais?: string | null;
   slug: string;
   regaloHabilitado: boolean;
   pagoTarjetaHabilitado?: boolean;
@@ -65,6 +67,7 @@ function AnimatedTabDescription({ text }: { text: string }) {
 
 export function GuestPageTabs({
   invitationId,
+  pais,
   slug,
   regaloHabilitado,
   pagoTarjetaHabilitado = false,
@@ -276,6 +279,7 @@ export function GuestPageTabs({
               <h2 className="text-xl font-semibold mb-6">Lista de Invitados</h2>
               <GuestListWithPayment
                 invitationId={invitationId}
+                pais={pais}
                 pagoTarjetaHabilitado={pagoTarjetaHabilitado}
                 // Sin un precio cargado no hay monto que repartir entre los
                 // cupos: el panel se queda con los estados simples y esconde

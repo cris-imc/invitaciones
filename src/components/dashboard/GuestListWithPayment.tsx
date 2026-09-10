@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Info, ChevronUp, ChevronDown, Download, NotebookPen, ListChecks, Undo2, Pencil, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { formatearMonto } from "@/lib/i18n/moneda";
+import { useIdioma } from "@/components/i18n/ProveedorIdioma";
 import { hapticoConfirmar, hapticoDeshacer } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,6 +65,8 @@ interface Guest {
 
 interface GuestListWithPaymentProps {
   invitationId: string;
+  /** El país de la invitación: de él sale la moneda de los montos. */
+  pais?: string | null;
   paymentAmount?: number;
   pagoTarjetaHabilitado?: boolean;
   /**
@@ -168,6 +172,7 @@ const SORT_LABELS: Record<SortBy, string> = {
 
 export function GuestListWithPayment({
   invitationId,
+  pais,
   paymentAmount,
   pagoTarjetaHabilitado = false,
   hasPrices = false,
@@ -447,8 +452,11 @@ export function GuestListWithPayment({
         .reduce((s, g) => s + g.attendingCount * paymentAmount, 0)
     : 0;
 
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const { idioma } = useIdioma();
+  // La moneda sale del país de la invitación y no de un peso argentino fijo:
+  // un anfitrión mexicano cobrando 900 pesos mexicanos veía el total escrito
+  // como si fueran pesos argentinos. Ver lib/i18n/moneda.ts.
+  const formatMonto = (n: number) => formatearMonto(n, pais, idioma);
 
   const handleExportExcel = () => {
     if (guests.length === 0) return;
@@ -601,9 +609,9 @@ export function GuestListWithPayment({
                 fontSize: "13px",
               }}
             >
-              <span>💰 Recaudado: <b style={{ color: "var(--accent)" }}>{formatARS(collectedTotal)}</b></span>
+              <span>💰 Recaudado: <b style={{ color: "var(--accent)" }}>{formatMonto(collectedTotal)}</b></span>
               <span style={{ opacity: .5 }}>·</span>
-              <span>⏳ Estimado total: <b>{formatARS(estimatedTotal)}</b></span>
+              <span>⏳ Estimado total: <b>{formatMonto(estimatedTotal)}</b></span>
               <span style={{ opacity: .5 }}>·</span>
               <span style={{ opacity: .6 }}>⊘ Exentos: {exemptCount}</span>
             </div>
@@ -905,10 +913,10 @@ export function GuestListWithPayment({
                       {guest.pendingAmount > 0 ? (
                         <>
                           {" · falta marcar "}
-                          <b className="text-foreground">{formatARS(guest.pendingAmount)}</b>
+                          <b className="text-foreground">{formatMonto(guest.pendingAmount)}</b>
                         </>
                       ) : guest.surplus > 0 ? (
-                        <>{" · "}<b className="text-foreground">{formatARS(guest.surplus)} a favor</b></>
+                        <>{" · "}<b className="text-foreground">{formatMonto(guest.surplus)} a favor</b></>
                       ) : null}
                     </span>
                   )}
@@ -1142,17 +1150,17 @@ export function GuestListWithPayment({
                 {detailGuest.paidSeats} de {detailGuest.totalSeats} pagos
               </span>
               <span>
-                Cobrado: <b className="text-foreground">{formatARS(detailGuest.paidAmount)}</b>
+                Cobrado: <b className="text-foreground">{formatMonto(detailGuest.paidAmount)}</b>
               </span>
               {detailGuest.pendingAmount > 0 && (
                 <span>
-                  Falta marcar: <b className="text-foreground">{formatARS(detailGuest.pendingAmount)}</b>
+                  Falta marcar: <b className="text-foreground">{formatMonto(detailGuest.pendingAmount)}</b>
                 </span>
               )}
-              <span>Total: {formatARS(detailGuest.totalAmount)}</span>
+              <span>Total: {formatMonto(detailGuest.totalAmount)}</span>
               {detailGuest.surplus > 0 && (
                 <span>
-                  <b className="text-foreground">{formatARS(detailGuest.surplus)}</b> a favor
+                  <b className="text-foreground">{formatMonto(detailGuest.surplus)}</b> a favor
                 </span>
               )}
             </div>
@@ -1162,17 +1170,17 @@ export function GuestListWithPayment({
             <div className="flex shrink-0 flex-wrap gap-x-3 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
               <span className="font-medium uppercase tracking-wide opacity-70">Tu registro</span>
               <span>
-                recibiste <b className="text-foreground">{formatARS(detailGuest.receivedAmount)}</b>
+                recibiste <b className="text-foreground">{formatMonto(detailGuest.receivedAmount)}</b>
               </span>
               {detailGuest.onAccount > 0 && (
                 <span>
-                  · recibiste <b className="text-foreground">{formatARS(detailGuest.onAccount)}</b> más de
+                  · recibiste <b className="text-foreground">{formatMonto(detailGuest.onAccount)}</b> más de
                   lo que marcaste como pagado
                 </span>
               )}
               {detailGuest.missingAmount > 0 && (
                 <span>
-                  · recibiste <b className="text-foreground">{formatARS(detailGuest.missingAmount)}</b> menos
+                  · recibiste <b className="text-foreground">{formatMonto(detailGuest.missingAmount)}</b> menos
                   de lo que marcaste como pagado
                 </span>
               )}
@@ -1254,7 +1262,7 @@ export function GuestListWithPayment({
                 <p>
                   Ese lugar deja de estar pago
                   {seatConfirm && seatConfirm.seat.price > 0 ? (
-                    <> y se descuentan <strong>{formatARS(seatConfirm.seat.price)}</strong> de lo cobrado</>
+                    <> y se descuentan <strong>{formatMonto(seatConfirm.seat.price)}</strong> de lo cobrado</>
                   ) : null}
                   .
                 </p>
@@ -1299,7 +1307,7 @@ export function GuestListWithPayment({
                   </strong>{" "}
                   marcado{clearConfirm?.marked !== 1 ? "s" : ""} como pago
                   {clearConfirm && clearConfirm.guest.paidAmount > 0
-                    ? ` (${formatARS(clearConfirm.guest.paidAmount)})`
+                    ? ` (${formatMonto(clearConfirm.guest.paidAmount)})`
                     : ""}
                   . Se van a desmarcar todos y no se puede deshacer.
                 </p>
@@ -1353,7 +1361,7 @@ export function GuestListWithPayment({
                 />
                 {notesFor && (
                   <p className="text-xs text-muted-foreground">
-                    Los cupos que marcaste suman {formatARS(notesFor.paidAmount)}.
+                    Los cupos que marcaste suman {formatMonto(notesFor.paidAmount)}.
                   </p>
                 )}
               </div>
