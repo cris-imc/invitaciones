@@ -7,6 +7,10 @@ import { validatePassword } from "@/lib/password";
 import { createCheckoutPreference, getPublicBaseUrl } from "@/lib/mercadopago";
 import { getRequestIp } from "@/lib/request-ip";
 import { resolveDiscountForPlan } from "@/lib/discount-codes";
+import { esCodigoPais } from "@/lib/paises";
+import { costumbresDe } from '@/lib/costumbres-por-pais';
+import { precioConDescuento } from '@/lib/precios-por-pais';
+import { crearOrden, paypalDisponible } from '@/lib/paypal';
 
 export async function POST(request: NextRequest) {
   if (!REGISTRATION_ENABLED) {
@@ -18,7 +22,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, email, password, planTier, phoneAreaCode, phoneNumber, acceptedTerms, discountCode } = body;
+    const { name, email, password, planTier, phoneAreaCode, phoneNumber, pais, acceptedTerms, discountCode } = body;
 
     // Validate input
     if (!name || !email || !password) {
@@ -51,6 +55,17 @@ export async function POST(request: NextRequest) {
     const phoneNumberError = validatePhoneNumber(phoneNumber || "");
     if (phoneNumberError) {
       return NextResponse.json({ error: phoneNumberError }, { status: 400 });
+    }
+
+    // El país decide qué datos bancarios se le van a pedir después (CBU,
+    // clave PIX, routing number...). Se rechaza cualquier valor que no sea uno
+    // de los países que manejamos en vez de caer al default: un código
+    // inventado dejaría al usuario con formularios de Argentina sin avisarle.
+    if (!esCodigoPais(pais)) {
+      return NextResponse.json(
+        { error: "Elegí un país válido" },
+        { status: 400 }
+      );
     }
 
     // Check if user already exists
@@ -101,6 +116,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         phoneAreaCode,
         phoneNumber,
+        pais,
         planTier: "FREE",
         premiumCredits: 0,
         diamondCredits: 0,
@@ -128,39 +144,73 @@ export async function POST(request: NextRequest) {
     const { amount, discountCodeId, discountAmount } = discountResult;
 
     try {
+      // Qué procesador cobra sale del país, no de una preferencia: una
+      // cuenta común de Mercado Pago Argentina no puede cobrarle a alguien
+      // de otro país -- MP no convierte monedas y el checkout argentino
+      // pide un documento argentino. Fuera de Argentina cobra PayPal.
+      const porMercadoPago = costumbresDe(pais).mediosDePago.includes("mercadopago");
+
+      // El precio y la moneda salen del país. El descuento se calculó sobre
+      // la lista argentina, así que fuera de Argentina se cobra el precio en
+      // dólares que corresponde al plan.
+      const precio = porMercadoPago
+        ? { monto: amount, moneda: "ARS" }
+        : precioConDescuento(paidPlanTier, pais);
+
       const payment = await prisma.payment.create({
         data: {
           userId: user.id,
-          amount,
-          currency: "ARS",
+          amount: precio.monto,
+          currency: precio.moneda,
           status: "PENDING",
           planTier: paidPlanTier,
+          proveedor: porMercadoPago ? "mercadopago" : "paypal",
           discountCodeId,
           discountAmount: discountAmount || null,
         },
       });
 
       const baseUrl = getPublicBaseUrl(request.nextUrl.origin);
+      const titulo = `Membresía ${paidPlanTier === "DIAMOND" ? "Diamond" : "Premium"} - Alta Invitación`;
 
-      const { preferenceId, checkoutUrl } = await createCheckoutPreference({
-        paymentId: payment.id,
-        title: `Membresía ${paidPlanTier === "DIAMOND" ? "Diamond" : "Premium"} - Alta Invitación`,
-        amount,
-        payerEmail: user.email,
-        baseUrl,
-      });
-
-      await prisma.payment.update({
-        where: { id: payment.id },
-        data: { mercadoPagoId: preferenceId },
-      });
+      let checkoutUrl: string;
+      if (porMercadoPago) {
+        const preferencia = await createCheckoutPreference({
+          paymentId: payment.id,
+          title: titulo,
+          amount: precio.monto,
+          payerEmail: user.email,
+          baseUrl,
+        });
+        checkoutUrl = preferencia.checkoutUrl;
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: { mercadoPagoId: preferencia.preferenceId },
+        });
+      } else {
+        if (!paypalDisponible()) {
+          throw new Error("PayPal no está configurado y es el único cobro disponible en este país");
+        }
+        const orden = await crearOrden({
+          monto: precio.monto,
+          moneda: precio.moneda,
+          descripcion: titulo,
+          referencia: payment.id,
+          urlBase: baseUrl,
+        });
+        checkoutUrl = orden.urlDeAprobacion;
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: { paypalOrderId: orden.ordenId },
+        });
+      }
 
       return NextResponse.json(
-        { message: "Usuario creado exitosamente", user, checkoutUrl },
+        { message: "Usuario creado exitosamente", user, checkoutUrl, proveedor: porMercadoPago ? "mercadopago" : "paypal" },
         { status: 201 }
       );
     } catch (paymentError) {
-      console.error("Error creando la preferencia de Mercado Pago:", paymentError);
+      console.error("Error creando el cobro:", paymentError);
       // La cuenta ya existe (como Gratis, sin credito) -- no la perdemos por
       // un problema al armar el cobro. El usuario puede iniciar sesion igual.
       return NextResponse.json(
