@@ -31,10 +31,20 @@ import { PLAN_LIMITS, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, type PlanT
  *
  * LA COMISIÓN NO ES IGUAL EN TODOS LADOS. En España y Estados Unidos el banco
  * que recibe se queda con una comisión fija por operación, así que el precio
- * la incluye: son 3 € y 3 USD adentro de los 25 € / 29 USD. En Colombia,
- * México y Uruguay las cuentas no cobran esa comisión, así que ahí se cobra
- * el equivalente neto y nada más -- cargarles un costo que no existe sería
- * cobrarles de más por ser de otro país.
+ * la incluye: son 3 € y 3 USD adentro de los 25 € / 29 USD. En México las
+ * cuentas no cobran esa comisión, así que ahí se cobra el equivalente neto y
+ * nada más -- cargarle un costo que no existe sería cobrarle de más por ser
+ * de otro país.
+ *
+ * COLOMBIA Y URUGUAY SON LA EXCEPCIÓN, y no por la comisión del banco: PayPal
+ * no acepta sus monedas -- verificado contra la API, no contra la
+ * documentación --, así que la orden se emite en dólares por la tarifa de
+ * Estados Unidos. Si el precio que ven fuera el neto, verían el equivalente
+ * de 25,78 USD y en el checkout de PayPal les aparecerían 29: el número
+ * cambiaría entre la promesa y el cobro, que es justo donde se pierden las
+ * ventas. Por eso su precio local iguala a lo que PayPal va a cobrar, y en
+ * pantalla lleva un asterisco aclarando que el cobro es en dólares (ver
+ * cobraEnOtraMoneda).
  *
  * ATENCIÓN, ESTO ES UNA DECISIÓN COMERCIAL, NO TÉCNICA. España se fijó a mano
  * (25 € y 30 €, ya con la comisión adentro) y de ahí salieron los demás.
@@ -70,9 +80,9 @@ interface Tarifa {
  */
 const LISTA: Record<CodigoPais, Tarifa> = {
   AR: { PREMIUM: PLAN_LIMITS.PREMIUM.price, DIAMOND: PLAN_LIMITS.DIAMOND.price },
-  CO: { PREMIUM: 105000, DIAMOND: 130000 },
+  CO: { PREMIUM: 115000, DIAMOND: 140000 },
   MX: { PREMIUM: 575, DIAMOND: 715 },
-  UY: { PREMIUM: 1360, DIAMOND: 1690 },
+  UY: { PREMIUM: 1490, DIAMOND: 1820 },
   ES: { PREMIUM: 32, DIAMOND: 39 },
   US: { PREMIUM: 37, DIAMOND: 45 },
 };
@@ -80,9 +90,9 @@ const LISTA: Record<CodigoPais, Tarifa> = {
 /** Precio con el descuento vigente: lo que realmente paga el cliente. */
 const CON_DESCUENTO: Record<CodigoPais, Tarifa> = {
   AR: { PREMIUM: PREMIUM_DISCOUNT_PRICE, DIAMOND: DIAMOND_DISCOUNT_PRICE },
-  CO: { PREMIUM: 80000, DIAMOND: 98000 },
+  CO: { PREMIUM: 90000, DIAMOND: 109000 },
   MX: { PREMIUM: 435, DIAMOND: 535 },
-  UY: { PREMIUM: 1030, DIAMOND: 1270 },
+  UY: { PREMIUM: 1170, DIAMOND: 1410 },
   ES: { PREMIUM: 25, DIAMOND: 30 },
   US: { PREMIUM: 29, DIAMOND: 35 },
 };

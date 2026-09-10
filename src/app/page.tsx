@@ -14,7 +14,7 @@ import type { ClaveTexto } from "@/lib/i18n/texto";
 import { headers } from "next/headers";
 import { paisSegunCabeceras } from "@/lib/pais-visitante";
 import { costumbresDeVisitante } from "@/lib/costumbres-por-pais";
-import { precioDePlan, precioConDescuento, formatearPrecio } from "@/lib/precios-por-pais";
+import { precioDePlan, precioConDescuento, formatearPrecio, cobraEnOtraMoneda, precioParaPayPal } from "@/lib/precios-por-pais";
 import { idiomaDelAnfitrion } from "@/lib/i18n/servidor";
 
 
@@ -47,6 +47,12 @@ export default async function Home() {
   const paisVisitante = paisSegunCabeceras((n) => cabeceras.get(n));
   const costumbres = costumbresDeVisitante(paisVisitante);
   const cuotas = costumbres.cuotasSinInteres;
+  // PayPal tiene una lista cerrada de monedas y no están ni el peso
+  // colombiano ni el uruguayo: a esos países se les cobra en dólares. El
+  // precio que ven ya iguala a ese monto, pero el asterisco lo aclara --
+  // llegar al checkout y ver otra moneda sin explicación parece un error.
+  const enDolares =
+    !costumbres.mediosDePago.includes("mercadopago") && cobraEnOtraMoneda(paisVisitante);
 
   // Pesos en Argentina, dólares en el resto. No es una conversión: son
   // precios propios, para que el precio internacional no quede atado a la
@@ -333,6 +339,17 @@ export default async function Home() {
             </p>
           </div>
 
+          {/* La aclaración del asterisco de los precios. Va acá, junto a los
+              números, y no en el pie de la página: una aclaración sobre lo que
+              se va a cobrar tiene que leerse en el mismo momento que el precio. */}
+          {enDolares && (
+            <p className="max-w-2xl mx-auto text-center text-xs text-[var(--shell-fg-soft)] mb-8">
+              {t("landing.planes.cobroEnDolares", {
+                monto: formatearPrecio(precioParaPayPal("PREMIUM", paisVisitante), idioma),
+              })}
+            </p>
+          )}
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-6 items-stretch">
             {/* Gratis */}
             <div className="bg-[var(--card)] border border-[var(--line)] rounded-3xl p-6 flex flex-col relative overflow-hidden backdrop-blur-sm transition-transform hover:-translate-y-1">
@@ -392,7 +409,7 @@ export default async function Home() {
               <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">Premium</h3>
               <div className="mb-1 flex items-baseline gap-2 flex-wrap">
                 <span className="text-base text-[var(--shell-fg-soft)] font-sans line-through">{precio(precioDePlan("PREMIUM", paisVisitante))}</span>
-                <span className="text-4xl font-display text-[var(--foreground)]">{precio(premiumConDescuento)}</span>
+                <span className="text-4xl font-display text-[var(--foreground)]">{precio(premiumConDescuento)}{enDolares && <span className="text-2xl align-super">*</span>}</span>
                 <span className="text-lg text-[var(--shell-fg-soft)] font-sans font-normal">{t("landing.planes.porEvento")}</span>
               </div>
               <p className="text-xs font-semibold text-[var(--accent)] mb-1">{t("landing.planes.descuento", { porcentaje: PREMIUM_DISCOUNT_PERCENTAGE })}</p>
@@ -454,7 +471,7 @@ export default async function Home() {
               <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">Diamond</h3>
               <div className="mb-1 flex items-baseline gap-2 flex-wrap">
                 <span className="text-base text-[var(--shell-fg-soft)] font-sans line-through">{precio(precioDePlan("DIAMOND", paisVisitante))}</span>
-                <span className="text-4xl font-display text-[var(--foreground)]">{precio(diamondConDescuento)}</span>
+                <span className="text-4xl font-display text-[var(--foreground)]">{precio(diamondConDescuento)}{enDolares && <span className="text-2xl align-super">*</span>}</span>
                 <span className="text-lg text-[var(--shell-fg-soft)] font-sans font-normal">{t("landing.planes.porEvento")}</span>
               </div>
               <p className="text-xs font-semibold text-[var(--accent)] mb-1">{t("landing.planes.descuento", { porcentaje: DIAMOND_DISCOUNT_PERCENTAGE })}</p>
