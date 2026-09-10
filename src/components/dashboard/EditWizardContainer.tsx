@@ -69,11 +69,16 @@ function WizardContent({ invitation }: { invitation: any }) {
                 frasePersonalizadaHabilitada: Boolean(invitation.frasePersonalizadaHabilitada),
                 frasePersonalizadaTexto: invitation.frasePersonalizadaTexto || "",
 
+                // País de la invitación: de él dependen los campos bancarios que
+                // pide StepBankDetails (ver src/lib/paises.ts).
+                pais: invitation.pais || "AR",
+
                 // Regalo
                 regaloHabilitado: Boolean(invitation.regaloHabilitado),
                 regaloTitulo: invitation.regaloTitulo || "Regalo",
                 regaloMensaje: invitation.regaloMensaje || "",
                 regaloMostrarDatos: Boolean(invitation.regaloMostrarDatos),
+                regaloDatosBancarios: invitation.regaloDatosBancarios || "",
                 regaloCbu: invitation.regaloCbu || "",
                 regaloAlias: invitation.regaloAlias || "",
                 regaloBanco: invitation.regaloBanco || "",
@@ -85,6 +90,7 @@ function WizardContent({ invitation }: { invitation: any }) {
                 pagoTarjetaTitulo: invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases",
                 pagoTarjetaMensaje: invitation.pagoTarjetaMensaje || "",
                 pagoTarjetaMostrarDatos: Boolean(invitation.pagoTarjetaMostrarDatos),
+                pagoTarjetaDatosBancarios: invitation.pagoTarjetaDatosBancarios || "",
                 pagoTarjetaCbu: invitation.pagoTarjetaCbu || "",
                 pagoTarjetaAlias: invitation.pagoTarjetaAlias || "",
                 pagoTarjetaBanco: invitation.pagoTarjetaBanco || "",

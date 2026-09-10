@@ -140,10 +140,18 @@ export const invitationSchema = z.object({
     frasePersonalizadaTexto: z.string().optional(),
     frasePersonalizadaEstilo: z.string().optional(),
 
+    // País de la invitación: define qué campos bancarios se piden (ver
+    // src/lib/paises.ts). Si no viene, se asume "AR" (ver paisDe()).
+    pais: z.string().optional(),
+
     regaloHabilitado: z.boolean().default(false),
     regaloTitulo: z.string().optional(),
     regaloMensaje: z.string().optional(),
     regaloMostrarDatos: z.boolean().default(false),
+    // Los datos bancarios del país, como JSON {clave: valor}. Las columnas
+    // regaloCbu/regaloAlias siguen existiendo por las invitaciones argentinas
+    // ya creadas (ver src/lib/datos-bancarios.ts).
+    regaloDatosBancarios: z.string().optional(),
     regaloCbu: z.string().optional(),
     regaloAlias: z.string().optional(),
     regaloBanco: z.string().optional(),
@@ -158,6 +166,7 @@ export const invitationSchema = z.object({
     pagoTarjetaTitulo: z.string().optional(),
     pagoTarjetaMensaje: z.string().optional(),
     pagoTarjetaMostrarDatos: z.boolean().default(false),
+    pagoTarjetaDatosBancarios: z.string().optional(),
     pagoTarjetaCbu: z.string().optional(),
     pagoTarjetaAlias: z.string().optional(),
     pagoTarjetaBanco: z.string().optional(),
