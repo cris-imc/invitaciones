@@ -3,42 +3,30 @@
 import { useEffect } from "react";
 
 /**
- * Cuántas miniaturas pueden estar cargadas al mismo tiempo.
+ * Cuántas miniaturas pueden estar vivas a la vez.
  *
- * Cada una es una página de Next entera (con su propio fetch, sus fuentes y
- * sus imágenes), así que lo caro es tenerlas vivas, no listarlas.
+ * Cada una es una página de Next entera adentro de un iframe, así que el
+ * límite no es estético: en un teléfono, ocho de estas hacen que Safari se
+ * quede sin memoria, mate la pestaña y la recargue sola. Ya pasó una vez (ver
+ * el commit "la pestaña de modelos se colgaba") y volvió a pasar.
  *
- * El tope se cuenta mirando el DOM en cada pasada y no llevando un contador:
- * la versión anterior tenía uno que se decrementaba dos veces por miniatura
- * -- una en el evento `load` y otra en el setTimeout de seguridad, que
- * dispara igual aunque el load ya haya corrido --, así que se iba a negativo
- * y `active < CONCURRENCY` dejaba de limitar nada. Terminaban cargándose
- * todas juntas y el navegador mataba la pestaña.
+ * En el teléfono el techo es más bajo que en escritorio: no por la pantalla
+ * sino por el presupuesto de memoria, que es mucho más chico.
  */
-const VIVAS_MIN = 4;
+const VIVAS_TELEFONO = 4;
+const VIVAS_ESCRITORIO = 8;
+const ANCHO_TELEFONO = 768;
+
+/** Cuánto antes de entrar en pantalla se empieza a cargar una miniatura. */
+const MARGEN_CARGA_PX = 300;
 
 /**
- * Techo duro, pase lo que pase. El problema original fue justamente que el
- * límite dejó de limitar y se cargaban las 32 juntas hasta que el navegador
- * mataba la pestaña; el tope se adapta, pero nunca por encima de esto.
+ * A qué distancia se suelta una que ya cargó. Bien holgado respecto del margen
+ * de carga: si los dos números estuvieran cerca, una miniatura parada justo en
+ * el borde entraría en un ciclo de cargarse y soltarse con cada ajuste chico
+ * de scroll.
  */
-const VIVAS_TECHO = 8;
-
-/** Cuánto antes de entrar en pantalla se empieza a cargar una miniatura.
- *  A propósito chico: cada portada tiene su efecto de apertura y, si se
- *  precarga con mucha anticipación, el efecto ya se jugó fuera de vista. */
-const MARGEN_CARGA_PX = 150;
-
-/** A qué distancia se suelta una que ya cargó. Muy holgado respecto del margen
- *  de carga, para que una miniatura parada justo en el borde no entre en un
- *  ciclo de cargarse y soltarse con cada ajuste chico de scroll. */
 const MARGEN_SOLTAR_PX = 1200;
-
-/** Cuánto más lejos tiene que estar una miniatura cargada que una que se
- *  quiere cargar para que valga la pena cambiarlas. Sin este margen, dos
- *  miniaturas casi a la misma distancia se turnarían en cada cuadro de scroll,
- *  descargándose y recargándose sin parar. */
-const VENTAJA_MINIMA_PX = 250;
 
 // Un solo componente para todas las miniaturas (no un hook por tarjeta). Usa
 // scroll/resize + getBoundingClientRect en vez de IntersectionObserver a
@@ -53,105 +41,93 @@ export function ModelosLazyLoader() {
     // saliera de ahí, una miniatura soltada no volvería a cargarse nunca.
     const estaCargada = (el: HTMLIFrameElement) => el.dataset.modeloCargada === "1";
 
+    /**
+     * La distancia de una miniatura al viewport: 0 si se ve aunque sea en
+     * parte, y si no, cuántos píxeles falta scrollear para alcanzarla.
+     *
+     * Se mide contra el VIEWPORT y no contra su centro, y esa es la
+     * corrección que hace que esto funcione. Con la distancia al centro, una
+     * miniatura que se ve abajo de todo y otra que está fuera de pantalla dan
+     * números parecidos; el intercambio pedía además una "ventaja mínima" que
+     * casi nunca se daba, el cupo quedaba trabado y varias miniaturas no
+     * cargaban NUNCA -- se quedaban en negro para siempre. Con esta medida,
+     * todo lo visible vale 0 y nunca lo desaloja algo que no se ve.
+     */
+    const distancia = (el: HTMLIFrameElement): number => {
+      const r = el.getBoundingClientRect();
+      const alto = window.innerHeight;
+      if (r.bottom < 0) return -r.bottom;
+      if (r.top > alto) return r.top - alto;
+      return 0;
+    };
+
+    /** Una miniatura sin tamaño no está en pantalla aunque su rect caiga
+     *  dentro: pasa con las que quedan en un árbol montado pero oculto (la
+     *  pestaña que no está activa). */
+    const tieneTamano = (el: HTMLIFrameElement) => {
+      const r = el.getBoundingClientRect();
+      return r.width >= 2 && r.height >= 2;
+    };
+
+    const cargar = (el: HTMLIFrameElement) => {
+      el.dataset.modeloCargada = "1";
+      el.src = el.getAttribute("data-modelo-src")!;
+    };
+
+    const soltar = (el: HTMLIFrameElement) => {
+      delete el.dataset.modeloCargada;
+      // Navegar a about:blank y no quitar el atributo: sacar el src no
+      // descarga el documento que ya se pintó, y es justamente la memoria que
+      // hay que devolver.
+      el.src = "about:blank";
+    };
+
     const revisar = () => {
-      // Con la pestaña en segundo plano no se carga ninguna miniatura nueva:
-      // cada una es una página entera y no tiene sentido pagar ese tráfico
-      // (ni el render en el servidor) por algo que nadie está mirando. Las que
-      // ya están cargadas se dejan como están, así al volver está todo puesto.
+      // Con la pestaña del navegador en segundo plano no se carga nada nuevo:
+      // cada miniatura es una página entera y no tiene sentido pagar esa
+      // memoria por algo que nadie está mirando.
       if (document.hidden) return;
 
-      const alto = window.innerHeight;
-      const centro = alto / 2;
       const todas = Array.from(
         document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]")
-      );
+      ).filter((el) => el.getAttribute("data-modelo-src"));
 
-      const soltar = (el: HTMLIFrameElement) => {
-        delete el.dataset.modeloCargada;
-        el.src = "about:blank";
-      };
-      const distancia = (el: HTMLIFrameElement) => {
-        const r = el.getBoundingClientRect();
-        return Math.abs(r.top + r.height / 2 - centro);
-      };
+      const vivasMax =
+        window.innerWidth < ANCHO_TELEFONO ? VIVAS_TELEFONO : VIVAS_ESCRITORIO;
 
-      // Primero soltar lo que quedó lejos, para hacer lugar en el mismo pase.
+      // 1. Soltar lo que quedó lejos o lo que dejó de tener tamaño (cambio de
+      //    pestaña): libera memoria y hace lugar en la misma pasada.
       for (const el of todas) {
         if (!estaCargada(el)) continue;
-        const r = el.getBoundingClientRect();
-        if (r.bottom < -MARGEN_SOLTAR_PX || r.top > alto + MARGEN_SOLTAR_PX) {
-          soltar(el);
-        }
+        if (!tieneTamano(el) || distancia(el) > MARGEN_SOLTAR_PX) soltar(el);
       }
 
-      // El tope sale de cuántas miniaturas entran de verdad en esta pantalla,
-      // no de un número fijo. Con 4 fijas y una grilla de 3 columnas, en
-      // escritorio se ven 6 a la vez y dos quedaban oscuras siempre: ninguna
-      // estrategia de reciclado arregla un presupuesto más chico que lo que
-      // hay a la vista. En un teléfono entran 2 o 3, así que ahí sigue siendo
-      // el mínimo de siempre.
-      const enPantalla = todas.filter((el) => {
-        const r = el.getBoundingClientRect();
-        if (r.width < 2 || r.height < 2) return false;
-        return r.bottom > 0 && r.top < alto;
-      }).length;
-      const vivasMax = Math.min(VIVAS_TECHO, Math.max(VIVAS_MIN, enPantalla + 1));
-
-      // El cupo sale de contar el DOM en cada pasada: no hay contador que
-      // pueda desincronizarse ni irse a negativo.
-      let cupo = vivasMax - todas.filter(estaCargada).length;
-
-      // Las más cercanas al centro primero: son las que se están mirando.
+      // 2. Las que deberían estar cargadas, de la más cercana a la más lejana.
       const candidatas = todas
-        .filter((el) => {
-          if (estaCargada(el)) return false;
-          if (!el.getAttribute("data-modelo-src")) return false;
-          const r = el.getBoundingClientRect();
-          // Una miniatura sin tamaño no está en pantalla aunque su rect caiga
-          // dentro (pasa con las que quedan en un árbol montado pero oculto).
-          if (r.width < 2 || r.height < 2) return false;
-          return r.bottom > -MARGEN_CARGA_PX && r.top < alto + MARGEN_CARGA_PX;
-        })
-        .map((el) => {
-          const r = el.getBoundingClientRect();
-          return { el, dist: Math.abs(r.top + r.height / 2 - centro) };
-        })
-        .sort((a, b) => a.dist - b.dist);
+        .filter((el) => !estaCargada(el) && tieneTamano(el) && distancia(el) <= MARGEN_CARGA_PX)
+        .sort((a, b) => distancia(a) - distancia(b));
 
-      // Con el cupo lleno, manda lo que la persona está mirando: se suelta la
-      // cargada que haya quedado más lejos para hacerle lugar.
+      if (candidatas.length === 0) return;
+
+      // 3. Cargarlas, haciendo lugar si el cupo está lleno.
       //
-      // Sin esto, en mobile las miniaturas nuevas quedaban oscuras: una sólo
-      // se soltaba al alejarse MARGEN_SOLTAR_PX, y en una columna angosta,
-      // para cuando la primera llegaba a esa distancia, ya había tres nuevas
-      // en pantalla esperando un cupo que no llegaba.
-      if (candidatas.length > 0) {
+      //    Acá estaba el bloqueo viejo: para desalojar una cargada se le
+      //    exigía superar a la candidata por un margen extra, y como se medía
+      //    al centro de la pantalla esa diferencia casi nunca aparecía. Ahora
+      //    alcanza con que la cargada esté ESTRICTAMENTE más lejos: como todo
+      //    lo visible mide 0, una miniatura a la vista jamás es desalojada por
+      //    otra que no se ve, y el ciclo de cargar/soltar no puede armarse.
+      for (const candidata of candidatas) {
         const cargadas = todas
           .filter(estaCargada)
-          .map((el) => ({ el, dist: distancia(el) }))
-          .sort((a, b) => b.dist - a.dist); // la más lejana primero
+          .sort((a, b) => distancia(b) - distancia(a)); // la más lejana primero
 
-        // `liberadas` es a cuál candidata le tocaría el próximo lugar: la
-        // primera ya tiene el que se acaba de hacer, la segunda el siguiente.
-        let liberadas = 0;
-        while (cupo <= 0 && cargadas.length > 0 && liberadas < candidatas.length) {
+        if (cargadas.length >= vivasMax) {
           const lejana = cargadas[0];
-          const cercana = candidatas[liberadas];
-          if (lejana.dist <= cercana.dist + VENTAJA_MINIMA_PX) break;
-          soltar(lejana.el);
-          cargadas.shift();
-          liberadas++;
-          cupo++;
+          if (!lejana || distancia(lejana) <= distancia(candidata)) break;
+          soltar(lejana);
         }
-      }
-
-      if (cupo <= 0) return;
-
-      for (const { el } of candidatas) {
-        if (cupo <= 0) break;
-        el.dataset.modeloCargada = "1";
-        el.src = el.getAttribute("data-modelo-src")!;
-        cupo--;
+        cargar(candidata);
       }
     };
 
