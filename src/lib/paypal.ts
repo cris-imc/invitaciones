@@ -140,11 +140,83 @@ export async function capturarOrden(ordenId: string): Promise<ResultadoCaptura> 
   const j = (await r.json()) as {
     status?: string;
     purchase_units?: { reference_id?: string }[];
+    details?: { issue?: string; description?: string }[];
   };
+
+  // El motivo del rechazo importa: ORDER_ALREADY_CAPTURED no es un error
+  // sino que el otro camino -- la vuelta del comprador o el webhook -- ya
+  // la cobró. Sin este detalle los dos casos se ven igual y una orden
+  // cobrada quedaría marcada como rechazada.
+  const motivo = j.details?.[0]?.issue;
 
   return {
     aprobada: r.ok && j.status === "COMPLETED",
-    estado: j.status ?? `HTTP ${r.status}`,
+    estado: j.status ?? motivo ?? `HTTP ${r.status}`,
     referencia: j.purchase_units?.[0]?.reference_id ?? null,
   };
+}
+
+export interface EstadoDeOrden {
+  /** CREATED | SAVED | APPROVED | VOIDED | COMPLETED | PAYER_ACTION_REQUIRED */
+  estado: string;
+  /** El id de nuestro Payment, tal como se mandó al crear la orden. */
+  referencia: string | null;
+}
+
+/**
+ * El estado real de una orden, preguntándoselo a PayPal.
+ *
+ * Existe para el webhook: lo que llega en la notificación se puede falsificar,
+ * así que de ahí sólo se toma el identificador y el estado se consulta acá con
+ * nuestras credenciales. Mismo criterio que el webhook de Mercado Pago.
+ */
+export async function consultarOrden(ordenId: string): Promise<EstadoDeOrden | null> {
+  const r = await fetch(`${BASE}/v2/checkout/orders/${ordenId}`, {
+    headers: { Authorization: `Bearer ${await token()}` },
+    cache: "no-store",
+  });
+  if (!r.ok) return null;
+
+  const j = (await r.json()) as {
+    status?: string;
+    purchase_units?: { reference_id?: string }[];
+  };
+  return {
+    estado: j.status ?? "DESCONOCIDO",
+    referencia: j.purchase_units?.[0]?.reference_id ?? null,
+  };
+}
+
+/**
+ * Comprueba que la notificación viene de PayPal y no de cualquiera.
+ *
+ * Es defensa en profundidad: el estado igual se vuelve a consultar, así que
+ * una notificación falsa no alcanza para acreditar nada. Si PAYPAL_WEBHOOK_ID
+ * no está cargado se devuelve `true` -- sin ese dato no se puede verificar, y
+ * rechazar todo dejaría los pagos sin acreditar, que es peor.
+ */
+export async function notificacionEsDePayPal(
+  cabeceras: Headers,
+  cuerpo: string
+): Promise<boolean> {
+  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  if (!webhookId) return true;
+
+  const r = await fetch(`${BASE}/v1/notifications/verify-webhook-signature`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      auth_algo: cabeceras.get("paypal-auth-algo"),
+      cert_url: cabeceras.get("paypal-cert-url"),
+      transmission_id: cabeceras.get("paypal-transmission-id"),
+      transmission_sig: cabeceras.get("paypal-transmission-sig"),
+      transmission_time: cabeceras.get("paypal-transmission-time"),
+      webhook_id: webhookId,
+      webhook_event: JSON.parse(cuerpo),
+    }),
+    cache: "no-store",
+  });
+  if (!r.ok) return false;
+  const j = (await r.json()) as { verification_status?: string };
+  return j.verification_status === "SUCCESS";
 }
