@@ -148,7 +148,13 @@ model Invitation {
   // familia; false = muestra siempre el nombre de los novios/quinceañera/
   // evento aunque el link sea personalizado. Configuración genérica del
   // dueño de la tarjeta, no por invitado individual.
-  mostrarNombreInvitadoEnSaludo Boolean          @default(true)
+  /// Apagado por defecto: la portada arranca mostrando a quién se festeja, que
+  /// es lo que la invitación viene a decir. Saludar por el nombre del invitado
+  /// es una decisión del anfitrión, no el comportamiento por omisión.
+  ///
+  /// Sólo afecta a las invitaciones nuevas: las que ya existen conservan el
+  /// valor que tengan guardado.
+  mostrarNombreInvitadoEnSaludo Boolean          @default(false)
   tipo                         String
   estado                       String           @default("BORRADOR")
   slug                         String           @unique
@@ -354,6 +360,12 @@ model Guest {
   /// si avisó que venía, esto dice que llegó. Mucha gente confirma y no va, y
   /// alguna cae sin confirmar, así que mezclarlos perdería las dos cosas.
   ingresoEn              DateTime?
+  /// Si al escanearlo en la puerta el sistema lo marcó como rechazado, y por
+  /// qué. Se guarda el motivo tal como estaba EN ESE MOMENTO: si después paga
+  /// la tarjeta, sigue siendo cierto que llegó debiendo, y esa es justamente
+  /// la conversación que el anfitrión quiere poder tener al día siguiente.
+  ingresoRechazado       Boolean          @default(false)
+  ingresoMotivo          String?
   /// Cuándo abrió su invitación por primera vez, cuándo la última, y cuántas
   /// veces. Sirve para lo que todo anfitrión pregunta antes de insistir por
   /// WhatsApp: "¿le habrá llegado?". Distinto de confirmar: se puede abrir y

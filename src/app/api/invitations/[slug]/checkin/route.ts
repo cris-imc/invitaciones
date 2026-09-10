@@ -77,9 +77,6 @@ export async function POST(
 
     const yaHabiaEntrado = guest.ingresoEn !== null;
     const ingresoEn = guest.ingresoEn ?? new Date();
-    if (!yaHabiaEntrado) {
-      await prisma.guest.update({ where: { id: guest.id }, data: { ingresoEn } });
-    }
 
     const confirmo = guest.status === "CONFIRMED";
 
@@ -117,6 +114,19 @@ export async function POST(
           ? "Tiene la tarjeta paga a medias"
           : "No pagó la tarjeta"
         : null;
+
+    // Se graba el resultado del escaneo, no sólo la hora: sin esto, al día
+    // siguiente no quedaba rastro de que esta familia llegó debiendo la
+    // tarjeta -- la pantalla lo decía y se lo llevaba el viento. El motivo se
+    // guarda tal como estaba en ese momento: si después pagan, sigue siendo
+    // cierto que llegaron sin pagar.
+    if (!yaHabiaEntrado) {
+      await prisma.guest.update({
+        where: { id: guest.id },
+        data: { ingresoEn, ingresoRechazado: rechazado, ingresoMotivo: motivo },
+      });
+    }
+
     // Confirmados: lo que dijeron que vienen. Sin confirmar: a cuántos se
     // invitó, que es lo único que se sabe de ellos en la puerta.
     const adultos = confirmo ? guest.attendingAdults : guest.expectedAdults ?? 0;

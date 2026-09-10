@@ -278,6 +278,14 @@ export default function SubscriptionPage() {
                         )}
                         <span>Control de ingreso por QR</span>
                       </li>
+                      <li className="flex items-center gap-2">
+                        {plan.features.readReceipts ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <X className="w-4 h-4 text-gray-300" />
+                        )}
+                        <span>Ver quién abrió la invitación</span>
+                      </li>
                     </ul>
 
                     {isCurrent ? (

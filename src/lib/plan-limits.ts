@@ -13,6 +13,8 @@ export interface PlanFeatures {
   dedicatedSupport: boolean;
   customDesign: boolean;
   tableAssignment: boolean;
+  /** Ver si cada invitado abrió su invitación, y cuándo. */
+  readReceipts: boolean;
 }
 
 export interface PlanLimits {
@@ -53,6 +55,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       dedicatedSupport: false,
       customDesign: false,
       tableAssignment: false,
+      readReceipts: false,
     },
   },
   PREMIUM: {
@@ -76,6 +79,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       dedicatedSupport: true,
       customDesign: false,
       tableAssignment: false,
+      readReceipts: false,
     },
   },
   DIAMOND: {
@@ -99,6 +103,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       dedicatedSupport: true,
       customDesign: false,
       tableAssignment: true,
+      readReceipts: true,
     },
   },
   // Mismo alcance que Diamond, pero conserva el crédito "Hecho con amor por
@@ -126,6 +131,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       dedicatedSupport: true,
       customDesign: false,
       tableAssignment: true,
+      readReceipts: true,
     },
   },
   ENTERPRISE: {
@@ -149,6 +155,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       dedicatedSupport: true,
       customDesign: true,
       tableAssignment: true,
+      readReceipts: true,
     },
   },
   ADMIN: {
@@ -172,6 +179,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       dedicatedSupport: true,
       customDesign: true,
       tableAssignment: true,
+      readReceipts: true,
     },
   },
 };

@@ -60,6 +60,13 @@ const FILA_PRIMERA = 15;
 /** Cuántos invitados sin ubicar se listan por página. */
 const POR_PAGINA = 8;
 
+// Auto-scroll mientras se arrastra un invitado. En el teléfono la lista queda
+// debajo del salón, así que para llevar a alguien del final de la lista hasta
+// una mesa hay que subir -- y con el dedo apretado el navegador ya no
+// scrollea solo. Acercando el dedo al borde, la página acompaña.
+const ZONA_BORDE_PX = 90;
+const VELOCIDAD_MAX_PX = 18;
+
 /**
  * Cómo se llama la mesa para el anfitrión. El alias manda si lo puso, porque
  * es con lo que él piensa el salón ("los primos van con los tíos"); el número
@@ -150,6 +157,7 @@ export function MesasPanel({ slug }: Props) {
   const [busqueda, setBusqueda] = useState("");
   const [pagina, setPagina] = useState(0);
   const [escaneando, setEscaneando] = useState(false);
+  const [incluirSinConfirmar, setIncluirSinConfirmar] = useState(false);
 
   const lienzoRef = useRef<HTMLDivElement>(null);
   const fantasmaRef = useRef<HTMLDivElement>(null);
@@ -161,6 +169,49 @@ export function MesasPanel({ slug }: Props) {
   // que arranca el arrastre; sin esto aparecía un instante en la esquina
   // superior izquierda antes de saltar a su lugar.
   const ultimaPos = useRef({ x: 0, y: 0 });
+
+  // ── Auto-scroll de borde durante el arrastre ─────────────────────
+  const autoScroll = useRef<{ vel: number; raf: number | null }>({ vel: 0, raf: null });
+
+  const pasoDeScroll = useCallback(() => {
+    const s = autoScroll.current;
+    if (s.vel === 0) {
+      s.raf = null;
+      return;
+    }
+    window.scrollBy(0, s.vel);
+    s.raf = requestAnimationFrame(pasoDeScroll);
+  }, []);
+
+  const frenarScroll = useCallback(() => {
+    const s = autoScroll.current;
+    s.vel = 0;
+    if (s.raf !== null) {
+      cancelAnimationFrame(s.raf);
+      s.raf = null;
+    }
+  }, []);
+
+  /** Más cerca del borde, más rápido: acompaña el gesto en vez de saltar. */
+  const ajustarScroll = useCallback(
+    (y: number) => {
+      const alto = window.innerHeight;
+      let vel = 0;
+      if (y < ZONA_BORDE_PX) {
+        vel = -Math.ceil(((ZONA_BORDE_PX - y) / ZONA_BORDE_PX) * VELOCIDAD_MAX_PX);
+      } else if (y > alto - ZONA_BORDE_PX) {
+        vel = Math.ceil(((y - (alto - ZONA_BORDE_PX)) / ZONA_BORDE_PX) * VELOCIDAD_MAX_PX);
+      }
+      const s = autoScroll.current;
+      s.vel = vel;
+      if (vel !== 0 && s.raf === null) s.raf = requestAnimationFrame(pasoDeScroll);
+    },
+    [pasoDeScroll]
+  );
+
+  // Si el componente se va en medio de un arrastre, el bucle tiene que morir
+  // con él o la página sigue scrolleando sola.
+  useEffect(() => frenarScroll, [frenarScroll]);
 
   const mostrarAviso = useCallback((texto: string) => {
     setAviso(texto);
@@ -208,12 +259,21 @@ export function MesasPanel({ slug }: Props) {
   // Los que todavía tienen gente sin ubicar. Una familia aparece acá aunque ya
   // esté sentada a medias: si de 6 se ubicaron 4, quedan 2 para repartir en
   // otra mesa, y ese resto es justamente lo que hay que resolver.
+  // Quién entra en el reparto. Por defecto sólo los confirmados: sentar a
+  // quien todavía no dijo si viene es acomodar el salón con un número
+  // inventado, y si al final vienen tres en vez de seis hay que rehacer las
+  // mesas de alrededor. El anfitrión puede pedir verlos igual.
+  const seSienta = useCallback(
+    (i: InvitadoApi) => i.aSentar > 0 && (incluirSinConfirmar || i.status === "CONFIRMED"),
+    [incluirSinConfirmar]
+  );
+
   const pendientes = useMemo<Pendiente[]>(
     () =>
       invitados
         .map((i) => ({ ...i, ubicados: porInvitado.get(i.id) ?? 0 }))
-        .filter((i) => i.aSentar > 0 && i.ubicados < i.aSentar),
-    [invitados, porInvitado]
+        .filter((i) => seSienta(i) && i.ubicados < i.aSentar),
+    [invitados, porInvitado, seSienta]
   );
 
   const ocupacion = useCallback(
@@ -222,11 +282,11 @@ export function MesasPanel({ slug }: Props) {
   );
 
   const totales = useMemo(() => {
-    const aSentar = invitados.reduce((a, i) => a + i.aSentar, 0);
+    const aSentar = invitados.filter(seSienta).reduce((a, i) => a + i.aSentar, 0);
     const ubicados = mesas.reduce((a, m) => a + ocupacion(m), 0);
     const sillas = mesas.reduce((a, m) => a + m.sillas, 0);
     return { aSentar, ubicados, sillas };
-  }, [invitados, mesas, ocupacion]);
+  }, [invitados, mesas, ocupacion, seSienta]);
 
   const invitadoSel = seleccionado
     ? pendientes.find((p) => p.id === seleccionado) ?? null
@@ -460,6 +520,7 @@ export function MesasPanel({ slug }: Props) {
       fantasmaRef.current.style.left = `${e.clientX}px`;
       fantasmaRef.current.style.top = `${e.clientY}px`;
     }
+    ajustarScroll(e.clientY);
   };
 
   const invPointerUp = (e: React.PointerEvent, p: Pendiente) => {
@@ -467,6 +528,7 @@ export function MesasPanel({ slug }: Props) {
     arrastreInv.current = null;
     e.currentTarget.releasePointerCapture?.(e.pointerId);
     setArrastrando(null);
+    frenarScroll();
     if (!a) return;
 
     if (!a.movio) {
@@ -706,6 +768,22 @@ export function MesasPanel({ slug }: Props) {
                 : "Arrastrá un invitado o familia hasta la mesa, o tocalo y después tocá la mesa."}
             </p>
 
+            {/* Destildado por defecto: lo sano es ubicar sobre confirmados.
+                Pero hay anfitriones que arman el salón con semanas de
+                anticipación y prefieren ir adelantando con los invitados,
+                sabiendo que después van a tener que retocar. */}
+            <label className="flex items-start gap-2 mb-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={incluirSinConfirmar}
+                onChange={(e) => setIncluirSinConfirmar(e.target.checked)}
+                className="mt-0.5 w-3.5 h-3.5 accent-[var(--accent)] shrink-0"
+              />
+              <span className="text-xs text-muted-foreground leading-snug">
+                Mostrar también los que no confirmaron
+              </span>
+            </label>
+
             {/* Con un evento chico sobra la lista sola; con 60 grupos, sin
                 buscador hay que scrollear a mano hasta encontrar a alguien. */}
             {pendientes.length > POR_PAGINA && (
@@ -723,9 +801,8 @@ export function MesasPanel({ slug }: Props) {
               // ubicados" sería mentir.
               totales.aSentar === 0 ? (
                 <p className="text-xs text-muted-foreground py-2">
-                  Todavía no confirmó nadie. Sólo se pueden ubicar los invitados
-                  que confirmaron: sentar a quien no dijo si viene es acomodar el
-                  salón con un número inventado.
+                  Todavía no confirmó nadie. Si querés ir adelantando, tildá la
+                  opción de arriba para ubicar también a los que no contestaron.
                 </p>
               ) : (
                 <p className="text-xs text-emerald-400 py-2">Están todos ubicados.</p>
@@ -757,7 +834,21 @@ export function MesasPanel({ slug }: Props) {
                             elegido ? "text-[var(--ink)]/50" : "text-white/25"
                           }`}
                         />
-                        <span className="min-w-0 flex-1 truncate">{p.name}</span>
+                        <span className="min-w-0 flex-1 truncate">
+                          {p.name}
+                          {/* Que quede claro cuál es cuál: los números de un
+                              pendiente son a cuántos se invitó, no a cuántos
+                              vienen, y pueden cambiar. */}
+                          {p.status !== "CONFIRMED" && (
+                            <span
+                              className={`block text-[10px] leading-tight ${
+                                elegido ? "text-[var(--ink)]/60" : "text-amber-400/80"
+                              }`}
+                            >
+                              sin confirmar
+                            </span>
+                          )}
+                        </span>
                         <span
                           className={`shrink-0 text-xs ${
                             elegido ? "text-[var(--ink)]/70" : "text-muted-foreground"

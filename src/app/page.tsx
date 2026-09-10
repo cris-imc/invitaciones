@@ -397,6 +397,10 @@ export default async function Home() {
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span><strong className="text-white">Control de ingreso:</strong> escaneás el QR en la puerta y ves quién llegó y a qué mesa va</span>
                 </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-white">Quién abrió la invitación:</strong> sabés a quién le llegó y a quién volver a escribirle</span>
+                </li>
               </ul>
               <Link href={diamondUrl} className="w-full mt-auto">
                 <Button className="w-full rounded-xl bg-[var(--accent)] text-[var(--ink)] hover:bg-[var(--accent)]/90 py-6 font-semibold font-sans">Elegir Diamond</Button>

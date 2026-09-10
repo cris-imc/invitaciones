@@ -62,7 +62,7 @@ import {
 import { hapticoConfirmar, hapticoDeshacer, hapticoError } from "@/lib/haptics";
 import { useToast } from "@/components/ui/Toast";
 import { getInvitePhrase } from "@/lib/invitation-copy";
-import { PLAN_LIMITS } from "@/lib/plan-limits";
+import { PLAN_LIMITS, canUseFeature, PlanTier } from "@/lib/plan-limits";
 import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
 import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
 
@@ -139,6 +139,8 @@ interface Guest {
   abiertaEn?: string | null;
   aperturas?: number;
   responseDate?: string | null;
+  ingresoRechazado?: boolean;
+  ingresoMotivo?: string | null;
 }
 
 function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido: string): string {
@@ -215,7 +217,7 @@ interface GuestManagerProps {
   initialMostrarNombreInvitadoEnSaludo?: boolean;
 }
 
-export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino, tipo, initialMostrarNombreInvitadoEnSaludo = true }: GuestManagerProps) {
+export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier, pagoTarjetaHabilitado = false, pagoTarjetaMonto, precioAdolescente: initPrecioAdolescente, precioNino: initPrecioNino, tipo, initialMostrarNombreInvitadoEnSaludo = false }: GuestManagerProps) {
   const router = useRouter();
   const [guests, setGuests] = useState<Guest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -287,6 +289,11 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [newGuestTeenCount, setNewGuestTeenCount] = useState(0);
   const [newGuestChildCount, setNewGuestChildCount] = useState(0);
   const [newGuestIsExempt, setNewGuestIsExempt] = useState(false);
+  // El visto es de Diamond en adelante. Se registra igual en todos los
+  // planes -- no cuesta nada y si el cliente sube de plan el dato ya está --
+  // pero sólo se muestra donde corresponde.
+  const verApertura = canUseFeature((planTier ?? "FREE") as PlanTier, "readReceipts");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Edit form individual category
@@ -1063,7 +1070,24 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             WhatsApp, y es distinta de haber confirmado: se puede
                             abrir la invitación y no contestar. Mezclada entre las
                             otras etiquetas se perdía. */}
-                        {(() => {
+                        {/* Rechazado en la puerta. Queda para el día después:
+                            es la conversación pendiente con esa familia, y sin
+                            esto la pantalla del escáner lo decía y se lo
+                            llevaba el viento. */}
+                        {guest.ingresoRechazado && (
+                          <div
+                            className="flex items-center text-xs mt-1 text-red-500 dark:text-red-400"
+                            title={guest.ingresoMotivo ?? undefined}
+                          >
+                            <XCircle className="w-3 h-3 mr-1 shrink-0" />
+                            Rechazado en la puerta
+                            {guest.ingresoMotivo && (
+                              <span className="ml-1 opacity-75 truncate">· {guest.ingresoMotivo}</span>
+                            )}
+                          </div>
+                        )}
+
+                        {verApertura && (() => {
                           const visto = aperturaDe(guest);
                           return (
                             <div
