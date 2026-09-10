@@ -127,6 +127,7 @@ const CRONO_ICONS: Record<string, string> = {
 // escopeada solo a este componente vía CSS var override en el wrapper raíz.
 const luzlunaCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--luzluna-cormorant",
@@ -134,6 +135,7 @@ const luzlunaCormorant = Cormorant_Garamond({
 });
 const luzlunaQuicksand = Quicksand({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600", "700"],
   variable: "--luzluna-quicksand",
   display: "swap",
@@ -632,8 +634,8 @@ export function LuzLunaTemplatePerlaSuave({ invitation, guest, isPersonalized = 
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/luzluna-boda.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/luzluna-quince.png"
+    : tipo === "CASAMIENTO" ? "/fondos/luzluna-boda.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/luzluna-quince.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

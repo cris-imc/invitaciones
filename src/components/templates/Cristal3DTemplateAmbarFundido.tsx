@@ -97,18 +97,21 @@ const PhotoCornerFrame = () => (
 // --font-cormorant/--font-inter/--font-sans.
 const crysDisplay = Outfit({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "600", "700"],
   variable: "--crys-display",
   display: "swap",
 });
 const crysBody = Manrope({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--crys-body",
   display: "swap",
 });
 const crysMono = Space_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "700"],
   variable: "--crys-mono",
   display: "swap",
@@ -615,7 +618,7 @@ export function Cristal3DTemplateAmbarFundido({ invitation, guest, isPersonalize
   // delicado que el "flash" de familias tipo Circuito/Neon).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/cristal3d-quince.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/cristal3d-quince.webp" : undefined;
   const portadaTintColor1 = "#FFB347";
   const portadaTintColor2 = "#FF6B9D";
 

@@ -56,6 +56,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const pvpBodoni = Bodoni_Moda({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--pvp-bodoni",
@@ -64,6 +65,7 @@ const pvpBodoni = Bodoni_Moda({
 
 const pvpMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--pvp-mono",
   display: "swap",

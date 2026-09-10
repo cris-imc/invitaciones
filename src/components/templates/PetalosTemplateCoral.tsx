@@ -130,6 +130,7 @@ const CRONO_ICONS: Record<string, string> = {
 // solo a este componente vía CSS var override en el wrapper raíz.
 const petalosPlayfair = Playfair_Display({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--petalos-playfair",
@@ -137,6 +138,7 @@ const petalosPlayfair = Playfair_Display({
 });
 const petalosNunito = Nunito({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600", "700"],
   variable: "--petalos-nunito",
   display: "swap",
@@ -630,8 +632,8 @@ export function PetalosTemplateCoral({ invitation, guest, isPersonalized = false
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/petalos-boda.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/petalos-quince.png"
+    : tipo === "CASAMIENTO" ? "/fondos/petalos-boda.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/petalos-quince.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

@@ -44,6 +44,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const ftgPlayfair = Playfair_Display({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--ftg-playfair",
@@ -52,6 +53,7 @@ const ftgPlayfair = Playfair_Display({
 
 const ftgMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--ftg-mono",
   display: "swap",

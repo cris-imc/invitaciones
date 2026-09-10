@@ -45,12 +45,14 @@ import { useTextos } from "@/components/i18n/ProveedorIdioma";
 // solo a este componente vía CSS var override en el wrapper raíz.
 const corporateSpaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "600", "700"],
   variable: "--corporate-space-grotesk",
   display: "swap",
 });
 const corporateSora = Sora({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--corporate-sora",
   display: "swap",

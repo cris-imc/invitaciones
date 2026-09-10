@@ -7,7 +7,7 @@
 # Test info
 
 - Name: auth.spec.ts >> 1. Cuentas y Autenticación >> Registro y Validaciones
-- Location: e2e\auth.spec.ts:13:7
+- Location: e2e/auth.spec.ts:13:7
 
 # Error details
 
@@ -16,107 +16,131 @@ Test timeout of 30000ms exceeded.
 ```
 
 ```
-Error: page.waitForURL: Test timeout of 30000ms exceeded.
-=========================== logs ===========================
-waiting for navigation until "load"
-============================================================
+Error: locator.fill: Test timeout of 30000ms exceeded.
+Call log:
+  - waiting for getByPlaceholder(/correo|email/i)
+
 ```
 
 # Page snapshot
 
 ```yaml
-- generic [ref=f1e1]:
+- generic [active] [ref=f1e1]:
   - generic [ref=f1e3]:
     - link "Volver al inicio" [ref=f1e4] [cursor=pointer]:
       - /url: /
     - generic [ref=f1e7]:
       - generic [ref=f1e8]:
         - heading "Crea tu cuenta" [level=1] [ref=f1e9]
-        - paragraph [ref=f1e10]: Comienza a crear invitaciones digitales increíbles
+        - paragraph [ref=f1e10]: Elegí la invitación que mejor se adapta a tu evento
       - generic [ref=f1e11]:
         - generic [ref=f1e12]:
-          - heading "Elige tu plan" [level=2] [ref=f1e13]
-          - generic [ref=f1e14]:
-            - button "Gratis $ 0 Hasta 20 invitados Plantilla 100% personalizada Gestión de invitados y pagos Cuenta regresiva Album de fotos ✕ Sin musica de fondo ✕ Sin LIVE (fotos en vivo) ✕ Sin Trivia ✕ Sin sugerencias DJ" [ref=f1e15]:
-              - generic [ref=f1e17]:
-                - heading "Gratis" [level=3] [ref=f1e18]
-                - paragraph [ref=f1e19]: $ 0
-              - list [ref=f1e23]:
-                - listitem [ref=f1e24]:
-                  - generic [ref=f1e27]: Hasta 20 invitados
-                - listitem [ref=f1e28]:
-                  - generic [ref=f1e31]: Plantilla 100% personalizada
-                - listitem [ref=f1e32]:
-                  - generic [ref=f1e35]: Gestión de invitados y pagos
-                - listitem [ref=f1e36]:
-                  - generic [ref=f1e39]: Cuenta regresiva
-                - listitem [ref=f1e40]:
-                  - generic [ref=f1e43]: Album de fotos
-                - listitem [ref=f1e44]:
-                  - generic [ref=f1e45]: ✕
-                  - generic [ref=f1e46]: Sin musica de fondo
-                - listitem [ref=f1e47]:
-                  - generic [ref=f1e48]: ✕
-                  - generic [ref=f1e49]: Sin LIVE (fotos en vivo)
-                - listitem [ref=f1e50]:
-                  - generic [ref=f1e51]: ✕
-                  - generic [ref=f1e52]: Sin Trivia
-                - listitem [ref=f1e53]:
-                  - generic [ref=f1e54]: ✕
-                  - generic [ref=f1e55]: Sin sugerencias DJ
-            - button "Más Popular Premium $ 50.000 Invitados ilimitados Plantilla 100% personalizada Gestión de invitados y pagos Cuenta regresiva Album de fotos Con musica de fondo Con LIVE (fotos en vivo) Con Trivia Con sugerencias DJ ⚠️ El pago se habilitará próximamente con Mercado Pago" [ref=f1e56]:
-              - generic [ref=f1e57]: Más Popular
-              - generic [ref=f1e59]:
-                - heading "Premium" [level=3] [ref=f1e60]
-                - paragraph [ref=f1e61]: $ 50.000
-              - list [ref=f1e62]:
-                - listitem [ref=f1e63]:
-                  - generic [ref=f1e66]: Invitados ilimitados
-                - listitem [ref=f1e67]:
-                  - generic [ref=f1e70]: Plantilla 100% personalizada
-                - listitem [ref=f1e71]:
-                  - generic [ref=f1e74]: Gestión de invitados y pagos
-                - listitem [ref=f1e75]:
-                  - generic [ref=f1e78]: Cuenta regresiva
-                - listitem [ref=f1e79]:
-                  - generic [ref=f1e82]: Album de fotos
-                - listitem [ref=f1e83]:
-                  - generic [ref=f1e86]: Con musica de fondo
-                - listitem [ref=f1e87]:
-                  - generic [ref=f1e90]: Con LIVE (fotos en vivo)
-                - listitem [ref=f1e91]:
-                  - generic [ref=f1e94]: Con Trivia
-                - listitem [ref=f1e95]:
-                  - generic [ref=f1e98]: Con sugerencias DJ
-              - generic [ref=f1e99]: ⚠️ El pago se habilitará próximamente con Mercado Pago
-        - generic [ref=f1e100]:
-          - heading "Datos de tu cuenta" [level=2] [ref=f1e101]
-          - generic [ref=f1e102]:
-            - generic [ref=f1e103]:
-              - generic [ref=f1e104]: Nombre completo
-              - textbox "Nombre completo" [active] [ref=f1e108]:
-                - /placeholder: Juan Pérez
-            - generic [ref=f1e109]:
-              - generic [ref=f1e110]: Email
-              - textbox "Email" [ref=f1e114]:
-                - /placeholder: tu@email.com
-                - text: qa_1785663098222@test.com
+          - button "Gratis $ 0 Hasta 20 invitados Plantilla 100% personalizada Gestión de invitados Cuenta regresiva Hasta 5 fotos en el álbum ✕ Sin gestión de pagos ✕ Sin musica de fondo ✕ Sin Modo LIVE (fotos y mensajes en vivo) ✕ Sin Trivia ✕ Sin sugerencias DJ" [ref=f1e13]:
+            - generic [ref=f1e15]:
+              - heading "Gratis" [level=3] [ref=f1e16]
+              - generic [ref=f1e17]: $ 0
+            - list [ref=f1e20]:
+              - listitem [ref=f1e21]:
+                - generic [ref=f1e24]: Hasta 20 invitados
+              - listitem [ref=f1e25]:
+                - generic [ref=f1e28]: Plantilla 100% personalizada
+              - listitem [ref=f1e29]:
+                - generic [ref=f1e32]: Gestión de invitados
+              - listitem [ref=f1e33]:
+                - generic [ref=f1e36]: Cuenta regresiva
+              - listitem [ref=f1e37]:
+                - generic [ref=f1e40]: Hasta 5 fotos en el álbum
+              - listitem [ref=f1e41]:
+                - generic [ref=f1e42]: ✕
+                - generic [ref=f1e43]: Sin gestión de pagos
+              - listitem [ref=f1e44]:
+                - generic [ref=f1e45]: ✕
+                - generic [ref=f1e46]: Sin musica de fondo
+              - listitem [ref=f1e47]:
+                - generic [ref=f1e48]: ✕
+                - generic [ref=f1e49]: Sin Modo LIVE (fotos y mensajes en vivo)
+              - listitem [ref=f1e50]:
+                - generic [ref=f1e51]: ✕
+                - generic [ref=f1e52]: Sin Trivia
+              - listitem [ref=f1e53]:
+                - generic [ref=f1e54]: ✕
+                - generic [ref=f1e55]: Sin sugerencias DJ
+          - button "Premium $ 45.000 $ 35.000 22% OFF Invitados ilimitados Plantilla 100% personalizada Gestión de invitados y pagos Cuenta regresiva Hasta 15 fotos en el álbum Con musica de fondo Con Trivia Con sugerencias DJ ✕ Sin Modo LIVE (fotos y mensajes en vivo) ✕ Sin organización de mesas ✕ Sin control de ingreso por QR ✕ Sin ver quién abrió la invitación" [ref=f1e56]:
+            - generic [ref=f1e58]:
+              - heading "Premium" [level=3] [ref=f1e59]
+              - generic [ref=f1e60]:
+                - generic [ref=f1e61]: $ 45.000
+                - generic [ref=f1e62]: $ 35.000
+                - generic [ref=f1e63]: 22% OFF
+            - list [ref=f1e65]:
+              - listitem [ref=f1e66]:
+                - generic [ref=f1e69]: Invitados ilimitados
+              - listitem [ref=f1e70]:
+                - generic [ref=f1e73]: Plantilla 100% personalizada
+              - listitem [ref=f1e74]:
+                - generic [ref=f1e77]: Gestión de invitados y pagos
+              - listitem [ref=f1e78]:
+                - generic [ref=f1e81]: Cuenta regresiva
+              - listitem [ref=f1e82]:
+                - generic [ref=f1e85]: Hasta 15 fotos en el álbum
+              - listitem [ref=f1e86]:
+                - generic [ref=f1e89]: Con musica de fondo
+              - listitem [ref=f1e90]:
+                - generic [ref=f1e93]: Con Trivia
+              - listitem [ref=f1e94]:
+                - generic [ref=f1e97]: Con sugerencias DJ
+              - listitem [ref=f1e98]:
+                - generic [ref=f1e99]: ✕
+                - generic [ref=f1e100]: Sin Modo LIVE (fotos y mensajes en vivo)
+              - listitem [ref=f1e101]:
+                - generic [ref=f1e102]: ✕
+                - generic [ref=f1e103]: Sin organización de mesas
+              - listitem [ref=f1e104]:
+                - generic [ref=f1e105]: ✕
+                - generic [ref=f1e106]: Sin control de ingreso por QR
+              - listitem [ref=f1e107]:
+                - generic [ref=f1e108]: ✕
+                - generic [ref=f1e109]: Sin ver quién abrió la invitación
+          - 'button "Recomendado Diamond $ 60.000 $ 45.000 25% OFF Invitados ilimitados Plantilla 100% personalizada Gestión de invitados y pagos Cuenta regresiva Hasta 15 fotos en el álbum Con musica de fondo Con LIVE (fotos y mensajes en vivo) Único plan con “Modo LIVE”: las fotos y mensajes que suben tus invitados se proyectan en pantalla en tiempo real, durante la fiesta. Con organización de mesas Con control de ingreso por QR Ver quién abrió la invitación Con Trivia Con sugerencias DJ" [ref=f1e110]':
+            - generic [ref=f1e111]: Recomendado
             - generic [ref=f1e115]:
-              - generic [ref=f1e116]: Contraseña
-              - textbox "Contraseña" [ref=f1e120]:
-                - /placeholder: Mínimo 6 caracteres
-            - generic [ref=f1e121]:
-              - generic [ref=f1e122]: Confirmar contraseña
-              - textbox "Confirmar contraseña" [ref=f1e126]:
-                - /placeholder: Repite tu contraseña
-                - text: Password123!
-            - button "Crear Cuenta Gratis" [ref=f1e127] [cursor=pointer]
-            - paragraph [ref=f1e129]:
-              - text: ¿Ya tienes cuenta?
-              - link "Inicia sesión" [ref=f1e130] [cursor=pointer]:
-                - /url: /login
-  - button "Open Next.js Dev Tools" [ref=f1e136] [cursor=pointer]
-  - alert [ref=f1e140]
+              - heading "Diamond" [level=3] [ref=f1e116]
+              - generic [ref=f1e117]:
+                - generic [ref=f1e118]: $ 60.000
+                - generic [ref=f1e119]: $ 45.000
+                - generic [ref=f1e120]: 25% OFF
+            - list [ref=f1e124]:
+              - listitem [ref=f1e125]:
+                - generic [ref=f1e128]: Invitados ilimitados
+              - listitem [ref=f1e129]:
+                - generic [ref=f1e132]: Plantilla 100% personalizada
+              - listitem [ref=f1e133]:
+                - generic [ref=f1e136]: Gestión de invitados y pagos
+              - listitem [ref=f1e137]:
+                - generic [ref=f1e140]: Cuenta regresiva
+              - listitem [ref=f1e141]:
+                - generic [ref=f1e144]: Hasta 15 fotos en el álbum
+              - listitem [ref=f1e145]:
+                - generic [ref=f1e148]: Con musica de fondo
+              - listitem [ref=f1e149]:
+                - generic [ref=f1e150]: Con LIVE (fotos y mensajes en vivo)
+                - paragraph [ref=f1e158]: "Único plan con “Modo LIVE”: las fotos y mensajes que suben tus invitados se proyectan en pantalla en tiempo real, durante la fiesta."
+              - listitem [ref=f1e159]:
+                - generic [ref=f1e162]: Con organización de mesas
+              - listitem [ref=f1e163]:
+                - generic [ref=f1e166]: Con control de ingreso por QR
+              - listitem [ref=f1e167]:
+                - generic [ref=f1e170]: Ver quién abrió la invitación
+              - listitem [ref=f1e171]:
+                - generic [ref=f1e174]: Con Trivia
+              - listitem [ref=f1e175]:
+                - generic [ref=f1e178]: Con sugerencias DJ
+        - button "Continuar" [ref=f1e179] [cursor=pointer]
+        - paragraph [ref=f1e181]:
+          - text: ¿Ya tienes cuenta?
+          - link "Inicia sesión" [ref=f1e182] [cursor=pointer]:
+            - /url: /login
+  - alert [ref=f1e183]
 ```
 
 # Test source
@@ -146,7 +170,8 @@ waiting for navigation until "load"
   22 |     }
   23 | 
   24 |     // Probar registro inválido
-  25 |     await page.getByPlaceholder(/correo|email/i).fill('invalid-email');
+> 25 |     await page.getByPlaceholder(/correo|email/i).fill('invalid-email');
+     |                                                  ^ Error: locator.fill: Test timeout of 30000ms exceeded.
   26 |     await page.getByPlaceholder(/contraseña|password/i).fill('123');
   27 |     await page.getByRole('button', { name: /registrarse|crear/i }).click();
   28 | 
@@ -166,8 +191,7 @@ waiting for navigation until "load"
   42 |     await page.getByRole('button', { name: /registrarse|crear/i }).click();
   43 | 
   44 |     // Esperar redirección al login o dashboard
-> 45 |     await page.waitForURL(/.*(\/dashboard|\/login)/);
-     |                ^ Error: page.waitForURL: Test timeout of 30000ms exceeded.
+  45 |     await page.waitForURL(/.*(\/dashboard|\/login)/);
   46 |   });
   47 | 
   48 |   test('Login y Logout Correcto', async ({ page }) => {

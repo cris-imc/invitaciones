@@ -55,6 +55,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const bbsDisplay = Bodoni_Moda({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--cpc-display",
@@ -63,6 +64,7 @@ const bbsDisplay = Bodoni_Moda({
 
 const bbsMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--cpc-mono",
   display: "swap",

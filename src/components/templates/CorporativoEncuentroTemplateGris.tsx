@@ -55,6 +55,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const cpeDisplay = Playfair_Display({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "700"],
   variable: "--cpe-display",
@@ -63,6 +64,7 @@ const cpeDisplay = Playfair_Display({
 
 const cpeMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--cpe-mono",
   display: "swap",

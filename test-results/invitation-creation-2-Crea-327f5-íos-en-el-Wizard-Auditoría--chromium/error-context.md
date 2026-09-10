@@ -7,7 +7,7 @@
 # Test info
 
 - Name: invitation-creation.spec.ts >> 2. Creación y Configuración de Invitaciones >> Validar campos vacíos en el Wizard (Auditoría)
-- Location: e2e\invitation-creation.spec.ts:14:7
+- Location: e2e/invitation-creation.spec.ts:14:7
 
 # Error details
 
@@ -29,8 +29,7 @@ Call log:
   - generic [ref=f3e4]:
     - heading "404" [level=1] [ref=f3e5]
     - heading "This page could not be found." [level=2] [ref=f3e7]
-  - button "Open Next.js Dev Tools" [ref=f3e13] [cursor=pointer]
-  - alert [ref=f3e17]
+  - alert [ref=f3e8]
 ```
 
 # Test source

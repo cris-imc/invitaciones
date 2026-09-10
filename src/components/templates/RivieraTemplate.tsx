@@ -89,12 +89,14 @@ const IconOlive = ({ className, style }: { className?: string; style?: React.CSS
 // --font-cormorant/--font-inter/--font-sans.
 const rivieraMarcellus = Marcellus({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--riviera-marcellus",
   display: "swap",
 });
 const rivieraMulish = Mulish({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600", "700"],
   variable: "--riviera-mulish",
   display: "swap",
@@ -608,7 +610,7 @@ export function RivieraTemplate({ invitation, guest, isPersonalized = false }: R
   // oscuro propio.
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/riviera-boda.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/riviera-boda.webp" : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 

@@ -57,6 +57,7 @@ const IconQuiz  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 // las demás plantillas que comparten --font-cormorant/--font-inter/--font-sans.
 const modernoFraunces = Fraunces({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--moderno-fraunces",
@@ -64,6 +65,7 @@ const modernoFraunces = Fraunces({
 });
 const modernoSora = Sora({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--moderno-sora",
   display: "swap",
@@ -483,8 +485,8 @@ export function ModernoTemplate({ invitation, guest, isPersonalized = false }: M
   const portadaTintColor1 = "#C9A876";
   const portadaTintColor2 = "#3E7A6A";
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/moderno-boda.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/moderno-quince.png"
+    : tipo === "CASAMIENTO" ? "/fondos/moderno-boda.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/moderno-quince.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

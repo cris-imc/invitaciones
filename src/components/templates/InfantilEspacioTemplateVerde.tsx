@@ -55,6 +55,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const ifeDisplay = Baloo_2({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "700", "800"],
   variable: "--ife-display",
   display: "swap",
@@ -62,6 +63,7 @@ const ifeDisplay = Baloo_2({
 
 const ifeMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--ife-mono",
   display: "swap",

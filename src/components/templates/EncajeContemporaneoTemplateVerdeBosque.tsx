@@ -64,6 +64,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const encPlayfair = Playfair_Display({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "700"],
   variable: "--enc-playfair",
@@ -72,6 +73,7 @@ const encPlayfair = Playfair_Display({
 
 const encMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--enc-mono",
   display: "swap",

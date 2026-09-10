@@ -123,6 +123,9 @@ export function MusicUploader({ onMusicUploaded, currentMusicUrl, className }: M
 
                         <audio
                             ref={audioRef}
+                            // Es un reproductor de prueba del wizard: no hace
+                            // falta ir buscando el archivo hasta que le den play.
+                            preload="none"
                             src={activeUrl}
                             onEnded={() => setIsPlaying(false)}
                             onPause={() => setIsPlaying(false)}

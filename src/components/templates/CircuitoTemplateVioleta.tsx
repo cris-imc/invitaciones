@@ -99,18 +99,21 @@ const PhotoCornerFrame = () => (
 // --font-cormorant/--font-inter/--font-sans.
 const circDisplay = Orbitron({
   subsets: ["latin"],
+  preload: false,
   weight: ["600", "700", "800"],
   variable: "--circ-display",
   display: "swap",
 });
 const circBody = JetBrains_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--circ-body",
   display: "swap",
 });
 const circMono = JetBrains_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "700"],
   variable: "--circ-mono",
   display: "swap",
@@ -618,7 +621,7 @@ export function CircuitoTemplateVioleta({ invitation, guest, isPersonalized = fa
   // las variantes (bg no cambia por variante).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/circuito-quince.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/circuito-quince.webp" : undefined;
   const portadaTintColor1 = "#B14EFF";
   const portadaTintColor2 = "#FF2E9B";
 

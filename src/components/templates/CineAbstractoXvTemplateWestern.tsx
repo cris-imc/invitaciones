@@ -45,6 +45,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const cxvArchivoBlack = Archivo_Black({
   subsets: ["latin"],
+  preload: false,
   weight: "400",
   variable: "--cxv-archivo",
   display: "swap",
@@ -52,6 +53,7 @@ const cxvArchivoBlack = Archivo_Black({
 
 const cxvMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--cxv-mono",
   display: "swap",

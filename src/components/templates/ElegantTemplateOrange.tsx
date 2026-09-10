@@ -441,8 +441,8 @@ export function ElegantTemplateOrange({ invitation, guest, isPersonalized = fals
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/elegant-boda.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/elegant-quince.png"
+    : tipo === "CASAMIENTO" ? "/fondos/elegant-boda.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/elegant-quince.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

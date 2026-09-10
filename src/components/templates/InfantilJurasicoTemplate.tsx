@@ -55,6 +55,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const ifjDisplay = Baloo_2({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "700", "800"],
   variable: "--ifj-display",
   display: "swap",
@@ -62,6 +63,7 @@ const ifjDisplay = Baloo_2({
 
 const ifjMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--ifj-mono",
   display: "swap",

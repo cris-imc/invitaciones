@@ -126,6 +126,7 @@ const CRONO_ICONS: Record<string, string> = {
 // solo a este componente vía CSS var override en el wrapper raíz.
 const sedaCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--seda-cormorant",
@@ -133,6 +134,7 @@ const sedaCormorant = Cormorant_Garamond({
 });
 const sedaPoppins = Poppins({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--seda-poppins",
   display: "swap",
@@ -620,8 +622,8 @@ export function SedaTemplate({ invitation, guest, isPersonalized = false }: Seda
   // Seda tiene 3 PNG de fondo por tipo de evento (claro/oscuro/base) -- esta
   // es la variante base (tema claro), usa el PNG "base" de cada tipo.
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/seda-boda-base.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/seda-quince-base.png"
+    : tipo === "CASAMIENTO" ? "/fondos/seda-boda-base.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/seda-quince-base.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

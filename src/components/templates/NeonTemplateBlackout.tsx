@@ -84,18 +84,21 @@ const PhotoCornerFrame = () => (
 // plantillas que comparten --font-cormorant/--font-inter/--font-sans.
 const neonBebas = Bebas_Neue({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--neon-bebas",
   display: "swap",
 });
 const neonSpaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--neon-space-grotesk",
   display: "swap",
 });
 const neonSpaceMono = Space_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "700"],
   variable: "--neon-space-mono",
   display: "swap",
@@ -603,7 +606,7 @@ export function NeonTemplateBlackout({ invitation, guest, isPersonalized = false
   // Neon es QUINCE_ANOS o CUMPLEANOS -- el PNG de fondo solo aplica a
   // QUINCE_ANOS, no a CUMPLEANOS (esa rama cae en el bucket "Evento", que no
   // tiene estética fija y por eso no tiene PNG propio, ver plan de rollout).
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/neon-quince.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/neon-quince.webp" : undefined;
   const portadaTintColor1 = "#00E5FF";
   const portadaTintColor2 = "#FF2E9B";
 

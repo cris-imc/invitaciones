@@ -54,6 +54,12 @@ export function ModelosLazyLoader() {
     const estaCargada = (el: HTMLIFrameElement) => el.dataset.modeloCargada === "1";
 
     const revisar = () => {
+      // Con la pestaña en segundo plano no se carga ninguna miniatura nueva:
+      // cada una es una página entera y no tiene sentido pagar ese tráfico
+      // (ni el render en el servidor) por algo que nadie está mirando. Las que
+      // ya están cargadas se dejan como están, así al volver está todo puesto.
+      if (document.hidden) return;
+
       const alto = window.innerHeight;
       const centro = alto / 2;
       const todas = Array.from(
@@ -166,6 +172,9 @@ export function ModelosLazyLoader() {
 
     window.addEventListener("scroll", alScrollear, { passive: true });
     window.addEventListener("resize", alScrollear);
+    // Al volver a la pestaña hay que revisar de nuevo: mientras estuvo oculta
+    // se saltearon todas las pasadas, y puede haber quedado scroll sin atender.
+    document.addEventListener("visibilitychange", alScrollear);
 
     // Las miniaturas de una pestaña recién abierta son iframes que acaban de
     // montarse y, sin scroll de por medio, ningún evento avisa.
@@ -176,6 +185,7 @@ export function ModelosLazyLoader() {
       observador.disconnect();
       window.removeEventListener("scroll", alScrollear);
       window.removeEventListener("resize", alScrollear);
+      document.removeEventListener("visibilitychange", alScrollear);
     };
   }, []);
 

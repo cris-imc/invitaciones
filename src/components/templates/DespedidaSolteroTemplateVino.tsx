@@ -55,6 +55,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const dpoDisplay = Bodoni_Moda({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--dpo-display",
@@ -63,6 +64,7 @@ const dpoDisplay = Bodoni_Moda({
 
 const dpoMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--dpo-mono",
   display: "swap",

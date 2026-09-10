@@ -97,6 +97,7 @@ const IconStarDoodle = ({ className, style }: { className?: string; style?: Reac
 // --font-cormorant/--font-inter/--font-sans.
 const cineGaramond = EB_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--cine-garamond",
@@ -104,12 +105,14 @@ const cineGaramond = EB_Garamond({
 });
 const cineJost = Jost({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--cine-jost",
   display: "swap",
 });
 const cineMono = Space_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "700"],
   variable: "--cine-mono",
   display: "swap",
@@ -623,8 +626,8 @@ export function CineTemplateNoir({ invitation, guest, isPersonalized = false }: 
   const portadaTintColor1 = "#8FA3B0";
   const portadaTintColor2 = "#2E4A52";
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/cine-boda.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/cine-quince.png"
+    : tipo === "CASAMIENTO" ? "/fondos/cine-boda.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/cine-quince.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

@@ -51,6 +51,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const adpSerif = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["300", "400", "600"],
   variable: "--adp-serif",
@@ -59,6 +60,7 @@ const adpSerif = Cormorant_Garamond({
 
 const adpMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--adp-mono",
   display: "swap",

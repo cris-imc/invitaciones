@@ -143,6 +143,7 @@ const IconAnchor = ({ className, style }: { className?: string; style?: React.CS
 // --font-cormorant/--font-inter/--font-sans.
 const bonvoyagePlayfair = Playfair_Display({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["500", "600", "700"],
   variable: "--bonvoyage-playfair",
@@ -150,6 +151,7 @@ const bonvoyagePlayfair = Playfair_Display({
 });
 const bonvoyageDmSans = DM_Sans({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--bonvoyage-dmsans",
   display: "swap",
@@ -650,8 +652,8 @@ export function BonVoyageTemplateIvoire({ invitation, guest, isPersonalized = fa
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/bonvoyage-boda.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/bonvoyage-quince.png"
+    : tipo === "CASAMIENTO" ? "/fondos/bonvoyage-boda.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/bonvoyage-quince.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

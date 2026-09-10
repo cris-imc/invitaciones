@@ -3,6 +3,28 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
+const esProduccion = process.env.NODE_ENV === 'production'
+
+/**
+ * La clave del Super Usuario sale de SEED_ADMIN_PASSWORD, nunca del código:
+ * este archivo está en el repo y el repo es público, así que cualquier clave
+ * escrita acá queda a la vista de todo el mundo.
+ *
+ * - Si la variable está puesta, se aplica (al crear la cuenta y también al
+ *   actualizarla, para poder rotar la clave desde Railway).
+ * - Si NO está puesta, la clave existente NO se toca. Antes el seed la
+ *   reescribía en cada arranque, así que cambiarla desde la app no servía de
+ *   nada: el próximo deploy la volvía atrás.
+ * - Si no está puesta y encima hay que CREAR la cuenta, se corta con un error
+ *   claro en vez de inventar una clave débil.
+ */
+function resolverClaveAdmin(): { clave: string; origen: string } | null {
+  const desdeEnv = process.env.SEED_ADMIN_PASSWORD
+  if (desdeEnv) return { clave: desdeEnv, origen: 'SEED_ADMIN_PASSWORD' }
+  if (!esProduccion) return { clave: 'admin-local-dev', origen: 'valor por defecto de desarrollo' }
+  return null
+}
+
 async function main() {
   // Super Usuario: reemplaza al admin@invitaciones.com original. Busca por
   // el email VIEJO primero para renombrar esa fila en su lugar (preserva su
@@ -10,34 +32,65 @@ async function main() {
   // crear una fila nueva y dejar la vieja huerfana en bases ya existentes
   // (producción). Si no existe (base nueva), la crea directo con el email
   // nuevo.
-  const suPassword = await bcrypt.hash('97Chucky-', 10)
-  const legacyAdmin = await prisma.user.findUnique({ where: { email: 'admin@invitaciones.com' } })
-  const adminUser = legacyAdmin
+  const claveAdmin = resolverClaveAdmin()
+  const suPassword = claveAdmin ? await bcrypt.hash(claveAdmin.clave, 10) : null
+
+  // Se mira PRIMERO el email nuevo. Si ya existe esa cuenta, no hay nada que
+  // renombrar: intentar mover igual la vieja al email nuevo choca contra la
+  // restricción de unicidad y, como el arranque encadena con &&, se lleva
+  // puesto el deploy entero. Sólo se renombra la vieja si la nueva no está.
+  const actual = await prisma.user.findUnique({ where: { email: 'admin@altainvitacion.com' } })
+  const legacyAdmin = actual
+    ? null
+    : await prisma.user.findUnique({ where: { email: 'admin@invitaciones.com' } })
+  const existente = actual ?? legacyAdmin
+
+  if (!existente && !suPassword) {
+    throw new Error(
+      'Hay que crear el Super Usuario pero falta SEED_ADMIN_PASSWORD. ' +
+      'Definila como variable de entorno (en Railway: Variables) y volvé a desplegar.'
+    )
+  }
+
+  // La clave sólo se toca si vino una nueva por variable de entorno.
+  const datosClave = suPassword ? { password: suPassword } : {}
+
+  const adminUser = existente
     ? await prisma.user.update({
-        where: { id: legacyAdmin.id },
+        where: { id: existente.id },
         data: {
           email: 'admin@altainvitacion.com',
           name: 'Super Admin',
-          password: suPassword,
           role: 'SUPERUSER',
           planTier: 'ADMIN',
           subscriptionStatus: 'ACTIVE',
+          ...datosClave,
         },
       })
-    : await prisma.user.upsert({
-        where: { email: 'admin@altainvitacion.com' },
-        update: { password: suPassword, role: 'SUPERUSER' },
-        create: {
+    : await prisma.user.create({
+        data: {
           email: 'admin@altainvitacion.com',
           name: 'Super Admin',
-          password: suPassword,
+          password: suPassword!,
           role: 'SUPERUSER',
           planTier: 'ADMIN',
           subscriptionStatus: 'ACTIVE',
         },
       })
 
-  console.log('✅ Super Usuario creado:', adminUser.email)
+  console.log(
+    '✅ Super Usuario listo:', adminUser.email,
+    claveAdmin ? `(clave tomada de ${claveAdmin.origen})` : '(clave sin cambios)'
+  )
+
+  // De acá en adelante son datos de demostración: un usuario de prueba con
+  // clave conocida (test@example.com / test123, también visible en el repo)
+  // y dos invitaciones de ejemplo. Se venían creando en la base REAL en cada
+  // arranque. Ahora quedan sólo para desarrollo; SEED_DEMO=1 los fuerza.
+  if (esProduccion && process.env.SEED_DEMO !== '1') {
+    console.log('ℹ️  Datos de demostración omitidos (producción)')
+    return
+  }
 
   // Crear usuario de prueba FREE
   const testPassword = await bcrypt.hash('test123', 10)

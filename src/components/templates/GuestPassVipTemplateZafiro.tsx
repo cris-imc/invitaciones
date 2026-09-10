@@ -47,6 +47,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const gpBodoni = Bodoni_Moda({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--gp-bodoni",
@@ -55,6 +56,7 @@ const gpBodoni = Bodoni_Moda({
 
 const gpMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--gp-mono",
   display: "swap",

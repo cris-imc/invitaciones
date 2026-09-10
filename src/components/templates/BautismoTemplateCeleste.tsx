@@ -55,6 +55,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const btsDisplay = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--bts-display",
@@ -63,6 +64,7 @@ const btsDisplay = Cormorant_Garamond({
 
 const btsMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--bts-mono",
   display: "swap",

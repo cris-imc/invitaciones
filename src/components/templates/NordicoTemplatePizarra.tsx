@@ -89,12 +89,14 @@ const IconLineDoodle = ({ className, style }: { className?: string; style?: Reac
 // --font-cormorant/--font-inter/--font-sans.
 const nordicoSpaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--nordico-space-grotesk",
   display: "swap",
 });
 const nordicoInter = Inter({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600", "700"],
   variable: "--nordico-inter",
   display: "swap",
@@ -598,7 +600,7 @@ export function NordicoTemplatePizarra({ invitation, guest, isPersonalized = fal
   // oscuro propio (#1A1F26).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/nordico-boda.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/nordico-boda.webp" : undefined;
   // El nombre en la portada va en mayúscula fija por diseño (estética
   // editorial de Nordico), pero la tipografía del título la elige el
   // usuario -- con fuentes decorativas/cursivas (Dancing Script, Great

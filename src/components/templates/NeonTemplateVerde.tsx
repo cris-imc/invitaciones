@@ -84,18 +84,21 @@ const PhotoCornerFrame = () => (
 // plantillas que comparten --font-cormorant/--font-inter/--font-sans.
 const neonBebas = Bebas_Neue({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--neon-bebas",
   display: "swap",
 });
 const neonSpaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--neon-space-grotesk",
   display: "swap",
 });
 const neonSpaceMono = Space_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "700"],
   variable: "--neon-space-mono",
   display: "swap",
@@ -601,7 +604,7 @@ export function NeonTemplateVerde({ invitation, guest, isPersonalized = false }:
   // scrimColorRgb = rgb(#0D0D10), igual en todas (bg no cambia por variante).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/neon-quince.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/neon-quince.webp" : undefined;
   const portadaTintColor1 = "#B6FF3C";
   const portadaTintColor2 = "#FF2E9B";
 

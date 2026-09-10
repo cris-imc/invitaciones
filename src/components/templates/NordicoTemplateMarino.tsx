@@ -89,12 +89,14 @@ const IconLineDoodle = ({ className, style }: { className?: string; style?: Reac
 // --font-cormorant/--font-inter/--font-sans.
 const nordicoSpaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--nordico-space-grotesk",
   display: "swap",
 });
 const nordicoInter = Inter({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600", "700"],
   variable: "--nordico-inter",
   display: "swap",
@@ -597,7 +599,7 @@ export function NordicoTemplateMarino({ invitation, guest, isPersonalized = fals
   // (#111111, igual en todas las variantes de Nordico).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/nordico-boda.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/nordico-boda.webp" : undefined;
   // Ver nota en NordicoTemplate.tsx (base): Cinzel es la única fuente de
   // título pensada para mayúscula, el resto usa "capitalize".
   const isCinzelTitle = invitation.fontTitle === "cinzel";

@@ -278,12 +278,22 @@ export default async function Home() {
           </div>
           <div className="max-w-3xl mx-auto px-6">
             <div className="rounded-2xl overflow-hidden shadow-[0_10px_50px_rgba(0,0,0,0.5)] border border-[var(--line)]">
+              {/* `preload="none"`: antes los dos videos pedían sus metadatos
+                  apenas cargaba la landing (el oculto también -- `display:none`
+                  no evita la descarga). Ahora no se baja nada hasta que le den
+                  play.
+                  El poster es negro sólido a propósito, del mismo tamaño que
+                  cada video: es el reposo que se eligió para la sección, y
+                  puesto como imagen (1,4 KB) en vez de dejar el atributo vacío
+                  porque sin poster cada navegador resuelve distinto -- algunos
+                  pintan negro y otros dejan ver el fondo de la página. */}
               {/* Mobile video */}
               <video
                 src="/video-demo-mobile.mp4"
+                poster="/video-demo-mobile-poster.webp"
                 controls
                 playsInline
-                preload="metadata"
+                preload="none"
                 className="w-full block md:hidden"
               >
                 {t("landing.video.sinSoporte")}
@@ -291,9 +301,10 @@ export default async function Home() {
               {/* Desktop video */}
               <video
                 src="/video-demo.mp4"
+                poster="/video-demo-poster.webp"
                 controls
                 playsInline
-                preload="metadata"
+                preload="none"
                 className="w-full hidden md:block"
               >
                 {t("landing.video.sinSoporte")}

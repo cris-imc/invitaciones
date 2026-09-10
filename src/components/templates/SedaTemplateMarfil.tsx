@@ -126,6 +126,7 @@ const CRONO_ICONS: Record<string, string> = {
 // solo a este componente vía CSS var override en el wrapper raíz.
 const sedaCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--seda-cormorant",
@@ -133,6 +134,7 @@ const sedaCormorant = Cormorant_Garamond({
 });
 const sedaPoppins = Poppins({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--seda-poppins",
   display: "swap",
@@ -616,8 +618,8 @@ export function SedaTemplateMarfil({ invitation, guest, isPersonalized = false }
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const portadaFondoFallback = portadaFondoAnimado ? undefined
-    : tipo === "CASAMIENTO" ? "/fondos/seda-boda-claro.png"
-    : tipo === "QUINCE_ANOS" ? "/fondos/seda-quince-claro.png"
+    : tipo === "CASAMIENTO" ? "/fondos/seda-boda-claro.webp"
+    : tipo === "QUINCE_ANOS" ? "/fondos/seda-quince-claro.webp"
     : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);

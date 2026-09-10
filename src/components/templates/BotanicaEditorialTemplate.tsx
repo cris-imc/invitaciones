@@ -40,6 +40,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const bteSerif = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["300", "400", "500", "600"],
   variable: "--bte-serif",
@@ -48,6 +49,7 @@ const bteSerif = Cormorant_Garamond({
 
 const bteMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--bte-mono",
   display: "swap",

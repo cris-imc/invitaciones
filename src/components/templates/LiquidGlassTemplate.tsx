@@ -63,6 +63,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 
 const lqgCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["300", "500"],
   variable: "--lqg-cormorant",
@@ -71,6 +72,7 @@ const lqgCormorant = Cormorant_Garamond({
 
 const lqgMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--lqg-mono",
   display: "swap",

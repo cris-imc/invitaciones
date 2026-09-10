@@ -44,6 +44,7 @@ import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/Provee
 // navegador, que es el fallback estándar de next/font para este caso.
 const cabSerif = Frank_Ruhl_Libre({
   subsets: ["latin"],
+  preload: false,
   style: ["normal"],
   weight: ["400", "500"],
   variable: "--cab-serif",
@@ -52,6 +53,7 @@ const cabSerif = Frank_Ruhl_Libre({
 
 const cabMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--cab-mono",
   display: "swap",

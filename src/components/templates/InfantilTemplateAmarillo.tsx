@@ -50,12 +50,14 @@ import { useTextos } from "@/components/i18n/ProveedorIdioma";
 // solo a este componente vía CSS var override en el wrapper raíz.
 const infantilBaloo = Baloo_2({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "600", "700", "800"],
   variable: "--infantil-baloo",
   display: "swap",
 });
 const infantilManrope = Manrope({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700", "800"],
   variable: "--infantil-manrope",
   display: "swap",

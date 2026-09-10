@@ -94,12 +94,14 @@ const IconChurch = ({ className, style }: { className?: string; style?: React.CS
 // que comparten --font-cormorant/--font-inter/--font-sans.
 const onixItaliana = Italiana({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--onix-italiana",
   display: "swap",
 });
 const onixCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600", "700"],
   variable: "--onix-cormorant",
@@ -603,7 +605,7 @@ export function OnixTemplateZafiro({ invitation, guest, isPersonalized = false }
   // scrimColorRgb = rgb(#140B14), igual en todas (bg no cambia por variante).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/onix-quince.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/onix-quince.webp" : undefined;
   const portadaTintColor1 = "#7FA8D9";
   const portadaTintColor2 = "#78466E";
 

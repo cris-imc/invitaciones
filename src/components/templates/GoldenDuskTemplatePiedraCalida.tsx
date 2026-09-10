@@ -143,6 +143,7 @@ const IconArbor = ({ className, style }: { className?: string; style?: React.CSS
 // --font-cormorant/--font-inter/--font-sans.
 const goldenduskCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["500", "600", "700"],
   variable: "--goldendusk-cormorant",
@@ -150,6 +151,7 @@ const goldenduskCormorant = Cormorant_Garamond({
 });
 const goldenduskJost = Jost({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--goldendusk-jost",
   display: "swap",
@@ -651,7 +653,7 @@ export function GoldenDuskTemplatePiedraCalida({ invitation, guest, isPersonaliz
 
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/goldendusk-boda.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/goldendusk-boda.webp" : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 
