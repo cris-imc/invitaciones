@@ -1,5 +1,7 @@
 import { cookies, headers } from "next/headers";
-import { COOKIE_IDIOMA, IDIOMA_POR_DEFECTO, esIdiomaValido, idiomaSegunNavegador, type Idioma } from "./idiomas";
+import { COOKIE_IDIOMA, IDIOMA_POR_DEFECTO, esIdiomaValido, idiomaSegunNavegador, idiomaSegunPais, type Idioma } from "./idiomas";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/db";
 import { traductorDe, type Traductor } from "./texto";
 import { paisSegunCabeceras } from "@/lib/pais-visitante";
 
@@ -16,6 +18,11 @@ import { paisSegunCabeceras } from "@/lib/pais-visitante";
  * más molestas que puede hacer un sitio.
  */
 export async function idiomaDelAnfitrion(): Promise<Idioma> {
+  // Con sesión, el idioma sale del país de la cuenta: son la misma decisión
+  // tomada una sola vez, al registrarse.
+  const deLaCuenta = await paisDeLaCuenta();
+  if (deLaCuenta) return idiomaSegunPais(deLaCuenta);
+
   const guardado = (await cookies()).get(COOKIE_IDIOMA)?.value;
   if (esIdiomaValido(guardado)) return guardado;
 
@@ -50,9 +57,38 @@ export async function textosDelAnfitrion(): Promise<Traductor> {
  * mostrar las cuotas, así que las dos cosas no pueden discrepar.
  */
 export async function paisDelAnfitrion(): Promise<string | null> {
+  // Con sesión manda LA CUENTA, no la cookie. Si la cuenta es argentina el
+  // panel es argentino: precios en pesos, cuotas, CBU. Dejar que el selector
+  // de la landing lo pisara desde adentro dejaría a alguien con invitaciones
+  // ya creadas viendo precios en dólares sin entender por qué.
+  const dePerfil = await paisDeLaCuenta();
+  if (dePerfil) return dePerfil;
+
+  // Sin sesión -- landing y registro -- vale lo que eligió el visitante.
   try {
     const cabeceras = await headers();
     return paisSegunCabeceras((n) => cabeceras.get(n));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * El país guardado en la cuenta, o null si no hay sesión.
+ *
+ * Se consulta la base y no la sesión porque el país no viaja en el token:
+ * agregarlo obligaría a que todos vuelvan a iniciar sesión para que su token
+ * lo tenga, y es una consulta por id, indexada.
+ */
+async function paisDeLaCuenta(): Promise<string | null> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return null;
+    const usuario = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { pais: true },
+    });
+    return usuario?.pais ?? null;
   } catch {
     return null;
   }

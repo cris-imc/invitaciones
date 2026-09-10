@@ -4,12 +4,10 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { updateUserProfile, updateUserPhone, updateUserPais } from "@/app/actions/user";
+import { updateUserProfile, updateUserPhone } from "@/app/actions/user";
 import { useToast } from "@/components/ui/Toast";
-import { User, Mail, Phone, Globe, Loader2 } from "lucide-react";
+import { User, Mail, Phone, Loader2 } from "lucide-react";
 import { normalizeDigits } from "@/lib/phone";
-import { SelectorPais } from "@/components/ui/SelectorPais";
-import type { CodigoPais } from "@/lib/paises";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 export function ProfileForm({
@@ -17,28 +15,24 @@ export function ProfileForm({
     email,
     initialPhoneAreaCode,
     initialPhoneNumber,
-    initialPais,
 }: {
     initialName: string;
     email: string;
     initialPhoneAreaCode: string;
     initialPhoneNumber: string;
-    initialPais: CodigoPais;
 }) {
     const { update } = useSession();
     const t = useTextos();
     const [name, setName] = useState(initialName);
     const [phoneAreaCode, setPhoneAreaCode] = useState(initialPhoneAreaCode);
     const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber);
-    const [pais, setPais] = useState<CodigoPais>(initialPais);
     const [isLoading, setIsLoading] = useState(false);
     const { showToast } = useToast();
 
     const isDirty =
         name !== initialName ||
         phoneAreaCode !== initialPhoneAreaCode ||
-        phoneNumber !== initialPhoneNumber ||
-        pais !== initialPais;
+        phoneNumber !== initialPhoneNumber;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -66,15 +60,6 @@ export function ProfileForm({
                     return;
                 }
                 await update({ hasPhone: true });
-            }
-
-            if (pais !== initialPais) {
-                const res = await updateUserPais(pais);
-                if (!res.success) {
-                    showToast(res.error || t("panel.perfil.errorPais"), "error");
-                    setIsLoading(false);
-                    return;
-                }
             }
 
             showToast(t("panel.perfil.guardado"), "success");
@@ -114,22 +99,6 @@ export function ProfileForm({
                         className="h-12 bg-[var(--tinte-1)] border-[var(--campo-borde-suave)] text-[var(--shell-fg-soft)] rounded-xl cursor-not-allowed"
                     />
                     <p className="text-xs text-[var(--shell-fg-soft)] mt-1">{t("panel.perfil.correoNota")}</p>
-                </div>
-
-                <div className="space-y-2">
-                    <label htmlFor="pais" className="text-sm font-medium text-[var(--shell-fg-strong)] flex items-center gap-2">
-                        <Globe className="w-4 h-4 opacity-50" />
-                        {t("panel.perfil.pais")}
-                    </label>
-                    <SelectorPais
-                        id="pais"
-                        valor={pais}
-                        onCambio={setPais}
-                        className="bg-[var(--tinte-1)] border-[var(--campo-borde)] text-[var(--foreground)] focus-visible:ring-indigo-500"
-                    />
-                    <p className="text-xs text-[var(--shell-fg-soft)] mt-1">
-                        {t("panel.perfil.paisNota")}
-                    </p>
                 </div>
 
                 <div className="space-y-2">

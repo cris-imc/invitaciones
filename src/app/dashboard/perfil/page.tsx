@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ProfileForm } from "./ProfileForm";
 import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
-import { esCodigoPais } from "@/lib/paises";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 
 // El título de la pestaña también sigue al idioma, así que se arma en tiempo
@@ -21,10 +20,8 @@ export default async function PerfilPage() {
 
     const dbUser = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { phoneAreaCode: true, phoneNumber: true, pais: true },
+        select: { phoneAreaCode: true, phoneNumber: true },
     });
-
-    const paisGuardado = dbUser?.pais;
     const t = await textosDelAnfitrion();
 
     return (
@@ -43,7 +40,6 @@ export default async function PerfilPage() {
                     email={session.user.email || ""}
                     initialPhoneAreaCode={dbUser?.phoneAreaCode || ""}
                     initialPhoneNumber={dbUser?.phoneNumber || ""}
-                    initialPais={esCodigoPais(paisGuardado) ? paisGuardado : "AR"}
                 />
             </div>
         </div>

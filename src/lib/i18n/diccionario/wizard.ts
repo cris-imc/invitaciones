@@ -118,6 +118,8 @@ const es = {
         ciudad: "Ciudad / Localidad del Evento",
         ciudadPlaceholder: "Ej: Buenos Aires, Rosario, Mendoza…",
         ciudadAyuda: "Aparece junto a la fecha en la tarjeta de bienvenida de tus invitados.",
+        idioma: "Idioma de la invitación",
+        idiomaAyuda: "En este idioma la van a ver tus invitados, sin importar el idioma de su celular. Lo que escribas vos —nombres, dirección, tu mensaje— va tal cual, sin traducir.",
     },
 
     plantilla: {
@@ -639,6 +641,8 @@ const en: Wizard = {
         ciudad: "City / town of the event",
         ciudadPlaceholder: "E.g. Buenos Aires, Rosario, Mendoza…",
         ciudadAyuda: "It appears next to the date on your guests' welcome card.",
+        idioma: "Invitation language",
+        idiomaAyuda: "Your guests will see it in this language, whatever their phone is set to. What you write —names, address, your message— goes exactly as you wrote it.",
     },
 
     plantilla: {
@@ -1152,6 +1156,8 @@ const pt: Wizard = {
         ciudad: "Cidade do evento",
         ciudadPlaceholder: "Ex.: São Paulo, Rio de Janeiro, Curitiba…",
         ciudadAyuda: "Aparece junto da data no cartão de boas-vindas dos seus convidados.",
+        idioma: "Idioma do convite",
+        idiomaAyuda: "Seus convidados vão vê-lo neste idioma, não importa o idioma do celular deles. O que você escrever —nomes, endereço, sua mensagem— vai exatamente como está.",
     },
 
     plantilla: {

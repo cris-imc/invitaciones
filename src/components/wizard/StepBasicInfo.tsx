@@ -20,6 +20,7 @@ import { useSession } from "next-auth/react";
 import { isAdmin as isAdminRole } from "@/lib/roles";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { useIdioma } from "@/components/i18n/ProveedorIdioma";
+import { SelectorIdiomaInvitacion } from "./SelectorIdiomaInvitacion";
 
 // El formato largo de fecha ("12 de marzo de 2027") lo arma date-fns, no el
 // diccionario: el nombre del mes y el orden de las partes cambian con el
@@ -203,6 +204,8 @@ export function StepBasicInfo() {
                             </FormItem>
                         )}
                     />
+
+                    <SelectorIdiomaInvitacion />
 
 
 

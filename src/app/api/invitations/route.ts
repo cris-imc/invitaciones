@@ -8,6 +8,7 @@ import { slugify } from '@/lib/slugify';
 import { resolveGoogleMapsShortLink } from '@/lib/google-maps';
 import { isAdmin as isAdminRole } from '@/lib/roles';
 import { esCodigoPais } from '@/lib/paises';
+import { esIdiomaValido, idiomaSegunPais } from '@/lib/i18n/idiomas';
 
 // GET - Obtener invitaciones del usuario o invitación pública por slug
 export async function GET(request: NextRequest) {
@@ -282,6 +283,10 @@ export async function POST(request: NextRequest) {
             data: {
                 userId,
                 pais: paisInvitacion,
+                // El idioma en que la ven los invitados. Puede no coincidir con
+                // el país: una boda en Miami organizada desde Argentina va en
+                // inglés. Si no se eligió, sale del país.
+                idioma: esIdiomaValido(body.idioma) ? body.idioma : idiomaSegunPais(paisInvitacion),
                 planTier: invitationPlanTier, // Asignar el plan correspondiente
                 premiumCreditSpent: willSpendCredit,
                 diamondCreditSpent: willSpendDiamondCredit,
@@ -645,6 +650,7 @@ export async function PUT(request: NextRequest) {
                 regaloCbu: body.regaloCbu,
                 regaloAlias: body.regaloAlias,
                 regaloDatosBancarios: body.regaloDatosBancarios,
+                ...(esIdiomaValido(body.idioma) ? { idioma: body.idioma } : {}),
                 regaloBanco: body.regaloBanco,
                 regaloTitular: body.regaloTitular,
                 regaloMonto: newRegaloMonto,

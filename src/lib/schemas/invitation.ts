@@ -143,6 +143,7 @@ export const invitationSchema = z.object({
     // País de la invitación: define qué campos bancarios se piden (ver
     // src/lib/paises.ts). Si no viene, se asume "AR" (ver paisDe()).
     pais: z.string().optional(),
+  idioma: z.string().optional(),
 
     regaloHabilitado: z.boolean().default(false),
     regaloTitulo: z.string().optional(),
