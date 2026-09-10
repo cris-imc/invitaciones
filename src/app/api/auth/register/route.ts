@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { REGISTRATION_ENABLED } from "@/lib/features";
-import { validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
+import { validarTelefono } from "@/lib/phone";
 import { validatePassword } from "@/lib/password";
 import { createCheckoutPreference, getPublicBaseUrl } from "@/lib/mercadopago";
 import { getRequestIp } from "@/lib/request-ip";
@@ -47,14 +47,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: passwordError }, { status: 400 });
     }
 
-    const areaCodeError = validatePhoneAreaCode(phoneAreaCode || "");
-    if (areaCodeError) {
-      return NextResponse.json({ error: areaCodeError }, { status: 400 });
-    }
-
-    const phoneNumberError = validatePhoneNumber(phoneNumber || "");
-    if (phoneNumberError) {
-      return NextResponse.json({ error: phoneNumberError }, { status: 400 });
+    // El teléfono es opcional: no se le manda nada automático, el login no lo
+    // usa y la clave se recupera por email. Sus reglas dependen del país.
+    const errorTelefono = validarTelefono(pais, phoneAreaCode || "", phoneNumber || "");
+    if (errorTelefono) {
+      return NextResponse.json({ error: errorTelefono }, { status: 400 });
     }
 
     // El país decide qué datos bancarios se le van a pedir después (CBU,

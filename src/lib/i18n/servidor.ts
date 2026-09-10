@@ -18,13 +18,17 @@ import { paisSegunCabeceras } from "@/lib/pais-visitante";
  * más molestas que puede hacer un sitio.
  */
 export async function idiomaDelAnfitrion(): Promise<Idioma> {
-  // Con sesión, el idioma sale del país de la cuenta: son la misma decisión
-  // tomada una sola vez, al registrarse.
-  const deLaCuenta = await paisDeLaCuenta();
-  if (deLaCuenta) return idiomaSegunPais(deLaCuenta);
-
+  // Primero lo que la persona eligió, siempre. El idioma del panel es libre
+  // y no depende del país: dónde vive alguien no dice qué idioma habla, y
+  // alguien de México puede querer el panel en inglés (los datos bancarios
+  // le van a seguir pidiendo una CLABE, porque eso sí depende del país).
   const guardado = (await cookies()).get(COOKIE_IDIOMA)?.value;
   if (esIdiomaValido(guardado)) return guardado;
+
+  // Sin elección previa, el del país de la cuenta es el mejor punto de
+  // partida: es lo que habla la mayoría de la gente de ahí.
+  const deLaCuenta = await paisDeLaCuenta();
+  if (deLaCuenta) return idiomaSegunPais(deLaCuenta);
 
   try {
     return idiomaSegunNavegador((await headers()).get("accept-language"));

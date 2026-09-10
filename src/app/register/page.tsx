@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { PagoPorTransferencia } from "@/components/pagos/PagoPorTransferencia";
-import { normalizeDigits, validatePhoneAreaCode, validatePhoneNumber } from "@/lib/phone";
+import { normalizeDigits, validarTelefono, prefijoTelefonico } from "@/lib/phone";
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 import { setPendingWizardDesiredCredit } from "@/lib/pending-wizard-invitation";
 import { costumbresDe } from "@/lib/costumbres-por-pais";
@@ -217,17 +217,12 @@ function RegisterForm() {
       return;
     }
 
-    const areaCodeError = validatePhoneAreaCode(formData.phoneAreaCode);
-    if (areaCodeError) {
+    // El teléfono es opcional y sus reglas dependen del país: las que había
+    // eran argentinas y le rechazaban a un colombiano un número válido.
+    const errorTelefono = validarTelefono(formData.pais, formData.phoneAreaCode, formData.phoneNumber);
+    if (errorTelefono) {
       hapticoError();
-      showToast(areaCodeError, "error");
-      return;
-    }
-
-    const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
-    if (phoneNumberError) {
-      hapticoError();
-      showToast(phoneNumberError, "error");
+      showToast(errorTelefono, "error");
       return;
     }
 
@@ -576,6 +571,7 @@ function RegisterForm() {
                   <Label className="flex items-center gap-2 mb-2 opacity-80">
                     <Phone className="w-4 h-4" />
                     Teléfono
+                    <span className="font-normal text-[var(--shell-fg-soft)]">(opcional)</span>
                   </Label>
                   <div className="grid grid-cols-[100px_1fr] gap-2">
                     <Input
@@ -585,8 +581,7 @@ function RegisterForm() {
                       placeholder="Cód. área"
                       value={formData.phoneAreaCode}
                       onChange={(e) => setFormData({ ...formData, phoneAreaCode: normalizeDigits(e.target.value) })}
-                      maxLength={4}
-                      required
+                      maxLength={6}
                       className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                     />
                     <Input
@@ -596,13 +591,16 @@ function RegisterForm() {
                       placeholder="Número"
                       value={formData.phoneNumber}
                       onChange={(e) => setFormData({ ...formData, phoneNumber: normalizeDigits(e.target.value) })}
-                      maxLength={8}
-                      required
+                      maxLength={12}
                       className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                     />
                   </div>
+                  {/* La ayuda depende del país: la del 0 y el 15 son prefijos de
+                      marcado argentinos que no existen en ningún otro lado. */}
                   <p className="text-xs opacity-50 mt-1.5">
-                    Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234)
+                    {formData.pais === "AR"
+                      ? "Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234)"
+                      : `Código de área y número, sólo dígitos (${prefijoTelefonico(formData.pais)})`}
                   </p>
                 </div>
 
