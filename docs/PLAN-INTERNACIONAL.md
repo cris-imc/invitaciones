@@ -89,18 +89,42 @@ traducción.
 
 ---
 
-## Modo claro y oscuro
+## Modo claro y oscuro — hecho a medias, a propósito
 
 Va en esta misma rama porque comparte el problema: un producto que se muestra a
 gente de siete países no puede tener una sola manera de verse.
 
-El modo claro tiene que ser en **blancos cálidos, cremas y tono manteca**. Nada
-de blanco puro ni de grises fríos: papel, no pantalla. El dorado de la marca
-probablemente necesite una versión más oscura para contrastar sobre crema.
+El modo claro quedó en **blancos cálidos y crema**: papel, no pantalla. El
+dorado de la marca daba **2.32:1** sobre crema — ilegible —, así que se
+oscureció manteniendo el matiz, bajando la luminosidad de 53% a 32%, y quedó en
+**5.49:1**.
 
-Las **plantillas de invitación no participan**: cada una tiene su propia paleta
-y el invitado la ve como la diseñó el anfitrión. Esto es sólo para el panel y
-la landing.
+Contrastes verificados con la fórmula WCAG, recalculados de forma independiente
+y coincidentes: texto principal 16.56:1, tarjetas 17.30:1, dorado 5.49:1,
+salvia 6.09:1, rojo de error 5.80:1.
+
+No hay destello del tema equivocado al cargar: un script bloqueante lee la
+preferencia guardada y marca el elemento raíz antes de que React hidrate.
+
+### Qué NO participa, y por qué
+
+- Las **plantillas de invitación**: cada una tiene su paleta y el invitado la
+  ve como la diseñó el anfitrión.
+- El **hero de la landing**: su fondo animado de luces está armado para
+  oscuro. Adaptarlo a claro es un trabajo de diseño, no agregar un
+  interruptor. Queda oscuro en los dos temas.
+
+### Lo que falta
+
+**26 archivos con colores escritos a mano** (`bg-black`, `text-white/60`) que se
+van a ver oscuros aunque el resto del panel esté en claro. Son sobre todo
+pantallas de admin, perfil y FAQ. Unos 140 cambios que necesitan criterio uno
+por uno, no un reemplazo mecánico.
+
+El sidebar, la barra superior, las tarjetas de invitación, el panel
+"Administrar" y la landing sí quedaron adaptados. **Antes de mostrar el
+interruptor a un cliente hay que terminar esas 26 pantallas**, o va a encontrar
+zonas oscuras sueltas.
 
 ---
 
