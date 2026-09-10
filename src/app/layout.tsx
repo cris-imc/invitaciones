@@ -74,8 +74,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${allFonts}`}>
+    // suppressHydrationWarning: el script de abajo corre antes de que React
+    // hidrate y puede agregar data-tema="claro" a este elemento. Sin este
+    // flag, React compara ese atributo (puesto por el script) contra el HTML
+    // que mandó el servidor (que nunca lo tiene) y tira un warning de
+    // hidratación en <html> -- el mismo patrón que usa next-themes.
+    <html lang="es" className={`${allFonts}`} suppressHydrationWarning>
       <head>
+        {/* Evita el "flash" de tema equivocado: si no hiciéramos esto, la
+            página siempre pintaría oscuro primero (el default de globals.css)
+            y recién al hidratar React se pondría claro para quien lo eligió,
+            generando un parpadeo visible. Este script es bloqueante (sin
+            async/defer) y corre durante el parseo del <head>, antes de
+            pintar el <body> -- por eso alcanza con leer localStorage acá,
+            no hace falta cookie ni Server Component para esto. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('alta-tema');if(t==='claro'){document.documentElement.setAttribute('data-tema','claro');}}catch(e){}})();",
+          }}
+        />
       </head>
       <body className="antialiased">
         <ViewportHeightFix />

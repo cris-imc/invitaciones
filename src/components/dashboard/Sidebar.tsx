@@ -14,6 +14,7 @@ import { NewInvitationButton } from "@/components/dashboard/NewInvitationButton"
 import { CreateUserButton } from "@/components/dashboard/CreateUserButton";
 import { HelpMenu } from "@/components/dashboard/HelpMenu";
 import { LandingLogo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { isAdmin } from "@/lib/roles";
 
 const allSidebarItems = [
@@ -137,9 +138,15 @@ export function Sidebar() {
 
             <HelpMenu variant="desktop" />
 
+            {/* Selector de tema: sin gate de sesión, también lo puede usar
+                quien está en el wizard público sin cuenta todavía. */}
+            <div className="mt-4 px-2 flex items-center justify-center">
+                <ThemeToggle />
+            </div>
+
             {isAuthenticated && (
-                <div className="mt-4 px-2">
-                    <button onClick={handleSignOut} className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 py-2 rounded-lg text-sm font-semibold transition-colors">
+                <div className="mt-2 px-2">
+                    <button onClick={handleSignOut} className="sidebar-signout-btn w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold">
                         <LogOut className="w-4 h-4" />
                         Cerrar Sesión
                     </button>
@@ -190,7 +197,10 @@ export function Sidebar() {
                         <div className="p-brand" style={{ margin: 0 }}>
                             <LandingLogo className="h-[50px] w-auto" />
                         </div>
-                        <HelpMenu variant="mobile" />
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <HelpMenu variant="mobile" />
+                        </div>
                     </header>
 
                     {/* ── MOBILE BOTTOM NAV (botonera con Inicio elevado al centro) ──
