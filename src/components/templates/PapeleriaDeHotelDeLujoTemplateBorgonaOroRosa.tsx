@@ -45,6 +45,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const phlPlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -128,9 +130,10 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest, isPersonalized = false }: PapeleriaDeHotelDeLujoTemplateProps) {
+  const tx = useTextos();
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda"));
 
   // "Saludar por nombre del invitado/familia" (Administrar > Gestionar
   // invitados): si está activo, la portada saluda con el nombre del
@@ -139,7 +142,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
   // un dato propio (no como si Familia Juarez fuera quien se casa).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "RESERVA CONFIRMADA PARA LA BODA" : "RESERVA CONFIRMADA PARA LA BODA DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.reservaConfirmadaBoda").toUpperCase() : tx("invitacion.sabor.reservaConfirmadaBodaDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : <>{novia}<br /><span className="phl-accent-italic" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
@@ -166,7 +169,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Su habitación está reservada. El resto, es servicio de conserjería."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeConserjeria")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -176,7 +179,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -270,7 +273,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: PhlQuizQuestion[] = safeJson<PhlQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -431,7 +434,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#F5DCD0";
       }
       if (stubRef.current) {
@@ -725,7 +728,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
 
       <div ref={scrollerRef} data-scroller="1" className="phl-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="phl-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #2A1520 0%, #22111A 55%, #170A10 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="phl-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="phl-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="phl-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="phl-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="phl-date-month">{monthAbbr}</span>
@@ -746,7 +749,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
           />
 
           <div data-drift="-70" className="phl-medallion phl-medallion--corner">
-            <Medallion label="LM" sub="ACCESO" arcId="phlArc1" arcText="GRAND HOTEL · SUITE NUPCIAL · " spin="normal" />
+            <Medallion label="LM" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="phlArc1" arcText={tx("invitacion.sabor.arcoGrandHotel").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -757,7 +760,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`phl-hero-photo-section${!photoMobile ? " phl-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " phl-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="phl-hero-photo-frame">
@@ -781,18 +784,18 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
           <div className="phl-scanline" />
           <span data-xin="1" data-dist="-60" className="phl-kicker" style={{ position: "relative" }}>{knPre(2)} — SU SUITE ESTARÁ LISTA EN</span>
           <div className="phl-cd-grid">
-            <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="phl-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="phl-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #2E1424 0%, #0C0B11 52%, #170A10 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="phl-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #2E1424 0%, #0C0B11 52%, #170A10 100%)" }}>
           <div data-drift="-130" className="phl-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="phl-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="phl-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="phl-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -813,7 +816,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="phl-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="phl-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="phl-pan-sticky">
             <div data-strip="1" className="phl-strip">
               {ceremoniaHabilitada && (
@@ -829,35 +832,35 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
                   <div className="phl-facts">
                     {ceremoniaHora && (
                       <div className="phl-facts-row phl-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="phl-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="phl-seguir">SEGUÍ BAJANDO <span className="phl-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="phl-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="phl-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="phl-panel phl-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="phl-hair-bg" />
                 <div className="phl-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="phl-panel-title">
-                  {lugarNombre || "El salón"}
+                  {lugarNombre || tx("invitacion.ubicacion.elSalon")}
                   {direccion && <><br /><span className="phl-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="phl-facts">
                   <div className="phl-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="phl-facts-row phl-facts-row--last">
-                      <span>CÓDIGO</span><span className="phl-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="phl-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -871,7 +874,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
                     ))}
                   </div>
                 )}
-                <div className="phl-seguir">SEGUÍ BAJANDO <span className="phl-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="phl-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="phl-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -882,12 +885,12 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
                   </svg>
                   <div className="phl-panel-block">
                     <span className="phl-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="phl-panel-title-sm">Cómo llegar</span>
-                    <span className="phl-mini-label">VALET DISPONIBLE · SERVICIO DE CONSERJERÍA</span>
+                    <span className="phl-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
+                    <span className="phl-mini-label">{tx("invitacion.sabor.valetConserjeria").toUpperCase()}</span>
                     {direccion && <span className="phl-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="phl-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -896,9 +899,9 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
 
               <div data-tone="dark" className="phl-panel phl-panel--center" style={{ background: "#22111A", color: "#F4F1EA" }}>
                 <div className="phl-medallion phl-medallion--lg">
-                  <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`SUITE Nº ${passNumber}`} arcId="phlArc2" arcText={`ACCESO VIP · SUITE Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <Medallion label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroSuite", { n: passNumber }).toUpperCase()} arcId="phlArc2" arcText={tx("invitacion.pase.arcoAccesoVipSuite", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="phl-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="phl-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -917,7 +920,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
         <section data-tone="dark" data-screen-label="Check-in" className="phl-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #2A1520 0%, #22111A 60%, #170A10 100%)" }}>
           <span data-xin="1" data-dist="-60" className="phl-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="phl-h2">
-            Confirmá<br /><span className="phl-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="phl-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -951,20 +954,20 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
               />
             </div>
           ) : (
-            <p className="phl-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="phl-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="phl-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="phl-pan">
           <div className="phl-pan-sticky">
             <div data-strip="1" className="phl-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="phl-panel phl-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="phl-hair-bg" />
                   <div className="phl-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="phl-panel-title-md">Álbum <span className="phl-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="phl-panel-title-md">{tx("invitacion.album.titulo")} <span className="phl-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="phl-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -974,25 +977,25 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="phl-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="phl-photo-placeholder">Sin fotos todavía</span>
+                      <span className="phl-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="phl-seguir phl-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="phl-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="phl-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="phl-panel phl-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="phl-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="phl-panel-title">Todo lo que<br /><span className="phl-accent-serif">vamos a recordar</span></h2>
+                <span className="phl-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="phl-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="phl-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="phl-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#8C4A45" />
@@ -1000,8 +1003,8 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
                     <div className="phl-live-placeholder">
                       <span className="phl-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1013,9 +1016,9 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="phl-section" style={{ background: "#22111A" }}>
-            <span data-xin="1" data-dist="-60" className="phl-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="phl-h2">¿Qué pedido<br /><span className="phl-accent-italic">no puede faltar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="phl-section" style={{ background: "#22111A" }}>
+            <span data-xin="1" data-dist="-60" className="phl-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="phl-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaPedidoFaltar"), "phl-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="phl-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="phl-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F5DCD0" : "#E3A99A" }} />
@@ -1025,24 +1028,24 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
               <PhlSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="phl-section" style={{ background: "#22111A" }}>
-            <span data-xin="1" data-dist="-60" className="phl-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="phl-section" style={{ background: "#22111A" }}>
+            <span data-xin="1" data-dist="-60" className="phl-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="phl-h2">
-              Si querés<br /><span className="phl-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="phl-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="phl-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1062,7 +1065,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1084,7 +1087,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="phl-section" style={{ background: "#22111A" }}>
-            <span data-xin="1" data-dist="-60" className="phl-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="phl-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="phl-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1093,7 +1096,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
@@ -1103,9 +1106,9 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
           <span data-xin="1" data-dist="-60" className="phl-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU RESERVA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="phl-final-card">
             <div className="phl-medallion phl-medallion--final">
-              <Medallion label="LM" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="phlArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <Medallion label="LM" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="phlArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="phl-mini-label phl-accent-serif-2">SUITE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="phl-mini-label phl-accent-serif-2">{tx("invitacion.pase.numeroSuiteAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="phl-final-names">
               {novia}{novia && novio ? <span className="phl-accent-italic"> &amp; </span> : ""}{novio}
             </span>
@@ -1113,8 +1116,8 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
             <div className="phl-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="phl-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="phl-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="phl-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1126,7 +1129,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
       </div>
 
       <div ref={railRef} className="phl-rail">
-        <span ref={railTopRef} className="phl-rail-top">SUITE Nº {passNumber}</span>
+        <span ref={railTopRef} className="phl-rail-top">{tx("invitacion.pase.numeroSuite", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="phl-rail-line">
           <span ref={railBarRef} className="phl-rail-bar" />
         </div>
@@ -1148,7 +1151,7 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="phl-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="phl-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CoverHalf>
         </div>
         <div ref={bottomRef} className="phl-cover-half phl-cover-half--bottom">
@@ -1162,12 +1165,12 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="phl-cover-cta phl-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="phl-cover-cta phl-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="phl-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="phl-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1182,14 +1185,14 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="phl-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1256,6 +1259,7 @@ function Medallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1264,7 +1268,7 @@ function Medallion({
     <>
       <div className="phl-medallion-ring" style={{ animation: spin === "none" ? "none" : `phlRing ${ringDuration}s linear infinite` }} />
       <div className="phl-medallion-core">
-        {title && <span className="phl-medallion-sub">SECTOR</span>}
+        {title && <span className="phl-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "phl-medallion-label-sm" : "phl-medallion-label"}>{title || label}</span>
         {sub && <span className="phl-medallion-sub phl-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1283,6 +1287,7 @@ function Medallion({
 }
 
 function PhlCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1297,7 +1302,7 @@ function PhlCopyField({ label, value }: { label: string; value: string }) {
         <span className="phl-bank-row-value">{value}</span>
       </div>
       <button type="button" className="phl-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1361,6 +1366,7 @@ function PhlRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1392,8 +1398,7 @@ function PhlRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1417,7 +1422,7 @@ function PhlRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1426,7 +1431,7 @@ function PhlRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1435,9 +1440,9 @@ function PhlRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="phl-rsvp-declined">
-        <p className="phl-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="phl-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="phl-rsvp-btn phl-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1450,13 +1455,13 @@ function PhlRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí. */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="phl-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="phl-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1466,7 +1471,7 @@ function PhlRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="phl-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="phl-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1476,7 +1481,7 @@ function PhlRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="phl-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="phl-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1486,15 +1491,15 @@ function PhlRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="phl-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="phl-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="phl-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="phl-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="phl-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="phl-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="phl-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1504,7 +1509,7 @@ function PhlRsvpCard({
           </div>
         ) : (
           <div className="phl-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1519,7 +1524,7 @@ function PhlRsvpCard({
             <div className="phl-rsvp-payment-value">
               <span className="phl-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="phl-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="phl-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="phl-rsvp-payment-detail">
@@ -1533,7 +1538,7 @@ function PhlRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1545,9 +1550,9 @@ function PhlRsvpCard({
 
       <div ref={stubRef} className="phl-stub">
         <div className="phl-stub-top">
-          <span>SUITE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroSuite", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="phl-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="phl-seal">
@@ -1562,10 +1567,10 @@ function PhlRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="phl-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="phl-rsvp-btn phl-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1588,6 +1593,7 @@ interface PhlSongItem {
 // <SongSuggestion> (/api/songs), pero sin el look de tarjetas redondeadas
 // del componente compartido.
 function PhlSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<PhlSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1611,7 +1617,7 @@ function PhlSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1624,14 +1630,14 @@ function PhlSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1641,9 +1647,9 @@ function PhlSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="phl-song">
       <form onSubmit={handleSubmit} className="phl-song-row">
         <div className="phl-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="phl-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="phl-song-input" />
           <span className="phl-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="phl-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="phl-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="phl-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1653,7 +1659,7 @@ function PhlSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="phl-song-item">
               <span className="phl-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="phl-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="phl-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1665,6 +1671,7 @@ function PhlSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function PhlQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: PhlQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1707,7 +1714,7 @@ function PhlQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1779,11 +1786,11 @@ function PhlQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="phl-quiz-result">
           <p className="phl-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="phl-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1830,6 +1837,7 @@ function CoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="phl-cover-inner">
       {photoMobile && (
@@ -1860,7 +1868,7 @@ function CoverHalf({
       <div className="phl-cover-sunburst" />
       <div className="phl-cover-content">
         <div className="phl-cover-top-row">
-          <span>SUITE Nº {passNumber}</span><span className="phl-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroSuite", { n: passNumber }).toUpperCase()}</span><span className="phl-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="phl-cover-center">
           <span ref={kickerRef} className="phl-cover-kicker">{kickerText}</span>
@@ -1877,7 +1885,7 @@ function CoverHalf({
           {children}
           <div className="phl-barcode-wrap">
             <div className="phl-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="phl-mini-label phl-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="phl-mini-label phl-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

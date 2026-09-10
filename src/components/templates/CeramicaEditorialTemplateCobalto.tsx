@@ -43,6 +43,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const cmeSerif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -126,9 +128,10 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonalized = false }: CeramicaEditorialTemplateProps) {
+  const tx = useTextos();
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda"));
 
   // Monograma del medallón (sello de cerámica): iniciales de los novios --
   // igual que en el mockup ("LM" para Lucía & Mateo). Sin nombres cargados
@@ -144,7 +147,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
   // un dato propio (no como si Familia Juarez fuera quien se casa).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA PIEZA DE TALLER PARA LA BODA" : "UNA PIEZA DE TALLER PARA LA BODA DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.piezaTallerBoda").toUpperCase() : tx("invitacion.sabor.piezaTallerBodaDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : <>{novia}<br /><span className="cme-accent-italic" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
@@ -170,7 +173,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
   const scrollVertical = Boolean(invitation.storytellingScrollVertical);
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. El resto se cuece a fuego lento."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeFuegoLento")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -180,7 +183,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -274,7 +277,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: CmeQuizQuestion[] = safeJson<CmeQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -434,7 +437,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#EDEAE0";
       }
       if (stubRef.current) {
@@ -728,7 +731,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
 
       <div ref={scrollerRef} data-scroller="1" className="cme-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="cme-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #161A33 0%, #16202E 55%, #0E131C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cme-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="cme-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="cme-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="cme-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="cme-date-month">{monthAbbr}</span>
@@ -749,7 +752,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
           />
 
           <div data-drift="-70" className="cme-medallion cme-medallion--corner">
-            <CmeMedallion label={monograma} sub="ACCESO" arcId="cmeArc1" arcText={`TALLER DE CERÁMICA · PIEZA Nº ${passNumber} · `} spin="normal" />
+            <CmeMedallion label={monograma} sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="cmeArc1" arcText={tx("invitacion.pase.arcoTallerCeramicaPieza", { n: passNumber }).toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -760,7 +763,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`cme-hero-photo-section${!photoMobile ? " cme-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " cme-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="cme-hero-photo-frame">
@@ -784,18 +787,18 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
           <div className="cme-scanline" />
           <span data-xin="1" data-dist="-60" className="cme-kicker" style={{ position: "relative" }}>{knPre(2)} — SALE DEL HORNO EN</span>
           <div className="cme-cd-grid">
-            <CmeCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CmeCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CmeCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CmeCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CmeCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CmeCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CmeCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CmeCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="cme-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="cme-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #14183A 0%, #0A0E1C 52%, #0E131C 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="cme-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #14183A 0%, #0A0E1C 52%, #0E131C 100%)" }}>
           <div data-drift="-130" className="cme-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="cme-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="cme-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="cme-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -816,7 +819,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="cme-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="cme-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="cme-pan-sticky">
             <div data-strip="1" className="cme-strip">
               {ceremoniaHabilitada && (
@@ -832,35 +835,35 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
                   <div className="cme-facts">
                     {ceremoniaHora && (
                       <div className="cme-facts-row cme-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="cme-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="cme-seguir">SEGUÍ BAJANDO <span className="cme-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="cme-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cme-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="cme-panel cme-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="cme-hair-bg" />
                 <div className="cme-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="cme-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="cme-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="cme-facts">
                   <div className="cme-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="cme-facts-row cme-facts-row--last">
-                      <span>CÓDIGO</span><span className="cme-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="cme-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -874,7 +877,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
                     ))}
                   </div>
                 )}
-                <div className="cme-seguir">SEGUÍ BAJANDO <span className="cme-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="cme-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cme-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -885,11 +888,11 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
                   </svg>
                   <div className="cme-panel-block">
                     <span className="cme-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="cme-panel-title-sm">Cómo llegar</span>
+                    <span className="cme-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="cme-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cme-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -898,9 +901,9 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
 
               <div data-tone="dark" className="cme-panel cme-panel--center" style={{ background: "#16202E", color: "#F4F1EA" }}>
                 <div className="cme-medallion cme-medallion--lg">
-                  <CmeMedallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PIEZA Nº ${passNumber}`} arcId="cmeArc2" arcText={`ACCESO VIP · PIEZA Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <CmeMedallion label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroPieza", { n: passNumber }).toUpperCase()} arcId="cmeArc2" arcText={tx("invitacion.pase.arcoAccesoVipPieza", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="cme-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="cme-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -919,7 +922,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
         <section data-tone="dark" data-screen-label="Check-in" className="cme-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #161A33 0%, #16202E 60%, #0E131C 100%)" }}>
           <span data-xin="1" data-dist="-60" className="cme-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cme-h2">
-            Confirmá<br /><span className="cme-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="cme-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -954,20 +957,20 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
               />
             </div>
           ) : (
-            <p className="cme-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="cme-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="cme-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="cme-pan">
           <div className="cme-pan-sticky">
             <div data-strip="1" className="cme-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="cme-panel cme-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cme-hair-bg" />
                   <div className="cme-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="cme-panel-title-md">Álbum <span className="cme-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="cme-panel-title-md">{tx("invitacion.album.titulo")} <span className="cme-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="cme-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -977,25 +980,25 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="cme-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="cme-photo-placeholder">Sin fotos todavía</span>
+                      <span className="cme-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="cme-seguir cme-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="cme-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="cme-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="cme-panel cme-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="cme-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="cme-panel-title">Todo lo que<br /><span className="cme-accent-serif">vamos a recordar</span></h2>
+                <span className="cme-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="cme-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="cme-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="cme-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#5E8BB9" />
@@ -1003,8 +1006,8 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
                     <div className="cme-live-placeholder">
                       <span className="cme-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1016,9 +1019,9 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="cme-section" style={{ background: "#16202E" }}>
-            <span data-xin="1" data-dist="-60" className="cme-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="cme-h2">¿Qué tema<br /><span className="cme-accent-italic">te hace bailar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="cme-section" style={{ background: "#16202E" }}>
+            <span data-xin="1" data-dist="-60" className="cme-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="cme-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaBailar"), "cme-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cme-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="cme-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#EDEAE0" : "#5E8BB9" }} />
@@ -1028,24 +1031,24 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
               <CmeSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cme-section" style={{ background: "#16202E" }}>
-            <span data-xin="1" data-dist="-60" className="cme-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="cme-section" style={{ background: "#16202E" }}>
+            <span data-xin="1" data-dist="-60" className="cme-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cme-h2">
-              Si querés<br /><span className="cme-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="cme-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cme-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1065,7 +1068,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1087,7 +1090,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cme-section" style={{ background: "#16202E" }}>
-            <span data-xin="1" data-dist="-60" className="cme-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="cme-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cme-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1096,7 +1099,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
@@ -1106,9 +1109,9 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
           <span data-xin="1" data-dist="-60" className="cme-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cme-final-card">
             <div className="cme-medallion cme-medallion--final">
-              <CmeMedallion label={monograma} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cmeArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <CmeMedallion label={monograma} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cmeArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="cme-mini-label cme-accent-serif-2">PIEZA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="cme-mini-label cme-accent-serif-2">{tx("invitacion.pase.numeroPiezaAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="cme-final-names">
               {novia}{novia && novio ? <span className="cme-accent-italic"> &amp; </span> : ""}{novio}
             </span>
@@ -1116,8 +1119,8 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
             <div className="cme-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="cme-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="cme-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="cme-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1129,7 +1132,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
       </div>
 
       <div ref={railRef} className="cme-rail">
-        <span ref={railTopRef} className="cme-rail-top">PIEZA Nº {passNumber}</span>
+        <span ref={railTopRef} className="cme-rail-top">{tx("invitacion.pase.numeroPieza", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="cme-rail-line">
           <span ref={railBarRef} className="cme-rail-bar" />
         </div>
@@ -1151,7 +1154,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="cme-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="cme-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CmeCoverHalf>
         </div>
         <div ref={bottomRef} className="cme-cover-half cme-cover-half--bottom">
@@ -1165,12 +1168,12 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="cme-cover-cta cme-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="cme-cover-cta cme-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CmeCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="cme-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="cme-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1185,14 +1188,14 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="cme-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1259,6 +1262,7 @@ function CmeMedallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1267,7 +1271,7 @@ function CmeMedallion({
     <>
       <div className="cme-medallion-ring" style={{ animation: spin === "none" ? "none" : `cmeRing ${ringDuration}s linear infinite` }} />
       <div className="cme-medallion-core">
-        {title && <span className="cme-medallion-sub">SECTOR</span>}
+        {title && <span className="cme-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "cme-medallion-label-sm" : "cme-medallion-label"}>{title || label}</span>
         {sub && <span className="cme-medallion-sub cme-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1286,6 +1290,7 @@ function CmeMedallion({
 }
 
 function CmeCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1300,7 +1305,7 @@ function CmeCopyField({ label, value }: { label: string; value: string }) {
         <span className="cme-bank-row-value">{value}</span>
       </div>
       <button type="button" className="cme-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1366,6 +1371,7 @@ function CmeRsvpCard({
   onConfirmed: (data: { attending: boolean; count: number }) => void;
   monograma: string;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1397,8 +1403,7 @@ function CmeRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1422,7 +1427,7 @@ function CmeRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1431,7 +1436,7 @@ function CmeRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1440,9 +1445,9 @@ function CmeRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="cme-rsvp-declined">
-        <p className="cme-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="cme-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="cme-rsvp-btn cme-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1455,13 +1460,13 @@ function CmeRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí. */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="cme-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="cme-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1471,7 +1476,7 @@ function CmeRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="cme-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="cme-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1481,7 +1486,7 @@ function CmeRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="cme-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="cme-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1491,15 +1496,15 @@ function CmeRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="cme-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="cme-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="cme-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="cme-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="cme-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="cme-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="cme-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1509,7 +1514,7 @@ function CmeRsvpCard({
           </div>
         ) : (
           <div className="cme-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1524,7 +1529,7 @@ function CmeRsvpCard({
             <div className="cme-rsvp-payment-value">
               <span className="cme-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="cme-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="cme-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="cme-rsvp-payment-detail">
@@ -1538,7 +1543,7 @@ function CmeRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1550,9 +1555,9 @@ function CmeRsvpCard({
 
       <div ref={stubRef} className="cme-stub">
         <div className="cme-stub-top">
-          <span>PIEZA Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPieza", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="cme-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="cme-seal">
@@ -1567,10 +1572,10 @@ function CmeRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="cme-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="cme-rsvp-btn cme-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1593,6 +1598,7 @@ interface CmeSongItem {
 // <SongSuggestion> (/api/songs), pero sin el look de tarjetas redondeadas del
 // componente compartido.
 function CmeSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<CmeSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1616,7 +1622,7 @@ function CmeSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1629,14 +1635,14 @@ function CmeSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1646,9 +1652,9 @@ function CmeSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="cme-song">
       <form onSubmit={handleSubmit} className="cme-song-row">
         <div className="cme-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="cme-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="cme-song-input" />
           <span className="cme-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="cme-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="cme-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="cme-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1658,7 +1664,7 @@ function CmeSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="cme-song-item">
               <span className="cme-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="cme-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="cme-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1670,6 +1676,7 @@ function CmeSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function CmeQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: CmeQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1712,7 +1719,7 @@ function CmeQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1784,11 +1791,11 @@ function CmeQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="cme-quiz-result">
           <p className="cme-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="cme-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1835,6 +1842,7 @@ function CmeCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="cme-cover-inner">
       {photoMobile && (
@@ -1865,7 +1873,7 @@ function CmeCoverHalf({
       <div className="cme-cover-glaze" />
       <div className="cme-cover-content">
         <div className="cme-cover-top-row">
-          <span>PIEZA Nº {passNumber}</span><span className="cme-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPieza", { n: passNumber }).toUpperCase()}</span><span className="cme-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cme-cover-center">
           <span ref={kickerRef} className="cme-cover-kicker">{kickerText}</span>
@@ -1882,7 +1890,7 @@ function CmeCoverHalf({
           {children}
           <div className="cme-barcode-wrap">
             <div className="cme-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="cme-mini-label cme-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="cme-mini-label cme-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

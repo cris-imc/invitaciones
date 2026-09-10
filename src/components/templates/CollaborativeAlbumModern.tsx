@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/Toast";
 
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 interface CollaborativeAlbumModernProps {
   invitationSlug: string;
   fechaEvento?: Date | string;
@@ -26,6 +27,8 @@ export function CollaborativeAlbumModern({
   guestName,
   photos = [] 
 }: CollaborativeAlbumModernProps) {
+  const tx = useTextos();
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploaderName, setUploaderName] = useState(guestName || "");
   const [isUploading, setIsUploading] = useState(false);
@@ -87,7 +90,7 @@ export function CollaborativeAlbumModern({
           <div>
             <Input
               type="text"
-              placeholder="Tu nombre"
+              placeholder={tx("invitacion.album.tuNombre")}
               value={uploaderName}
               onChange={(e) => setUploaderName(e.target.value)}
               className="w-full"
@@ -139,7 +142,7 @@ export function CollaborativeAlbumModern({
               >
                 <img
                   src={photo.url}
-                  alt={`Foto de ${photo.uploaderName || "invitado"}`}
+                  alt={tx("invitacion.album.fotoDe", { nombre: photo.uploaderName || "invitado" })}
                   className="w-full h-full object-cover"
                 />
                 {photo.uploaderName && (

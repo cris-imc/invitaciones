@@ -41,6 +41,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 // Frank Ruhl Libre solo expone la variante "normal" en next/font/google
 // (aunque Google Fonts sirve itálica para esta familia) -- los usos en
@@ -128,9 +130,10 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPersonalized = false }: CineAbstractoTemplateProps) {
+  const tx = useTextos();
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda"));
 
   // "Saludar por nombre del invitado/familia" (Administrar > Gestionar
   // invitados): si está activo, la portada saluda con el nombre del
@@ -140,7 +143,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
   // se casa).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA PELÍCULA SOBRE LA BODA" : "UNA PELÍCULA SOBRE LA BODA DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.peliculaBoda").toUpperCase() : tx("invitacion.sabor.peliculaBodaDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : <>{novia}<br /><span className="cab-accent-italic" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
@@ -169,7 +172,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
   const scrollVertical = Boolean(invitation.storytellingScrollVertical);
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Apaguen los teléfonos. Empieza la función."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeApaguenTelefonos")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -179,7 +182,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -273,7 +276,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: CabQuizQuestion[] = safeJson<CabQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -435,7 +438,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#CFEEDD";
       }
       if (stubRef.current) {
@@ -751,7 +754,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
 
       <div ref={scrollerRef} data-scroller="1" className="cab-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="cab-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #101E18 0%, #0B0B10 55%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cab-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="cab-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="cab-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="cab-date-month">{monthAbbr}</span>
@@ -772,7 +775,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
           />
 
           <div data-drift="-70" className="cab-medallion cab-medallion--corner">
-            <CabMedallion label="35mm" sub="ACCESO" arcId="cabArc1" arcText="ALL ACCESS · CINE ABSTRACTO · " spin="normal" />
+            <CabMedallion label="35mm" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="cabArc1" arcText={tx("invitacion.sabor.arcoCineAbstracto").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -783,7 +786,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`cab-hero-photo-section${!photoMobile ? " cab-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " cab-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="cab-hero-photo-frame">
@@ -807,18 +810,18 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
           <div className="cab-scanline" />
           <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>{knPre(2)} — LA FUNCIÓN EMPIEZA EN</span>
           <div className="cab-cd-grid">
-            <CabCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CabCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CabCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CabCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CabCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CabCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CabCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CabCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="cab-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="cab-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #111F19 0%, #0C0B11 52%, #08080B 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="cab-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #111F19 0%, #0C0B11 52%, #08080B 100%)" }}>
           <div data-drift="-130" className="cab-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="cab-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -839,7 +842,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="cab-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")} className="cab-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="cab-pan-sticky">
             <div data-strip="1" className="cab-strip">
               {ceremoniaHabilitada && (
@@ -855,35 +858,35 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
                   <div className="cab-facts">
                     {ceremoniaHora && (
                       <div className="cab-facts-row cab-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="cab-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="cab-seguir">SEGUÍ BAJANDO <span className="cab-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="cab-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cab-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" data-camshake={ceremoniaHabilitada ? undefined : "1"} className="cab-panel cab-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="cab-hair-bg" />
                 <div className="cab-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="cab-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="cab-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="cab-facts">
                   <div className="cab-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="cab-facts-row cab-facts-row--last">
-                      <span>CÓDIGO</span><span className="cab-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="cab-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -897,7 +900,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
                     ))}
                   </div>
                 )}
-                <div className="cab-seguir">SEGUÍ BAJANDO <span className="cab-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="cab-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cab-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -908,11 +911,11 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
                   </svg>
                   <div className="cab-panel-block">
                     <span className="cab-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="cab-panel-title-sm">Cómo llegar</span>
+                    <span className="cab-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="cab-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cab-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -921,9 +924,9 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
 
               <div data-tone="dark" className="cab-panel cab-panel--center" style={{ background: "#0B0B10", color: "#F4F1EA" }}>
                 <div className="cab-medallion cab-medallion--lg">
-                  <CabMedallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`ENTRADA Nº ${passNumber}`} arcId="cabArc2" arcText={`ACCESO VIP · ENTRADA Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <CabMedallion label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()} arcId="cabArc2" arcText={tx("invitacion.pase.arcoAccesoVipEntrada", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="cab-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="cab-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -942,7 +945,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
         <section data-tone="dark" data-screen-label="Check-in" className="cab-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #101E18 0%, #0B0B10 60%, #08080B 100%)" }}>
           <span data-xin="1" data-dist="-60" className="cab-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cab-h2">
-            Confirmá<br /><span className="cab-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="cab-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -976,20 +979,20 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
               />
             </div>
           ) : (
-            <p className="cab-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="cab-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="cab-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="cab-pan">
           <div className="cab-pan-sticky">
             <div data-strip="1" className="cab-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="cab-panel cab-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cab-hair-bg" />
                   <div className="cab-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="cab-panel-title-md">Álbum <span className="cab-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="cab-panel-title-md">{tx("invitacion.album.titulo")} <span className="cab-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="cab-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -999,25 +1002,25 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="cab-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="cab-photo-placeholder">Sin fotos todavía</span>
+                      <span className="cab-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="cab-seguir cab-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="cab-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="cab-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="cab-panel cab-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="cab-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="cab-panel-title">Todo lo que<br /><span className="cab-accent-serif">vamos a recordar</span></h2>
+                <span className="cab-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="cab-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="cab-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="cab-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#1F4A3B" />
@@ -1025,8 +1028,8 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
                     <div className="cab-live-placeholder">
                       <span className="cab-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1038,9 +1041,9 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2">¿Qué banda sonora<br /><span className="cab-accent-italic">no puede faltar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="cab-section" style={{ background: "#0B0B10" }}>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaBandaSonoraFaltar"), "cab-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cab-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="cab-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#CFEEDD" : "#3F9C74" }} />
@@ -1050,24 +1053,24 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
               <CabSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="cab-section" style={{ background: "#0B0B10" }}>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2">
-              Si querés<br /><span className="cab-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="cab-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cab-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1087,7 +1090,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1109,7 +1112,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cab-section" style={{ background: "#0B0B10" }}>
-            <span data-xin="1" data-dist="-60" className="cab-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="cab-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cab-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1118,7 +1121,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
@@ -1128,9 +1131,9 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
           <span data-xin="1" data-dist="-60" className="cab-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cab-final-card">
             <div className="cab-medallion cab-medallion--final">
-              <CabMedallion label="35mm" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cabArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <CabMedallion label="35mm" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cabArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="cab-mini-label cab-accent-serif-2">ENTRADA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="cab-mini-label cab-accent-serif-2">{tx("invitacion.pase.numeroEntradaAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="cab-final-names">
               {novia}{novia && novio ? <span className="cab-accent-italic"> &amp; </span> : ""}{novio}
             </span>
@@ -1138,8 +1141,8 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
             <div className="cab-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="cab-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="cab-replay" onClick={reset}>VER LOS TRÁILERS OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="cab-replay" onClick={reset}>{tx("invitacion.portada.verTrailersOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1151,7 +1154,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
       </div>
 
       <div ref={railRef} className="cab-rail">
-        <span ref={railTopRef} className="cab-rail-top">ENTRADA Nº {passNumber}</span>
+        <span ref={railTopRef} className="cab-rail-top">{tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="cab-rail-line">
           <span ref={railBarRef} className="cab-rail-bar" />
         </div>
@@ -1174,7 +1177,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="cab-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="cab-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CabCoverHalf>
         </div>
         <div ref={bottomRef} className="cab-cover-half cab-cover-half--bottom">
@@ -1189,12 +1192,12 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="cab-cover-cta cab-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="cab-cover-cta cab-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CabCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="cab-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="cab-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1209,14 +1212,14 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="cab-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1283,6 +1286,7 @@ function CabMedallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1297,7 +1301,7 @@ function CabMedallion({
         style={{ animation: spin === "none" ? "none" : `cabRing ${ringDuration}s steps(24) infinite` }}
       />
       <div className="cab-medallion-core">
-        {title && <span className="cab-medallion-sub">SECTOR</span>}
+        {title && <span className="cab-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "cab-medallion-label-sm" : "cab-medallion-label"}>{title || label}</span>
         {sub && <span className="cab-medallion-sub cab-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1316,6 +1320,7 @@ function CabMedallion({
 }
 
 function CabCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1330,7 +1335,7 @@ function CabCopyField({ label, value }: { label: string; value: string }) {
         <span className="cab-bank-row-value">{value}</span>
       </div>
       <button type="button" className="cab-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1394,6 +1399,7 @@ function CabRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1425,8 +1431,7 @@ function CabRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1450,7 +1455,7 @@ function CabRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1459,7 +1464,7 @@ function CabRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1468,9 +1473,9 @@ function CabRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="cab-rsvp-declined">
-        <p className="cab-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="cab-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="cab-rsvp-btn cab-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1483,13 +1488,13 @@ function CabRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí. */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="cab-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="cab-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1499,7 +1504,7 @@ function CabRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="cab-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="cab-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1509,7 +1514,7 @@ function CabRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="cab-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="cab-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1519,15 +1524,15 @@ function CabRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="cab-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="cab-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="cab-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="cab-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="cab-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="cab-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="cab-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1537,7 +1542,7 @@ function CabRsvpCard({
           </div>
         ) : (
           <div className="cab-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1552,7 +1557,7 @@ function CabRsvpCard({
             <div className="cab-rsvp-payment-value">
               <span className="cab-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="cab-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="cab-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="cab-rsvp-payment-detail">
@@ -1566,7 +1571,7 @@ function CabRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1578,9 +1583,9 @@ function CabRsvpCard({
 
       <div ref={stubRef} className="cab-stub">
         <div className="cab-stub-top">
-          <span>ENTRADA Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="cab-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="cab-seal">
@@ -1595,10 +1600,10 @@ function CabRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="cab-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="cab-rsvp-btn cab-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1621,6 +1626,7 @@ interface CabSongItem {
 // <SongSuggestion> (/api/songs), pero sin el look de tarjetas redondeadas
 // del componente compartido.
 function CabSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<CabSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1644,7 +1650,7 @@ function CabSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1657,14 +1663,14 @@ function CabSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1674,9 +1680,9 @@ function CabSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="cab-song">
       <form onSubmit={handleSubmit} className="cab-song-row">
         <div className="cab-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="cab-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="cab-song-input" />
           <span className="cab-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="cab-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="cab-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="cab-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1686,7 +1692,7 @@ function CabSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="cab-song-item">
               <span className="cab-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="cab-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="cab-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1698,6 +1704,7 @@ function CabSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function CabQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: CabQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1740,7 +1747,7 @@ function CabQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1812,11 +1819,11 @@ function CabQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="cab-quiz-result">
           <p className="cab-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="cab-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1865,6 +1872,7 @@ function CabCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="cab-cover-inner">
       {photoMobile && (
@@ -1902,7 +1910,7 @@ function CabCoverHalf({
       <div className="cab-cover-sprockets cab-cover-sprockets--bottom" />
       <div className="cab-cover-content">
         <div className="cab-cover-top-row">
-          <span>ENTRADA Nº {passNumber}</span><span className="cab-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()}</span><span className="cab-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cab-cover-center">
           <span ref={kickerRef} className="cab-cover-kicker">{kickerText}</span>
@@ -1915,12 +1923,12 @@ function CabCoverHalf({
           <div className="cab-cover-facts">
             <span>{dressCode ? dressCode.toUpperCase() : "SECTOR — SALA"}</span>
             <span>{hora} H</span>
-            <span>CÓD. {eventCode}</span>
+            <span>{tx("invitacion.pase.codigoAbrev", { codigo: eventCode }).toUpperCase()}</span>
           </div>
           {children}
           <div className="cab-barcode-wrap">
             <div className="cab-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="cab-mini-label cab-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="cab-mini-label cab-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

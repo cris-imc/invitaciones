@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface BottomNavPillProps {
   sections: {
@@ -31,6 +32,7 @@ interface BottomNavPillProps {
 }
 
 export function BottomNavPill({ sections, variant = "default", accentColor = "#C9A876", surfaceColor = "#151219", inactiveColor, solid = false }: BottomNavPillProps) {
+  const tx = useTextos();
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "");
 
   // Observa qué sección está visible y marca el nav activo
@@ -74,7 +76,7 @@ export function BottomNavPill({ sections, variant = "default", accentColor = "#C
         ? `fixed bottom-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-nowrap overflow-x-auto items-center justify-start sm:justify-center gap-x-3 sm:gap-x-4 px-4 sm:px-6 py-3.5 rounded-[2rem] border border-[var(--t-acc)]/20 shadow-xl w-[95%] max-w-max hide-desktop ${solid ? "bg-[var(--t-surface)]" : "bg-[var(--t-surface)]/95 backdrop-blur-md"}`
         : "bottom-nav hide-desktop"}
       style={variant === "moderno" ? { scrollbarWidth: 'none', msOverflowStyle: 'none', "--t-acc": accentColor, "--t-surface": surfaceColor, "--t-nav-inactive": inactiveColor ?? accentColor } as React.CSSProperties : undefined}
-      aria-label="Navegación de la invitación"
+      aria-label={tx("invitacion.portada.navegacion")}
       role="navigation"
     >
       {sections.map(({ id, label, icon }) => (
@@ -85,7 +87,7 @@ export function BottomNavPill({ sections, variant = "default", accentColor = "#C
             e.preventDefault();
             handleNav(id);
           }}
-          aria-label={`Ir a ${label}`}
+          aria-label={tx("invitacion.portada.irASeccion", { seccion: label })}
           aria-current={activeId === id ? "true" : undefined}
           className={variant === "moderno" 
             ? `font-sans text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.15em] transition-colors whitespace-nowrap ${activeId === id ? "text-[var(--t-acc)]" : "text-[var(--t-nav-inactive)]/75 hover:text-[var(--t-acc)]"}`

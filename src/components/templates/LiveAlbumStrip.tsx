@@ -13,6 +13,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface LiveAlbumStripProps {
   photos: string[];
@@ -23,6 +24,7 @@ interface LiveAlbumStripProps {
 }
 
 export function LiveAlbumStrip({ photos, tone = "light", accentColor }: LiveAlbumStripProps) {
+  const tx = useTextos();
   const trackRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
@@ -129,7 +131,7 @@ export function LiveAlbumStrip({ photos, tone = "light", accentColor }: LiveAlbu
               className="lba-item"
               style={{ backgroundImage: `url(${url})` }}
               role="img"
-              aria-label={`Foto ${(i % photos.length) + 1}`}
+              aria-label={tx("invitacion.album.foto", { n: (i % photos.length) + 1 })}
               onClick={() => setExpandedPhoto(url)}
             />
           ))}
@@ -145,14 +147,14 @@ export function LiveAlbumStrip({ photos, tone = "light", accentColor }: LiveAlbu
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="lba-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}

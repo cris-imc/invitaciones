@@ -44,6 +44,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const bcwBodoni = Bodoni_Moda({
   subsets: ["latin"],
@@ -127,14 +129,15 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = false }: BlackAndWhiteTemplateProps) {
+  const tx = useTextos();
   const tipo = String(invitation.tipo ?? "OTRO");
   const isCasamiento = tipo === "CASAMIENTO";
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
   const nombreQuinceanera = String(invitation.nombreQuinceanera ?? "");
   const namesTitle = isCasamiento
-    ? (novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda"))
-    : (nombreQuinceanera || String(invitation.nombreEvento ?? "Mis quince"));
+    ? (novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda")))
+    : (nombreQuinceanera || String(invitation.nombreEvento ?? tx("invitacion.evento.misQuince")));
   const admitLabel = isCasamiento ? "ALL ACCESS" : "ALL ACCESS";
 
   // "Saludar por nombre del invitado/familia" (Administrar > Gestionar
@@ -146,8 +149,8 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
   const coverKickerText = isCasamiento
-    ? (showGuestNameInCover ? "ACCESO EXCLUSIVO A LA BODA" : "ACCESO EXCLUSIVO A LA BODA DE")
-    : (showGuestNameInCover ? "ACCESO EXCLUSIVO PARA" : "ACCESO EXCLUSIVO A LOS QUINCE DE");
+    ? (showGuestNameInCover ? tx("invitacion.sabor.accesoBoda").toUpperCase() : tx("invitacion.sabor.accesoBodaDe").toUpperCase())
+    : (showGuestNameInCover ? tx("invitacion.sabor.accesoPara").toUpperCase() : tx("invitacion.sabor.accesoQuinceDe").toUpperCase());
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : isCasamiento
@@ -176,7 +179,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Bloqueá el día. El resto lo contamos nosotros."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -186,7 +189,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -282,7 +285,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: BcwQuizQuestion[] = safeJson<BcwQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -443,7 +446,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#FFFFFF";
       }
       if (stubRef.current) {
@@ -737,7 +740,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
 
       <div ref={scrollerRef} data-scroller="1" className="bcw-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="bcw-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0A0A0A 55%, #080808 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bcw-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="bcw-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="bcw-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="bcw-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="bcw-date-month">{monthAbbr}</span>
@@ -758,7 +761,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
           />
 
           <div data-drift="-70" className="bcw-medallion bcw-medallion--corner">
-            <Medallion label="VIP" sub="ACCESO" arcId="bcwArc1" arcText={isCasamiento ? "NOS CASAMOS · EDICIÓN ÚNICA · " : "ALL ACCESS · MIS QUINCE · "} spin="normal" />
+            <Medallion label="VIP" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="bcwArc1" arcText={isCasamiento ? tx("invitacion.sabor.arcoNosCasamos").toUpperCase() : tx("invitacion.sabor.arcoAllAccessMisQuince").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -770,7 +773,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`bcw-hero-photo-section${!photoMobile ? " bcw-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " bcw-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="bcw-hero-photo-frame">
@@ -785,7 +788,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                 </div>
               )}
             </div>
-            <span data-xin="1" data-dist="-60" className="bcw-kicker bcw-hero-photo-kicker">02 — {isCasamiento ? "NUESTRA HISTORIA" : "MI HISTORIA"}</span>
+            <span data-xin="1" data-dist="-60" className="bcw-kicker bcw-hero-photo-kicker">02 — {isCasamiento ? tx("invitacion.sabor.nuestraHistoria").toUpperCase() : tx("invitacion.sabor.miHistoria").toUpperCase()}</span>
           </section>
         )}
 
@@ -794,18 +797,18 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
           <div className="bcw-scanline" />
           <span data-xin="1" data-dist="-60" className="bcw-kicker" style={{ position: "relative" }}>{knPre(2)} — EL PASE SE ACTIVA EN</span>
           <div className="bcw-cd-grid">
-            <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="bcw-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="bcw-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #080808 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="bcw-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #080808 100%)" }}>
           <div data-drift="-130" className="bcw-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="bcw-kicker" style={{ position: "relative" }}>{knPre(3)} — UN MENSAJE PARA VOS</span>
+          <span data-xin="1" data-dist="-60" className="bcw-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.frase.unMensajeParaVos").toUpperCase()}</span>
           <h2 ref={phraseRef} className="bcw-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -826,7 +829,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="bcw-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="bcw-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="bcw-pan-sticky">
             <div data-strip="1" className="bcw-strip">
               {ceremoniaHabilitada && (
@@ -842,35 +845,35 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                   <div className="bcw-facts">
                     {ceremoniaHora && (
                       <div className="bcw-facts-row bcw-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="bcw-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="bcw-seguir">SEGUÍ BAJANDO <span className="bcw-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="bcw-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="bcw-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="bcw-panel bcw-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="bcw-hair-bg" />
                 <div className="bcw-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="bcw-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="bcw-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="bcw-facts">
                   <div className="bcw-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="bcw-facts-row bcw-facts-row--last">
-                      <span>CÓDIGO</span><span className="bcw-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="bcw-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -884,7 +887,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                     ))}
                   </div>
                 )}
-                <div className="bcw-seguir">SEGUÍ BAJANDO <span className="bcw-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="bcw-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="bcw-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -895,11 +898,11 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                   </svg>
                   <div className="bcw-panel-block">
                     <span className="bcw-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="bcw-panel-title-sm">Cómo llegar</span>
+                    <span className="bcw-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="bcw-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bcw-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -908,9 +911,9 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
 
               <div data-tone="dark" className="bcw-panel bcw-panel--center" style={{ background: "#0A0A0A", color: "#F4F1EA" }}>
                 <div className="bcw-medallion bcw-medallion--lg">
-                  <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PASE Nº ${passNumber}`} arcId="bcwArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <Medallion label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()} arcId="bcwArc2" arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="bcw-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="bcw-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -929,7 +932,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
         <section data-tone="dark" data-screen-label="Check-in" className="bcw-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #0A0A0A 60%, #080808 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bcw-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bcw-h2">
-            Confirmá<br /><span className="bcw-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="bcw-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -963,20 +966,20 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
               />
             </div>
           ) : (
-            <p className="bcw-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="bcw-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bcw-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="bcw-pan">
           <div className="bcw-pan-sticky">
             <div data-strip="1" className="bcw-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="bcw-panel bcw-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="bcw-hair-bg" />
                   <div className="bcw-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="bcw-panel-title-md">Álbum <span className="bcw-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="bcw-panel-title-md">{tx("invitacion.album.titulo")} <span className="bcw-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="bcw-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -986,25 +989,25 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="bcw-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="bcw-photo-placeholder">Sin fotos todavía</span>
+                      <span className="bcw-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="bcw-seguir bcw-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="bcw-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="bcw-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="bcw-panel bcw-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="bcw-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="bcw-panel-title">Todo lo que<br /><span className="bcw-accent-serif">vamos a recordar</span></h2>
+                <span className="bcw-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="bcw-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="bcw-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="bcw-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#4A4A4A" />
@@ -1012,8 +1015,8 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                     <div className="bcw-live-placeholder">
                       <span className="bcw-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1025,9 +1028,9 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="bcw-section" style={{ background: "#0A0A0A" }}>
-            <span data-xin="1" data-dist="-60" className="bcw-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="bcw-h2">¿Qué tema<br /><span className="bcw-accent-italic">te hace bailar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="bcw-section" style={{ background: "#0A0A0A" }}>
+            <span data-xin="1" data-dist="-60" className="bcw-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="bcw-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaBailar"), "bcw-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bcw-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="bcw-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#FFFFFF" : "#B9B9BC" }} />
@@ -1037,24 +1040,24 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
               <GpSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bcw-section" style={{ background: "#0A0A0A" }}>
-            <span data-xin="1" data-dist="-60" className="bcw-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="bcw-section" style={{ background: "#0A0A0A" }}>
+            <span data-xin="1" data-dist="-60" className="bcw-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bcw-h2">
-              Si querés<br /><span className="bcw-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="bcw-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bcw-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1074,7 +1077,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1096,7 +1099,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bcw-section" style={{ background: "#0A0A0A" }}>
-            <span data-xin="1" data-dist="-60" className="bcw-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="bcw-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bcw-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1105,19 +1108,19 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="bcw-section bcw-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0A0A0A 55%, #080808 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bcw-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="bcw-section bcw-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0A0A0A 55%, #080808 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="bcw-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bcw-final-card">
             <div className="bcw-medallion bcw-medallion--final">
-              <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bcwArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <Medallion label="VIP" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="bcwArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="bcw-mini-label bcw-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="bcw-mini-label bcw-accent-serif-2">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="bcw-final-names">
               {isCasamiento
                 ? <>{novia}{novia && novio ? <span className="bcw-accent-italic"> &amp; </span> : ""}{novio}</>
@@ -1127,8 +1130,8 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
             <div className="bcw-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="bcw-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="bcw-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="bcw-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1140,7 +1143,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
       </div>
 
       <div ref={railRef} className="bcw-rail">
-        <span ref={railTopRef} className="bcw-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="bcw-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="bcw-rail-line">
           <span ref={railBarRef} className="bcw-rail-bar" />
         </div>
@@ -1163,7 +1166,7 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="bcw-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="bcw-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CoverHalf>
         </div>
         <div ref={bottomRef} className="bcw-cover-half bcw-cover-half--bottom">
@@ -1178,12 +1181,12 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="bcw-cover-cta bcw-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="bcw-cover-cta bcw-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="bcw-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="bcw-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1198,14 +1201,14 @@ export function BlackAndWhiteTemplate({ invitation, guest, isPersonalized = fals
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="bcw-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1272,6 +1275,7 @@ function Medallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1280,7 +1284,7 @@ function Medallion({
     <>
       <div className="bcw-medallion-ring" style={{ animation: spin === "none" ? "none" : `bcwRing ${ringDuration}s linear infinite` }} />
       <div className="bcw-medallion-core">
-        {title && <span className="bcw-medallion-sub">SECTOR</span>}
+        {title && <span className="bcw-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "bcw-medallion-label-sm" : "bcw-medallion-label"}>{title || label}</span>
         {sub && <span className="bcw-medallion-sub bcw-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1299,6 +1303,7 @@ function Medallion({
 }
 
 function GpCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1313,7 +1318,7 @@ function GpCopyField({ label, value }: { label: string; value: string }) {
         <span className="bcw-bank-row-value">{value}</span>
       </div>
       <button type="button" className="bcw-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1377,6 +1382,7 @@ function GpRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1408,8 +1414,7 @@ function GpRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1433,7 +1438,7 @@ function GpRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1442,7 +1447,7 @@ function GpRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1451,9 +1456,9 @@ function GpRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="bcw-rsvp-declined">
-        <p className="bcw-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="bcw-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="bcw-rsvp-btn bcw-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1466,13 +1471,13 @@ function GpRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí (ver img/confirmacion.jpg). */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="bcw-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="bcw-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1482,7 +1487,7 @@ function GpRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="bcw-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="bcw-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1492,7 +1497,7 @@ function GpRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="bcw-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="bcw-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1502,15 +1507,15 @@ function GpRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="bcw-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="bcw-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="bcw-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="bcw-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="bcw-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="bcw-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="bcw-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1520,7 +1525,7 @@ function GpRsvpCard({
           </div>
         ) : (
           <div className="bcw-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1535,7 +1540,7 @@ function GpRsvpCard({
             <div className="bcw-rsvp-payment-value">
               <span className="bcw-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="bcw-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="bcw-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="bcw-rsvp-payment-detail">
@@ -1549,7 +1554,7 @@ function GpRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1561,9 +1566,9 @@ function GpRsvpCard({
 
       <div ref={stubRef} className="bcw-stub">
         <div className="bcw-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="bcw-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="bcw-seal">
@@ -1578,10 +1583,10 @@ function GpRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="bcw-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="bcw-rsvp-btn bcw-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1604,6 +1609,7 @@ interface GpSongItem {
 // img/musica.JPG) -- misma API que <SongSuggestion> (/api/songs), pero sin
 // el look de tarjetas redondeadas del componente compartido.
 function GpSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<GpSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1627,7 +1633,7 @@ function GpSongSuggestion({ invitationId, guestToken, guestName }: { invitationI
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1640,14 +1646,14 @@ function GpSongSuggestion({ invitationId, guestToken, guestName }: { invitationI
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1657,9 +1663,9 @@ function GpSongSuggestion({ invitationId, guestToken, guestName }: { invitationI
     <div className="bcw-song">
       <form onSubmit={handleSubmit} className="bcw-song-row">
         <div className="bcw-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="bcw-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="bcw-song-input" />
           <span className="bcw-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="bcw-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="bcw-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="bcw-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1669,7 +1675,7 @@ function GpSongSuggestion({ invitationId, guestToken, guestName }: { invitationI
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="bcw-song-item">
               <span className="bcw-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="bcw-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="bcw-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1681,6 +1687,7 @@ function GpSongSuggestion({ invitationId, guestToken, guestName }: { invitationI
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function BcwQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: BcwQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1723,7 +1730,7 @@ function BcwQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1795,11 +1802,11 @@ function BcwQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="bcw-quiz-result">
           <p className="bcw-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="bcw-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1848,6 +1855,7 @@ function CoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="bcw-cover-inner">
       {photoMobile && (
@@ -1866,7 +1874,7 @@ function CoverHalf({
       <div className="bcw-cover-frame bcw-cover-frame--inner" />
       <div className="bcw-cover-content">
         <div className="bcw-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="bcw-accent-serif-2">{admitLabel}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="bcw-accent-serif-2">{admitLabel}</span>
         </div>
         <div className="bcw-cover-center">
           <span ref={kickerRef} className="bcw-cover-kicker">{kickerText}</span>
@@ -1883,7 +1891,7 @@ function CoverHalf({
           {children}
           <div className="bcw-barcode-wrap">
             <div className="bcw-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="bcw-mini-label bcw-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="bcw-mini-label bcw-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

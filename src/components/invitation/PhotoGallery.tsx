@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 interface PhotoGalleryProps {
   albumId?: string;
   photos: Array<{
@@ -14,6 +15,8 @@ interface PhotoGalleryProps {
 }
 
 export function PhotoGallery({ albumId, photos }: PhotoGalleryProps) {
+  const tx = useTextos();
+
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
   if (!photos || photos.length === 0) {
@@ -33,7 +36,7 @@ export function PhotoGallery({ albumId, photos }: PhotoGalleryProps) {
           >
             <img
               src={photo.url}
-              alt={photo.alt || `Foto ${index + 1}`}
+              alt={photo.alt || tx("invitacion.album.foto", { n: index + 1 })}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -61,7 +64,7 @@ export function PhotoGallery({ albumId, photos }: PhotoGalleryProps) {
             
             <motion.img
               src={photos[selectedPhoto].url}
-              alt={photos[selectedPhoto].alt || `Foto ${selectedPhoto + 1}`}
+              alt={photos[selectedPhoto].alt || tx("invitacion.album.foto", { n: selectedPhoto + 1 })}
               className="max-w-full max-h-full object-contain"
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}

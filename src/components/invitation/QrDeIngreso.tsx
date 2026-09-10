@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface Props {
   guest?: {
@@ -29,6 +30,7 @@ interface Props {
  * distinta, y un valor fijo dejaría QRs que apuntan al lugar equivocado.
  */
 export function QrDeIngreso({ guest }: Props) {
+  const tx = useTextos();
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -94,7 +96,7 @@ export function QrDeIngreso({ guest }: Props) {
         }}
       >
         {mesas.length > 0
-          ? "Mostralo al llegar y te indicamos tu mesa."
+          ? tx("invitacion.pase.mostraloAlLlegar")
           : "Mostralo al llegar para registrar tu ingreso."}
       </span>
     </section>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface TriviaQuestion {
     pregunta: string;
@@ -24,6 +25,7 @@ interface QuizTriviaProps {
 }
 
 export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, guestName, guestToken, className, cardClassName }: QuizTriviaProps) {
+  const tx = useTextos();
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [userAnswers, setUserAnswers] = useState<number[]>([]);
@@ -80,7 +82,7 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     invitationId,
-                    guestName: guestName || 'Invitado Anónimo',
+                    guestName: guestName || tx("invitacion.evento.invitadoAnonimo"),
                     guestToken: guestToken || null,
                     answers,
                     score,
@@ -250,7 +252,7 @@ export function QuizTrivia({ icono, titulo, subtitulo, preguntas, invitationId, 
                             )}
                             <div className="text-8xl">{emoji}</div>
                             <h3 className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
-                                ¡Quiz Completado!
+                                {tx("invitacion.quiz.quizCompletado")}
                             </h3>
                             <div className="space-y-2">
                                 <div className="text-6xl font-bold" style={{ color: 'var(--color-primary)' }}>

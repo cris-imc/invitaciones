@@ -50,6 +50,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const btsDisplay = Cormorant_Garamond({
   subsets: ["latin"],
@@ -133,6 +135,7 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = false }: BautismoTemplateMarfilProps) {
+  const tx = useTextos();
   // Festejado/a: el nombre va SOLO (ej. "Sofía"), nunca con un prefijo tipo
   // "Baby Shower de" pegado adelante -- ese prefijo ya lo dice el kicker de
   // arriba (coverKickerText), repetirlo en el nombre queda redundante/roto
@@ -147,7 +150,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
   // cambia a una invitación personalizada en vez de anunciar la llegada.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA INVITACIÓN ESPECIAL PARA" : "CON ALEGRÍA COMPARTIMOS EL BAUTISMO DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.portada.unaInvitacionEspecialPara").toUpperCase() : tx("invitacion.sabor.bautismoDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -172,7 +175,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. Los esperamos para celebrar juntos."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeCelebrarJuntos")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -267,7 +270,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: BtsQuizQuestion[] = safeJson<BtsQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -428,7 +431,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#FBF7EE";
       }
       if (stubRef.current) {
@@ -722,7 +725,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
 
       <div ref={scrollerRef} data-scroller="1" className="bts-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="bts-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #161712 55%, #11120E 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bts-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="bts-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="bts-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="bts-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="bts-date-month">{monthAbbr}</span>
@@ -743,7 +746,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
           />
 
           <div data-drift="-70" className="bts-medallion bts-medallion--corner">
-            <BtsMedallionCmp label="LL" sub="ACCESO" arcId="btsArc1" arcText="BAUTISMO · ACCESO · " spin="normal" />
+            <BtsMedallionCmp label="LL" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="btsArc1" arcText={tx("invitacion.sabor.arcoBautismo").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -758,7 +761,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`bts-hero-photo-section${!photoMobile ? " bts-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " bts-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="bts-hero-photo-frame">
@@ -782,18 +785,18 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
           <div className="bts-scanline" />
           <span data-xin="1" data-dist="-60" className="bts-kicker" style={{ position: "relative" }}>{knPre(2)} — LA CEREMONIA ES EN</span>
           <div className="bts-cd-grid">
-            <BtsCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <BtsCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <BtsCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <BtsCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <BtsCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <BtsCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <BtsCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <BtsCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="bts-perf-strip" />
         </section>
 
         {hasFrase && (
-          <section id="quote" data-tone="dark" data-screen-label="Frase" className="bts-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #11120E 100%)" }}>
+          <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="bts-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #11120E 100%)" }}>
             <div data-drift="-130" className="bts-glow-blob" />
-            <span data-xin="1" data-dist="-60" className="bts-kicker" style={{ position: "relative" }}>{knPre(3)} — UN MENSAJE PARA VOS</span>
+            <span data-xin="1" data-dist="-60" className="bts-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.frase.unMensajeParaVos").toUpperCase()}</span>
             <h2 ref={phraseRef} className="bts-phrase" style={{ fontSize: fraseFontSize }}>
               {fraseWords.map((w, i) => (
                 // El espacio va FUERA del span: el motor de reveal fuerza
@@ -814,25 +817,25 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
           </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="bts-pan">
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="bts-pan">
           <div className="bts-pan-sticky">
             <div data-strip="1" className="bts-strip">
               <div id="details" data-tone="light" className="bts-panel bts-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="bts-hair-bg" />
                 <div className="bts-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="bts-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="bts-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="bts-facts">
                   <div className="bts-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="bts-facts-row bts-facts-row--last">
-                      <span>CÓDIGO</span><span className="bts-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="bts-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -846,7 +849,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
                     ))}
                   </div>
                 )}
-                <div className="bts-seguir">SEGUÍ BAJANDO <span className="bts-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="bts-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="bts-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -857,11 +860,11 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
                   </svg>
                   <div className="bts-panel-block">
                     <span className="bts-mini-label">02 / {LUGAR_PANEL_COUNT}</span>
-                    <span className="bts-panel-title-sm">Cómo llegar</span>
+                    <span className="bts-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="bts-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bts-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -870,9 +873,9 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
 
               <div data-tone="dark" className="bts-panel bts-panel--center" style={{ background: "#161712", color: "#F4F1EA" }}>
                 <div className="bts-medallion bts-medallion--lg">
-                  <BtsMedallionCmp label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PASE Nº ${passNumber}`} arcId="btsArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <BtsMedallionCmp label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()} arcId="btsArc2" arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="bts-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="bts-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -891,7 +894,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
         <section data-tone="dark" data-screen-label="Check-in" className="bts-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #161712 60%, #11120E 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bts-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bts-h2">
-            Confirmá<br /><span className="bts-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="bts-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -925,20 +928,20 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
               />
             </div>
           ) : (
-            <p className="bts-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="bts-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bts-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="bts-pan">
           <div className="bts-pan-sticky">
             <div data-strip="1" className="bts-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="bts-panel bts-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="bts-hair-bg" />
                   <div className="bts-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="bts-panel-title-md">Álbum <span className="bts-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="bts-panel-title-md">{tx("invitacion.album.titulo")} <span className="bts-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="bts-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -948,25 +951,25 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="bts-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="bts-photo-placeholder">Sin fotos todavía</span>
+                      <span className="bts-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="bts-seguir bts-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="bts-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="bts-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="bts-panel bts-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="bts-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="bts-panel-title">Todo lo que<br /><span className="bts-accent-serif">vamos a recordar</span></h2>
+                <span className="bts-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="bts-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="bts-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="bts-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#8C7A54" />
@@ -974,8 +977,8 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
                     <div className="bts-live-placeholder">
                       <span className="bts-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -987,9 +990,9 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="bts-section" style={{ background: "#161712" }}>
-            <span data-xin="1" data-dist="-60" className="bts-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="bts-h2">¿Qué bendición<br /><span className="bts-accent-italic">le desean?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="bts-section" style={{ background: "#161712" }}>
+            <span data-xin="1" data-dist="-60" className="bts-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="bts-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaBendicionDesean"), "bts-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bts-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="bts-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#FBF7EE" : "#D9CBAE" }} />
@@ -999,24 +1002,24 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
               <BtsSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bts-section" style={{ background: "#161712" }}>
-            <span data-xin="1" data-dist="-60" className="bts-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="bts-section" style={{ background: "#161712" }}>
+            <span data-xin="1" data-dist="-60" className="bts-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bts-h2">
-              Si querés<br /><span className="bts-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="bts-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bts-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1036,7 +1039,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1058,7 +1061,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bts-section" style={{ background: "#161712" }}>
-            <span data-xin="1" data-dist="-60" className="bts-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="bts-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bts-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1067,26 +1070,26 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="bts-section bts-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #161712 55%, #11120E 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bts-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="bts-section bts-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #161712 55%, #11120E 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="bts-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bts-final-card">
             <div className="bts-medallion bts-medallion--final">
-              <BtsMedallionCmp label="LL" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="btsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <BtsMedallionCmp label="LL" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="btsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="bts-mini-label bts-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="bts-mini-label bts-accent-serif-2">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="bts-final-names">{namesTitle}</span>
             <span className="bts-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="bts-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="bts-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="bts-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="bts-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1098,7 +1101,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
       </div>
 
       <div ref={railRef} className="bts-rail">
-        <span ref={railTopRef} className="bts-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="bts-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="bts-rail-line">
           <span ref={railBarRef} className="bts-rail-bar" />
         </div>
@@ -1120,7 +1123,7 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="bts-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="bts-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </BtsCoverHalf>
         </div>
         <div ref={bottomRef} className="bts-cover-half bts-cover-half--bottom">
@@ -1134,12 +1137,12 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="bts-cover-cta bts-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="bts-cover-cta bts-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </BtsCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="bts-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="bts-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1154,14 +1157,14 @@ export function BautismoTemplateMarfil({ invitation, guest, isPersonalized = fal
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="bts-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1228,6 +1231,7 @@ function BtsMedallionCmp({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1236,7 +1240,7 @@ function BtsMedallionCmp({
     <>
       <div className="bts-medallion-ring" style={{ animation: spin === "none" ? "none" : `btsRing ${ringDuration}s linear infinite` }} />
       <div className="bts-medallion-core">
-        {title && <span className="bts-medallion-sub">SECTOR</span>}
+        {title && <span className="bts-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "bts-medallion-label-sm" : "bts-medallion-label"}>{title || label}</span>
         {sub && <span className="bts-medallion-sub bts-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1255,6 +1259,7 @@ function BtsMedallionCmp({
 }
 
 function BtsCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1269,7 +1274,7 @@ function BtsCopyField({ label, value }: { label: string; value: string }) {
         <span className="bts-bank-row-value">{value}</span>
       </div>
       <button type="button" className="bts-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1333,6 +1338,7 @@ function BtsRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1364,8 +1370,7 @@ function BtsRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1389,7 +1394,7 @@ function BtsRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1398,7 +1403,7 @@ function BtsRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1407,9 +1412,9 @@ function BtsRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="bts-rsvp-declined">
-        <p className="bts-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="bts-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="bts-rsvp-btn bts-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1422,13 +1427,13 @@ function BtsRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí (ver img/confirmacion.jpg). */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="bts-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="bts-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1438,7 +1443,7 @@ function BtsRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="bts-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="bts-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1448,7 +1453,7 @@ function BtsRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="bts-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="bts-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1458,15 +1463,15 @@ function BtsRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="bts-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="bts-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="bts-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="bts-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="bts-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="bts-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="bts-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1476,7 +1481,7 @@ function BtsRsvpCard({
           </div>
         ) : (
           <div className="bts-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1491,7 +1496,7 @@ function BtsRsvpCard({
             <div className="bts-rsvp-payment-value">
               <span className="bts-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="bts-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="bts-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="bts-rsvp-payment-detail">
@@ -1505,7 +1510,7 @@ function BtsRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1517,9 +1522,9 @@ function BtsRsvpCard({
 
       <div ref={stubRef} className="bts-stub">
         <div className="bts-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="bts-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="bts-seal">
@@ -1534,10 +1539,10 @@ function BtsRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="bts-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="bts-rsvp-btn bts-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1560,6 +1565,7 @@ interface GpSongItem {
 // img/musica.JPG) -- misma API que <SongSuggestion> (/api/songs), pero sin
 // el look de tarjetas redondeadas del componente compartido.
 function BtsSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<GpSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1583,7 +1589,7 @@ function BtsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1596,14 +1602,14 @@ function BtsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1613,9 +1619,9 @@ function BtsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="bts-song">
       <form onSubmit={handleSubmit} className="bts-song-row">
         <div className="bts-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="bts-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="bts-song-input" />
           <span className="bts-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="bts-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="bts-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="bts-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1625,7 +1631,7 @@ function BtsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="bts-song-item">
               <span className="bts-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="bts-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="bts-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1637,6 +1643,7 @@ function BtsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function BtsQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: BtsQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1679,7 +1686,7 @@ function BtsQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1751,11 +1758,11 @@ function BtsQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="bts-quiz-result">
           <p className="bts-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="bts-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1802,6 +1809,7 @@ function BtsCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="bts-cover-inner">
       {/* Cada recorte reemplaza el degradé de fondo SOLO en su propio
@@ -1839,7 +1847,7 @@ function BtsCoverHalf({
       <div className="bts-cover-texture" />
       <div className="bts-cover-content">
         <div className="bts-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="bts-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="bts-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="bts-cover-center">
           <span ref={kickerRef} className="bts-cover-kicker">{kickerText}</span>
@@ -1856,7 +1864,7 @@ function BtsCoverHalf({
           {children}
           <div className="bts-barcode-wrap">
             <div className="bts-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="bts-mini-label bts-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="bts-mini-label bts-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

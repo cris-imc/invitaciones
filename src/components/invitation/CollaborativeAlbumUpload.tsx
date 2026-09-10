@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Upload, Loader2, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 interface CollaborativeAlbumUploadProps {
     invitationSlug: string;
     guestName?: string; // Auto-detected from personalized link
@@ -18,6 +19,8 @@ export function CollaborativeAlbumUpload({
     guestName,
     onUploadSuccess,
 }: CollaborativeAlbumUploadProps) {
+  const tx = useTextos();
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [uploaderName, setUploaderName] = useState(guestName || "");
     const [preview, setPreview] = useState<string | null>(null);
@@ -146,7 +149,7 @@ export function CollaborativeAlbumUpload({
                         <Input
                             id="uploaderName"
                             type="text"
-                            placeholder="Ej: Juan Pérez"
+                            placeholder={tx("invitacion.album.ejemploNombre")}
                             value={uploaderName}
                             onChange={(e) => setUploaderName(e.target.value)}
                             className="mt-2"

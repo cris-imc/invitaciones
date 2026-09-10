@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface AlbumPolaroidCascadeProps {
   photos: string[];
@@ -26,6 +27,7 @@ const SHIFTS = [-14, 10, -8, 16, -10, 8, -16, 12, -6, 10];
 // (todo transform/opacity vía CSS) -- mismo motivo que AlbumMosaic para no
 // repetir el congelamiento del carrusel viejo (commit 82bcaff).
 export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHeader = false, maxPhotos = 4 }: AlbumPolaroidCascadeProps) {
+  const tx = useTextos();
   const photos = allPhotos.slice(0, maxPhotos);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -92,8 +94,8 @@ export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHead
           <div className="t-kicker flex justify-center mb-6">
             <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
           </div>
-          <p className="t-kicker">Álbum</p>
-          <h2>Un poco de nuestra historia</h2>
+          <p className="t-kicker">{tx("invitacion.album.titulo")}</p>
+          <h2>{tx("invitacion.frase.unPocoDeNuestraHistoria")}</h2>
         </>
       )}
       <div className="cascade-wrap w-full !max-w-[1000px] mx-auto">
@@ -118,7 +120,7 @@ export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHead
                   e.currentTarget.style.transform = `rotate(${rot}deg) translateX(${shift}px)`;
                 }}
                 role="img"
-                aria-label={`Foto ${i + 1}`}
+                aria-label={tx("invitacion.album.foto", { n: i + 1 })}
                 onClick={() => setOpenIndex(i)}
                 onContextMenu={(e) => e.preventDefault()}
               >
@@ -142,7 +144,7 @@ export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHead
               e.stopPropagation();
               setOpenIndex(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             <X className="w-8 h-8" />
           </button>
@@ -155,7 +157,7 @@ export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHead
                   e.stopPropagation();
                   setOpenIndex((i) => (i === null ? i : (i - 1 + photos.length) % photos.length));
                 }}
-                aria-label="Foto anterior"
+                aria-label={tx("invitacion.album.fotoAnterior")}
               >
                 <ChevronLeft className="w-7 h-7" />
               </button>
@@ -165,7 +167,7 @@ export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHead
                   e.stopPropagation();
                   setOpenIndex((i) => (i === null ? i : (i + 1) % photos.length));
                 }}
-                aria-label="Foto siguiente"
+                aria-label={tx("invitacion.album.fotoSiguiente")}
               >
                 <ChevronRight className="w-7 h-7" />
               </button>
@@ -174,7 +176,7 @@ export function AlbumPolaroidCascade({ photos: allPhotos, dark = false, hideHead
 
           <img
             src={photos[openIndex]}
-            alt={`Foto ampliada ${openIndex + 1} de ${photos.length}`}
+            alt={tx("invitacion.album.fotoAmpliadaDeTotal", { n: openIndex + 1, total: photos.length })}
             className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default select-none"
             draggable={false}
             style={{ WebkitTouchCallout: "none" }}

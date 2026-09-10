@@ -47,6 +47,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const adpSerif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -140,9 +142,10 @@ function coupleInitialsFrom(novia: string, novio: string): string {
 }
 
 export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersonalized = false }: AtelierDePapelTemplateProps) {
+  const tx = useTextos();
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda"));
   const initials = coupleInitialsFrom(novia, novio);
 
   // "Saludar por nombre del invitado/familia" (Administrar > Gestionar
@@ -153,7 +156,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
   // quien se casa).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA LÁMINA NUEVA PARA LA BODA" : "UNA LÁMINA NUEVA PARA LA BODA DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.laminaNuevaBoda").toUpperCase() : tx("invitacion.sabor.laminaNuevaBodaDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : <>{novia}<br /><span className="adp-accent-italic" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
@@ -180,7 +183,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. El resto se corta a mano."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeCortaAMano")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -190,7 +193,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -282,7 +285,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: AdpQuizQuestion[] = safeJson<AdpQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -443,7 +446,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#E8F4E1";
       }
       if (stubRef.current) {
@@ -737,7 +740,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
 
       <div ref={scrollerRef} data-scroller="1" className="adp-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="adp-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #151E23 0%, #11150F 55%, #11150F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="adp-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="adp-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="adp-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="adp-date-month">{monthAbbr}</span>
@@ -758,7 +761,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
           />
 
           <div data-drift="-70" className="adp-medallion adp-medallion--corner">
-            <Medallion label={initials} sub="ACCESO" arcId="adpArc1" arcText="ATELIER DE PAPEL · LÁMINA VII · " spin="normal" />
+            <Medallion label={initials} sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="adpArc1" arcText={tx("invitacion.sabor.arcoAtelier").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -767,7 +770,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`adp-hero-photo-section${!photoMobile ? " adp-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " adp-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="adp-hero-photo-frame">
@@ -791,18 +794,18 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
           <div className="adp-scanline" />
           <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>{knPre(2)} — LA PRÓXIMA LÁMINA LLEGA EN</span>
           <div className="adp-cd-grid">
-            <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="adp-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="adp-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #151E23 0%, #0C1012 52%, #11150F 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="adp-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #151E23 0%, #0C1012 52%, #11150F 100%)" }}>
           <div data-drift="-130" className="adp-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="adp-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -823,7 +826,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="adp-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="adp-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="adp-pan-sticky">
             <div data-strip="1" className="adp-strip">
               {ceremoniaHabilitada && (
@@ -839,35 +842,35 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
                   <div className="adp-facts">
                     {ceremoniaHora && (
                       <div className="adp-facts-row adp-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="adp-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="adp-seguir">SEGUÍ BAJANDO <span className="adp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="adp-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="adp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="adp-panel adp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="adp-hair-bg" />
                 <div className="adp-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="adp-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="adp-accent-serif-loc">{direccion}</span></>}
                 </h2>
                 <div className="adp-facts">
                   <div className="adp-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="adp-facts-row adp-facts-row--last">
-                      <span>CÓDIGO</span><span className="adp-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="adp-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -881,7 +884,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
                     ))}
                   </div>
                 )}
-                <div className="adp-seguir">SEGUÍ BAJANDO <span className="adp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="adp-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="adp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -892,11 +895,11 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
                   </svg>
                   <div className="adp-panel-block">
                     <span className="adp-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="adp-panel-title-sm">Cómo llegar</span>
+                    <span className="adp-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="adp-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="adp-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -905,9 +908,9 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
 
               <div data-tone="dark" className="adp-panel adp-panel--center" style={{ background: "#11150F", color: "#F4F1EA" }}>
                 <div className="adp-medallion adp-medallion--lg">
-                  <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`LÁMINA Nº ${laminaNumber}`} arcId="adpArc2" arcText={`ACCESO · LÁMINA Nº ${laminaNumber} · `} spin="reverse" title="Reservado" />
+                  <Medallion label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroLamina", { n: laminaNumber }).toUpperCase()} arcId="adpArc2" arcText={tx("invitacion.pase.arcoAccesoLamina", { n: laminaNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="adp-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="adp-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -926,7 +929,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
         <section data-tone="dark" data-screen-label="Check-in" className="adp-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #151E23 0%, #11150F 60%, #11150F 100%)" }}>
           <span data-xin="1" data-dist="-60" className="adp-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="adp-h2">
-            Confirmá<br /><span className="adp-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="adp-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -961,20 +964,20 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
               />
             </div>
           ) : (
-            <p className="adp-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="adp-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="adp-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="adp-pan">
           <div className="adp-pan-sticky">
             <div data-strip="1" className="adp-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="adp-panel adp-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="adp-hair-bg" />
                   <div className="adp-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="adp-panel-title-md">Álbum <span className="adp-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="adp-panel-title-md">{tx("invitacion.album.titulo")} <span className="adp-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="adp-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -984,25 +987,25 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="adp-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="adp-photo-placeholder">Sin fotos todavía</span>
+                      <span className="adp-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="adp-seguir adp-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="adp-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="adp-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="adp-panel adp-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="adp-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="adp-panel-title">Todo lo que<br /><span className="adp-accent-serif">vamos a recordar</span></h2>
+                <span className="adp-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="adp-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="adp-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="adp-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#2B2620" />
@@ -1010,8 +1013,8 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
                     <div className="adp-live-placeholder">
                       <span className="adp-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1023,9 +1026,9 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="adp-section" style={{ background: "#11150F" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2">¿Qué tema<br /><span className="adp-accent-italic">te hace bailar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="adp-section" style={{ background: "#11150F" }}>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaBailar"), "adp-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="adp-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="adp-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#E8F4E1" : "#5F7A52" }} />
@@ -1035,24 +1038,24 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
               <AdpSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="adp-section" style={{ background: "#11150F" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="adp-section" style={{ background: "#11150F" }}>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2">
-              Si querés<br /><span className="adp-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="adp-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="adp-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1072,7 +1075,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1094,7 +1097,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="adp-section" style={{ background: "#11150F" }}>
-            <span data-xin="1" data-dist="-60" className="adp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="adp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="adp-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1103,19 +1106,19 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu lámina" className="adp-section adp-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #151E23 0%, #11150F 55%, #11150F 100%)" }}>
+        <section data-tone="dark" data-screen-label={tx("invitacion.sabor.tuLamina")} className="adp-section adp-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #151E23 0%, #11150F 55%, #11150F 100%)" }}>
           <span data-xin="1" data-dist="-60" className="adp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="adp-final-card">
             <div className="adp-medallion adp-medallion--final">
-              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="adpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="adpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="adp-mini-label adp-accent-serif-2">LÁMINA Nº {laminaNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="adp-mini-label adp-accent-serif-2">{tx("invitacion.pase.numeroLaminaAdmite", { n: laminaNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="adp-final-names">
               {novia}{novia && novio ? <span className="adp-accent-italic"> &amp; </span> : ""}{novio}
             </span>
@@ -1123,8 +1126,8 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
             <div className="adp-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="adp-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="adp-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="adp-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1136,7 +1139,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
       </div>
 
       <div ref={railRef} className="adp-rail">
-        <span ref={railTopRef} className="adp-rail-top">LÁMINA Nº {laminaNumber}</span>
+        <span ref={railTopRef} className="adp-rail-top">{tx("invitacion.pase.numeroLamina", { n: laminaNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="adp-rail-line">
           <span ref={railBarRef} className="adp-rail-bar" />
         </div>
@@ -1158,7 +1161,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="adp-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="adp-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CoverHalf>
         </div>
         <div ref={bottomRef} className="adp-cover-half adp-cover-half--bottom">
@@ -1172,12 +1175,12 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="adp-cover-cta adp-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="adp-cover-cta adp-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="adp-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="adp-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1192,14 +1195,14 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="adp-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1266,6 +1269,7 @@ function Medallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1274,7 +1278,7 @@ function Medallion({
     <>
       <div className="adp-medallion-ring" style={{ animation: spin === "none" ? "none" : `adpRing ${ringDuration}s linear infinite` }} />
       <div className="adp-medallion-core">
-        {title && <span className="adp-medallion-sub">SECTOR</span>}
+        {title && <span className="adp-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "adp-medallion-label-sm" : "adp-medallion-label"}>{title || label}</span>
         {/* El segundo renglón solo se destaca con el acento bronce cuando hay
             un `title` (caso "Reservado" en Cuándo y dónde, ver mockup "MESA
@@ -1297,6 +1301,7 @@ function Medallion({
 }
 
 function AdpCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1311,7 +1316,7 @@ function AdpCopyField({ label, value }: { label: string; value: string }) {
         <span className="adp-bank-row-value">{value}</span>
       </div>
       <button type="button" className="adp-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1377,6 +1382,7 @@ function AdpRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1408,8 +1414,7 @@ function AdpRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1433,7 +1438,7 @@ function AdpRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1442,7 +1447,7 @@ function AdpRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1451,9 +1456,9 @@ function AdpRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="adp-rsvp-declined">
-        <p className="adp-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="adp-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="adp-rsvp-btn adp-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1466,13 +1471,13 @@ function AdpRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí. */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="adp-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="adp-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1482,7 +1487,7 @@ function AdpRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="adp-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="adp-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1492,7 +1497,7 @@ function AdpRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="adp-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="adp-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1502,15 +1507,15 @@ function AdpRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="adp-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="adp-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="adp-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="adp-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="adp-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="adp-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="adp-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1520,7 +1525,7 @@ function AdpRsvpCard({
           </div>
         ) : (
           <div className="adp-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1535,7 +1540,7 @@ function AdpRsvpCard({
             <div className="adp-rsvp-payment-value">
               <span className="adp-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="adp-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="adp-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="adp-rsvp-payment-detail">
@@ -1549,7 +1554,7 @@ function AdpRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1561,9 +1566,9 @@ function AdpRsvpCard({
 
       <div ref={stubRef} className="adp-stub">
         <div className="adp-stub-top">
-          <span>LÁMINA Nº {laminaNumber}</span>
+          <span>{tx("invitacion.pase.numeroLamina", { n: laminaNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="adp-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="adp-seal">
@@ -1578,10 +1583,10 @@ function AdpRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="adp-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="adp-rsvp-btn adp-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1604,6 +1609,7 @@ interface AdpSongItem {
 // que <SongSuggestion> (/api/songs), pero sin el look de tarjetas
 // redondeadas del componente compartido.
 function AdpSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<AdpSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1627,7 +1633,7 @@ function AdpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1640,14 +1646,14 @@ function AdpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1657,9 +1663,9 @@ function AdpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="adp-song">
       <form onSubmit={handleSubmit} className="adp-song-row">
         <div className="adp-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="adp-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="adp-song-input" />
           <span className="adp-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="adp-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="adp-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="adp-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1669,7 +1675,7 @@ function AdpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="adp-song-item">
               <span className="adp-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="adp-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="adp-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1681,6 +1687,7 @@ function AdpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function AdpQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: AdpQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1723,7 +1730,7 @@ function AdpQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1795,11 +1802,11 @@ function AdpQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="adp-quiz-result">
           <p className="adp-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="adp-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1846,6 +1853,7 @@ function CoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="adp-cover-inner">
       {photoMobile && (
@@ -1868,7 +1876,7 @@ function CoverHalf({
       <div className="adp-cover-paper adp-cover-paper--2" />
       <div className="adp-cover-content">
         <div className="adp-cover-top-row">
-          <span>LÁMINA Nº {laminaNumber}</span><span className="adp-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroLamina", { n: laminaNumber }).toUpperCase()}</span><span className="adp-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="adp-cover-center">
           <span ref={kickerRef} className="adp-cover-kicker">{kickerText}</span>
@@ -1885,7 +1893,7 @@ function CoverHalf({
           {children}
           <div className="adp-barcode-wrap">
             <div className="adp-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="adp-mini-label adp-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="adp-mini-label adp-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

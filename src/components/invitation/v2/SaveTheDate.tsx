@@ -5,6 +5,7 @@ import { CalendarPlus } from "lucide-react";
 import { LordIcon } from "@/components/ui/LordIcon";
 import { RingsIcon } from "@/components/ui/icons/RingsIcon";
 import { CrownIcon } from "@/components/ui/icons/CrownIcon";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface SaveTheDateProps {
   eventName: string;
@@ -132,6 +133,7 @@ function ensureContrast(fgHex: string, bgHex: string, minRatio: number, maxMix =
 }
 
 export function SaveTheDate({ eventName, targetDate, location = "", description = "", dark = false, headerIcon }: SaveTheDateProps) {
+  const tx = useTextos();
   const rootRef = useRef<HTMLElement>(null);
   const [safeAcc, setSafeAcc] = useState<string | undefined>(undefined);
   const [safeMuted, setSafeMuted] = useState<string | undefined>(undefined);
@@ -267,7 +269,7 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
           }}
         >
           <CalendarPlus className="w-3.5 h-3.5" strokeWidth={1.75} />
-          Agregar al calendario
+          {tx("invitacion.saveTheDate.agregarAlCalendario")}
         </a>
       ) : (
         <button
@@ -289,7 +291,7 @@ export function SaveTheDate({ eventName, targetDate, location = "", description 
           }}
         >
           <CalendarPlus className="w-3.5 h-3.5" strokeWidth={1.75} />
-          Agregar al calendario
+          {tx("invitacion.saveTheDate.agregarAlCalendario")}
         </button>
       )}
     </section>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface PaymentBadgeProps {
   paymentStatus: "PENDING" | "EXEMPT" | "PAID";
@@ -31,18 +32,19 @@ export function PaymentBadge({
   banco,
   titular,
 }: PaymentBadgeProps) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
 
   if (paymentStatus === "PAID") {
     return (
-      <div className="inv-pay paid" role="status" aria-label="Estado de pago: pagado">
+      <div className="inv-pay paid" role="status" aria-label={tx("invitacion.pago.estadoPagado")}>
         <div className="inv-pay-dot" aria-hidden="true" />
         <div>
           <strong style={{ display: "block", fontSize: "13.5px", marginBottom: 2 }}>
             ✓ Tarjeta confirmada
           </strong>
           <p style={{ margin: 0, fontSize: "13px", lineHeight: 1.5 }}>
-            ¡Tu pago fue registrado! Gracias, nos vemos el gran día 💛
+            {tx("invitacion.pago.pagoRegistrado")}
           </p>
         </div>
       </div>
@@ -51,14 +53,14 @@ export function PaymentBadge({
 
   if (paymentStatus === "EXEMPT") {
     return (
-      <div className="inv-pay exempt" role="status" aria-label="Estado de pago: sin cargo">
+      <div className="inv-pay exempt" role="status" aria-label={tx("invitacion.pago.estadoSinCargo")}>
         <div className="inv-pay-dot" aria-hidden="true" />
         <div>
           <strong style={{ display: "block", fontSize: "13.5px", marginBottom: 2 }}>
-            ✓ Sin cargo
+            {"✓ " + tx("invitacion.pago.sinCargo")}
           </strong>
           <p style={{ margin: 0, fontSize: "13px", lineHeight: 1.5 }}>
-            Tu lugar está cubierto. ¡Te esperamos!
+            {tx("invitacion.pago.lugarCubierto")}
           </p>
         </div>
       </div>
@@ -91,16 +93,16 @@ export function PaymentBadge({
   };
 
   return (
-    <div className="inv-pay pending" role="region" aria-label="Información de pago de tarjeta">
+    <div className="inv-pay pending" role="region" aria-label={tx("invitacion.pago.infoTarjeta")}>
       <div className="inv-pay-dot" aria-hidden="true" />
       <div style={{ flex: 1 }}>
         <strong style={{ display: "block", fontSize: "13.5px", marginBottom: 4 }}>
-          Monto a pagar: {formattedTotal}
+          {tx("invitacion.pago.montoAPagar")} {formattedTotal}
         </strong>
 
         {alias && (
           <p style={{ margin: "0 0 8px", fontSize: "13px", lineHeight: 1.5 }}>
-            Transferencia:&nbsp;
+            {tx("invitacion.pago.transferencia")}&nbsp;
             <button
               onClick={handleCopyAlias}
               style={{
@@ -113,13 +115,13 @@ export function PaymentBadge({
                 padding: 0,
                 textDecoration: "underline dotted",
               }}
-              aria-label={`Copiar alias ${alias}`}
+              aria-label={tx("invitacion.regalos.copiarAlias", { alias: alias })}
             >
               {alias}
             </button>
             {copied && (
               <span style={{ marginLeft: 6, fontSize: 11, color: "var(--c-muted)" }}>
-                ✓ Copiado
+                {"✓ " + tx("invitacion.regalos.copiado")}
               </span>
             )}
           </p>
@@ -127,7 +129,7 @@ export function PaymentBadge({
 
         {banco && (
           <p style={{ margin: "0 0 2px", fontSize: "12px", opacity: 0.7 }}>
-            Banco: {banco}{titular ? ` · ${titular}` : ""}
+            {tx("invitacion.regalos.banco")}: {banco}{titular ? ` · ${titular}` : ""}
           </p>
         )}
         {cbu && (
@@ -137,7 +139,7 @@ export function PaymentBadge({
         )}
 
         <p style={{ margin: "8px 0 0", fontSize: "12px", opacity: 0.7 }}>
-          Una vez que lo recibamos, vas a ver acá la confirmación 💛
+          {tx("invitacion.pago.veremosConfirmacion")}
         </p>
       </div>
     </div>

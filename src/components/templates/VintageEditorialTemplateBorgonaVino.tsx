@@ -42,6 +42,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const vtePlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -125,9 +127,10 @@ function edicionNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPersonalized = false }: VintageEditorialTemplateProps) {
+  const tx = useTextos();
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda"));
 
   // Iniciales de la pareja para el medallón tipo sello ("LM" en el mockup de
   // Lucía & Mateo) -- se derivan de los nombres reales, nunca hardcodeadas.
@@ -141,7 +144,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
   // un dato propio (no como si Familia Juarez fuera quien se casa).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA EDICIÓN VINTAGE PARA LA BODA" : "UNA EDICIÓN VINTAGE PARA LA BODA DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.edicionVintageBoda").toUpperCase() : tx("invitacion.sabor.edicionVintageBodaDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : <>{novia}<br /><span className="vte-accent-italic" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
@@ -168,7 +171,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
   const scrollVertical = Boolean(invitation.storytellingScrollVertical);
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. El resto queda en el álbum."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeQuedaEnElAlbum")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -178,7 +181,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -272,7 +275,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: VteQuizQuestion[] = safeJson<VteQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -432,7 +435,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "EDICIÓN CONFIRMADA";
+        statusRef.current.textContent = tx("invitacion.sabor.edicionConfirmada").toUpperCase();
         statusRef.current.style.color = "#F1DBE0";
       }
       if (stubRef.current) {
@@ -726,7 +729,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
 
       <div ref={scrollerRef} data-scroller="1" className="vte-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="vte-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #1B1015 0%, #1F1014 55%, #130A0C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="vte-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="vte-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="vte-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="vte-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="vte-date-month">{monthAbbr}</span>
@@ -747,7 +750,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
           />
 
           <div data-drift="-70" className="vte-medallion vte-medallion--corner">
-            <Medallion label={coupleInitials} sub="ACCESO" arcId="vteArc1" arcText={`EDICIÓN DE BODAS · Nº ${edicionNumero} · `} spin="normal" />
+            <Medallion label={coupleInitials} sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="vteArc1" arcText={tx("invitacion.pase.arcoEdicionDeBodas", { n: edicionNumero }).toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -758,7 +761,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`vte-hero-photo-section${!photoMobile ? " vte-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " vte-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="vte-hero-photo-frame">
@@ -782,18 +785,18 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
           <div className="vte-scanline" />
           <span data-xin="1" data-dist="-60" className="vte-kicker" style={{ position: "relative" }}>{knPre(2)} — LA EDICIÓN SALE EN</span>
           <div className="vte-cd-grid">
-            <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="vte-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="vte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1F1017 0%, #0F0A0C 52%, #130A0C 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="vte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1F1017 0%, #0F0A0C 52%, #130A0C 100%)" }}>
           <div data-drift="-130" className="vte-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="vte-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="vte-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="vte-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -814,7 +817,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="vte-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")} className="vte-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="vte-pan-sticky">
             <div data-strip="1" className="vte-strip">
               {ceremoniaHabilitada && (
@@ -830,35 +833,35 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
                   <div className="vte-facts">
                     {ceremoniaHora && (
                       <div className="vte-facts-row vte-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="vte-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="vte-seguir">SEGUÍ BAJANDO <span className="vte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="vte-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="vte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="vte-panel vte-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="vte-hair-bg" />
                 <div className="vte-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="vte-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="vte-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="vte-facts">
                   <div className="vte-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="vte-facts-row vte-facts-row--last">
-                      <span>CÓDIGO</span><span className="vte-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="vte-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -872,7 +875,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
                     ))}
                   </div>
                 )}
-                <div className="vte-seguir">SEGUÍ BAJANDO <span className="vte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="vte-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="vte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -883,11 +886,11 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
                   </svg>
                   <div className="vte-panel-block">
                     <span className="vte-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="vte-panel-title-sm">Cómo llegar</span>
+                    <span className="vte-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="vte-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="vte-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -896,9 +899,9 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
 
               <div data-tone="dark" className="vte-panel vte-panel--center" style={{ background: "#1F1014", color: "#F4F1EA" }}>
                 <div className="vte-medallion vte-medallion--lg">
-                  <Medallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`EDICIÓN Nº ${edicionNumero}`} arcId="vteArc2" arcText={`ACCESO VIP · EDICIÓN Nº ${edicionNumero} · `} spin="reverse" title="Reservado" />
+                  <Medallion label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroEdicion", { n: edicionNumero }).toUpperCase()} arcId="vteArc2" arcText={tx("invitacion.pase.arcoAccesoVipEdicion", { n: edicionNumero }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="vte-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="vte-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -917,7 +920,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
         <section data-tone="dark" data-screen-label="Check-in" className="vte-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #1B1015 0%, #1F1014 60%, #130A0C 100%)" }}>
           <span data-xin="1" data-dist="-60" className="vte-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="vte-h2">
-            Confirmá<br /><span className="vte-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="vte-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -951,20 +954,20 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
               />
             </div>
           ) : (
-            <p className="vte-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="vte-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="vte-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="vte-pan">
           <div className="vte-pan-sticky">
             <div data-strip="1" className="vte-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="vte-panel vte-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="vte-hair-bg" />
                   <div className="vte-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="vte-panel-title-md">Álbum <span className="vte-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="vte-panel-title-md">{tx("invitacion.album.titulo")} <span className="vte-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="vte-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -974,25 +977,25 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="vte-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="vte-photo-placeholder">Sin fotos todavía</span>
+                      <span className="vte-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="vte-seguir vte-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="vte-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="vte-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="vte-panel vte-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="vte-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="vte-panel-title">Todo lo que<br /><span className="vte-accent-serif">vamos a recordar</span></h2>
+                <span className="vte-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="vte-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="vte-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="vte-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#7D3A48" />
@@ -1000,8 +1003,8 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
                     <div className="vte-live-placeholder">
                       <span className="vte-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1013,9 +1016,9 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="vte-section" style={{ background: "#1F1014" }}>
-            <span data-xin="1" data-dist="-60" className="vte-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="vte-h2">¿Qué tema<br /><span className="vte-accent-italic">te hace bailar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="vte-section" style={{ background: "#1F1014" }}>
+            <span data-xin="1" data-dist="-60" className="vte-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="vte-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaBailar"), "vte-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="vte-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="vte-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F1DBE0" : "#B66A7E" }} />
@@ -1025,24 +1028,24 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
               <VteSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="vte-section" style={{ background: "#1F1014" }}>
-            <span data-xin="1" data-dist="-60" className="vte-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="vte-section" style={{ background: "#1F1014" }}>
+            <span data-xin="1" data-dist="-60" className="vte-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="vte-h2">
-              Si querés<br /><span className="vte-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="vte-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="vte-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1062,7 +1065,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1084,7 +1087,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="vte-section" style={{ background: "#1F1014" }}>
-            <span data-xin="1" data-dist="-60" className="vte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="vte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="vte-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1093,19 +1096,19 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu edición" className="vte-section vte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1B1015 0%, #1F1014 55%, #130A0C 100%)" }}>
+        <section data-tone="dark" data-screen-label={tx("invitacion.sabor.tuEdicion")} className="vte-section vte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1B1015 0%, #1F1014 55%, #130A0C 100%)" }}>
           <span data-xin="1" data-dist="-60" className="vte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU EDICIÓN</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="vte-final-card">
             <div className="vte-medallion vte-medallion--final">
-              <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="vteArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="vteArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="vte-mini-label vte-accent-serif-2">EDICIÓN Nº {edicionNumero} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="vte-mini-label vte-accent-serif-2">{tx("invitacion.pase.numeroEdicionAdmite", { n: edicionNumero, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="vte-final-names">
               {novia}{novia && novio ? <span className="vte-accent-italic"> &amp; </span> : ""}{novio}
             </span>
@@ -1113,8 +1116,8 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
             <div className="vte-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="vte-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="vte-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="vte-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1126,7 +1129,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
       </div>
 
       <div ref={railRef} className="vte-rail">
-        <span ref={railTopRef} className="vte-rail-top">EDICIÓN Nº {edicionNumero}</span>
+        <span ref={railTopRef} className="vte-rail-top">{tx("invitacion.pase.numeroEdicion", { n: edicionNumero }).toUpperCase()}</span>
         <div ref={railLineRef} className="vte-rail-line">
           <span ref={railBarRef} className="vte-rail-bar" />
         </div>
@@ -1149,7 +1152,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="vte-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="vte-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CoverHalf>
         </div>
         <div ref={bottomRef} className="vte-cover-half vte-cover-half--bottom">
@@ -1164,12 +1167,12 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="vte-cover-cta vte-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="vte-cover-cta vte-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="vte-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="vte-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1184,14 +1187,14 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="vte-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1258,6 +1261,7 @@ function Medallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1266,7 +1270,7 @@ function Medallion({
     <>
       <div className="vte-medallion-ring" style={{ animation: spin === "none" ? "none" : `vteRing ${ringDuration}s linear infinite` }} />
       <div className="vte-medallion-core">
-        {title && <span className="vte-medallion-sub">SECTOR</span>}
+        {title && <span className="vte-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "vte-medallion-label-sm" : "vte-medallion-label"}>{title || label}</span>
         {sub && <span className="vte-medallion-sub vte-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1285,6 +1289,7 @@ function Medallion({
 }
 
 function VteCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1299,7 +1304,7 @@ function VteCopyField({ label, value }: { label: string; value: string }) {
         <span className="vte-bank-row-value">{value}</span>
       </div>
       <button type="button" className="vte-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1363,6 +1368,7 @@ function VteRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1394,8 +1400,7 @@ function VteRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1419,7 +1424,7 @@ function VteRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1428,7 +1433,7 @@ function VteRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1437,9 +1442,9 @@ function VteRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="vte-rsvp-declined">
-        <p className="vte-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, esta invitación sigue activa.</p>
+        <p className="vte-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarInvitacion")}</p>
         <button type="button" className="vte-rsvp-btn vte-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1452,13 +1457,13 @@ function VteRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí. */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="vte-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="vte-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1468,7 +1473,7 @@ function VteRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="vte-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="vte-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1478,7 +1483,7 @@ function VteRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="vte-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="vte-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1488,15 +1493,15 @@ function VteRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="vte-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="vte-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="vte-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="vte-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="vte-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="vte-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="vte-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1506,7 +1511,7 @@ function VteRsvpCard({
           </div>
         ) : (
           <div className="vte-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1521,7 +1526,7 @@ function VteRsvpCard({
             <div className="vte-rsvp-payment-value">
               <span className="vte-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="vte-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="vte-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="vte-rsvp-payment-detail">
@@ -1535,7 +1540,7 @@ function VteRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1547,9 +1552,9 @@ function VteRsvpCard({
 
       <div ref={stubRef} className="vte-stub">
         <div className="vte-stub-top">
-          <span>EDICIÓN Nº {edicionNumero}</span>
+          <span>{tx("invitacion.pase.numeroEdicion", { n: edicionNumero }).toUpperCase()}</span>
           <span ref={statusRef} className="vte-stub-status">
-            {confirmed ? "EDICIÓN CONFIRMADA" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.sabor.edicionConfirmada").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="vte-seal">
@@ -1564,10 +1569,10 @@ function VteRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="vte-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="vte-rsvp-btn vte-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1590,6 +1595,7 @@ interface VteSongItem {
 // <SongSuggestion> (/api/songs), pero sin el look de tarjetas redondeadas
 // del componente compartido.
 function VteSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<VteSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1613,7 +1619,7 @@ function VteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1626,14 +1632,14 @@ function VteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1643,9 +1649,9 @@ function VteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="vte-song">
       <form onSubmit={handleSubmit} className="vte-song-row">
         <div className="vte-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="vte-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="vte-song-input" />
           <span className="vte-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="vte-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="vte-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="vte-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1655,7 +1661,7 @@ function VteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="vte-song-item">
               <span className="vte-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="vte-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="vte-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1667,6 +1673,7 @@ function VteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function VteQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: VteQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1709,7 +1716,7 @@ function VteQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1781,11 +1788,11 @@ function VteQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="vte-quiz-result">
           <p className="vte-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="vte-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1834,6 +1841,7 @@ function CoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="vte-cover-inner">
       {photoMobile && (
@@ -1864,7 +1872,7 @@ function CoverHalf({
       <div className="vte-cover-sunburst" />
       <div className="vte-cover-content">
         <div className="vte-cover-top-row">
-          <span>EDICIÓN Nº {edicionNumero}</span><span className="vte-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroEdicion", { n: edicionNumero }).toUpperCase()}</span><span className="vte-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="vte-cover-center">
           <span ref={kickerRef} className="vte-cover-kicker">{kickerText}</span>
@@ -1877,12 +1885,12 @@ function CoverHalf({
           <div className="vte-cover-facts">
             {dressCode && <span>{dressCode.toUpperCase()}</span>}
             <span>{hora} H</span>
-            <span>CÓD. {codigo}</span>
+            <span>{tx("invitacion.pase.codigoAbrev", { codigo: codigo }).toUpperCase()}</span>
           </div>
           {children}
           <div className="vte-barcode-wrap">
             <div className="vte-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="vte-mini-label vte-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="vte-mini-label vte-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

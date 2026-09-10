@@ -35,6 +35,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const bteSerif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -118,9 +120,10 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonalized = false }: BotanicaEditorialTemplateBorgonaProps) {
+  const tx = useTextos();
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda"));
 
   // Monograma del medallón: iniciales reales de la pareja (reemplaza el "LM"
   // fijo del mockup demo) -- si falta algún nombre, cae a una inicial neutra.
@@ -135,7 +138,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
   // casa).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UN HERBARIO PARA LA BODA" : "UN HERBARIO PARA LA BODA DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.herbarioBoda").toUpperCase() : tx("invitacion.sabor.herbarioBodaDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : <>{novia}<br /><span className="bte-accent-phrase" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
@@ -162,7 +165,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. El jardín hace el resto."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeJardinHaceElResto")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -172,7 +175,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -264,7 +267,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: BteQuizQuestion[] = safeJson<BteQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -424,7 +427,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#C49AA0";
       }
       if (stubRef.current) {
@@ -725,7 +728,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
 
       <div ref={scrollerRef} data-scroller="1" className="bte-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="bte-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #261018 0%, #180C10 55%, #120A0C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bte-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="bte-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="bte-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="bte-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="bte-date-month">{monthAbbr}</span>
@@ -761,7 +764,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
           </svg>
 
           <div data-drift="-70" className="bte-medallion bte-medallion--corner">
-            <BteMedallion label={coupleInitials} sub="ACCESO" arcId="bteArc1" arcText={`HERBARIO · LÁMINA Nº ${passNumber} · `} spin="normal" />
+            <BteMedallion label={coupleInitials} sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="bteArc1" arcText={tx("invitacion.pase.arcoHerbarioLamina", { n: passNumber }).toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -770,7 +773,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`bte-hero-photo-section${!photoMobile ? " bte-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " bte-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="bte-hero-photo-frame">
@@ -794,18 +797,18 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
           <div className="bte-scanline" />
           <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>{knPre(2)} — FLORECE EN</span>
           <div className="bte-cd-grid">
-            <BteCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <BteCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <BteCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <BteCdBox refEl={sRef} delay={280} dist={170} label="SEG" accent />
+            <BteCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <BteCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <BteCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <BteCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} accent />
           </div>
           <div className="bte-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="bte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #2E1220 0%, #170A10 52%, #120A0C 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="bte-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #2E1220 0%, #170A10 52%, #120A0C 100%)" }}>
           <div data-drift="-130" className="bte-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="bte-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="bte-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -826,7 +829,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="bte-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="bte-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="bte-pan-sticky">
             <div data-strip="1" className="bte-strip">
               {ceremoniaHabilitada && (
@@ -842,35 +845,35 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
                   <div className="bte-facts">
                     {ceremoniaHora && (
                       <div className="bte-facts-row bte-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="bte-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="bte-seguir">SEGUÍ BAJANDO <span className="bte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="bte-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="bte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="bte-panel bte-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="bte-hair-bg" />
                 <div className="bte-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="bte-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="bte-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="bte-facts">
                   <div className="bte-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="bte-facts-row bte-facts-row--last">
-                      <span>CÓDIGO</span><span className="bte-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="bte-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -884,7 +887,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
                     ))}
                   </div>
                 )}
-                <div className="bte-seguir">SEGUÍ BAJANDO <span className="bte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="bte-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="bte-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -895,11 +898,11 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
                   </svg>
                   <div className="bte-panel-block">
                     <span className="bte-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="bte-panel-title-sm">Cómo llegar</span>
+                    <span className="bte-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="bte-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bte-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -908,9 +911,9 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
 
               <div data-tone="dark" className="bte-panel bte-panel--center" style={{ background: "#180C10", color: "#F4F1EA" }}>
                 <div className="bte-medallion bte-medallion--lg">
-                  <BteMedallion label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`LÁMINA Nº ${passNumber}`} arcId="bteArc2" arcText={`ACCESO VIP · LÁMINA Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <BteMedallion label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroLamina", { n: passNumber }).toUpperCase()} arcId="bteArc2" arcText={tx("invitacion.pase.arcoAccesoVipLamina", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="bte-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="bte-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -929,7 +932,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
         <section data-tone="dark" data-screen-label="Check-in" className="bte-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #261018 0%, #180C10 60%, #120A0C 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bte-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bte-h2">
-            Confirmá<br /><span className="bte-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="bte-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -963,20 +966,20 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
               />
             </div>
           ) : (
-            <p className="bte-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="bte-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bte-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="bte-pan">
           <div className="bte-pan-sticky">
             <div data-strip="1" className="bte-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="bte-panel bte-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="bte-hair-bg" />
                   <div className="bte-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="bte-panel-title-md">Álbum <span className="bte-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="bte-panel-title-md">{tx("invitacion.album.titulo")} <span className="bte-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="bte-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -986,25 +989,25 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="bte-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="bte-photo-placeholder">Sin fotos todavía</span>
+                      <span className="bte-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="bte-seguir bte-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="bte-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="bte-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="bte-panel bte-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="bte-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="bte-panel-title">Todo lo que<br /><span className="bte-accent-serif">vamos a recordar</span></h2>
+                <span className="bte-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="bte-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="bte-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="bte-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#52222E" />
@@ -1012,8 +1015,8 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
                     <div className="bte-live-placeholder">
                       <span className="bte-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1025,9 +1028,9 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="bte-section" style={{ background: "#180C10" }}>
-            <span data-xin="1" data-dist="-60" className="bte-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2">¿Qué flor<br /><span className="bte-accent-italic">nos representa?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="bte-section" style={{ background: "#180C10" }}>
+            <span data-xin="1" data-dist="-60" className="bte-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaFlorRepresenta"), "bte-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bte-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="bte-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#C49AA0" : "#7A3E4E" }} />
@@ -1037,24 +1040,24 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
               <BteSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bte-section" style={{ background: "#180C10" }}>
-            <span data-xin="1" data-dist="-60" className="bte-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="bte-section" style={{ background: "#180C10" }}>
+            <span data-xin="1" data-dist="-60" className="bte-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2">
-              Si querés<br /><span className="bte-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="bte-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bte-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1074,7 +1077,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1096,7 +1099,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bte-section" style={{ background: "#180C10" }}>
-            <span data-xin="1" data-dist="-60" className="bte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="bte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bte-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1105,19 +1108,19 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu lámina" className="bte-section bte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #261018 0%, #180C10 55%, #120A0C 100%)" }}>
+        <section data-tone="dark" data-screen-label={tx("invitacion.sabor.tuLamina")} className="bte-section bte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #261018 0%, #180C10 55%, #120A0C 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bte-final-card">
             <div className="bte-medallion bte-medallion--final">
-              <BteMedallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bteArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <BteMedallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="bteArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="bte-mini-label bte-accent-dark-2">LÁMINA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="bte-mini-label bte-accent-dark-2">{tx("invitacion.pase.numeroLaminaAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="bte-final-names">
               {novia}{novia && novio ? <span className="bte-accent-phrase"> &amp; </span> : ""}{novio}
             </span>
@@ -1125,8 +1128,8 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
             <div className="bte-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="bte-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="bte-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="bte-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1138,7 +1141,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
       </div>
 
       <div ref={railRef} className="bte-rail">
-        <span ref={railTopRef} className="bte-rail-top">LÁMINA Nº {passNumber}</span>
+        <span ref={railTopRef} className="bte-rail-top">{tx("invitacion.pase.numeroLamina", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="bte-rail-line">
           <span ref={railBarRef} className="bte-rail-bar" />
         </div>
@@ -1160,7 +1163,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="bte-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="bte-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </BteCoverHalf>
         </div>
         <div ref={bottomRef} className="bte-cover-half bte-cover-half--bottom">
@@ -1174,12 +1177,12 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="bte-cover-cta bte-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="bte-cover-cta bte-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </BteCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="bte-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="bte-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1194,14 +1197,14 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="bte-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1268,6 +1271,7 @@ function BteMedallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1276,7 +1280,7 @@ function BteMedallion({
     <>
       <div className="bte-medallion-ring" style={{ animation: spin === "none" ? "none" : `bteRing ${ringDuration}s linear infinite` }} />
       <div className="bte-medallion-core">
-        {title && <span className="bte-medallion-sub">SECTOR</span>}
+        {title && <span className="bte-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "bte-medallion-label-sm" : "bte-medallion-label"}>{title || label}</span>
         {sub && <span className="bte-medallion-sub bte-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1295,6 +1299,7 @@ function BteMedallion({
 }
 
 function BteCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1309,7 +1314,7 @@ function BteCopyField({ label, value }: { label: string; value: string }) {
         <span className="bte-bank-row-value">{value}</span>
       </div>
       <button type="button" className="bte-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1373,6 +1378,7 @@ function BteRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1404,8 +1410,7 @@ function BteRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1429,7 +1434,7 @@ function BteRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1438,7 +1443,7 @@ function BteRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1447,9 +1452,9 @@ function BteRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="bte-rsvp-declined">
-        <p className="bte-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="bte-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="bte-rsvp-btn bte-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1462,13 +1467,13 @@ function BteRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí. */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="bte-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="bte-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1478,7 +1483,7 @@ function BteRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="bte-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="bte-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1488,7 +1493,7 @@ function BteRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="bte-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="bte-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1498,15 +1503,15 @@ function BteRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="bte-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="bte-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="bte-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="bte-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="bte-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="bte-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="bte-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1516,7 +1521,7 @@ function BteRsvpCard({
           </div>
         ) : (
           <div className="bte-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1531,7 +1536,7 @@ function BteRsvpCard({
             <div className="bte-rsvp-payment-value">
               <span className="bte-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="bte-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="bte-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="bte-rsvp-payment-detail">
@@ -1545,7 +1550,7 @@ function BteRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1557,9 +1562,9 @@ function BteRsvpCard({
 
       <div ref={stubRef} className="bte-stub">
         <div className="bte-stub-top">
-          <span>LÁMINA Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroLamina", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="bte-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="bte-seal">
@@ -1574,10 +1579,10 @@ function BteRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="bte-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="bte-rsvp-btn bte-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1601,6 +1606,7 @@ interface BteSongItem {
 // del componente compartido. Lista acotada con scroll propio (max-height
 // 180px) para no romper el layout con muchas canciones sumadas.
 function BteSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<BteSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1624,7 +1630,7 @@ function BteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1637,14 +1643,14 @@ function BteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1654,9 +1660,9 @@ function BteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="bte-song">
       <form onSubmit={handleSubmit} className="bte-song-row">
         <div className="bte-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="bte-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="bte-song-input" />
           <span className="bte-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="bte-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="bte-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="bte-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1666,7 +1672,7 @@ function BteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="bte-song-item">
               <span className="bte-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="bte-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="bte-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1678,6 +1684,7 @@ function BteSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function BteQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: BteQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1720,7 +1727,7 @@ function BteQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1792,11 +1799,11 @@ function BteQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="bte-quiz-result">
           <p className="bte-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="bte-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1843,6 +1850,7 @@ function BteCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="bte-cover-inner">
       {photoMobile && (
@@ -1859,7 +1867,7 @@ function BteCoverHalf({
       <div className="bte-cover-linen" />
       <div className="bte-cover-content">
         <div className="bte-cover-top-row">
-          <span>LÁMINA Nº {passNumber}</span><span className="bte-accent-dark-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroLamina", { n: passNumber }).toUpperCase()}</span><span className="bte-accent-dark-2">ALL ACCESS</span>
         </div>
         <div className="bte-cover-center">
           <span ref={kickerRef} className="bte-cover-kicker">{kickerText}</span>
@@ -1876,7 +1884,7 @@ function BteCoverHalf({
           {children}
           <div className="bte-barcode-wrap">
             <div className="bte-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="bte-mini-label bte-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="bte-mini-label bte-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Music } from "lucide-react";
 import { SectionWrapper } from "./SectionWrapper";
 import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface SongItem {
   id: string;
@@ -29,14 +30,20 @@ interface SongSuggestionProps {
 export function SongSuggestion({
   invitationId,
   guestToken,
-  guestName = "Invitado",
+  guestName,
   dark = true,
   showPublicList = true,
-  kicker = "¿Armamos la playlist de la fiesta?",
-  title = "Que no falte en la pista",
+  kicker,
+  title,
   hideHeader = false,
   variant = "default",
 }: SongSuggestionProps) {
+  const tx = useTextos();
+  // Los valores por defecto se resuelven acá y no en la firma: necesitan el
+  // traductor, que sólo existe una vez montado el componente.
+  const nombreInvitado = guestName ?? tx("invitacion.evento.invitado");
+  const kickerTexto = kicker ?? tx("invitacion.musica.armamosLaPlaylist");
+  const tituloTexto = title ?? tx("invitacion.musica.queNoFalteEnLaPista");
   const [songs, setSongs] = useState<SongItem[]>([]);
   const [inputValue, setInputValue] = useState(""); // For default title or moderno single input
   const [artistValue, setArtistValue] = useState(""); // For default artist
@@ -77,8 +84,8 @@ export function SongSuggestion({
     const title_val = inputValue.trim();
     const artist_val = artistValue.trim();
 
-    if (!title_val) { setError("Escribí el nombre de la canción"); return; }
-    if (!artist_val) { setError("Escribí el artista"); return; }
+    if (!title_val) { setError(tx("invitacion.musica.escribiNombreCancion")); return; }
+    if (!artist_val) { setError(tx("invitacion.musica.escribiArtista")); return; }
 
     setError("");
     setIsSubmitting(true);
@@ -92,12 +99,12 @@ export function SongSuggestion({
           title: title_val,
           artist: artist_val,
           guestToken,
-          guestName,
+          guestName: nombreInvitado,
         }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Error al enviar");
+        throw new Error(errData.error || tx("invitacion.musica.errorEnviar"));
       }
       setSubmitted(true);
       setInputValue("");
@@ -116,7 +123,7 @@ export function SongSuggestion({
         }
       }
     } catch (err: any) {
-      setError(err.message || "No se pudo enviar. Intentá de nuevo.");
+      setError(err.message || tx("invitacion.musica.noSePudoEnviarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -154,14 +161,14 @@ export function SongSuggestion({
             </div>
             {variant === "moderno" ? (
               <p className="t-kicker text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
-                {kicker}
+                {kickerTexto}
               </p>
             ) : (
               <>
-                <p className="t-kicker">{kicker}</p>
-                <h2>{title}</h2>
+                <p className="t-kicker">{kickerTexto}</p>
+                <h2>{tituloTexto}</h2>
                 <p style={{ marginBottom: "var(--sp-5)" }}>
-                  Dejanos el tema que no puede faltar esa noche.
+                  {tx("invitacion.musica.dejanosElTema")}
                 </p>
               </>
             )}
@@ -174,7 +181,7 @@ export function SongSuggestion({
               <DrawLucideIcon icon={Music} size={46} color="var(--t-acc)" strokeWidth={1.5} className={variant === "moderno" ? undefined : "t-kicker"} />
             </div>
             <p className={variant === "moderno" ? "t-kicker text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--t-acc)] mb-6" : "t-kicker"} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}>
-              {kicker}
+              {kickerTexto}
             </p>
           </>
         )}
@@ -192,7 +199,7 @@ export function SongSuggestion({
             }}
             role="status"
           >
-            Ya sugeriste el máximo de 3 canciones para esta invitación. ¡Gracias!
+            {tx("invitacion.musica.maximoAlcanzado")}
           </div>
         ) : !submitted ? (
           <form onSubmit={handleSubmit} noValidate>
@@ -201,7 +208,7 @@ export function SongSuggestion({
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Canción"
+                  placeholder={tx("invitacion.musica.cancion")}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   maxLength={100}
@@ -209,7 +216,7 @@ export function SongSuggestion({
                 />
                 <input
                   type="text"
-                  placeholder="Artista"
+                  placeholder={tx("invitacion.musica.artista")}
                   value={artistValue}
                   onChange={(e) => setArtistValue(e.target.value)}
                   maxLength={80}
@@ -229,20 +236,20 @@ export function SongSuggestion({
                   <input
                     ref={inputRef}
                     type="text"
-                    placeholder="Nombre de la canción"
+                    placeholder={tx("invitacion.musica.nombreDeLaCancion")}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     maxLength={100}
-                    aria-label="Nombre de la canción"
+                    aria-label={tx("invitacion.musica.nombreDeLaCancion")}
                     style={{ flex: 2, padding: "12px 14px", borderRadius: "var(--radius-s)", border: "1px solid rgba(255,255,255,.2)", background: "rgba(255,255,255,.1)", color: "var(--on-ink)" }}
                   />
                   <input
                     type="text"
-                    placeholder="Artista"
+                    placeholder={tx("invitacion.musica.artista")}
                     value={artistValue}
                     onChange={(e) => setArtistValue(e.target.value)}
                     maxLength={80}
-                    aria-label="Artista"
+                    aria-label={tx("invitacion.musica.artista")}
                     style={{ flex: 1, padding: "12px 14px", borderRadius: "var(--radius-s)", border: "1px solid rgba(255,255,255,.2)", background: "rgba(255,255,255,.1)", color: "var(--on-ink)" }}
                   />
                 </div>
@@ -252,7 +259,7 @@ export function SongSuggestion({
                   disabled={isSubmitting}
                   style={{ background: "var(--t-onpaper)", color: "var(--t-paper)", border: "none", width: "fit-content", padding: "10px 24px", marginTop: "8px", alignSelf: "flex-start" }}
                 >
-                  {isSubmitting ? "Enviando…" : "Enviar sugerencia"}
+                  {isSubmitting ? tx("invitacion.musica.enviando") : tx("invitacion.musica.enviarSugerencia")}
                 </button>
               </div>
             )}
@@ -275,14 +282,14 @@ export function SongSuggestion({
             }}
             role="status"
           >
-            <span>✓ ¡Gracias! Tu canción fue enviada.</span>
+            <span>{"✓ " + tx("invitacion.musica.graciasCancionEnviada")}</span>
             {!limitReached && (
               <button
                 onClick={() => setSubmitted(false)}
                 className={variant === "moderno" ? "text-white underline text-xs ml-4" : ""}
                 style={variant === "moderno" ? {} : { background: "none", border: "none", color: "var(--c-accent)", cursor: "pointer", fontSize: "inherit", padding: 0, textDecoration: "underline" }}
               >
-                Sugerir otra
+                {tx("invitacion.musica.sugerirOtra")}
               </button>
             )}
           </div>
@@ -323,7 +330,7 @@ export function SongSuggestion({
                       </b>
                       <span style={{ color: "var(--t-onpaper)", opacity: 0.8 }}>
                         {song.artist}
-                        {song.guestName ? ` · sugerida por ${song.guestName}` : ""}
+                        {song.guestName ? tx("invitacion.musica.sugeridaPor", { nombre: song.guestName }) : ""}
                       </span>
                     </div>
                     <button 

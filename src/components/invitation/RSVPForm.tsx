@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface RSVPFormProps {
     invitationId: string;
 }
 
 export function RSVPForm({ invitationId }: RSVPFormProps) {
+  const tx = useTextos();
     const [name, setName] = useState("");
     const [attending, setAttending] = useState("yes");
     const [count, setCount] = useState(1);
@@ -67,7 +69,7 @@ export function RSVPForm({ invitationId }: RSVPFormProps) {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Nombre y Apellido"
+                        placeholder={tx("invitacion.rsvp.placeholderNombre")}
                         required
                         className="text-center text-xl h-14 bg-slate-50 border-transparent focus:border-primary focus:ring-0 transition-all"
                         style={{ fontFamily: "var(--font-sans)" }}
@@ -101,7 +103,7 @@ export function RSVPForm({ invitationId }: RSVPFormProps) {
                         letterSpacing: '0.1em'
                     }}
                 >
-                    {isSubmitting ? "ENVIANDO..." : "CONFIRMAR ASISTENCIA"}
+                    {isSubmitting ? "ENVIANDO..." : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
                 </Button>
             </form>
         </div>

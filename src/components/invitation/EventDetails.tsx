@@ -2,6 +2,7 @@
 
 import { MapPin, Calendar, Clock, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface EventDetailsProps {
     lugarNombre: string;
@@ -32,6 +33,7 @@ export function EventDetails({
     ceremoniaHora,
     ceremoniaMapUrl
 }: EventDetailsProps) {
+  const tx = useTextos();
     const showCeremonia = Boolean(ceremoniaHabilitada && (ceremoniaNombre || ceremoniaDireccion));
 
     return (
@@ -50,7 +52,7 @@ export function EventDetails({
                                 </div>
 
                                 <span className="text-xs font-semibold tracking-[0.2em] text-amber-800 uppercase mb-3 font-sans">
-                                    {ceremoniaTitulo || "Ceremonia / Civil"}
+                                    {ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil")}
                                 </span>
 
                                 <h3 className="text-xl md:text-2xl font-medium mb-3 text-gray-900 font-serif">
@@ -58,9 +60,7 @@ export function EventDetails({
                                 </h3>
 
                                 {ceremoniaHora && (
-                                    <p className="text-sm font-semibold text-amber-700 mb-2 font-mono">
-                                        🕒 {ceremoniaHora} hs
-                                    </p>
+                                    <p className="text-sm font-semibold text-amber-700 mb-2 font-mono">{"🕒 " + tx("invitacion.ubicacion.horaConSufijo", { hora: ceremoniaHora })}</p>
                                 )}
 
                                 <p className="text-sm text-gray-600 mb-6 font-light max-w-xs mx-auto leading-relaxed">
@@ -74,7 +74,7 @@ export function EventDetails({
                                         onClick={() => window.open(ceremoniaMapUrl, '_blank')}
                                     >
                                         <Navigation className="w-3.5 h-3.5 mr-2" />
-                                        Cómo llegar
+                                        {tx("invitacion.ubicacion.comoLlegar")}
                                     </Button>
                                 )}
                             </div>
@@ -91,7 +91,7 @@ export function EventDetails({
                             </div>
 
                             <span className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase mb-3 font-sans">
-                                {showCeremonia ? "Fiesta / Salón" : "Ceremonia & Fiesta"}
+                                {showCeremonia ? tx("invitacion.ubicacion.fiestaSalon") : "Ceremonia & Fiesta"}
                             </span>
 
                             <h3 className="text-xl md:text-2xl font-medium mb-3 text-gray-900 font-serif">
@@ -99,9 +99,7 @@ export function EventDetails({
                             </h3>
 
                             {showCeremonia && hora && (
-                                <p className="text-sm font-semibold text-primary mb-2 font-mono">
-                                    🕒 {hora} hs
-                                </p>
+                                <p className="text-sm font-semibold text-primary mb-2 font-mono">{"🕒 " + tx("invitacion.ubicacion.horaConSufijo", { hora: hora })}</p>
                             )}
 
                             <p className="text-sm text-gray-600 mb-6 font-light max-w-xs mx-auto leading-relaxed">
@@ -115,7 +113,7 @@ export function EventDetails({
                                     onClick={() => window.open(mapUrl, '_blank')}
                                 >
                                     <Navigation className="w-3.5 h-3.5 mr-2" />
-                                    Cómo llegar
+                                    {tx("invitacion.ubicacion.comoLlegar")}
                                 </Button>
                             )}
                         </div>
@@ -148,7 +146,7 @@ export function EventDetails({
 
                             <div className="mt-6 flex items-center gap-2 text-gray-600 bg-white/50 px-4 py-2 rounded-full text-sm">
                                 <Clock className="w-4 h-4" />
-                                <span className="font-medium">{hora} hs</span>
+                                <span className="font-medium">{tx("invitacion.ubicacion.horaConSufijo", { hora: hora })}</span>
                             </div>
                         </div>
                     </div>

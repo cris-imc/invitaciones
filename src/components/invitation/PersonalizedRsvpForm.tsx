@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/Toast";
 
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 interface Guest {
     id: string;
     name: string;
@@ -26,6 +27,8 @@ interface PersonalizedRsvpFormProps {
 }
 
 export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: PersonalizedRsvpFormProps) {
+  const tx = useTextos();
+
     const [attending, setAttending] = useState<string>(guest.status === "CONFIRMED" ? "yes" : guest.status === "DECLINED" ? "no" : "");
     const [count, setCount] = useState<string>(guest.attendingCount > 0 ? guest.attendingCount.toString() : guest.expectedCount.toString());
     const [message, setMessage] = useState(guest.message || "");
@@ -125,7 +128,7 @@ export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: Personali
                             <Label>¿Cuántas personas asistirán?</Label>
                             <Select value={count} onValueChange={setCount}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Seleccionar cantidad" />
+                                    <SelectValue placeholder={tx("invitacion.rsvp.seleccionarCantidad")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {Array.from({ length: guest.expectedCount }, (_, i) => i + 1).map((num) => (
@@ -145,7 +148,7 @@ export function PersonalizedRsvpForm({ guest, invitation, onSuccess }: Personali
                         <Label htmlFor="message">Mensaje (Opcional)</Label>
                         <Textarea
                             id="message"
-                            placeholder="Alguna restricción alimentaria o mensaje para los anfitriones..."
+                            placeholder={tx("invitacion.rsvp.placeholderRestriccion")}
                             value={message}
                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
                         />

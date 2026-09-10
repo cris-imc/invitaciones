@@ -2,6 +2,7 @@
 
 import { useCountdown, pad } from "./useCountdown";
 import { Heart } from "lucide-react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 // Corrección 3 (docs/correcciones.md): componente de countdown unificado con
 // 4 estilos visuales seleccionables desde el wizard (StepCountdownStyle).
@@ -20,24 +21,28 @@ interface CountdownProps {
 
 export function Countdown({
   targetDate,
-  kicker = "Cuenta regresiva",
+  kicker,
   dark = false,
   countdownStyle = "clasico",
 }: CountdownProps) {
+  const tx = useTextos();
+  // El valor por defecto se resuelve acá y no en la firma: necesita el
+  // traductor, que sólo existe una vez montado el componente.
+  const kickerTexto = kicker ?? tx("invitacion.cuentaRegresiva.kicker");
   const { time, isEventDay, isPast, hasEnded } = useCountdown(targetDate);
   const sectionClass = `d-sec${dark ? " dark" : ""}`;
 
   if (isEventDay || (!isPast && time.dias === 0 && time.hs === 0 && time.min === 0 && time.seg === 0)) {
     return (
       <section className={sectionClass} id="countdown">
-        <p className="t-kicker">{kicker}</p>
+        <p className="t-kicker">{kickerTexto}</p>
         <div className="cd-past p-8 rounded-2xl bg-[color-mix(in_srgb,var(--t-acc)_15%,transparent)] border border-[var(--t-acc)] text-center shadow-lg">
           <Heart className="w-12 h-12 mx-auto mb-3 text-[var(--t-acc)] opacity-90" strokeWidth={1.5} />
           <h3 className="text-2xl sm:text-3xl font-bold font-serif mb-2 text-[var(--t-acc)]">
-            ¡Llegó el día!
+            {tx("invitacion.cuentaRegresiva.llegoElDia")}
           </h3>
           <p className="cd-past-text text-base sm:text-lg font-medium opacity-90 leading-relaxed" style={{ color: "var(--t-muted, #8F8F98)" }}>
-            ¡Hoy es el gran día! Prepárate para festejar, reír y disfrutar cada instante inolvidable.
+            {tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}
           </p>
         </div>
       </section>
@@ -47,22 +52,24 @@ export function Countdown({
   if (hasEnded || isPast) {
     return (
       <section className={sectionClass} id="countdown">
-        <p className="t-kicker">{kicker}</p>
+        <p className="t-kicker">{kickerTexto}</p>
         <div className="cd-past text-center">
           <Heart className="w-10 h-10 mx-auto mb-2 text-[var(--t-acc)] opacity-90" strokeWidth={1.5} />
-          <p className="cd-past-text" style={{ color: "var(--t-muted, #8F8F98)" }}>¡Ya fue una noche increíble!</p>
+          <p className="cd-past-text" style={{ color: "var(--t-muted, #8F8F98)" }}>{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
         </div>
       </section>
     );
   }
 
   const boxes: { label: string; value: string }[] = [
-    { label: "Días", value: String(time.dias) },
-    { label: "Hs", value: pad(time.hs) },
-    { label: "Min", value: pad(time.min) },
-    { label: "Seg", value: pad(time.seg) },
+    { label: tx("invitacion.cuentaRegresiva.diasAbrev"), value: String(time.dias) },
+    { label: tx("invitacion.cuentaRegresiva.horasAbrev"), value: pad(time.hs) },
+    { label: tx("invitacion.cuentaRegresiva.minutosAbrev"), value: pad(time.min) },
+    { label: tx("invitacion.cuentaRegresiva.segundosAbrev"), value: pad(time.seg) },
   ];
-  const kickerLabel = kicker.toUpperCase() === "CUENTA REGRESIVA" ? "CUENTA REGRESIVA EN VIVO" : kicker.toUpperCase();
+  const kickerLabel = kickerTexto.toUpperCase() === tx("invitacion.cuentaRegresiva.kicker").toUpperCase()
+    ? tx("invitacion.cuentaRegresiva.enVivo").toUpperCase()
+    : kickerTexto.toUpperCase();
 
   if (countdownStyle === "minimalista") {
     return (
@@ -75,7 +82,7 @@ export function Countdown({
           {time.dias}
         </p>
         <p className="text-xs sm:text-sm font-sans font-medium uppercase tracking-widest mt-2" style={{ color: "var(--t-acc)", opacity: 0.8 }}>
-          {time.dias === 1 ? "día para el gran momento" : "días para el gran momento"}
+          {tx(time.dias === 1 ? "invitacion.cuentaRegresiva.dia" : "invitacion.cuentaRegresiva.dias")} {tx("invitacion.cuentaRegresiva.paraElGranMomento")}
         </p>
       </section>
     );

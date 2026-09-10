@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { BedDouble, CircleParking, Bus, Info, X, CircleQuestionMark } from "lucide-react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface InfoAdicionalSectionProps {
   invitation: {
@@ -23,6 +24,7 @@ interface InfoAdicionalSectionProps {
 // simple y legible a propósito (no la fuente ornamental de la plantilla) --
 // es información práctica, no parte de la estética de la tarjeta.
 export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) {
+  const tx = useTextos();
   const [open, setOpen] = useState(false);
 
   const items = [
@@ -52,7 +54,7 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
       enabled: invitation.infoAdicionalHabilitado,
       text: invitation.infoAdicionalTexto,
       icon: Info,
-      title: "Datos Adicionales",
+      title: tx("invitacion.infoAdicional.titulo"),
     },
   ].filter((item) => item.enabled && item.text && item.text.trim());
 
@@ -134,7 +136,7 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
         }}
       >
         <CircleQuestionMark className="w-4 h-4" />
-        ¿Qué necesitás saber?
+        {tx("invitacion.infoAdicional.queNecesitasSaber")}
       </button>
 
       {open && (
@@ -146,7 +148,7 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
             id="ia-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="¿Qué necesitás saber?"
+            aria-label={tx("invitacion.infoAdicional.queNecesitasSaber")}
             onClick={(e) => e.stopPropagation()}
             style={{
               background: "#fff",
@@ -170,12 +172,12 @@ export function InfoAdicionalSection({ invitation }: InfoAdicionalSectionProps) 
                 borderBottom: "1px solid #eee",
               }}
             >
-              <h3 id="ia-modal-title" style={{ fontSize: "17px", fontWeight: 700, margin: 0 }}>¿Qué necesitás saber?</h3>
+              <h3 id="ia-modal-title" style={{ fontSize: "17px", fontWeight: 700, margin: 0 }}>{tx("invitacion.infoAdicional.queNecesitasSaber")}</h3>
               <button
                 id="ia-modal-close"
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Cerrar"
+                aria-label={tx("invitacion.cerrar")}
                 style={{ cursor: "pointer", padding: "4px" }}
               >
                 <X className="w-5 h-5" />

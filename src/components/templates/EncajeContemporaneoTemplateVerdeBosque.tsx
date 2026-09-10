@@ -59,6 +59,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const encPlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -143,9 +145,10 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPersonalized = false }: EncajeContemporaneoTemplateProps) {
+  const tx = useTextos();
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
-  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? "Nuestra boda");
+  const namesTitle = novia && novio ? `${novia} & ${novio}` : String(invitation.nombreEvento ?? tx("invitacion.evento.nuestraBoda"));
 
   // Iniciales de la pareja para el medallón ("LM" en el mockup real) -- si
   // falta algún nombre, cae a un par de letras genérico en vez de romper el
@@ -160,7 +163,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
   // fuera quien se casa).
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA TRAMA TEJIDA PARA" : "UNA TRAMA TEJIDA PARA LA BODA DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.tramaTejidaPara").toUpperCase() : tx("invitacion.sabor.tramaTejidaBodaDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover
     ? coverGuestName
     : <>{novia}<br /><span className="enc-amp" style={{ fontSize: "0.54em" }}>&amp;</span><br />{novio}</>;
@@ -190,7 +193,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. El resto se teje solo."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeSeTejeSolo")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -200,7 +203,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
   // Ceremonia: sección propia si está habilitada (lugar distinto a la
   // fiesta, ver StepCeremonia.tsx) -- nunca se mezcla con los datos del salón.
   const ceremoniaHabilitada = Boolean(invitation.ceremoniaHabilitada);
-  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || "Ceremonia / Civil");
+  const ceremoniaTitulo = String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"));
   const ceremoniaNombre = String(invitation.ceremoniaNombre ?? "");
   const ceremoniaDireccion = String(invitation.ceremoniaDireccion ?? "");
   const ceremoniaHora = String(invitation.ceremoniaHora ?? "");
@@ -294,7 +297,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: EncQuizQuestion[] = safeJson<EncQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -454,7 +457,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#F7F3ED";
       }
       if (stubRef.current) {
@@ -748,7 +751,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
 
       <div ref={scrollerRef} data-scroller="1" className="enc-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="enc-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #182517 0%, #0D120D 55%, #0A0D0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="enc-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="enc-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="enc-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="enc-date-month">{monthAbbr}</span>
@@ -769,7 +772,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
           />
 
           <div data-drift="-70" className="enc-medallion enc-medallion--corner">
-            <Medallion label={initials} sub="ACCESO" arcId="encArc1" arcText="NOS CASAMOS · EDICIÓN ÚNICA · " spin="normal" />
+            <Medallion label={initials} sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="encArc1" arcText={tx("invitacion.sabor.arcoNosCasamos").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -780,7 +783,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`enc-hero-photo-section${!photoMobile ? " enc-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " enc-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="enc-hero-photo-frame">
@@ -804,18 +807,18 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
           <div className="enc-scanline" />
           <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>{knPre(2)} — LA RETÍCULA SE COMPLETA EN</span>
           <div className="enc-cd-grid">
-            <CdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="enc-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="enc-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1A2818 0%, #0B0F0B 52%, #0A0D0A 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="enc-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1A2818 0%, #0B0F0B 52%, #0A0D0A 100%)" }}>
           <div data-drift="-130" className="enc-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="enc-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="enc-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -836,7 +839,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="enc-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="enc-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="enc-pan-sticky">
             <div data-strip="1" className="enc-strip">
               {ceremoniaHabilitada && (
@@ -852,35 +855,35 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                   <div className="enc-facts">
                     {ceremoniaHora && (
                       <div className="enc-facts-row enc-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="enc-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="enc-seguir">SEGUÍ BAJANDO <span className="enc-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="enc-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="enc-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="enc-panel enc-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="enc-hair-bg" />
                 <div className="enc-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="enc-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="enc-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="enc-facts">
                   <div className="enc-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="enc-facts-row enc-facts-row--last">
-                      <span>CÓDIGO</span><span className="enc-ink-cta">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="enc-ink-cta">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -894,7 +897,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                     ))}
                   </div>
                 )}
-                <div className="enc-seguir">SEGUÍ BAJANDO <span className="enc-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="enc-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="enc-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -905,11 +908,11 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                   </svg>
                   <div className="enc-panel-block">
                     <span className="enc-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="enc-panel-title-sm">Cómo llegar</span>
+                    <span className="enc-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="enc-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="enc-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -921,9 +924,9 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                   {/* El backend no reserva mesas/sectores reales -- "Salón" es
                       un rótulo genérico de sector (no un dato inventado por
                       invitado), igual que el mockup real. */}
-                  <Medallion label={initials} sub={`PASE Nº ${passNumber}`} arcId="encArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" title="Salón" />
+                  <Medallion label={initials} sub={tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()} arcId="encArc2" arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.salon")} />
                 </div>
-                <span className="enc-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="enc-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -942,7 +945,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
         <section data-tone="dark" data-screen-label="Check-in" className="enc-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #182517 0%, #0D120D 60%, #0A0D0A 100%)" }}>
           <span data-xin="1" data-dist="-60" className="enc-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="enc-h2">
-            Confirmá<br /><span className="enc-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="enc-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -977,20 +980,20 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
               />
             </div>
           ) : (
-            <p className="enc-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="enc-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="enc-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="enc-pan">
           <div className="enc-pan-sticky">
             <div data-strip="1" className="enc-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="enc-panel enc-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="enc-hair-bg" />
                   <div className="enc-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="enc-panel-title-md">Álbum <span className="enc-accent-serif-dark">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="enc-panel-title-md">{tx("invitacion.album.titulo")} <span className="enc-accent-serif-dark">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="enc-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -1000,25 +1003,25 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="enc-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="enc-photo-placeholder">Sin fotos todavía</span>
+                      <span className="enc-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="enc-seguir enc-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="enc-ink-cta">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="enc-ink-cta">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="enc-panel enc-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="enc-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="enc-panel-title">Todo lo que<br /><span className="enc-accent-serif-dark">vamos a recordar</span></h2>
+                <span className="enc-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="enc-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="enc-accent-serif-dark">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="enc-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#3F8A55" />
@@ -1026,8 +1029,8 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                     <div className="enc-live-placeholder">
                       <span className="enc-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -1039,9 +1042,9 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="enc-section" style={{ background: "#0D120D" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2">¿Qué tema<br /><span className="enc-accent-italic">merece la pista?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="enc-section" style={{ background: "#0D120D" }}>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaMerecePista"), "enc-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="enc-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="enc-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F7F3ED" : "#3F8A55" }} />
@@ -1051,24 +1054,24 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
               <EncSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="enc-section" style={{ background: "#0D120D" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="enc-section" style={{ background: "#0D120D" }}>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2">
-              Si querés<br /><span className="enc-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="enc-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="enc-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1088,7 +1091,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1110,7 +1113,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="enc-section" style={{ background: "#0D120D" }}>
-            <span data-xin="1" data-dist="-60" className="enc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="enc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="enc-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1119,19 +1122,19 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="enc-section enc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #182517 0%, #0D120D 55%, #0A0D0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="enc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="enc-section enc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #182517 0%, #0D120D 55%, #0A0D0A 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="enc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="enc-final-card">
             <div className="enc-medallion enc-medallion--final">
-              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="encArc3" arcText={textoArco(namesTitle, fechaArc)} spin="reverse" />
+              <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="encArc3" arcText={textoArco(namesTitle, fechaArc)} spin="reverse" />
             </div>
-            <span className="enc-mini-label enc-accent-rust">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="enc-mini-label enc-accent-rust">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="enc-final-names">
               {novia}{novia && novio ? <span className="enc-amp"> &amp; </span> : ""}{novio}
             </span>
@@ -1139,8 +1142,8 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
             <div className="enc-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="enc-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="enc-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="enc-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1152,7 +1155,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
       </div>
 
       <div ref={railRef} className="enc-rail">
-        <span ref={railTopRef} className="enc-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="enc-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="enc-rail-line">
           <span ref={railBarRef} className="enc-rail-bar" />
         </div>
@@ -1174,7 +1177,7 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="enc-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="enc-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CoverHalf>
         </div>
         <div ref={bottomRef} className="enc-cover-half enc-cover-half--bottom">
@@ -1188,12 +1191,12 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="enc-cover-cta enc-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="enc-cover-cta enc-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="enc-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="enc-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1208,14 +1211,14 @@ export function EncajeContemporaneoTemplateVerdeBosque({ invitation, guest, isPe
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="enc-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1282,6 +1285,7 @@ function Medallion({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1290,7 +1294,7 @@ function Medallion({
     <>
       <div className="enc-medallion-ring" style={{ animation: spin === "none" ? "none" : `encRing ${ringDuration}s linear infinite` }} />
       <div className="enc-medallion-core">
-        {title && <span className="enc-medallion-sub">SECTOR</span>}
+        {title && <span className="enc-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "enc-medallion-label-sm" : "enc-medallion-label"}>{title || label}</span>
         {sub && <span className="enc-medallion-sub enc-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1309,6 +1313,7 @@ function Medallion({
 }
 
 function EncCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1323,7 +1328,7 @@ function EncCopyField({ label, value }: { label: string; value: string }) {
         <span className="enc-bank-row-value">{value}</span>
       </div>
       <button type="button" className="enc-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1389,6 +1394,7 @@ function EncRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1420,8 +1426,7 @@ function EncRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1445,7 +1450,7 @@ function EncRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1454,7 +1459,7 @@ function EncRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1463,9 +1468,9 @@ function EncRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="enc-rsvp-declined">
-        <p className="enc-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="enc-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="enc-rsvp-btn enc-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1478,13 +1483,13 @@ function EncRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí. */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="enc-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="enc-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1494,7 +1499,7 @@ function EncRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="enc-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="enc-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1504,7 +1509,7 @@ function EncRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="enc-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="enc-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1514,15 +1519,15 @@ function EncRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="enc-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="enc-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="enc-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="enc-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="enc-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="enc-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="enc-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1532,7 +1537,7 @@ function EncRsvpCard({
           </div>
         ) : (
           <div className="enc-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1547,7 +1552,7 @@ function EncRsvpCard({
             <div className="enc-rsvp-payment-value">
               <span className="enc-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="enc-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="enc-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="enc-rsvp-payment-detail">
@@ -1561,7 +1566,7 @@ function EncRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1573,9 +1578,9 @@ function EncRsvpCard({
 
       <div ref={stubRef} className="enc-stub">
         <div className="enc-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="enc-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="enc-seal">
@@ -1590,10 +1595,10 @@ function EncRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="enc-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="enc-rsvp-btn enc-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1616,6 +1621,7 @@ interface EncSongItem {
 // <SongSuggestion> (/api/songs), pero sin el look de tarjetas redondeadas
 // del componente compartido.
 function EncSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<EncSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1639,7 +1645,7 @@ function EncSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1652,14 +1658,14 @@ function EncSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1669,9 +1675,9 @@ function EncSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="enc-song">
       <form onSubmit={handleSubmit} className="enc-song-row">
         <div className="enc-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="enc-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="enc-song-input" />
           <span className="enc-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="enc-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="enc-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="enc-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1681,7 +1687,7 @@ function EncSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="enc-song-item">
               <span className="enc-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="enc-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="enc-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1693,6 +1699,7 @@ function EncSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function EncQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: EncQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1735,7 +1742,7 @@ function EncQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1807,11 +1814,11 @@ function EncQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="enc-quiz-result">
           <p className="enc-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="enc-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1858,6 +1865,7 @@ function CoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="enc-cover-inner">
       {/* A diferencia del resto de la colección, la tapa de esta familia es
@@ -1892,7 +1900,7 @@ function CoverHalf({
       <div data-weave="1" className="enc-cover-weave" />
       <div className="enc-cover-content">
         <div className="enc-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="enc-accent-rust">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="enc-accent-rust">ALL ACCESS</span>
         </div>
         <div className="enc-cover-center">
           <span ref={kickerRef} className="enc-cover-kicker">{kickerText}</span>
@@ -1909,7 +1917,7 @@ function CoverHalf({
           {children}
           <div className="enc-barcode-wrap">
             <div className="enc-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="enc-mini-label enc-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="enc-mini-label enc-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

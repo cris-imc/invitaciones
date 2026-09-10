@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Camera } from "lucide-react";
 import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface AlbumCarouselProps {
   photos: string[];
@@ -11,6 +12,7 @@ interface AlbumCarouselProps {
 }
 
 export function AlbumCarousel({ photos, dark = false, hideHeader = false }: AlbumCarouselProps) {
+  const tx = useTextos();
   const trackRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
@@ -116,8 +118,8 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
           <div className="t-kicker flex justify-center mb-6">
             <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
           </div>
-          <p className="t-kicker">Álbum</p>
-          <h2>Un poco de nuestra historia</h2>
+          <p className="t-kicker">{tx("invitacion.album.titulo")}</p>
+          <h2>{tx("invitacion.frase.unPocoDeNuestraHistoria")}</h2>
         </>
       )}
       <div
@@ -136,7 +138,7 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
               className="album-item cursor-pointer hover:opacity-90 transition-opacity select-none"
               style={{ backgroundImage: `url(${url})`, WebkitTouchCallout: "none" }}
               role="img"
-              aria-label={`Foto ${(i % photos.length) + 1}`}
+              aria-label={tx("invitacion.album.foto", { n: (i % photos.length) + 1 })}
               onClick={() => setExpandedPhoto(url)}
             />
           ))}
@@ -146,7 +148,7 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
             className="album-btn"
             type="button"
             onClick={() => scroll("prev")}
-            aria-label="Foto anterior"
+            aria-label={tx("invitacion.album.fotoAnterior")}
           >
             ‹
           </button>
@@ -154,7 +156,7 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
             className="album-btn"
             type="button"
             onClick={() => scroll("next")}
-            aria-label="Foto siguiente"
+            aria-label={tx("invitacion.album.fotoSiguiente")}
           >
             ›
           </button>
@@ -180,7 +182,7 @@ export function AlbumCarousel({ photos, dark = false, hideHeader = false }: Albu
 
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default select-none"
             draggable={false}
             style={{ WebkitTouchCallout: "none" }}

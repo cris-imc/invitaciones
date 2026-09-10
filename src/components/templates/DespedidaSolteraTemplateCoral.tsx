@@ -50,6 +50,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const dpsDisplay = Cormorant_Garamond({
   subsets: ["latin"],
@@ -133,6 +135,7 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalized = false }: DespedidaSolteraTemplateCoralProps) {
+  const tx = useTextos();
   // Festejado/a: el nombre va SOLO (ej. "Sofía"), nunca con un prefijo tipo
   // el prefijo del evento pegado adelante -- ese prefijo ya lo dice el kicker de
   // arriba (coverKickerText), repetirlo en el nombre queda redundante/roto
@@ -147,7 +150,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
   // cambia a una invitación personalizada en vez de anunciar la llegada.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA INVITACIÓN ESPECIAL PARA" : "LA ÚLTIMA NOCHE LIBRE DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.portada.unaInvitacionEspecialPara").toUpperCase() : tx("invitacion.sabor.ultimaNocheLibreDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -172,7 +175,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. Esta noche es solo para ella."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeSoloParaElla")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -267,7 +270,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: DpsQuizQuestion[] = safeJson<DpsQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -428,7 +431,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#FDF1E7";
       }
       if (stubRef.current) {
@@ -722,7 +725,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
 
       <div ref={scrollerRef} data-scroller="1" className="dps-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="dps-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #180D16 55%, #130A11 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="dps-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="dps-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="dps-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="dps-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="dps-date-month">{monthAbbr}</span>
@@ -743,7 +746,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
           />
 
           <div data-drift="-70" className="dps-medallion dps-medallion--corner">
-            <DpsMedallionCmp label="DS" sub="ACCESO" arcId="dpsArc1" arcText="DESPEDIDA · ACCESO · " spin="normal" />
+            <DpsMedallionCmp label="DS" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="dpsArc1" arcText={tx("invitacion.sabor.arcoDespedida").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -758,7 +761,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`dps-hero-photo-section${!photoMobile ? " dps-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " dps-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="dps-hero-photo-frame">
@@ -782,18 +785,18 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
           <div className="dps-scanline" />
           <span data-xin="1" data-dist="-60" className="dps-kicker" style={{ position: "relative" }}>{knPre(2)} — LA FIESTA EMPIEZA EN</span>
           <div className="dps-cd-grid">
-            <DpsCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <DpsCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <DpsCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <DpsCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <DpsCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <DpsCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <DpsCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <DpsCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="dps-perf-strip" />
         </section>
 
         {hasFrase && (
-          <section id="quote" data-tone="dark" data-screen-label="Frase" className="dps-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #130A11 100%)" }}>
+          <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="dps-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #130A11 100%)" }}>
             <div data-drift="-130" className="dps-glow-blob" />
-            <span data-xin="1" data-dist="-60" className="dps-kicker" style={{ position: "relative" }}>{knPre(3)} — UN MENSAJE PARA VOS</span>
+            <span data-xin="1" data-dist="-60" className="dps-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.frase.unMensajeParaVos").toUpperCase()}</span>
             <h2 ref={phraseRef} className="dps-phrase" style={{ fontSize: fraseFontSize }}>
               {fraseWords.map((w, i) => (
                 // El espacio va FUERA del span: el motor de reveal fuerza
@@ -814,25 +817,25 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
           </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="dps-pan">
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="dps-pan">
           <div className="dps-pan-sticky">
             <div data-strip="1" className="dps-strip">
               <div id="details" data-tone="light" className="dps-panel dps-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="dps-hair-bg" />
                 <div className="dps-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="dps-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="dps-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="dps-facts">
                   <div className="dps-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="dps-facts-row dps-facts-row--last">
-                      <span>CÓDIGO</span><span className="dps-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="dps-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -846,7 +849,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
                     ))}
                   </div>
                 )}
-                <div className="dps-seguir">SEGUÍ BAJANDO <span className="dps-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="dps-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="dps-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -857,11 +860,11 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
                   </svg>
                   <div className="dps-panel-block">
                     <span className="dps-mini-label">02 / {LUGAR_PANEL_COUNT}</span>
-                    <span className="dps-panel-title-sm">Cómo llegar</span>
+                    <span className="dps-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="dps-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="dps-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -870,9 +873,9 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
 
               <div data-tone="dark" className="dps-panel dps-panel--center" style={{ background: "#180D16", color: "#F4F1EA" }}>
                 <div className="dps-medallion dps-medallion--lg">
-                  <DpsMedallionCmp label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PASE Nº ${passNumber}`} arcId="dpsArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <DpsMedallionCmp label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()} arcId="dpsArc2" arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="dps-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="dps-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -891,7 +894,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
         <section data-tone="dark" data-screen-label="Check-in" className="dps-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #180D16 60%, #130A11 100%)" }}>
           <span data-xin="1" data-dist="-60" className="dps-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="dps-h2">
-            Confirmá<br /><span className="dps-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="dps-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -925,20 +928,20 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
               />
             </div>
           ) : (
-            <p className="dps-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="dps-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="dps-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="dps-pan">
           <div className="dps-pan-sticky">
             <div data-strip="1" className="dps-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="dps-panel dps-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="dps-hair-bg" />
                   <div className="dps-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="dps-panel-title-md">Álbum <span className="dps-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="dps-panel-title-md">{tx("invitacion.album.titulo")} <span className="dps-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="dps-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -948,25 +951,25 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="dps-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="dps-photo-placeholder">Sin fotos todavía</span>
+                      <span className="dps-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="dps-seguir dps-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="dps-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="dps-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="dps-panel dps-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="dps-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="dps-panel-title">Todo lo que<br /><span className="dps-accent-serif">vamos a recordar</span></h2>
+                <span className="dps-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="dps-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="dps-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="dps-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#A85E3A" />
@@ -974,8 +977,8 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
                     <div className="dps-live-placeholder">
                       <span className="dps-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -987,9 +990,9 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="dps-section" style={{ background: "#180D16" }}>
-            <span data-xin="1" data-dist="-60" className="dps-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="dps-h2">¿Qué anécdota<br /><span className="dps-accent-italic">no puede faltar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="dps-section" style={{ background: "#180D16" }}>
+            <span data-xin="1" data-dist="-60" className="dps-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="dps-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaAnecdotaFaltar"), "dps-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="dps-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="dps-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#FDF1E7" : "#E8A07C" }} />
@@ -999,24 +1002,24 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
               <DpsSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="dps-section" style={{ background: "#180D16" }}>
-            <span data-xin="1" data-dist="-60" className="dps-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="dps-section" style={{ background: "#180D16" }}>
+            <span data-xin="1" data-dist="-60" className="dps-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="dps-h2">
-              Si querés<br /><span className="dps-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="dps-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="dps-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1036,7 +1039,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1058,7 +1061,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="dps-section" style={{ background: "#180D16" }}>
-            <span data-xin="1" data-dist="-60" className="dps-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="dps-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="dps-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1067,26 +1070,26 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="dps-section dps-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #180D16 55%, #130A11 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="dps-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="dps-section dps-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #180D16 55%, #130A11 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="dps-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="dps-final-card">
             <div className="dps-medallion dps-medallion--final">
-              <DpsMedallionCmp label="DS" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="dpsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <DpsMedallionCmp label="DS" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="dpsArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="dps-mini-label dps-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="dps-mini-label dps-accent-serif-2">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="dps-final-names">{namesTitle}</span>
             <span className="dps-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="dps-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="dps-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="dps-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="dps-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1098,7 +1101,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
       </div>
 
       <div ref={railRef} className="dps-rail">
-        <span ref={railTopRef} className="dps-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="dps-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="dps-rail-line">
           <span ref={railBarRef} className="dps-rail-bar" />
         </div>
@@ -1120,7 +1123,7 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="dps-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="dps-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </DpsCoverHalf>
         </div>
         <div ref={bottomRef} className="dps-cover-half dps-cover-half--bottom">
@@ -1134,12 +1137,12 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="dps-cover-cta dps-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="dps-cover-cta dps-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </DpsCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="dps-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="dps-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1154,14 +1157,14 @@ export function DespedidaSolteraTemplateCoral({ invitation, guest, isPersonalize
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="dps-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1228,6 +1231,7 @@ function DpsMedallionCmp({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1236,7 +1240,7 @@ function DpsMedallionCmp({
     <>
       <div className="dps-medallion-ring" style={{ animation: spin === "none" ? "none" : `dpsRing ${ringDuration}s linear infinite` }} />
       <div className="dps-medallion-core">
-        {title && <span className="dps-medallion-sub">SECTOR</span>}
+        {title && <span className="dps-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "dps-medallion-label-sm" : "dps-medallion-label"}>{title || label}</span>
         {sub && <span className="dps-medallion-sub dps-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1255,6 +1259,7 @@ function DpsMedallionCmp({
 }
 
 function DpsCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1269,7 +1274,7 @@ function DpsCopyField({ label, value }: { label: string; value: string }) {
         <span className="dps-bank-row-value">{value}</span>
       </div>
       <button type="button" className="dps-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1333,6 +1338,7 @@ function DpsRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1364,8 +1370,7 @@ function DpsRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1389,7 +1394,7 @@ function DpsRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1398,7 +1403,7 @@ function DpsRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1407,9 +1412,9 @@ function DpsRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="dps-rsvp-declined">
-        <p className="dps-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="dps-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="dps-rsvp-btn dps-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1422,13 +1427,13 @@ function DpsRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí (ver img/confirmacion.jpg). */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="dps-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="dps-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1438,7 +1443,7 @@ function DpsRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="dps-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="dps-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1448,7 +1453,7 @@ function DpsRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="dps-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="dps-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1458,15 +1463,15 @@ function DpsRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="dps-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="dps-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="dps-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="dps-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="dps-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="dps-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="dps-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1476,7 +1481,7 @@ function DpsRsvpCard({
           </div>
         ) : (
           <div className="dps-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1491,7 +1496,7 @@ function DpsRsvpCard({
             <div className="dps-rsvp-payment-value">
               <span className="dps-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="dps-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="dps-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="dps-rsvp-payment-detail">
@@ -1505,7 +1510,7 @@ function DpsRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1517,9 +1522,9 @@ function DpsRsvpCard({
 
       <div ref={stubRef} className="dps-stub">
         <div className="dps-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="dps-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="dps-seal">
@@ -1534,10 +1539,10 @@ function DpsRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="dps-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="dps-rsvp-btn dps-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1560,6 +1565,7 @@ interface DpsSongItem {
 // img/musica.JPG) -- misma API que <SongSuggestion> (/api/songs), pero sin
 // el look de tarjetas redondeadas del componente compartido.
 function DpsSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<DpsSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1583,7 +1589,7 @@ function DpsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1596,14 +1602,14 @@ function DpsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1613,9 +1619,9 @@ function DpsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="dps-song">
       <form onSubmit={handleSubmit} className="dps-song-row">
         <div className="dps-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="dps-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="dps-song-input" />
           <span className="dps-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="dps-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="dps-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="dps-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1625,7 +1631,7 @@ function DpsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="dps-song-item">
               <span className="dps-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="dps-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="dps-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1637,6 +1643,7 @@ function DpsSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function DpsQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: DpsQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1679,7 +1686,7 @@ function DpsQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1751,11 +1758,11 @@ function DpsQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="dps-quiz-result">
           <p className="dps-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="dps-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1802,6 +1809,7 @@ function DpsCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="dps-cover-inner">
       {/* Cada recorte reemplaza el degradé de fondo SOLO en su propio
@@ -1839,7 +1847,7 @@ function DpsCoverHalf({
       <div className="dps-cover-texture" />
       <div className="dps-cover-content">
         <div className="dps-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="dps-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="dps-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="dps-cover-center">
           <span ref={kickerRef} className="dps-cover-kicker">{kickerText}</span>
@@ -1856,7 +1864,7 @@ function DpsCoverHalf({
           {children}
           <div className="dps-barcode-wrap">
             <div className="dps-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="dps-mini-label dps-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="dps-mini-label dps-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

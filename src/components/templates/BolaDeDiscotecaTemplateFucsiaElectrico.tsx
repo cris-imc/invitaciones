@@ -38,6 +38,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const bddArchivo = Archivo_Black({
   subsets: ["latin"],
@@ -122,14 +124,15 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPersonalized = false }: BolaDeDiscotecaTemplateProps) {
+  const tx = useTextos();
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
-  const namesTitle = nombreQuinceanera || "Mis quince";
+  const namesTitle = nombreQuinceanera || tx("invitacion.evento.misQuince");
 
   // "Saludar por nombre del invitado/familia": si está activo, la portada
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "LA PISTA SE PRENDE PARA" : "LA PISTA SE PRENDE PARA LOS 15 DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.pistaSePrendePara").toUpperCase() : tx("invitacion.sabor.pistaSePrendeQuinceDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -154,7 +157,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Bloqueá la noche entera. La pista no se apaga."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajePistaNoSeApaga")
   );
 
   // Cronograma real (no inventado) -- se muestra tal cual lo cargó el
@@ -252,7 +255,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: BddQuizQuestion[] = safeJson<BddQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeMi"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -409,7 +412,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#FFFFFF";
       }
       if (stubRef.current) {
@@ -695,7 +698,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
       <div ref={scrollerRef} data-scroller="1" className="bdd-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="bdd-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #161233 0%, #0A0A22 55%, #08081A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bdd-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="bdd-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="bdd-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="bdd-date-month">{monthAbbr}</span>
@@ -716,14 +719,14 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
           />
 
           <div data-drift="-70" className="bdd-medallion bdd-medallion--corner">
-            <BddMedallion mainText="15" subLabel="ACCESO" arcId="bddArc1" arcText="MIS 15 · ALL ACCESS · " spin="normal" />
+            <BddMedallion mainText="15" subLabel={tx("invitacion.pase.acceso").toUpperCase()} arcId="bddArc1" arcText={tx("invitacion.sabor.arcoMis15AllAccess").toUpperCase()} spin="normal" />
           </div>
         </section>
 
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`bdd-hero-photo-section${!photoMobile ? " bdd-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " bdd-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="bdd-hero-photo-frame">
@@ -747,18 +750,18 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
           <div className="bdd-scanline" />
           <span data-xin="1" data-dist="-60" className="bdd-kicker" style={{ position: "relative" }}>{knPre(2)} — LA PISTA SE ENCIENDE EN</span>
           <div className="bdd-cd-grid">
-            <BddCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <BddCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <BddCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <BddCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <BddCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <BddCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <BddCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <BddCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="bdd-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="bdd-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1D1338 0%, #120A22 52%, #08081A 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="bdd-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1D1338 0%, #120A22 52%, #08081A 100%)" }}>
           <div data-drift="-130" className="bdd-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="bdd-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="bdd-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -782,7 +785,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="bdd-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")} className="bdd-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="bdd-pan-sticky">
             <div data-strip="1" className="bdd-strip">
               {ceremoniaHabilitada && (
@@ -798,23 +801,23 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                   <div className="bdd-facts">
                     {ceremoniaHora && (
                       <div className="bdd-facts-row bdd-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="bdd-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="bdd-seguir">SEGUÍ BAJANDO <span className="bdd-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="bdd-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="bdd-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="bdd-panel bdd-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="bdd-hair-bg" />
                 <div className="bdd-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="bdd-panel-title">
                   {lugarNombre || "Club Nocturno"}
@@ -822,11 +825,11 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                 </h2>
                 <div className="bdd-facts">
                   <div className="bdd-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="bdd-facts-row bdd-facts-row--last">
-                      <span>CÓDIGO</span><span className="bdd-accent-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="bdd-accent-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -840,7 +843,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                     ))}
                   </div>
                 )}
-                <div className="bdd-seguir">SEGUÍ BAJANDO <span className="bdd-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="bdd-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="bdd-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -851,11 +854,11 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                   </svg>
                   <div className="bdd-panel-block">
                     <span className="bdd-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="bdd-panel-title-sm">Cómo llegar</span>
+                    <span className="bdd-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="bdd-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bdd-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -864,9 +867,9 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
               <div data-tone="dark" className="bdd-panel bdd-panel--center" style={{ background: "#0A0A22", color: "#F4F1EA" }}>
                 <div className="bdd-medallion bdd-medallion--lg">
-                  <BddMedallion topLabel="SECTOR" mainText="Pista" subLabel={`PASE Nº ${passNumber}`} arcId="bddArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" />
+                  <BddMedallion topLabel={tx("invitacion.pase.sector").toUpperCase()} mainText={tx("invitacion.pase.pista")} subLabel={tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()} arcId="bddArc2" arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()} spin="reverse" />
                 </div>
-                <span className="bdd-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="bdd-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -885,7 +888,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
         <section data-tone="dark" data-screen-label="Check-in" className="bdd-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #161233 0%, #0A0A22 60%, #08081A 100%)" }}>
           <span data-xin="1" data-dist="-60" className="bdd-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="bdd-h2">
-            Confirmá<br /><span className="bdd-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="bdd-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -919,20 +922,20 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
               />
             </div>
           ) : (
-            <p className="bdd-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="bdd-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="bdd-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="bdd-pan">
           <div className="bdd-pan-sticky">
             <div data-strip="1" className="bdd-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="bdd-panel bdd-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="bdd-hair-bg" />
                   <div className="bdd-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="bdd-panel-title-md">Álbum <span className="bdd-accent-pink-italic">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="bdd-panel-title-md">{tx("invitacion.album.titulo")} <span className="bdd-accent-pink-italic">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="bdd-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -942,25 +945,25 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="bdd-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="bdd-photo-placeholder">Sin fotos todavía</span>
+                      <span className="bdd-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="bdd-seguir bdd-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="bdd-accent-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="bdd-accent-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="bdd-panel bdd-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="bdd-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="bdd-panel-title">Todo lo que<br /><span className="bdd-accent-pink-italic">vamos a recordar</span></h2>
+                <span className="bdd-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="bdd-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="bdd-accent-pink-italic">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="bdd-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#FF17B0" />
@@ -968,8 +971,8 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                     <div className="bdd-live-placeholder">
                       <span className="bdd-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -981,9 +984,9 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="bdd-section" style={{ background: "#0A0A22" }}>
-            <span data-xin="1" data-dist="-60" className="bdd-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="bdd-h2">¿Qué tema<br /><span className="bdd-accent-pink-italic">te hace bailar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="bdd-section" style={{ background: "#0A0A22" }}>
+            <span data-xin="1" data-dist="-60" className="bdd-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="bdd-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaBailar"), "bdd-accent-pink-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bdd-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="bdd-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#FFFFFF" : "#2E6BFF" }} />
@@ -993,24 +996,24 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
               <BddSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="bdd-section" style={{ background: "#0A0A22" }}>
-            <span data-xin="1" data-dist="-60" className="bdd-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="bdd-section" style={{ background: "#0A0A22" }}>
+            <span data-xin="1" data-dist="-60" className="bdd-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bdd-h2">
-              Si querés<br /><span className="bdd-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="bdd-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="bdd-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1030,7 +1033,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1052,7 +1055,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bdd-section" style={{ background: "#0A0A22" }}>
-            <span data-xin="1" data-dist="-60" className="bdd-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="bdd-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="bdd-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1061,26 +1064,26 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="bdd-section bdd-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #161233 0%, #0A0A22 55%, #08081A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bdd-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="bdd-section bdd-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #161233 0%, #0A0A22 55%, #08081A 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="bdd-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bdd-final-card">
             <div className="bdd-medallion bdd-medallion--final">
-              <BddMedallion mainText="15" subLabel={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="bddArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <BddMedallion mainText="15" subLabel={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="bddArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="bdd-mini-label bdd-accent-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="bdd-mini-label bdd-accent-2">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="bdd-final-names">{namesTitle}</span>
             <span className="bdd-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="bdd-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="bdd-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="bdd-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="bdd-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1092,7 +1095,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
       </div>
 
       <div ref={railRef} className="bdd-rail">
-        <span ref={railTopRef} className="bdd-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="bdd-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="bdd-rail-line">
           <span ref={railBarRef} className="bdd-rail-bar" />
         </div>
@@ -1114,7 +1117,7 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="bdd-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="bdd-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </BddCoverHalf>
         </div>
         <div ref={bottomRef} className="bdd-cover-half bdd-cover-half--bottom">
@@ -1128,12 +1131,12 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="bdd-cover-cta bdd-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="bdd-cover-cta bdd-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </BddCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="bdd-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="bdd-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1148,14 +1151,14 @@ export function BolaDeDiscotecaTemplateFucsiaElectrico({ invitation, guest, isPe
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="bdd-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1253,6 +1256,7 @@ function BddMedallion({
 }
 
 function BddCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1267,7 +1271,7 @@ function BddCopyField({ label, value }: { label: string; value: string }) {
         <span className="bdd-bank-row-value">{value}</span>
       </div>
       <button type="button" className="bdd-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1330,6 +1334,7 @@ function BddRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1361,8 +1366,7 @@ function BddRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1386,7 +1390,7 @@ function BddRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1395,7 +1399,7 @@ function BddRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1404,9 +1408,9 @@ function BddRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="bdd-rsvp-declined">
-        <p className="bdd-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="bdd-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="bdd-rsvp-btn bdd-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1416,13 +1420,13 @@ function BddRsvpCard({
     <>
       <div className="bdd-rsvp-rows">
         <div className="bdd-rsvp-row">
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="bdd-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="bdd-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1432,7 +1436,7 @@ function BddRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="bdd-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="bdd-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1442,7 +1446,7 @@ function BddRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="bdd-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="bdd-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1452,15 +1456,15 @@ function BddRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="bdd-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="bdd-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="bdd-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="bdd-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="bdd-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="bdd-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="bdd-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1470,7 +1474,7 @@ function BddRsvpCard({
           </div>
         ) : (
           <div className="bdd-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1481,7 +1485,7 @@ function BddRsvpCard({
             <div className="bdd-rsvp-payment-value">
               <span className="bdd-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="bdd-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="bdd-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="bdd-rsvp-payment-detail">
@@ -1495,7 +1499,7 @@ function BddRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1507,9 +1511,9 @@ function BddRsvpCard({
 
       <div ref={stubRef} className="bdd-stub">
         <div className="bdd-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="bdd-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="bdd-seal">
@@ -1524,10 +1528,10 @@ function BddRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="bdd-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="bdd-rsvp-btn bdd-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1548,6 +1552,7 @@ interface BddSongItem {
 
 // Misma API que <SongSuggestion> (/api/songs), look propio de la plantilla.
 function BddSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<BddSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1571,7 +1576,7 @@ function BddSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1584,14 +1589,14 @@ function BddSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1601,9 +1606,9 @@ function BddSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="bdd-song">
       <form onSubmit={handleSubmit} className="bdd-song-row">
         <div className="bdd-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="bdd-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="bdd-song-input" />
           <span className="bdd-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="bdd-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="bdd-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="bdd-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1613,7 +1618,7 @@ function BddSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="bdd-song-item">
               <span className="bdd-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="bdd-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="bdd-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1625,6 +1630,7 @@ function BddSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página -- misma API
 // /api/quiz que usa el resto de las plantillas.
 function BddQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: BddQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1667,7 +1673,7 @@ function BddQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1739,11 +1745,11 @@ function BddQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="bdd-quiz-result">
           <p className="bdd-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="bdd-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1790,6 +1796,7 @@ function BddCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="bdd-cover-inner">
       {photoMobile && (
@@ -1806,7 +1813,7 @@ function BddCoverHalf({
       <div className="bdd-discolight" />
       <div className="bdd-cover-content">
         <div className="bdd-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="bdd-accent-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="bdd-accent-2">ALL ACCESS</span>
         </div>
         <div className="bdd-cover-center">
           <span ref={kickerRef} className="bdd-cover-kicker">{kickerText}</span>
@@ -1823,7 +1830,7 @@ function BddCoverHalf({
           {children}
           <div className="bdd-barcode-wrap">
             <div className="bdd-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="bdd-mini-label bdd-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="bdd-mini-label bdd-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

@@ -44,6 +44,8 @@ import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 15.5v-4M12 8.2h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
@@ -167,6 +169,7 @@ interface CronoItem {
 }
 
 function CopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -185,7 +188,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
         type="button" 
         onClick={handle}
       >
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -210,6 +213,7 @@ interface QuizQuestion {
 }
 
 function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string; tipo?: string }) {
+  const tx = useTextos();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
@@ -274,7 +278,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 invitationId,
-                guestName: guestName || 'Invitado Anónimo',
+                guestName: guestName || tx("invitacion.evento.invitadoAnonimo"),
                 guestToken: guestToken || null,
                 answers: Object.values(newPicks),
                 score,
@@ -314,21 +318,19 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
     return (
       <div className="quiz-box text-center flex flex-col items-center">
         <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "#FFFFFF" }}>
-          ¡Juego Completado!
+          {tx("invitacion.quiz.juegoCompletado")}
         </h3>
-        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#F1E4E6" }}>
-          RESPONDISTE {score} DE {preguntas.length} CORRECTAMENTE ({percent}%)
-        </p>
+        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem", color: "#F1E4E6" }}>{tx("invitacion.quiz.respondisteCorrectamentePorcentaje", { aciertos: score, total: preguntas.length, pct: percent }).toUpperCase()}</p>
         
         {isSaving ? (
-          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7, color: "#B9A6B4" }}>Guardando tus resultados...</p>
+          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7, color: "#B9A6B4" }}>{tx("invitacion.quiz.guardandoResultados")}</p>
         ) : (
           stats && stats.count > 0 && (
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.05)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "left", maxWidth: "90%" }}>
                 <Users className="w-5 h-5 text-[#D89AA0] shrink-0" />
                 <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4, color: "#F1E4E6" }}>
-                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong style={{ color: "#FFFFFF" }}>{stats.avg}%</strong>.
+                  {tx("invitacion.quiz.promedioGlobal", { n: stats.count })} <strong style={{ color: "#FFFFFF" }}>{stats.avg}%</strong>.
                 </p>
               </div>
             </div>
@@ -349,7 +351,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
     if (formatted.length > 0) {
       formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
     }
-    return `¿${formatted}${formatted.endsWith('?') ? '' : '?'}`;
+    return tx("invitacion.quiz.signoPregunta", { pregunta: formatted }) + (formatted.endsWith('?') ? '' : '?');
   };
 
   return (
@@ -392,11 +394,8 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
   );
 }
 
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("es-AR").format(num);
-};
-
 export function OnixTemplate({ invitation, guest, isPersonalized = false }: OnixTemplateProps) {
+  const tx = useTextos();
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
@@ -520,9 +519,9 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
   // Cover / Welcome Overlay data
   const portadaHabilitada = Boolean(invitation.portadaHabilitada ?? true);
   const ciudad = String(invitation.ciudad ?? "");
-  const portadaKicker = String(invitation.portadaKicker || "Con mucho cariño, para");
-  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || "Te invitamos a compartir este día tan especial con nosotros");
-  const portadaBoton = String(invitation.portadaTextoBoton || "Abrir invitación");
+  const portadaKicker = String(invitation.portadaKicker || tx("invitacion.portada.conMuchoCarinoPara"));
+  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || tx("invitacion.portada.mensajeBienvenida"));
+  const portadaBoton = String(invitation.portadaTextoBoton || tx("invitacion.portada.abrirInvitacion"));
 
   const getHeroTitle = () => {
     if (tipo === "CASAMIENTO") {
@@ -538,9 +537,9 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
 
   const eyebrow = invitation.nombreEvento 
     ? String(invitation.nombreEvento)
-    : tipo === "CASAMIENTO" ? "Nos casamos"
-    : tipo === "QUINCE_ANOS" ? "Mis quince años"
-    : "Te invitamos";
+    : tipo === "CASAMIENTO" ? tx("invitacion.evento.nosCasamos")
+    : tipo === "QUINCE_ANOS" ? tx("invitacion.evento.misQuinceAnos")
+    : tx("invitacion.evento.teInvitamos");
 
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
@@ -560,7 +559,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
   // Google bloquea (X-Frame-Options) y quedaba como un recuadro blanco.
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
 
-  const quoteKicker = "Unas palabras";
+  const quoteKicker = tx("invitacion.frase.unasPalabras");
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
   const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
@@ -590,10 +589,10 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
     ...(mapUrl        ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
-    ...(rsvpEnabled   ? [{ id: "rsvp",     label: "Confirmar", icon: <IconCheck /> }] : []),
-    ...(showGiftSection  ? [{ id: "banco",    label: "Banco",     icon: <IconGift /> }]  : []),
+    ...(rsvpEnabled   ? [{ id: "rsvp",     label: tx("invitacion.rsvp.confirmar"), icon: <IconCheck /> }] : []),
+    ...(showGiftSection  ? [{ id: "banco",    label: tx("invitacion.regalos.banco"),     icon: <IconGift /> }]  : []),
     ...(triviaHabilitada && triviaPreguntas.length > 0 ? [{ id: "quiz", label: "Juego", icon: <IconQuiz /> }] : []),
-    ...(songsEnabled  ? [{ id: "songs",    label: "Música",    icon: <IconMusic /> }] : []),
+    ...(songsEnabled  ? [{ id: "songs",    label: tx("invitacion.musica.titulo"),    icon: <IconMusic /> }] : []),
   ];
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
@@ -634,7 +633,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
             {/* Header Content */}
             <div className="p-10 md:p-16 space-y-8">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white tracking-wide drop-shadow-md">
-                Un momento <AnimatedSynonyms words={["inolvidable", "único", "eterno", "mágico"]} className="italic text-amber-200/90 font-serif" />
+                {tx("invitacion.frase.unMomento")} <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="italic text-amber-200/90 font-serif" />
               </h1>
               
               <div className="flex justify-center items-center gap-4 py-2 opacity-60">
@@ -644,13 +643,13 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
               </div>
 
               <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide" >
-                Gracias por acompañarnos en este día tan especial y compartir la alegría de crear recuerdos que perdurarán para siempre.
+                {tx("invitacion.frase.graciasPorAcompanarnos")}
               </p>
 
               <div className="pt-6">
                 <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs  tracking-widest uppercase backdrop-blur-md" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
-                  <span>Álbum disponible hasta el {expirationDateStr}</span>
+                  <span>{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</span>
                 </div>
               </div>
             </div>
@@ -665,10 +664,10 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                 ) : (
                   <div className="text-center space-y-3">
                     <h3 className="font-serif font-light text-xl text-slate-200 tracking-wide">
-                      Álbum Fotográfico
+                      {tx("invitacion.album.fotografico")}
                     </h3>
                     <p className="text-sm text-slate-400  font-light tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                      No se registraron capturas durante la velada.
+                      {tx("invitacion.album.sinCapturas")}
                     </p>
                   </div>
                 )}
@@ -836,7 +835,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
           font-size: 13px !important;
         }
         /* Make decision buttons side-by-side */
-        #rsvp.section.dark div:has(> button[aria-label="Confirmar asistencia"]) {
+        #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) {
           flex-direction: row !important;
           gap: 12px !important;
         }
@@ -1048,7 +1047,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
               <p className=" text-sm font-medium text-[#B9A6B4] tracking-wide uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8 }}>
-                Dress code: {activeDressCode}
+                {tx("invitacion.ubicacion.dressCode")} {activeDressCode}
               </p>
             )}
 
@@ -1065,7 +1064,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
               onMouseEnter={(e) => { e.currentTarget.style.background = '#D89AA0'; e.currentTarget.style.color = '#140B14'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(216,154,160,0.08)'; e.currentTarget.style.color = '#D89AA0'; }}
             >
-              ABRIR INVITACIÓN
+              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
             </button>
 
           </div>
@@ -1088,7 +1087,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
-                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D89AA0] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
+                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D89AA0] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{tx("invitacion.pase.paseEspecial")}</span>
                 <span className="text-[#FFFFFF] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
                 {guest.mesas && guest.mesas.length > 0 && (
                   <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D89AA0] leading-none mt-1.5" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{guest.mesas.join(" · ")}</span>
@@ -1096,13 +1095,13 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
               </div>
               <div className="flex flex-col items-end border-l border-[#D89AA0]/20 pl-3">
                 <span className="text-[#FFFFFF] font-bold text-sm leading-none">{guest.expectedCount}</span>
-                <span className="text-[#B9A6B4] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
+                <span className="text-[#B9A6B4] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#D89AA0]" />
-              <span className="text-[#231A22]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#231A22]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{tx("invitacion.pase.pase")}</span>
             </div>
           )}
         </div>,
@@ -1157,7 +1156,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
           <p className=" text-sm font-medium text-white/90 tracking-wide drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
           {Boolean(activeDressCode) && (
             <p className=" text-xs font-semibold text-white/80 tracking-widest uppercase mt-4 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              Dress code: {activeDressCode}
+              {tx("invitacion.ubicacion.dressCode")} {activeDressCode}
             </p>
           )}
         </div>
@@ -1196,7 +1195,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
             </p>
             {Boolean(activeDressCode) && (
               <p className=" text-xs font-semibold text-[#D89AA0] tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                Dress code: {activeDressCode}
+                {tx("invitacion.ubicacion.dressCode")} {activeDressCode}
               </p>
             )}
           </div>
@@ -1248,8 +1247,8 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
           <Countdown
             targetDate={fechaEvento}
             countdownStyle={invitation.countdownStyle as any}
-            kicker="Cuenta regresiva"
-            title={tipo === "CASAMIENTO" ? "Faltan poquitos días" : "La cuenta ya empezó"}
+            kicker={tx("invitacion.cuentaRegresiva.kicker")}
+            title={tipo === "CASAMIENTO" ? tx("invitacion.cuentaRegresiva.faltanPoquitosDias") : tx("invitacion.cuentaRegresiva.laCuentaYaEmpezo")}
             dark
           />
         ) : null}
@@ -1275,7 +1274,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
               <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
             <p className="t-kicker mb-8 flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#D89AA0]" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              CUÁNDO Y DÓNDE
+              {tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}
             </p>
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
@@ -1292,8 +1291,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                   )}
                   {Boolean(invitation.ceremoniaHora) && (
                     <p className="text-[#B9A6B4]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                      {String(invitation.ceremoniaHora)} hs
-                    </p>
+                      {tx("invitacion.ubicacion.horaConSufijo", { hora: String(invitation.ceremoniaHora) })}</p>
                   )}
                   {Boolean(invitation.ceremoniaDireccion) && (
                     <p className="text-[#B9A6B4]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1302,7 +1300,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                   )}
                   {Boolean(invitation.ceremoniaMapUrl) && (
                     <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#D89AA0] hover:text-white transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                      Ver mapa ceremonia ↗
+                      {tx("invitacion.ubicacion.verMapaCeremonia") + " ↗"}
                     </a>
                   )}
                 </div>
@@ -1313,7 +1311,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
             {(lugarNombre || direccion) && (
               <div className="bg-black/20 border-l-[2px] border-l-[#D89AA0] p-6 sm:p-8 mb-10 shadow-sm">
                 <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B9A6B4] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  FIESTA / SALÓN
+                  {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}
                 </span>
                 {lugarNombre && (
                   <h4 className="text-2xl sm:text-3xl font-light text-[#FFFFFF] mb-3" style={{ fontFamily: 'var(--font-cormorant), serif', fontStyle: 'italic' }}>
@@ -1322,8 +1320,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                 )}
                 {hora && (
                   <p className="text-[#B9A6B4]  text-sm sm:text-base mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                    {hora} hs
-                  </p>
+                    {tx("invitacion.ubicacion.horaConSufijo", { hora: hora })}</p>
                 )}
                 {direccion && (
                   <p className="text-[#B9A6B4]  text-sm sm:text-base mb-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
@@ -1332,7 +1329,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                 )}
                 {mapUrl && (
                   <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-1  text-xs font-semibold tracking-wider text-[#D89AA0] hover:text-white transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                    Ver mapa fiesta ↗
+                    {tx("invitacion.ubicacion.verMapaFiesta") + " ↗"}
                   </a>
                 )}
               </div>
@@ -1373,7 +1370,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                 <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
               <p className="t-kicker mb-10 flex items-center gap-2">
-                ÁLBUM
+                {tx("invitacion.album.titulo").toUpperCase()}
               </p>
             </div>
             <div className="w-full">
@@ -1395,7 +1392,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                 height="220"
                 style={{ border: 0, display: "block" }}
                 loading="lazy"
-                title={`Mapa: ${lugarNombre}`}
+                title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })}
                 referrerPolicy="no-referrer-when-downgrade"
               />
             ) : (
@@ -1405,7 +1402,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                 rel="noopener noreferrer"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "220px", width: "100%", padding: "0 24px", textAlign: "center", color: "var(--t-acc)", fontSize: 13, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "3px" }}
               >
-                No pudimos mostrar el mapa acá — tocá para verlo en Google Maps
+                {tx("invitacion.ubicacion.mapaNoDisponible")}
               </a>
             )}
             </div>
@@ -1459,7 +1456,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                   <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>
                 <p className="t-kicker mb-10 flex items-center gap-2 text-[#D89AA0]">
-                  DATOS BANCARIOS DEL EVENTO
+                  {tx("invitacion.regalos.datosBancarios").toUpperCase()}
                 </p>
 
                 <div className="grid grid-cols-1 gap-6 text-left w-full mt-4 items-stretch">
@@ -1467,7 +1464,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                     <BankDetailsCard
                       icon={<CreditCard className="w-5 h-5" strokeWidth={1.5} />}
                       data={{
-                        titulo: String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                        titulo: String((invitation as any).pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                         mensaje: String((invitation as any).pagoTarjetaMensaje || ""),
                         banco: String((invitation as any).pagoTarjetaBanco || ""),
                         cbu: String((invitation as any).pagoTarjetaCbu || ""),
@@ -1487,7 +1484,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                     <BankDetailsCard
                       icon={<Gift className="w-5 h-5" strokeWidth={1.5} />}
                       data={{
-                        titulo: String((invitation as any).regaloTitulo || "Regalos del Evento"),
+                        titulo: String((invitation as any).regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                         mensaje: String((invitation as any).regaloMensaje || ""),
                         banco: String((invitation as any).regaloBanco || ""),
                         cbu: String((invitation as any).regaloCbu || ""),
@@ -1514,7 +1511,7 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
                 <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
               <p className="t-kicker mb-8 flex items-center gap-2">
-                {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
+                {String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes").toUpperCase())}
               </p>
               <ProgressiveQuiz 
                 preguntas={triviaPreguntas} 
@@ -1531,8 +1528,8 @@ export function OnixTemplate({ invitation, guest, isPersonalized = false }: Onix
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}
             guestToken={guest?.uniqueToken}
-            guestName={guest?.name ?? "Invitado"}
-            kicker="¿Armamos la playlist de la fiesta?"
+            guestName={guest?.name ?? tx("invitacion.evento.invitado")}
+            kicker={tx("invitacion.musica.armamosLaPlaylist")}
             hideHeader
             dark
             showPublicList

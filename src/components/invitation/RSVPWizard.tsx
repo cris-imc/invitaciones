@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, PartyPopper } from "lucide-react";
 import Confetti from 'react-confetti';
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface RSVPWizardProps {
     invitationId: string;
@@ -16,6 +17,7 @@ interface RSVPWizardProps {
 }
 
 export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
+  const tx = useTextos();
     const [step, setStep] = useState(1);
     const [attending, setAttending] = useState<string | null>(null);
     const [name, setName] = useState("");
@@ -122,7 +124,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                 {step > s ? <Check className="w-5 h-5" /> : s}
                             </motion.div>
                             <span className="text-xs text-center" style={{ color: 'var(--color-text-secondary)' }}>
-                                {s === 1 ? 'Asistencia' : s === 2 ? 'Datos' : s === 3 ? 'Detalles' : 'Confirmar'}
+                                {s === 1 ? 'Asistencia' : s === 2 ? 'Datos' : s === 3 ? 'Detalles' : tx("invitacion.rsvp.confirmar")}
                             </span>
                         </div>
                     ))}
@@ -153,7 +155,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                 <h3 className="text-4xl mb-4" style={{ fontFamily: "'Parisienne', cursive", color: 'var(--color-primary)' }}>
                                     ¿Podrás acompañarnos?
                                 </h3>
-                                <p className="text-gray-600">Confirmá tu asistencia</p>
+                                <p className="text-gray-600">{tx("invitacion.rsvp.kicker")}</p>
                             </div>
 
                             <RadioGroup value={attending || ""} onValueChange={setAttending} className="space-y-6">
@@ -215,7 +217,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                     id="name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="Juan Pérez"
+                                    placeholder={tx("invitacion.rsvp.ejemploNombre")}
                                     className="h-14 text-lg rounded-xl border-2 focus:border-primary"
                                     required
                                 />
@@ -230,7 +232,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="juan@ejemplo.com"
+                                    placeholder={tx("invitacion.rsvp.ejemploEmail")}
                                     className="h-14 text-lg rounded-xl border-2 focus:border-primary"
                                 />
                             </div>
@@ -305,7 +307,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                     id="dietary"
                                     value={dietaryRestrictions}
                                     onChange={(e) => setDietaryRestrictions(e.target.value)}
-                                    placeholder="Vegetariano, celíaco, alergias..."
+                                    placeholder={tx("invitacion.rsvp.ejemploDietaLarga")}
                                     className="min-h-[100px] rounded-xl border-2 focus:border-primary resize-none"
                                 />
                             </div>
@@ -318,7 +320,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                     id="song"
                                     value={songRequest}
                                     onChange={(e) => setSongRequest(e.target.value)}
-                                    placeholder="Artista - Canción"
+                                    placeholder={tx("invitacion.musica.artistaYCancion")}
                                     className="h-14 text-lg rounded-xl border-2 focus:border-primary"
                                 />
                             </div>
@@ -331,7 +333,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                     id="message"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Dejanos tus deseos..."
+                                    placeholder={tx("invitacion.rsvp.placeholderDeseos")}
                                     className="min-h-[120px] rounded-xl border-2 focus:border-primary resize-none"
                                 />
                             </div>
@@ -361,7 +363,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                     id="message-no"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Te vamos a extrañar..."
+                                    placeholder={tx("invitacion.rsvp.placeholderDespedida")}
                                     className="min-h-[200px] rounded-xl border-2 focus:border-primary resize-none"
                                 />
                             </div>
@@ -461,7 +463,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                 color: 'var(--color-text-light)'
                             }}
                         >
-                            {isSubmitting ? 'Enviando...' : 'Confirmar'}
+                            {isSubmitting ? 'Enviando...' : tx("invitacion.rsvp.confirmar")}
                             <Check className="w-5 h-5" />
                         </Button>
                     )}

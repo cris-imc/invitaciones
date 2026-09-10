@@ -57,6 +57,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const pvpBodoni = Bodoni_Moda({
   subsets: ["latin"],
@@ -135,14 +137,15 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false }: PaseVipTemplateProps) {
+  const tx = useTextos();
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
-  const namesTitle = nombreQuinceanera || "Mis quince";
+  const namesTitle = nombreQuinceanera || tx("invitacion.evento.misQuince");
 
   // "Saludar por nombre del invitado/familia": si está activo, la portada
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "ACCESO EXCLUSIVO PARA" : "ACCESO EXCLUSIVO A LOS QUINCE DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.accesoPara").toUpperCase() : tx("invitacion.sabor.accesoQuinceDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -166,7 +169,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
   const scrollVertical = Boolean(invitation.storytellingScrollVertical);
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Bloqueá la noche entera. El resto lo cuento yo."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoCuentoYo")
   );
 
   // Cronograma real (no inventado) -- se muestra tal cual lo cargó el
@@ -264,7 +267,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: PvpQuizQuestion[] = safeJson<PvpQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeMi"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -419,7 +422,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#F0C9A0";
       }
       if (stubRef.current) {
@@ -705,7 +708,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
 
       <div ref={scrollerRef} data-scroller="1" className="pvp-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="pvp-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #231409 0%, #0F0A07 55%, #0D0906 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="pvp-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="pvp-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="pvp-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="pvp-date-month">{monthAbbr}</span>
@@ -726,14 +729,14 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
           />
 
           <div data-drift="-70" className="pvp-medallion pvp-medallion--corner">
-            <PvpMedallion label="VIP" sub="ACCESO" arcId="pvpArc1" arcText="ALL ACCESS · MIS QUINCE · " spin="normal" />
+            <PvpMedallion label="VIP" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="pvpArc1" arcText={tx("invitacion.sabor.arcoAllAccessMisQuince").toUpperCase()} spin="normal" />
           </div>
         </section>
 
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`pvp-hero-photo-section${!photoMobile ? " pvp-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " pvp-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="pvp-hero-photo-frame">
@@ -757,18 +760,18 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
           <div className="pvp-scanline" />
           <span data-xin="1" data-dist="-60" className="pvp-kicker" style={{ position: "relative" }}>{knPre(2)} — EL PASE SE ACTIVA EN</span>
           <div className="pvp-cd-grid">
-            <PvpCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <PvpCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <PvpCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <PvpCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <PvpCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <PvpCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <PvpCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <PvpCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="pvp-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="pvp-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1E140A 0%, #0F0A07 52%, #0D0906 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="pvp-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1E140A 0%, #0F0A07 52%, #0D0906 100%)" }}>
           <div data-drift="-130" className="pvp-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="pvp-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="pvp-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -788,7 +791,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="pvp-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")} className="pvp-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="pvp-pan-sticky">
             <div data-strip="1" className="pvp-strip">
               {ceremoniaHabilitada && (
@@ -804,35 +807,35 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
                   <div className="pvp-facts">
                     {ceremoniaHora && (
                       <div className="pvp-facts-row pvp-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="pvp-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="pvp-seguir">SEGUÍ BAJANDO <span className="pvp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="pvp-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="pvp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="pvp-panel pvp-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="pvp-hair-bg" />
                 <div className="pvp-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="pvp-panel-title">
-                  {lugarNombre || "El salón"}
+                  {lugarNombre || tx("invitacion.ubicacion.elSalon")}
                   {direccion && <><br /><span className="pvp-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="pvp-facts">
                   <div className="pvp-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="pvp-facts-row pvp-facts-row--last">
-                      <span>CÓDIGO</span><span className="pvp-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="pvp-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -846,7 +849,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
                     ))}
                   </div>
                 )}
-                <div className="pvp-seguir">SEGUÍ BAJANDO <span className="pvp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="pvp-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="pvp-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -857,11 +860,11 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
                   </svg>
                   <div className="pvp-panel-block">
                     <span className="pvp-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="pvp-panel-title-sm">Cómo llegar</span>
+                    <span className="pvp-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="pvp-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pvp-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -870,9 +873,9 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
 
               <div data-tone="dark" className="pvp-panel pvp-panel--center" style={{ background: "#0F0A07", color: "#F4F1EA" }}>
                 <div className="pvp-medallion pvp-medallion--lg">
-                  <PvpMedallion title="SECTOR" label="Pista" sub="MESA VIP" arcId="pvpArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" />
+                  <PvpMedallion title={tx("invitacion.pase.sector").toUpperCase()} label={tx("invitacion.pase.pista")} sub={tx("invitacion.pase.mesaVip").toUpperCase()} arcId="pvpArc2" arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()} spin="reverse" />
                 </div>
-                <span className="pvp-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="pvp-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -891,7 +894,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
         <section data-tone="dark" data-screen-label="Check-in" className="pvp-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #231409 0%, #0F0A07 60%, #0D0906 100%)" }}>
           <span data-xin="1" data-dist="-60" className="pvp-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="pvp-h2">
-            Confirmá<br /><span className="pvp-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="pvp-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -925,20 +928,20 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
               />
             </div>
           ) : (
-            <p className="pvp-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="pvp-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="pvp-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="pvp-pan">
           <div className="pvp-pan-sticky">
             <div data-strip="1" className="pvp-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="pvp-panel pvp-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="pvp-hair-bg" />
                   <div className="pvp-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="pvp-panel-title-md">Álbum <span className="pvp-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="pvp-panel-title-md">{tx("invitacion.album.titulo")} <span className="pvp-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="pvp-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -948,25 +951,25 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="pvp-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="pvp-photo-placeholder">Sin fotos todavía</span>
+                      <span className="pvp-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="pvp-seguir pvp-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="pvp-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="pvp-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="pvp-panel pvp-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="pvp-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="pvp-panel-title">Todo lo que<br /><span className="pvp-accent-serif">vamos a recordar</span></h2>
+                <span className="pvp-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="pvp-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="pvp-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="pvp-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#8A4E2A" />
@@ -974,8 +977,8 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
                     <div className="pvp-live-placeholder">
                       <span className="pvp-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -987,9 +990,9 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="pvp-section" style={{ background: "#0F0A07" }}>
-            <span data-xin="1" data-dist="-60" className="pvp-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="pvp-h2">¿Qué tema<br /><span className="pvp-accent-italic">no puede faltar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="pvp-section" style={{ background: "#0F0A07" }}>
+            <span data-xin="1" data-dist="-60" className="pvp-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="pvp-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaFaltar"), "pvp-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="pvp-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="pvp-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F0C9A0" : "#C9784A" }} />
@@ -999,24 +1002,24 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
               <PvpSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="pvp-section" style={{ background: "#0F0A07" }}>
-            <span data-xin="1" data-dist="-60" className="pvp-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="pvp-section" style={{ background: "#0F0A07" }}>
+            <span data-xin="1" data-dist="-60" className="pvp-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="pvp-h2">
-              Si querés<br /><span className="pvp-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="pvp-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="pvp-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1036,7 +1039,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1058,7 +1061,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="pvp-section" style={{ background: "#0F0A07" }}>
-            <span data-xin="1" data-dist="-60" className="pvp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="pvp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="pvp-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1067,26 +1070,26 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         <section data-tone="dark" data-screen-label="Tu pase VIP" className="pvp-section pvp-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #231409 0%, #0F0A07 55%, #0D0906 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="pvp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+          <span data-xin="1" data-dist="-60" className="pvp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="pvp-final-card">
             <div className="pvp-medallion pvp-medallion--final">
-              <PvpMedallion label="VIP" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="pvpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <PvpMedallion label="VIP" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="pvpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="pvp-mini-label pvp-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="pvp-mini-label pvp-accent-serif-2">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="pvp-final-names">{namesTitle}</span>
             <span className="pvp-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="pvp-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="pvp-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="pvp-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="pvp-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1098,7 +1101,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
       </div>
 
       <div ref={railRef} className="pvp-rail">
-        <span ref={railTopRef} className="pvp-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="pvp-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="pvp-rail-line">
           <span ref={railBarRef} className="pvp-rail-bar" />
         </div>
@@ -1120,7 +1123,7 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="pvp-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="pvp-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </PvpCoverHalf>
         </div>
         <div ref={bottomRef} className="pvp-cover-half pvp-cover-half--bottom">
@@ -1134,12 +1137,12 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="pvp-cover-cta pvp-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="pvp-cover-cta pvp-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </PvpCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="pvp-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="pvp-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1154,14 +1157,14 @@ export function PaseVipTemplateCobre({ invitation, guest, isPersonalized = false
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="pvp-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1257,6 +1260,7 @@ function PvpMedallion({
 }
 
 function PvpCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1271,7 +1275,7 @@ function PvpCopyField({ label, value }: { label: string; value: string }) {
         <span className="pvp-bank-row-value">{value}</span>
       </div>
       <button type="button" className="pvp-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1334,6 +1338,7 @@ function PvpRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1365,8 +1370,7 @@ function PvpRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1390,7 +1394,7 @@ function PvpRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1399,7 +1403,7 @@ function PvpRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1408,9 +1412,9 @@ function PvpRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="pvp-rsvp-declined">
-        <p className="pvp-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="pvp-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="pvp-rsvp-btn pvp-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1420,13 +1424,13 @@ function PvpRsvpCard({
     <>
       <div className="pvp-rsvp-rows">
         <div className="pvp-rsvp-row">
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="pvp-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="pvp-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1436,7 +1440,7 @@ function PvpRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="pvp-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="pvp-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1446,7 +1450,7 @@ function PvpRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="pvp-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="pvp-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1456,15 +1460,15 @@ function PvpRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="pvp-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="pvp-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="pvp-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="pvp-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="pvp-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="pvp-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="pvp-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1474,7 +1478,7 @@ function PvpRsvpCard({
           </div>
         ) : (
           <div className="pvp-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1485,7 +1489,7 @@ function PvpRsvpCard({
             <div className="pvp-rsvp-payment-value">
               <span className="pvp-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="pvp-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="pvp-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="pvp-rsvp-payment-detail">
@@ -1499,7 +1503,7 @@ function PvpRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1511,9 +1515,9 @@ function PvpRsvpCard({
 
       <div ref={stubRef} className="pvp-stub">
         <div className="pvp-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="pvp-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="pvp-seal">
@@ -1528,10 +1532,10 @@ function PvpRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="pvp-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="pvp-rsvp-btn pvp-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1552,6 +1556,7 @@ interface PvpSongItem {
 
 // Misma API que <SongSuggestion> (/api/songs), look propio de la plantilla.
 function PvpSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<PvpSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1575,7 +1580,7 @@ function PvpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1588,14 +1593,14 @@ function PvpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1605,9 +1610,9 @@ function PvpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="pvp-song">
       <form onSubmit={handleSubmit} className="pvp-song-row">
         <div className="pvp-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="pvp-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="pvp-song-input" />
           <span className="pvp-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="pvp-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="pvp-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="pvp-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1617,7 +1622,7 @@ function PvpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="pvp-song-item">
               <span className="pvp-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="pvp-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="pvp-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1629,6 +1634,7 @@ function PvpSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página -- misma API
 // /api/quiz que usa el resto de las plantillas.
 function PvpQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: PvpQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1671,7 +1677,7 @@ function PvpQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1743,11 +1749,11 @@ function PvpQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="pvp-quiz-result">
           <p className="pvp-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="pvp-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1794,6 +1800,7 @@ function PvpCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="pvp-cover-inner">
       {photoMobile && (
@@ -1810,7 +1817,7 @@ function PvpCoverHalf({
       <div className="pvp-cover-grid" />
       <div className="pvp-cover-content">
         <div className="pvp-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="pvp-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="pvp-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="pvp-cover-center">
           <span ref={kickerRef} className="pvp-cover-kicker">{kickerText}</span>
@@ -1827,7 +1834,7 @@ function PvpCoverHalf({
           {children}
           <div className="pvp-barcode-wrap">
             <div className="pvp-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="pvp-mini-label pvp-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="pvp-mini-label pvp-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

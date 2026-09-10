@@ -2,6 +2,7 @@
 
 import { ScrollReveal } from "./ScrollReveal";
 
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 interface FarewellProps {
     nombreEvento: string;
     tipo: string;
@@ -21,6 +22,8 @@ export function Farewell({
     colorPrincipal,
     despedidaFoto,
 }: FarewellProps) {
+  const tx = useTextos();
+
     // Determine host names and message
     const getHostsAndMessage = () => {
         if (tipo === 'CASAMIENTO') {
@@ -49,7 +52,7 @@ export function Farewell({
                         {despedidaFoto ? (
                             <img
                                 src={despedidaFoto}
-                                alt="Despedida"
+                                alt={tx("invitacion.frase.altDespedida")}
                                 className="w-32 h-32 mx-auto rounded-full object-cover shadow-lg"
                             />
                         ) : (

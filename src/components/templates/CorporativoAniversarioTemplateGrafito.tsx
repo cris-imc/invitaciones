@@ -50,6 +50,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const cpaDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -133,6 +135,7 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPersonalized = false }: CorporativoAniversarioTemplateGrafitoProps) {
+  const tx = useTextos();
   // Festejado/a: el nombre va SOLO (ej. "Sofía"), nunca con un prefijo tipo
   // "Baby Shower de" pegado adelante -- ese prefijo ya lo dice el kicker de
   // arriba (coverKickerText), repetirlo en el nombre queda redundante/roto
@@ -147,7 +150,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
   // cambia a una invitación personalizada en vez de anunciar la llegada.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA INVITACIÓN ESPECIAL PARA" : "CELEBRAMOS UN NUEVO CAPÍTULO EN";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.portada.unaInvitacionEspecialPara").toUpperCase() : tx("invitacion.sabor.nuevoCapituloEn").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -172,7 +175,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. Un capítulo que se celebra una sola vez."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeCapituloUnaSolaVez")
   );
 
   // Cronograma real (no ceremonia[0]/recepcion[1] inventados) -- se muestra
@@ -267,7 +270,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: CpaQuizQuestion[] = safeJson<CpaQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de nosotros?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeNosotros"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -428,7 +431,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#EDEDEF";
       }
       if (stubRef.current) {
@@ -722,7 +725,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
 
       <div ref={scrollerRef} data-scroller="1" className="cpa-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="cpa-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0E1319 55%, #0B0F13 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cpa-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="cpa-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="cpa-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="cpa-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="cpa-date-month">{monthAbbr}</span>
@@ -743,7 +746,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
           />
 
           <div data-drift="-70" className="cpa-medallion cpa-medallion--corner">
-            <CpaMedallionCmp label="10" sub="ACCESO" arcId="cpaArc1" arcText="ANIVERSARIO · ACCESO · " spin="normal" />
+            <CpaMedallionCmp label="10" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="cpaArc1" arcText={tx("invitacion.sabor.arcoAniversario").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -758,7 +761,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`cpa-hero-photo-section${!photoMobile ? " cpa-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " cpa-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="cpa-hero-photo-frame">
@@ -782,18 +785,18 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
           <div className="cpa-scanline" />
           <span data-xin="1" data-dist="-60" className="cpa-kicker" style={{ position: "relative" }}>{knPre(2)} — EL BRINDIS ES EN</span>
           <div className="cpa-cd-grid">
-            <CpaCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CpaCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CpaCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CpaCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CpaCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CpaCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CpaCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CpaCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="cpa-perf-strip" />
         </section>
 
         {hasFrase && (
-          <section id="quote" data-tone="dark" data-screen-label="Frase" className="cpa-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #0B0F13 100%)" }}>
+          <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="cpa-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #0B0F13 100%)" }}>
             <div data-drift="-130" className="cpa-glow-blob" />
-            <span data-xin="1" data-dist="-60" className="cpa-kicker" style={{ position: "relative" }}>{knPre(3)} — UN MENSAJE PARA VOS</span>
+            <span data-xin="1" data-dist="-60" className="cpa-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.frase.unMensajeParaVos").toUpperCase()}</span>
             <h2 ref={phraseRef} className="cpa-phrase" style={{ fontSize: fraseFontSize }}>
               {fraseWords.map((w, i) => (
                 // El espacio va FUERA del span: el motor de reveal fuerza
@@ -814,25 +817,25 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
           </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="cpa-pan">
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="cpa-pan">
           <div className="cpa-pan-sticky">
             <div data-strip="1" className="cpa-strip">
               <div id="details" data-tone="light" className="cpa-panel cpa-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="cpa-hair-bg" />
                 <div className="cpa-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>01 / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>01 / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="cpa-panel-title">
-                  {lugarNombre || "El lugar"}
+                  {lugarNombre || tx("invitacion.ubicacion.elLugar")}
                   {direccion && <><br /><span className="cpa-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="cpa-facts">
                   <div className="cpa-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="cpa-facts-row cpa-facts-row--last">
-                      <span>CÓDIGO</span><span className="cpa-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="cpa-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -846,7 +849,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
                     ))}
                   </div>
                 )}
-                <div className="cpa-seguir">SEGUÍ BAJANDO <span className="cpa-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="cpa-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cpa-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -857,11 +860,11 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
                   </svg>
                   <div className="cpa-panel-block">
                     <span className="cpa-mini-label">02 / {LUGAR_PANEL_COUNT}</span>
-                    <span className="cpa-panel-title-sm">Cómo llegar</span>
+                    <span className="cpa-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="cpa-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cpa-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -870,9 +873,9 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
 
               <div data-tone="dark" className="cpa-panel cpa-panel--center" style={{ background: "#0E1319", color: "#F4F1EA" }}>
                 <div className="cpa-medallion cpa-medallion--lg">
-                  <CpaMedallionCmp label={dressCode ? dressCode.toUpperCase() : "ACCESO"} sub={`PASE Nº ${passNumber}`} arcId="cpaArc2" arcText={`ACCESO VIP · PASE Nº ${passNumber} · `} spin="reverse" title="Reservado" />
+                  <CpaMedallionCmp label={dressCode ? dressCode.toUpperCase() : tx("invitacion.pase.acceso").toUpperCase()} sub={tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()} arcId="cpaArc2" arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()} spin="reverse" title={tx("invitacion.pase.reservado")} />
                 </div>
-                <span className="cpa-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="cpa-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -891,7 +894,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
         <section data-tone="dark" data-screen-label="Check-in" className="cpa-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #0E1319 60%, #0B0F13 100%)" }}>
           <span data-xin="1" data-dist="-60" className="cpa-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cpa-h2">
-            Confirmá<br /><span className="cpa-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="cpa-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -925,20 +928,20 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
               />
             </div>
           ) : (
-            <p className="cpa-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="cpa-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="cpa-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="cpa-pan">
           <div className="cpa-pan-sticky">
             <div data-strip="1" className="cpa-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="cpa-panel cpa-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cpa-hair-bg" />
                   <div className="cpa-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="cpa-panel-title-md">Álbum <span className="cpa-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="cpa-panel-title-md">{tx("invitacion.album.titulo")} <span className="cpa-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="cpa-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -948,25 +951,25 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="cpa-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="cpa-photo-placeholder">Sin fotos todavía</span>
+                      <span className="cpa-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="cpa-seguir cpa-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="cpa-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="cpa-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="cpa-panel cpa-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="cpa-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="cpa-panel-title">Todo lo que<br /><span className="cpa-accent-serif">vamos a recordar</span></h2>
+                <span className="cpa-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="cpa-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="cpa-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="cpa-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#5A5A61" />
@@ -974,8 +977,8 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
                     <div className="cpa-live-placeholder">
                       <span className="cpa-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -987,9 +990,9 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="cpa-section" style={{ background: "#0E1319" }}>
-            <span data-xin="1" data-dist="-60" className="cpa-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="cpa-h2">¿Qué recuerdo<br /><span className="cpa-accent-italic">te marcó más?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="cpa-section" style={{ background: "#0E1319" }}>
+            <span data-xin="1" data-dist="-60" className="cpa-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="cpa-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaRecuerdoMarco"), "cpa-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cpa-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="cpa-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#EDEDEF" : "#A8A8AC" }} />
@@ -999,24 +1002,24 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
               <CpaSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cpa-section" style={{ background: "#0E1319" }}>
-            <span data-xin="1" data-dist="-60" className="cpa-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="cpa-section" style={{ background: "#0E1319" }}>
+            <span data-xin="1" data-dist="-60" className="cpa-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cpa-h2">
-              Si querés<br /><span className="cpa-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="cpa-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cpa-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1036,7 +1039,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1058,7 +1061,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cpa-section" style={{ background: "#0E1319" }}>
-            <span data-xin="1" data-dist="-60" className="cpa-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="cpa-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cpa-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1067,26 +1070,26 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="cpa-section cpa-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0E1319 55%, #0B0F13 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cpa-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="cpa-section cpa-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0E1319 55%, #0B0F13 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="cpa-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cpa-final-card">
             <div className="cpa-medallion cpa-medallion--final">
-              <CpaMedallionCmp label="10" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cpaArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <CpaMedallionCmp label="10" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cpaArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="cpa-mini-label cpa-accent-serif-2">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="cpa-mini-label cpa-accent-serif-2">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="cpa-final-names">{namesTitle}</span>
             <span className="cpa-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="cpa-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="cpa-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="cpa-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="cpa-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1098,7 +1101,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
       </div>
 
       <div ref={railRef} className="cpa-rail">
-        <span ref={railTopRef} className="cpa-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="cpa-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="cpa-rail-line">
           <span ref={railBarRef} className="cpa-rail-bar" />
         </div>
@@ -1120,7 +1123,7 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="cpa-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="cpa-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CpaCoverHalf>
         </div>
         <div ref={bottomRef} className="cpa-cover-half cpa-cover-half--bottom">
@@ -1134,12 +1137,12 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="cpa-cover-cta cpa-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="cpa-cover-cta cpa-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CpaCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="cpa-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="cpa-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1154,14 +1157,14 @@ export function CorporativoAniversarioTemplateGrafito({ invitation, guest, isPer
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="cpa-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1228,6 +1231,7 @@ function CpaMedallionCmp({
   title?: string;
   compact?: boolean;
 }) {
+  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React. useState (no useMemo) es
   // la forma admitida de calcular un valor no determinístico una sola vez.
@@ -1236,7 +1240,7 @@ function CpaMedallionCmp({
     <>
       <div className="cpa-medallion-ring" style={{ animation: spin === "none" ? "none" : `cpaRing ${ringDuration}s linear infinite` }} />
       <div className="cpa-medallion-core">
-        {title && <span className="cpa-medallion-sub">SECTOR</span>}
+        {title && <span className="cpa-medallion-sub">{tx("invitacion.pase.sector").toUpperCase()}</span>}
         <span className={compact ? "cpa-medallion-label-sm" : "cpa-medallion-label"}>{title || label}</span>
         {sub && <span className="cpa-medallion-sub cpa-medallion-sub--accent">{sub}</span>}
       </div>
@@ -1255,6 +1259,7 @@ function CpaMedallionCmp({
 }
 
 function CpaCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1269,7 +1274,7 @@ function CpaCopyField({ label, value }: { label: string; value: string }) {
         <span className="cpa-bank-row-value">{value}</span>
       </div>
       <button type="button" className="cpa-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1333,6 +1338,7 @@ function CpaRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1364,8 +1370,7 @@ function CpaRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1389,7 +1394,7 @@ function CpaRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1398,7 +1403,7 @@ function CpaRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1407,9 +1412,9 @@ function CpaRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="cpa-rsvp-declined">
-        <p className="cpa-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="cpa-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="cpa-rsvp-btn cpa-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1422,13 +1427,13 @@ function CpaRsvpCard({
           {/* Con más de un invitado el nombre suele ser de un grupo/familia
               ("Familia Juarez"), no el de una persona puntual -- la etiqueta
               "Nombre y apellido" queda rara ahí (ver img/confirmacion.jpg). */}
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="cpa-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="cpa-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1438,7 +1443,7 @@ function CpaRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="cpa-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="cpa-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1448,7 +1453,7 @@ function CpaRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="cpa-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="cpa-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1458,15 +1463,15 @@ function CpaRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="cpa-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="cpa-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="cpa-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="cpa-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="cpa-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="cpa-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="cpa-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1476,7 +1481,7 @@ function CpaRsvpCard({
           </div>
         ) : (
           <div className="cpa-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1491,7 +1496,7 @@ function CpaRsvpCard({
             <div className="cpa-rsvp-payment-value">
               <span className="cpa-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="cpa-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="cpa-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="cpa-rsvp-payment-detail">
@@ -1505,7 +1510,7 @@ function CpaRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1517,9 +1522,9 @@ function CpaRsvpCard({
 
       <div ref={stubRef} className="cpa-stub">
         <div className="cpa-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="cpa-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="cpa-seal">
@@ -1534,10 +1539,10 @@ function CpaRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="cpa-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="cpa-rsvp-btn cpa-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1560,6 +1565,7 @@ interface GpSongItem {
 // img/musica.JPG) -- misma API que <SongSuggestion> (/api/songs), pero sin
 // el look de tarjetas redondeadas del componente compartido.
 function CpaSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<GpSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1583,7 +1589,7 @@ function CpaSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1596,14 +1602,14 @@ function CpaSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1613,9 +1619,9 @@ function CpaSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="cpa-song">
       <form onSubmit={handleSubmit} className="cpa-song-row">
         <div className="cpa-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="cpa-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="cpa-song-input" />
           <span className="cpa-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="cpa-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="cpa-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="cpa-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1625,7 +1631,7 @@ function CpaSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="cpa-song-item">
               <span className="cpa-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="cpa-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="cpa-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1637,6 +1643,7 @@ function CpaSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página (no un wizard
 // paso a paso) -- misma API /api/quiz que usa el resto de las plantillas.
 function CpaQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: CpaQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1679,7 +1686,7 @@ function CpaQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1751,11 +1758,11 @@ function CpaQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="cpa-quiz-result">
           <p className="cpa-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="cpa-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1802,6 +1809,7 @@ function CpaCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="cpa-cover-inner">
       {/* Cada recorte reemplaza el degradé de fondo SOLO en su propio
@@ -1839,7 +1847,7 @@ function CpaCoverHalf({
       <div className="cpa-cover-texture" />
       <div className="cpa-cover-content">
         <div className="cpa-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="cpa-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="cpa-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cpa-cover-center">
           <span ref={kickerRef} className="cpa-cover-kicker">{kickerText}</span>
@@ -1856,7 +1864,7 @@ function CpaCoverHalf({
           {children}
           <div className="cpa-barcode-wrap">
             <div className="cpa-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="cpa-mini-label cpa-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="cpa-mini-label cpa-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

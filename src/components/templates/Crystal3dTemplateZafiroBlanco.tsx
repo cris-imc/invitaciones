@@ -38,6 +38,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const c3dPoppins = Poppins({
   subsets: ["latin"],
@@ -116,14 +118,15 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalized = false }: Crystal3dTemplateProps) {
+  const tx = useTextos();
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
-  const namesTitle = nombreQuinceanera || "Mis quince";
+  const namesTitle = nombreQuinceanera || tx("invitacion.evento.misQuince");
 
   // "Saludar por nombre del invitado/familia": si está activo, la portada
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA FACETA ÚNICA PARA" : "UNA FACETA ÚNICA PARA LOS 15 DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.facetaUnicaPara").toUpperCase() : tx("invitacion.sabor.facetaUnicaQuinceDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -148,7 +151,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Bloqueá la noche entera. Esto no termina temprano."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeNoTerminaTemprano")
   );
 
   // Cronograma real (no inventado) -- se muestra tal cual lo cargó el
@@ -246,7 +249,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: C3dQuizQuestion[] = safeJson<C3dQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeMi"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -402,7 +405,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#F2F6FF";
       }
       if (stubRef.current) {
@@ -688,7 +691,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
 
       <div ref={scrollerRef} data-scroller="1" className="c3d-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="c3d-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #131C33 0%, #0A1220 55%, #05070F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="c3d-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="c3d-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="c3d-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="c3d-date-month">{monthAbbr}</span>
@@ -709,14 +712,14 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
           />
 
           <div data-drift="-70" className="c3d-medallion c3d-medallion--corner">
-            <C3dFacetGem arcId="c3dArc0" arcText="MIS 15 · ALL ACCESS · " />
+            <C3dFacetGem arcId="c3dArc0" arcText={tx("invitacion.sabor.arcoMis15AllAccess").toUpperCase()} />
           </div>
         </section>
 
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`c3d-hero-photo-section${!photoMobile ? " c3d-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " c3d-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="c3d-hero-photo-frame">
@@ -740,18 +743,18 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
           <div className="c3d-scanline" />
           <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>{knPre(2)} — EL CRISTAL SE ILUMINA EN</span>
           <div className="c3d-cd-grid">
-            <C3dCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <C3dCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <C3dCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <C3dCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <C3dCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <C3dCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <C3dCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <C3dCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="c3d-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="c3d-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #141E3A 0%, #0A1322 52%, #05070F 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="c3d-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #141E3A 0%, #0A1322 52%, #05070F 100%)" }}>
           <div data-drift="-130" className="c3d-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="c3d-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => {
               const accented = i >= fraseAccentStart;
@@ -776,7 +779,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="c3d-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")} className="c3d-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="c3d-pan-sticky">
             <div data-strip="1" className="c3d-strip">
               {ceremoniaHabilitada && (
@@ -792,23 +795,23 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                   <div className="c3d-facts">
                     {ceremoniaHora && (
                       <div className="c3d-facts-row c3d-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="c3d-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="c3d-seguir">SEGUÍ BAJANDO <span className="c3d-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="c3d-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="c3d-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="c3d-panel c3d-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="c3d-hair-bg" />
                 <div className="c3d-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="c3d-panel-title">
                   {lugarNombre || "Studio"}
@@ -816,11 +819,11 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                 </h2>
                 <div className="c3d-facts">
                   <div className="c3d-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="c3d-facts-row c3d-facts-row--last">
-                      <span>CÓDIGO</span><span className="c3d-accent-lavender">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="c3d-accent-lavender">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -834,7 +837,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                     ))}
                   </div>
                 )}
-                <div className="c3d-seguir">SEGUÍ BAJANDO <span className="c3d-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="c3d-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="c3d-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -845,11 +848,11 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                   </svg>
                   <div className="c3d-panel-block">
                     <span className="c3d-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="c3d-panel-title-sm">Cómo llegar</span>
+                    <span className="c3d-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="c3d-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="c3d-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -861,13 +864,13 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                   <C3dMedallion
                     ringGradient="conic-gradient(from 90deg, #6E93E8, #F2F6FF, #D7DEEC, #6E93E8, #6E93E8)"
                     topLabel="ACCESO VIP"
-                    sub={`PASE Nº ${passNumber}`}
+                    sub={tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}
                     subAccent="cyan"
                     arcId="c3dArc2"
-                    arcText={`ACCESO VIP · PASE Nº ${passNumber} · `}
+                    arcText={tx("invitacion.pase.arcoAccesoVipPase", { n: passNumber }).toUpperCase()}
                   />
                 </div>
-                <span className="c3d-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="c3d-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -886,7 +889,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
         <section data-tone="dark" data-screen-label="Check-in" className="c3d-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #131C33 0%, #0A1220 60%, #05070F 100%)" }}>
           <span data-xin="1" data-dist="-60" className="c3d-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="c3d-h2">
-            Confirmá<br /><span className="c3d-accent-italic-cyan">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="c3d-accent-italic-cyan">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -920,20 +923,20 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
               />
             </div>
           ) : (
-            <p className="c3d-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="c3d-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="c3d-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="c3d-pan">
           <div className="c3d-pan-sticky">
             <div data-strip="1" className="c3d-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="c3d-panel c3d-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="c3d-hair-bg" />
                   <div className="c3d-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="c3d-panel-title-md">Álbum <span className="c3d-accent-italic-lavender">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="c3d-panel-title-md">{tx("invitacion.album.titulo")} <span className="c3d-accent-italic-lavender">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="c3d-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -943,25 +946,25 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="c3d-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="c3d-photo-placeholder">Sin fotos todavía</span>
+                      <span className="c3d-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="c3d-seguir c3d-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="c3d-accent-lavender">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="c3d-accent-lavender">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="c3d-panel c3d-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="c3d-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="c3d-panel-title">Todo lo que<br /><span className="c3d-accent-italic-lavender">vamos a recordar</span></h2>
+                <span className="c3d-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="c3d-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="c3d-accent-italic-lavender">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="c3d-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#D7DEEC" />
@@ -969,8 +972,8 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                     <div className="c3d-live-placeholder">
                       <span className="c3d-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -982,9 +985,9 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="c3d-section" style={{ background: "#0A1220" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2">¿Qué tema<br /><span className="c3d-accent-italic-lavender">te hace bailar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="c3d-section" style={{ background: "#0A1220" }}>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaTemaBailar"), "c3d-accent-italic-lavender")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="c3d-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="c3d-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F2F6FF" : "#6E93E8" }} />
@@ -994,24 +997,24 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
               <C3dSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="c3d-section" style={{ background: "#0A1220" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="c3d-section" style={{ background: "#0A1220" }}>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2">
-              Si querés<br /><span className="c3d-accent-italic-cyan">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="c3d-accent-italic-cyan">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="c3d-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1031,7 +1034,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1053,7 +1056,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="c3d-section" style={{ background: "#0A1220" }}>
-            <span data-xin="1" data-dist="-60" className="c3d-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="c3d-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="c3d-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1062,32 +1065,32 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
-        <section data-tone="dark" data-screen-label="Tu pase" className="c3d-section c3d-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #131C33 0%, #0A1220 55%, #05070F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="c3d-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PASE</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="c3d-section c3d-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #131C33 0%, #0A1220 55%, #05070F 100%)" }}>
+          <span data-xin="1" data-dist="-60" className="c3d-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="c3d-final-card">
             <div className="c3d-medallion c3d-medallion--final">
               <C3dMedallion
                 ringGradient="conic-gradient(from 140deg, #D7DEEC, #6E93E8, #6E93E8, #F2F6FF, #D7DEEC)"
-                sub={confirmed ? "CONFIRMADO" : "PENDIENTE"}
+                sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()}
                 subAccent="cyan"
                 arcId="c3dArc3"
                 arcText={textoArco(namesTitle, fechaCorta)}
               />
             </div>
-            <span className="c3d-mini-label c3d-accent-cyan">PASE Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="c3d-mini-label c3d-accent-cyan">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="c3d-final-names">{namesTitle}</span>
             <span className="c3d-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="c3d-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="c3d-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="c3d-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="c3d-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1099,7 +1102,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
       </div>
 
       <div ref={railRef} className="c3d-rail">
-        <span ref={railTopRef} className="c3d-rail-top">PASE Nº {passNumber}</span>
+        <span ref={railTopRef} className="c3d-rail-top">{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="c3d-rail-line">
           <span ref={railBarRef} className="c3d-rail-bar" />
         </div>
@@ -1121,7 +1124,7 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="c3d-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="c3d-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </C3dCoverHalf>
         </div>
         <div ref={bottomRef} className="c3d-cover-half c3d-cover-half--bottom">
@@ -1135,12 +1138,12 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="c3d-cover-cta c3d-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="c3d-cover-cta c3d-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </C3dCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="c3d-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="c3d-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1155,14 +1158,14 @@ export function Crystal3dTemplateZafiroBlanco({ invitation, guest, isPersonalize
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="c3d-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1217,12 +1220,14 @@ function C3dDots({ count = 3 }: { count?: number }) {
 // que gira suavemente en 3D (rotate3d), con el número "15" centrado y un
 // anillo de texto girando en sentido contrario alrededor.
 function C3dFacetGem({ arcId, arcText }: { arcId: string; arcText: string }) {
+  const tx = useTextos();
+
   return (
     <>
       <div className="c3d-facet-gem" />
       <div className="c3d-facet-core">
         <span className="c3d-facet-num">15</span>
-        <span className="c3d-facet-sub">ACCESO</span>
+        <span className="c3d-facet-sub">{tx("invitacion.pase.acceso").toUpperCase()}</span>
       </div>
       <svg viewBox="0 0 100 100" className="c3d-facet-arc">
         <defs><path id={arcId} d="M50 50 m -38 0 a 38 38 0 1 1 76 0 a 38 38 0 1 1 -76 0" fill="none" /></defs>
@@ -1285,6 +1290,7 @@ function C3dMedallion({
 }
 
 function C3dCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1299,7 +1305,7 @@ function C3dCopyField({ label, value }: { label: string; value: string }) {
         <span className="c3d-bank-row-value">{value}</span>
       </div>
       <button type="button" className="c3d-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1362,6 +1368,7 @@ function C3dRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1393,8 +1400,7 @@ function C3dRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1418,7 +1424,7 @@ function C3dRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1427,7 +1433,7 @@ function C3dRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1436,9 +1442,9 @@ function C3dRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="c3d-rsvp-declined">
-        <p className="c3d-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="c3d-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="c3d-rsvp-btn c3d-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1448,13 +1454,13 @@ function C3dRsvpCard({
     <>
       <div className="c3d-rsvp-rows">
         <div className="c3d-rsvp-row">
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="c3d-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="c3d-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1464,7 +1470,7 @@ function C3dRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="c3d-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="c3d-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1474,7 +1480,7 @@ function C3dRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="c3d-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="c3d-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1484,15 +1490,15 @@ function C3dRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="c3d-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="c3d-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="c3d-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="c3d-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="c3d-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="c3d-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="c3d-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1502,7 +1508,7 @@ function C3dRsvpCard({
           </div>
         ) : (
           <div className="c3d-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1513,7 +1519,7 @@ function C3dRsvpCard({
             <div className="c3d-rsvp-payment-value">
               <span className="c3d-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="c3d-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="c3d-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="c3d-rsvp-payment-detail">
@@ -1527,7 +1533,7 @@ function C3dRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1539,9 +1545,9 @@ function C3dRsvpCard({
 
       <div ref={stubRef} className="c3d-stub">
         <div className="c3d-stub-top">
-          <span>PASE Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="c3d-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="c3d-seal">
@@ -1556,10 +1562,10 @@ function C3dRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="c3d-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="c3d-rsvp-btn c3d-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1580,6 +1586,7 @@ interface C3dSongItem {
 
 // Misma API que <SongSuggestion> (/api/songs), look propio de la plantilla.
 function C3dSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<C3dSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1603,7 +1610,7 @@ function C3dSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1616,14 +1623,14 @@ function C3dSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1633,9 +1640,9 @@ function C3dSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="c3d-song">
       <form onSubmit={handleSubmit} className="c3d-song-row">
         <div className="c3d-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="c3d-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="c3d-song-input" />
           <span className="c3d-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="c3d-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="c3d-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="c3d-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1645,7 +1652,7 @@ function C3dSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="c3d-song-item">
               <span className="c3d-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="c3d-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="c3d-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1657,6 +1664,7 @@ function C3dSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página -- misma API
 // /api/quiz que usa el resto de las plantillas.
 function C3dQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: C3dQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1699,7 +1707,7 @@ function C3dQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1771,11 +1779,11 @@ function C3dQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="c3d-quiz-result">
           <p className="c3d-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="c3d-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1822,6 +1830,7 @@ function C3dCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="c3d-cover-inner">
       {photoMobile && (
@@ -1838,7 +1847,7 @@ function C3dCoverHalf({
       <div className="c3d-cover-facets" />
       <div className="c3d-cover-content">
         <div className="c3d-cover-top-row">
-          <span>PASE Nº {passNumber}</span><span className="c3d-accent-cyan">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroPase", { n: passNumber }).toUpperCase()}</span><span className="c3d-accent-cyan">ALL ACCESS</span>
         </div>
         <div className="c3d-cover-center">
           <span ref={kickerRef} className="c3d-cover-kicker">{kickerText}</span>
@@ -1855,7 +1864,7 @@ function C3dCoverHalf({
           {children}
           <div className="c3d-barcode-wrap">
             <div className="c3d-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="c3d-mini-label c3d-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="c3d-mini-label c3d-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

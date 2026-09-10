@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Play, Pause } from "lucide-react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface UseMusicPlayerOptions {
     musicaUrl: string;
@@ -80,11 +81,12 @@ interface MusicToggleButtonProps {
 }
 
 export function MusicToggleButton({ isPlaying, onToggle, className = "" }: MusicToggleButtonProps) {
+  const tx = useTextos();
     return (
         <Button
             onClick={onToggle}
             size="icon"
-            aria-label={isPlaying ? "Pausar música" : "Reproducir música"}
+            aria-label={isPlaying ? tx("invitacion.musica.pausarMusica") : tx("invitacion.musica.reproducirMusica")}
             className={`rounded-full w-9 h-9 shrink-0 shadow-md backdrop-blur-md border transition-opacity hover:opacity-100 ${className}`}
             style={{
                 backgroundColor: 'rgba(var(--color-primary-rgb), 0.35)',

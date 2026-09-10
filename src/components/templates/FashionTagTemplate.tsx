@@ -39,6 +39,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const ftgPlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -117,14 +119,15 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function FashionTagTemplate({ invitation, guest, isPersonalized = false }: FashionTagTemplateProps) {
+  const tx = useTextos();
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
-  const namesTitle = nombreQuinceanera || "Mis quince";
+  const namesTitle = nombreQuinceanera || tx("invitacion.evento.misQuince");
 
   // "Saludar por nombre del invitado/familia": si está activo, la portada
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "UNA ETIQUETA DE COLECCIÓN PARA" : "UNA ETIQUETA DE COLECCIÓN PARA LOS 15 DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.etiquetaColeccionPara").toUpperCase() : tx("invitacion.sabor.etiquetaColeccionQuinceDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -149,7 +152,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. Talle único, edición limitada."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeTalleUnico")
   );
 
   // Cronograma real (no inventado) -- se muestra tal cual lo cargó el
@@ -251,7 +254,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: FtgQuizQuestion[] = safeJson<FtgQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeMi"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -406,7 +409,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#F7F3EA";
       }
       if (stubRef.current) {
@@ -692,7 +695,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
 
       <div ref={scrollerRef} data-scroller="1" className="ftg-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="ftg-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #14100E 55%, #100C0A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="ftg-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="ftg-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="ftg-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="ftg-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="ftg-date-month">{monthAbbr}</span>
@@ -713,7 +716,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
           />
 
           <div data-drift="-70" className="ftg-medallion ftg-medallion--corner">
-            <FtgMedallion sub="ACCESO" arcId="ftgArc1" arcText="MIS 15 · TALLE ÚNICO · " spin="normal" />
+            <FtgMedallion sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="ftgArc1" arcText={tx("invitacion.sabor.arcoTalleUnico").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -722,7 +725,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`ftg-hero-photo-section${!photoMobile ? " ftg-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " ftg-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="ftg-hero-photo-frame">
@@ -746,18 +749,18 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
           <div className="ftg-scanline" />
           <span data-xin="1" data-dist="-60" className="ftg-kicker" style={{ position: "relative" }}>{knPre(2)} — LA ETIQUETA CUELGA EN</span>
           <div className="ftg-cd-grid">
-            <FtgCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <FtgCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <FtgCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <FtgCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <FtgCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <FtgCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <FtgCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <FtgCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="ftg-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="ftg-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #100C0A 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="ftg-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C1727 0%, #0C0B11 52%, #100C0A 100%)" }}>
           <div data-drift="-130" className="ftg-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="ftg-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="ftg-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="ftg-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -777,7 +780,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="El lugar" className="ftg-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.elLugar")} className="ftg-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="ftg-pan-sticky">
             <div data-strip="1" className="ftg-strip">
               {ceremoniaHabilitada && (
@@ -793,35 +796,35 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
                   <div className="ftg-facts">
                     {ceremoniaHora && (
                       <div className="ftg-facts-row ftg-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="ftg-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="ftg-seguir">SEGUÍ BAJANDO <span className="ftg-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="ftg-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="ftg-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="ftg-panel ftg-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="ftg-hair-bg" />
                 <div className="ftg-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="ftg-panel-title">
-                  {lugarNombre || "El salón"}
+                  {lugarNombre || tx("invitacion.ubicacion.elSalon")}
                   {direccion && <><br /><span className="ftg-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="ftg-facts">
                   <div className="ftg-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="ftg-facts-row ftg-facts-row--last">
-                      <span>CÓDIGO</span><span className="ftg-accent-dark">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="ftg-accent-dark">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -835,7 +838,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
                     ))}
                   </div>
                 )}
-                <div className="ftg-seguir">SEGUÍ BAJANDO <span className="ftg-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="ftg-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="ftg-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -846,11 +849,11 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
                   </svg>
                   <div className="ftg-panel-block">
                     <span className="ftg-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="ftg-panel-title-sm">Cómo llegar</span>
+                    <span className="ftg-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="ftg-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="ftg-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -859,9 +862,9 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
 
               <div data-tone="dark" className="ftg-panel ftg-panel--center" style={{ background: "#14100E", color: "#F4F1EA" }}>
                 <div className="ftg-medallion ftg-medallion--lg">
-                  <FtgMedallion sub={`ETIQUETA Nº ${passNumber}`} arcId="ftgArc2" arcText={`ACCESO VIP · ETIQUETA Nº ${passNumber} · `} spin="reverse" />
+                  <FtgMedallion sub={tx("invitacion.pase.numeroEtiqueta", { n: passNumber }).toUpperCase()} arcId="ftgArc2" arcText={tx("invitacion.pase.arcoAccesoVipEtiqueta", { n: passNumber }).toUpperCase()} spin="reverse" />
                 </div>
-                <span className="ftg-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="ftg-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -880,7 +883,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
         <section data-tone="dark" data-screen-label="Check-in" className="ftg-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #17141F 0%, #14100E 60%, #100C0A 100%)" }}>
           <span data-xin="1" data-dist="-60" className="ftg-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="ftg-h2">
-            Confirmá<br /><span className="ftg-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="ftg-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -914,20 +917,20 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
               />
             </div>
           ) : (
-            <p className="ftg-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="ftg-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="ftg-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="ftg-pan">
           <div className="ftg-pan-sticky">
             <div data-strip="1" className="ftg-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="ftg-panel ftg-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="ftg-hair-bg" />
                   <div className="ftg-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="ftg-panel-title-md">Álbum <span className="ftg-accent-dark-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="ftg-panel-title-md">{tx("invitacion.album.titulo")} <span className="ftg-accent-dark-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="ftg-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -937,25 +940,25 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="ftg-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="ftg-photo-placeholder">Sin fotos todavía</span>
+                      <span className="ftg-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="ftg-seguir ftg-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="ftg-accent-dark">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="ftg-accent-dark">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="ftg-panel ftg-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="ftg-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="ftg-panel-title">Todo lo que<br /><span className="ftg-accent-dark-serif">vamos a recordar</span></h2>
+                <span className="ftg-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="ftg-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="ftg-accent-dark-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="ftg-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#B0562E" />
@@ -963,8 +966,8 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
                     <div className="ftg-live-placeholder">
                       <span className="ftg-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -976,9 +979,9 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="ftg-section" style={{ background: "#14100E" }}>
-            <span data-xin="1" data-dist="-60" className="ftg-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="ftg-h2">¿Qué outfit<br /><span className="ftg-accent-italic">no puede faltar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="ftg-section" style={{ background: "#14100E" }}>
+            <span data-xin="1" data-dist="-60" className="ftg-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="ftg-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaOutfitFaltar"), "ftg-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="ftg-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="ftg-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F7F3EA" : "#B0562E" }} />
@@ -988,24 +991,24 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
               <FtgSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="ftg-section" style={{ background: "#14100E" }}>
-            <span data-xin="1" data-dist="-60" className="ftg-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="ftg-section" style={{ background: "#14100E" }}>
+            <span data-xin="1" data-dist="-60" className="ftg-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="ftg-h2">
-              Si querés<br /><span className="ftg-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="ftg-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="ftg-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1025,7 +1028,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1047,7 +1050,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="ftg-section" style={{ background: "#14100E" }}>
-            <span data-xin="1" data-dist="-60" className="ftg-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="ftg-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="ftg-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1056,7 +1059,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
@@ -1066,16 +1069,16 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
           <span data-xin="1" data-dist="-60" className="ftg-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ETIQUETA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="ftg-final-card">
             <div className="ftg-medallion ftg-medallion--final">
-              <FtgMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="ftgArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <FtgMedallion sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="ftgArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="ftg-mini-label ftg-accent-dark">ETIQUETA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="ftg-mini-label ftg-accent-dark">{tx("invitacion.pase.numeroEtiquetaAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="ftg-final-names">{namesTitle}</span>
             <span className="ftg-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="ftg-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="ftg-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="ftg-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="ftg-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1087,7 +1090,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
       </div>
 
       <div ref={railRef} className="ftg-rail">
-        <span ref={railTopRef} className="ftg-rail-top">ETIQUETA Nº {passNumber}</span>
+        <span ref={railTopRef} className="ftg-rail-top">{tx("invitacion.pase.numeroEtiqueta", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="ftg-rail-line">
           <span ref={railBarRef} className="ftg-rail-bar" />
         </div>
@@ -1109,7 +1112,7 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="ftg-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="ftg-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </FtgCoverHalf>
         </div>
         <div ref={bottomRef} className="ftg-cover-half ftg-cover-half--bottom">
@@ -1123,12 +1126,12 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="ftg-cover-cta ftg-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="ftg-cover-cta ftg-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </FtgCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="ftg-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="ftg-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1143,14 +1146,14 @@ export function FashionTagTemplate({ invitation, guest, isPersonalized = false }
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="ftg-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1241,6 +1244,7 @@ function FtgMedallion({
 }
 
 function FtgCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1255,7 +1259,7 @@ function FtgCopyField({ label, value }: { label: string; value: string }) {
         <span className="ftg-bank-row-value">{value}</span>
       </div>
       <button type="button" className="ftg-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1318,6 +1322,7 @@ function FtgRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1349,8 +1354,7 @@ function FtgRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1374,7 +1378,7 @@ function FtgRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1383,7 +1387,7 @@ function FtgRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1392,9 +1396,9 @@ function FtgRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="ftg-rsvp-declined">
-        <p className="ftg-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="ftg-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="ftg-rsvp-btn ftg-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1404,13 +1408,13 @@ function FtgRsvpCard({
     <>
       <div className="ftg-rsvp-rows">
         <div className="ftg-rsvp-row">
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="ftg-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="ftg-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1420,7 +1424,7 @@ function FtgRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="ftg-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="ftg-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1430,7 +1434,7 @@ function FtgRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="ftg-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="ftg-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1440,15 +1444,15 @@ function FtgRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="ftg-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="ftg-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="ftg-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="ftg-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="ftg-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="ftg-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="ftg-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1458,7 +1462,7 @@ function FtgRsvpCard({
           </div>
         ) : (
           <div className="ftg-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1469,7 +1473,7 @@ function FtgRsvpCard({
             <div className="ftg-rsvp-payment-value">
               <span className="ftg-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="ftg-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="ftg-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="ftg-rsvp-payment-detail">
@@ -1483,7 +1487,7 @@ function FtgRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1495,9 +1499,9 @@ function FtgRsvpCard({
 
       <div ref={stubRef} className="ftg-stub">
         <div className="ftg-stub-top">
-          <span>ETIQUETA Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroEtiqueta", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="ftg-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="ftg-seal">
@@ -1512,10 +1516,10 @@ function FtgRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="ftg-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="ftg-rsvp-btn ftg-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1536,6 +1540,7 @@ interface FtgSongItem {
 
 // Misma API que <SongSuggestion> (/api/songs), look propio de la plantilla.
 function FtgSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<FtgSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1559,7 +1564,7 @@ function FtgSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1572,14 +1577,14 @@ function FtgSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1589,9 +1594,9 @@ function FtgSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="ftg-song">
       <form onSubmit={handleSubmit} className="ftg-song-row">
         <div className="ftg-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="ftg-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="ftg-song-input" />
           <span className="ftg-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="ftg-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="ftg-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="ftg-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1601,7 +1606,7 @@ function FtgSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="ftg-song-item">
               <span className="ftg-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="ftg-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="ftg-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1613,6 +1618,7 @@ function FtgSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página -- misma API
 // /api/quiz que usa el resto de las plantillas.
 function FtgQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: FtgQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1655,7 +1661,7 @@ function FtgQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1727,11 +1733,11 @@ function FtgQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="ftg-quiz-result">
           <p className="ftg-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="ftg-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1778,6 +1784,7 @@ function FtgCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="ftg-cover-inner">
       {photoMobile && (
@@ -1794,7 +1801,7 @@ function FtgCoverHalf({
       <div className="ftg-cover-grain" />
       <div className="ftg-cover-content">
         <div className="ftg-cover-top-row">
-          <span>ETIQUETA Nº {passNumber}</span><span className="ftg-accent-dark">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroEtiqueta", { n: passNumber }).toUpperCase()}</span><span className="ftg-accent-dark">ALL ACCESS</span>
         </div>
         <div className="ftg-cover-center">
           <span ref={kickerRef} className="ftg-cover-kicker">{kickerText}</span>
@@ -1812,7 +1819,7 @@ function FtgCoverHalf({
           {children}
           <div className="ftg-barcode-wrap">
             <div className="ftg-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="ftg-mini-label ftg-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="ftg-mini-label ftg-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

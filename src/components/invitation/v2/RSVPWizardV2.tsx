@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PartyPopper, Heart, UserCheck } from "lucide-react";
 import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 type PaymentStatus = "PENDING" | "PARTIAL" | "EXEMPT" | "PAID";
 
@@ -75,6 +77,7 @@ export function RSVPWizardV2({
   paymentView = null,
   onConfirmed,
 }: RSVPWizardV2Props) {
+  const tx = useTextos();
   const router = useRouter();
   const [step, setStep] = useState<Step>(() => {
     if (initialStatus === "CONFIRMED") return "done";
@@ -142,8 +145,28 @@ export function RSVPWizardV2({
     totalPayment = (adultPrice * adultCount) + (teenPrice * teenCount) + (childPrice * childCount);
   }
 
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
+
+  /**
+   * El detalle de lo confirmado: "2 adultos, 1 adolescente y 3 niños".
+   *
+   * Se arma con partes traducidas y se une con la conjunción del idioma en
+   * vez de pegar trozos de frase: "A, B y C" es "A, B and C" en inglés y
+   * "A, B e C" en portugués, y el singular de cada franja tampoco se resuelve
+   * agregando una "s".
+   */
+  const detalleConfirmado = (() => {
+    const partes: string[] = [];
+    if (maxGuests > 1 && (adultCount > 0 || teenCount > 0 || childCount > 0)) {
+      if (adultCount > 0) partes.push(`${adultCount} ${tx(adultCount === 1 ? "invitacion.rsvp.adultoUno" : "invitacion.rsvp.adultoVarios")}`);
+      if (teenCount > 0) partes.push(`${teenCount} ${tx(teenCount === 1 ? "invitacion.rsvp.adolescenteUno" : "invitacion.rsvp.adolescenteVarios")}`);
+      if (childCount > 0) partes.push(`${childCount} ${tx(childCount === 1 ? "invitacion.rsvp.ninoUno" : "invitacion.rsvp.ninoVarios")}`);
+    } else {
+      partes.push(`${count} ${tx(count === 1 ? "invitacion.rsvp.personaUna" : "invitacion.rsvp.personaVarias")}`);
+    }
+    if (partes.length <= 1) return partes.join("");
+    return `${partes.slice(0, -1).join(", ")} ${tx("invitacion.rsvp.y")} ${partes[partes.length - 1]}`;
+  })();
 
   const renderContent = () => {
     if (step === "decision") {
@@ -153,17 +176,19 @@ export function RSVPWizardV2({
             className="t-btn"
             onClick={() => setStep("details")}
             style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}
-            aria-label="Confirmar asistencia"
+            data-rsvp="confirmar"
+            aria-label={tx("invitacion.rsvp.confirmarAsistencia")}
           >
-            Confirmar
+            {tx("invitacion.rsvp.confirmar")}
           </button>
           <button
             className="t-btn"
             onClick={() => handleDecline()}
             style={{ width: "100%", justifyContent: "center", background: "transparent", fontWeight: 600, color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit", borderColor: "currentColor" }}
-            aria-label="Declinar invitación"
+            data-rsvp="declinar"
+            aria-label={tx("invitacion.rsvp.declinarInvitacion")}
           >
-            Rechazar
+            {tx("invitacion.rsvp.rechazar")}
           </button>
         </div>
       );
@@ -175,13 +200,13 @@ export function RSVPWizardV2({
         <div style={{ color: textColor }}>
           {!guestToken && (
             <div className="t-field" style={{ marginBottom: "14px" }}>
-              <label htmlFor="rsvp-name" style={{ color: textColor }}>Tu nombre y apellido</label>
+              <label htmlFor="rsvp-name" style={{ color: textColor }}>{tx("invitacion.rsvp.tuNombreYApellido")}</label>
               <input
                 id="rsvp-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nombre y apellido"
+                placeholder={tx("invitacion.rsvp.nombreYApellido")}
                 required
                 autoComplete="name"
               />
@@ -190,13 +215,13 @@ export function RSVPWizardV2({
           {maxGuests > 1 && (
             <div className="t-field" style={{ marginBottom: "14px" }}>
               <label id="count-label" style={{ marginBottom: "8px", display: "block", color: textColor, opacity: 1 }}>
-                ¿Cuántos asisten? {maxGuests > 1 ? `(máx. ${maxGuests})` : ""}
+                {tx("invitacion.rsvp.cuantosAsisten")} {maxGuests > 1 ? tx("invitacion.rsvp.maximo", { n: maxGuests }) : ""}
               </label>
               <div style={{ marginTop: "16px" }}>
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                   {/* ADULTOS */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>Adultos</span>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>{tx("invitacion.rsvp.adultos")}</span>
                     <div className="stepper" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                       <button
                         type="button"
@@ -217,7 +242,7 @@ export function RSVPWizardV2({
                   {/* ADOLESCENTES */}
                   {maxTeens !== 0 && (
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>Adolescentes</span>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>{tx("invitacion.rsvp.adolescentes")}</span>
                     <div className="stepper" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                       <button
                         type="button"
@@ -239,7 +264,7 @@ export function RSVPWizardV2({
                   {/* NIÑOS */}
                   {maxChildren !== 0 && (
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>Niños</span>
+                    <span style={{ fontSize: "14px", fontWeight: "600", color: "inherit", opacity: 0.9 }}>{tx("invitacion.rsvp.ninos")}</span>
                     <div className="stepper" style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                       <button
                         type="button"
@@ -264,14 +289,14 @@ export function RSVPWizardV2({
 
           <div className="t-field" style={{ marginBottom: "14px" }}>
             <label htmlFor="rsvp-dietary" style={{ color: textColor }}>
-              Restricción alimentaria <span style={{ opacity: .7 }}>(opcional)</span>
+              {tx("invitacion.rsvp.restriccionAlimentaria")} <span style={{ opacity: .7 }}>{tx("invitacion.rsvp.opcional")}</span>
             </label>
             <input
               id="rsvp-dietary"
               type="text"
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
-              placeholder="Ej: vegetariano, celíaco…"
+              placeholder={tx("invitacion.rsvp.ejemploDieta")}
             />
           </div>
 
@@ -287,7 +312,7 @@ export function RSVPWizardV2({
             disabled={isSubmitting || (!guestToken && !name.trim())}
             style={{ background: "var(--t-acc2)", borderColor: "var(--t-acc2)", color: "var(--t-onink)", width: "100%", justifyContent: "center", fontSize: "15px", padding: "16px", marginTop: "14px" }}
           >
-            {isSubmitting ? "Guardando…" : "✓ Confirmar asistencia"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando") : "✓ " + tx("invitacion.rsvp.confirmarAsistencia")}
           </button>
         </div>
       );
@@ -305,13 +330,7 @@ export function RSVPWizardV2({
             textAlign: "center",
             color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit"
           }}>
-            {maxGuests > 1 && (adultCount > 0 || teenCount > 0 || childCount > 0) ? (
-              `Confirmaste ${adultCount} ${adultCount === 1 ? "adulto" : "adultos"}` +
-              (teenCount > 0 ? `, ${teenCount} ${teenCount === 1 ? "adolescente" : "adolescentes"}` : "") +
-              (childCount > 0 ? ` y ${childCount} ${childCount === 1 ? "niño" : "niños"}.` : ".")
-            ) : (
-              `Confirmaste ${count} ${count === 1 ? "persona" : "personas"}.`
-            )}
+            {tx("invitacion.rsvp.confirmaste", { detalle: detalleConfirmado })}
           </p>
           {/* Haber pagado no cierra la puerta: si al invitado le quedan cupos y
               quiere sumar a alguien, tiene que poder. El lugar nuevo entra al
@@ -323,11 +342,11 @@ export function RSVPWizardV2({
             onClick={() => setStep("decision")}
             style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", border: "1px solid currentColor", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}
           >
-            Modificar asistencia
+            {tx("invitacion.rsvp.modificarAsistencia")}
           </button>
           {paymentStatus === "PAID" && hasPayment && count < maxGuests && (
             <p style={{ marginTop: "10px", fontSize: "12.5px", lineHeight: 1.5, opacity: 0.75, textAlign: "center", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}>
-              Si sumás personas, el lugar nuevo se cobra aparte.
+              {tx("invitacion.pago.sumasPersonas")}
             </p>
           )}
         </div>
@@ -338,17 +357,17 @@ export function RSVPWizardV2({
       return (
         <div role="status">
           <h3 style={{ marginBottom: "16px", fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-            Qué pena <Heart className="w-6 h-6" strokeWidth={1.5} />
+            {tx("invitacion.rsvp.quePena")} <Heart className="w-6 h-6" strokeWidth={1.5} />
           </h3>
           <p style={{ fontSize: "16px", opacity: 0.9, lineHeight: 1.5, color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit" }}>
-            Gracias por avisarnos. Si cambiás de idea, el link sigue activo.
+            {tx("invitacion.rsvp.graciasPorAvisarLink")}
           </p>
           <button
             className="t-btn"
             onClick={() => setStep("decision")}
             style={{ marginTop: "24px", justifyContent: "center", width: "100%", background: "transparent", color: dark ? "var(--chic-ink, #FFFFFF)" : "inherit", border: "1px solid currentColor" }}
           >
-            Cambié de idea, ¡voy!
+            {tx("invitacion.rsvp.cambieDeIdeaVoy")}
           </button>
         </div>
       );
@@ -362,8 +381,8 @@ export function RSVPWizardV2({
           <div className="t-kicker flex justify-center mb-4">
             <DrawLucideIcon icon={UserCheck} size={46} color="var(--t-acc)" strokeWidth={1.5} />
           </div>
-          <p className="t-kicker">Confirmá tu asistencia</p>
-          <h2>{maxGuests > 1 ? "¿Van a venir?" : "¿Vas a venir?"}</h2>
+          <p className="t-kicker">{tx("invitacion.rsvp.kicker")}</p>
+          <h2>{maxGuests > 1 ? tx("invitacion.rsvp.vanAVenir") : tx("invitacion.rsvp.vasAVenir")}</h2>
         </>
       )}
 
@@ -376,16 +395,16 @@ export function RSVPWizardV2({
           <div className="t-detail" style={{ background: "rgba(255,255,255,.07)", border: "1px dashed var(--t-acc)", margin: 0, height: "fit-content", borderRadius: "12px", padding: "16px" }}>
             <h4 style={{ marginBottom: "8px", fontFamily: "var(--t-font-d)", fontSize: "15px", color: "var(--t-acc)", marginTop: 0 }}>
               {!guestToken
-                ? "Valor de la tarjeta (vista previa)"
+                ? tx("invitacion.pago.valorTarjetaPreview")
                 : paymentStatus === "PAID"
-                  ? "Tarjeta abonada ✓"
-                  : "Valor de la tarjeta"}
+                  ? tx("invitacion.pago.tarjetaAbonada") + " ✓"
+                  : tx("invitacion.pago.valorTarjeta")}
             </h4>
             <p style={{ display: "block", opacity: 0.85, fontSize: "13.5px", lineHeight: 1.5, margin: 0, color: "inherit" }}>
-              {paymentStatus === "PAID" ? "Monto pagado:" : "Monto total a pagar:"} <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(totalPayment)}</span>
+              {paymentStatus === "PAID" ? tx("invitacion.pago.montoPagado") : tx("invitacion.pago.montoTotal")} <span style={{ fontWeight: 600, color: "inherit" }}>{formatARS(totalPayment)}</span>
               <br />
               <span style={{ fontSize: "12px", opacity: 0.8 }}>
-                ({adultCount} adultos{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} adolescentes` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} niños` : ""})
+                ({adultCount} {tx("invitacion.rsvp.adultoVarios")}{precioAdolescente != null && teenCount > 0 ? `, ${teenCount} ${tx("invitacion.rsvp.adolescenteVarios")}` : ""}{precioNino != null && childCount > 0 ? `, ${childCount} ${tx("invitacion.rsvp.ninoVarios")}` : ""})
               </span>
             </p>
             {/* Con un pago parcial el invitado solo se entera de que hay algo
@@ -393,7 +412,7 @@ export function RSVPWizardV2({
                 anfitrion, que es quien sabe quien de la familia puso que. */}
             {paymentStatus === "PARTIAL" && (
               <p style={{ display: "block", margin: "8px 0 0", fontSize: "13px", lineHeight: 1.5, opacity: 0.9, color: "inherit" }}>
-                Ya tenés un pago parcial registrado.
+                {tx("invitacion.pago.yaTenesPagoParcial")}
               </p>
             )}
             {maxGuests > 1 && (
@@ -411,17 +430,17 @@ export function RSVPWizardV2({
                   <>
                     {adultCount > 0 && (
                       <span style={{ fontSize: "12px" }}>
-                        {adultCount} adulto{adultCount !== 1 ? "s" : ""} × {formatARS(adultPrice)}
+                        {adultCount} {tx(adultCount === 1 ? "invitacion.rsvp.adultoUno" : "invitacion.rsvp.adultoVarios")} × {formatARS(adultPrice)}
                       </span>
                     )}
                     {teenCount > 0 && (
                       <span style={{ fontSize: "12px" }}>
-                        {teenCount} adolescente{teenCount !== 1 ? "s" : ""} × {formatARS(teenPrice)}
+                        {teenCount} {tx(teenCount === 1 ? "invitacion.rsvp.adolescenteUno" : "invitacion.rsvp.adolescenteVarios")} × {formatARS(teenPrice)}
                       </span>
                     )}
                     {childCount > 0 && (
                       <span style={{ fontSize: "12px" }}>
-                        {childCount} niño{childCount !== 1 ? "s" : ""} × {formatARS(childPrice)}
+                        {childCount} {tx(childCount === 1 ? "invitacion.rsvp.ninoUno" : "invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}
                       </span>
                     )}
                   </>
@@ -461,14 +480,14 @@ export function RSVPWizardV2({
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Error al confirmar");
+        throw new Error(data.error || tx("invitacion.rsvp.errorConfirmar"));
       }
 
       setStep("done");
       onConfirmed?.({ attending: true, count });
       router.refresh();
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.";
+      const msg = e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta");
       setError(msg);
     } finally {
       setIsSubmitting(false);

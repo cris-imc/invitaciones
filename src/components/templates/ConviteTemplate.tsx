@@ -21,6 +21,7 @@ import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
@@ -73,6 +74,7 @@ interface CronoItem {
 }
 
 function CopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -87,7 +89,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
         <span className="text-sm font-mono text-white/90 break-all">{value}</span>
       </div>
       <button className={`copy-btn shrink-0 text-xs font-semibold px-3 py-1 rounded-full border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 transition-all${copied ? " copied bg-amber-500/30" : ""}`} type="button" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -112,6 +114,7 @@ interface QuizQuestion {
 }
 
 function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string; tipo?: string }) {
+  const tx = useTextos();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
@@ -168,7 +171,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 invitationId,
-                guestName: guestName || 'Invitado Anónimo',
+                guestName: guestName || tx("invitacion.evento.invitadoAnonimo"),
                 guestToken: guestToken || null,
                 answers: Object.values(newPicks),
                 score,
@@ -206,20 +209,20 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
         <div className="flex justify-center mb-4 text-amber-500">
           {percent === 100 ? <Trophy className="w-16 h-16" strokeWidth={1.5} /> : percent >= 70 ? <Star className="w-16 h-16" strokeWidth={1.5} /> : <ThumbsUp className="w-16 h-16" strokeWidth={1.5} />}
         </div>
-        <h3 style={{ fontFamily: "var(--t-font-d)", fontSize: "28px", color: "var(--t-onpaper)" }}>¡Quiz Completado!</h3>
+        <h3 style={{ fontFamily: "var(--t-font-d)", fontSize: "28px", color: "var(--t-onpaper)" }}>{tx("invitacion.quiz.quizCompletado")}</h3>
         <p style={{ marginTop: "12px", opacity: 0.9 }}>
           Respondiste {score} de {preguntas.length} correctamente ({percent}%).
         </p>
         
         {isSaving ? (
-          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7 }}>Guardando tus resultados...</p>
+          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7 }}>{tx("invitacion.quiz.guardandoResultados")}</p>
         ) : (
           stats && stats.count > 0 && (
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "var(--t-paper2)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(0,0,0,0.06)", textAlign: "left", maxWidth: "90%" }}>
                 <Users className="w-5 h-5 opacity-60 shrink-0" />
                 <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4 }}>
-                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong>{stats.avg}%</strong>.
+                  {tx("invitacion.quiz.promedioGlobal", { n: stats.count })} <strong>{stats.avg}%</strong>.
                 </p>
               </div>
             </div>
@@ -267,6 +270,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
 }
 
 export function ConviteTemplate({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
+  const tx = useTextos();
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const tipo   = String(invitation.tipo ?? "OTRO");
   const theme  = getThemeFromTipo(tipo);
@@ -274,9 +278,9 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   // Cover / Welcome Overlay data
   const portadaHabilitada = Boolean(invitation.portadaHabilitada ?? true);
   const ciudad = String(invitation.ciudad ?? "");
-  const portadaKicker = String(invitation.portadaKicker || "Con mucho cariño, para");
-  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || "Te invitamos a compartir este día tan especial con nosotros");
-  const portadaBoton = String(invitation.portadaTextoBoton || "Abrir invitación");
+  const portadaKicker = String(invitation.portadaKicker || tx("invitacion.portada.conMuchoCarinoPara"));
+  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || tx("invitacion.portada.mensajeBienvenida"));
+  const portadaBoton = String(invitation.portadaTextoBoton || tx("invitacion.portada.abrirInvitacion"));
 
   const getHeroTitle = () => {
     if (tipo === "CASAMIENTO") {
@@ -292,9 +296,9 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
 
   const eyebrow = invitation.nombreEvento 
     ? String(invitation.nombreEvento)
-    : tipo === "CASAMIENTO" ? "Nos casamos"
-    : tipo === "QUINCE_ANOS" ? "Mis quince años"
-    : "Te invitamos";
+    : tipo === "CASAMIENTO" ? tx("invitacion.evento.nosCasamos")
+    : tipo === "QUINCE_ANOS" ? tx("invitacion.evento.misQuinceAnos")
+    : tx("invitacion.evento.teInvitamos");
 
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
@@ -314,7 +318,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   // Google bloquea (X-Frame-Options) y quedaba como un recuadro blanco.
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
 
-  const quoteKicker = "Unas palabras";
+  const quoteKicker = tx("invitacion.frase.unasPalabras");
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
   const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
@@ -345,10 +349,10 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
     ...(mapUrl        ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
-    ...(rsvpEnabled   ? [{ id: "rsvp",     label: "Confirmar", icon: <IconCheck /> }] : []),
-    ...(showGiftSection  ? [{ id: "banco",    label: "Banco",     icon: <IconGift /> }]  : []),
+    ...(rsvpEnabled   ? [{ id: "rsvp",     label: tx("invitacion.rsvp.confirmar"), icon: <IconCheck /> }] : []),
+    ...(showGiftSection  ? [{ id: "banco",    label: tx("invitacion.regalos.banco"),     icon: <IconGift /> }]  : []),
     ...(triviaHabilitada && triviaPreguntas.length > 0 ? [{ id: "quiz", label: "Juego", icon: <IconQuiz /> }] : []),
-    ...(songsEnabled  ? [{ id: "songs",    label: "Música",    icon: <IconMusic /> }] : []),
+    ...(songsEnabled  ? [{ id: "songs",    label: tx("invitacion.musica.titulo"),    icon: <IconMusic /> }] : []),
   ];
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
@@ -381,7 +385,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             {/* Header Content */}
             <div className="p-10 md:p-16 space-y-8">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white tracking-wide drop-shadow-md">
-                Un momento <AnimatedSynonyms words={["inolvidable", "único", "eterno", "mágico"]} className="italic text-amber-200/90 font-serif" />
+                {tx("invitacion.frase.unMomento")} <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="italic text-amber-200/90 font-serif" />
               </h1>
               
               <div className="flex justify-center items-center gap-4 py-2 opacity-60">
@@ -391,13 +395,13 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               </div>
 
               <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide" >
-                Gracias por acompañarnos en este día tan especial y compartir la alegría de crear recuerdos que perdurarán para siempre.
+                {tx("invitacion.frase.graciasPorAcompanarnos")}
               </p>
 
               <div className="pt-6">
                 <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs  tracking-widest uppercase backdrop-blur-md" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
-                  <span>Álbum disponible hasta el {expirationDateStr}</span>
+                  <span>{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</span>
                 </div>
               </div>
             </div>
@@ -412,10 +416,10 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 ) : (
                   <div className="text-center space-y-3">
                     <h3 className="font-serif font-light text-xl text-slate-200 tracking-wide">
-                      Álbum Fotográfico
+                      {tx("invitacion.album.fotografico")}
                     </h3>
                     <p className="text-sm text-slate-400  font-light tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                      No se registraron capturas durante la velada.
+                      {tx("invitacion.album.sinCapturas")}
                     </p>
                   </div>
                 )}
@@ -544,8 +548,8 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           <Countdown
             targetDate={fechaEvento}
             countdownStyle={invitation.countdownStyle as any}
-            kicker="Cuenta regresiva"
-            title={tipo === "CASAMIENTO" ? "Faltan poquitos días" : "La cuenta ya empezó"}
+            kicker={tx("invitacion.cuentaRegresiva.kicker")}
+            title={tipo === "CASAMIENTO" ? tx("invitacion.cuentaRegresiva.faltanPoquitosDias") : tx("invitacion.cuentaRegresiva.laCuentaYaEmpezo")}
           />
         ) : null}
 
@@ -565,14 +569,14 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         ) : null}
 
         <SectionWrapper id="details" delay={150}>
-          <p className="t-kicker">Cuándo y dónde</p>
+          <p className="t-kicker">{tx("invitacion.ubicacion.cuandoYDonde")}</p>
           <h2>Los esperamos</h2>
 
           {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
           {Boolean(invitation.ceremoniaHabilitada) && (
             <div className="t-detail" style={{ margin: "0 0 20px 0", borderLeft: "4px solid var(--t-acc)", paddingLeft: "18px" }}>
               <span className="t-kicker" style={{ display: "block", marginBottom: "6px" }}>
-                {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
+                {String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}
               </span>
               {Boolean(invitation.ceremoniaNombre) && (
                 <h4 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: "4px" }}>
@@ -591,7 +595,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               )}
               {Boolean(invitation.ceremoniaMapUrl) && (
                 <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="t-btn" style={{ marginTop: "10px" }}>
-                  Ver mapa ceremonia ↗
+                  {tx("invitacion.ubicacion.verMapaCeremonia") + " ↗"}
                 </a>
               )}
             </div>
@@ -600,7 +604,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           {/* TARJETA 2: FIESTA / SALÓN (Siempre visible si se ingresó lugar o dirección) */}
           {(lugarNombre || direccion) && (
             <div className="t-detail" style={{ margin: "0 0 20px 0" }}>
-              <span className="t-kicker" style={{ display: "block", marginBottom: "6px" }}>Fiesta / Salón</span>
+              <span className="t-kicker" style={{ display: "block", marginBottom: "6px" }}>{tx("invitacion.ubicacion.fiestaSalon")}</span>
               {lugarNombre && <h4 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: "4px" }}>{lugarNombre}</h4>}
               {hora && <p style={{ fontWeight: 600, margin: "4px 0", display: "flex", alignItems: "center", gap: "6px" }}>
                 <Clock className="w-4 h-4 text-amber-600/70 dark:text-amber-400/70" /> {hora} hs
@@ -610,7 +614,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               </p>}
               {mapUrl && (
                 <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="t-btn" style={{ marginTop: "10px" }}>
-                  Ver mapa fiesta ↗
+                  {tx("invitacion.ubicacion.verMapaFiesta") + " ↗"}
                 </a>
               )}
             </div>
@@ -660,7 +664,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 height="220"
                 style={{ border: 0, display: "block" }}
                 loading="lazy"
-                title={`Mapa: ${lugarNombre}`}
+                title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })}
                 referrerPolicy="no-referrer-when-downgrade"
               />
             ) : (
@@ -670,7 +674,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 rel="noopener noreferrer"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "220px", width: "100%", padding: "0 24px", textAlign: "center", color: "var(--t-acc)", fontSize: 13, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "3px" }}
               >
-                No pudimos mostrar el mapa acá — tocá para verlo en Google Maps
+                {tx("invitacion.ubicacion.mapaNoDisponible")}
               </a>
             )}
             </div>
@@ -712,7 +716,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
         {showGiftSection && (
           <SectionWrapper dark id="banco" delay={200}>
             <p className="t-kicker">{bothAccounts ? "Datos Bancarios del Evento" : "Datos Bancarios"}</p>
-            <h2>{bothAccounts ? "Transferencias & Regalos" : (pagoTarjetaHabilitado ? String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases") : String((invitation as any).regaloTitulo || "Regalos del Evento"))}</h2>
+            <h2>{bothAccounts ? "Transferencias & Regalos" : (pagoTarjetaHabilitado ? String((invitation as any).pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")) : String((invitation as any).regaloTitulo || tx("invitacion.regalos.tituloEvento")))}</h2>
             <p style={{ opacity: 0.8, marginBottom: "20px" }} className="text-sm max-w-2xl">
               {bothAccounts
                 ? "Disponemos de dos cuentas bancarias independientes: una para la acreditación / pago de tarjetas de la fiesta y otra para los regalos."
@@ -726,7 +730,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 <BankDetailsCard
                   icon={<span>💳</span>}
                   data={{
-                    titulo: String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String((invitation as any).pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String((invitation as any).pagoTarjetaMensaje || ""),
                     banco: String((invitation as any).pagoTarjetaBanco || ""),
                     cbu: String((invitation as any).pagoTarjetaCbu || ""),
@@ -748,7 +752,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
                 <BankDetailsCard
                   icon={<span>🎁</span>}
                   data={{
-                    titulo: String((invitation as any).regaloTitulo || "Regalos del Evento"),
+                    titulo: String((invitation as any).regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String((invitation as any).regaloMensaje || ""),
                     banco: String((invitation as any).regaloBanco || ""),
                     cbu: String((invitation as any).regaloCbu || ""),
@@ -774,7 +778,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
             <div className="flex justify-center mb-4">
               <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
-            <p className="t-kicker">¿Cuánto sabés?</p>
+            <p className="t-kicker">{tx("invitacion.quiz.cuantoSabes")}</p>
             <h2>{String(invitation.triviaTitulo ?? "Un juego para vos")}</h2>
             <ProgressiveQuiz 
               preguntas={triviaPreguntas} 
@@ -790,7 +794,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}
             guestToken={guest?.uniqueToken}
-            guestName={guest?.name ?? "Invitado"}
+            guestName={guest?.name ?? tx("invitacion.evento.invitado")}
             dark
             showPublicList
           />

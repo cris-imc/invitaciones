@@ -5,6 +5,7 @@ import { CollaborativeAlbumUpload } from "./CollaborativeAlbumUpload";
 import { ScrollReveal } from "./ScrollReveal";
 import { Loader2 } from "lucide-react";
 
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 interface Photo {
     id: string;
     url: string;
@@ -33,6 +34,8 @@ export function SharedAlbum({
     guestName,
     className,
 }: SharedAlbumProps) {
+  const tx = useTextos();
+
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -95,7 +98,7 @@ export function SharedAlbum({
                                             year: 'numeric',
                                             timeZone: 'UTC'
                                         })}
-                                        {horaEvento && ` a las ${horaEvento}`}
+                                        {horaEvento && tx("invitacion.album.aLasHora", { hora: horaEvento })}
                                     </p>
                                 )}
                             </div>
@@ -126,7 +129,7 @@ export function SharedAlbum({
                                 >
                                     <img
                                         src={photo.url}
-                                        alt={`Foto de ${photo.uploadedBy}`}
+                                        alt={tx("invitacion.album.fotoDe", { nombre: photo.uploadedBy })}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">

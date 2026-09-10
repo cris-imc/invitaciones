@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Camera } from "lucide-react";
 import { DrawLucideIcon } from "@/components/ui/icons/DrawLucideIcon";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface AlbumCarouselPolaroidProps {
   photos: string[];
@@ -20,6 +21,7 @@ const ROTATIONS = [-5, 4, -3, 6, -6, 3, -4, 5, -2, 4];
 // rectángulo liso original. Comparte toda la lógica de auto-scroll/pausa
 // con AlbumCarousel -- ver comentarios ahí para el detalle de por qué.
 export function AlbumCarouselPolaroid({ photos, dark = false, hideHeader = false }: AlbumCarouselPolaroidProps) {
+  const tx = useTextos();
   const trackRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
@@ -160,8 +162,8 @@ export function AlbumCarouselPolaroid({ photos, dark = false, hideHeader = false
           <div className="t-kicker flex justify-center mb-6">
             <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
           </div>
-          <p className="t-kicker">Álbum</p>
-          <h2>Un poco de nuestra historia</h2>
+          <p className="t-kicker">{tx("invitacion.album.titulo")}</p>
+          <h2>{tx("invitacion.frase.unPocoDeNuestraHistoria")}</h2>
         </>
       )}
       <div
@@ -182,7 +184,7 @@ export function AlbumCarouselPolaroid({ photos, dark = false, hideHeader = false
                   className="album-polaroid-frame select-none"
                   style={{ transform: `rotate(${rot}deg)`, WebkitTouchCallout: "none" }}
                   role="img"
-                  aria-label={`Foto ${(i % photos.length) + 1}`}
+                  aria-label={tx("invitacion.album.foto", { n: (i % photos.length) + 1 })}
                   onClick={() => setExpandedPhoto(url)}
                 >
                   <div className="album-polaroid-photo" style={{ backgroundImage: `url(${url})` }} />
@@ -196,7 +198,7 @@ export function AlbumCarouselPolaroid({ photos, dark = false, hideHeader = false
             className="album-btn"
             type="button"
             onClick={() => scroll("prev")}
-            aria-label="Foto anterior"
+            aria-label={tx("invitacion.album.fotoAnterior")}
           >
             ‹
           </button>
@@ -204,7 +206,7 @@ export function AlbumCarouselPolaroid({ photos, dark = false, hideHeader = false
             className="album-btn"
             type="button"
             onClick={() => scroll("next")}
-            aria-label="Foto siguiente"
+            aria-label={tx("invitacion.album.fotoSiguiente")}
           >
             ›
           </button>
@@ -230,7 +232,7 @@ export function AlbumCarouselPolaroid({ photos, dark = false, hideHeader = false
 
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default select-none"
             draggable={false}
             style={{ WebkitTouchCallout: "none" }}

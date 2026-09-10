@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Heart } from "lucide-react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface CountdownV2Props {
   targetDate: Date;
@@ -35,10 +36,14 @@ function pad(n: number) {
 
 export function CountdownV2({
   targetDate,
-  kicker = "Cuenta regresiva",
+  kicker,
   title,
   dark = false,
 }: CountdownV2Props) {
+  const tx = useTextos();
+  // El valor por defecto se resuelve acá y no en la firma: necesita el
+  // traductor, que sólo existe una vez montado el componente.
+  const kickerTexto = kicker ?? tx("invitacion.cuentaRegresiva.kicker");
   const now = new Date();
   const target = new Date(targetDate);
   const isEventDay =
@@ -72,23 +77,23 @@ export function CountdownV2({
   const sectionClass = `d-sec${dark ? " dark" : ""}`;
 
   const boxes: { label: string; value: string }[] = [
-    { label: "Días", value: String(time.dias) },
-    { label: "Hs",   value: pad(time.hs) },
-    { label: "Min",  value: pad(time.min) },
-    { label: "Seg",  value: pad(time.seg) },
+    { label: tx("invitacion.cuentaRegresiva.diasAbrev"), value: String(time.dias) },
+    { label: tx("invitacion.cuentaRegresiva.horasAbrev"), value: pad(time.hs) },
+    { label: tx("invitacion.cuentaRegresiva.minutosAbrev"), value: pad(time.min) },
+    { label: tx("invitacion.cuentaRegresiva.segundosAbrev"), value: pad(time.seg) },
   ];
 
   if (isEventDay || (isToday && (time.dias === 0 && time.hs === 0))) {
     return (
       <section className={sectionClass} id="countdown">
-        <p className="t-kicker">{kicker}</p>
+        <p className="t-kicker">{kickerTexto}</p>
         <div className="cd-past p-8 rounded-2xl bg-[color-mix(in_srgb,var(--t-acc)_15%,transparent)] border border-[var(--t-acc)] text-center shadow-lg">
           <Heart className="w-12 h-12 mx-auto mb-3 text-[var(--t-acc)] opacity-90" strokeWidth={1.5} />
           <h3 className="text-2xl sm:text-3xl font-bold font-serif mb-2 text-[var(--t-acc)]">
-            ¡Llegó el día!
+            {tx("invitacion.cuentaRegresiva.llegoElDia")}
           </h3>
           <p className="cd-past-text text-base sm:text-lg font-medium opacity-90 leading-relaxed">
-            ¡Hoy es el gran día! Prepárate para festejar, reír y disfrutar cada instante inolvidable.
+            {tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}
           </p>
         </div>
       </section>
@@ -98,10 +103,10 @@ export function CountdownV2({
   if (hasEnded || isPast) {
     return (
       <section className={sectionClass} id="countdown">
-        <p className="t-kicker">{kicker}</p>
+        <p className="t-kicker">{kickerTexto}</p>
         <div className="cd-past text-center">
           <Heart className="w-10 h-10 mx-auto mb-2 text-[var(--t-acc)] opacity-90" strokeWidth={1.5} />
-          <p className="cd-past-text">¡Ya fue una noche increíble!</p>
+          <p className="cd-past-text">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
         </div>
       </section>
     );
@@ -109,7 +114,7 @@ export function CountdownV2({
 
   return (
     <section className={sectionClass} id="countdown">
-      <p className="t-kicker">{kicker}</p>
+      <p className="t-kicker">{kickerTexto}</p>
       {title && <h2>{title}</h2>}
 
       <div style={{ display: "flex", alignItems: "center", gap: "2rem", margin: "3.5rem 0" }}>
@@ -136,7 +141,7 @@ export function CountdownV2({
             <span className="block w-1.5 h-1.5 rounded-full bg-[var(--t-acc)] animate-pulse" style={{ animationDelay: "300ms" }}></span>
           </div>
         </div>
-        <div className="t-cd" role="timer" aria-live="off" aria-label="Cuenta regresiva" style={{ margin: 0, flex: 1 }}>
+        <div className="t-cd" role="timer" aria-live="off" aria-label={tx("invitacion.cuentaRegresiva.kicker")} style={{ margin: 0, flex: 1 }}>
           {boxes.map(({ label, value }) => (
             <div key={label}>
               <b aria-label={`${value} ${label}`}>

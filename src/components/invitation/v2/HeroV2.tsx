@@ -1,4 +1,5 @@
 "use client";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface HeroV2Props {
   monogram: string;          // "M & G" | "V"
@@ -25,6 +26,8 @@ export function HeroV2({
   posY = 30,
   scale = 110,
 }: HeroV2Props) {
+  const tx = useTextos();
+
   const bgStyle = backgroundImage
     ? {
         backgroundImage: `
@@ -67,7 +70,7 @@ export function HeroV2({
           backgroundPosition: `${posX}% ${posY}%`,
         } : {}),
       }}
-      aria-label={`Portada: ${eyebrow} — ${title}`}
+      aria-label={tx("invitacion.portada.etiquetaPortada", { kicker: eyebrow, titulo: title })}
     >
       {/* Noise overlay sutil para textura */}
       <div

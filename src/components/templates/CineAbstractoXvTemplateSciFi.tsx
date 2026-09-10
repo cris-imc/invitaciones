@@ -40,6 +40,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const cxvArchivoBlack = Archivo_Black({
   subsets: ["latin"],
@@ -117,14 +119,15 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized = false }: CineAbstractoXvTemplateProps) {
+  const tx = useTextos();
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
-  const namesTitle = nombreQuinceanera || "Mis quince";
+  const namesTitle = nombreQuinceanera || tx("invitacion.evento.misQuince");
 
   // "Saludar por nombre del invitado/familia": si está activo, la portada
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "FUNCIÓN DE ESTRENO PARA" : "FUNCIÓN DE ESTRENO PARA LOS 15 DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.funcionEstrenoPara").toUpperCase() : tx("invitacion.sabor.funcionEstrenoQuinceDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -149,7 +152,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Apaguen los teléfonos. Empieza la función."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeApaguenTelefonos")
   );
 
   // Cronograma real (no inventado) -- se muestra tal cual lo cargó el
@@ -251,7 +254,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: CxvQuizQuestion[] = safeJson<CxvQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeMi"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -406,7 +409,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#F5F1E8";
       }
       if (stubRef.current) {
@@ -692,7 +695,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
 
       <div ref={scrollerRef} data-scroller="1" className="cxv-scroller">
         <section data-tone="dark" data-screen-label="Save the Date" className="cxv-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #150A2A 0%, #0B0620 55%, #06030F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cxv-kicker">01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="cxv-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="cxv-date-stack">
             <span data-xin="1" data-delay="60" data-dist="-110" className="cxv-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="cxv-date-month">{monthAbbr}</span>
@@ -713,7 +716,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
           />
 
           <div data-drift="-70" className="cxv-medallion cxv-medallion--corner">
-            <CxvMedallion sub="ACCESO" arcId="cxvArc1" arcText="MIS 15 · FUNCIÓN ÚNICA · " spin="normal" />
+            <CxvMedallion sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="cxvArc1" arcText={tx("invitacion.sabor.arcoFuncionUnica").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -723,7 +726,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`cxv-hero-photo-section${!photoMobile ? " cxv-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " cxv-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="cxv-hero-photo-frame">
@@ -748,18 +751,18 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
           <div className="cxv-scanline" />
           <span data-xin="1" data-dist="-60" className="cxv-kicker" style={{ position: "relative" }}>{knPre(2)} — LA FUNCIÓN EMPIEZA EN</span>
           <div className="cxv-cd-grid">
-            <CxvCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <CxvCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <CxvCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <CxvCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <CxvCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <CxvCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <CxvCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <CxvCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="cxv-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="cxv-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C0B30 0%, #0E0818 52%, #06030F 100%)" }}>
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="cxv-section" style={{ background: "radial-gradient(130% 90% at 86% 16%, #1C0B30 0%, #0E0818 52%, #06030F 100%)" }}>
           <div data-drift="-130" className="cxv-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="cxv-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="cxv-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="cxv-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -779,7 +782,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="cxv-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")} className="cxv-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="cxv-pan-sticky">
             <div data-strip="1" className="cxv-strip">
               {ceremoniaHabilitada && (
@@ -795,35 +798,35 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
                   <div className="cxv-facts">
                     {ceremoniaHora && (
                       <div className="cxv-facts-row cxv-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="cxv-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="cxv-seguir">SEGUÍ BAJANDO <span className="cxv-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="cxv-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cxv-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="cxv-panel cxv-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="cxv-hair-bg" />
                 <div className="cxv-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="cxv-panel-title">
-                  {lugarNombre || "El salón"}
+                  {lugarNombre || tx("invitacion.ubicacion.elSalon")}
                   {direccion && <><br /><span className="cxv-accent-serif">{direccion}</span></>}
                 </h2>
                 <div className="cxv-facts">
                   <div className="cxv-facts-row">
-                    <span>HORARIO</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="cxv-facts-row cxv-facts-row--last">
-                      <span>CÓDIGO</span><span className="cxv-accent-serif-2">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="cxv-accent-serif-2">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -837,7 +840,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
                     ))}
                   </div>
                 )}
-                <div className="cxv-seguir">SEGUÍ BAJANDO <span className="cxv-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="cxv-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cxv-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -848,11 +851,11 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
                   </svg>
                   <div className="cxv-panel-block">
                     <span className="cxv-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="cxv-panel-title-sm">Cómo llegar</span>
+                    <span className="cxv-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     {direccion && <span className="cxv-mini-label">{direccion}</span>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cxv-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -861,9 +864,9 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
 
               <div data-tone="dark" className="cxv-panel cxv-panel--center" style={{ background: "#0B0620", color: "#F4F1EA" }}>
                 <div className="cxv-medallion cxv-medallion--lg">
-                  <CxvMedallion sub={`ENTRADA Nº ${passNumber}`} arcId="cxvArc2" arcText={`ACCESO VIP · ENTRADA Nº ${passNumber} · `} spin="reverse" />
+                  <CxvMedallion sub={tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()} arcId="cxvArc2" arcText={tx("invitacion.pase.arcoAccesoVipEntrada", { n: passNumber }).toUpperCase()} spin="reverse" />
                 </div>
-                <span className="cxv-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="cxv-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -882,7 +885,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
         <section data-tone="dark" data-screen-label="Check-in" className="cxv-section" style={{ background: "radial-gradient(110% 70% at 50% 100%, #150A2A 0%, #0B0620 60%, #06030F 100%)" }}>
           <span data-xin="1" data-dist="-60" className="cxv-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="cxv-h2">
-            Confirmá<br /><span className="cxv-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="cxv-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -916,20 +919,20 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
               />
             </div>
           ) : (
-            <p className="cxv-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="cxv-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="cxv-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="cxv-pan">
           <div className="cxv-pan-sticky">
             <div data-strip="1" className="cxv-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="cxv-panel cxv-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cxv-hair-bg" />
                   <div className="cxv-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="cxv-panel-title-md">Álbum <span className="cxv-accent-serif">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="cxv-panel-title-md">{tx("invitacion.album.titulo")} <span className="cxv-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="cxv-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -939,25 +942,25 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="cxv-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="cxv-photo-placeholder">Sin fotos todavía</span>
+                      <span className="cxv-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="cxv-seguir cxv-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="cxv-accent-serif-2">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="cxv-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="cxv-panel cxv-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="cxv-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="cxv-panel-title">Todo lo que<br /><span className="cxv-accent-serif">vamos a recordar</span></h2>
+                <span className="cxv-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="cxv-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="cxv-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="cxv-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#E01AA0" />
@@ -965,8 +968,8 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
                     <div className="cxv-live-placeholder">
                       <span className="cxv-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -978,9 +981,9 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="cxv-section" style={{ background: "#0B0620" }}>
-            <span data-xin="1" data-dist="-60" className="cxv-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="cxv-h2">¿Qué banda sonora<br /><span className="cxv-accent-italic">abre la noche?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="cxv-section" style={{ background: "#0B0620" }}>
+            <span data-xin="1" data-dist="-60" className="cxv-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="cxv-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaBandaSonoraAbreNoche"), "cxv-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cxv-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="cxv-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F5F1E8" : "#18D2E0" }} />
@@ -990,24 +993,24 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
               <CxvSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="cxv-section" style={{ background: "#0B0620" }}>
-            <span data-xin="1" data-dist="-60" className="cxv-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="cxv-section" style={{ background: "#0B0620" }}>
+            <span data-xin="1" data-dist="-60" className="cxv-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cxv-h2">
-              Si querés<br /><span className="cxv-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="cxv-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="cxv-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1027,7 +1030,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1049,7 +1052,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cxv-section" style={{ background: "#0B0620" }}>
-            <span data-xin="1" data-dist="-60" className="cxv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="cxv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="cxv-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1058,7 +1061,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
@@ -1068,16 +1071,16 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
           <span data-xin="1" data-dist="-60" className="cxv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cxv-final-card">
             <div className="cxv-medallion cxv-medallion--final">
-              <CxvMedallion sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="cxvArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <CxvMedallion sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cxvArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
-            <span className="cxv-mini-label cxv-accent-serif-2">ENTRADA Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="cxv-mini-label cxv-accent-serif-2">{tx("invitacion.pase.numeroEntradaAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="cxv-final-names">{namesTitle}</span>
             <span className="cxv-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="cxv-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="cxv-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="cxv-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="cxv-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1089,7 +1092,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
       </div>
 
       <div ref={railRef} className="cxv-rail">
-        <span ref={railTopRef} className="cxv-rail-top">ENTRADA Nº {passNumber}</span>
+        <span ref={railTopRef} className="cxv-rail-top">{tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="cxv-rail-line">
           <span ref={railBarRef} className="cxv-rail-bar" />
         </div>
@@ -1111,7 +1114,7 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="cxv-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="cxv-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </CxvCoverHalf>
         </div>
         <div ref={bottomRef} className="cxv-cover-half cxv-cover-half--bottom">
@@ -1125,12 +1128,12 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="cxv-cover-cta cxv-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="cxv-cover-cta cxv-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </CxvCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="cxv-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="cxv-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1145,14 +1148,14 @@ export function CineAbstractoXvTemplateSciFi({ invitation, guest, isPersonalized
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="cxv-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1243,6 +1246,7 @@ function CxvMedallion({
 }
 
 function CxvCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1257,7 +1261,7 @@ function CxvCopyField({ label, value }: { label: string; value: string }) {
         <span className="cxv-bank-row-value">{value}</span>
       </div>
       <button type="button" className="cxv-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1320,6 +1324,7 @@ function CxvRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1351,8 +1356,7 @@ function CxvRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1376,7 +1380,7 @@ function CxvRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1385,7 +1389,7 @@ function CxvRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1394,9 +1398,9 @@ function CxvRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="cxv-rsvp-declined">
-        <p className="cxv-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="cxv-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="cxv-rsvp-btn cxv-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1406,13 +1410,13 @@ function CxvRsvpCard({
     <>
       <div className="cxv-rsvp-rows">
         <div className="cxv-rsvp-row">
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="cxv-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="cxv-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1422,7 +1426,7 @@ function CxvRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="cxv-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="cxv-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1432,7 +1436,7 @@ function CxvRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="cxv-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="cxv-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1442,15 +1446,15 @@ function CxvRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="cxv-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="cxv-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="cxv-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="cxv-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="cxv-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="cxv-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="cxv-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1460,7 +1464,7 @@ function CxvRsvpCard({
           </div>
         ) : (
           <div className="cxv-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1471,7 +1475,7 @@ function CxvRsvpCard({
             <div className="cxv-rsvp-payment-value">
               <span className="cxv-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="cxv-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="cxv-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="cxv-rsvp-payment-detail">
@@ -1485,7 +1489,7 @@ function CxvRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1497,9 +1501,9 @@ function CxvRsvpCard({
 
       <div ref={stubRef} className="cxv-stub">
         <div className="cxv-stub-top">
-          <span>ENTRADA Nº {passNumber}</span>
+          <span>{tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()}</span>
           <span ref={statusRef} className="cxv-stub-status">
-            {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+            {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
         <div ref={sealRef} className="cxv-seal">
@@ -1514,10 +1518,10 @@ function CxvRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="cxv-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="cxv-rsvp-btn cxv-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1538,6 +1542,7 @@ interface CxvSongItem {
 
 // Misma API que <SongSuggestion> (/api/songs), look propio de la plantilla.
 function CxvSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<CxvSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1561,7 +1566,7 @@ function CxvSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1574,14 +1579,14 @@ function CxvSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1591,9 +1596,9 @@ function CxvSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="cxv-song">
       <form onSubmit={handleSubmit} className="cxv-song-row">
         <div className="cxv-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="cxv-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="cxv-song-input" />
           <span className="cxv-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="cxv-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="cxv-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="cxv-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1603,7 +1608,7 @@ function CxvSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="cxv-song-item">
               <span className="cxv-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="cxv-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="cxv-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1615,6 +1620,7 @@ function CxvSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página -- misma API
 // /api/quiz que usa el resto de las plantillas.
 function CxvQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: CxvQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1657,7 +1663,7 @@ function CxvQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1729,11 +1735,11 @@ function CxvQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="cxv-quiz-result">
           <p className="cxv-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="cxv-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1780,6 +1786,7 @@ function CxvCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="cxv-cover-inner">
       {photoMobile && (
@@ -1818,7 +1825,7 @@ function CxvCoverHalf({
       </div>
       <div className="cxv-cover-content">
         <div className="cxv-cover-top-row">
-          <span>ENTRADA Nº {passNumber}</span><span className="cxv-accent-serif-2">ALL ACCESS</span>
+          <span>{tx("invitacion.pase.numeroEntrada", { n: passNumber }).toUpperCase()}</span><span className="cxv-accent-serif-2">ALL ACCESS</span>
         </div>
         <div className="cxv-cover-center">
           <span ref={kickerRef} className="cxv-cover-kicker">{kickerText}</span>
@@ -1835,7 +1842,7 @@ function CxvCoverHalf({
           {children}
           <div className="cxv-barcode-wrap">
             <div className="cxv-barcode" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="cxv-mini-label cxv-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="cxv-mini-label cxv-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

@@ -37,6 +37,8 @@ import { createPortal } from "react-dom";
 import { escalaTitulo, largoTitulo } from "@/lib/title-scale";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const flbArchivo = Archivo_Black({
   subsets: ["latin"],
@@ -114,14 +116,15 @@ function passNumberFrom(orderNumber: number | undefined): string {
 }
 
 export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonalized = false }: FashionLookbookTemplateProps) {
+  const tx = useTextos();
   const nombreQuinceanera = String(invitation.nombreQuinceanera || invitation.nombreEvento || "");
-  const namesTitle = nombreQuinceanera || "Mis quince";
+  const namesTitle = nombreQuinceanera || tx("invitacion.evento.misQuince");
 
   // "Saludar por nombre del invitado/familia": si está activo, la portada
   // saluda con el nombre del invitado/familia en vez de la quinceañera.
   const showGuestNameInCover = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
   const coverGuestName = resolveGuestNameDisplay(invitation, guest);
-  const coverKickerText = showGuestNameInCover ? "CASTING ABIERTO PARA" : "CASTING ABIERTO PARA LOS 15 DE";
+  const coverKickerText = showGuestNameInCover ? tx("invitacion.sabor.castingAbiertoPara").toUpperCase() : tx("invitacion.sabor.castingAbiertoQuinceDe").toUpperCase();
   const coverNamesTitle: React.ReactNode = showGuestNameInCover ? coverGuestName : namesTitle;
 
   const fechaEvento = invitation.fechaEvento ? new Date(String(invitation.fechaEvento)) : new Date();
@@ -149,7 +152,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
   const dressCode = String(invitation.portadaDressCode ?? "");
   const portadaMensaje = String(
-    invitation.portadaMensaje || "Guardá la fecha. Vos estás en el casting."
+    invitation.portadaMensaje || tx("invitacion.sabor.mensajeEstasEnElCasting")
   );
 
   // Cronograma real (no inventado) -- se muestra tal cual lo cargó el
@@ -251,7 +254,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
 
   const triviaHabilitada = Boolean(invitation.triviaHabilitada);
   const triviaPreguntas: FlbQuizQuestion[] = safeJson<FlbQuizQuestion[]>(String(invitation.triviaPreguntas ?? ""), []);
-  const triviaTitulo = String(invitation.triviaTitulo || "¿Cuánto sabés de mí?");
+  const triviaTitulo = String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabesDeMi"));
   const quizEnabled = triviaHabilitada && triviaPreguntas.length > 0;
 
   // Frase: elegible/personalizable desde el wizard (StepPhrase) -- si está
@@ -411,7 +414,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
     }
     window.setTimeout(() => {
       if (statusRef.current) {
-        statusRef.current.textContent = "ACCESO CONFIRMADO";
+        statusRef.current.textContent = tx("invitacion.pase.accesoConfirmado").toUpperCase();
         statusRef.current.style.color = "#F5F2ED";
       }
       if (stubRef.current) {
@@ -699,7 +702,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
         <section data-tone="dark" data-screen-label="Save the Date" className="flb-section">
           <span className="flb-watermark" aria-hidden="true">15</span>
           <div className="flb-grid-overlay" />
-          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>01 — GUARDÁ LA FECHA</span>
+          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="flb-date-stack" style={{ position: "relative" }}>
             <span data-xin="1" data-delay="60" data-dist="-110" className="flb-date-num">{dayNum}</span>
             <span data-xin="1" data-delay="170" data-dist="140" className="flb-date-month">{monthAbbr}</span>
@@ -720,7 +723,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
           />
 
           <div data-drift="-70" className="flb-medallion flb-medallion--corner">
-            <FlbMedallion main="15" sub="ACCESO" arcId="flbArc1" arcText="LOOKBOOK SS27 · EDICIÓN ÚNICA · " spin="normal" />
+            <FlbMedallion main="15" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="flbArc1" arcText={tx("invitacion.sabor.arcoLookbook").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -729,7 +732,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
         {(photoMobile || photoDesktop) && (
           <section
             data-tone="dark"
-            data-screen-label="Nuestra foto"
+            data-screen-label={tx("invitacion.album.nuestraFoto")}
             className={`flb-hero-photo-section${!photoMobile ? " flb-hero-photo-section--no-mobile" : ""}${!photoDesktop ? " flb-hero-photo-section--no-desktop" : ""}`}
           >
             <div className="flb-hero-photo-frame">
@@ -753,18 +756,18 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
           <div className="flb-scanline" />
           <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>{knPre(2)} — LA CAMPAÑA SALE EN</span>
           <div className="flb-cd-grid">
-            <FlbCdBox refEl={dRef} delay={40} dist={-90} label="DÍAS" />
-            <FlbCdBox refEl={hRef} delay={120} dist={110} label="HORAS" />
-            <FlbCdBox refEl={mRef} delay={200} dist={-140} label="MIN" />
-            <FlbCdBox refEl={sRef} delay={280} dist={170} label="SEG" />
+            <FlbCdBox refEl={dRef} delay={40} dist={-90} label={tx("invitacion.cuentaRegresiva.dias").toUpperCase()} />
+            <FlbCdBox refEl={hRef} delay={120} dist={110} label={tx("invitacion.cuentaRegresiva.horas").toUpperCase()} />
+            <FlbCdBox refEl={mRef} delay={200} dist={-140} label={tx("invitacion.cuentaRegresiva.minutosAbrev").toUpperCase()} />
+            <FlbCdBox refEl={sRef} delay={280} dist={170} label={tx("invitacion.cuentaRegresiva.segundosAbrev").toUpperCase()} />
           </div>
           <div className="flb-perf-strip" />
         </section>
 
         {hasFrase && (
-        <section id="quote" data-tone="dark" data-screen-label="Frase" className="flb-section">
+        <section id="quote" data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="flb-section">
           <div data-drift="-130" className="flb-glow-blob" />
-          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>{knPre(3)} — CUANDO LLEGUE A CERO</span>
+          <span data-xin="1" data-dist="-60" className="flb-kicker" style={{ position: "relative" }}>{knPre(3)} {"— " + tx("invitacion.cuentaRegresiva.cuandoLlegueACero").toUpperCase()}</span>
           <h2 ref={phraseRef} className="flb-phrase" style={{ fontSize: fraseFontSize }}>
             {fraseWords.map((w, i) => (
               // El espacio va FUERA del span: el motor de reveal fuerza
@@ -784,7 +787,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
         </section>
         )}
 
-        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Cuándo y dónde" className="flb-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
+        <div data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")} className="flb-pan" style={!scrollVertical && ceremoniaHabilitada ? { height: "340vh" } : undefined}>
           <div className="flb-pan-sticky">
             <div data-strip="1" className="flb-strip">
               {ceremoniaHabilitada && (
@@ -800,35 +803,35 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
                   <div className="flb-facts">
                     {ceremoniaHora && (
                       <div className="flb-facts-row flb-facts-row--last">
-                        <span>HORARIO</span><span>{ceremoniaHora} H</span>
+                        <span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{ceremoniaHora} H</span>
                       </div>
                     )}
                   </div>
                   {ceremoniaMapUrl && (
                     <a href={ceremoniaMapUrl} target="_blank" rel="noopener noreferrer" className="flb-link-cta">
-                      ABRIR EN MAPAS →
+                      {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                     </a>
                   )}
-                  <div className="flb-seguir">SEGUÍ BAJANDO <span className="flb-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                  <div className="flb-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="flb-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
                 </div>
               )}
 
               <div id="details" data-tone="light" className="flb-panel flb-panel--between" style={{ background: "#EFEBE1", color: "#14141B" }}>
                 <div className="flb-hair-bg" />
                 <div className="flb-panel-top">
-                  <span>{kn(3)} — CUÁNDO Y DÓNDE</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
+                  <span>{kn(3)} {"— " + tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{ceremoniaHabilitada ? "02" : "01"} / {LUGAR_PANEL_COUNT}</span>
                 </div>
                 <h2 className="flb-panel-title">
-                  {lugarNombre || "El salón"}
+                  {lugarNombre || tx("invitacion.ubicacion.elSalon")}
                   {direccion && <><br /><span className="flb-accent-red-serif">{direccion}</span></>}
                 </h2>
                 <div className="flb-facts">
                   <div className="flb-facts-row">
-                    <span>RECEPCIÓN</span><span>{hora} H</span>
+                    <span>{tx("invitacion.ubicacion.recepcion").toUpperCase()}</span><span>{hora} H</span>
                   </div>
                   {dressCode && (
                     <div className="flb-facts-row flb-facts-row--last">
-                      <span>CÓDIGO</span><span className="flb-accent-plain">{dressCode.toUpperCase()}</span>
+                      <span>{tx("invitacion.pase.codigo").toUpperCase()}</span><span className="flb-accent-plain">{dressCode.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
@@ -842,7 +845,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
                     ))}
                   </div>
                 )}
-                <div className="flb-seguir">SEGUÍ BAJANDO <span className="flb-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
+                <div className="flb-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="flb-side-hint">{scrollVertical ? "↓" : "→"}</span></div>
               </div>
 
               {hayComoLlegar && (
@@ -853,11 +856,11 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
                   </svg>
                   <div className="flb-panel-block">
                     <span className="flb-mini-label">{ceremoniaHabilitada ? "03" : "02"} / {LUGAR_PANEL_COUNT}</span>
-                    <span className="flb-panel-title-sm">Cómo llegar</span>
+                    <span className="flb-panel-title-sm">{tx("invitacion.ubicacion.comoLlegar")}</span>
                     <span className="flb-mini-label">15 MIN DESDE EL CENTRO · ESTACIONAMIENTO EN EL PREDIO</span>
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="flb-link-cta">
-                        ABRIR EN MAPAS →
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase() + " →"}
                       </a>
                     )}
                   </div>
@@ -866,9 +869,9 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
 
               <div data-tone="dark" className="flb-panel flb-panel--center" style={{ background: "#0D0F0A", color: "#F4F1EA" }}>
                 <div className="flb-medallion flb-medallion--lg">
-                  <FlbMedallion kicker="SECTOR" main="Pasarela" sub="LOOK 04" subColor="#6B8F3B" arcId="flbArc2" arcText={`ACCESO VIP · LOOK Nº ${passNumber} · `} spin="reverse" />
+                  <FlbMedallion kicker={tx("invitacion.pase.sector").toUpperCase()} main={tx("invitacion.pase.pasarela")} sub="LOOK 04" subColor="#6B8F3B" arcId="flbArc2" arcText={tx("invitacion.pase.arcoAccesoVipLook", { n: passNumber }).toUpperCase()} spin="reverse" />
                 </div>
-                <span className="flb-mini-label flb-mini-label--dark">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} — TU UBICACIÓN</span>
+                <span className="flb-mini-label flb-mini-label--dark">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
                 {guest?.mesas && guest.mesas.length > 0 && (
                   <span
@@ -887,7 +890,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
         <section data-tone="dark" data-screen-label="Check-in" className="flb-section">
           <span data-xin="1" data-dist="-60" className="flb-kicker">{kn(4)} — CHECK-IN</span>
           <h2 data-xin="1" data-delay="80" data-dist="130" className="flb-h2">
-            Confirmá<br /><span className="flb-accent-italic">tu acceso</span>
+            {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="flb-accent-italic">{tx("invitacion.rsvp.confirmaLinea2")}</span>
           </h2>
 
           {rsvpEnabled ? (
@@ -921,20 +924,20 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
               />
             </div>
           ) : (
-            <p className="flb-lead">La confirmación de asistencia está cerrada por el momento.</p>
+            <p className="flb-lead">{tx("invitacion.rsvp.cerrada")}</p>
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label="Álbum" className="flb-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="flb-pan">
           <div className="flb-pan-sticky">
             <div data-strip="1" className="flb-strip">
               {photoPages.map((page, pageIndex) => (
                 <div key={pageIndex} data-tone="light" className="flb-panel flb-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="flb-hair-bg" />
                   <div className="flb-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>HOJA {String(pageIndex + 1).padStart(2, "0")} / {String(photoPages.length).padStart(2, "0")}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
                   </div>
-                  {pageIndex === 0 && <h2 className="flb-panel-title-md">Álbum <span className="flb-accent-mono">de fotos</span></h2>}
+                  {pageIndex === 0 && <h2 className="flb-panel-title-md">{tx("invitacion.album.titulo")} <span className="flb-accent-mono">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="flb-mosaic">
                     {page.length > 0 ? page.map((url, i) => (
                       <div
@@ -944,25 +947,25 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
                         tabIndex={0}
                         onClick={() => setExpandedPhoto(url)}
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpandedPhoto(url); }}
-                        aria-label={`Ampliar foto ${i + 1}`}
+                        aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="flb-mosaic-img" />
                       </div>
                     )) : (
-                      <span className="flb-photo-placeholder">Sin fotos todavía</span>
+                      <span className="flb-photo-placeholder">{tx("invitacion.album.sinFotos")}</span>
                     )}
                   </div>
                   <div className="flb-seguir flb-seguir--split">
-                    <span>{allPhotos.length} FOTOS SUBIDAS</span>
-                    <span className="flb-accent-plain">SEGUÍ →</span>
+                    <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
+                    <span className="flb-accent-plain">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
                   </div>
                 </div>
               ))}
 
               <div data-tone="light" className="flb-panel flb-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="flb-panel-top" style={{ display: "block" }}>HOJA {String(photoPages.length + 1).padStart(2, "0")} — EN VIVO</span>
-                <h2 className="flb-panel-title">Todo lo que<br /><span className="flb-accent-mono">vamos a recordar</span></h2>
+                <span className="flb-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
+                <h2 className="flb-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="flb-accent-mono">{tx("invitacion.album.tituloLinea2")}</span></h2>
                 <div className="flb-album-embed">
                   {livePhotos.length > 0 ? (
                     <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#6B8F3B" />
@@ -970,8 +973,8 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
                     <div className="flb-live-placeholder">
                       <span className="flb-mini-label">
                         {eventHasStarted
-                          ? "Todavía no se subió nada en vivo."
-                          : "Esta sección se activa el día de la fiesta -- ahí vas a poder ver todo lo que subamos en vivo."}
+                          ? tx("invitacion.enVivo.nadaTodavia")
+                          : tx("invitacion.enVivo.seActivaElDia")}
                       </span>
                     </div>
                   )}
@@ -983,9 +986,9 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
         </div>
 
         {sugerenciaMusicaHabilitada && (
-          <section id="music" data-tone="dark" data-screen-label="Música" className="flb-section" style={{ background: "#0D0F0A" }}>
-            <span data-xin="1" data-dist="-60" className="flb-kicker">{kn(6)} — SUGERENCIA DE MÚSICA</span>
-            <h2 data-xin="1" data-delay="80" data-dist="140" className="flb-h2">¿Qué look<br /><span className="flb-accent-italic">no puede faltar?</span></h2>
+          <section id="music" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="flb-section" style={{ background: "#0D0F0A" }}>
+            <span data-xin="1" data-dist="-60" className="flb-kicker">{kn(6)} {"— " + tx("invitacion.musica.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="80" data-dist="140" className="flb-h2">{tituloEnDosLineas(tx("invitacion.sabor.preguntaLookFaltar"), "flb-accent-italic")}</h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="flb-eq">
               {[0, 0.18, 0.36, 0.54, 0.72].map((delay, i) => (
                 <span key={i} className="flb-eq-bar" style={{ animationDelay: `${delay}s`, background: i === 2 ? "#F5F2ED" : "#6B8F3B" }} />
@@ -995,24 +998,24 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
               <FlbSongSuggestion
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
         )}
 
         {showBankSection && (
-          <section id="banco" data-tone="dark" data-screen-label="Regalos" className="flb-section" style={{ background: "#0D0F0A" }}>
-            <span data-xin="1" data-dist="-60" className="flb-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} — REGALOS Y PAGOS</span>
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="flb-section" style={{ background: "#0D0F0A" }}>
+            <span data-xin="1" data-dist="-60" className="flb-kicker">{sugerenciaMusicaHabilitada ? kn(7) : kn(6)} {"— " + tx("invitacion.regalos.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="flb-h2">
-              Si querés<br /><span className="flb-accent-italic">sumarte</span>
+              {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="flb-accent-italic">{tx("invitacion.regalos.siQueresLinea2")}</span>
             </h2>
             <div data-xin="1" data-delay="160" data-dist="-80" className="flb-bank-wrap">
               {pagoTarjetaHabilitado && (
                 <BankDetailsCard
                   icon={<CreditCard className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                    titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                     mensaje: String(invitation.pagoTarjetaMensaje || ""),
                     banco: String(invitation.pagoTarjetaBanco || ""),
                     cbu: String(invitation.pagoTarjetaCbu || ""),
@@ -1032,7 +1035,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
                 <BankDetailsCard
                   icon={<Gift className="w-[18px] h-[18px]" strokeWidth={1.5} />}
                   data={{
-                    titulo: String(invitation.regaloTitulo || "Regalos del Evento"),
+                    titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                     mensaje: String(invitation.regaloMensaje || ""),
                     banco: String(invitation.regaloBanco || ""),
                     cbu: String(invitation.regaloCbu || ""),
@@ -1054,7 +1057,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
 
         {quizEnabled && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="flb-section" style={{ background: "#0D0F0A" }}>
-            <span data-xin="1" data-dist="-60" className="flb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} — EL JUEGO</span>
+            <span data-xin="1" data-dist="-60" className="flb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection].filter(Boolean).length + 6)} {"— " + tx("invitacion.quiz.kicker").toUpperCase()}</span>
             <h2 data-xin="1" data-delay="80" data-dist="140" className="flb-h2" style={{ fontSize: "clamp(28px, 6vw, 44px)" }}>
               {triviaTitulo}
             </h2>
@@ -1063,7 +1066,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
                 preguntas={triviaPreguntas}
                 invitationId={String(invitation.id ?? "")}
                 guestToken={guest?.uniqueToken}
-                guestName={guestName || "Invitado"}
+                guestName={guestName || tx("invitacion.evento.invitado")}
               />
             </div>
           </section>
@@ -1073,16 +1076,16 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
           <span data-xin="1" data-dist="-60" className="flb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LOOK</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="flb-final-card">
             <div className="flb-medallion flb-medallion--final">
-              <FlbMedallion main="15" sub={confirmed ? "CONFIRMADO" : "PENDIENTE"} arcId="flbArc3" arcText={textoArco(namesTitle, fechaCompacta)} spin="reverse" />
+              <FlbMedallion main="15" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="flbArc3" arcText={textoArco(namesTitle, fechaCompacta)} spin="reverse" />
             </div>
-            <span className="flb-mini-label flb-accent-plain">LOOK Nº {passNumber} · ADMIT {guestAdults + guestTeens + guestChildren || 1}</span>
+            <span className="flb-mini-label flb-accent-plain">{tx("invitacion.pase.numeroLookAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="flb-final-names">{namesTitle}</span>
             <span className="flb-mini-label" style={{ color: "#A8A292" }}>{fechaCorta} — {hora} H</span>
             <div className="flb-barcode" style={{ width: "60%", height: 26, opacity: 0.6 }} />
           </div>
           <div className="flb-final-footer">
-            <span>NO TRANSFERIBLE</span>
-            <span className="flb-replay" onClick={reset}>VER LA APERTURA OTRA VEZ ↺</span>
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="flb-replay" onClick={reset}>{tx("invitacion.portada.verAperturaOtraVez").toUpperCase() + " ↺"}</span>
           </div>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <InfoAdicionalSection invitation={invitation as any} />
@@ -1094,7 +1097,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
       </div>
 
       <div ref={railRef} className="flb-rail">
-        <span ref={railTopRef} className="flb-rail-top">LOOK Nº {passNumber}</span>
+        <span ref={railTopRef} className="flb-rail-top">{tx("invitacion.pase.numeroLook", { n: passNumber }).toUpperCase()}</span>
         <div ref={railLineRef} className="flb-rail-line">
           <span ref={railBarRef} className="flb-rail-bar" />
         </div>
@@ -1117,7 +1120,7 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <div className="flb-cover-cta">ABRIR INVITACIÓN</div>
+            <div className="flb-cover-cta">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</div>
           </FlbCoverHalf>
         </div>
         <div ref={bottomRef} className="flb-cover-half flb-cover-half--bottom">
@@ -1132,12 +1135,12 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
             photoMobile={photoMobile}
             photoDesktop={photoDesktop}
           >
-            <button onClick={open} className="flb-cover-cta flb-cover-cta--btn">ABRIR INVITACIÓN</button>
+            <button onClick={open} className="flb-cover-cta flb-cover-cta--btn">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</button>
           </FlbCoverHalf>
         </div>
       </div>
 
-      <div ref={hintRef} className="flb-hint">DESLIZÁ ↓</div>
+      <div ref={hintRef} className="flb-hint">{tx("invitacion.portada.desliza").toUpperCase() + " ↓"}</div>
 
       {expandedPhoto && (
         <div
@@ -1152,14 +1155,14 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
               e.stopPropagation();
               setExpandedPhoto(null);
             }}
-            aria-label="Cerrar"
+            aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={expandedPhoto}
-            alt="Foto ampliada"
+            alt={tx("invitacion.album.fotoAmpliada")}
             className="flb-lightbox-img"
             draggable={false}
             onClick={(e) => e.stopPropagation()}
@@ -1258,6 +1261,7 @@ function FlbMedallion({
 }
 
 function FlbCopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -1272,7 +1276,7 @@ function FlbCopyField({ label, value }: { label: string; value: string }) {
         <span className="flb-bank-row-value">{value}</span>
       </div>
       <button type="button" className="flb-bank-copy" onClick={handle}>
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -1335,6 +1339,7 @@ function FlbRsvpCard({
   statusRef: React.RefObject<HTMLSpanElement | null>;
   onConfirmed: (data: { attending: boolean; count: number }) => void;
 }) {
+  const tx = useTextos();
   const [status, setStatus] = useState<GuestStatus>(initialStatus);
   const hasSpecific =
     initialStatus === "CONFIRMED" &&
@@ -1366,8 +1371,7 @@ function FlbRsvpCard({
     teenCount === (initialAttendingTeens ?? 0) &&
     childCount === (initialAttendingChildren ?? 0);
   const totalPayment = useServerTotal ? paymentView.total : liveTotal;
-  const formatARS = (n: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(n);
+  const formatARS = useFormatoDeMoneda();
 
   async function submit(asistencia: "CONFIRMA" | "NO_ASISTE") {
     setIsSubmitting(true);
@@ -1391,7 +1395,7 @@ function FlbRsvpCard({
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al confirmar");
+        throw new Error(d.error || tx("invitacion.rsvp.errorConfirmar"));
       }
       if (asistencia === "CONFIRMA") {
         setStatus("CONFIRMED");
@@ -1400,7 +1404,7 @@ function FlbRsvpCard({
         setStatus("DECLINED");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al confirmar. Intentá de nuevo.");
+      setError(e instanceof Error ? e.message : tx("invitacion.rsvp.errorConfirmarReintenta"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1409,9 +1413,9 @@ function FlbRsvpCard({
   if (status === "DECLINED") {
     return (
       <div className="flb-rsvp-declined">
-        <p className="flb-rsvp-declined-text">Gracias por avisarnos. Si cambiás de idea, este mismo acceso sigue activo.</p>
+        <p className="flb-rsvp-declined-text">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
         <button type="button" className="flb-rsvp-btn flb-rsvp-btn--ghost" onClick={() => setStatus("PENDING")}>
-          CAMBIÉ DE IDEA
+          {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
     );
@@ -1421,13 +1425,13 @@ function FlbRsvpCard({
     <>
       <div className="flb-rsvp-rows">
         <div className="flb-rsvp-row">
-          <span>{totalGuests > 1 ? "RESERVADO PARA" : "NOMBRE Y APELLIDO"}</span>
+          <span>{totalGuests > 1 ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.rsvp.nombreYApellido").toUpperCase()}</span>
           <span>{guestName || "—"}</span>
         </div>
 
         {totalGuests > 1 && status !== "CONFIRMED" && (
           <div className="flb-rsvp-row">
-            <span>ADULTOS</span>
+            <span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span>
             <div className="flb-rsvp-stepper">
               <button type="button" onClick={() => setAdultCount((v) => Math.max(1, v - 1))} disabled={adultCount <= 1}>−</button>
               <span>{String(adultCount).padStart(2, "0")}</span>
@@ -1437,7 +1441,7 @@ function FlbRsvpCard({
         )}
         {maxTeens > 0 && status !== "CONFIRMED" && (
           <div className="flb-rsvp-row">
-            <span>ADOLESCENTES</span>
+            <span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span>
             <div className="flb-rsvp-stepper">
               <button type="button" onClick={() => setTeenCount((v) => Math.max(0, v - 1))} disabled={teenCount <= 0}>−</button>
               <span>{String(teenCount).padStart(2, "0")}</span>
@@ -1447,7 +1451,7 @@ function FlbRsvpCard({
         )}
         {maxChildren > 0 && status !== "CONFIRMED" && (
           <div className="flb-rsvp-row">
-            <span>NIÑOS</span>
+            <span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span>
             <div className="flb-rsvp-stepper">
               <button type="button" onClick={() => setChildCount((v) => Math.max(0, v - 1))} disabled={childCount <= 0}>−</button>
               <span>{String(childCount).padStart(2, "0")}</span>
@@ -1457,15 +1461,15 @@ function FlbRsvpCard({
         )}
         {status === "CONFIRMED" && (
           <>
-            {totalGuests > 1 && adultCount > 0 && <div className="flb-rsvp-row"><span>ADULTOS</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
-            {teenCount > 0 && <div className="flb-rsvp-row"><span>ADOLESCENTES</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
-            {childCount > 0 && <div className="flb-rsvp-row"><span>NIÑOS</span><span>{String(childCount).padStart(2, "0")}</span></div>}
+            {totalGuests > 1 && adultCount > 0 && <div className="flb-rsvp-row"><span>{tx("invitacion.rsvp.adultos").toUpperCase()}</span><span>{String(adultCount).padStart(2, "0")}</span></div>}
+            {teenCount > 0 && <div className="flb-rsvp-row"><span>{tx("invitacion.rsvp.adolescentes").toUpperCase()}</span><span>{String(teenCount).padStart(2, "0")}</span></div>}
+            {childCount > 0 && <div className="flb-rsvp-row"><span>{tx("invitacion.rsvp.ninos").toUpperCase()}</span><span>{String(childCount).padStart(2, "0")}</span></div>}
           </>
         )}
 
         {status !== "CONFIRMED" ? (
           <div className="flb-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <input
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
@@ -1475,7 +1479,7 @@ function FlbRsvpCard({
           </div>
         ) : (
           <div className="flb-rsvp-row">
-            <span>RESTRICCIÓN ALIMENTARIA</span>
+            <span>{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</span>
             <span>{guestRestrictions || dietary || "—"}</span>
           </div>
         )}
@@ -1486,7 +1490,7 @@ function FlbRsvpCard({
             <div className="flb-rsvp-payment-value">
               <span className="flb-rsvp-payment-total">{formatARS(totalPayment)}</span>
               {paymentStatus === "PARTIAL" && (
-                <div className="flb-rsvp-payment-detail"><span>Pago parcial registrado</span></div>
+                <div className="flb-rsvp-payment-detail"><span>{tx("invitacion.pago.pagoParcialRegistrado")}</span></div>
               )}
               {(adultCount > 0 || teenCount > 0 || childCount > 0) && (
                 <div className="flb-rsvp-payment-detail">
@@ -1500,7 +1504,7 @@ function FlbRsvpCard({
                       <span>{teenCount} {teenCount === 1 ? "adolescente" : "adolescentes"} × {formatARS(teenPrice)}</span>
                     )}
                     {childCount > 0 && (
-                      <span>{childCount} {childCount === 1 ? "niño" : "niños"} × {formatARS(childPrice)}</span>
+                      <span>{childCount} {childCount === 1 ? tx("invitacion.rsvp.ninoUno") : tx("invitacion.rsvp.ninoVarios")} × {formatARS(childPrice)}</span>
                     )}
                       </>}
                 </div>
@@ -1516,9 +1520,9 @@ function FlbRsvpCard({
         </div>
         <div className="flb-stub-body">
           <div className="flb-stub-top">
-            <span>LOOK Nº {passNumber}</span>
+            <span>{tx("invitacion.pase.numeroLook", { n: passNumber }).toUpperCase()}</span>
             <span ref={statusRef} className="flb-stub-status">
-              {confirmed ? "ACCESO CONFIRMADO" : "PENDIENTE"}
+              {confirmed ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
             </span>
           </div>
           <div className="flb-barcode flb-barcode--stub" />
@@ -1531,10 +1535,10 @@ function FlbRsvpCard({
       {status !== "CONFIRMED" ? (
         <>
           <button type="button" className="flb-rsvp-btn" disabled={isSubmitting} onClick={() => submit("CONFIRMA")}>
-            {isSubmitting ? "GUARDANDO…" : "CONFIRMAR ASISTENCIA"}
+            {isSubmitting ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
           <button type="button" className="flb-rsvp-btn flb-rsvp-btn--ghost" disabled={isSubmitting} onClick={() => submit("NO_ASISTE")}>
-            NO VOY A PODER ASISTIR
+            {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
@@ -1555,6 +1559,7 @@ interface FlbSongItem {
 
 // Misma API que <SongSuggestion> (/api/songs), look propio de la plantilla.
 function FlbSongSuggestion({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+  const tx = useTextos();
   const [songs, setSongs] = useState<FlbSongItem[]>([]);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -1578,7 +1583,7 @@ function FlbSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     const t = title.trim();
     const a = artist.trim();
     if (!t || !a) {
-      setError("Completá tema y artista");
+      setError(tx("invitacion.musica.completaTemaYArtista"));
       return;
     }
     setError("");
@@ -1591,14 +1596,14 @@ function FlbSongSuggestion({ invitationId, guestToken, guestName }: { invitation
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error al enviar");
+        throw new Error(d.error || tx("invitacion.musica.errorEnviar"));
       }
       setTitle("");
       setArtist("");
       const data = await fetch(listUrl).then((r) => r.json());
       if (Array.isArray(data)) setSongs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar");
+      setError(err instanceof Error ? err.message : tx("invitacion.musica.noSePudoEnviar"));
     } finally {
       setIsSubmitting(false);
     }
@@ -1608,9 +1613,9 @@ function FlbSongSuggestion({ invitationId, guestToken, guestName }: { invitation
     <div className="flb-song">
       <form onSubmit={handleSubmit} className="flb-song-row">
         <div className="flb-song-inputs">
-          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="ARTISTA" maxLength={80} className="flb-song-input" />
+          <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={tx("invitacion.musica.artista").toUpperCase()} maxLength={80} className="flb-song-input" />
           <span className="flb-song-sep">—</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="TEMA" maxLength={100} className="flb-song-input" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={tx("invitacion.musica.tema").toUpperCase()} maxLength={100} className="flb-song-input" />
         </div>
         <button type="submit" disabled={isSubmitting} className="flb-song-submit">+ {isSubmitting ? "..." : "SUMAR"}</button>
       </form>
@@ -1620,7 +1625,7 @@ function FlbSongSuggestion({ invitationId, guestToken, guestName }: { invitation
           {songs.slice(0, 12).map((s, i) => (
             <div key={s.id} className="flb-song-item">
               <span className="flb-song-item-title">{String(i + 1).padStart(2, "0")} · {s.artist} — {s.title}</span>
-              <span className="flb-song-item-by">Sumado por {s.guestName || "Invitado"}</span>
+              <span className="flb-song-item-by">{tx("invitacion.musica.sumadoPor")} {s.guestName || tx("invitacion.evento.invitado")}</span>
             </div>
           ))}
         </div>
@@ -1632,6 +1637,7 @@ function FlbSongSuggestion({ invitationId, guestToken, guestName }: { invitation
 // Todas las preguntas se muestran juntas en la misma página -- misma API
 // /api/quiz que usa el resto de las plantillas.
 function FlbQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas: FlbQuizQuestion[]; invitationId: string; guestToken?: string; guestName?: string }) {
+  const tx = useTextos();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1674,7 +1680,7 @@ function FlbQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitationId,
-          guestName: guestName || "Invitado",
+          guestName: guestName || tx("invitacion.evento.invitado"),
           guestToken: guestToken || null,
           answers: Object.values(finalPicks),
           score,
@@ -1746,11 +1752,11 @@ function FlbQuiz({ preguntas, invitationId, guestToken, guestName }: { preguntas
       {finished && (
         <div className="flb-quiz-result">
           <p className="flb-quiz-result-score">
-            {isSaving ? "GUARDANDO…" : `RESPONDISTE ${score} DE ${preguntas.length} CORRECTAMENTE`}
+            {isSaving ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: score, total: preguntas.length }).toUpperCase()}
           </p>
           {!isSaving && stats && stats.count > 0 && (
             <p className="flb-quiz-result-stat">
-              El promedio del resto de los invitados ({stats.count}) es del {stats.avg}%.
+              {tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}
             </p>
           )}
         </div>
@@ -1799,6 +1805,7 @@ function FlbCoverHalf({
   photoDesktop?: string;
   children: React.ReactNode;
 }) {
+  const tx = useTextos();
   return (
     <div className="flb-cover-inner">
       {photoMobile && (
@@ -1815,7 +1822,7 @@ function FlbCoverHalf({
       <div className="flb-cover-grid" />
       <div className="flb-cover-content">
         <div className="flb-cover-top-row">
-          <span>LOOKBOOK SS27 · Nº {passNumber}</span><span className="flb-accent-red">EDICIÓN ÚNICA</span>
+          <span>{tx("invitacion.pase.numeroLookbookSs27", { n: passNumber }).toUpperCase()}</span><span className="flb-accent-red">{tx("invitacion.sabor.edicionUnica").toUpperCase()}</span>
         </div>
         <div className="flb-cover-center">
           <span ref={kickerRef} className="flb-cover-kicker">{kickerText}</span>
@@ -1828,13 +1835,13 @@ function FlbCoverHalf({
           <div className="flb-cover-facts">
             <span>SECTOR — PASARELA</span>
             <span>{hora} H</span>
-            <span>CÓD. {lookCode}</span>
+            <span>{tx("invitacion.pase.codigoAbrev", { codigo: lookCode }).toUpperCase()}</span>
           </div>
           {dressCode && <div className="flb-cover-facts flb-cover-facts--dress"><span>{dressCode.toUpperCase()}</span></div>}
           {children}
           <div className="flb-barcode-wrap">
             <div className="flb-barcode flb-barcode--cover" style={{ width: "62%", height: "clamp(15px, 3vh, 26px)", opacity: 0.6 }} />
-            <span className="flb-mini-label flb-mini-label--cover" style={{ color: "#56534A" }}>NO TRANSFERIBLE</span>
+            <span className="flb-mini-label flb-mini-label--cover" style={{ color: "#56534A" }}>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
           </div>
         </div>
       </div>

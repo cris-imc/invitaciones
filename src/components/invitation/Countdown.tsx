@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { Calendar, MapPin, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface CountdownProps {
     targetDate: Date;
 }
 
 export function Countdown({ targetDate }: CountdownProps) {
+  const tx = useTextos();
     const [timeLeft, setTimeLeft] = useState({
         days: 0,
         hours: 0,
@@ -37,7 +39,7 @@ export function Countdown({ targetDate }: CountdownProps) {
     }, [targetDate]);
 
     const labels: Record<string, string> = {
-        days: "DÍAS",
+        days: tx("invitacion.cuentaRegresiva.dias").toUpperCase(),
         hours: "HS",
         minutes: "MIN",
         seconds: "SEG"

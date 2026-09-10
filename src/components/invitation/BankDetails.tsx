@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollReveal } from "./ScrollReveal";
 import { useToast } from "@/components/ui/Toast";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 interface BankDetailsProps {
     // Regalos
@@ -37,6 +38,7 @@ interface BankDetailsProps {
 }
 
 export function BankDetails(props: BankDetailsProps) {
+  const tx = useTextos();
     const { showToast } = useToast();
     const [isRevealed, setIsRevealed] = useState(false);
 
@@ -46,7 +48,7 @@ export function BankDetails(props: BankDetailsProps) {
 
     const copyToClipboard = (text: string, label: string) => {
         navigator.clipboard.writeText(text);
-        showToast(`${label} copiado al portapapeles`, "success");
+        showToast(tx("invitacion.regalos.copiadoAlPortapapeles", { campo: label }), "success");
     };
 
     if (!hasRegalo && !hasPagoTarjeta && !props.mostrarDatos) {
@@ -107,7 +109,7 @@ export function BankDetails(props: BankDetailsProps) {
                                         <CardHeader className="pb-3">
                                             <CardTitle className="text-lg text-primary flex items-center gap-2">
                                                 <CreditCard className="w-5 h-5 text-blue-600" />
-                                                <span>{props.pagoTarjetaTitulo || "Pago de Tarjetas / Pases"}</span>
+                                                <span>{props.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")}</span>
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4 text-left">
@@ -118,7 +120,7 @@ export function BankDetails(props: BankDetailsProps) {
                                             )}
                                             {props.pagoTarjetaBanco && (
                                                 <div>
-                                                    <p className="text-xs text-muted-foreground uppercase font-semibold">Banco</p>
+                                                    <p className="text-xs text-muted-foreground uppercase font-semibold">{tx("invitacion.regalos.banco")}</p>
                                                     <p className="text-base font-medium">{props.pagoTarjetaBanco}</p>
                                                 </div>
                                             )}
@@ -170,7 +172,7 @@ export function BankDetails(props: BankDetailsProps) {
                                         <CardHeader className="pb-3">
                                             <CardTitle className="text-lg text-primary flex items-center gap-2">
                                                 <Gift className="w-5 h-5 text-amber-600" />
-                                                <span>{props.regaloTitulo || props.titulo || "Regalos del Evento"}</span>
+                                                <span>{props.regaloTitulo || props.titulo || tx("invitacion.regalos.tituloEvento")}</span>
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4 text-left">
@@ -181,7 +183,7 @@ export function BankDetails(props: BankDetailsProps) {
                                             )}
                                             {(props.regaloBanco || props.banco) && (
                                                 <div>
-                                                    <p className="text-xs text-muted-foreground uppercase font-semibold">Banco</p>
+                                                    <p className="text-xs text-muted-foreground uppercase font-semibold">{tx("invitacion.regalos.banco")}</p>
                                                     <p className="text-base font-medium">{props.regaloBanco || props.banco}</p>
                                                 </div>
                                             )}

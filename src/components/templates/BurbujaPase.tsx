@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Ticket } from "lucide-react";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 // Se muestra desplegada al entrar, el tiempo justo para leer el nombre y la
 // mesa, y después se pliega sola a la píldora chica para no taparle nada a la
@@ -41,6 +42,7 @@ interface Props {
  * variante a otra es el acento, que es donde se nota la identidad.
  */
 export function BurbujaPase({ acento, guest }: Props) {
+  const tx = useTextos();
   const [desplegada, setDesplegada] = useState(true);
   const mesas = guest.mesas ?? [];
   const lugares = guest.expectedCount ?? 1;
@@ -74,7 +76,7 @@ export function BurbujaPase({ acento, guest }: Props) {
               className="text-[8px] font-semibold uppercase tracking-[0.2em] leading-none mb-1"
               style={{ fontFamily: "var(--font-body-custom, var(--font-inter))", color: acento }}
             >
-              Pase Especial
+              {tx("invitacion.pase.paseEspecial")}
             </span>
             <span
               className="font-bold text-sm leading-none truncate text-white"
@@ -99,7 +101,7 @@ export function BurbujaPase({ acento, guest }: Props) {
               {lugares}
             </span>
             <span className="text-[#8F8F98] text-[8px] uppercase tracking-wider leading-none mt-1">
-              {lugares === 1 ? "Lugar" : "Lugares"}
+              {lugares === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}
             </span>
           </div>
         </div>
@@ -110,7 +112,7 @@ export function BurbujaPase({ acento, guest }: Props) {
             className="text-[#15151A] text-[10px] font-semibold tracking-wider uppercase"
             style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}
           >
-            Pase
+            {tx("invitacion.pase.pase")}
           </span>
         </div>
       )}

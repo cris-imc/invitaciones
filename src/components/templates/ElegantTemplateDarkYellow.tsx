@@ -27,6 +27,8 @@ import { toEmbedMapUrl } from "@/lib/google-maps";
 import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
+import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 
 const IconInfo  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>;
 const IconCheck = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>;
@@ -80,6 +82,7 @@ interface CronoItem {
 }
 
 function CopyField({ label, value }: { label: string; value: string }) {
+  const tx = useTextos();
   const [copied, setCopied] = useState(false);
   const handle = () => {
     navigator.clipboard.writeText(value).then(() => {
@@ -98,7 +101,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
         type="button" 
         onClick={handle}
       >
-        {copied ? "✓ Copiado" : "Copiar"}
+        {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
   );
@@ -123,6 +126,7 @@ interface QuizQuestion {
 }
 
 function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string; tipo?: string }) {
+  const tx = useTextos();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [finished, setFinished] = useState(false);
@@ -187,7 +191,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 invitationId,
-                guestName: guestName || 'Invitado Anónimo',
+                guestName: guestName || tx("invitacion.evento.invitadoAnonimo"),
                 guestToken: guestToken || null,
                 answers: Object.values(newPicks),
                 score,
@@ -227,21 +231,19 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
     return (
       <div className="quiz-box text-center flex flex-col items-center">
         <h3 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "2rem", fontStyle: "italic", color: "var(--t-onpaper)" }}>
-          ¡Juego Completado!
+          {tx("invitacion.quiz.juegoCompletado")}
         </h3>
-        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem" }}>
-          RESPONDISTE {score} DE {preguntas.length} CORRECTAMENTE ({percent}%)
-        </p>
+        <p style={{ marginTop: "12px", opacity: 0.8, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.8rem" }}>{tx("invitacion.quiz.respondisteCorrectamentePorcentaje", { aciertos: score, total: preguntas.length, pct: percent }).toUpperCase()}</p>
         
         {isSaving ? (
-          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7 }}>Guardando tus resultados...</p>
+          <p style={{ marginTop: "16px", fontSize: "14px", opacity: 0.7 }}>{tx("invitacion.quiz.guardandoResultados")}</p>
         ) : (
           stats && stats.count > 0 && (
             <div style={{ marginTop: "28px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "var(--t-paper2)", padding: "8px 16px", borderRadius: "99px", border: "1px solid rgba(0,0,0,0.06)", textAlign: "left", maxWidth: "90%" }}>
                 <Users className="w-5 h-5 opacity-60 shrink-0" />
                 <p style={{ fontSize: "11.5px", margin: 0, opacity: 0.85, lineHeight: 1.4 }}>
-                  El promedio global de aciertos del resto de los invitados ({stats.count}) es del <strong>{stats.avg}%</strong>.
+                  {tx("invitacion.quiz.promedioGlobal", { n: stats.count })} <strong>{stats.avg}%</strong>.
                 </p>
               </div>
             </div>
@@ -262,7 +264,7 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
     if (formatted.length > 0) {
       formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
     }
-    return `¿${formatted}${formatted.endsWith('?') ? '' : '?'}`;
+    return tx("invitacion.quiz.signoPregunta", { pregunta: formatted }) + (formatted.endsWith('?') ? '' : '?');
   };
 
   return (
@@ -305,11 +307,8 @@ function ProgressiveQuiz({ preguntas, invitationId, guestToken, guestName, tipo 
   );
 }
 
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("es-AR").format(num);
-};
-
 export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = false }: ConviteTemplateProps) {
+  const tx = useTextos();
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
   const [isTicketMaximized, setIsTicketMaximized] = useState(true);
@@ -360,9 +359,9 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
   // Cover / Welcome Overlay data
   const portadaHabilitada = Boolean(invitation.portadaHabilitada ?? true);
   const ciudad = String(invitation.ciudad ?? "");
-  const portadaKicker = String(invitation.portadaKicker || "Con mucho cariño, para");
-  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || "Te invitamos a compartir este día tan especial con nosotros");
-  const portadaBoton = String(invitation.portadaTextoBoton || "Abrir invitación");
+  const portadaKicker = String(invitation.portadaKicker || tx("invitacion.portada.conMuchoCarinoPara"));
+  const portadaMensaje = String(invitation.portadaMensaje || invitation.frasePersonalizadaTexto || invitation.portadaTitulo || tx("invitacion.portada.mensajeBienvenida"));
+  const portadaBoton = String(invitation.portadaTextoBoton || tx("invitacion.portada.abrirInvitacion"));
 
   const getHeroTitle = () => {
     if (tipo === "CASAMIENTO") {
@@ -378,9 +377,9 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
 
   const eyebrow = invitation.nombreEvento 
     ? String(invitation.nombreEvento)
-    : tipo === "CASAMIENTO" ? "Nos casamos"
-    : tipo === "QUINCE_ANOS" ? "Mis quince años"
-    : "Te invitamos";
+    : tipo === "CASAMIENTO" ? tx("invitacion.evento.nosCasamos")
+    : tipo === "QUINCE_ANOS" ? tx("invitacion.evento.misQuinceAnos")
+    : tx("invitacion.evento.teInvitamos");
 
   const fechaEvento = invitation.fechaEvento
     ? new Date(String(invitation.fechaEvento))
@@ -400,7 +399,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
   // Google bloquea (X-Frame-Options) y quedaba como un recuadro blanco.
   const embedMapUrl = mapUrl ? toEmbedMapUrl(mapUrl) : null;
 
-  const quoteKicker = "Unas palabras";
+  const quoteKicker = tx("invitacion.frase.unasPalabras");
 
   const galeria: string[] = safeJson<string[]>(String(invitation.galeriaPrincipalFotos ?? ""), []);
   const albumFotos = (invitation.album as { fotos?: { url: string }[] } | null)?.fotos?.map((f) => f.url) ?? [];
@@ -430,10 +429,10 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
   const navSections = [
     { id: "details",   label: "Detalles", icon: <IconInfo /> },
     ...(mapUrl        ? [{ id: "location", label: "Mapa",      icon: <IconMap /> }]   : []),
-    ...(rsvpEnabled   ? [{ id: "rsvp",     label: "Confirmar", icon: <IconCheck /> }] : []),
-    ...(showGiftSection  ? [{ id: "banco",    label: "Banco",     icon: <IconGift /> }]  : []),
+    ...(rsvpEnabled   ? [{ id: "rsvp",     label: tx("invitacion.rsvp.confirmar"), icon: <IconCheck /> }] : []),
+    ...(showGiftSection  ? [{ id: "banco",    label: tx("invitacion.regalos.banco"),     icon: <IconGift /> }]  : []),
     ...(triviaHabilitada && triviaPreguntas.length > 0 ? [{ id: "quiz", label: "Juego", icon: <IconQuiz /> }] : []),
-    ...(songsEnabled  ? [{ id: "songs",    label: "Música",    icon: <IconMusic /> }] : []),
+    ...(songsEnabled  ? [{ id: "songs",    label: tx("invitacion.musica.titulo"),    icon: <IconMusic /> }] : []),
   ];
 
   const heroBgMobile  = String(invitation.portadaImagenFondo ?? "") || undefined;
@@ -473,7 +472,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
             {/* Header Content */}
             <div className="p-10 md:p-16 space-y-8">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white tracking-wide drop-shadow-md">
-                Un momento <AnimatedSynonyms words={["inolvidable", "único", "eterno", "mágico"]} className="italic text-amber-200/90 font-serif" />
+                {tx("invitacion.frase.unMomento")} <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="italic text-amber-200/90 font-serif" />
               </h1>
               
               <div className="flex justify-center items-center gap-4 py-2 opacity-60">
@@ -483,13 +482,13 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
               </div>
 
               <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-sans max-w-2xl mx-auto font-light tracking-wide" >
-                Gracias por acompañarnos en este día tan especial y compartir la alegría de crear recuerdos que perdurarán para siempre.
+                {tx("invitacion.frase.graciasPorAcompanarnos")}
               </p>
 
               <div className="pt-6">
                 <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs  tracking-widest uppercase backdrop-blur-md" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80 animate-pulse" />
-                  <span>Álbum disponible hasta el {expirationDateStr}</span>
+                  <span>{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</span>
                 </div>
               </div>
             </div>
@@ -504,10 +503,10 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                 ) : (
                   <div className="text-center space-y-3">
                     <h3 className="font-serif font-light text-xl text-slate-200 tracking-wide">
-                      Álbum Fotográfico
+                      {tx("invitacion.album.fotografico")}
                     </h3>
                     <p className="text-sm text-slate-400  font-light tracking-wide" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                      No se registraron capturas durante la velada.
+                      {tx("invitacion.album.sinCapturas")}
                     </p>
                   </div>
                 )}
@@ -637,7 +636,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
           min-width: 120px !important;
         }
         /* Make decision buttons side-by-side */
-        #rsvp.section.dark div:has(> button[aria-label="Confirmar asistencia"]) {
+        #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) {
           flex-direction: row !important;
           gap: 12px !important;
         }
@@ -803,7 +802,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
           min-width: 120px !important;
         }
         /* Make decision buttons side-by-side */
-        #rsvp.section.dark div:has(> button[aria-label="Confirmar asistencia"]) {
+        #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) {
           flex-direction: row !important;
           gap: 12px !important;
         }
@@ -1023,7 +1022,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
             {/* Dress Code */}
             {Boolean(activeDressCode) && (
               <p className={`text-sm font-medium tracking-wide uppercase${portadaFondoAnimado ? " elegant-cover-text-muted" : ""}`} style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif", letterSpacing: "0.2em", opacity: 0.8, color: portadaFondoAnimado ? undefined : '#7D786F' }}>
-                Dress code: {activeDressCode}
+                {tx("invitacion.ubicacion.dressCode")} {activeDressCode}
               </p>
             )}
 
@@ -1034,7 +1033,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
               className={`inline-block font-medium text-xs tracking-[0.2em] px-10 py-3 border transition-colors duration-500 cursor-pointer${portadaFondoAnimado ? " elegant-cover-btn" : " border-[#2C2C2C] text-[#2C2C2C] hover:bg-[#2C2C2C] hover:text-[#F9F7F1]"}`}
               style={{ fontFamily: "var(--font-body-custom, var(--font-inter)), sans-serif" }}
             >
-              ABRIR INVITACIÓN
+              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
             </button>
 
           </div>
@@ -1063,7 +1062,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
           {isTicketMaximized ? (
             <div className="flex items-center justify-between w-full animate-in fade-in duration-300">
               <div className="flex flex-col text-left">
-                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#B8964C] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase Especial</span>
+                <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#B8964C] leading-none mb-1" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{tx("invitacion.pase.paseEspecial")}</span>
                 <span className="text-[#1A2B33] font-bold text-sm leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{guest.name}</span>
                 {guest.mesas && guest.mesas.length > 0 && (
                   <span className=" text-[8px] font-semibold uppercase tracking-[0.2em] text-[#B8964C] leading-none mt-1.5" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{guest.mesas.join(" · ")}</span>
@@ -1071,13 +1070,13 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
               </div>
               <div className="flex flex-col items-end border-l border-[#B8964C]/20 pl-3">
                 <span className="text-[#1A2B33] font-bold text-sm leading-none">{guest.expectedCount}</span>
-                <span className="text-[#4A5568] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? 'Lugar' : 'Lugares'}</span>
+                <span className="text-[#4A5568] text-[8px] uppercase tracking-wider leading-none mt-1">{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
               <Ticket className="w-4 h-4 text-[#B8964C]" />
-              <span className="text-[#F2EFE6]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>Pase</span>
+              <span className="text-[#F2EFE6]  text-[10px] font-semibold tracking-wider uppercase" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{tx("invitacion.pase.pase")}</span>
             </div>
           )}
         </div>,
@@ -1120,7 +1119,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
           <p className=" text-sm font-medium text-white/90 tracking-wide drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>{fechaStr}{ciudad ? ` · ${ciudad}` : ""}{lugarNombre ? ` · ${lugarNombre}` : ""}</p>
           {Boolean(activeDressCode) && (
             <p className=" text-xs font-semibold text-white/80 tracking-widest uppercase mt-4 drop-shadow-sm" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-              Dress code: {activeDressCode}
+              {tx("invitacion.ubicacion.dressCode")} {activeDressCode}
             </p>
           )}
         </div>
@@ -1156,7 +1155,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
             </p>
             {Boolean(activeDressCode) && (
               <p className=" text-xs font-semibold text-[#B8964C] tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                Dress code: {activeDressCode}
+                {tx("invitacion.ubicacion.dressCode")} {activeDressCode}
               </p>
             )}
           </div>
@@ -1186,8 +1185,8 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
           <Countdown
             targetDate={fechaEvento}
             countdownStyle={invitation.countdownStyle as any}
-            kicker="Cuenta regresiva"
-            title={tipo === "CASAMIENTO" ? "Faltan poquitos días" : "La cuenta ya empezó"}
+            kicker={tx("invitacion.cuentaRegresiva.kicker")}
+            title={tipo === "CASAMIENTO" ? tx("invitacion.cuentaRegresiva.faltanPoquitosDias") : tx("invitacion.cuentaRegresiva.laCuentaYaEmpezo")}
           />
         ) : null}
 
@@ -1212,7 +1211,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
               <DrawLucideIcon icon={CalendarDays} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
             <p className="t-kicker mb-8">
-              CUÁNDO Y DÓNDE
+              {tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}
             </p>
 
             {/* TARJETA 1: CEREMONIA / CIVIL (Si está cargada) */}
@@ -1220,7 +1219,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
               <div className="bg-[#FAF8F5] border border-[#B8964C]/20 rounded-xl p-5 sm:p-7 mb-6 shadow-sm transition-all hover:shadow-md">
                 <div>
                   <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8A7039] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                    {String(invitation.ceremoniaTitulo || "Ceremonia / Civil")}
+                    {String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}
                   </span>
                   {Boolean(invitation.ceremoniaNombre) && (
                     <h4 className="text-2xl font-bold text-[#1A2B33] mb-4" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
@@ -1239,7 +1238,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                   )}
                   {Boolean(invitation.ceremoniaMapUrl) && (
                     <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2  text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#B8964C] hover:text-[#B8964C] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                      Ver mapa ceremonia ↗
+                      {tx("invitacion.ubicacion.verMapaCeremonia") + " ↗"}
                     </a>
                   )}
                 </div>
@@ -1250,7 +1249,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
             {(lugarNombre || direccion) && (
               <div className="bg-[#FAF8F5] border border-[#B8964C]/20 rounded-xl p-5 sm:p-7 mb-10 shadow-sm transition-all hover:shadow-md">
                 <span className=" text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8A7039] block mb-3" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                  Fiesta / Salón
+                  {tx("invitacion.ubicacion.fiestaSalon")}
                 </span>
                 {lugarNombre && (
                   <h4 className="text-2xl font-bold text-[#1A2B33] mb-4" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
@@ -1269,7 +1268,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                 )}
                 {mapUrl && (
                   <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2  text-xs font-semibold tracking-wider text-[#1A2B33] uppercase underline underline-offset-4 decoration-[#B8964C] hover:text-[#B8964C] transition-colors" style={{ fontFamily: "var(--font-body-custom, var(--font-inter))" }}>
-                    Ver mapa fiesta ↗
+                    {tx("invitacion.ubicacion.verMapaFiesta") + " ↗"}
                   </a>
                 )}
               </div>
@@ -1310,7 +1309,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                 <DrawLucideIcon icon={Camera} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
               <p className="t-kicker mb-10">
-                ÁLBUM
+                {tx("invitacion.album.titulo").toUpperCase()}
               </p>
             </div>
             <div className="w-full">
@@ -1332,7 +1331,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                 height="220"
                 style={{ border: 0, display: "block" }}
                 loading="lazy"
-                title={`Mapa: ${lugarNombre}`}
+                title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })}
                 referrerPolicy="no-referrer-when-downgrade"
               />
             ) : (
@@ -1342,7 +1341,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                 rel="noopener noreferrer"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "220px", width: "100%", padding: "0 24px", textAlign: "center", color: "var(--t-acc)", fontSize: 13, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "3px" }}
               >
-                No pudimos mostrar el mapa acá — tocá para verlo en Google Maps
+                {tx("invitacion.ubicacion.mapaNoDisponible")}
               </a>
             )}
             </div>
@@ -1396,7 +1395,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                   <DrawLucideIcon icon={Landmark} size={46} color="var(--t-acc)" strokeWidth={1.5} />
                 </div>
                 <p className="t-kicker mb-10 text-[#B8964C]">
-                  DATOS BANCARIOS DEL EVENTO
+                  {tx("invitacion.regalos.datosBancarios").toUpperCase()}
                 </p>
 
                 <div className="grid grid-cols-1 gap-6 text-left w-full mt-4 items-stretch">
@@ -1404,7 +1403,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                     <BankDetailsCard
                       icon={<CreditCard className="w-5 h-5" strokeWidth={1.5} />}
                       data={{
-                        titulo: String((invitation as any).pagoTarjetaTitulo || "Pago de Tarjetas / Pases"),
+                        titulo: String((invitation as any).pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                         mensaje: String((invitation as any).pagoTarjetaMensaje || ""),
                         banco: String((invitation as any).pagoTarjetaBanco || ""),
                         cbu: String((invitation as any).pagoTarjetaCbu || ""),
@@ -1424,7 +1423,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                     <BankDetailsCard
                       icon={<Gift className="w-5 h-5" strokeWidth={1.5} />}
                       data={{
-                        titulo: String((invitation as any).regaloTitulo || "Regalos del Evento"),
+                        titulo: String((invitation as any).regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                         mensaje: String((invitation as any).regaloMensaje || ""),
                         banco: String((invitation as any).regaloBanco || ""),
                         cbu: String((invitation as any).regaloCbu || ""),
@@ -1451,7 +1450,7 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
                 <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
               </div>
               <p className="t-kicker mb-8">
-                {String(invitation.triviaTitulo || "¿CUÁNTO SABÉS?")}
+                {String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes").toUpperCase())}
               </p>
               <ProgressiveQuiz 
                 preguntas={triviaPreguntas} 
@@ -1468,8 +1467,8 @@ export function ElegantTemplateDarkYellow({ invitation, guest, isPersonalized = 
           <SongSuggestion
             invitationId={String(invitation.id ?? "")}
             guestToken={guest?.uniqueToken}
-            guestName={guest?.name ?? "Invitado"}
-            kicker="¿Armamos la playlist de la fiesta?"
+            guestName={guest?.name ?? tx("invitacion.evento.invitado")}
+            kicker={tx("invitacion.musica.armamosLaPlaylist")}
             hideHeader
             dark
             showPublicList
