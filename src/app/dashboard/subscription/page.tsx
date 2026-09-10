@@ -5,7 +5,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PLAN_LIMITS, formatPrice, type PlanTier } from "@/lib/plan-limits";
+import { PLAN_LIMITS, type PlanTier } from "@/lib/plan-limits";
+import { precioDePlan, formatearPrecio } from "@/lib/precios-por-pais";
+import { esCodigoPais, type CodigoPais } from "@/lib/paises";
 import { 
   Check,
   X,
@@ -27,6 +29,29 @@ export default function SubscriptionPage() {
   });
 
   const userPlanTier = (session?.user?.planTier || "FREE") as PlanTier;
+
+  // El país no viaja en la sesión (agregarlo obligaría a que todos vuelvan a
+  // iniciar sesión para que su token lo tenga), así que se consulta. De él
+  // sale la moneda: un mexicano tiene que ver pesos mexicanos acá, igual que
+  // en la landing y en el registro. Hasta que llegue, Argentina, que es el
+  // default de la base.
+  const [pais, setPais] = useState<CodigoPais>("AR");
+  useEffect(() => {
+    let vigente = true;
+    fetch("/api/user/pais")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (vigente && esCodigoPais(j?.pais)) setPais(j.pais);
+      })
+      .catch(() => {
+        // Sin respuesta se queda en Argentina: peor sería no mostrar precio.
+      });
+    return () => {
+      vigente = false;
+    };
+  }, []);
+
+  const precio = (planTier: PlanTier) => formatearPrecio(precioDePlan(planTier, pais), "es");
   const currentPlan = PLAN_LIMITS[userPlanTier];
 
   useEffect(() => {
@@ -87,7 +112,7 @@ export default function SubscriptionPage() {
                 )}
               </div>
               <p className="text-2xl font-bold text-purple-600">
-                {formatPrice(currentPlan.price)}
+                {precio(userPlanTier)}
                 {currentPlan.price > 0 && <span className="text-sm text-gray-500 ml-2">/ evento</span>}
               </p>
             </div>
@@ -206,7 +231,7 @@ export default function SubscriptionPage() {
                         {plan.name}
                       </h3>
                       <p className="text-4xl font-bold text-purple-600">
-                        {formatPrice(plan.price)}
+                        {precio(planKey)}
                       </p>
                       {plan.price > 0 && (
                         <p className="text-sm text-gray-500 mt-1">pago único</p>

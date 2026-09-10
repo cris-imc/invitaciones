@@ -9,7 +9,7 @@ import { getRequestIp } from "@/lib/request-ip";
 import { resolveDiscountForPlan } from "@/lib/discount-codes";
 import { esCodigoPais } from "@/lib/paises";
 import { costumbresDe } from '@/lib/costumbres-por-pais';
-import { precioConDescuento } from '@/lib/precios-por-pais';
+import { precioParaPayPal } from '@/lib/precios-por-pais';
 import { crearOrden, paypalDisponible } from '@/lib/paypal';
 
 export async function POST(request: NextRequest) {
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       // dólares que corresponde al plan.
       const precio = porMercadoPago
         ? { monto: amount, moneda: "ARS" }
-        : precioConDescuento(paidPlanTier, pais);
+        : precioParaPayPal(paidPlanTier, pais);
 
       const payment = await prisma.payment.create({
         data: {

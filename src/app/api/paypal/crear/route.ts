@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { crearOrden, paypalDisponible } from "@/lib/paypal";
 import { esCodigoPais } from "@/lib/paises";
 import { costumbresDe } from "@/lib/costumbres-por-pais";
-import { precioConDescuento } from "@/lib/precios-por-pais";
+import { precioParaPayPal } from "@/lib/precios-por-pais";
 
 /**
  * Arranca un cobro por PayPal y devuelve a dónde mandar al comprador.
@@ -44,7 +44,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const precio = precioConDescuento(planTier, pais);
+  // Por PayPal se cobra en una moneda que PayPal acepte, que no siempre
+  // es la que se le muestra al cliente (ver precioParaPayPal).
+  const precio = precioParaPayPal(planTier, pais);
 
   // El Payment se crea PENDING antes de hablar con PayPal: su id es la
   // referencia que viaja con la orden y vuelve en la captura. Sin eso no hay

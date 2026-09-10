@@ -20,6 +20,13 @@ import { normalizeDigits, validarTelefono, prefijoTelefonico } from "@/lib/phone
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 import { setPendingWizardDesiredCredit } from "@/lib/pending-wizard-invitation";
 import { costumbresDe } from "@/lib/costumbres-por-pais";
+import {
+  cobraEnOtraMoneda,
+  precioParaPayPal,
+  precioDePlan,
+  precioConDescuento,
+  formatearPrecio,
+} from "@/lib/precios-por-pais";
 import { paisDelVisitanteEnCliente, recordarPaisDelVisitante } from "@/lib/pais-visitante";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
@@ -79,10 +86,17 @@ const PLAN_CARDS: {
   },
 ];
 
-function planPriceLabel(plan: PlanType): string {
-  if (plan === "FREE") return formatPrice(PLAN_LIMITS.FREE.price);
-  if (plan === "DIAMOND") return formatPrice(DIAMOND_DISCOUNT_PRICE);
-  return formatPrice(PREMIUM_DISCOUNT_PRICE);
+/**
+ * El precio que paga alguien de ese país, en su moneda.
+ *
+ * Antes salía de PLAN_LIMITS, que son los precios argentinos: un colombiano
+ * veía el precio en pesos colombianos en la landing, hacía clic en "Crear
+ * cuenta" y acá le aparecían pesos argentinos. Cambiar de número entre la
+ * promesa y el checkout es la forma más rápida de perder la venta.
+ */
+function planPriceLabel(plan: PlanType, pais: CodigoPais): string {
+  if (plan === "FREE") return formatearPrecio(precioDePlan("FREE", pais), "es");
+  return formatearPrecio(precioConDescuento(plan as "PREMIUM" | "DIAMOND", pais), "es");
 }
 
 export default function RegisterPage() {
@@ -368,11 +382,11 @@ function RegisterForm() {
                         <div className="mt-1 flex items-baseline gap-2 flex-wrap">
                           {(plan.key === "DIAMOND" || plan.key === "PREMIUM") && (
                             <span className="text-sm font-normal text-[var(--on-ink)]/40 line-through">
-                              {formatPrice(PLAN_LIMITS[plan.key].price)}
+                              {formatearPrecio(precioDePlan(plan.key, formData.pais), "es")}
                             </span>
                           )}
                           <span className="text-xl sm:text-2xl font-display text-[var(--accent)]">
-                            {planPriceLabel(plan.key)}
+                            {planPriceLabel(plan.key, formData.pais)}
                           </span>
                           {plan.key === "DIAMOND" && (
                             <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)]">
@@ -473,11 +487,11 @@ function RegisterForm() {
                 <div className="flex items-baseline gap-2 flex-wrap justify-end">
                   {appliedDiscount && (
                     <span className="text-sm font-normal text-[var(--on-ink)]/40 line-through">
-                      {planPriceLabel(selectedPlan)}
+                      {planPriceLabel(selectedPlan, formData.pais)}
                     </span>
                   )}
                   <p className="text-xl font-display text-[var(--accent)]">
-                    {appliedDiscount ? formatPrice(appliedDiscount.amount) : planPriceLabel(selectedPlan)}
+                    {appliedDiscount ? formatPrice(appliedDiscount.amount) : planPriceLabel(selectedPlan, formData.pais)}
                   </p>
                 </div>
               </div>
@@ -692,6 +706,24 @@ function RegisterForm() {
                     ? "Continuar a Mercado Pago"
                     : "Continuar a PayPal"}
                 </Button>
+
+                {/* PayPal no cobra en pesos colombianos ni uruguayos, así que
+                    ahí se muestra el precio local pero la orden va en dólares.
+                    Se avisa ANTES de mandarlo al checkout: llegar a PayPal y
+                    ver otra moneda sin explicación parece un error o una
+                    estafa, y se pierde la venta. */}
+                {selectedPlan !== "FREE" && !porMercadoPago && cobraEnOtraMoneda(formData.pais) && (
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    PayPal cobra en dólares:{" "}
+                    <strong>
+                      {formatearPrecio(
+                        precioParaPayPal(selectedPlan as "PREMIUM" | "DIAMOND", formData.pais),
+                        "es"
+                      )}
+                    </strong>
+                    . Tu banco lo convierte a tu moneda.
+                  </p>
+                )}
 
                 {/* Sólo cuando hay algo que pagar: en el plan gratis no hay
                     nada que transferir y sería una distracción. Ya no está
