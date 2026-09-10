@@ -55,7 +55,7 @@ export function BankDetailsCard({
   const [expanded, setExpanded] = useState(defaultExpanded);
   const fuente = useDatosDeInvitacion();
 
-  // Los campos que pide el país de la invitación (clave PIX en Brasil,
+  // Los campos que pide el país de la invitación (IBAN en España,
   // CLABE en México, routing + account en Estados Unidos). En Argentina
   // devuelve CBU y Alias, así que no cambia nada de lo que ya se veía.
   const seccion = fuente ? seccionDeEstaTarjeta(fuente, data) : null;

@@ -5,6 +5,7 @@ import { useWizardStore } from "@/store/wizard-store";
 import { useEffect, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { esCodigoPais } from "@/lib/paises";
+import { paisDelVisitanteEnCliente, recordarPaisDelVisitante } from "@/lib/pais-visitante";
 import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 // Sincroniza el store con la elección gratis/premium/diamond hecha en el
@@ -38,12 +39,32 @@ function WizardBootstrap() {
         fetch("/api/user/pais")
             .then((r) => (r.ok ? r.json() : null))
             .then((j) => {
-                if (vigente && esCodigoPais(j?.pais)) setData({ pais: j.pais });
+                if (!vigente) return;
+                if (esCodigoPais(j?.pais)) {
+                    setData({ pais: j.pais });
+                    return;
+                }
+                // Sin cuenta -- alguien que entró por "Empezar gratis" sin
+                // registrarse -- el país sale de dónde está mirando. Sin esto
+                // un colombiano armaba toda su invitación en formato argentino
+                // y recién al final le pedían un CBU que no tiene.
+                aplicarPaisDelVisitante();
             })
             .catch(() => {
-                // Sin respuesta se queda en Argentina, que es el default de la
-                // base: peor sería trabar el wizard por esto.
+                // Idem: si la consulta falla, al menos el país del visitante.
+                if (vigente) aplicarPaisDelVisitante();
             });
+
+        function aplicarPaisDelVisitante() {
+            const detectado = paisDelVisitanteEnCliente();
+            if (!detectado) return;
+            setData({ pais: detectado });
+            // Se deja registrado además de usarlo: los precios y los medios de
+            // pago se resuelven en el SERVIDOR, y sin la cookie la próxima
+            // página seguiría mostrando pesos argentinos a un colombiano que
+            // entró directo al wizard sin pasar por la landing.
+            recordarPaisDelVisitante(detectado);
+        }
         return () => {
             vigente = false;
         };

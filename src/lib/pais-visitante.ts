@@ -29,11 +29,12 @@ export const COOKIE_PAIS_VISITANTE = "pais-visitante";
  * importa es dónde vive la persona, no por dónde sale su tráfico.
  */
 const ZONAS: Record<string, CodigoPais> = {
-  "America/Santiago": "CL",
-  "America/Punta_Arenas": "CL",
-  "Pacific/Easter": "CL",
   "America/Montevideo": "UY",
   "America/Bogota": "CO",
+  // España: la península, Canarias y las ciudades autónomas.
+  "Europe/Madrid": "ES",
+  "Atlantic/Canary": "ES",
+  "Africa/Ceuta": "ES",
 };
 
 const PREFIJOS: [string, CodigoPais][] = [
@@ -43,17 +44,8 @@ const PREFIJOS: [string, CodigoPais][] = [
   ["America/Mendoza", "AR"],
 ];
 
-// Brasil y México tienen muchas zonas y se listan enteras: adivinarlas por
-// prefijo daría falsos positivos (America/Cancun no dice "Mexico" en el
-// nombre, y America/Bahia es Brasil pero America/Bahia_Banderas es México).
-const BRASIL = new Set([
-  "America/Sao_Paulo", "America/Bahia", "America/Fortaleza", "America/Recife",
-  "America/Manaus", "America/Belem", "America/Cuiaba", "America/Campo_Grande",
-  "America/Porto_Velho", "America/Boa_Vista", "America/Rio_Branco",
-  "America/Maceio", "America/Araguaina", "America/Santarem", "America/Eirunepe",
-  "America/Noronha",
-]);
-
+// México tiene muchas zonas y se listan enteras: adivinarlas por prefijo
+// daría falsos positivos (America/Cancun no dice "Mexico" en el nombre).
 const MEXICO = new Set([
   "America/Mexico_City", "America/Cancun", "America/Merida", "America/Monterrey",
   "America/Mazatlan", "America/Chihuahua", "America/Hermosillo", "America/Tijuana",
@@ -65,7 +57,6 @@ const MEXICO = new Set([
 export function paisSegunZonaHoraria(zona: string | null | undefined): CodigoPais | null {
   if (!zona) return null;
   if (ZONAS[zona]) return ZONAS[zona];
-  if (BRASIL.has(zona)) return "BR";
   if (MEXICO.has(zona)) return "MX";
   if (zona.startsWith("America/Indiana/") || zona.startsWith("America/North_Dakota/")) return "US";
   if (zona.startsWith("US/") || zona.startsWith("America/Kentucky/")) return "US";
@@ -112,4 +103,47 @@ export function paisSegunCabeceras(get: (nombre: string) => string | null): Codi
   }
 
   return null;
+}
+
+
+/* ------------------------------------------------------------------ *
+ * Detección del lado del cliente
+ * ------------------------------------------------------------------ */
+
+function leerCookieCruda(nombre: string): string | null {
+  if (typeof document === "undefined") return null;
+  const par = document.cookie.split("; ").find((c) => c.startsWith(`${nombre}=`));
+  return par ? decodeURIComponent(par.split("=").slice(1).join("=")) : null;
+}
+
+/**
+ * El país de quien está mirando, resuelto en el navegador.
+ *
+ * Orden: lo que ya eligió o se detectó antes (la cookie), y si no hay nada, lo
+ * que sugiere la zona horaria. Devuelve null cuando no se puede afirmar nada,
+ * para que cada pantalla decida su propio respaldo en vez de recibir un
+ * "Argentina" inventado.
+ *
+ * Se usa en el registro y en el wizard del embudo, donde no hay cuenta de la
+ * cual sacar el país: sin esto, un colombiano que entra por "Empezar gratis"
+ * arrancaba con formulario argentino y datos bancarios de CBU.
+ */
+export function paisDelVisitanteEnCliente(): CodigoPais | null {
+  const guardado = leerCookieCruda(COOKIE_PAIS_VISITANTE);
+  if (esCodigoPais(guardado)) return guardado;
+
+  try {
+    return paisSegunZonaHoraria(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Deja registrado el país detectado para que la próxima carga del servidor ya
+ * salga bien (precios, medios de pago y textos se resuelven allá).
+ */
+export function recordarPaisDelVisitante(pais: CodigoPais): void {
+  if (typeof document === "undefined") return;
+  document.cookie = `${COOKIE_PAIS_VISITANTE}=${pais}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
 }

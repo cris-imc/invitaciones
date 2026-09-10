@@ -38,7 +38,7 @@ const CLASES_SELECT =
 /**
  * Los campos que identifican la cuenta, sin el "banco".
  *
- * Chile, Uruguay, Colombia y México definen además un campo `banco` en
+ * Uruguay, Colombia, México y España definen además un campo `banco` en
  * paises.ts, pero el banco ya tiene su propio input en este paso y su columna
  * propia en la base desde antes (regaloBanco / pagoTarjetaBanco), y
  * datosParaMostrar() lo agrega siempre al final desde esa columna. Dibujar
@@ -133,7 +133,7 @@ function CamposBancariosDelPais({
                                 value={valor}
                                 placeholder={campo.placeholder}
                                 maxLength={maximo}
-                                // Un CBU, un alias o una clave PIX se escriben tal cual: el
+                                // Un CBU, un alias o un IBAN se escriben tal cual: el
                                 // autoformato de Input pone mayúscula inicial y arruinaría el dato.
                                 disableAutoFormat
                                 onChange={(e) => onCambio(campo, e.target.value)}
@@ -265,7 +265,7 @@ export function StepBankDetails() {
 
     const erroresRegalo = isRegaloActive ? erroresDe(valoresRegalo) : {};
     const erroresTarjeta = isPagoTarjetaActive ? erroresDe(valoresTarjeta) : {};
-    // El banco se valida con la definición del país cuando existe (en Chile,
+    // El banco se valida con la definición del país cuando existe (en Uruguay,
     // Uruguay y Colombia es obligatorio); donde el país no lo define, sigue
     // siendo un dato opcional como hasta ahora.
     const errorBancoRegalo =

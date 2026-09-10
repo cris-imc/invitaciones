@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // El país decide qué datos bancarios se le van a pedir después (CBU,
-    // clave PIX, routing number...). Se rechaza cualquier valor que no sea uno
+    // IBAN, routing number...). Se rechaza cualquier valor que no sea uno
     // de los países que manejamos en vez de caer al default: un código
     // inventado dejaría al usuario con formularios de Argentina sin avisarle.
     if (!esCodigoPais(pais)) {

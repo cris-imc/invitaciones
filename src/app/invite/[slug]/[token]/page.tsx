@@ -397,6 +397,12 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 regaloCbu: true,
                 regaloAlias: true,
                 regaloTitular: true,
+                // Los campos bancarios del país (tipo de cuenta y número en
+                // Colombia, CLABE en México, IBAN en España...). Sin esto
+                // el select no los traía, la tarjeta se quedaba sin datos del
+                // país y caía al respaldo argentino: en una invitación
+                // colombiana sólo se veían el banco y el titular.
+                regaloDatosBancarios: true,
                 regaloMonto: true,
                 precioNino: true,
                 precioAdolescente: true,
@@ -409,6 +415,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                 pagoTarjetaCbu: true,
                 pagoTarjetaBanco: true,
                 pagoTarjetaTitular: true,
+                pagoTarjetaDatosBancarios: true,
                 pagoTarjetaMonto: true,
                 triviaHabilitada: true,
                 triviaIcono: true,

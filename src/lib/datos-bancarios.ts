@@ -5,7 +5,7 @@ import { PAISES, esCodigoPais, type CampoBancario, type CodigoPais } from "./pai
  * y se muestran los datos bancarios de una invitación.
  *
  * POR QUÉ UN JSON Y NO COLUMNAS: cada país pide campos distintos -- Argentina
- * CBU y alias, Brasil una clave PIX, Estados Unidos routing y account number.
+ * CBU y alias, España un IBAN, Estados Unidos routing y account number.
  * Fijarlos como columnas obliga a agregar una por cada campo de cada país, y a
  * migrar la base cada vez que se suma un país. El JSON guarda `{clave: valor}`
  * con las claves que define paises.ts.

@@ -71,11 +71,10 @@ const SIN_RESOLVER: CostumbresDelPais = {
 
 const POR_PAIS: Record<CodigoPais, CostumbresDelPais> = {
   AR: ARGENTINA,
-  CL: SIN_RESOLVER,
   UY: SIN_RESOLVER,
-  BR: SIN_RESOLVER,
   CO: SIN_RESOLVER,
   MX: SIN_RESOLVER,
+  ES: SIN_RESOLVER,
   US: SIN_RESOLVER,
 };
 

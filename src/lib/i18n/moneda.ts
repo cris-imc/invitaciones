@@ -16,21 +16,19 @@ import type { Idioma } from "./idiomas";
 
 const LOCALES: Record<CodigoPais, Record<Idioma, string>> = {
   AR: { es: "es-AR", en: "en-US", pt: "pt-BR" },
-  CL: { es: "es-CL", en: "en-US", pt: "pt-BR" },
   UY: { es: "es-UY", en: "en-US", pt: "pt-BR" },
-  BR: { es: "es-AR", en: "en-US", pt: "pt-BR" },
   CO: { es: "es-CO", en: "en-US", pt: "pt-BR" },
   MX: { es: "es-MX", en: "en-US", pt: "pt-BR" },
+  ES: { es: "es-ES", en: "en-US", pt: "pt-BR" },
   US: { es: "es-MX", en: "en-US", pt: "pt-BR" },
 };
 
 const MONEDAS: Record<CodigoPais, string> = {
   AR: "ARS",
-  CL: "CLP",
   UY: "UYU",
-  BR: "BRL",
   CO: "COP",
   MX: "MXN",
+  ES: "EUR",
   US: "USD",
 };
 

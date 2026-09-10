@@ -7,24 +7,16 @@
  * fijos de CBU/Alias por una selección dinámica según `CodigoPais`.
  */
 
-export type CodigoPais = "AR" | "CL" | "UY" | "BR" | "CO" | "MX" | "US";
+export type CodigoPais = "AR" | "UY" | "CO" | "MX" | "ES" | "US";
 
-/**
- * Cómo validar el valor que carga el usuario en un campo bancario.
- * "pix" y "rut-cl" son casos especiales: no son una sola regla de longitud,
- * sino un formato compuesto (PIX admite 5 tipos de clave distintos; el RUT
- * lleva dígito verificador con un algoritmo propio), así que se resuelven
- * con lógica dedicada en `validarCampoBancario` en vez de un patrón genérico.
- */
+/** Cómo validar el valor que carga el usuario en un campo bancario. */
 export type ValidacionCampo =
     | { tipo: "digitos"; longitud: number }
     | { tipo: "digitos-rango"; min: number; max: number }
     | { tipo: "texto-libre" }
     | { tipo: "email" }
     | { tipo: "opciones"; valores: readonly string[] }
-    | { tipo: "regex"; patron: RegExp; mensajeError: string }
-    | { tipo: "pix" }
-    | { tipo: "rut-cl" };
+    | { tipo: "regex"; patron: RegExp; mensajeError: string };
 
 export interface CampoBancario {
     /** Clave estable para guardar el valor (ej. en el store del wizard). No cambia aunque cambie la etiqueta. */
@@ -92,49 +84,6 @@ export const PAISES: Record<CodigoPais, DefinicionPais> = {
             },
         ],
     },
-    CL: {
-        codigo: "CL",
-        nombre: "Chile",
-        moneda: { codigo: "CLP", simbolo: "$" },
-        codigoTelefonico: "+56",
-        camposBancarios: [
-            {
-                clave: "rut",
-                etiqueta: "RUT del titular",
-                placeholder: "12.345.678-9",
-                obligatorio: true,
-                validacion: { tipo: "rut-cl" },
-                ayuda: "RUT (Rol Único Tributario) del titular de la cuenta, con puntos y el dígito verificador separado por guion.",
-            },
-            {
-                clave: "tipoCuenta",
-                etiqueta: "Tipo de cuenta",
-                placeholder: "Cuenta Corriente",
-                obligatorio: true,
-                validacion: {
-                    tipo: "opciones",
-                    valores: ["Cuenta Corriente", "Cuenta Vista", "Cuenta de Ahorro"],
-                },
-            },
-            {
-                clave: "numeroCuenta",
-                etiqueta: "Número de cuenta",
-                placeholder: "00012345678",
-                obligatorio: true,
-                // Verificado que varía según el banco (BancoEstado, BCI, Santander, etc.);
-                // no encontré un largo único oficial. Uso un rango amplio (8 a 14 dígitos)
-                // en base a lo que reportan los propios bancos, no es un estándar cerrado.
-                validacion: { tipo: "digitos-rango", min: 8, max: 14 },
-            },
-            {
-                clave: "banco",
-                etiqueta: "Banco",
-                placeholder: "Banco Estado",
-                obligatorio: true,
-                validacion: { tipo: "texto-libre" },
-            },
-        ],
-    },
     UY: {
         codigo: "UY",
         nombre: "Uruguay",
@@ -162,20 +111,47 @@ export const PAISES: Record<CodigoPais, DefinicionPais> = {
             },
         ],
     },
-    BR: {
-        codigo: "BR",
-        nombre: "Brasil",
-        moneda: { codigo: "BRL", simbolo: "R$" },
-        codigoTelefonico: "+55",
+    ES: {
+        codigo: "ES",
+        nombre: "España",
+        moneda: { codigo: "EUR", simbolo: "€" },
+        codigoTelefonico: "+34",
         camposBancarios: [
             {
-                clave: "pix",
-                etiqueta: "Clave PIX",
-                placeholder: "juan@email.com",
+                clave: "iban",
+                etiqueta: "IBAN",
+                placeholder: "ES91 2100 0418 4502 0005 1332",
                 obligatorio: true,
-                validacion: { tipo: "pix" },
-                ayuda:
-                    "Puede ser tu CPF, CNPJ, email, teléfono (con +55) o una clave aleatoria generada por tu banco (formato UUID, ej: 123e4567-e89b-12d3-a456-426614174000).",
+                // NO se exige que empiece con "ES". Mucha gente en España cobra
+                // en cuentas de Wise, Revolut o N26, que emiten IBAN de
+                // Luxemburgo, Lituania o Irlanda: son cuentas perfectamente
+                // válidas para recibir euros y un patrón "^ES" se las
+                // rechazaría. Se valida la forma general de un IBAN -- dos
+                // letras de país, dos dígitos de control y hasta 30
+                // alfanuméricos -- y se admiten los espacios de a cuatro con
+                // los que los bancos lo muestran.
+                validacion: {
+                    tipo: "regex",
+                    patron: /^[A-Z]{2}\s?\d{2}(?:\s?[A-Z0-9]){11,30}$/i,
+                    mensajeError: "El IBAN empieza con dos letras del país y dos dígitos de control (por ejemplo ES91 2100 0418 4502 0005 1332).",
+                },
+                ayuda: "IBAN de la cuenta, con espacios o sin ellos. Vale también el de cuentas tipo Wise o Revolut, aunque no empiece con ES.",
+            },
+            {
+                clave: "banco",
+                etiqueta: "Banco",
+                placeholder: "CaixaBank",
+                obligatorio: true,
+                validacion: { tipo: "texto-libre" },
+            },
+            {
+                clave: "bizum",
+                etiqueta: "Bizum",
+                placeholder: "600123456",
+                obligatorio: false,
+                // Los móviles españoles son 9 dígitos y empiezan con 6 o 7.
+                validacion: { tipo: "digitos", longitud: 9 },
+                ayuda: "Opcional. El móvil asociado a Bizum, la forma más habitual de mandar un regalo en España.",
             },
         ],
     },
@@ -185,6 +161,22 @@ export const PAISES: Record<CodigoPais, DefinicionPais> = {
         moneda: { codigo: "COP", simbolo: "$" },
         codigoTelefonico: "+57",
         camposBancarios: [
+            {
+                clave: "llaveBreB",
+                etiqueta: "Llave Bre-B",
+                placeholder: "@mariarestrepo",
+                obligatorio: false,
+                // Texto libre a propósito: una llave Bre-B puede ser un alias
+                // alfanumérico, un celular, un correo o el documento, cada uno
+                // con su propio formato. Validar estricto con reglas que no
+                // tengo verificadas del todo significaría rechazar llaves
+                // buenas, que es mucho peor que aceptar una mal escrita: el
+                // invitado ve el error al pegarla en su banco y avisa. Mismo
+                // criterio que el rango amplio de la cédula, acá abajo.
+                validacion: { tipo: "texto-libre" },
+                ayuda:
+                    "Opcional, pero es la forma más cómoda para tus invitados: con la llave transfieren desde cualquier banco sin tipear el número de cuenta.",
+            },
             {
                 clave: "banco",
                 etiqueta: "Banco",
@@ -285,54 +277,6 @@ export const PAISES: Record<CodigoPais, DefinicionPais> = {
     },
 };
 
-/** Dígito verificador de un RUT chileno por el algoritmo de Módulo 11 (pesos 2 a 7, cíclicos, de derecha a izquierda). */
-function calcularDigitoVerificadorRut(cuerpo: string): string {
-    let suma = 0;
-    let multiplicador = 2;
-    for (let i = cuerpo.length - 1; i >= 0; i--) {
-        suma += Number(cuerpo[i]) * multiplicador;
-        multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-    }
-    const resto = 11 - (suma % 11);
-    if (resto === 11) return "0";
-    if (resto === 10) return "K";
-    return String(resto);
-}
-
-function validarRutChileno(valor: string): string | null {
-    const formatoOk = /^\d{1,2}\.\d{3}\.\d{3}-[0-9Kk]$/.test(valor);
-    if (!formatoOk) {
-        return "El RUT tiene que tener el formato 12.345.678-9, con puntos y el dígito verificador separado por guion.";
-    }
-    const [cuerpoConPuntos, digitoVerificador] = valor.split("-");
-    const cuerpo = cuerpoConPuntos.replace(/\./g, "");
-    const digitoEsperado = calcularDigitoVerificadorRut(cuerpo);
-    if (digitoVerificador.toUpperCase() !== digitoEsperado) {
-        return `El dígito verificador no corresponde a ese RUT: para ${cuerpoConPuntos} debería ser ${digitoEsperado}, ingresaste ${digitoVerificador.toUpperCase()}.`;
-    }
-    return null;
-}
-
-/**
- * PIX admite 5 tipos de clave (CPF, CNPJ, email, teléfono o una clave
- * aleatoria tipo UUID). Como no hay un selector previo de tipo en este
- * archivo, se acepta cualquiera de los 5 formatos y se informa cuál se
- * esperaba si no matchea ninguno.
- */
-function validarClavePix(valor: string): string | null {
-    const soloNumeros = valor.replace(/[.\-/\s]/g, "");
-    const esCpf = /^\d{11}$/.test(soloNumeros);
-    const esCnpj = /^\d{14}$/.test(soloNumeros);
-    const esEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
-    const esTelefono = /^\+55\d{10,11}$/.test(valor.replace(/[\s-]/g, ""));
-    const esAleatoria = /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(valor);
-
-    if (esCpf || esCnpj || esEmail || esTelefono || esAleatoria) {
-        return null;
-    }
-    return "La clave PIX tiene que ser un CPF (11 dígitos), CNPJ (14 dígitos), email, teléfono con código de país (+55...) o una clave aleatoria (formato UUID).";
-}
-
 /**
  * Valida un valor contra la definición de su campo bancario.
  * Devuelve el mensaje de error en español, o null si el valor es válido.
@@ -378,10 +322,6 @@ export function validarCampoBancario(campo: CampoBancario, valorCrudo: string): 
         case "regex": {
             return v.patron.test(valor) ? null : v.mensajeError;
         }
-        case "pix":
-            return validarClavePix(valor);
-        case "rut-cl":
-            return validarRutChileno(valor);
     }
 }
 

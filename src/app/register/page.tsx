@@ -20,6 +20,7 @@ import { normalizeDigits, validarTelefono, prefijoTelefonico } from "@/lib/phone
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 import { setPendingWizardDesiredCredit } from "@/lib/pending-wizard-invitation";
 import { costumbresDe } from "@/lib/costumbres-por-pais";
+import { paisDelVisitanteEnCliente, recordarPaisDelVisitante } from "@/lib/pais-visitante";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
 
@@ -48,7 +49,8 @@ const PLAN_CARDS: {
     features: [
       "Invitados ilimitados",
       "Plantilla 100% personalizada",
-      "Gestión de invitados y pagos",      "Cuenta regresiva",
+      "Gestión de invitados y pagos",
+      "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.PREMIUM.maxPhotos} fotos en el álbum`,
       "Con musica de fondo",
       "Con Trivia",
@@ -62,7 +64,8 @@ const PLAN_CARDS: {
     features: [
       "Invitados ilimitados",
       "Plantilla 100% personalizada",
-      "Gestión de invitados y pagos",      "Cuenta regresiva",
+      "Gestión de invitados y pagos",
+      "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.DIAMOND.maxPhotos} fotos en el álbum`,
       "Con musica de fondo",
       "Con LIVE (fotos y mensajes en vivo)",
@@ -141,10 +144,24 @@ function RegisterForm() {
     confirmPassword: "",
     phoneAreaCode: "",
     phoneNumber: "",
-    // Argentina de arranque: es de donde viene la enorme mayoría de las
-    // cuentas. Igual es obligatorio elegirlo, así que se puede cambiar.
+    // Argentina de arranque, y apenas monta se reemplaza por el país que se
+    // detecte (ver abajo). No se detecta acá mismo para no producir un HTML
+    // distinto en el servidor y en el cliente.
     pais: "AR" as CodigoPais,
   });
+
+  // El país de quien está entrando, para no hacerle buscar el suyo en la
+  // lista. Sólo pisa el valor inicial: si ya tocó el selector, manda su
+  // elección (por eso depende de `paisElegidoAMano`).
+  const [paisElegidoAMano, setPaisElegidoAMano] = useState(false);
+  useEffect(() => {
+    if (paisElegidoAMano) return;
+    const detectado = paisDelVisitanteEnCliente();
+    if (detectado) {
+      setFormData((previo) => ({ ...previo, pais: detectado }));
+      recordarPaisDelVisitante(detectado);
+    }
+  }, [paisElegidoAMano]);
 
   // Qué medios de pago corresponden al país elegido. Fuera de Argentina
   // sólo PayPal: una cuenta común de Mercado Pago Argentina no puede
@@ -559,7 +576,11 @@ function RegisterForm() {
                   <SelectorPais
                     id="pais"
                     valor={formData.pais}
-                    onCambio={(pais) => setFormData({ ...formData, pais })}
+                    onCambio={(pais) => {
+                      setPaisElegidoAMano(true);
+                      recordarPaisDelVisitante(pais);
+                      setFormData({ ...formData, pais });
+                    }}
                     className="border-none"
                   />
                   <p className="text-xs opacity-50 mt-1.5">

@@ -1,5 +1,5 @@
 import { DICCIONARIOS, type Diccionario } from "./diccionario/index";
-import { IDIOMA_POR_DEFECTO, type Idioma } from "./idiomas";
+import { IDIOMA_POR_DEFECTO, idiomaEfectivo, type Idioma } from "./idiomas";
 import { sobrescritura } from "./sobrescrituras";
 
 /**
@@ -56,7 +56,11 @@ function reemplazar(texto: string, valores?: Record<string, string | number>): s
  * y una invitación argentina escrita en inglés sigue siendo una quinceañera.
  * Ver sobrescrituras.ts.
  */
-export function traductorDe(idioma: Idioma, pais?: string | null) {
+export function traductorDe(idiomaPedido: Idioma, pais?: string | null) {
+  // Todo lo que se pinta pasa por acá, así que es el lugar donde el
+  // interruptor del multiidioma tiene efecto real: con el multiidioma
+  // apagado, un "en" guardado en una invitación vieja igual sale en español.
+  const idioma = idiomaEfectivo(idiomaPedido);
   const dic = DICCIONARIOS[idioma] ?? DICCIONARIOS[IDIOMA_POR_DEFECTO];
 
   return function t(clave: ClaveTexto, valores?: Record<string, string | number>): string {

@@ -21,14 +21,6 @@ const BANDERAS: Record<CodigoPais, React.ReactNode> = {
       <circle cx="12" cy="8" r="1.6" fill={SOL} />
     </>
   ),
-  CL: (
-    <>
-      <rect width="24" height="16" fill="#fff" />
-      <rect y="8" width="24" height="8" fill="#D52B1E" />
-      <rect width="8" height="8" fill="#0039A6" />
-      <path d="M4 2.2l.8 2.4h2.5l-2 1.5.8 2.4L4 7l-2.1 1.5.8-2.4-2-1.5h2.5z" fill="#fff" />
-    </>
-  ),
   UY: (
     <>
       <rect width="24" height="16" fill="#fff" />
@@ -37,13 +29,6 @@ const BANDERAS: Record<CodigoPais, React.ReactNode> = {
       <rect y="11" width="24" height="2.2" fill="#0038A8" />
       <rect width="9" height="8.8" fill="#fff" />
       <circle cx="4.5" cy="4.4" r="2" fill={SOL} />
-    </>
-  ),
-  BR: (
-    <>
-      <rect width="24" height="16" fill="#009C3B" />
-      <path d="M12 2l9.5 6L12 14 2.5 8z" fill="#FFDF00" />
-      <circle cx="12" cy="8" r="3.4" fill="#002776" />
     </>
   ),
   CO: (
@@ -59,6 +44,12 @@ const BANDERAS: Record<CodigoPais, React.ReactNode> = {
       <rect width="8" height="16" fill="#006847" />
       <rect x="16" width="8" height="16" fill="#CE1126" />
       <circle cx="12" cy="8" r="2" fill="none" stroke="#8B5A2B" strokeWidth="1.2" />
+    </>
+  ),
+  ES: (
+    <>
+      <rect width="24" height="16" fill="#AA151B" />
+      <rect y="4" width="24" height="8" fill="#F1BF00" />
     </>
   ),
   US: (

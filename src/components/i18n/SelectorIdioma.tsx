@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Languages } from "lucide-react";
-import { IDIOMAS, NOMBRES_DE_IDIOMA, SIGLAS, COOKIE_IDIOMA, esIdiomaValido, type Idioma } from "@/lib/i18n/idiomas";
+import { IDIOMAS_DISPONIBLES, NOMBRES_DE_IDIOMA, SIGLAS, COOKIE_IDIOMA, esIdiomaValido, type Idioma } from "@/lib/i18n/idiomas";
 import { useIdioma } from "./ProveedorIdioma";
 
 interface Props {
@@ -49,6 +49,11 @@ export function SelectorIdioma({ className }: Props) {
     window.location.reload();
   };
 
+  // Con un solo idioma disponible no hay nada que elegir: el selector se
+  // esconde en vez de mostrar una lista de un elemento. Vuelve solo cuando se
+  // prende MULTIIDIOMA_HABILITADO.
+  if (IDIOMAS_DISPONIBLES.length < 2) return null;
+
   return (
     <div className={`selector-idioma ${className ?? ""}`}>
       <button
@@ -68,7 +73,7 @@ export function SelectorIdioma({ className }: Props) {
           {/* Capa para cerrar tocando afuera, sin dejar oyentes en el documento. */}
           <div className="selector-idioma-fuera" onClick={() => setAbierto(false)} />
           <ul className="selector-idioma-lista" role="listbox">
-            {IDIOMAS.map((i) => (
+            {IDIOMAS_DISPONIBLES.map((i) => (
               <li key={i}>
                 <button
                   type="button"

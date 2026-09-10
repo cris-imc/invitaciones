@@ -23,12 +23,13 @@ function guardarCookie(nombre: string, valor: string) {
 /**
  * Selector de PAÍS, no de idioma.
  *
- * El país es el dato que decide todo: el idioma sale de él (Brasil en
- * portugués, Estados Unidos en inglés, el resto en español) y también los
- * medios de pago y qué funciones tiene sentido ofrecer. Pedir las dos cosas
- * por separado sería pedirle dos veces lo mismo al 95% de la gente, y dejaría
- * abierta la combinación absurda de "estoy en Brasil pero mostrame pesos
- * argentinos y cuotas sin interés".
+ * El país es el dato que decide todo: los datos bancarios que se piden, la
+ * moneda, los medios de pago y qué funciones tiene sentido ofrecer. Sin él
+ * quedaría abierta la combinación absurda de "estoy en Colombia pero
+ * mostrame pesos argentinos y cuotas sin interés".
+ *
+ * El idioma ya no se deriva de acá: hoy la app entera va en español para
+ * todos los países (ver MULTIIDIOMA_HABILITADO en lib/i18n/idiomas.ts).
  *
  * Al elegir se guardan las dos cookies -- país e idioma -- porque el servidor
  * lee cada una por su lado y así ninguna pantalla tiene que volver a derivar

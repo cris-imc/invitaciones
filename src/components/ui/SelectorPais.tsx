@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
  * Selector del país del ANFITRIÓN (el que crea la cuenta y la invitación).
  *
  * De acá sale qué datos bancarios se le piden después para que sus invitados
- * le transfieran: CBU y alias en Argentina, una clave PIX en Brasil, routing +
+ * le transfieran: CBU y alias en Argentina, un IBAN en España, routing +
  * account number en Estados Unidos (ver src/lib/paises.ts).
  *
  * POR QUÉ SE PREGUNTA Y NO SE DEDUCE: la IP o el idioma del navegador son los

@@ -2,7 +2,7 @@
 
 import { useWizardStore } from "@/store/wizard-store";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
-import { IDIOMAS, NOMBRES_DE_IDIOMA, idiomaSegunPais, esIdiomaValido, type Idioma } from "@/lib/i18n/idiomas";
+import { IDIOMAS_DISPONIBLES, NOMBRES_DE_IDIOMA, idiomaSegunPais, esIdiomaValido, type Idioma } from "@/lib/i18n/idiomas";
 
 /**
  * En qué idioma van a ver la invitación los invitados.
@@ -26,6 +26,11 @@ export function SelectorIdiomaInvitacion() {
     ? data.idioma
     : idiomaSegunPais(data.pais);
 
+  // Con un solo idioma disponible no hay elección que ofrecer, y preguntarla
+  // sería ruido en un paso que ya pide varias cosas. Vuelve sola al prender
+  // MULTIIDIOMA_HABILITADO.
+  if (IDIOMAS_DISPONIBLES.length < 2) return null;
+
   return (
     <div className="space-y-2">
       <label htmlFor="idioma-invitacion" className="text-sm font-medium">
@@ -37,7 +42,7 @@ export function SelectorIdiomaInvitacion() {
         onChange={(e) => setData({ idioma: e.target.value })}
         className="campo-nativo bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 w-full rounded-xl px-4 text-sm"
       >
-        {IDIOMAS.map((i) => (
+        {IDIOMAS_DISPONIBLES.map((i) => (
           <option key={i} value={i}>
             {NOMBRES_DE_IDIOMA[i]}
           </option>

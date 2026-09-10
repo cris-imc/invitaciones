@@ -22,6 +22,27 @@
 export const IDIOMAS = ["es", "en", "pt"] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
+/**
+ * EL INTERRUPTOR DEL MULTIIDIOMA.
+ *
+ * Hoy está apagado: la app entera -- landing, panel, wizard, plantillas e
+ * invitaciones -- va siempre en español, para cualquier país, Estados Unidos
+ * incluido. Sólo cambian los datos bancarios, que dependen del país y no del
+ * idioma.
+ *
+ * La maquinaria (diccionarios, traducciones de las plantillas, selectores)
+ * queda entera y sin usarse a propósito: prender el multiidioma es poner esto
+ * en `true`, no rehacer el trabajo.
+ *
+ * Con el interruptor apagado:
+ *  - `idiomaEfectivo()` devuelve siempre español, y por ahí pasa todo lo que
+ *    se pinta (ver `traductorDe`), así que un "en" o un "pt" guardado en la
+ *    base de antes tampoco se cuela.
+ *  - `IDIOMAS_DISPONIBLES` queda con un solo idioma y los selectores se
+ *    esconden solos.
+ */
+export const MULTIIDIOMA_HABILITADO = false;
+
 export const IDIOMA_POR_DEFECTO: Idioma = "es";
 
 export const NOMBRES_DE_IDIOMA: Record<Idioma, string> = {
@@ -39,6 +60,22 @@ export const SIGLAS: Record<Idioma, string> = {
 
 export const COOKIE_IDIOMA = "idioma";
 
+/** Los idiomas que se le ofrecen a la gente hoy. */
+export const IDIOMAS_DISPONIBLES: readonly Idioma[] = MULTIIDIOMA_HABILITADO
+  ? IDIOMAS
+  : [IDIOMA_POR_DEFECTO];
+
+/**
+ * El idioma con el que finalmente se pinta algo.
+ *
+ * Único lugar donde se decide, para que no queden caminos por los que se
+ * escape un idioma que hoy no se ofrece.
+ */
+export function idiomaEfectivo(v: unknown): Idioma {
+  if (!MULTIIDIOMA_HABILITADO) return IDIOMA_POR_DEFECTO;
+  return esIdiomaValido(v) ? v : IDIOMA_POR_DEFECTO;
+}
+
 export function esIdiomaValido(v: unknown): v is Idioma {
   return typeof v === "string" && (IDIOMAS as readonly string[]).includes(v);
 }
@@ -51,6 +88,7 @@ export function esIdiomaValido(v: unknown): v is Idioma {
  * cosas más molestas que puede hacer un sitio.
  */
 export function idiomaSegunNavegador(acceptLanguage: string | null): Idioma {
+  if (!MULTIIDIOMA_HABILITADO) return IDIOMA_POR_DEFECTO;
   if (!acceptLanguage) return IDIOMA_POR_DEFECTO;
 
   // "pt-BR,pt;q=0.9,en;q=0.8" -> ["pt-br", "pt", "en"], en orden de preferencia.
@@ -82,7 +120,7 @@ export function idiomaSegunNavegador(acceptLanguage: string | null): Idioma {
  * al 95% de la gente.
  */
 export function idiomaSegunPais(pais: string | null | undefined): Idioma {
-  if (pais === "BR") return "pt";
+  if (!MULTIIDIOMA_HABILITADO) return IDIOMA_POR_DEFECTO;
   if (pais === "US") return "en";
   return "es";
 }
