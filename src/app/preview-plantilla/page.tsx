@@ -65,6 +65,10 @@ import {
   type TemplateTipo,
 } from "@/components/wizard/template-preview-registry";
 import { getTemplatePreviewSample } from "@/lib/template-preview-samples";
+import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
+import { ProveedorInvitacion } from "@/components/invitation/ContextoInvitacion";
+import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
+import { traductorDe } from "@/lib/i18n/texto";
 
 const COMPONENTS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COMPONENTS> = {
   ELEGANT: ELEGANT_COMPONENTS,
@@ -382,6 +386,7 @@ function PreviewPlantillaContent() {
         ...Object.fromEntries(
           Object.entries(liveInvitation).filter(([key, v]) => {
             if (v === undefined || v === null || v === "") return false;
+
             // Para el album: solo pisar si el user realmente subió fotos
             if (key === "galeriaPrincipalFotos") {
               if (v === "[]") return false;
@@ -398,6 +403,12 @@ function PreviewPlantillaContent() {
         ),
       }
     : sample;
+
+  const idiomaDeLaInvitacion = esIdiomaValido(displayInvitation.idioma)
+    ? displayInvitation.idioma
+    : idiomaSegunPais(
+        typeof displayInvitation.pais === "string" ? displayInvitation.pais : null
+      );
     
   displayInvitation.isPreviewMode = true;
 
@@ -441,9 +452,13 @@ function PreviewPlantillaContent() {
 
     let openTimeout: ReturnType<typeof setTimeout> | null = null;
     const tryOpen = () => {
-      const btn = Array.from(document.querySelectorAll("button")).find((b) =>
-        /abrir/i.test(b.textContent || "")
-      );
+      const textoDelBoton = traductorDe(idiomaDeLaInvitacion)(
+        "invitacion.portada.abrirInvitacion"
+      ).toLowerCase();
+      const btn = Array.from(document.querySelectorAll("button")).find((b) => {
+        const t = (b.textContent || "").toLowerCase();
+        return t.includes(textoDelBoton) || /abrir|open/i.test(t);
+      });
       if (!btn) return false;
       // La portada ya está montada y es una vista válida para mostrar -- avisar
       // "ready" ya (saca el spinner del modal) en vez de esperar a la apertura.
@@ -481,9 +496,18 @@ function PreviewPlantillaContent() {
       observer.disconnect();
       clearTimeout(timeout);
     };
-  }, [evento, tipo, color, scrollable, showCoverOnly, hasFirstContact, coverHoldMs]);
+  }, [evento, tipo, color, scrollable, showCoverOnly, hasFirstContact, coverHoldMs, idiomaDeLaInvitacion]);
 
-  return <Template invitation={displayInvitation} guest={null} isPersonalized={false} />;
+  return (
+    <ProveedorIdioma
+      idioma={idiomaDeLaInvitacion}
+      pais={typeof displayInvitation.pais === "string" ? displayInvitation.pais : null}
+    >
+      <ProveedorInvitacion datos={displayInvitation as never}>
+        <Template invitation={displayInvitation} guest={null} isPersonalized={false} />
+      </ProveedorInvitacion>
+    </ProveedorIdioma>
+  );
 }
 
 export default function PreviewPlantillaPage() {
