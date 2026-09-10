@@ -123,9 +123,31 @@ Las invitaciones soportan:
 
 ```env
 DATABASE_URL="postgresql://..."
-NEXTAUTH_SECRET="..." # Para autenticación (próximamente)
+AUTH_SECRET="..."                 # Obligatoria en producción
 NEXTAUTH_URL="http://localhost:3000"
+
+SEED_ADMIN_PASSWORD="..."         # Clave del Super Usuario (ver abajo)
+SEED_DEMO="1"                     # Opcional: fuerza los datos de ejemplo
 ```
+
+#### `SEED_ADMIN_PASSWORD`
+
+La clave del Super Usuario (`admin@altainvitacion.com`) sale de acá y nunca
+del código: este repositorio es público, así que cualquier clave escrita en
+`prisma/seed.ts` queda a la vista.
+
+El seed corre en cada arranque, y se comporta así:
+
+| Situación | Qué hace |
+|---|---|
+| La variable está puesta | Aplica esa clave (sirve para rotarla) |
+| No está puesta y la cuenta existe | **No toca la clave** — se puede cambiar desde la app sin que el próximo deploy la revierta |
+| No está puesta y hay que crear la cuenta | Corta con un error claro, en vez de inventar una clave débil |
+
+#### Datos de ejemplo
+
+El usuario `test@example.com` y las dos invitaciones de muestra son sólo para
+desarrollo: en producción no se crean. `SEED_DEMO=1` los fuerza si hacen falta.
 
 ## 📄 Licencia
 
