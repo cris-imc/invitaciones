@@ -34,7 +34,7 @@ const TAB_DESCRIPTIONS: Record<Tab, string> = {
   invitados: "Revisá quién confirmó asistencia y llevá el control exacto de los pagos...",
   precio: "Modificá el precio de la tarjeta y mantené informado a tus invitados...",
   canciones: "Aprobá o rechazá las canciones que sugieren para la fiesta...",
-  mesas: "Armá el salón, asigná una mesa a cada familia y repartí a las que no entran en una sola...",
+  mesas: "Armá el salón, asigná mesas y controlá quién llega escaneando el QR en la puerta...",
   live: "Modo Fiesta: Proyectá fotos en vivo y moderá la pantalla gigante...",
 };
 
@@ -134,7 +134,7 @@ export function GuestPageTabs({
     { id: "agregar", label: "Gestionar invitados", highlight: "gold" },
     { id: "invitados", label: pagoTarjetaHabilitado ? "Gestionar pagos" : "Lista de invitados", highlight: "default" },
     ...(pagoTarjetaHabilitado ? [{ id: "precio" as Tab, label: "Gestionar precios", highlight: "default" as const }] : []),
-    { id: "mesas", label: "Mesas", highlight: "default" },
+    { id: "mesas", label: "Mesas e ingresos", highlight: "default" },
     { id: "canciones", label: "Música sugerida", highlight: "default" },
     { id: "live" as Tab, label: "LIVE", highlight: "live" },
   ];
@@ -290,7 +290,7 @@ export function GuestPageTabs({
           )}
           {tab === "mesas" && (
             <div>
-              <h2 className="text-xl font-semibold mb-6">Mesas del salón</h2>
+              <h2 className="text-xl font-semibold mb-6">Mesas e ingresos</h2>
               <MesasPanel slug={slug} />
             </div>
           )}

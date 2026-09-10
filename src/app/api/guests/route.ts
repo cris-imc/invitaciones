@@ -58,6 +58,13 @@ export async function GET(request: NextRequest) {
         uniqueToken: true,
         responseDate: true,
         createdAt: true,
+        // Las mesas asignadas viajan junto al invitado: cuando alguien
+        // pregunta dónde se sienta, el anfitrión no tendría que cruzar dos
+        // pantallas para contestarle.
+        lugaresEnMesas: {
+          select: { lugares: true, mesa: { select: { numero: true } } },
+          orderBy: { mesa: { numero: "asc" } },
+        },
       },
     });
 

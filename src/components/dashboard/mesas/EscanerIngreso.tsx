@@ -11,6 +11,8 @@ interface MesaDelInvitado {
 }
 interface Resultado {
   nombre: string;
+  rechazado: boolean;
+  motivo: string | null;
   esGrupo: boolean;
   personas: number;
   confirmo: boolean;
@@ -200,18 +202,37 @@ export function EscanerIngreso({ slug }: Props) {
         {/* El resultado tapa la cámara a propósito: en la puerta se mira de
             reojo y a un metro, así que tiene que leerse de un golpe. */}
         {(resultado || noEncontrado) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center bg-black/85 backdrop-blur-sm">
+          <div
+            className={`absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center backdrop-blur-sm ${
+              resultado?.rechazado ? "bg-red-950/90" : "bg-black/85"
+            }`}
+          >
             {resultado ? (
               <div className="w-full max-h-full overflow-y-auto flex flex-col items-center gap-1.5 py-2">
-                <span
-                  className={`text-xs uppercase tracking-[0.2em] ${
-                    resultado.yaHabiaEntrado ? "text-amber-300" : "text-emerald-400"
-                  }`}
-                >
-                  {resultado.yaHabiaEntrado
-                    ? `Ya había entrado ${new Date(resultado.ingresoEn).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}`
-                    : "Ingreso registrado"}
-                </span>
+                {/* El rechazo va arriba de todo y ocupa lugar: en la puerta,
+                    con gente esperando, el dato que no puede pasarse por alto
+                    es este. No es una tranquera -- el ingreso queda registrado
+                    igual y la decisión de dejarlo pasar sigue siendo tuya. */}
+                {resultado.rechazado ? (
+                  <>
+                    <span className="text-2xl font-bold tracking-wide text-red-300">
+                      RECHAZADO
+                    </span>
+                    <span className="text-sm text-red-200/90 leading-snug max-w-[15rem]">
+                      {resultado.motivo}. Contactar al anfitrión.
+                    </span>
+                  </>
+                ) : (
+                  <span
+                    className={`text-xs uppercase tracking-[0.2em] ${
+                      resultado.yaHabiaEntrado ? "text-amber-300" : "text-emerald-400"
+                    }`}
+                  >
+                    {resultado.yaHabiaEntrado
+                      ? `Ya había entrado ${new Date(resultado.ingresoEn).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}`
+                      : "Ingreso registrado"}
+                  </span>
+                )}
 
                 <span className="text-xl font-semibold leading-tight">{resultado.nombre}</span>
 

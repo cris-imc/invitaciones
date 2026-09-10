@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { accesoPorSlug, lugaresQueOcupa } from "@/lib/mesas";
+import { resolveCardPayment } from "@/lib/card-payments";
 
 /**
  * POST - Resuelve un QR escaneado en la puerta: quién es, cuántos vienen, qué
@@ -54,6 +55,9 @@ export async function POST(
         attendingAdults: true,
         attendingTeens: true,
         attendingChildren: true,
+        isExempt: true,
+        seatDetails: true,
+        receivedAmount: true,
         dietaryRestrictions: true,
         hostNotes: true,
         ingresoEn: true,
@@ -78,6 +82,41 @@ export async function POST(
     }
 
     const confirmo = guest.status === "CONFIRMED";
+
+    // Si este evento cobra la tarjeta, hay que saber si este invitado está al
+    // día. Se recalcula con la misma función que usa el panel en vez de leer
+    // el `paymentStatus` guardado: si el invitado sumó o restó gente después
+    // de que el anfitrión marcó cupos, el guardado quedó viejo y en la puerta
+    // diría "pagado" debiendo la diferencia.
+    const invitacion = await prisma.invitation.findUnique({
+      where: { id: acceso.invitationId },
+      select: {
+        pagoTarjetaHabilitado: true,
+        regaloMonto: true,
+        precioNino: true,
+        precioAdolescente: true,
+        precioNinoHabilitado: true,
+        precioAdolescenteHabilitado: true,
+      },
+    });
+
+    const cobra = Boolean(invitacion?.pagoTarjetaHabilitado);
+    const pago = cobra
+      ? resolveCardPayment(guest as never, invitacion as never).status
+      : null;
+    const debe = cobra && pago !== "PAID" && pago !== "EXEMPT";
+
+    // Rechazo en la puerta: no confirmó, o debe la tarjeta. Es un aviso para
+    // el anfitrión, no una tranquera -- la decisión de dejar pasar o no es
+    // suya, y por eso el ingreso queda igual registrado.
+    const rechazado = !confirmo || debe;
+    const motivo = !confirmo
+      ? "No confirmó su asistencia"
+      : debe
+        ? pago === "PARTIAL"
+          ? "Tiene la tarjeta paga a medias"
+          : "No pagó la tarjeta"
+        : null;
     // Confirmados: lo que dijeron que vienen. Sin confirmar: a cuántos se
     // invitó, que es lo único que se sabe de ellos en la puerta.
     const adultos = confirmo ? guest.attendingAdults : guest.expectedAdults ?? 0;
@@ -86,6 +125,9 @@ export async function POST(
 
     return NextResponse.json({
       nombre: guest.name,
+      rechazado,
+      motivo,
+      pago,
       esGrupo: guest.type !== "INDIVIDUAL",
       personas: lugaresQueOcupa(guest),
       confirmo,

@@ -71,6 +71,44 @@ import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
 // esto deshabilitado), así que queda reactivada.
 const HINT_BUBBLE_ENABLED = true;
 
+/**
+ * Desde cuándo se registra que un invitado abrió su invitación. Antes de esta
+ * fecha el dato no existía, así que de esos invitados no se sabe nada: puede
+ * haber abierto la invitación diez veces y no quedó registro.
+ */
+const DESDE_QUE_SE_MIDE = new Date("2026-09-10T00:00:00Z");
+
+/**
+ * Si este invitado abrió su invitación, y con qué certeza.
+ *
+ * Devuelve `null` cuando no hay forma de saberlo -- alguien cargado antes de
+ * que esto se midiera y que no contestó nunca. Ahí no se muestra nada: decir
+ * "Sin abrir" sería afirmar algo falso sobre gente de la que no tenemos dato.
+ *
+ * Haber contestado cuenta como haber abierto: para confirmar o rechazar hay
+ * que entrar a la invitación. Sin esto, un evento entero con invitados
+ * confirmados de antes aparecería como que nadie abrió nada.
+ */
+function aperturaDe(guest: Guest): { abrio: boolean; detalle: string } | null {
+  const fmt = (d: string) =>
+    new Date(d).toLocaleString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  if (guest.abiertaEn) {
+    const veces = (guest.aperturas ?? 0) > 1 ? ` · ${guest.aperturas} veces en total` : "";
+    return { abrio: true, detalle: `Abrió por primera vez el ${fmt(guest.abiertaEn)}${veces}` };
+  }
+  if (guest.responseDate) {
+    return { abrio: true, detalle: `Contestó el ${fmt(guest.responseDate)}, así que la abrió` };
+  }
+  if (new Date(guest.createdAt) < DESDE_QUE_SE_MIDE) return null;
+  return { abrio: false, detalle: "Todavía no abrió su invitación" };
+}
+
 interface Guest {
   id: string;
   name: string;
@@ -90,6 +128,7 @@ interface Guest {
   createdAt: string;
   abiertaEn?: string | null;
   aperturas?: number;
+  responseDate?: string | null;
 }
 
 function buildGuestName(type: "INDIVIDUAL" | "FAMILY", nombre: string, apellido: string): string {
@@ -1001,21 +1040,25 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                               que uno se hace antes de volver a mandar el link
                               por WhatsApp, y es distinta de haber confirmado:
                               se puede abrir y no contestar. */}
-                          {guest.abiertaEn ? (
-                            <span
-                              className="flex items-center shrink-0 text-emerald-600 dark:text-emerald-400"
-                              title={`Abrió por primera vez el ${new Date(guest.abiertaEn).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}${(guest.aperturas ?? 0) > 1 ? ` · ${guest.aperturas} veces en total` : ""}`}
-                            >
-                              <Eye className="w-3 h-3 mr-1" /> Abrió
-                            </span>
-                          ) : (
-                            <span
-                              className="flex items-center shrink-0 opacity-60"
-                              title="Todavía no abrió su invitación"
-                            >
-                              <EyeOff className="w-3 h-3 mr-1" /> Sin abrir
-                            </span>
-                          )}
+                          {(() => {
+                            const visto = aperturaDe(guest);
+                            if (visto === null) return null;
+                            return visto.abrio ? (
+                              <span
+                                className="flex items-center shrink-0 text-emerald-600 dark:text-emerald-400"
+                                title={visto.detalle}
+                              >
+                                <Eye className="w-3 h-3 mr-1" /> Abrió
+                              </span>
+                            ) : (
+                              <span
+                                className="flex items-center shrink-0 opacity-60"
+                                title="Todavía no abrió su invitación"
+                              >
+                                <EyeOff className="w-3 h-3 mr-1" /> Sin abrir
+                              </span>
+                            );
+                          })()}
                           {guest.isExempt && (
                             <Badge
                               variant="outline"

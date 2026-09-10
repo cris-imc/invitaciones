@@ -46,6 +46,7 @@ interface Guest {
   pendingAmount: number;
   totalAmount: number;
   surplus: number;
+  lugaresEnMesas?: { lugares: number; mesa: { numero: number } }[];
   // Registro propio del anfitrión: plata que dice haber recibido, y la
   // diferencia contra lo que representan los cupos marcados.
   receivedAmount: number;
@@ -790,6 +791,20 @@ export function GuestListWithPayment({
                     {guest.status === "CONFIRMED" && `${guest.attendingCount} persona${guest.attendingCount !== 1 ? "s" : ""}`}
                     {guest.dietaryRestrictions && (guest.status === "CONFIRMED" ? ` · ${guest.dietaryRestrictions}` : guest.dietaryRestrictions)}
                   </span>
+                  {/* La mesa asignada, acá mismo. Sin pagos habilitados esta
+                      columna está vacía y la pregunta más común del anfitrión
+                      -- "¿dónde sentaron a los Pérez?" -- obligaba a cambiar de
+                      pestaña. Con el detalle de lugares sólo si quedó repartida
+                      entre varias: si va toda a una mesa, el número alcanza. */}
+                  {(guest.lugaresEnMesas?.length ?? 0) > 0 && (
+                    <span className="shrink-0 rounded-full border border-[var(--accent)]/35 bg-[var(--accent)]/10 px-2 py-0.5 text-[11px] font-semibold text-[var(--accent)]">
+                      {guest.lugaresEnMesas!.length === 1
+                        ? `Mesa ${guest.lugaresEnMesas![0].mesa.numero}`
+                        : guest
+                            .lugaresEnMesas!.map((l) => `Mesa ${l.mesa.numero} (${l.lugares})`)
+                            .join(" · ")}
+                    </span>
+                  )}
                 </div>
               </div>
 
