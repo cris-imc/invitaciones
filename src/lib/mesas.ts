@@ -27,19 +27,20 @@ export interface GuestParaMesas {
 /**
  * Cuánta gente hay que sentar de este invitado.
  *
- * Antes de que confirmen, lo único que se sabe es a cuántos se invitó
- * (expectedCount). Cuando confirman, manda lo que dijeron que vienen
- * (attendingCount): una familia invitada de 6 que confirma 4 ocupa 4 sillas,
- * no 6. Y quien avisó que no viene no ocupa ninguna.
+ * Sólo los que confirmaron, y con lo que dijeron que vienen: una familia
+ * invitada de 6 que confirma 4 ocupa 4 sillas, no 6.
+ *
+ * Los pendientes no ocupan nada y por eso no aparecen para ubicar. Sentar a
+ * alguien que todavía no dijo si viene es acomodar el salón con un número
+ * inventado: si al final vienen tres en vez de seis, hay que rehacer las mesas
+ * de alrededor. Cuando confirme, aparece solo en la lista.
  */
 export function lugaresQueOcupa(g: {
   status: string;
   expectedCount: number;
   attendingCount: number;
 }): number {
-  if (g.status === "DECLINED") return 0;
-  if (g.status === "CONFIRMED") return g.attendingCount;
-  return g.expectedCount;
+  return g.status === "CONFIRMED" ? g.attendingCount : 0;
 }
 
 export function esFormaValida(v: unknown): v is FormaMesa {

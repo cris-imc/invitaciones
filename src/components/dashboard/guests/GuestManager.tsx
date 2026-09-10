@@ -89,7 +89,7 @@ const DESDE_QUE_SE_MIDE = new Date("2026-09-10T00:00:00Z");
  * que entrar a la invitación. Sin esto, un evento entero con invitados
  * confirmados de antes aparecería como que nadie abrió nada.
  */
-function aperturaDe(guest: Guest): { abrio: boolean; detalle: string } | null {
+function aperturaDe(guest: Guest): { abrio: boolean; detalle: string } {
   const fmt = (d: string) =>
     new Date(d).toLocaleString("es-AR", {
       day: "2-digit",
@@ -105,7 +105,17 @@ function aperturaDe(guest: Guest): { abrio: boolean; detalle: string } | null {
   if (guest.responseDate) {
     return { abrio: true, detalle: `Contestó el ${fmt(guest.responseDate)}, así que la abrió` };
   }
-  if (new Date(guest.createdAt) < DESDE_QUE_SE_MIDE) return null;
+  // De los cargados antes de que esto se midiera no hay registro. Igual se
+  // muestra "Sin abrir", porque es lo accionable -- a esa persona le vas a
+  // volver a escribir de todos modos -- pero el detalle lo aclara, para que
+  // nadie tome por confirmado algo que en realidad no se sabe.
+  if (new Date(guest.createdAt) < DESDE_QUE_SE_MIDE) {
+    return {
+      abrio: false,
+      detalle:
+        "Sin registro: este invitado se cargó antes de que se empezara a medir la apertura. Puede haberla abierto sin que quedara constancia.",
+    };
+  }
   return { abrio: false, detalle: "Todavía no abrió su invitación" };
 }
 
@@ -1028,7 +1038,9 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
                           {guest.type === "FAMILY" ? (
                             <span className="flex items-center shrink-0">
-                              <Users className="w-3 h-3 mr-1" /> Familia (
+                              {/* "Grupal" y no "Familia": un grupo puede ser los
+                                  compañeros de trabajo o los amigos del club. */}
+                              <Users className="w-3 h-3 mr-1" /> Grupal (
                               {guest.expectedCount})
                             </span>
                           ) : (
@@ -1036,29 +1048,6 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                               <Users className="w-3 h-3 mr-1" /> Individual
                             </span>
                           )}
-                          {/* Si abrió su invitación o todavía no. Es la pregunta
-                              que uno se hace antes de volver a mandar el link
-                              por WhatsApp, y es distinta de haber confirmado:
-                              se puede abrir y no contestar. */}
-                          {(() => {
-                            const visto = aperturaDe(guest);
-                            if (visto === null) return null;
-                            return visto.abrio ? (
-                              <span
-                                className="flex items-center shrink-0 text-emerald-600 dark:text-emerald-400"
-                                title={visto.detalle}
-                              >
-                                <Eye className="w-3 h-3 mr-1" /> Abrió
-                              </span>
-                            ) : (
-                              <span
-                                className="flex items-center shrink-0 opacity-60"
-                                title="Todavía no abrió su invitación"
-                              >
-                                <EyeOff className="w-3 h-3 mr-1" /> Sin abrir
-                              </span>
-                            );
-                          })()}
                           {guest.isExempt && (
                             <Badge
                               variant="outline"
@@ -1068,6 +1057,32 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                             </Badge>
                           )}
                         </div>
+
+                        {/* En su propio renglón, siempre presente. Es la pregunta
+                            que uno se hace antes de volver a mandar el link por
+                            WhatsApp, y es distinta de haber confirmado: se puede
+                            abrir la invitación y no contestar. Mezclada entre las
+                            otras etiquetas se perdía. */}
+                        {(() => {
+                          const visto = aperturaDe(guest);
+                          return (
+                            <div
+                              className={`flex items-center text-xs mt-1 ${
+                                visto.abrio
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-muted-foreground opacity-70"
+                              }`}
+                              title={visto.detalle}
+                            >
+                              {visto.abrio ? (
+                                <Eye className="w-3 h-3 mr-1 shrink-0" />
+                              ) : (
+                                <EyeOff className="w-3 h-3 mr-1 shrink-0" />
+                              )}
+                              {visto.abrio ? "Abrió la invitación" : "Sin abrir"}
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end shrink-0">

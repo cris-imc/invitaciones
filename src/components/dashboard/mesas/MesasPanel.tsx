@@ -200,8 +200,8 @@ export function MesasPanel({ slug }: Props) {
     return m;
   }, [mesas]);
 
-  const nombrePorId = useMemo(
-    () => new Map(invitados.map((i) => [i.id, i.name])),
+  const infoPorId = useMemo(
+    () => new Map(invitados.map((i) => [i.id, i])),
     [invitados]
   );
 
@@ -256,6 +256,17 @@ export function MesasPanel({ slug }: Props) {
   const extra = Math.max(0, mesas.length - 10);
   const anchoPx = Math.round((ANCHO_BASE + extra * 70) * espacio);
   const altoPx = Math.round((ALTO_BASE + extra * 45) * espacio);
+
+  // Hasta dónde llega el salón que se ve. El lienzo por dentro mide siempre lo
+  // mismo -- las posiciones son porcentajes suyos, y achicarlo de verdad
+  // comprimiría las mesas entre sí hasta pisarse --, pero se recorta a la
+  // altura de la mesa más baja: sin esto quedaba media pantalla vacía debajo
+  // de las mesas. Al arrastrar una hacia abajo, el recorte crece con ella.
+  const masBaja = mesas.length > 0 ? Math.max(...mesas.map((m) => m.posY)) : 0;
+  const altoVisible =
+    mesas.length === 0
+      ? Math.min(altoPx, 340)
+      : Math.min(altoPx, Math.max(300, Math.round(((masBaja + 14) / 100) * altoPx)));
 
   // Al abrir, el salón se achica lo justo para entrar entero en pantalla: la
   // primera imagen tiene que ser el plano completo, no un pedazo con scroll.
@@ -617,7 +628,10 @@ export function MesasPanel({ slug }: Props) {
             grilla se dimensiona por su contenido -- el salón entero, que es
             más ancho que el teléfono -- y el desborde se lo come toda la
             página en vez de quedar contenido en este recuadro con scroll. */}
-        <div className="min-w-0 overflow-auto max-h-[72vh] rounded-xl border border-white/10">
+        <div
+          className="min-w-0 overflow-auto max-h-[72vh] rounded-xl border border-white/10"
+          style={{ height: altoVisible }}
+        >
           <div
             ref={lienzoRef}
             // Tocar el piso vacío suelta lo que estuviera elegido y cierra la
@@ -670,7 +684,7 @@ export function MesasPanel({ slug }: Props) {
             <EditorMesa
               mesa={mesa}
               ocupadas={ocupacion(mesa)}
-              nombrePorId={nombrePorId}
+              infoPorId={infoPorId}
               ocupado={ocupado}
               onCerrar={() => setMesaAbierta(null)}
               onCambiar={(c) => editarMesa(mesa.id, c)}
@@ -704,7 +718,18 @@ export function MesasPanel({ slug }: Props) {
             )}
 
             {pendientes.length === 0 ? (
-              <p className="text-xs text-emerald-400 py-2">Están todos ubicados.</p>
+              // Distinto de "no hay nadie": si todavía nadie confirmó, la lista
+              // vacía no significa que esté todo resuelto, y decir "están todos
+              // ubicados" sería mentir.
+              totales.aSentar === 0 ? (
+                <p className="text-xs text-muted-foreground py-2">
+                  Todavía no confirmó nadie. Sólo se pueden ubicar los invitados
+                  que confirmaron: sentar a quien no dijo si viene es acomodar el
+                  salón con un número inventado.
+                </p>
+              ) : (
+                <p className="text-xs text-emerald-400 py-2">Están todos ubicados.</p>
+              )
             ) : visibles.length === 0 ? (
               <p className="text-xs text-muted-foreground py-2">
                 Nadie sin ubicar coincide con “{busqueda}”.
@@ -907,7 +932,7 @@ function MesaDibujo({
 function EditorMesa({
   mesa,
   ocupadas,
-  nombrePorId,
+  infoPorId,
   ocupado,
   onCerrar,
   onCambiar,
@@ -916,7 +941,7 @@ function EditorMesa({
 }: {
   mesa: MesaApi;
   ocupadas: number;
-  nombrePorId: Map<string, string>;
+  infoPorId: Map<string, InvitadoApi>;
   ocupado: boolean;
   onCerrar: () => void;
   onCambiar: (cambios: Record<string, unknown>) => void;
@@ -1065,29 +1090,47 @@ function EditorMesa({
                     aria-hidden="true"
                   />
                   <span className="min-w-0 truncate text-sm">
-                    {nombrePorId.get(l.guestId) ?? "Invitado"}
+                    {infoPorId.get(l.guestId)?.name ?? "Invitado"}
+                    {/* Estaba confirmado cuando lo sentaste y después se dio de
+                        baja. Sigue ocupando sillas hasta que lo saques, y sin
+                        este aviso quedarían lugares reservados para gente que
+                        avisó que no viene. */}
+                    {infoPorId.get(l.guestId) &&
+                      infoPorId.get(l.guestId)!.status !== "CONFIRMED" && (
+                        <span className="block text-[10px] text-amber-400 leading-tight">
+                          ya no está confirmado
+                        </span>
+                      )}
                   </span>
                 </span>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    disabled={ocupado}
-                    onClick={() => onLugares(l.guestId, l.lugares - 1)}
-                    className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-                    aria-label="Un lugar menos en esta mesa"
-                  >
-                    <Minus className="w-3 h-3" />
-                  </button>
-                  <span className="w-4 text-center text-xs font-semibold">{l.lugares}</span>
-                  <button
-                    type="button"
-                    disabled={ocupado}
-                    onClick={() => onLugares(l.guestId, l.lugares + 1)}
-                    className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
-                    aria-label="Un lugar más en esta mesa"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
+                  {/* El − / + sirve para repartir un grupo entre varias mesas.
+                      A una persona sola no hay nada que repartirle, así que
+                      ahí sobra: quedan dos botones que no hacen nada útil al
+                      lado de cada invitado individual. */}
+                  {(infoPorId.get(l.guestId)?.aSentar ?? 0) > 1 ? (
+                    <>
+                      <button
+                        type="button"
+                        disabled={ocupado}
+                        onClick={() => onLugares(l.guestId, l.lugares - 1)}
+                        className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+                        aria-label="Un lugar menos en esta mesa"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="w-4 text-center text-xs font-semibold">{l.lugares}</span>
+                      <button
+                        type="button"
+                        disabled={ocupado}
+                        onClick={() => onLugares(l.guestId, l.lugares + 1)}
+                        className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+                        aria-label="Un lugar más en esta mesa"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </>
+                  ) : null}
                   <button
                     type="button"
                     disabled={ocupado}
