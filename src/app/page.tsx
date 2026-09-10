@@ -6,7 +6,7 @@ import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingLogo } from "@/components/ui/Logo";
 import { HeroFondoFiesta } from "@/components/landing/HeroFondoFiesta";
-import { Settings2, Users, Radio, CalendarDays, MapPin, ListChecks, Gift, Images, Music, MessageCircleHeart, Rss } from "lucide-react";
+import { Settings2, Users, Radio, CalendarDays, MapPin, ListChecks, Gift, Images, Music, MessageCircleHeart, Rss, Armchair, ScanLine, Eye } from "lucide-react";
 import { auth } from "@/auth";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
 import { FAQ_ITEMS } from "@/lib/faq-data";
@@ -166,6 +166,9 @@ export default async function Home() {
             {[
               { icon: <Gift className="w-6 h-6" />, title: "Quién pagó y quién debe", text: "Llevá la cuenta de la tarjeta invitado por invitado: precio por lugar, exentos y pagos parciales. El dinero va directo a vos.", premium: false, destacado: true },
               { icon: <Rss className="w-6 h-6" />, title: "Modo LIVE", text: "Fotos y mensajes de tus invitados proyectados en vivo durante la fiesta.", premium: true, destacado: true },
+              { icon: <Armchair className="w-6 h-6" />, title: "Organización de mesas", text: "Armá el salón, asigná cada familia a su mesa y repartí a las que no entran en una sola. Cada invitado ve la suya en su invitación.", premium: true, destacado: true },
+              { icon: <ScanLine className="w-6 h-6" />, title: "Control de ingreso", text: "Cada invitación termina con un QR. Lo escaneás en la puerta y ves quiénes son, cuántos vienen y a qué mesa mandarlos.", premium: true, destacado: true },
+              { icon: <Eye className="w-6 h-6" />, title: "Quién abrió la invitación", text: "Sabés a quién le llegó y a quién conviene volver a escribirle, antes de insistir a ciegas por WhatsApp.", premium: true, destacado: true },
               { icon: <ListChecks className="w-6 h-6" />, title: "Confirmación de asistencia", text: "RSVP en tiempo real: sabés quién confirmó sin tener que preguntar.", premium: false, destacado: false },
               { icon: <MessageCircleHeart className="w-6 h-6" />, title: "Módulo social", text: "Sugerencias de canciones para el DJ y mensajes de cariño de los invitados.", premium: false, destacado: false },
               { icon: <CalendarDays className="w-6 h-6" />, title: "Save the date", text: "Cuenta regresiva y botón para agendar la fecha directo en Google Calendar.", premium: false, destacado: false },
