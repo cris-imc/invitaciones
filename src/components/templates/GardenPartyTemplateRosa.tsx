@@ -48,6 +48,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 // este componente vía CSS var override en el wrapper raíz.
 const gardenFraunces = Fraunces({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--gardenparty-fraunces",
@@ -55,6 +56,7 @@ const gardenFraunces = Fraunces({
 });
 const gardenPoppins = Poppins({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--gardenparty-poppins",
   display: "swap",

@@ -40,6 +40,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const prcCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["300", "400", "600"],
   variable: "--prc-cormorant",
@@ -48,6 +49,7 @@ const prcCormorant = Cormorant_Garamond({
 
 const prcMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--prc-mono",
   display: "swap",

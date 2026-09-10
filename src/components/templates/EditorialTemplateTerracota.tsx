@@ -98,6 +98,7 @@ const IconChurch = ({ className, style }: { className?: string; style?: React.CS
 // --font-cormorant/--font-inter/--font-sans.
 const editorialBodoni = Bodoni_Moda({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--editorial-bodoni",
@@ -105,6 +106,7 @@ const editorialBodoni = Bodoni_Moda({
 });
 const editorialArchivo = Archivo({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--editorial-archivo",
   display: "swap",
@@ -609,7 +611,7 @@ export function EditorialTemplateTerracota({ invitation, guest, isPersonalized =
 
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/editorial-quince.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/editorial-quince.webp" : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 

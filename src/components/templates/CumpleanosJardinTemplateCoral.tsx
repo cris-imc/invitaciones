@@ -53,6 +53,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const bbsDisplay = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--cpj-display",
@@ -61,6 +62,7 @@ const bbsDisplay = Cormorant_Garamond({
 
 const bbsMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--cpj-mono",
   display: "swap",

@@ -53,6 +53,7 @@ const IconQuiz  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 // las demás plantillas que comparten --font-cormorant/--font-inter/--font-sans.
 const modernoFraunces = Fraunces({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--moderno-fraunces",
@@ -60,6 +61,7 @@ const modernoFraunces = Fraunces({
 });
 const modernoSora = Sora({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--moderno-sora",
   display: "swap",

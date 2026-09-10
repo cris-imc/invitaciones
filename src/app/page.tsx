@@ -239,12 +239,20 @@ export default async function Home() {
           </div>
           <div className="max-w-3xl mx-auto px-6">
             <div className="rounded-2xl overflow-hidden shadow-[0_10px_50px_rgba(0,0,0,0.5)] border border-white/10">
+              {/* `preload="none"` + poster: antes los dos videos pedían sus
+                  metadatos apenas cargaba la landing (el oculto también --
+                  `display:none` no evita la descarga), y el primer fotograma
+                  del video es negro, así que la sección se veía como un
+                  rectángulo vacío hasta que alguien apretaba play. Ahora se
+                  muestra una portada de 10 KB y el video sólo se baja si lo
+                  reproducen. */}
               {/* Mobile video */}
               <video
                 src="/video-demo-mobile.mp4"
+                poster="/video-demo-mobile-poster.webp"
                 controls
                 playsInline
-                preload="metadata"
+                preload="none"
                 className="w-full block md:hidden"
               >
                 Tu navegador no soporta video HTML5.
@@ -252,9 +260,10 @@ export default async function Home() {
               {/* Desktop video */}
               <video
                 src="/video-demo.mp4"
+                poster="/video-demo-poster.webp"
                 controls
                 playsInline
-                preload="metadata"
+                preload="none"
                 className="w-full hidden md:block"
               >
                 Tu navegador no soporta video HTML5.

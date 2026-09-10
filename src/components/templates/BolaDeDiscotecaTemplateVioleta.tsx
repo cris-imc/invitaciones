@@ -41,6 +41,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const bddArchivo = Archivo_Black({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--bdd-archivo",
   display: "swap",
@@ -48,6 +49,7 @@ const bddArchivo = Archivo_Black({
 
 const bddMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--bdd-mono",
   display: "swap",

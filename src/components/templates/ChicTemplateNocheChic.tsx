@@ -107,6 +107,7 @@ const IconChurch = ({ className, style }: { className?: string; style?: React.CS
 // --font-cormorant/--font-inter/--font-sans.
 const chicPlayfair = Playfair_Display({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--chic-playfair",
@@ -114,6 +115,7 @@ const chicPlayfair = Playfair_Display({
 });
 const chicJost = Jost({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600"],
   variable: "--chic-jost",
   display: "swap",
@@ -654,7 +656,7 @@ export function ChicTemplateNocheChic({ invitation, guest, isPersonalized = fals
   // tono de tinta oscura que la plantilla YA tiene (no su fondo claro, que
   // no oscurecería lo suficiente la foto).
   const coverScrimRgb = "36,30,18"; // rgb(#F2ECE0)
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/chic-boda.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "CASAMIENTO" ? "/fondos/chic-boda.webp" : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 

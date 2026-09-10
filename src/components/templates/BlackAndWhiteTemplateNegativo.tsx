@@ -47,6 +47,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const bcwBodoni = Bodoni_Moda({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--bcw-bodoni",
@@ -55,6 +56,7 @@ const bcwBodoni = Bodoni_Moda({
 
 const bcwMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--bcw-mono",
   display: "swap",

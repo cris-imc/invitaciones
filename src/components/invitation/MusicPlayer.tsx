@@ -68,7 +68,12 @@ export function useMusicPlayer({ musicaUrl, autoplay = true }: UseMusicPlayerOpt
         }
     };
 
-    const audioElement = <audio ref={audioRef} loop={false} preload="auto" src={musicaUrl} />;
+    // `preload="none"`: la música NUNCA arranca sola (ver arriba, siempre
+    // espera un gesto), así que con "auto" el navegador se bajaba el mp3
+    // entero -- 4 a 5,6 MB -- en cada visita aunque nadie lo escuchara. Con
+    // "none" no se pide nada hasta el play, y ahí empieza a sonar igual de
+    // rápido porque el servidor ya responde por tramos (Range).
+    const audioElement = <audio ref={audioRef} loop={false} preload="none" src={musicaUrl} />;
 
     return { isPlaying, togglePlay, audioElement };
 }

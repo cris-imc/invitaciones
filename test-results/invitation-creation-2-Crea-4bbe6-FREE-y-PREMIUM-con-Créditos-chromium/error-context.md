@@ -7,7 +7,7 @@
 # Test info
 
 - Name: invitation-creation.spec.ts >> 2. Creación y Configuración de Invitaciones >> Creación de tarjeta FREE y PREMIUM con Créditos
-- Location: e2e\invitation-creation.spec.ts:36:7
+- Location: e2e/invitation-creation.spec.ts:36:7
 
 # Error details
 
@@ -29,8 +29,7 @@ Call log:
   - generic [ref=f1e4]:
     - heading "404" [level=1] [ref=f1e5]
     - heading "This page could not be found." [level=2] [ref=f1e7]
-  - button "Open Next.js Dev Tools" [ref=f1e13] [cursor=pointer]
-  - alert [ref=f1e17]
+  - alert [ref=f1e8]
 ```
 
 # Test source

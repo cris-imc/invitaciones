@@ -104,12 +104,14 @@ const IconChurch = ({ className, style }: { className?: string; style?: React.CS
 // --font-cormorant/--font-inter/--font-sans.
 const jardinsedaGloock = Gloock({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--jardinseda-gloock",
   display: "swap",
 });
 const jardinsedaQuicksand = Quicksand({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500", "600", "700"],
   variable: "--jardinseda-quicksand",
   display: "swap",
@@ -624,7 +626,7 @@ export function JardinSedaTemplateRosaAntiguo({ invitation, guest, isPersonalize
 
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/jardinseda-quince.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/jardinseda-quince.webp" : undefined;
 
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
 

@@ -7,7 +7,7 @@
 # Test info
 
 - Name: auth.spec.ts >> 1. Cuentas y Autenticación >> Login y Logout Correcto
-- Location: e2e\auth.spec.ts:48:7
+- Location: e2e/auth.spec.ts:48:7
 
 # Error details
 
@@ -38,19 +38,22 @@ Call log:
           - generic [ref=e14]: Email
           - textbox "Email" [active] [ref=e18]:
             - /placeholder: tu@email.com
-            - text: qa_1785663098202@test.com
+            - text: qa_1789058877992@test.com
         - generic [ref=e19]:
           - generic [ref=e20]: Contraseña
-          - textbox "Contraseña" [ref=e24]:
-            - /placeholder: ••••••••
-        - button "Iniciar Sesión" [ref=e25]
-      - generic [ref=e26]: o
-      - paragraph [ref=e31]:
+          - generic [ref=e24]:
+            - textbox "Contraseña" [ref=e25]:
+              - /placeholder: ••••••••
+            - button "Mostrar contraseña" [ref=e26]
+          - link "¿Olvidaste tu contraseña?" [ref=e31] [cursor=pointer]:
+            - /url: /forgot-password
+        - button "Iniciar Sesión" [ref=e32]
+      - generic [ref=e33]: o
+      - paragraph [ref=e38]:
         - text: ¿No tienes cuenta?
-        - link "Regístrate gratis" [ref=e32] [cursor=pointer]:
+        - link "Registrate acá" [ref=e39] [cursor=pointer]:
           - /url: /register
-  - button "Open Next.js Dev Tools" [ref=e38] [cursor=pointer]
-  - alert [ref=e42]
+  - alert [ref=e40]
 ```
 
 # Test source

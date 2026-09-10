@@ -40,6 +40,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const flbArchivo = Archivo_Black({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--flb-archivo",
   display: "swap",
@@ -47,6 +48,7 @@ const flbArchivo = Archivo_Black({
 
 const flbMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--flb-mono",
   display: "swap",

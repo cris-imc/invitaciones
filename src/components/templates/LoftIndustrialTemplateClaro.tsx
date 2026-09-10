@@ -46,12 +46,14 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 // componente vía CSS var override en el wrapper raíz.
 const loftSpaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "600", "700"],
   variable: "--loftindustrial-space-grotesk",
   display: "swap",
 });
 const loftSora = Sora({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
   variable: "--loftindustrial-sora",
   display: "swap",

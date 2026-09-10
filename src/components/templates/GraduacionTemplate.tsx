@@ -53,6 +53,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const grdDisplay = Playfair_Display({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500"],
   variable: "--grd-display",
@@ -61,6 +62,7 @@ const grdDisplay = Playfair_Display({
 
 const grdMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--grd-mono",
   display: "swap",

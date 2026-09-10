@@ -50,6 +50,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const myoItaliana = Italiana({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--myo-italiana",
   display: "swap",
@@ -57,6 +58,7 @@ const myoItaliana = Italiana({
 
 const myoCormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "500", "600"],
   variable: "--myo-cormorant",
@@ -65,6 +67,7 @@ const myoCormorant = Cormorant_Garamond({
 
 const myoMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--myo-mono",
   display: "swap",

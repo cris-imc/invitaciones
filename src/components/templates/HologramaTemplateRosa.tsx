@@ -115,18 +115,21 @@ const PhotoCornerFrame = () => (
 // --font-cormorant/--font-inter/--font-sans.
 const holoDisplay = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "600", "700"],
   variable: "--holo-display",
   display: "swap",
 });
 const holoBody = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--holo-body",
   display: "swap",
 });
 const holoMono = Space_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "700"],
   variable: "--holo-mono",
   display: "swap",
@@ -647,7 +650,7 @@ export function HologramaTemplateRosa({ invitation, guest, isPersonalized = fals
   // scrimColorRgb = rgb(#0D0D14), igual en todas (bg no cambia por variante).
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/holograma-quince-2.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/holograma-quince-2.webp" : undefined;
   const portadaTintColor1 = "#FF6FD8";
   const portadaTintColor2 = "#22D3EE";
 

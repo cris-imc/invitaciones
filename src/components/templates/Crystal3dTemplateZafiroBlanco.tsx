@@ -41,6 +41,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const c3dPoppins = Poppins({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "600", "700"],
   variable: "--c3d-poppins",
@@ -49,6 +50,7 @@ const c3dPoppins = Poppins({
 
 const c3dMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--c3d-mono",
   display: "swap",

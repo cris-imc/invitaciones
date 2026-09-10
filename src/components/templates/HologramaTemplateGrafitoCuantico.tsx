@@ -115,18 +115,21 @@ const PhotoCornerFrame = () => (
 // --font-cormorant/--font-inter/--font-sans.
 const holoDisplay = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "600", "700"],
   variable: "--holo-display",
   display: "swap",
 });
 const holoBody = Space_Grotesk({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--holo-body",
   display: "swap",
 });
 const holoMono = Space_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "700"],
   variable: "--holo-mono",
   display: "swap",
@@ -654,7 +657,7 @@ export function HologramaTemplateGrafitoCuantico({ invitation, guest, isPersonal
   // Holograma tiene 2 PNG de fondo para quince (el usuario dijo "ni claro ni
   // oscuro, para que lo distribuyas como vos quieras entre las variantes") --
   // esta variante puntual usa el PNG 1.
-  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/holograma-quince-1.png" : undefined;
+  const portadaFondoFallback = !portadaFondoAnimado && tipo === "QUINCE_ANOS" ? "/fondos/holograma-quince-1.webp" : undefined;
   const portadaTintColor1 = "#00D9FF";
   const portadaTintColor2 = "#22D3EE";
 

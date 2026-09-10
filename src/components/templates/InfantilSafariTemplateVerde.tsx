@@ -57,6 +57,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 // más abajo, sin el italic real).
 const ifsDisplay = Baloo_2({
   subsets: ["latin"],
+  preload: false,
   weight: ["500", "700", "800"],
   variable: "--ifs-display",
   display: "swap",
@@ -64,6 +65,7 @@ const ifsDisplay = Baloo_2({
 
 const ifsMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--ifs-mono",
   display: "swap",

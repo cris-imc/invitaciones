@@ -46,6 +46,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const cmeSerif = Cormorant_Garamond({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["300", "400", "600"],
   variable: "--cme-serif",
@@ -54,6 +55,7 @@ const cmeSerif = Cormorant_Garamond({
 
 const cmeMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--cme-mono",
   display: "swap",

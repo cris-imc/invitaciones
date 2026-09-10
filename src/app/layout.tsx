@@ -6,33 +6,41 @@ import { ViewportHeightFix } from "@/components/ViewportHeightFix";
 import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2, Sora, Dancing_Script, Playfair_Display, Great_Vibes, Merriweather, Lora, DM_Sans, Cinzel, Parisienne, Sacramento, Abril_Fatface, Prata, Montserrat, Open_Sans, Nunito, Lato } from 'next/font/google';
 import localFont from 'next/font/local';
 
+// Sólo las 4 fuentes del chrome de la app (display / ui / mono / body en
+// globals.css) se precargan. Las otras 20 son opciones que el usuario elige
+// para SU invitación: con el preload por defecto, Next metía un
+// <link rel="preload"> de las 24 en TODAS las páginas de la app, así que cada
+// visitante se bajaba ~30 archivos de fuente para ver, a lo sumo, 4 o 5. Con
+// `preload: false` el navegador baja únicamente las que la página realmente
+// pinta; `display: 'swap'` ya estaba puesto, así que el texto se ve desde el
+// primer momento.
 const fraunces = Fraunces({ style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' });
 const spaceMono = Space_Mono({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-space-mono', display: 'swap' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const sora = Sora({ subsets: ['latin'], variable: '--font-sora', display: 'swap' });
+const sora = Sora({ preload: false, subsets: ['latin'], variable: '--font-sora', display: 'swap' });
 
-const cormorant = Cormorant_Garamond({ weight: ['400', '500', '600', '700'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-cormorant', display: 'swap' });
-const bricolage = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-bricolage', display: 'swap' });
-const fredoka = Fredoka({ subsets: ['latin'], variable: '--font-fredoka', display: 'swap' });
-const baloo = Baloo_2({ subsets: ['latin'], variable: '--font-baloo', display: 'swap' });
+const cormorant = Cormorant_Garamond({ preload: false, weight: ['400', '500', '600', '700'], style: ['normal', 'italic'], subsets: ['latin'], variable: '--font-cormorant', display: 'swap' });
+const bricolage = Bricolage_Grotesque({ preload: false, subsets: ['latin'], variable: '--font-bricolage', display: 'swap' });
+const fredoka = Fredoka({ preload: false, subsets: ['latin'], variable: '--font-fredoka', display: 'swap' });
+const baloo = Baloo_2({ preload: false, subsets: ['latin'], variable: '--font-baloo', display: 'swap' });
 
 // Corrección 2 (docs/correcciones.md): tipografía de dos niveles del wizard.
 // Títulos:
-const dancingScript = Dancing_Script({ subsets: ['latin'], variable: '--font-dancing-script', display: 'swap' });
-const playfairDisplay = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair-display', display: 'swap' });
-const greatVibes = Great_Vibes({ weight: ['400'], subsets: ['latin'], variable: '--font-great-vibes', display: 'swap' });
-const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', display: 'swap' });
-const parisienne = Parisienne({ weight: ['400'], subsets: ['latin'], variable: '--font-parisienne', display: 'swap' });
-const sacramento = Sacramento({ weight: ['400'], subsets: ['latin'], variable: '--font-sacramento', display: 'swap' });
-const abrilFatface = Abril_Fatface({ weight: ['400'], subsets: ['latin'], variable: '--font-abril-fatface', display: 'swap' });
-const prata = Prata({ weight: ['400'], subsets: ['latin'], variable: '--font-prata', display: 'swap' });
+const dancingScript = Dancing_Script({ preload: false, subsets: ['latin'], variable: '--font-dancing-script', display: 'swap' });
+const playfairDisplay = Playfair_Display({ preload: false, subsets: ['latin'], variable: '--font-playfair-display', display: 'swap' });
+const greatVibes = Great_Vibes({ preload: false, weight: ['400'], subsets: ['latin'], variable: '--font-great-vibes', display: 'swap' });
+const cinzel = Cinzel({ preload: false, subsets: ['latin'], variable: '--font-cinzel', display: 'swap' });
+const parisienne = Parisienne({ preload: false, weight: ['400'], subsets: ['latin'], variable: '--font-parisienne', display: 'swap' });
+const sacramento = Sacramento({ preload: false, weight: ['400'], subsets: ['latin'], variable: '--font-sacramento', display: 'swap' });
+const abrilFatface = Abril_Fatface({ preload: false, weight: ['400'], subsets: ['latin'], variable: '--font-abril-fatface', display: 'swap' });
+const prata = Prata({ preload: false, weight: ['400'], subsets: ['latin'], variable: '--font-prata', display: 'swap' });
 
 // Texto:
-const merriweather = Merriweather({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-merriweather', display: 'swap' });
-const lora = Lora({ subsets: ['latin'], variable: '--font-lora', display: 'swap' });
-const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' });
-const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-montserrat', display: 'swap' });
+const merriweather = Merriweather({ preload: false, weight: ['400', '700'], subsets: ['latin'], variable: '--font-merriweather', display: 'swap' });
+const lora = Lora({ preload: false, subsets: ['latin'], variable: '--font-lora', display: 'swap' });
+const dmSans = DM_Sans({ preload: false, subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' });
+const montserrat = Montserrat({ preload: false, subsets: ['latin'], variable: '--font-montserrat', display: 'swap' });
 // Auto-hospedada (next/font/local) en vez de next/font/google -- las URLs de
 // Roboto que trae fijadas el paquete de Next.js para este build empezaron a
 // devolver 404 de fonts.gstatic.com, rompiendo el build en Railway. Con el
@@ -46,9 +54,9 @@ const roboto = localFont({
   variable: '--font-roboto',
   display: 'swap',
 });
-const openSans = Open_Sans({ subsets: ['latin'], variable: '--font-open-sans', display: 'swap' });
-const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito', display: 'swap' });
-const lato = Lato({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-lato', display: 'swap' });
+const openSans = Open_Sans({ preload: false, subsets: ['latin'], variable: '--font-open-sans', display: 'swap' });
+const nunito = Nunito({ preload: false, subsets: ['latin'], variable: '--font-nunito', display: 'swap' });
+const lato = Lato({ preload: false, weight: ['400', '700'], subsets: ['latin'], variable: '--font-lato', display: 'swap' });
 
 const allFonts = [
   fraunces, spaceGrotesk, spaceMono, inter, sora, cormorant, bricolage, fredoka, baloo,

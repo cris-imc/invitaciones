@@ -39,6 +39,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const acpPoppins = Poppins({
   subsets: ["latin"],
+  preload: false,
   style: ["normal", "italic"],
   weight: ["400", "600", "700", "800"],
   variable: "--acp-poppins",
@@ -47,6 +48,7 @@ const acpPoppins = Poppins({
 
 const acpMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--acp-mono",
   display: "swap",

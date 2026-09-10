@@ -53,6 +53,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 
 const ingDisplay = Archivo_Black({
   subsets: ["latin"],
+  preload: false,
   weight: ["400"],
   variable: "--ing-display",
   display: "swap",
@@ -60,6 +61,7 @@ const ingDisplay = Archivo_Black({
 
 const ingMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  preload: false,
   weight: ["300", "400", "500"],
   variable: "--ing-mono",
   display: "swap",
