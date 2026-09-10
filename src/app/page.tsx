@@ -388,10 +388,10 @@ export default async function Home() {
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span><strong className="text-white">Interacción LIVE:</strong> proyección de fotos en vivo en tu fiesta (hasta {PLAN_LIMITS.DIAMOND.maxLivePhotos} fotos)</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>Álbum de fotos (hasta {PLAN_LIMITS.DIAMOND.maxPhotos} fotos)</span>
-                </li>
+                {/* El álbum no se repite acá: Diamond tiene el mismo límite que
+                    Premium y la tarjeta ya arranca diciendo "todo lo del plan
+                    Premium". Repetirlo hacía que la lista de lo que suma
+                    Diamond pareciera más larga de lo que realmente es. */}
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span><strong className="text-white">Organización de mesas:</strong> armá el salón y asigná a cada familia su mesa, y cada invitado la ve en su invitación</span>
