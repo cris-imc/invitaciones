@@ -285,15 +285,41 @@ import { InfantilTemplateCeleste } from "@/components/templates/InfantilTemplate
 import { InfantilTemplateLavanda } from "@/components/templates/InfantilTemplateLavanda";
 import { InfantilTemplateMenta } from "@/components/templates/InfantilTemplateMenta";
 
-export default async function PreviewPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PreviewPage({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
     const { slug } = await params;
-    const invitation = await prisma.invitation.findUnique({
+    const consulta = (await searchParams) ?? {};
+    const invitationCruda = await prisma.invitation.findUnique({
         where: { slug },
     });
 
-    if (!invitation) {
+    if (!invitationCruda) {
         notFound();
     }
+
+    /**
+     * MINIATURA: esta preview se está dibujando dentro de un recuadro de 170px
+     * en /modelos, sin poder tocarse (pointer-events: none).
+     *
+     * Se le saca el mapa, y no es un detalle estético: cada plantilla embebe un
+     * Google Maps, que es una aplicación entera con render de tiles. Con varias
+     * miniaturas vivas a la vez eso son varios Google Maps simultáneos, y es lo
+     * que hacía que el navegador del teléfono se quedara sin memoria, matara la
+     * pestaña y mostrara "No se puede abrir esta página".
+     *
+     * Se resuelve vaciando `mapUrl` y no tocando las plantillas: las 364 ya
+     * envuelven su sección de ubicación en `{mapUrl && ...}`, así que sin ese
+     * dato ninguna dibuja el mapa. En un recuadro de 170px no se veía igual.
+     */
+    const esMiniatura = consulta.miniatura === "1";
+    const invitation = esMiniatura
+        ? { ...invitationCruda, mapUrl: null }
+        : invitationCruda;
 
     let temaColoresObj = { colorPrincipal: 'default' };
     try {

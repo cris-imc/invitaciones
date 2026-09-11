@@ -33,7 +33,11 @@ export function ModeloThumbnail({ slug, label }: ModeloThumbnailProps) {
     >
       <div className="relative overflow-hidden bg-neutral-900" style={{ width: BOX_WIDTH, height: BOX_HEIGHT }}>
         <iframe
-          data-modelo-src={`/preview/${slug}`}
+          // `miniatura=1`: le avisa a la preview que se dibuja en un recuadro
+          // chico y no interactivo, para que no cargue el mapa (ver la página
+          // de preview). Varios Google Maps vivos a la vez tumbaban el
+          // navegador del teléfono.
+          data-modelo-src={`/preview/${slug}?miniatura=1`}
           data-modelo-iframe=""
           title={label}
           width={IFRAME_WIDTH}

@@ -12,10 +12,27 @@ import { useEffect } from "react";
  *
  * En el teléfono el techo es más bajo que en escritorio: no por la pantalla
  * sino por el presupuesto de memoria, que es mucho más chico.
+ *
+ * Cuatro y no menos porque en un teléfono entran cuatro miniaturas en
+ * pantalla: con un techo más bajo, las que sobran quedan en NEGRO a la vista,
+ * que es peor que el problema que se quiere evitar. Lo que descomprime la
+ * memoria no es bajar este número sino no cargar un Google Maps por miniatura
+ * (ver `miniatura=1` en la página de preview).
  */
 const VIVAS_TELEFONO = 4;
 const VIVAS_ESCRITORIO = 8;
 const ANCHO_TELEFONO = 768;
+
+/**
+ * Cuántas pueden estar CARGANDO a la vez. Distinto del techo de vivas: ese
+ * acota la memoria, este acota las conexiones.
+ *
+ * Los navegadores abren como mucho ~6 conexiones por dominio. Ocho páginas
+ * arrancando juntas se pisan entre ellas, se encolan y varias se quedan a
+ * medio cargar -- "cargan de a 8 y no se cargan todas". De a dos, cada una
+ * termina rápido y las demás entran enseguida.
+ */
+const CARGANDO_MAX = 2;
 
 /** Cuánto antes de entrar en pantalla se empieza a cargar una miniatura. */
 const MARGEN_CARGA_PX = 300;
@@ -69,13 +86,29 @@ export function ModelosLazyLoader() {
       return r.width >= 2 && r.height >= 2;
     };
 
+    const estaCargando = (el: HTMLIFrameElement) => el.dataset.modeloCargando === "1";
+
     const cargar = (el: HTMLIFrameElement) => {
       el.dataset.modeloCargada = "1";
+      el.dataset.modeloCargando = "1";
+      // El `load` avisa que terminó y libera el lugar para la siguiente. El
+      // temporizador es la red de seguridad: si la carga muere sin disparar
+      // `load`, sin él ese lugar quedaría ocupado para siempre y no cargaría
+      // ninguna más.
+      const listo = () => {
+        delete el.dataset.modeloCargando;
+        el.removeEventListener("load", listo);
+        window.clearTimeout(guardia);
+        alScrollear();
+      };
+      const guardia = window.setTimeout(listo, 8000);
+      el.addEventListener("load", listo);
       el.src = el.getAttribute("data-modelo-src")!;
     };
 
     const soltar = (el: HTMLIFrameElement) => {
       delete el.dataset.modeloCargada;
+      delete el.dataset.modeloCargando;
       // Navegar a about:blank y no quitar el atributo: sacar el src no
       // descarga el documento que ya se pintó, y es justamente la memoria que
       // hay que devolver.
@@ -109,6 +142,10 @@ export function ModelosLazyLoader() {
 
       if (candidatas.length === 0) return;
 
+      // Cuántos lugares de carga hay libres ahora mismo.
+      let enVuelo = todas.filter(estaCargando).length;
+      if (enVuelo >= CARGANDO_MAX) return;
+
       // 3. Cargarlas, haciendo lugar si el cupo está lleno.
       //
       //    Acá estaba el bloqueo viejo: para desalojar una cargada se le
@@ -122,12 +159,17 @@ export function ModelosLazyLoader() {
           .filter(estaCargada)
           .sort((a, b) => distancia(b) - distancia(a)); // la más lejana primero
 
+        if (enVuelo >= CARGANDO_MAX) break;
+
         if (cargadas.length >= vivasMax) {
-          const lejana = cargadas[0];
+          // No se desaloja algo que todavía está cargando: sería tirar a la
+          // basura una descarga a medio hacer y volver a empezarla.
+          const lejana = cargadas.find((el) => !estaCargando(el));
           if (!lejana || distancia(lejana) <= distancia(candidata)) break;
           soltar(lejana);
         }
         cargar(candidata);
+        enVuelo++;
       }
     };
 
