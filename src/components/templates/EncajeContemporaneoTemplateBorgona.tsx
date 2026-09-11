@@ -44,7 +44,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Playfair_Display, IBM_Plex_Mono } from "next/font/google";
-import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
@@ -298,7 +297,6 @@ export function EncajeContemporaneoTemplateBorgona({ invitation, guest, isPerson
   // se calculara una sola vez, quien la deja abierta cruzando la fecha se
   // queda para siempre en la cuenta regresiva clavada en cero.
   const estadoDelEvento = useEstadoDelEvento(eventDateTime);
-  const eventHasStarted = estadoDelEvento !== "PRE_EVENT";
 
   const rsvpEnabled = Boolean(invitation.rsvpEnabled ?? true);
   const sugerenciaMusicaHabilitada = Boolean(invitation.sugerenciaMusicaHabilitada ?? false);
@@ -1032,7 +1030,7 @@ export function EncajeContemporaneoTemplateBorgona({ invitation, guest, isPerson
                 <div key={pageIndex} data-tone="light" className="enc-panel enc-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="enc-hair-bg" />
                   <div className="enc-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span>{photoPages.length > 1 && (<span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>)}
                   </div>
                   {pageIndex === 0 && <h2 className="enc-panel-title-md">{tx("invitacion.album.titulo")} <span className="enc-accent-serif-dark">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="enc-mosaic">
@@ -1059,26 +1057,8 @@ export function EncajeContemporaneoTemplateBorgona({ invitation, guest, isPerson
                   </div>
                 </div>
               ))}
-
-              <div data-tone="light" className="enc-panel enc-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="enc-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
-                <h2 className="enc-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="enc-accent-serif-dark">{tx("invitacion.album.tituloLinea2")}</span></h2>
-                <div className="enc-album-embed">
-                  {livePhotos.length > 0 ? (
-                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#A83A5A" />
-                  ) : (
-                    <div className="enc-live-placeholder">
-                      <span className="enc-mini-label">
-                        {eventHasStarted
-                          ? tx("invitacion.enVivo.nadaTodavia")
-                          : tx("invitacion.enVivo.seActivaElDia")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
-            {!scrollVertical && <Dots count={photoPages.length + 1} />}
+            {!scrollVertical && <Dots count={photoPages.length} />}
           </div>
         </div>
 

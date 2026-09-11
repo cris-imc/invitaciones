@@ -27,7 +27,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Bodoni_Moda, IBM_Plex_Mono } from "next/font/google";
-import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
@@ -266,7 +265,6 @@ export function GuestPassVipTemplatePlata({ invitation, guest, isPersonalized = 
   // se calculara una sola vez, quien la deja abierta cruzando la fecha se
   // queda para siempre en la cuenta regresiva clavada en cero.
   const estadoDelEvento = useEstadoDelEvento(eventDateTime);
-  const eventHasStarted = estadoDelEvento !== "PRE_EVENT";
 
   const rsvpEnabled = Boolean(invitation.rsvpEnabled ?? true);
   const sugerenciaMusicaHabilitada = Boolean(invitation.sugerenciaMusicaHabilitada ?? false);
@@ -997,7 +995,7 @@ export function GuestPassVipTemplatePlata({ invitation, guest, isPersonalized = 
                 <div key={pageIndex} data-tone="light" className="gpv-panel gpv-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="gpv-hair-bg" />
                   <div className="gpv-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span>{photoPages.length > 1 && (<span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>)}
                   </div>
                   {pageIndex === 0 && <h2 className="gpv-panel-title-md">{tx("invitacion.album.titulo")} <span className="gpv-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="gpv-mosaic">
@@ -1024,26 +1022,8 @@ export function GuestPassVipTemplatePlata({ invitation, guest, isPersonalized = 
                   </div>
                 </div>
               ))}
-
-              <div data-tone="light" className="gpv-panel gpv-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="gpv-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
-                <h2 className="gpv-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="gpv-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
-                <div className="gpv-album-embed">
-                  {livePhotos.length > 0 ? (
-                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#5C6C78" />
-                  ) : (
-                    <div className="gpv-live-placeholder">
-                      <span className="gpv-mini-label">
-                        {eventHasStarted
-                          ? tx("invitacion.enVivo.nadaTodavia")
-                          : tx("invitacion.enVivo.seActivaElDia")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
-            {!scrollVertical && <Dots count={photoPages.length + 1} />}
+            {!scrollVertical && <Dots count={photoPages.length} />}
           </div>
         </div>
 

@@ -25,7 +25,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Archivo_Black, IBM_Plex_Mono } from "next/font/google";
-import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { AnimatedCoverPhoto, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
@@ -255,7 +254,6 @@ export function CineAbstractoXvTemplateTecnicolor({ invitation, guest, isPersona
   // se calculara una sola vez, quien la deja abierta cruzando la fecha se
   // queda para siempre en la cuenta regresiva clavada en cero.
   const estadoDelEvento = useEstadoDelEvento(eventDateTime);
-  const eventHasStarted = estadoDelEvento !== "PRE_EVENT";
 
   const rsvpEnabled = Boolean(invitation.rsvpEnabled ?? true);
   const sugerenciaMusicaHabilitada = Boolean(invitation.sugerenciaMusicaHabilitada ?? false);
@@ -971,7 +969,7 @@ export function CineAbstractoXvTemplateTecnicolor({ invitation, guest, isPersona
                 <div key={pageIndex} data-tone="light" className="cxv-panel cxv-panel--gap" style={{ background: ALBUM_TONES[pageIndex % ALBUM_TONES.length], color: "#14141B" }}>
                   <div className="cxv-hair-bg" />
                   <div className="cxv-panel-top">
-                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span><span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>
+                    <span>{kn(5)} — ARCHIVO / {String(allPhotos.length).padStart(3, "0")}</span>{photoPages.length > 1 && (<span>{tx("invitacion.album.hojaDeTotal", { n: String(pageIndex + 1).padStart(2, "0"), total: String(photoPages.length).padStart(2, "0") }).toUpperCase()}</span>)}
                   </div>
                   {pageIndex === 0 && <h2 className="cxv-panel-title-md">{tx("invitacion.album.titulo")} <span className="cxv-accent-serif">{tx("invitacion.album.deFotos")}</span></h2>}
                   <div className="cxv-mosaic">
@@ -998,26 +996,8 @@ export function CineAbstractoXvTemplateTecnicolor({ invitation, guest, isPersona
                   </div>
                 </div>
               ))}
-
-              <div data-tone="light" className="cxv-panel cxv-panel--gap" style={{ background: "#EDE8DE", color: "#14141B" }}>
-                <span className="cxv-panel-top" style={{ display: "block" }}>{tx("invitacion.album.hoja", { n: String(photoPages.length + 1).padStart(2, "0"), etiqueta: "— " + tx("invitacion.enVivo.titulo").toUpperCase() }).toUpperCase()}</span>
-                <h2 className="cxv-panel-title">{tx("invitacion.album.tituloLinea1")}<br /><span className="cxv-accent-serif">{tx("invitacion.album.tituloLinea2")}</span></h2>
-                <div className="cxv-album-embed">
-                  {livePhotos.length > 0 ? (
-                    <LiveAlbumStrip photos={livePhotos} tone="light" accentColor="#FF6A1F" />
-                  ) : (
-                    <div className="cxv-live-placeholder">
-                      <span className="cxv-mini-label">
-                        {eventHasStarted
-                          ? tx("invitacion.enVivo.nadaTodavia")
-                          : tx("invitacion.enVivo.seActivaElDia")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
-            <CxvDots count={photoPages.length + 1} />
+            <CxvDots count={photoPages.length} />
           </div>
         </div>
 
