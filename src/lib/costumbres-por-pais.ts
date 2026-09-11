@@ -12,11 +12,7 @@ import { PAISES } from "./paises";
  *    existir cuando llegue al checkout. Una promesa de pago que no se cumple
  *    es peor que no hacerla.
  *
- * LO QUE TAMPOCO ESTÁ ACÁ: que en Estados Unidos no se festejan los quince
- * sino los Sweet 16. Se resuelve en el diccionario inglés, porque el inglés
- * se sirve únicamente a Estados Unidos -- el país decide el idioma, ver
- * idiomaSegunPais. Un flag acá sería una segunda forma de decir lo mismo, y
- * la que alguien se olvida de consultar.
+ *
  *
  * LO QUE NO ESTÁ ACÁ, Y POR QUÉ: la gestión de pagos. Se pensó en apagarla
  * fuera de Argentina, porque para casamientos y quince en el resto de

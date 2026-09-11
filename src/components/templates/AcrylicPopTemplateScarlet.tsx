@@ -1228,7 +1228,6 @@ function AcpMedallion({
   spin: "normal" | "reverse" | "none";
   compact?: boolean;
 }) {
-  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React.
   const [ringDuration] = useState(() => 18 + Math.random() * 4);
@@ -1236,7 +1235,7 @@ function AcpMedallion({
     <>
       <div className="acp-medallion-ring" style={{ animation: spin === "none" ? "none" : `gpRing ${ringDuration}s linear infinite` }} />
       <div className="acp-medallion-core">
-        <span className={compact ? "acp-medallion-num-sm" : "acp-medallion-num"}>{tx("invitacion.evento.edadQuince")}</span>
+        <span className={compact ? "acp-medallion-num-sm" : "acp-medallion-num"}>15</span>
         {sub && <span className="acp-medallion-sub">{sub}</span>}
       </div>
       {arcId && (

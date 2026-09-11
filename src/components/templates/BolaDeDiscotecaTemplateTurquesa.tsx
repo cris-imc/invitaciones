@@ -721,7 +721,7 @@ export function BolaDeDiscotecaTemplateTurquesa({ invitation, guest, isPersonali
           />
 
           <div data-drift="-70" className="bdd-medallion bdd-medallion--corner">
-            <BddMedallion mainText={tx("invitacion.evento.edadQuince")} subLabel={tx("invitacion.pase.acceso").toUpperCase()} arcId="bddArc1" arcText={tx("invitacion.sabor.arcoMis15AllAccess").toUpperCase()} spin="normal" />
+            <BddMedallion mainText="15" subLabel={tx("invitacion.pase.acceso").toUpperCase()} arcId="bddArc1" arcText={tx("invitacion.sabor.arcoMis15AllAccess").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -1076,7 +1076,7 @@ export function BolaDeDiscotecaTemplateTurquesa({ invitation, guest, isPersonali
           <span data-xin="1" data-dist="-60" className="bdd-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} {"— " + tx("invitacion.pase.guardaTuPase").toUpperCase()}</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bdd-final-card">
             <div className="bdd-medallion bdd-medallion--final">
-              <BddMedallion mainText={tx("invitacion.evento.edadQuince")} subLabel={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="bddArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <BddMedallion mainText="15" subLabel={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="bddArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="bdd-mini-label bdd-accent-2">{tx("invitacion.pase.numeroPaseAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="bdd-final-names">{namesTitle}</span>
@@ -1519,7 +1519,7 @@ function BddRsvpCard({
           </span>
         </div>
         <div ref={sealRef} className="bdd-seal">
-          <BddMedallion mainText={tx("invitacion.evento.edadQuince")} mainCompact arcId="" arcText="" spin="none" />
+          <BddMedallion mainText="15" mainCompact arcId="" arcText="" spin="none" />
         </div>
         <div ref={beamRef} className="bdd-beam" />
         <div className="bdd-barcode" style={{ width: "70%", opacity: confirmed ? 0.7 : 0.2 }} />

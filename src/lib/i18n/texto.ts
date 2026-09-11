@@ -1,6 +1,5 @@
 import { DICCIONARIOS, type Diccionario } from "./diccionario/index";
 import { IDIOMA_POR_DEFECTO, idiomaEfectivo, type Idioma } from "./idiomas";
-import { sobrescritura } from "./sobrescrituras";
 
 /**
  * Todas las claves posibles, como "panel.mesas.agregarMesa".
@@ -49,14 +48,7 @@ function reemplazar(texto: string, valores?: Record<string, string | number>): s
  * cruda: un texto en español dentro de una pantalla en inglés se lee mal, pero
  * "panel.mesas.agregarMesa" en un botón no se lee de ninguna manera.
  */
-/**
- * @param pais El país de quien lee -- el del anfitrión en el panel, el de la
- * invitación cuando la ve un invitado. Hay textos que cambian por país y no
- * por idioma: en Estados Unidos no se festejan los quince sino los Sweet 16,
- * y una invitación argentina escrita en inglés sigue siendo una quinceañera.
- * Ver sobrescrituras.ts.
- */
-export function traductorDe(idiomaPedido: Idioma, pais?: string | null) {
+export function traductorDe(idiomaPedido: Idioma) {
   // Todo lo que se pinta pasa por acá, así que es el lugar donde el
   // interruptor del multiidioma tiene efecto real: con el multiidioma
   // apagado, un "en" guardado en una invitación vieja igual sale en español.
@@ -65,7 +57,6 @@ export function traductorDe(idiomaPedido: Idioma, pais?: string | null) {
 
   return function t(clave: ClaveTexto, valores?: Record<string, string | number>): string {
     const texto =
-      sobrescritura(pais, idioma, clave) ??
       buscar(dic, clave) ??
       buscar(DICCIONARIOS[IDIOMA_POR_DEFECTO], clave);
 

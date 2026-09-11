@@ -844,7 +844,7 @@ export default async function InvitationPage({
     : idiomaSegunPais(invitation.pais);
 
   return (
-    <ProveedorIdioma idioma={idiomaInvitacion} pais={invitation.pais}>
+    <ProveedorIdioma idioma={idiomaInvitacion}>
       <ProveedorInvitacion datos={invitation}>
         <div data-plan-tier={String(invitation.planTier ?? 'FREE')}>
           {isFree && <FreePlanBanner />}

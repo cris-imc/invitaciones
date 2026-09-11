@@ -714,7 +714,7 @@ export function JewelryBoxTemplate({ invitation, guest, isPersonalized = false }
 
           <div data-drift="-70" className="jwb-medallion jwb-medallion--corner">
             <div data-gem="1" className="jwb-gem" />
-            <JwbMedallion label={tx("invitacion.evento.edadQuince")} sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="jwbArc1" arcText={tx("invitacion.sabor.arcoPiezaUnica").toUpperCase()} spin="normal" />
+            <JwbMedallion label="15" sub={tx("invitacion.pase.acceso").toUpperCase()} arcId="jwbArc1" arcText={tx("invitacion.sabor.arcoPiezaUnica").toUpperCase()} spin="normal" />
           </div>
         </section>
 
@@ -858,7 +858,7 @@ export function JewelryBoxTemplate({ invitation, guest, isPersonalized = false }
 
               <div data-tone="dark" className="jwb-panel jwb-panel--center" style={{ background: "#24102E", color: "#F4F1EA" }}>
                 <div className="jwb-medallion jwb-medallion--lg">
-                  <JwbMedallion label={tx("invitacion.evento.edadQuince")} sub={tx("invitacion.pase.numeroPieza", { n: passNumber }).toUpperCase()} arcId="jwbArc2" arcText={tx("invitacion.pase.arcoAccesoVipPieza", { n: passNumber }).toUpperCase()} spin="reverse" />
+                  <JwbMedallion label="15" sub={tx("invitacion.pase.numeroPieza", { n: passNumber }).toUpperCase()} arcId="jwbArc2" arcText={tx("invitacion.pase.arcoAccesoVipPieza", { n: passNumber }).toUpperCase()} spin="reverse" />
                 </div>
                 <span className="jwb-mini-label">{LUGAR_PANEL_COUNT} / {LUGAR_PANEL_COUNT} {"— " + tx("invitacion.ubicacion.tuUbicacion").toUpperCase()}</span>
                 {/* mesa-en-ubicacion */}
@@ -1065,7 +1065,7 @@ export function JewelryBoxTemplate({ invitation, guest, isPersonalized = false }
           <span data-xin="1" data-dist="-60" className="jwb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="jwb-final-card">
             <div className="jwb-medallion jwb-medallion--final">
-              <JwbMedallion label={tx("invitacion.evento.edadQuince")} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="jwbArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
+              <JwbMedallion label="15" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="jwbArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
             </div>
             <span className="jwb-mini-label jwb-accent-serif-2">{tx("invitacion.pase.numeroPiezaAdmite", { n: passNumber, cantidad: guestAdults + guestTeens + guestChildren || 1 }).toUpperCase()}</span>
             <span className="jwb-final-names">{namesTitle}</span>
@@ -1504,7 +1504,7 @@ function JwbRsvpCard({
           </span>
         </div>
         <div ref={sealRef} className="jwb-seal">
-          <JwbMedallion label={tx("invitacion.evento.edadQuince")} sub="" arcId="" arcText="" spin="none" compact />
+          <JwbMedallion label="15" sub="" arcId="" arcText="" spin="none" compact />
         </div>
         <div ref={beamRef} className="jwb-beam" />
         <div className="jwb-barcode" style={{ width: "70%", opacity: confirmed ? 0.7 : 0.2 }} />

@@ -179,7 +179,7 @@ export default async function InvitationPage({ params }: { params: Promise<{ slu
         : idiomaSegunPais(invitation.pais);
 
     return (
-        <ProveedorIdioma idioma={idiomaInvitacion} pais={invitation.pais}>
+        <ProveedorIdioma idioma={idiomaInvitacion}>
             <ProveedorInvitacion datos={invitation}>
                 {isFree && <FreePlanBanner />}
                 {isFree && <FreePlanBannerSpacer />}

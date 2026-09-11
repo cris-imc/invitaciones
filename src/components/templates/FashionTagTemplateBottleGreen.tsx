@@ -1221,7 +1221,6 @@ function FtgMedallion({
   spin: "normal" | "reverse" | "none";
   compact?: boolean;
 }) {
-  const tx = useTextos();
   // Duración fija por instancia (no en cada render) -- Math.random() directo
   // en el render viola la regla de pureza de React.
   const [ringDuration] = useState(() => 18 + Math.random() * 4);
@@ -1229,7 +1228,7 @@ function FtgMedallion({
     <>
       <div className="ftg-medallion-ring" style={{ animation: spin === "none" ? "none" : `gpRing ${ringDuration}s linear infinite` }} />
       <div className="ftg-medallion-core">
-        <span className={compact ? "ftg-medallion-num-sm" : "ftg-medallion-num"}>{tx("invitacion.evento.edadQuince")}</span>
+        <span className={compact ? "ftg-medallion-num-sm" : "ftg-medallion-num"}>15</span>
         {sub && <span className="ftg-medallion-sub ftg-medallion-sub--accent">{sub}</span>}
       </div>
       {arcId && (

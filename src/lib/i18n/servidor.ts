@@ -42,23 +42,17 @@ export async function idiomaDelAnfitrion(): Promise<Idioma> {
 /**
  * Atajo para un Server Component que sólo necesita traducir.
  *
- * Resuelve el país además del idioma, y no es opcional: hay textos que
- * cambian por país (ver sobrescrituras.ts). Sin esto, un Server Component
- * mostraba "quinceañera" a un estadounidense mientras el componente de
- * cliente de al lado, que sí recibe el país por el proveedor, mostraba
- * "Sweet 16" -- las dos palabras en la misma pantalla.
  */
 export async function textosDelAnfitrion(): Promise<Traductor> {
-  const [idioma, pais] = await Promise.all([idiomaDelAnfitrion(), paisDelAnfitrion()]);
-  return traductorDe(idioma, pais);
+  return traductorDe(await idiomaDelAnfitrion());
 }
 
 /**
  * El país del anfitrión (o del visitante que todavía no se registró).
  *
- * Se usa para los textos que cambian por país y no por idioma -- ver
- * sobrescrituras.ts. Sale de lo mismo que la landing usa para decidir si
- * mostrar las cuotas, así que las dos cosas no pueden discrepar.
+ * Lo usa /api/cobro para saber a qué cuenta bancaria mandar a transferir.
+ * Sale de lo mismo que la landing usa para decidir si mostrar las cuotas,
+ * así que las dos cosas no pueden discrepar.
  */
 export async function paisDelAnfitrion(): Promise<string | null> {
   // Con sesión manda LA CUENTA, no la cookie. Si la cuenta es argentina el

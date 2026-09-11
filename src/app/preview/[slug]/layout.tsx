@@ -49,7 +49,7 @@ export default async function PreviewLayout({
     : idiomaSegunPais(invitation.pais) ?? IDIOMA_POR_DEFECTO;
 
   return (
-    <ProveedorIdioma idioma={idioma} pais={invitation.pais}>
+    <ProveedorIdioma idioma={idioma}>
       <ProveedorInvitacion datos={invitation}>{children}</ProveedorInvitacion>
     </ProveedorIdioma>
   );

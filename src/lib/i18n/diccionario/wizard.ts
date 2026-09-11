@@ -906,9 +906,9 @@ const en: Wizard = {
             "Set up your transfer details for event gifts and/or ticket payments. We ask for the details used in {pais}.",
         infoTitulo: "Why can you set up two bank accounts?",
         infoTexto1:
-            "At many events (weddings or Sweet 16 parties) you need to keep the account for the ticket / catering payment (which goes to the venue or organiser) separate from your personal account for gifts.",
+            "At many events (weddings or quinceañeras) you need to keep the account for the ticket / catering payment (which goes to the venue or organiser) separate from your personal account for gifts.",
         infoTexto2:
-            "On top of that, at Sweet 16 parties the digital wallets young people use often have monthly limits on incoming money. Two accounts keep you under those limits and keep the finances apart.",
+            "On top of that, at quinceañeras the digital wallets young people use often have monthly limits on incoming money. Two accounts keep you under those limits and keep the finances apart.",
         infoTexto3:
             "💡 If you turn on only one account, the card shows that this single account is used for both gifts and payments.",
         avisoTitulo: "IMPORTANT SECURITY WARNING ABOUT YOUR BANK DETAILS!",

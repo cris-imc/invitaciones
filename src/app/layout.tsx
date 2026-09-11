@@ -89,9 +89,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const idioma = await idiomaDelAnfitrion();
-  // El país, para los textos que cambian por país y no por idioma (ver
-  // sobrescrituras.ts: en Estados Unidos son Sweet 16, no quince).
-  const pais = await paisDelAnfitrion();
 
   return (
     // suppressHydrationWarning: el script de abajo corre antes de que React
@@ -119,7 +116,7 @@ export default async function RootLayout({
         <ViewportHeightFix />
         <AuthProvider>
           <ToastProvider>
-            <ProveedorIdioma idioma={idioma} pais={pais}>
+            <ProveedorIdioma idioma={idioma}>
               {children}
             </ProveedorIdioma>
           </ToastProvider>

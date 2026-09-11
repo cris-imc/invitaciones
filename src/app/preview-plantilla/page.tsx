@@ -499,10 +499,7 @@ function PreviewPlantillaContent() {
   }, [evento, tipo, color, scrollable, showCoverOnly, hasFirstContact, coverHoldMs, idiomaDeLaInvitacion]);
 
   return (
-    <ProveedorIdioma
-      idioma={idiomaDeLaInvitacion}
-      pais={typeof displayInvitation.pais === "string" ? displayInvitation.pais : null}
-    >
+    <ProveedorIdioma idioma={idiomaDeLaInvitacion}>
       <ProveedorInvitacion datos={displayInvitation as never}>
         <Template invitation={displayInvitation} guest={null} isPersonalized={false} />
       </ProveedorInvitacion>

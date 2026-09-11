@@ -8,7 +8,6 @@ import { useDatosDeInvitacion } from "@/components/invitation/ContextoInvitacion
 
 interface Valor {
   idioma: Idioma;
-  pais: string | null;
   t: Traductor;
 }
 
@@ -34,15 +33,12 @@ const Contexto = createContext<Valor | null>(null);
  */
 export function ProveedorIdioma({
   idioma,
-  pais = null,
   children,
 }: {
   idioma: Idioma;
-  /** El país de quien lee: hay textos que cambian por país (ver sobrescrituras.ts). */
-  pais?: string | null;
   children: React.ReactNode;
 }) {
-  const valor = useMemo<Valor>(() => ({ idioma, pais, t: traductorDe(idioma, pais) }), [idioma, pais]);
+  const valor = useMemo<Valor>(() => ({ idioma, t: traductorDe(idioma) }), [idioma]);
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }
 
@@ -56,7 +52,7 @@ export function ProveedorIdioma({
 export function useIdioma(): Valor {
   const v = useContext(Contexto);
   return useMemo(
-    () => v ?? { idioma: IDIOMA_POR_DEFECTO, pais: null, t: traductorDe(IDIOMA_POR_DEFECTO) },
+    () => v ?? { idioma: IDIOMA_POR_DEFECTO, t: traductorDe(IDIOMA_POR_DEFECTO) },
     [v]
   );
 }
