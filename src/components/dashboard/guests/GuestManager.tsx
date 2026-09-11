@@ -808,6 +808,18 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   setNewGuestType(null);
                   setAddGuestOpen(false);
                 }}
+                // Cuántas personas más entran. El importador avisa con eso
+                // ANTES de mandar nada, en vez de cargar media lista y dejar
+                // la otra media en rojo.
+                cupoRestante={freePlanLimit === null ? null : Math.max(0, freePlanLimit - totalPeopleExpected)}
+                // El mismo selector de plan que ya aparece al agregar UN
+                // invitado de más. Pegar una lista de setenta es el mejor
+                // momento para ofrecerlo, y era justo donde no se ofrecía.
+                onLimiteAlcanzado={() => {
+                  setNewGuestType(null);
+                  setAddGuestOpen(false);
+                  setShowGuestLimitUpgrade(true);
+                }}
               />
             ) : newGuestType === null ? (
               <div className="space-y-3">

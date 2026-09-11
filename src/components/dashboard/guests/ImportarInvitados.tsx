@@ -9,13 +9,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { interpretarLista, type LineaImportada } from "@/lib/importar-invitados";
+import { interpretarLista, cuantasEntran, type LineaImportada } from "@/lib/importar-invitados";
 
 interface Props {
   slug: string;
   /** Para refrescar la lista cuando terminó de importar. */
   onImportado: () => void;
   onCerrar: () => void;
+  /**
+   * Cuántas personas más entran en el plan. `null` es sin tope.
+   *
+   * Se usa para avisar ANTES de importar. Sin esto, pegar cuarenta en una
+   * invitación Gratis entraba veinte y dejaba el resto en rojo: media lista
+   * cargada y ningún camino para cargar la otra media.
+   */
+  cupoRestante?: number | null;
+  /**
+   * Se llama cuando la lista no entra en el plan. El panel abre ahí mismo el
+   * selector de plan -- el mismo que ya aparece al agregar UN invitado de
+   * más. No ofrecerlo justo cuando alguien viene con setenta invitados era
+   * perder la venta en el mejor momento para hacerla.
+   */
+  onLimiteAlcanzado?: () => void;
 }
 
 const EJEMPLO = `Familia Pérez, 2 adultos, 2 adolescentes, 1 niño
@@ -55,7 +70,7 @@ const CABEN = Math.floor(ALTO_PANEL / ALTO_FILA);
  * alguien que confíe a ciegas en un parser, y el que después tiene que
  * corregir uno por uno es él.
  */
-export function ImportarInvitados({ slug, onImportado, onCerrar }: Props) {
+export function ImportarInvitados({ slug, onImportado, onCerrar, cupoRestante = null, onLimiteAlcanzado }: Props) {
   const [texto, setTexto] = useState("");
   const [importando, setImportando] = useState(false);
   const [progreso, setProgreso] = useState(0);
@@ -66,6 +81,17 @@ export function ImportarInvitados({ slug, onImportado, onCerrar }: Props) {
   const hayAlgo = texto.trim().length > 0;
 
   const avisos = resultado.lineas.filter((l) => !l.error && l.aviso);
+
+  // ¿La lista entra en el plan? Se pregunta ACÁ, antes de mandar nada. El
+  // servidor igual lo valida -- es el que manda --, pero enterarse recién
+  // cuando ya entraron veinte y fallaron veinte es la peor forma de saberlo.
+  const noEntra = cupoRestante !== null && resultado.totalPersonas > cupoRestante;
+
+  // Cuántas líneas entrarían, contando personas y no renglones.
+  const entran = useMemo(
+    () => (cupoRestante === null ? resultado.validas : cuantasEntran(resultado.lineas, cupoRestante)),
+    [resultado.lineas, resultado.validas, cupoRestante]
+  );
 
   // Qué filas entran en la mitad derecha.
   //
@@ -80,12 +106,16 @@ export function ImportarInvitados({ slug, onImportado, onCerrar }: Props) {
     const todas = resultado.lineas;
     if (todas.length <= CABEN) return { aLaVista: todas, ocultas: 0 };
     // Una fila menos, que es el lugar que se lleva el pie del "+N".
-    const entran = CABEN - 1;
-    return { aLaVista: todas.slice(-entran), ocultas: todas.length - entran };
+    const filas = CABEN - 1;
+    return { aLaVista: todas.slice(-filas), ocultas: todas.length - filas };
   }, [resultado.lineas]);
 
   const importar = async () => {
-    const aImportar = resultado.lineas.filter((l) => !l.error);
+    // Sólo las que entran en el plan. Mandar las que se sabe que van a ser
+    // rechazadas es pedirle al servidor que diga que no veinte veces y
+    // mostrar veinte renglones en rojo: el aviso de arriba ya dijo cuántas
+    // entran, y el botón dice ese mismo número.
+    const aImportar = resultado.lineas.filter((l) => !l.error).slice(0, entran);
     if (aImportar.length === 0) return;
 
     setImportando(true);
@@ -112,6 +142,20 @@ export function ImportarInvitados({ slug, onImportado, onCerrar }: Props) {
         });
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
+
+          // Se llenó el cupo del plan a mitad de la lista. Se CORTA acá en
+          // vez de seguir intentando: los que quedan van a fallar todos por
+          // lo mismo, y dejar veinte renglones en rojo no ayuda a nadie. Lo
+          // que hace falta es la salida, que es pasar de plan.
+          if (data.code === "GUEST_LIMIT_REACHED" && data.upgradable && onLimiteAlcanzado) {
+            setFallidos([]);
+            setImportando(false);
+            // Los que sí entraron ya están: hay que refrescar la lista.
+            onImportado();
+            onLimiteAlcanzado();
+            return;
+          }
+
           errores.push(`${l.nombre}: ${data.error || "no se pudo agregar"}`);
         }
       } catch {
@@ -345,21 +389,64 @@ export function ImportarInvitados({ slug, onImportado, onCerrar }: Props) {
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={importar}
-            disabled={importando || resultado.validas === 0}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[var(--accent)] text-[var(--ink)] text-sm font-semibold py-2.5 transition-all hover:brightness-110 disabled:opacity-40"
-          >
-            {importando ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Agregando {progreso} de {resultado.validas}…
-              </>
-            ) : (
-              `Agregar ${resultado.validas} ${resultado.validas === 1 ? "invitado" : "invitados"}`
-            )}
-          </button>
+          {/* La lista no entra en el plan. Se dice ANTES de importar y con los
+              números concretos, y lo que se ofrece primero es la salida --
+              pasar de plan --, no el error. Agregar uno solo de más ya
+              ofrecía esto; pegar una lista de setenta, que es cuando más
+              sentido tiene, no lo ofrecía. */}
+          {noEntra && !importando && (
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 space-y-2.5">
+              <p className="flex items-start gap-2 text-xs text-amber-400">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-px" />
+                <span>
+                  Tu plan admite{" "}
+                  <strong className="font-semibold">
+                    {cupoRestante} {cupoRestante === 1 ? "persona más" : "personas más"}
+                  </strong>{" "}
+                  y esta lista suma <strong className="font-semibold">{resultado.totalPersonas}</strong>.
+                  {entran > 0
+                    ? ` Entran las primeras ${entran}.`
+                    : " No entra ninguna."}
+                </span>
+              </p>
+              {onLimiteAlcanzado && (
+                <button
+                  type="button"
+                  onClick={onLimiteAlcanzado}
+                  className="w-full rounded-full bg-[var(--accent)] text-[var(--ink)] text-sm font-semibold py-2.5 transition-all hover:brightness-110"
+                >
+                  Ampliar el plan y agregarlos a todos
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Con el cupo lleno no hay nada que agregar: un botón apagado que
+              dice "Agregar sólo 0 invitados" es ruido. Ahí la única acción
+              posible es la de arriba, ampliar el plan. */}
+          {(entran > 0 || importando) && (
+            <button
+              type="button"
+              onClick={importar}
+              disabled={importando || resultado.validas === 0}
+              className={`w-full inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold py-2.5 transition-all disabled:opacity-40 ${
+                noEntra
+                  ? "border border-[var(--campo-borde)] text-[var(--foreground)] hover:bg-[var(--tinte-1)]"
+                  : "bg-[var(--accent)] text-[var(--ink)] hover:brightness-110"
+              }`}
+            >
+              {importando ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Agregando {progreso} de {entran}…
+                </>
+              ) : noEntra ? (
+                `Agregar sólo ${entran} ${entran === 1 ? "invitado" : "invitados"}`
+              ) : (
+                `Agregar ${resultado.validas} ${resultado.validas === 1 ? "invitado" : "invitados"}`
+              )}
+            </button>
+          )}
         </>
       )}
       </DialogContent>

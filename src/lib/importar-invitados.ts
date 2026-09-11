@@ -242,6 +242,26 @@ function parsearLinea(bruta: string, numero: number): LineaImportada | null {
   return base;
 }
 
+/**
+ * Cuántas líneas entran en el cupo que queda del plan.
+ *
+ * Cuenta PERSONAS, no renglones: una familia de cinco se lleva cinco lugares.
+ * Y corta en la primera que no entra en vez de seguir buscando alguna más
+ * chica -- importar salteado dejaría una lista distinta de la que se pegó, y
+ * el orden de la lista es el que la persona entiende.
+ */
+export function cuantasEntran(lineas: LineaImportada[], cupo: number): number {
+  let lugares = cupo;
+  let n = 0;
+  for (const l of lineas) {
+    if (l.error) continue;
+    if (l.total > lugares) break;
+    lugares -= l.total;
+    n++;
+  }
+  return n;
+}
+
 export interface ResultadoImportacion {
   lineas: LineaImportada[];
   validas: number;
