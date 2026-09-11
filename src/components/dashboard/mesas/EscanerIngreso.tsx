@@ -168,7 +168,7 @@ export function EscanerIngreso({ slug }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40 aspect-[3/4] max-h-[60vh] mx-auto max-w-sm">
+      <div className="relative overflow-hidden rounded-xl border border-[var(--campo-borde-suave)] bg-[var(--tinte-2)] aspect-[3/4] max-h-[60vh] mx-auto max-w-sm">
         <video
           ref={videoRef}
           playsInline
@@ -179,7 +179,7 @@ export function EscanerIngreso({ slug }: Props) {
 
         {!encendida && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
-            <Camera className="w-8 h-8 text-white/25" />
+            <Camera className="w-8 h-8 text-[var(--foreground)]/35" />
             <p className="text-sm text-muted-foreground">
               {t("panel.escaner.apuntaAlQr")}
             </p>
@@ -309,7 +309,7 @@ export function EscanerIngreso({ slug }: Props) {
           <button
             type="button"
             onClick={apagar}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 text-sm px-4 py-2 hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--campo-borde)] text-sm px-4 py-2 hover:bg-[var(--tinte-2)]"
           >
             <CameraOff className="w-4 h-4" />
             {t("panel.escaner.apagar")}
@@ -321,7 +321,7 @@ export function EscanerIngreso({ slug }: Props) {
               setResultado(null);
               setNoEncontrado(null);
             }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 text-sm px-4 py-2 hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--campo-borde)] text-sm px-4 py-2 hover:bg-[var(--tinte-2)]"
           >
             <RotateCcw className="w-4 h-4" />
             {t("panel.escaner.escanearOtro")}

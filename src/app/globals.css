@@ -76,6 +76,13 @@
   --tinte-3: rgba(246, 243, 236, .12);
   --tinte-4: rgba(246, 243, 236, .18);
 
+  /* Silla vacía del plano de mesas. Es un punto de 10px: con la opacidad de
+     un velo de fondo (--tinte-4 da 1.20:1 sobre el plano) directamente no se
+     ve, así que lleva la suya, calculada para quedar alrededor de 3:1 en los
+     dos temas -- visible sin competir con las sillas ocupadas, que van en
+     color pleno. */
+  --silla-vacia: rgba(246, 243, 236, .34);
+
   /* Aviso (lo que hoy esta escrito como ambar de Tailwind). El ambar
      claro funciona sobre tinta y es ilegible sobre crema: amber-200 da
      1.12:1 y amber-300 1.30:1 sobre el papel. Por eso el aviso necesita
@@ -281,6 +288,7 @@
   --tinte-2: rgba(15,22,19,.055);
   --tinte-3: rgba(15,22,19,.09);
   --tinte-4: rgba(15,22,19,.14);
+  --silla-vacia: rgba(15,22,19,.38);
   --aviso-texto: #7A4F06;             /* mismo matiz ambar, luminosidad al piso -> 6.43:1 sobre crema */
   --aviso-borde: rgba(122, 79, 6, .40);
   --diamante: #155E75;                /* mismo cian, oscurecido -> 6.56:1 sobre crema */
