@@ -45,6 +45,7 @@ import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
 import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
+import { esVistaMiniatura } from "@/lib/miniatura";
 
 const cmeSerif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -627,7 +628,9 @@ export function CeramicaEditorialTemplateCeladon({ invitation, guest, isPersonal
       }
       rafId = requestAnimationFrame(frame);
     };
-    rafId = requestAnimationFrame(frame);
+    // En miniatura (/modelos) el bucle no arranca: mueve lo que está detrás
+    // de la portada, que ahí nunca se abre. Ver esVistaMiniatura.
+    if (!esVistaMiniatura()) rafId = requestAnimationFrame(frame);
 
     const onResize = () => {};
     window.addEventListener("resize", onResize);

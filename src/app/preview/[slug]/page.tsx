@@ -3,7 +3,7 @@ import { invitacionParaMiniatura } from "@/lib/miniatura";
 import { prisma } from "@/lib/db";
 import { PlantillaDinamica } from "@/components/templates/PlantillaDinamica";
 
-export default async function PreviewPage({
+async function PreviewPageInterna({
     params,
     searchParams,
 }: {
@@ -462,4 +462,29 @@ export default async function PreviewPage({
     }
 
     return <PlantillaDinamica nombre="ConviteTemplate" invitation={invitation as Record<string, unknown>} />;
+}
+
+/**
+ * En MINIATURA (/modelos), además de los datos reducidos de arriba, se
+ * esconde el contenido interior de las plantillas Storytelling: el
+ * contenedor `data-scroller` con las secciones que están DETRÁS de la
+ * portada, que en la miniatura nunca se abre. Es la mitad del costo de esas
+ * plantillas: medido, ~70 capas de composición contra ~15 de una Flat, por
+ * los transforms y animaciones decorativas de adentro. Con `display: none`
+ * no hay layout, ni pintura, ni capas. La portada es un hermano del
+ * scroller, posicionada sobre el contenedor fijo, así que no cambia nada.
+ *
+ * Va acá afuera, como un `<style>`, porque la función de arriba devuelve la
+ * plantilla desde cientos de `return` distintos y las 177 plantillas
+ * comparten ese atributo.
+ */
+export default async function PreviewPage(props: Parameters<typeof PreviewPageInterna>[0]) {
+    const consulta = (await props.searchParams) ?? {};
+    const esMiniatura = consulta.miniatura === "1";
+    return (
+        <>
+            {esMiniatura && <style>{`[data-scroller="1"]{display:none !important}`}</style>}
+            <PreviewPageInterna {...props} />
+        </>
+    );
 }

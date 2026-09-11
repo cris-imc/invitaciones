@@ -44,6 +44,7 @@ import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
 import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
+import { esVistaMiniatura } from "@/lib/miniatura";
 
 const vtePlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -625,7 +626,9 @@ export function VintageEditorialTemplatePlataAntigua({ invitation, guest, isPers
       }
       rafId = requestAnimationFrame(frame);
     };
-    rafId = requestAnimationFrame(frame);
+    // En miniatura (/modelos) el bucle no arranca: mueve lo que está detrás
+    // de la portada, que ahí nunca se abre. Ver esVistaMiniatura.
+    if (!esVistaMiniatura()) rafId = requestAnimationFrame(frame);
 
     const onResize = () => {};
     window.addEventListener("resize", onResize);
