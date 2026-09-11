@@ -37,17 +37,12 @@ así queda el registro de qué se verificó y cómo.
 
 ## Reportados, pendientes
 
-- [ ] **Confirmar en el iPhone** que el video ya no abre la invitación, y que el
-  switch de tema quedó arriba a la derecha en escritorio y al lado de Ayuda
-  en mobile.
+- [ ] **Carga masiva de invitados.** Ya está hecha: es el commit `d66dffb` de
+  la rama `mesas` (pegar una lista + tabla de vista previa antes de guardar).
+  Falta traerlo con cherry-pick a `internacional`.
 
-- [ ] **Wizard, elegir fecha en mobile:** abre un calendario dibujado en HTML.
-  Debería abrir el selector nativo del celular.
-
-- [ ] **Wizard, elegir hora:** se ve raro en PC y en mobile. Debería arrancar
-  cerca de las 21 y moverse de 5 en 5 minutos.
-
-- [ ] **Las plantillas Storytelling no se probaron** desde que existen.
+- [ ] **El post evento no se probó en las Storytelling.** Las plantillas sí; lo
+  que falta es cómo se ve el post evento en esa colección.
 
 ---
 

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Heart, Music, Utensils, Calendar, Gift, Camera, Clock, Trash2, Plus, Info, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import { CampoHora } from "./CampoHora";
 
 const ICON_OPTIONS = [
     { value: "Heart", label: "Corazón", Icon: Heart },
@@ -171,17 +172,10 @@ export function StepCronograma() {
                         <div className="grid md:grid-cols-[1fr_3fr] gap-3">
                             <div className="space-y-1">
                                 <Label className="text-xs">{t("wizard.cronograma.hora")}</Label>
-                                <div className="relative">
-                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
-                                    <Input
-                                        type="time"
-                                        value={event.time}
-                                        onChange={(e) => updateEvent(index, "time", e.target.value)}
-                                        required
-                                        className="pl-9 [&::-webkit-calendar-picker-indicator]:hidden cursor-pointer"
-                                        onClick={(e) => "showPicker" in e.currentTarget && typeof e.currentTarget.showPicker === 'function' && e.currentTarget.showPicker()}
-                                    />
-                                </div>
+                                <CampoHora
+                                    value={event.time}
+                                    onChange={(valor) => updateEvent(index, "time", valor)}
+                                />
                             </div>
 
                             <div className="space-y-1">
