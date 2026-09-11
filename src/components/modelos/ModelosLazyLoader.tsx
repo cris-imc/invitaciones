@@ -5,40 +5,53 @@ import { useEffect } from "react";
 /**
  * LO QUE HACE Y LO QUE NO HACE, Y POR QUÉ.
  *
- * Carga cada miniatura cuando se acerca a la pantalla, de a pocas por vez, y
- * NO LA SUELTA NUNCA MÁS. Eso último es la decisión importante de este
- * archivo, y va contra la intuición.
+ * Carga TODAS las miniaturas de la pestaña activa apenas abre la página, de
+ * a pocas y en orden (primero las más cercanas a la pantalla), y no las
+ * suelta nunca más. Lo que NO hace, a propósito, es cargar en respuesta al
+ * scroll.
  *
- * La versión original cargaba las 8 miniaturas de una y no las tocaba más, y
- * andaba. Después se intentó "apagar las que no se ven" al scrollear, para
- * poder mostrar más modelos. Eso fue lo que rompió /modelos en el teléfono:
- * cada miniatura es una página de Next entera, y al scrollear se soltaban y
- * recargaban de a varias. Un documento recién soltado no devuelve su memoria
- * al instante, así que en el medio conviven el viejo y el nuevo, y en un
- * teléfono eso alcanza para que el navegador mate la pestaña ("No se puede
- * abrir esta página", "carga un rato, scrolleo y muere").
+ * Historia, porque cada versión anterior falló en el teléfono de una forma
+ * distinta:
  *
- * Con 8 modelos por pestaña (MODELOS_POR_PESTANA en app/modelos/page.tsx),
- * apagar no ahorra nada que valga ese riesgo: lo que de verdad pesaba era el
- * Google Maps que cada miniatura embebía, y eso ya no se carga (ver
- * `miniatura=1` en la página de preview). Así que: se carga una vez y queda.
+ * 1. Cargar las 8 de una: se pisaban entre ellas y varias quedaban a medio
+ *    cargar ("cargan de a 8 y no se cargan todas").
+ * 2. Cargar cerca de la pantalla y SOLTAR las lejanas: cada miniatura es una
+ *    página entera; al scrollear se soltaban y recargaban de a varias, y un
+ *    documento recién soltado no devuelve su memoria al instante. El
+ *    teléfono mataba la pestaña.
+ * 3. Cargar cerca de la pantalla sin soltar: mejor, pero el síntoma que
+ *    quedó fue exacto y revelador: bajando despacio la página aguanta (y se
+ *    puede cambiar de pestaña); bajando de golpe, muere. O sea, lo que mata
+ *    no es cuánto hay cargado sino el PICO: varias miniaturas arrancando a
+ *    la vez (HTML + JS + decodificar fotos + primer render) mientras las
+ *    demás animan.
  *
- * Si alguna vez una pestaña tiene muchos más de 8 modelos, la respuesta es
- * paginar la lista, no volver a soltar iframes.
+ * De ahí esta versión: la carga la gobierna una cola con concurrencia fija,
+ * no el dedo. Si la persona scrollea rápido, se encuentra con miniaturas ya
+ * cargadas o con recuadros vacíos que se llenan cuando les toca; nunca con
+ * ocho arranques simultáneos. La cola arranca por las más cercanas para que
+ * lo primero que se ve sea lo primero que carga.
+ *
+ * Además, las miniaturas que quedan lejos de la pantalla se OCULTAN con
+ * `visibility: hidden` -- no se descargan: el documento sigue vivo, la
+ * animación sigue corriendo, pero el compositor no mantiene texturas ni
+ * dibuja lo que no se ve. Volver a mostrarlas es sólo volver a pintar, sin
+ * red ni JS, así que no reproduce el problema de la versión 2.
  */
 
 /**
- * Cuántas pueden estar CARGANDO a la vez.
- *
- * Los navegadores abren como mucho ~6 conexiones por dominio. Ocho páginas
- * arrancando juntas se pisan entre ellas, se encolan y varias se quedan a
- * medio cargar -- "cargan de a 8 y no se cargan todas". De a dos, cada una
- * termina rápido y la siguiente entra enseguida.
+ * Cuántas pueden estar CARGANDO a la vez. Dos: cada una termina rápido y la
+ * siguiente entra enseguida, y el pico de memoria de "arrancar una página"
+ * nunca se suma más de dos veces.
  */
 const CARGANDO_MAX = 2;
 
-/** Cuánto antes de entrar en pantalla se empieza a cargar una miniatura. */
-const MARGEN_CARGA_PX = 300;
+/**
+ * A partir de cuántas pantallas de distancia se oculta una miniatura ya
+ * cargada. Una y media: lo que está a un scroll normal de distancia sigue
+ * pintado, así al aparecer no parpadea.
+ */
+const OCULTAR_A_PANTALLAS = 1.5;
 
 /**
  * Red de seguridad para el turno de carga: si una miniatura muere sin
@@ -71,6 +84,11 @@ export function ModelosLazyLoader() {
       return r.width >= 2 && r.height >= 2;
     };
 
+    const todas = () =>
+      Array.from(document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]")).filter(
+        (el) => el.getAttribute("data-modelo-src")
+      );
+
     let pendiente = false;
     const programar = () => {
       if (pendiente) return;
@@ -88,8 +106,7 @@ export function ModelosLazyLoader() {
         delete el.dataset.modeloCargando;
         el.removeEventListener("load", listo);
         window.clearTimeout(guardia);
-        // Terminó una: que entre la siguiente sin esperar a que alguien
-        // scrollee.
+        // Terminó una: que entre la siguiente sin esperar a nada.
         programar();
       };
       const guardia = window.setTimeout(listo, GUARDIA_CARGA_MS);
@@ -97,23 +114,34 @@ export function ModelosLazyLoader() {
       el.src = el.getAttribute("data-modelo-src")!;
     };
 
+    /** Oculta lo que quedó lejos y muestra lo que se acercó. Sin red, sin JS. */
+    const actualizarVisibilidad = (lista: HTMLIFrameElement[]) => {
+      const limite = window.innerHeight * OCULTAR_A_PANTALLAS;
+      for (const el of lista) {
+        if (!tieneTamano(el)) continue;
+        const oculta = distancia(el) > limite;
+        const valor = oculta ? "hidden" : "";
+        if (el.style.visibility !== valor) el.style.visibility = valor;
+      }
+    };
+
     const revisar = () => {
+      const lista = todas();
+      actualizarVisibilidad(lista);
+
       // Con la pestaña del navegador en segundo plano no se arranca nada
       // nuevo: cada miniatura es una página entera y no tiene sentido pagar
       // esa memoria por algo que nadie está mirando. Lo ya cargado se queda.
       if (document.hidden) return;
 
-      const todas = Array.from(
-        document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]")
-      ).filter((el) => el.getAttribute("data-modelo-src"));
-
-      let enVuelo = todas.filter(estaCargando).length;
+      let enVuelo = lista.filter(estaCargando).length;
       if (enVuelo >= CARGANDO_MAX) return;
 
-      // Las que faltan, de la más cercana a la más lejana. Nunca se
-      // desaloja nada: acá sólo se suma.
-      const candidatas = todas
-        .filter((el) => !estaCargada(el) && tieneTamano(el) && distancia(el) <= MARGEN_CARGA_PX)
+      // Todas las que faltan, sin importar la distancia: la cola las va a
+      // cargar igual, sólo cambia el orden. De la más cercana a la más
+      // lejana. Nunca se desaloja nada: acá sólo se suma.
+      const candidatas = lista
+        .filter((el) => !estaCargada(el) && tieneTamano(el))
         .sort((a, b) => distancia(a) - distancia(b));
 
       for (const candidata of candidatas) {
@@ -127,7 +155,8 @@ export function ModelosLazyLoader() {
 
     // Sin un "ya terminamos, dejar de escuchar": las pestañas de /modelos
     // (ModelosTabs) montan iframes nuevos al cambiar de pestaña, mucho después
-    // de que los de la primera hayan terminado de cargar.
+    // de que los de la primera hayan terminado de cargar. El scroll ya no
+    // dispara cargas (la cola las hace solas), pero sí decide qué se oculta.
     window.addEventListener("scroll", programar, { passive: true });
     window.addEventListener("resize", programar);
     // Al volver a la pestaña hay que revisar de nuevo: mientras estuvo oculta

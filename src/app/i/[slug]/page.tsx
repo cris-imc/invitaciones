@@ -1,290 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { ConviteTemplate } from "@/components/templates/ConviteTemplate";
-import { ElegantTemplate } from "@/components/templates/ElegantTemplate";
-import { ElegantTemplateGreen } from "@/components/templates/ElegantTemplateGreen";
-import { ElegantTemplateRed } from "@/components/templates/ElegantTemplateRed";
-import { ElegantTemplateBlue } from "@/components/templates/ElegantTemplateBlue";
-import { ElegantTemplateOrange } from "@/components/templates/ElegantTemplateOrange";
-import { ElegantTemplateViolet } from "@/components/templates/ElegantTemplateViolet";
-import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray";
-import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
-import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
-import { GuestPassVipTemplate } from "@/components/templates/GuestPassVipTemplate";
-import { GuestPassVipTemplateBorgona } from "@/components/templates/GuestPassVipTemplateBorgona";
-import { GuestPassVipTemplateEsmeralda } from "@/components/templates/GuestPassVipTemplateEsmeralda";
-import { GuestPassVipTemplatePlata } from "@/components/templates/GuestPassVipTemplatePlata";
-import { GuestPassVipTemplateZafiro } from "@/components/templates/GuestPassVipTemplateZafiro";
-import { BlackAndWhiteTemplate } from "@/components/templates/BlackAndWhiteTemplate";
-import { BlackAndWhiteTemplateNegativo } from "@/components/templates/BlackAndWhiteTemplateNegativo";
-import { PrincesaTemplate } from "@/components/templates/PrincesaTemplate";
-import { PrincesaTemplateAzulMedianoche } from "@/components/templates/PrincesaTemplateAzulMedianoche";
-import { PrincesaTemplateBorgona } from "@/components/templates/PrincesaTemplateBorgona";
-import { PrincesaTemplateBosqueEncantado } from "@/components/templates/PrincesaTemplateBosqueEncantado";
-import { PrincesaTemplateRosaAntiguo } from "@/components/templates/PrincesaTemplateRosaAntiguo";
-import { CoronaEscarlataTemplate } from "@/components/templates/CoronaEscarlataTemplate";
-import { CoronaEscarlataTemplateEsmeralda } from "@/components/templates/CoronaEscarlataTemplateEsmeralda";
-import { CoronaEscarlataTemplateImperial } from "@/components/templates/CoronaEscarlataTemplateImperial";
-import { CoronaEscarlataTemplateMedianoche } from "@/components/templates/CoronaEscarlataTemplateMedianoche";
-import { CoronaEscarlataTemplateZafiro } from "@/components/templates/CoronaEscarlataTemplateZafiro";
-import { JewelryBoxTemplate } from "@/components/templates/JewelryBoxTemplate";
-import { JewelryBoxTemplateEsmeralda } from "@/components/templates/JewelryBoxTemplateEsmeralda";
-import { JewelryBoxTemplatePerla } from "@/components/templates/JewelryBoxTemplatePerla";
-import { JewelryBoxTemplateRubi } from "@/components/templates/JewelryBoxTemplateRubi";
-import { JewelryBoxTemplateZafiro } from "@/components/templates/JewelryBoxTemplateZafiro";
-import { PaseVipTemplate } from "@/components/templates/PaseVipTemplate";
-import { PaseVipTemplateCobre } from "@/components/templates/PaseVipTemplateCobre";
-import { PaseVipTemplatePlatino } from "@/components/templates/PaseVipTemplatePlatino";
-import { PaseVipTemplateRubi } from "@/components/templates/PaseVipTemplateRubi";
-import { PaseVipTemplateVioleta } from "@/components/templates/PaseVipTemplateVioleta";
-import { CineAbstractoXvTemplate } from "@/components/templates/CineAbstractoXvTemplate";
-import { CineAbstractoXvTemplateNoir } from "@/components/templates/CineAbstractoXvTemplateNoir";
-import { CineAbstractoXvTemplateSciFi } from "@/components/templates/CineAbstractoXvTemplateSciFi";
-import { CineAbstractoXvTemplateTecnicolor } from "@/components/templates/CineAbstractoXvTemplateTecnicolor";
-import { CineAbstractoXvTemplateWestern } from "@/components/templates/CineAbstractoXvTemplateWestern";
-import { AcrylicPopTemplate } from "@/components/templates/AcrylicPopTemplate";
-import { AcrylicPopTemplateBubblegum } from "@/components/templates/AcrylicPopTemplateBubblegum";
-import { AcrylicPopTemplateScarlet } from "@/components/templates/AcrylicPopTemplateScarlet";
-import { AcrylicPopTemplateSunset } from "@/components/templates/AcrylicPopTemplateSunset";
-import { AcrylicPopTemplateUltraViolet } from "@/components/templates/AcrylicPopTemplateUltraViolet";
-import { BolaDeDiscotecaTemplate } from "@/components/templates/BolaDeDiscotecaTemplate";
-import { BolaDeDiscotecaTemplateEsmeralda } from "@/components/templates/BolaDeDiscotecaTemplateEsmeralda";
-import { BolaDeDiscotecaTemplateFucsiaElectrico } from "@/components/templates/BolaDeDiscotecaTemplateFucsiaElectrico";
-import { BolaDeDiscotecaTemplateTurquesa } from "@/components/templates/BolaDeDiscotecaTemplateTurquesa";
-import { BolaDeDiscotecaTemplateVioleta } from "@/components/templates/BolaDeDiscotecaTemplateVioleta";
-import { Crystal3dTemplate } from "@/components/templates/Crystal3dTemplate";
-import { Crystal3dTemplateAmbarBronce } from "@/components/templates/Crystal3dTemplateAmbarBronce";
-import { Crystal3dTemplateCuarzoRosa } from "@/components/templates/Crystal3dTemplateCuarzoRosa";
-import { Crystal3dTemplateEsmeraldaPlata } from "@/components/templates/Crystal3dTemplateEsmeraldaPlata";
-import { Crystal3dTemplateZafiroBlanco } from "@/components/templates/Crystal3dTemplateZafiroBlanco";
-import { FashionTagTemplate } from "@/components/templates/FashionTagTemplate";
-import { FashionTagTemplateBottleGreen } from "@/components/templates/FashionTagTemplateBottleGreen";
-import { FashionTagTemplateBurgundy } from "@/components/templates/FashionTagTemplateBurgundy";
-import { FashionTagTemplateGoldenMustard } from "@/components/templates/FashionTagTemplateGoldenMustard";
-import { FashionTagTemplateMidnightNavy } from "@/components/templates/FashionTagTemplateMidnightNavy";
-import { CeramicaEditorialTemplate } from "@/components/templates/CeramicaEditorialTemplate";
-import { CeramicaEditorialTemplateCeladon } from "@/components/templates/CeramicaEditorialTemplateCeladon";
-import { CeramicaEditorialTemplateCobalto } from "@/components/templates/CeramicaEditorialTemplateCobalto";
-import { CeramicaEditorialTemplateGrisPiedra } from "@/components/templates/CeramicaEditorialTemplateGrisPiedra";
-import { CeramicaEditorialTemplateTerracota } from "@/components/templates/CeramicaEditorialTemplateTerracota";
-import { CineAbstractoTemplate } from "@/components/templates/CineAbstractoTemplate";
-import { CineAbstractoTemplateBlancoNegroPlata } from "@/components/templates/CineAbstractoTemplateBlancoNegroPlata";
-import { CineAbstractoTemplateNoirEsmeralda } from "@/components/templates/CineAbstractoTemplateNoirEsmeralda";
-import { CineAbstractoTemplateSepiaClasico } from "@/components/templates/CineAbstractoTemplateSepiaClasico";
-import { CineAbstractoTemplateTecnicolorAzulNaranja } from "@/components/templates/CineAbstractoTemplateTecnicolorAzulNaranja";
-import { PapeleriaDeHotelDeLujoTemplate } from "@/components/templates/PapeleriaDeHotelDeLujoTemplate";
-import { PapeleriaDeHotelDeLujoTemplateAzulMarinoPlata } from "@/components/templates/PapeleriaDeHotelDeLujoTemplateAzulMarinoPlata";
-import { PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa } from "@/components/templates/PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa";
-import { PapeleriaDeHotelDeLujoTemplateGrisCarbonOroBlanco } from "@/components/templates/PapeleriaDeHotelDeLujoTemplateGrisCarbonOroBlanco";
-import { PapeleriaDeHotelDeLujoTemplateNegroYBronce } from "@/components/templates/PapeleriaDeHotelDeLujoTemplateNegroYBronce";
-import { VintageEditorialTemplate } from "@/components/templates/VintageEditorialTemplate";
-import { VintageEditorialTemplateAzulPetroleo } from "@/components/templates/VintageEditorialTemplateAzulPetroleo";
-import { VintageEditorialTemplateBorgonaVino } from "@/components/templates/VintageEditorialTemplateBorgonaVino";
-import { VintageEditorialTemplateOlivaVintage } from "@/components/templates/VintageEditorialTemplateOlivaVintage";
-import { VintageEditorialTemplatePlataAntigua } from "@/components/templates/VintageEditorialTemplatePlataAntigua";
-import { FashionLookbookTemplate } from "@/components/templates/FashionLookbookTemplate";
-import { FashionLookbookTemplateCobalto } from "@/components/templates/FashionLookbookTemplateCobalto";
-import { FashionLookbookTemplateMagenta } from "@/components/templates/FashionLookbookTemplateMagenta";
-import { FashionLookbookTemplateMilitar } from "@/components/templates/FashionLookbookTemplateMilitar";
-import { FashionLookbookTemplateMostaza } from "@/components/templates/FashionLookbookTemplateMostaza";
-import { MarmolYOroTemplate } from "@/components/templates/MarmolYOroTemplate";
-import { MarmolYOroTemplateBronce } from "@/components/templates/MarmolYOroTemplateBronce";
-import { MarmolYOroTemplateEsmeralda } from "@/components/templates/MarmolYOroTemplateEsmeralda";
-import { MarmolYOroTemplateOnix } from "@/components/templates/MarmolYOroTemplateOnix";
-import { MarmolYOroTemplateRosa } from "@/components/templates/MarmolYOroTemplateRosa";
-import { AtelierDePapelTemplate } from "@/components/templates/AtelierDePapelTemplate";
-import { AtelierDePapelTemplateAzulTinta } from "@/components/templates/AtelierDePapelTemplateAzulTinta";
-import { AtelierDePapelTemplateBorgonaVino } from "@/components/templates/AtelierDePapelTemplateBorgonaVino";
-import { AtelierDePapelTemplateGrisGrafito } from "@/components/templates/AtelierDePapelTemplateGrisGrafito";
-import { AtelierDePapelTemplateVerdeSalvia } from "@/components/templates/AtelierDePapelTemplateVerdeSalvia";
-import { BotanicaEditorialTemplate } from "@/components/templates/BotanicaEditorialTemplate";
-import { BotanicaEditorialTemplateBorgona } from "@/components/templates/BotanicaEditorialTemplateBorgona";
-import { BotanicaEditorialTemplateIndigo } from "@/components/templates/BotanicaEditorialTemplateIndigo";
-import { BotanicaEditorialTemplateLavanda } from "@/components/templates/BotanicaEditorialTemplateLavanda";
-import { BotanicaEditorialTemplateTerracota } from "@/components/templates/BotanicaEditorialTemplateTerracota";
-import { EncajeContemporaneoTemplate } from "@/components/templates/EncajeContemporaneoTemplate";
-import { EncajeContemporaneoTemplateAzulMedianoche } from "@/components/templates/EncajeContemporaneoTemplateAzulMedianoche";
-import { EncajeContemporaneoTemplateBorgona } from "@/components/templates/EncajeContemporaneoTemplateBorgona";
-import { EncajeContemporaneoTemplateGrisPiedra } from "@/components/templates/EncajeContemporaneoTemplateGrisPiedra";
-import { EncajeContemporaneoTemplateVerdeBosque } from "@/components/templates/EncajeContemporaneoTemplateVerdeBosque";
-import { LiquidGlassTemplate } from "@/components/templates/LiquidGlassTemplate";
-import { LiquidGlassTemplateAmatista } from "@/components/templates/LiquidGlassTemplateAmatista";
-import { LiquidGlassTemplateAmbar } from "@/components/templates/LiquidGlassTemplateAmbar";
-import { LiquidGlassTemplateCuarzo } from "@/components/templates/LiquidGlassTemplateCuarzo";
-import { LiquidGlassTemplateEsmeralda } from "@/components/templates/LiquidGlassTemplateEsmeralda";
-import { ModernoTemplate } from "@/components/templates/ModernoTemplate";
-import { NeonTemplateBlackout } from "@/components/templates/NeonTemplateBlackout";
-import { NeonTemplateTropical } from "@/components/templates/NeonTemplateTropical";
-import { NeonTemplateManzana } from "@/components/templates/NeonTemplateManzana";
-import { NeonTemplateAscuas } from "@/components/templates/NeonTemplateAscuas";
-import { NeonTemplateEclipse } from "@/components/templates/NeonTemplateEclipse";
-import { NeonTemplate } from "@/components/templates/NeonTemplate";
-import { NeonTemplateVioleta } from "@/components/templates/NeonTemplateVioleta";
-import { NeonTemplateDorado } from "@/components/templates/NeonTemplateDorado";
-import { NeonTemplateVerde } from "@/components/templates/NeonTemplateVerde";
-import { NeonTemplateAzul } from "@/components/templates/NeonTemplateAzul";
-import { NeonTemplateRojo } from "@/components/templates/NeonTemplateRojo";
-import { ChicTemplateNocheChic } from "@/components/templates/ChicTemplateNocheChic";
-import { ChicTemplatePiedraChic } from "@/components/templates/ChicTemplatePiedraChic";
-import { ChicTemplateAzulMedianocheChic } from "@/components/templates/ChicTemplateAzulMedianocheChic";
-import { ChicTemplateAmbar } from "@/components/templates/ChicTemplateAmbar";
-import { ChicTemplate } from "@/components/templates/ChicTemplate";
-import { ChicTemplateRosa } from "@/components/templates/ChicTemplateRosa";
-import { ChicTemplateAzul } from "@/components/templates/ChicTemplateAzul";
-import { ChicTemplateTerracota } from "@/components/templates/ChicTemplateTerracota";
-import { ChicTemplateVioleta } from "@/components/templates/ChicTemplateVioleta";
-import { ChicTemplateVerdeBotella } from "@/components/templates/ChicTemplateVerdeBotella";
-import { ChicTemplateGris } from "@/components/templates/ChicTemplateGris";
-import { ModernoTemplateAzul } from "@/components/templates/ModernoTemplateAzul";
-import { ModernoTemplateBordo } from "@/components/templates/ModernoTemplateBordo";
-import { ModernoTemplateNegro } from "@/components/templates/ModernoTemplateNegro";
-import { ModernoTemplatePurpura } from "@/components/templates/ModernoTemplatePurpura";
-import { ModernoTemplateVerde } from "@/components/templates/ModernoTemplateVerde";
-import { ModernoTemplateRojo } from "@/components/templates/ModernoTemplateRojo";
-import { ModernoTemplateGris } from "@/components/templates/ModernoTemplateGris";
-import { EditorialTemplate } from "@/components/templates/EditorialTemplate";
-import { EditorialTemplateOnice } from "@/components/templates/EditorialTemplateOnice";
-import { EditorialTemplatePiedra } from "@/components/templates/EditorialTemplatePiedra";
-import { EditorialTemplateCobalto } from "@/components/templates/EditorialTemplateCobalto";
-import { EditorialTemplateGrafito } from "@/components/templates/EditorialTemplateGrafito";
-import { EditorialTemplateAzul } from "@/components/templates/EditorialTemplateAzul";
-import { EditorialTemplateGris } from "@/components/templates/EditorialTemplateGris";
-import { EditorialTemplateMalva } from "@/components/templates/EditorialTemplateMalva";
-import { EditorialTemplateTerracota } from "@/components/templates/EditorialTemplateTerracota";
-import { EditorialTemplateVerde } from "@/components/templates/EditorialTemplateVerde";
-import { OnixTemplateCarbon } from "@/components/templates/OnixTemplateCarbon";
-import { OnixTemplateMarfil } from "@/components/templates/OnixTemplateMarfil";
-import { OnixTemplateBosque } from "@/components/templates/OnixTemplateBosque";
-import { OnixTemplateMedianoche } from "@/components/templates/OnixTemplateMedianoche";
-import { OnixTemplate } from "@/components/templates/OnixTemplate";
-import { OnixTemplateAmatista } from "@/components/templates/OnixTemplateAmatista";
-import { OnixTemplateEsmeralda } from "@/components/templates/OnixTemplateEsmeralda";
-import { OnixTemplateOro } from "@/components/templates/OnixTemplateOro";
-import { OnixTemplatePlata } from "@/components/templates/OnixTemplatePlata";
-import { OnixTemplateZafiro } from "@/components/templates/OnixTemplateZafiro";
-import { JardinSedaTemplateJardinNocturno } from "@/components/templates/JardinSedaTemplateJardinNocturno";
-import { JardinSedaTemplatePiedraJardin } from "@/components/templates/JardinSedaTemplatePiedraJardin";
-import { JardinSedaTemplateTerracotaJardin } from "@/components/templates/JardinSedaTemplateTerracotaJardin";
-import { JardinSedaTemplate } from "@/components/templates/JardinSedaTemplate";
-import { JardinSedaTemplateCielo } from "@/components/templates/JardinSedaTemplateCielo";
-import { JardinSedaTemplateDurazno } from "@/components/templates/JardinSedaTemplateDurazno";
-import { JardinSedaTemplateLila } from "@/components/templates/JardinSedaTemplateLila";
-import { JardinSedaTemplateRosaAntiguo } from "@/components/templates/JardinSedaTemplateRosaAntiguo";
-import { JardinSedaTemplateSalvia } from "@/components/templates/JardinSedaTemplateSalvia";
-import { HologramaTemplateNebulosaRoja } from "@/components/templates/HologramaTemplateNebulosaRoja";
-import { HologramaTemplateBlancoPrisma } from "@/components/templates/HologramaTemplateBlancoPrisma";
-import { HologramaTemplateGrafitoCuantico } from "@/components/templates/HologramaTemplateGrafitoCuantico";
-import { HologramaTemplateAurora } from "@/components/templates/HologramaTemplateAurora";
-import { HologramaTemplate } from "@/components/templates/HologramaTemplate";
-import { HologramaTemplateAzul } from "@/components/templates/HologramaTemplateAzul";
-import { HologramaTemplateCoral } from "@/components/templates/HologramaTemplateCoral";
-import { HologramaTemplateDorado } from "@/components/templates/HologramaTemplateDorado";
-import { HologramaTemplateEsmeralda } from "@/components/templates/HologramaTemplateEsmeralda";
-import { HologramaTemplateRosa } from "@/components/templates/HologramaTemplateRosa";
-import { CircuitoTemplate } from "@/components/templates/CircuitoTemplate";
-import { CircuitoTemplateAmbar } from "@/components/templates/CircuitoTemplateAmbar";
-import { CircuitoTemplateAzul } from "@/components/templates/CircuitoTemplateAzul";
-import { CircuitoTemplateLima } from "@/components/templates/CircuitoTemplateLima";
-import { CircuitoTemplateRojo } from "@/components/templates/CircuitoTemplateRojo";
-import { CircuitoTemplateVioleta } from "@/components/templates/CircuitoTemplateVioleta";
-import { Cristal3DTemplate } from "@/components/templates/Cristal3DTemplate";
-import { Cristal3DTemplateAmbar } from "@/components/templates/Cristal3DTemplateAmbar";
-import { Cristal3DTemplateEsmeralda } from "@/components/templates/Cristal3DTemplateEsmeralda";
-import { Cristal3DTemplateMenta } from "@/components/templates/Cristal3DTemplateMenta";
-import { Cristal3DTemplateRosaCuarzo } from "@/components/templates/Cristal3DTemplateRosaCuarzo";
-import { Cristal3DTemplateAmbarFundido } from "@/components/templates/Cristal3DTemplateAmbarFundido";
-import { Cristal3DTemplateCristalBlanco } from "@/components/templates/Cristal3DTemplateCristalBlanco";
-import { Cristal3DTemplateRosaCristalOscuro } from "@/components/templates/Cristal3DTemplateRosaCristalOscuro";
-import { Cristal3DTemplateVioleta } from "@/components/templates/Cristal3DTemplateVioleta";
-import { CineTemplateBlancoYNegro } from "@/components/templates/CineTemplateBlancoYNegro";
-import { CineTemplateMedianocheDeCine } from "@/components/templates/CineTemplateMedianocheDeCine";
-import { CineTemplateOcreVintage } from "@/components/templates/CineTemplateOcreVintage";
-import { CineTemplateAmbar } from "@/components/templates/CineTemplateAmbar";
-import { CineTemplate } from "@/components/templates/CineTemplate";
-import { CineTemplateBorgona } from "@/components/templates/CineTemplateBorgona";
-import { CineTemplateEsmeralda } from "@/components/templates/CineTemplateEsmeralda";
-import { CineTemplateNoir } from "@/components/templates/CineTemplateNoir";
-import { CineTemplateTecnicolor } from "@/components/templates/CineTemplateTecnicolor";
-import { NordicoTemplateCarbonNordico } from "@/components/templates/NordicoTemplateCarbonNordico";
-import { NordicoTemplateMusgo } from "@/components/templates/NordicoTemplateMusgo";
-import { NordicoTemplateArticoAzul } from "@/components/templates/NordicoTemplateArticoAzul";
-import { NordicoTemplatePizarra } from "@/components/templates/NordicoTemplatePizarra";
-import { NordicoTemplate } from "@/components/templates/NordicoTemplate";
-import { NordicoTemplateBosque } from "@/components/templates/NordicoTemplateBosque";
-import { NordicoTemplateMarino } from "@/components/templates/NordicoTemplateMarino";
-import { NordicoTemplateOcre } from "@/components/templates/NordicoTemplateOcre";
-import { NordicoTemplateTerracota } from "@/components/templates/NordicoTemplateTerracota";
-import { RivieraTemplateMedianocheRiviera } from "@/components/templates/RivieraTemplateMedianocheRiviera";
-import { RivieraTemplatePiedraGris } from "@/components/templates/RivieraTemplatePiedraGris";
-import { RivieraTemplateOcasoAzulejo } from "@/components/templates/RivieraTemplateOcasoAzulejo";
-import { RivieraTemplateLavandaCostera } from "@/components/templates/RivieraTemplateLavandaCostera";
-import { RivieraTemplateCal } from "@/components/templates/RivieraTemplateCal";
-import { RivieraTemplate } from "@/components/templates/RivieraTemplate";
-import { RivieraTemplateAzulejo } from "@/components/templates/RivieraTemplateAzulejo";
-import { RivieraTemplateCoral } from "@/components/templates/RivieraTemplateCoral";
-import { RivieraTemplateOcre } from "@/components/templates/RivieraTemplateOcre";
-import { RivieraTemplateOliva } from "@/components/templates/RivieraTemplateOliva";
-import { GoldenDuskTemplateNocheDorada } from "@/components/templates/GoldenDuskTemplateNocheDorada";
-import { GoldenDuskTemplatePiedraCalida } from "@/components/templates/GoldenDuskTemplatePiedraCalida";
-import { GoldenDuskTemplateNocheCiruela } from "@/components/templates/GoldenDuskTemplateNocheCiruela";
-import { GoldenDuskTemplateBrumaAzul } from "@/components/templates/GoldenDuskTemplateBrumaAzul";
-import { GoldenDuskTemplateOcaso } from "@/components/templates/GoldenDuskTemplateOcaso";
-import { GoldenDuskTemplate } from "@/components/templates/GoldenDuskTemplate";
-import { GoldenDuskTemplateAzulMedianoche } from "@/components/templates/GoldenDuskTemplateAzulMedianoche";
-import { GoldenDuskTemplateBorgona } from "@/components/templates/GoldenDuskTemplateBorgona";
-import { GoldenDuskTemplateChampagneDorado } from "@/components/templates/GoldenDuskTemplateChampagneDorado";
-import { GoldenDuskTemplateRosaAntiguo } from "@/components/templates/GoldenDuskTemplateRosaAntiguo";
-import { GoldenDuskTemplateSalvia } from "@/components/templates/GoldenDuskTemplateSalvia";
-import { SedaTemplateOnixSeda } from "@/components/templates/SedaTemplateOnixSeda";
-import { SedaTemplatePiedra } from "@/components/templates/SedaTemplatePiedra";
-import { SedaTemplateCiruela } from "@/components/templates/SedaTemplateCiruela";
-import { SedaTemplate } from "@/components/templates/SedaTemplate";
-import { SedaTemplateEsmeralda } from "@/components/templates/SedaTemplateEsmeralda";
-import { SedaTemplateMarfil } from "@/components/templates/SedaTemplateMarfil";
-import { SedaTemplateNocturna } from "@/components/templates/SedaTemplateNocturna";
-import { SedaTemplatePerla } from "@/components/templates/SedaTemplatePerla";
-import { PetalosTemplate } from "@/components/templates/PetalosTemplate";
-import { PetalosTemplateCoral } from "@/components/templates/PetalosTemplateCoral";
-import { PetalosTemplatePastel } from "@/components/templates/PetalosTemplatePastel";
-import { PetalosTemplateRosaPastel } from "@/components/templates/PetalosTemplateRosaPastel";
-import { PetalosTemplateVinoVibrante } from "@/components/templates/PetalosTemplateVinoVibrante";
-import { LuzLunaTemplate } from "@/components/templates/LuzLunaTemplate";
-import { LuzLunaTemplateMedianocheAzul } from "@/components/templates/LuzLunaTemplateMedianocheAzul";
-import { LuzLunaTemplateNocheEstrellada } from "@/components/templates/LuzLunaTemplateNocheEstrellada";
-import { LuzLunaTemplatePerlada } from "@/components/templates/LuzLunaTemplatePerlada";
-import { LuzLunaTemplatePerlaSuave } from "@/components/templates/LuzLunaTemplatePerlaSuave";
-import { BonVoyageTemplateNocheDeViaje } from "@/components/templates/BonVoyageTemplateNocheDeViaje";
-import { BonVoyageTemplateArenaCalida } from "@/components/templates/BonVoyageTemplateArenaCalida";
-import { BonVoyageTemplateCoralTropical } from "@/components/templates/BonVoyageTemplateCoralTropical";
-import { BonVoyageTemplateMapaVintage } from "@/components/templates/BonVoyageTemplateMapaVintage";
-import { BonVoyageTemplateIvoire } from "@/components/templates/BonVoyageTemplateIvoire";
-import { BonVoyageTemplate } from "@/components/templates/BonVoyageTemplate";
-import { BonVoyageTemplateCoral } from "@/components/templates/BonVoyageTemplateCoral";
-import { BonVoyageTemplateEsmeralda } from "@/components/templates/BonVoyageTemplateEsmeralda";
-import { BonVoyageTemplateLavanda } from "@/components/templates/BonVoyageTemplateLavanda";
-import { BonVoyageTemplateMedianoche } from "@/components/templates/BonVoyageTemplateMedianoche";
-import { BonVoyageTemplateTurquesa } from "@/components/templates/BonVoyageTemplateTurquesa";
-import { CorporateTemplate } from "@/components/templates/CorporateTemplate";
-import { CorporateTemplateBordo } from "@/components/templates/CorporateTemplateBordo";
-import { CorporateTemplateClaro } from "@/components/templates/CorporateTemplateClaro";
-import { CorporateTemplateVerde } from "@/components/templates/CorporateTemplateVerde";
-import { CorporateTemplateVioleta } from "@/components/templates/CorporateTemplateVioleta";
-import { GardenPartyTemplate } from "@/components/templates/GardenPartyTemplate";
-import { GardenPartyTemplateAmarillo } from "@/components/templates/GardenPartyTemplateAmarillo";
-import { GardenPartyTemplateLavanda } from "@/components/templates/GardenPartyTemplateLavanda";
-import { GardenPartyTemplateRosa } from "@/components/templates/GardenPartyTemplateRosa";
-import { GardenPartyTemplateVibrante } from "@/components/templates/GardenPartyTemplateVibrante";
-import { LoftIndustrialTemplate } from "@/components/templates/LoftIndustrialTemplate";
-import { LoftIndustrialTemplateAcero } from "@/components/templates/LoftIndustrialTemplateAcero";
-import { LoftIndustrialTemplateClaro } from "@/components/templates/LoftIndustrialTemplateClaro";
-import { LoftIndustrialTemplateCobre } from "@/components/templates/LoftIndustrialTemplateCobre";
-import { LoftIndustrialTemplateVerde } from "@/components/templates/LoftIndustrialTemplateVerde";
-import { InfantilTemplate } from "@/components/templates/InfantilTemplate";
-import { InfantilTemplateAmarillo } from "@/components/templates/InfantilTemplateAmarillo";
-import { InfantilTemplateCeleste } from "@/components/templates/InfantilTemplateCeleste";
-import { InfantilTemplateLavanda } from "@/components/templates/InfantilTemplateLavanda";
-import { InfantilTemplateMenta } from "@/components/templates/InfantilTemplateMenta";
+import { PlantillaDinamica } from "@/components/templates/PlantillaDinamica";
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { autoRejectStalePending } from "@/lib/live-cleanup";
 import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
@@ -406,424 +123,425 @@ export default async function InvitationPage({
 
         if (invitation!.templateTipo === 'NEON') {
             switch (color) {
-                case 'Blackout': return <NeonTemplateBlackout invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Tropical': return <NeonTemplateTropical invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Manzana': return <NeonTemplateManzana invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ascuas': return <NeonTemplateAscuas invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Eclipse': return <NeonTemplateEclipse invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violeta': return <NeonTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Dorado': return <NeonTemplateDorado invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Verde': return <NeonTemplateVerde invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Azul': return <NeonTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rojo': return <NeonTemplateRojo invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <NeonTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Blackout': return <PlantillaDinamica nombre="NeonTemplateBlackout" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Tropical': return <PlantillaDinamica nombre="NeonTemplateTropical" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Manzana': return <PlantillaDinamica nombre="NeonTemplateManzana" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ascuas': return <PlantillaDinamica nombre="NeonTemplateAscuas" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Eclipse': return <PlantillaDinamica nombre="NeonTemplateEclipse" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PlantillaDinamica nombre="NeonTemplateVioleta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Dorado': return <PlantillaDinamica nombre="NeonTemplateDorado" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Verde': return <PlantillaDinamica nombre="NeonTemplateVerde" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <PlantillaDinamica nombre="NeonTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rojo': return <PlantillaDinamica nombre="NeonTemplateRojo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="NeonTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CHIC') {
             switch (color) {
-                case 'NocheChic': return <ChicTemplateNocheChic invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'PiedraChic': return <ChicTemplatePiedraChic invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'AzulMedianocheChic': return <ChicTemplateAzulMedianocheChic invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ambar': return <ChicTemplateAmbar invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rosa': return <ChicTemplateRosa invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Azul': return <ChicTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Terracota': return <ChicTemplateTerracota invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violeta': return <ChicTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'VerdeBotella': return <ChicTemplateVerdeBotella invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Gris': return <ChicTemplateGris invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <ChicTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NocheChic': return <PlantillaDinamica nombre="ChicTemplateNocheChic" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'PiedraChic': return <PlantillaDinamica nombre="ChicTemplatePiedraChic" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AzulMedianocheChic': return <PlantillaDinamica nombre="ChicTemplateAzulMedianocheChic" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ambar': return <PlantillaDinamica nombre="ChicTemplateAmbar" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rosa': return <PlantillaDinamica nombre="ChicTemplateRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <PlantillaDinamica nombre="ChicTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Terracota': return <PlantillaDinamica nombre="ChicTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PlantillaDinamica nombre="ChicTemplateVioleta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'VerdeBotella': return <PlantillaDinamica nombre="ChicTemplateVerdeBotella" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Gris': return <PlantillaDinamica nombre="ChicTemplateGris" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="ChicTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'GUESTPASSVIP') {
             switch (color) {
-                case 'Borgona': return <GuestPassVipTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <GuestPassVipTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Plata': return <GuestPassVipTemplatePlata invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Zafiro': return <GuestPassVipTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <GuestPassVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Borgona': return <PlantillaDinamica nombre="GuestPassVipTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="GuestPassVipTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Plata': return <PlantillaDinamica nombre="GuestPassVipTemplatePlata" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Zafiro': return <PlantillaDinamica nombre="GuestPassVipTemplateZafiro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="GuestPassVipTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'BLACKANDWHITE') {
             switch (color) {
-                case 'Negativo': return <BlackAndWhiteTemplateNegativo invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <BlackAndWhiteTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Negativo': return <PlantillaDinamica nombre="BlackAndWhiteTemplateNegativo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="BlackAndWhiteTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'PRINCESA') {
             switch (color) {
-                case 'AzulMedianoche': return <PrincesaTemplateAzulMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Borgona': return <PrincesaTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'BosqueEncantado': return <PrincesaTemplateBosqueEncantado invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'RosaAntiguo': return <PrincesaTemplateRosaAntiguo invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <PrincesaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AzulMedianoche': return <PlantillaDinamica nombre="PrincesaTemplateAzulMedianoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Borgona': return <PlantillaDinamica nombre="PrincesaTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BosqueEncantado': return <PlantillaDinamica nombre="PrincesaTemplateBosqueEncantado" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'RosaAntiguo': return <PlantillaDinamica nombre="PrincesaTemplateRosaAntiguo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="PrincesaTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CORONAESCARLATA') {
             switch (color) {
-                case 'Esmeralda': return <CoronaEscarlataTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Imperial': return <CoronaEscarlataTemplateImperial invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Medianoche': return <CoronaEscarlataTemplateMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Zafiro': return <CoronaEscarlataTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <CoronaEscarlataTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="CoronaEscarlataTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Imperial': return <PlantillaDinamica nombre="CoronaEscarlataTemplateImperial" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Medianoche': return <PlantillaDinamica nombre="CoronaEscarlataTemplateMedianoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Zafiro': return <PlantillaDinamica nombre="CoronaEscarlataTemplateZafiro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CoronaEscarlataTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'JEWELRYBOX') {
             switch (color) {
-                case 'Esmeralda': return <JewelryBoxTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Perla': return <JewelryBoxTemplatePerla invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rubi': return <JewelryBoxTemplateRubi invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Zafiro': return <JewelryBoxTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <JewelryBoxTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="JewelryBoxTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Perla': return <PlantillaDinamica nombre="JewelryBoxTemplatePerla" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rubi': return <PlantillaDinamica nombre="JewelryBoxTemplateRubi" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Zafiro': return <PlantillaDinamica nombre="JewelryBoxTemplateZafiro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="JewelryBoxTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'PASEVIP') {
             switch (color) {
-                case 'Cobre': return <PaseVipTemplateCobre invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Platino': return <PaseVipTemplatePlatino invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rubi': return <PaseVipTemplateRubi invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violeta': return <PaseVipTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <PaseVipTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cobre': return <PlantillaDinamica nombre="PaseVipTemplateCobre" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Platino': return <PlantillaDinamica nombre="PaseVipTemplatePlatino" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rubi': return <PlantillaDinamica nombre="PaseVipTemplateRubi" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PlantillaDinamica nombre="PaseVipTemplateVioleta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="PaseVipTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CINEABSTRACTOXV') {
             switch (color) {
-                case 'Noir': return <CineAbstractoXvTemplateNoir invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'SciFi': return <CineAbstractoXvTemplateSciFi invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Tecnicolor': return <CineAbstractoXvTemplateTecnicolor invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Western': return <CineAbstractoXvTemplateWestern invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <CineAbstractoXvTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Noir': return <PlantillaDinamica nombre="CineAbstractoXvTemplateNoir" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'SciFi': return <PlantillaDinamica nombre="CineAbstractoXvTemplateSciFi" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Tecnicolor': return <PlantillaDinamica nombre="CineAbstractoXvTemplateTecnicolor" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Western': return <PlantillaDinamica nombre="CineAbstractoXvTemplateWestern" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CineAbstractoXvTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'ACRYLICPOP') {
             switch (color) {
-                case 'Bubblegum': return <AcrylicPopTemplateBubblegum invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Scarlet': return <AcrylicPopTemplateScarlet invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Sunset': return <AcrylicPopTemplateSunset invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'UltraViolet': return <AcrylicPopTemplateUltraViolet invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <AcrylicPopTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Bubblegum': return <PlantillaDinamica nombre="AcrylicPopTemplateBubblegum" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Scarlet': return <PlantillaDinamica nombre="AcrylicPopTemplateScarlet" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Sunset': return <PlantillaDinamica nombre="AcrylicPopTemplateSunset" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'UltraViolet': return <PlantillaDinamica nombre="AcrylicPopTemplateUltraViolet" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="AcrylicPopTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'BOLADEDISCOTECA') {
             switch (color) {
-                case 'Esmeralda': return <BolaDeDiscotecaTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'FucsiaElectrico': return <BolaDeDiscotecaTemplateFucsiaElectrico invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Turquesa': return <BolaDeDiscotecaTemplateTurquesa invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violeta': return <BolaDeDiscotecaTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <BolaDeDiscotecaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="BolaDeDiscotecaTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'FucsiaElectrico': return <PlantillaDinamica nombre="BolaDeDiscotecaTemplateFucsiaElectrico" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Turquesa': return <PlantillaDinamica nombre="BolaDeDiscotecaTemplateTurquesa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PlantillaDinamica nombre="BolaDeDiscotecaTemplateVioleta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="BolaDeDiscotecaTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CRYSTAL3D') {
             switch (color) {
-                case 'AmbarBronce': return <Crystal3dTemplateAmbarBronce invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'CuarzoRosa': return <Crystal3dTemplateCuarzoRosa invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'EsmeraldaPlata': return <Crystal3dTemplateEsmeraldaPlata invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'ZafiroBlanco': return <Crystal3dTemplateZafiroBlanco invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <Crystal3dTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AmbarBronce': return <PlantillaDinamica nombre="Crystal3dTemplateAmbarBronce" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'CuarzoRosa': return <PlantillaDinamica nombre="Crystal3dTemplateCuarzoRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'EsmeraldaPlata': return <PlantillaDinamica nombre="Crystal3dTemplateEsmeraldaPlata" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'ZafiroBlanco': return <PlantillaDinamica nombre="Crystal3dTemplateZafiroBlanco" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="Crystal3dTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'FASHIONTAG') {
             switch (color) {
-                case 'BottleGreen': return <FashionTagTemplateBottleGreen invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Burgundy': return <FashionTagTemplateBurgundy invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'GoldenMustard': return <FashionTagTemplateGoldenMustard invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'MidnightNavy': return <FashionTagTemplateMidnightNavy invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <FashionTagTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BottleGreen': return <PlantillaDinamica nombre="FashionTagTemplateBottleGreen" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Burgundy': return <PlantillaDinamica nombre="FashionTagTemplateBurgundy" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'GoldenMustard': return <PlantillaDinamica nombre="FashionTagTemplateGoldenMustard" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'MidnightNavy': return <PlantillaDinamica nombre="FashionTagTemplateMidnightNavy" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="FashionTagTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CERAMICAEDITORIAL') {
             switch (color) {
-                case 'Celadon': return <CeramicaEditorialTemplateCeladon invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Cobalto': return <CeramicaEditorialTemplateCobalto invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'GrisPiedra': return <CeramicaEditorialTemplateGrisPiedra invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Terracota': return <CeramicaEditorialTemplateTerracota invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <CeramicaEditorialTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Celadon': return <PlantillaDinamica nombre="CeramicaEditorialTemplateCeladon" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cobalto': return <PlantillaDinamica nombre="CeramicaEditorialTemplateCobalto" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'GrisPiedra': return <PlantillaDinamica nombre="CeramicaEditorialTemplateGrisPiedra" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Terracota': return <PlantillaDinamica nombre="CeramicaEditorialTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CeramicaEditorialTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CINEABSTRACTO') {
             switch (color) {
-                case 'BlancoNegroPlata': return <CineAbstractoTemplateBlancoNegroPlata invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'NoirEsmeralda': return <CineAbstractoTemplateNoirEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'SepiaClasico': return <CineAbstractoTemplateSepiaClasico invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'TecnicolorAzulNaranja': return <CineAbstractoTemplateTecnicolorAzulNaranja invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <CineAbstractoTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BlancoNegroPlata': return <PlantillaDinamica nombre="CineAbstractoTemplateBlancoNegroPlata" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NoirEsmeralda': return <PlantillaDinamica nombre="CineAbstractoTemplateNoirEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'SepiaClasico': return <PlantillaDinamica nombre="CineAbstractoTemplateSepiaClasico" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'TecnicolorAzulNaranja': return <PlantillaDinamica nombre="CineAbstractoTemplateTecnicolorAzulNaranja" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CineAbstractoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'PAPELERIADEHOTELDELUJO') {
             switch (color) {
-                case 'AzulMarinoPlata': return <PapeleriaDeHotelDeLujoTemplateAzulMarinoPlata invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'BorgonaOroRosa': return <PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'GrisCarbonOroBlanco': return <PapeleriaDeHotelDeLujoTemplateGrisCarbonOroBlanco invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'NegroYBronce': return <PapeleriaDeHotelDeLujoTemplateNegroYBronce invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <PapeleriaDeHotelDeLujoTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AzulMarinoPlata': return <PlantillaDinamica nombre="PapeleriaDeHotelDeLujoTemplateAzulMarinoPlata" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BorgonaOroRosa': return <PlantillaDinamica nombre="PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'GrisCarbonOroBlanco': return <PlantillaDinamica nombre="PapeleriaDeHotelDeLujoTemplateGrisCarbonOroBlanco" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NegroYBronce': return <PlantillaDinamica nombre="PapeleriaDeHotelDeLujoTemplateNegroYBronce" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="PapeleriaDeHotelDeLujoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'VINTAGEEDITORIAL') {
             switch (color) {
-                case 'AzulPetroleo': return <VintageEditorialTemplateAzulPetroleo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'BorgonaVino': return <VintageEditorialTemplateBorgonaVino invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'OlivaVintage': return <VintageEditorialTemplateOlivaVintage invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'PlataAntigua': return <VintageEditorialTemplatePlataAntigua invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <VintageEditorialTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AzulPetroleo': return <PlantillaDinamica nombre="VintageEditorialTemplateAzulPetroleo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BorgonaVino': return <PlantillaDinamica nombre="VintageEditorialTemplateBorgonaVino" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'OlivaVintage': return <PlantillaDinamica nombre="VintageEditorialTemplateOlivaVintage" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'PlataAntigua': return <PlantillaDinamica nombre="VintageEditorialTemplatePlataAntigua" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="VintageEditorialTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'FASHIONLOOKBOOK') {
             switch (color) {
-                case 'Cobalto': return <FashionLookbookTemplateCobalto invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Magenta': return <FashionLookbookTemplateMagenta invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Militar': return <FashionLookbookTemplateMilitar invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Mostaza': return <FashionLookbookTemplateMostaza invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <FashionLookbookTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cobalto': return <PlantillaDinamica nombre="FashionLookbookTemplateCobalto" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Magenta': return <PlantillaDinamica nombre="FashionLookbookTemplateMagenta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Militar': return <PlantillaDinamica nombre="FashionLookbookTemplateMilitar" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Mostaza': return <PlantillaDinamica nombre="FashionLookbookTemplateMostaza" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="FashionLookbookTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'MARMOLYORO') {
             switch (color) {
-                case 'Bronce': return <MarmolYOroTemplateBronce invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <MarmolYOroTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Onix': return <MarmolYOroTemplateOnix invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rosa': return <MarmolYOroTemplateRosa invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <MarmolYOroTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Bronce': return <PlantillaDinamica nombre="MarmolYOroTemplateBronce" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="MarmolYOroTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Onix': return <PlantillaDinamica nombre="MarmolYOroTemplateOnix" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rosa': return <PlantillaDinamica nombre="MarmolYOroTemplateRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="MarmolYOroTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'ATELIERDEPAPEL') {
             switch (color) {
-                case 'AzulTinta': return <AtelierDePapelTemplateAzulTinta invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'BorgonaVino': return <AtelierDePapelTemplateBorgonaVino invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'GrisGrafito': return <AtelierDePapelTemplateGrisGrafito invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'VerdeSalvia': return <AtelierDePapelTemplateVerdeSalvia invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <AtelierDePapelTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AzulTinta': return <PlantillaDinamica nombre="AtelierDePapelTemplateAzulTinta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BorgonaVino': return <PlantillaDinamica nombre="AtelierDePapelTemplateBorgonaVino" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'GrisGrafito': return <PlantillaDinamica nombre="AtelierDePapelTemplateGrisGrafito" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'VerdeSalvia': return <PlantillaDinamica nombre="AtelierDePapelTemplateVerdeSalvia" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="AtelierDePapelTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'BOTANICAEDITORIAL') {
             switch (color) {
-                case 'Borgona': return <BotanicaEditorialTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Indigo': return <BotanicaEditorialTemplateIndigo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Lavanda': return <BotanicaEditorialTemplateLavanda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Terracota': return <BotanicaEditorialTemplateTerracota invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <BotanicaEditorialTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Borgona': return <PlantillaDinamica nombre="BotanicaEditorialTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Indigo': return <PlantillaDinamica nombre="BotanicaEditorialTemplateIndigo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Lavanda': return <PlantillaDinamica nombre="BotanicaEditorialTemplateLavanda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Terracota': return <PlantillaDinamica nombre="BotanicaEditorialTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="BotanicaEditorialTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'ENCAJECONTEMPORANEO') {
             switch (color) {
-                case 'AzulMedianoche': return <EncajeContemporaneoTemplateAzulMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Borgona': return <EncajeContemporaneoTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'GrisPiedra': return <EncajeContemporaneoTemplateGrisPiedra invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'VerdeBosque': return <EncajeContemporaneoTemplateVerdeBosque invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <EncajeContemporaneoTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AzulMedianoche': return <PlantillaDinamica nombre="EncajeContemporaneoTemplateAzulMedianoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Borgona': return <PlantillaDinamica nombre="EncajeContemporaneoTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'GrisPiedra': return <PlantillaDinamica nombre="EncajeContemporaneoTemplateGrisPiedra" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'VerdeBosque': return <PlantillaDinamica nombre="EncajeContemporaneoTemplateVerdeBosque" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="EncajeContemporaneoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'LIQUIDGLASS') {
             switch (color) {
-                case 'Amatista': return <LiquidGlassTemplateAmatista invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ambar': return <LiquidGlassTemplateAmbar invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Cuarzo': return <LiquidGlassTemplateCuarzo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <LiquidGlassTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <LiquidGlassTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Amatista': return <PlantillaDinamica nombre="LiquidGlassTemplateAmatista" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ambar': return <PlantillaDinamica nombre="LiquidGlassTemplateAmbar" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cuarzo': return <PlantillaDinamica nombre="LiquidGlassTemplateCuarzo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="LiquidGlassTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="LiquidGlassTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'MODERNO') {
             switch (color) {
-                case 'Azul': return <ModernoTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Bordo': return <ModernoTemplateBordo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Negro': return <ModernoTemplateNegro invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Purpura': return <ModernoTemplatePurpura invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Verde': return <ModernoTemplateVerde invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rojo': return <ModernoTemplateRojo invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <PlantillaDinamica nombre="ModernoTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Bordo': return <PlantillaDinamica nombre="ModernoTemplateBordo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Negro': return <PlantillaDinamica nombre="ModernoTemplateNegro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Purpura': return <PlantillaDinamica nombre="ModernoTemplatePurpura" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Verde': return <PlantillaDinamica nombre="ModernoTemplateVerde" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rojo': return <PlantillaDinamica nombre="ModernoTemplateRojo" invitation={invRecord} guest={null} isPersonalized={false} />;
                 case 'default':
-                case 'Gris': return <ModernoTemplateGris invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <ModernoTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Gris': return <PlantillaDinamica nombre="ModernoTemplateGris" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="ModernoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'EDITORIAL') {
             switch (color) {
-                case 'Onice': return <EditorialTemplateOnice invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Piedra': return <EditorialTemplatePiedra invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Cobalto': return <EditorialTemplateCobalto invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Grafito': return <EditorialTemplateGrafito invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Azul': return <EditorialTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Gris': return <EditorialTemplateGris invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Malva': return <EditorialTemplateMalva invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Terracota': return <EditorialTemplateTerracota invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Verde': return <EditorialTemplateVerde invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <EditorialTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Onice': return <PlantillaDinamica nombre="EditorialTemplateOnice" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Piedra': return <PlantillaDinamica nombre="EditorialTemplatePiedra" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cobalto': return <PlantillaDinamica nombre="EditorialTemplateCobalto" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Grafito': return <PlantillaDinamica nombre="EditorialTemplateGrafito" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <PlantillaDinamica nombre="EditorialTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Gris': return <PlantillaDinamica nombre="EditorialTemplateGris" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Malva': return <PlantillaDinamica nombre="EditorialTemplateMalva" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Terracota': return <PlantillaDinamica nombre="EditorialTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Verde': return <PlantillaDinamica nombre="EditorialTemplateVerde" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="EditorialTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'ONIX') {
             switch (color) {
-                case 'Carbon': return <OnixTemplateCarbon invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Marfil': return <OnixTemplateMarfil invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Bosque': return <OnixTemplateBosque invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Medianoche': return <OnixTemplateMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Amatista': return <OnixTemplateAmatista invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <OnixTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Oro': return <OnixTemplateOro invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Plata': return <OnixTemplatePlata invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Zafiro': return <OnixTemplateZafiro invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <OnixTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Carbon': return <PlantillaDinamica nombre="OnixTemplateCarbon" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Marfil': return <PlantillaDinamica nombre="OnixTemplateMarfil" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Bosque': return <PlantillaDinamica nombre="OnixTemplateBosque" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Medianoche': return <PlantillaDinamica nombre="OnixTemplateMedianoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Amatista': return <PlantillaDinamica nombre="OnixTemplateAmatista" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="OnixTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Oro': return <PlantillaDinamica nombre="OnixTemplateOro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Plata': return <PlantillaDinamica nombre="OnixTemplatePlata" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Zafiro': return <PlantillaDinamica nombre="OnixTemplateZafiro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="OnixTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'JARDINSEDA') {
             switch (color) {
-                case 'JardinNocturno': return <JardinSedaTemplateJardinNocturno invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'PiedraJardin': return <JardinSedaTemplatePiedraJardin invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'TerracotaJardin': return <JardinSedaTemplateTerracotaJardin invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Cielo': return <JardinSedaTemplateCielo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Durazno': return <JardinSedaTemplateDurazno invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Lila': return <JardinSedaTemplateLila invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'RosaAntiguo': return <JardinSedaTemplateRosaAntiguo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Salvia': return <JardinSedaTemplateSalvia invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <JardinSedaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'JardinNocturno': return <PlantillaDinamica nombre="JardinSedaTemplateJardinNocturno" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'PiedraJardin': return <PlantillaDinamica nombre="JardinSedaTemplatePiedraJardin" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'TerracotaJardin': return <PlantillaDinamica nombre="JardinSedaTemplateTerracotaJardin" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cielo': return <PlantillaDinamica nombre="JardinSedaTemplateCielo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Durazno': return <PlantillaDinamica nombre="JardinSedaTemplateDurazno" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Lila': return <PlantillaDinamica nombre="JardinSedaTemplateLila" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'RosaAntiguo': return <PlantillaDinamica nombre="JardinSedaTemplateRosaAntiguo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Salvia': return <PlantillaDinamica nombre="JardinSedaTemplateSalvia" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="JardinSedaTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'HOLOGRAMA') {
             switch (color) {
-                case 'NebulosaRoja': return <HologramaTemplateNebulosaRoja invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'BlancoPrisma': return <HologramaTemplateBlancoPrisma invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'GrafitoCuantico': return <HologramaTemplateGrafitoCuantico invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Aurora': return <HologramaTemplateAurora invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Azul': return <HologramaTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Coral': return <HologramaTemplateCoral invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Dorado': return <HologramaTemplateDorado invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <HologramaTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rosa': return <HologramaTemplateRosa invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <HologramaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NebulosaRoja': return <PlantillaDinamica nombre="HologramaTemplateNebulosaRoja" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BlancoPrisma': return <PlantillaDinamica nombre="HologramaTemplateBlancoPrisma" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'GrafitoCuantico': return <PlantillaDinamica nombre="HologramaTemplateGrafitoCuantico" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Aurora': return <PlantillaDinamica nombre="HologramaTemplateAurora" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <PlantillaDinamica nombre="HologramaTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Coral': return <PlantillaDinamica nombre="HologramaTemplateCoral" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Dorado': return <PlantillaDinamica nombre="HologramaTemplateDorado" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="HologramaTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rosa': return <PlantillaDinamica nombre="HologramaTemplateRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="HologramaTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CIRCUITO') {
             switch (color) {
-                case 'Ambar': return <CircuitoTemplateAmbar invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Azul': return <CircuitoTemplateAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Lima': return <CircuitoTemplateLima invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rojo': return <CircuitoTemplateRojo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violeta': return <CircuitoTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <CircuitoTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ambar': return <PlantillaDinamica nombre="CircuitoTemplateAmbar" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azul': return <PlantillaDinamica nombre="CircuitoTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Lima': return <PlantillaDinamica nombre="CircuitoTemplateLima" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rojo': return <PlantillaDinamica nombre="CircuitoTemplateRojo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PlantillaDinamica nombre="CircuitoTemplateVioleta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CircuitoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CRISTAL3D') {
             switch (color) {
-                case 'Ambar': return <Cristal3DTemplateAmbar invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <Cristal3DTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Menta': return <Cristal3DTemplateMenta invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'RosaCuarzo': return <Cristal3DTemplateRosaCuarzo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'AmbarFundido': return <Cristal3DTemplateAmbarFundido invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'CristalBlanco': return <Cristal3DTemplateCristalBlanco invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'RosaCristalOscuro': return <Cristal3DTemplateRosaCristalOscuro invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violeta': return <Cristal3DTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <Cristal3DTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ambar': return <PlantillaDinamica nombre="Cristal3DTemplateAmbar" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="Cristal3DTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Menta': return <PlantillaDinamica nombre="Cristal3DTemplateMenta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'RosaCuarzo': return <PlantillaDinamica nombre="Cristal3DTemplateRosaCuarzo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AmbarFundido': return <PlantillaDinamica nombre="Cristal3DTemplateAmbarFundido" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'CristalBlanco': return <PlantillaDinamica nombre="Cristal3DTemplateCristalBlanco" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'RosaCristalOscuro': return <PlantillaDinamica nombre="Cristal3DTemplateRosaCristalOscuro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PlantillaDinamica nombre="Cristal3DTemplateVioleta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="Cristal3DTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CINE') {
             switch (color) {
-                case 'BlancoYNegro': return <CineTemplateBlancoYNegro invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'MedianocheDeCine': return <CineTemplateMedianocheDeCine invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'OcreVintage': return <CineTemplateOcreVintage invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ambar': return <CineTemplateAmbar invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Borgona': return <CineTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <CineTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Noir': return <CineTemplateNoir invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Tecnicolor': return <CineTemplateTecnicolor invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <CineTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BlancoYNegro': return <PlantillaDinamica nombre="CineTemplateBlancoYNegro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'MedianocheDeCine': return <PlantillaDinamica nombre="CineTemplateMedianocheDeCine" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'OcreVintage': return <PlantillaDinamica nombre="CineTemplateOcreVintage" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ambar': return <PlantillaDinamica nombre="CineTemplateAmbar" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Borgona': return <PlantillaDinamica nombre="CineTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="CineTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Noir': return <PlantillaDinamica nombre="CineTemplateNoir" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Tecnicolor': return <PlantillaDinamica nombre="CineTemplateTecnicolor" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CineTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'NORDICO') {
             switch (color) {
-                case 'CarbonNordico': return <NordicoTemplateCarbonNordico invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Musgo': return <NordicoTemplateMusgo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'ArticoAzul': return <NordicoTemplateArticoAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Pizarra': return <NordicoTemplatePizarra invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Bosque': return <NordicoTemplateBosque invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Marino': return <NordicoTemplateMarino invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ocre': return <NordicoTemplateOcre invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Terracota': return <NordicoTemplateTerracota invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <NordicoTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'CarbonNordico': return <PlantillaDinamica nombre="NordicoTemplateCarbonNordico" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Musgo': return <PlantillaDinamica nombre="NordicoTemplateMusgo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'ArticoAzul': return <PlantillaDinamica nombre="NordicoTemplateArticoAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Pizarra': return <PlantillaDinamica nombre="NordicoTemplatePizarra" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Bosque': return <PlantillaDinamica nombre="NordicoTemplateBosque" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Marino': return <PlantillaDinamica nombre="NordicoTemplateMarino" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ocre': return <PlantillaDinamica nombre="NordicoTemplateOcre" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Terracota': return <PlantillaDinamica nombre="NordicoTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="NordicoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'RIVIERA') {
             switch (color) {
-                case 'MedianocheRiviera': return <RivieraTemplateMedianocheRiviera invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'PiedraGris': return <RivieraTemplatePiedraGris invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'OcasoAzulejo': return <RivieraTemplateOcasoAzulejo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'LavandaCostera': return <RivieraTemplateLavandaCostera invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Cal': return <RivieraTemplateCal invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Azulejo': return <RivieraTemplateAzulejo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Coral': return <RivieraTemplateCoral invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ocre': return <RivieraTemplateOcre invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Oliva': return <RivieraTemplateOliva invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <RivieraTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'MedianocheRiviera': return <PlantillaDinamica nombre="RivieraTemplateMedianocheRiviera" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'PiedraGris': return <PlantillaDinamica nombre="RivieraTemplatePiedraGris" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'OcasoAzulejo': return <PlantillaDinamica nombre="RivieraTemplateOcasoAzulejo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'LavandaCostera': return <PlantillaDinamica nombre="RivieraTemplateLavandaCostera" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cal': return <PlantillaDinamica nombre="RivieraTemplateCal" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Azulejo': return <PlantillaDinamica nombre="RivieraTemplateAzulejo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Coral': return <PlantillaDinamica nombre="RivieraTemplateCoral" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ocre': return <PlantillaDinamica nombre="RivieraTemplateOcre" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Oliva': return <PlantillaDinamica nombre="RivieraTemplateOliva" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="RivieraTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'GOLDENDUSK') {
             switch (color) {
-                case 'NocheDorada': return <GoldenDuskTemplateNocheDorada invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'PiedraCalida': return <GoldenDuskTemplatePiedraCalida invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'NocheCiruela': return <GoldenDuskTemplateNocheCiruela invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'BrumaAzul': return <GoldenDuskTemplateBrumaAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ocaso': return <GoldenDuskTemplateOcaso invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'AzulMedianoche': return <GoldenDuskTemplateAzulMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Borgona': return <GoldenDuskTemplateBorgona invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'ChampagneDorado': return <GoldenDuskTemplateChampagneDorado invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'RosaAntiguo': return <GoldenDuskTemplateRosaAntiguo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Salvia': return <GoldenDuskTemplateSalvia invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <GoldenDuskTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NocheDorada': return <PlantillaDinamica nombre="GoldenDuskTemplateNocheDorada" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'PiedraCalida': return <PlantillaDinamica nombre="GoldenDuskTemplatePiedraCalida" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NocheCiruela': return <PlantillaDinamica nombre="GoldenDuskTemplateNocheCiruela" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'BrumaAzul': return <PlantillaDinamica nombre="GoldenDuskTemplateBrumaAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ocaso': return <PlantillaDinamica nombre="GoldenDuskTemplateOcaso" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'AzulMedianoche': return <PlantillaDinamica nombre="GoldenDuskTemplateAzulMedianoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Borgona': return <PlantillaDinamica nombre="GoldenDuskTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'ChampagneDorado': return <PlantillaDinamica nombre="GoldenDuskTemplateChampagneDorado" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'RosaAntiguo': return <PlantillaDinamica nombre="GoldenDuskTemplateRosaAntiguo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Salvia': return <PlantillaDinamica nombre="GoldenDuskTemplateSalvia" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="GoldenDuskTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'SEDA') {
             switch (color) {
-                case 'OnixSeda': return <SedaTemplateOnixSeda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Piedra': return <SedaTemplatePiedra invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ciruela': return <SedaTemplateCiruela invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <SedaTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Marfil': return <SedaTemplateMarfil invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Nocturna': return <SedaTemplateNocturna invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Perla': return <SedaTemplatePerla invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <SedaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'OnixSeda': return <PlantillaDinamica nombre="SedaTemplateOnixSeda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Piedra': return <PlantillaDinamica nombre="SedaTemplatePiedra" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ciruela': return <PlantillaDinamica nombre="SedaTemplateCiruela" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="SedaTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Marfil': return <PlantillaDinamica nombre="SedaTemplateMarfil" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Nocturna': return <PlantillaDinamica nombre="SedaTemplateNocturna" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Perla': return <PlantillaDinamica nombre="SedaTemplatePerla" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="SedaTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'PETALOS') {
             switch (color) {
-                case 'Coral': return <PetalosTemplateCoral invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Pastel': return <PetalosTemplatePastel invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'RosaPastel': return <PetalosTemplateRosaPastel invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'VinoVibrante': return <PetalosTemplateVinoVibrante invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <PetalosTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Coral': return <PlantillaDinamica nombre="PetalosTemplateCoral" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Pastel': return <PlantillaDinamica nombre="PetalosTemplatePastel" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'RosaPastel': return <PlantillaDinamica nombre="PetalosTemplateRosaPastel" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'VinoVibrante': return <PlantillaDinamica nombre="PetalosTemplateVinoVibrante" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="PetalosTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'LUZLUNA') {
             switch (color) {
-                case 'MedianocheAzul': return <LuzLunaTemplateMedianocheAzul invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'NocheEstrellada': return <LuzLunaTemplateNocheEstrellada invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Perlada': return <LuzLunaTemplatePerlada invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'PerlaSuave': return <LuzLunaTemplatePerlaSuave invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <LuzLunaTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'MedianocheAzul': return <PlantillaDinamica nombre="LuzLunaTemplateMedianocheAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NocheEstrellada': return <PlantillaDinamica nombre="LuzLunaTemplateNocheEstrellada" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Perlada': return <PlantillaDinamica nombre="LuzLunaTemplatePerlada" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'PerlaSuave': return <PlantillaDinamica nombre="LuzLunaTemplatePerlaSuave" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="LuzLunaTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'BONVOYAGE') {
             switch (color) {
-                case 'NocheDeViaje': return <BonVoyageTemplateNocheDeViaje invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'ArenaCalida': return <BonVoyageTemplateArenaCalida invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'CoralTropical': return <BonVoyageTemplateCoralTropical invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'MapaVintage': return <BonVoyageTemplateMapaVintage invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Ivoire': return <BonVoyageTemplateIvoire invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Coral': return <BonVoyageTemplateCoral invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Esmeralda': return <BonVoyageTemplateEsmeralda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Lavanda': return <BonVoyageTemplateLavanda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Medianoche': return <BonVoyageTemplateMedianoche invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Turquesa': return <BonVoyageTemplateTurquesa invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <BonVoyageTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'NocheDeViaje': return <PlantillaDinamica nombre="BonVoyageTemplateNocheDeViaje" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'ArenaCalida': return <PlantillaDinamica nombre="BonVoyageTemplateArenaCalida" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'CoralTropical': return <PlantillaDinamica nombre="BonVoyageTemplateCoralTropical" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'MapaVintage': return <PlantillaDinamica nombre="BonVoyageTemplateMapaVintage" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Ivoire': return <PlantillaDinamica nombre="BonVoyageTemplateIvoire" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Coral': return <PlantillaDinamica nombre="BonVoyageTemplateCoral" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Esmeralda': return <PlantillaDinamica nombre="BonVoyageTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Lavanda': return <PlantillaDinamica nombre="BonVoyageTemplateLavanda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Medianoche': return <PlantillaDinamica nombre="BonVoyageTemplateMedianoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Turquesa': return <PlantillaDinamica nombre="BonVoyageTemplateTurquesa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="BonVoyageTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'CORPORATE') {
             switch (color) {
-                case 'Bordo': return <CorporateTemplateBordo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Claro': return <CorporateTemplateClaro invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Verde': return <CorporateTemplateVerde invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violeta': return <CorporateTemplateVioleta invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <CorporateTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Bordo': return <PlantillaDinamica nombre="CorporateTemplateBordo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Claro': return <PlantillaDinamica nombre="CorporateTemplateClaro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Verde': return <PlantillaDinamica nombre="CorporateTemplateVerde" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violeta': return <PlantillaDinamica nombre="CorporateTemplateVioleta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CorporateTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'GARDENPARTY') {
             switch (color) {
-                case 'Amarillo': return <GardenPartyTemplateAmarillo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Lavanda': return <GardenPartyTemplateLavanda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Rosa': return <GardenPartyTemplateRosa invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Vibrante': return <GardenPartyTemplateVibrante invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <GardenPartyTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Amarillo': return <PlantillaDinamica nombre="GardenPartyTemplateAmarillo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Lavanda': return <PlantillaDinamica nombre="GardenPartyTemplateLavanda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rosa': return <PlantillaDinamica nombre="GardenPartyTemplateRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Vibrante': return <PlantillaDinamica nombre="GardenPartyTemplateVibrante" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="GardenPartyTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'LOFTINDUSTRIAL') {
             switch (color) {
-                case 'Acero': return <LoftIndustrialTemplateAcero invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Claro': return <LoftIndustrialTemplateClaro invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Cobre': return <LoftIndustrialTemplateCobre invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Verde': return <LoftIndustrialTemplateVerde invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <LoftIndustrialTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Acero': return <PlantillaDinamica nombre="LoftIndustrialTemplateAcero" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Claro': return <PlantillaDinamica nombre="LoftIndustrialTemplateClaro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Cobre': return <PlantillaDinamica nombre="LoftIndustrialTemplateCobre" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Verde': return <PlantillaDinamica nombre="LoftIndustrialTemplateVerde" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="LoftIndustrialTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else if (invitation!.templateTipo === 'INFANTIL') {
             switch (color) {
-                case 'Amarillo': return <InfantilTemplateAmarillo invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Celeste': return <InfantilTemplateCeleste invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Lavanda': return <InfantilTemplateLavanda invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Menta': return <InfantilTemplateMenta invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <InfantilTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Amarillo': return <PlantillaDinamica nombre="InfantilTemplateAmarillo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Celeste': return <PlantillaDinamica nombre="InfantilTemplateCeleste" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Lavanda': return <PlantillaDinamica nombre="InfantilTemplateLavanda" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Menta': return <PlantillaDinamica nombre="InfantilTemplateMenta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="InfantilTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         } else {
             // Default to ELEGANT
             switch (color) {
-                case 'Green': return <ElegantTemplateGreen invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Red': return <ElegantTemplateRed invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Blue': return <ElegantTemplateBlue invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Orange': return <ElegantTemplateOrange invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Violet': return <ElegantTemplateViolet invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Gray': return <ElegantTemplateGray invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'DarkYellow': return <ElegantTemplateDarkYellow invitation={invRecord} guest={null} isPersonalized={false} />;
-                case 'Pink': return <ElegantTemplatePink invitation={invRecord} guest={null} isPersonalized={false} />;
-                default: return <ElegantTemplate invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Green': return <PlantillaDinamica nombre="ElegantTemplateGreen" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Red': return <PlantillaDinamica nombre="ElegantTemplateRed" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Blue': return <PlantillaDinamica nombre="ElegantTemplateBlue" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Orange': return <PlantillaDinamica nombre="ElegantTemplateOrange" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Violet': return <PlantillaDinamica nombre="ElegantTemplateViolet" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Gray': return <PlantillaDinamica nombre="ElegantTemplateGray" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'DarkYellow': return <PlantillaDinamica nombre="ElegantTemplateDarkYellow" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Pink': return <PlantillaDinamica nombre="ElegantTemplatePink" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="ElegantTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
         }
     }
 
     // Usar el nuevo ConviteTemplate para todas las invitaciones
     return (
-      <ConviteTemplate
+      <PlantillaDinamica
+        nombre="ConviteTemplate"
         invitation={invitation as Record<string, unknown>}
         guest={null}
         isPersonalized={false}

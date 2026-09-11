@@ -29,9 +29,9 @@ import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 /**
  * Cuántos modelos se listan por pestaña.
  *
- * Se puede subir: ModelosLazyLoader carga sólo las miniaturas que están cerca
- * de la pantalla y suelta las que quedaron lejos, así que lo que cuesta no
- * depende de cuántas se listen sino de cuántas se estén viendo a la vez.
+ * Ocho es lo que un teléfono aguanta con todas cargadas a la vez:
+ * ModelosLazyLoader las carga TODAS (de a dos, en orden) y no las suelta, así
+ * que la memoria crece con este número. Antes de subirlo, paginar.
  */
 const MODELOS_POR_PESTANA = 8;
 
