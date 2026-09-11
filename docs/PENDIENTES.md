@@ -35,12 +35,42 @@ así queda el registro de qué se verificó y cómo.
 
 ---
 
-## Reportados, pendientes
+## Hechos en esta vuelta
 
-- [ ] **Bajar los logos oficiales** de Mercado Pago y PayPal a
-  `public/marcas/` (`mercadopago.svg` y `paypal.svg`). El componente ya está
-  y los usa apenas aparezcan; mientras tanto muestra el nombre de la marca en
-  su color. Los enlaces están en `public/marcas/LEEME.txt`.
+- [x] **Logos oficiales de pago.** `public/marcas/paypal.svg` (SVG de
+  paypalobjects.com) y `mercadopago.png` (el de la barra de
+  mercadopago.com.ar). Van sobre una pastilla blanca: los dos son azul
+  oscuro y sueltos sobre el fondo oscuro no se leen.
+
+- [x] **Contraste en claro al pegar la lista y en las mesas.** Colores
+  escritos a mano (`bg-black/25`, `border-white/10`) reemplazados por
+  tokens. Silla vacía y tablero del plano tenían blanco fijo: ahora hay un
+  token propio, `--silla-vacia`.
+
+- [x] **"Flia" y el número sin coma.** `Flia`/`Flia.`/`Fam.` se escriben
+  "Familia", y `Flia Gómez 5` entra como grupo de 5 en vez de como un
+  invitado llamado "Flia Gómez 5". `Los 3 Chiflados` sigue siendo un nombre.
+
+- [x] **La previsualización ya no es un chorizo.** El resumen va arriba y la
+  tabla muestra sólo lo que tiene error o aviso, más un asomo del resto.
+
+- [x] **Ejemplo de lista, y la carga masiva entera, en modal.** La tarjeta
+  de invitados es una columna angosta: los nombres salían cortados y cada
+  fila se partía en tres renglones.
+
+- [x] **El campo de hora del wizard.** En escritorio es una lista de 288
+  horas de cinco en cinco: 21:03 no se puede elegir porque no existe.
+  `step` solo no alcanzaba, se podía tipear igual. En el celular sigue la
+  rueda del sistema. El reloj negro era el ícono del navegador sin
+  `color-scheme`: se le puso `campo-nativo`, y se sacó el reloj duplicado.
+
+- [x] **El switch de tema y el botón de la cabecera.** Ya no se encinan (la
+  cabecera deja 64px) y quedaron a la misma altura: el que bajó es el
+  switch, medido en pantalla.
+
+---
+
+## Reportados, pendientes
 
 - [ ] **El post evento no se probó en las Storytelling.** Las plantillas sí; lo
   que falta es cómo se ve el post evento en esa colección.
