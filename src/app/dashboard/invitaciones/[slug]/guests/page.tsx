@@ -8,6 +8,8 @@ import { GuestPageTabs } from "@/components/dashboard/GuestPageTabs";
 import { getEventStatus } from "@/lib/expiration";
 import { isAdmin } from "@/lib/roles";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
+import { PasosPendientes } from "@/components/dashboard/PasosPendientes";
+import { resumirPasos } from "@/lib/pasos-pendientes";
 import type { Traductor } from "@/lib/i18n/texto";
 
 // Prueba visual: leyenda animada de estado (en vivo / desconectado) junto al
@@ -56,6 +58,18 @@ export default async function GuestManagementPage({ params }: { params: Promise<
   const isLive = eventStatus === "PRE_EVENT" || eventStatus === "EVENT_DAY";
   const t = await textosDelAnfitrion();
 
+  // Cuántos invitados tiene, para saber si ya cargó la lista.
+  const cantidadInvitados = await prisma.guest.count({ where: { invitationId: invitation.id } });
+  const pasos = resumirPasos({
+    slug,
+    fechaEvento: invitation.fechaEvento,
+    direccion: invitation.direccion,
+    mapUrl: invitation.mapUrl,
+    portadaImagenFondo: invitation.portadaImagenFondo,
+    cantidadInvitados,
+    estado: invitation.estado,
+  });
+
   return (
     <div className="p-4 md:p-8 space-y-6">
       {/* ── Breadcrumb ── */}
@@ -89,6 +103,9 @@ export default async function GuestManagementPage({ params }: { params: Promise<
           </div>
         </div>
       </div>
+
+      {/* ── Lo que falta para terminar la invitación ── */}
+      <PasosPendientes resumen={pasos} slug={slug} />
 
       {/* ── Estadísticas fijas (reemplaza al viejo recuadro "Capacidad") ── */}
       <GuestStatsBar invitationId={invitation.id} pagoTarjetaHabilitado={!!invitation.pagoTarjetaHabilitado} />
