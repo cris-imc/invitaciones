@@ -731,7 +731,7 @@ function RegisterForm() {
                     lib/cobro.ts) --, pero se sigue consultando `medios` porque
                     la lista de cada país es la que manda. */}
                 {selectedPlan !== "FREE" && medios.includes("transferencia") && (
-                  <PagoPorTransferencia concepto="tu plan" className="mt-1" />
+                  <PagoPorTransferencia concepto="tu plan" className="mt-1" pais={formData.pais} />
                 )}
 
                 <div className="text-center pt-4">

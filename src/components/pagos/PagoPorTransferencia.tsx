@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Copy, Check, Landmark } from "lucide-react";
 
 const WHATSAPP_COMPROBANTE = `https://wa.me/5493517660000?text=${encodeURIComponent(
@@ -17,6 +17,15 @@ interface Props {
   /** Qué está pagando, para que el mensaje diga algo concreto. */
   concepto?: string;
   className?: string;
+  /**
+   * De qué país mostrar la cuenta.
+   *
+   * Hace falta en el registro: ahí todavía no hay sesión y el país que
+   * importa es el que la persona acaba de elegir en el formulario, que el
+   * servidor no tiene forma de saber. Donde ya hay sesión se omite y lo
+   * resuelve el endpoint con el país de la cuenta.
+   */
+  pais?: string;
 }
 
 /**
@@ -40,7 +49,7 @@ function enGrupos(valor: string): string {
  * el camino principal. Esto es para quien prefiere transferir -- que en
  * Argentina es muchísima gente -- y sin ofrecerlo se perdía esa venta.
  */
-export function PagoPorTransferencia({ concepto, className }: Props) {
+export function PagoPorTransferencia({ concepto, className, pais }: Props) {
   const [abierto, setAbierto] = useState(false);
   // Qué etiqueta se copió, para que el "Copiado" salga en el botón correcto.
   const [copiado, setCopiado] = useState<string | null>(null);
@@ -51,23 +60,39 @@ export function PagoPorTransferencia({ concepto, className }: Props) {
   // y no del bundle, así que cambiar un número de cuenta en Railway tiene
   // efecto sin volver a construir la app. Se piden al desplegar el panel y no
   // al montar: la mayoría de la gente paga con Mercado Pago y nunca lo abre.
-  const alternar = () => {
-    const seAbre = !abierto;
-    setAbierto(seAbre);
-    if (!seAbre || cobro || cargando) return;
+  //
+  // Van atados al país: en el registro se puede abrir el panel, ver los datos
+  // de España, y después cambiar a México. Si no se vuelven a pedir, se queda
+  // en pantalla la cuenta equivocada y alguien transfiere a otro país.
+  useEffect(() => {
+    if (!abierto) return;
 
+    let vigente = true;
     setCargando(true);
-    fetch("/api/cobro")
+    setCobro(null);
+    fetch(pais ? `/api/cobro?pais=${encodeURIComponent(pais)}` : "/api/cobro")
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
+        // Si el país cambió otra vez mientras esto volvía, esta respuesta ya
+        // no sirve: pintarla dejaría la cuenta de un país que no es el
+        // elegido.
+        if (!vigente) return;
         if (j?.disponible) setCobro({ titular: j.titular, banco: j.banco, datos: j.datos });
       })
       .catch(() => {
         // Sin datos no se muestra la sección: media cuenta bancaria en
         // pantalla es peor que ninguna.
       })
-      .finally(() => setCargando(false));
-  };
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, [abierto, pais]);
+
+  const alternar = () => setAbierto((v) => !v);
 
   const copiar = async (etiqueta: string, valor: string) => {
     try {

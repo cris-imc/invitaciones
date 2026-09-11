@@ -180,11 +180,13 @@ export default async function InvitationPage({ params }: { params: Promise<{ slu
 
     return (
         <ProveedorIdioma idioma={idiomaInvitacion}>
+      <div data-invitado>
             <ProveedorInvitacion datos={invitation}>
                 {isFree && <FreePlanBanner />}
                 {isFree && <FreePlanBannerSpacer />}
                 {renderTemplate()}
             </ProveedorInvitacion>
+          </div>
         </ProveedorIdioma>
     );
 }

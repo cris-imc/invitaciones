@@ -16,7 +16,10 @@ export function FreePlanBanner() {
     <div
       className={`fixed top-0 left-0 right-0 z-[999999] flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 px-3 py-1.5 sm:py-0 ${HEIGHT_CLASSES}`}
       style={{
-        background: "var(--ink, #0F1613)",
+        // Fijo y no var(--ink): con el modo claro puesto, ese token es el
+        // crema del panel, y el texto de acá es crema fijo. Esto lo ve el
+        // invitado, que no tiene nada que ver con el tema del anfitrión.
+        background: "#0F1613",
         borderBottom: "1px solid rgba(246,243,236,0.12)",
       }}
     >
