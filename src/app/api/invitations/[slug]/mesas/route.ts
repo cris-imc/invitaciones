@@ -100,7 +100,7 @@ export async function POST(
         {
           error:
             acceso.maxMesas === 1
-              ? "El plan Gratis permite una sola mesa"
+              ? "Para armar más mesas hace falta Premium"
               : `Tu plan permite hasta ${acceso.maxMesas} mesas`,
           code: "TABLE_LIMIT_REACHED",
           upgradable: true,

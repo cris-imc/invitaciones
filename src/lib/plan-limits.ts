@@ -52,7 +52,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       "vintage-elegance",
       "luxury-minimalist",
     ], // 4 plantillas premium
-    // Una sola mesa: alcanza para probar la función, no para armar un salón.
+    // Una mesa: alcanza para entrar, arrastrar invitados y ver cómo funciona,
+    // y no alcanza para organizar un salón, que es para lo que se paga.
     maxMesas: 1,
     features: {
       customMusic: false,

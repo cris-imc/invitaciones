@@ -179,7 +179,7 @@ const es = {
       live: "Sin función LIVE",
       liveDiamond: "Sin función LIVE (exclusiva de Diamond)",
       marcaAgua: "Con marca de agua de altainvitacion",
-      mesas: "Sin organización de mesas",
+      mesas: "El salón completo es de Premium",
       ingreso: "Sin control de ingreso",
       aperturas: "Sin ver quién abrió la invitación",
     },
@@ -193,7 +193,6 @@ const es = {
       invitados: "Hasta {max} invitados",
       album: "Álbum de fotos (hasta {fotos} fotos)",
       ingreso: "Control de ingreso: escaneás el QR en la puerta",
-      unaMesa: "Una mesa, para probar la organización del salón",
     },
 
     premium: {
@@ -509,7 +508,7 @@ const en: Landing = {
       live: "No LIVE feature",
       liveDiamond: "No LIVE feature (Diamond only)",
       marcaAgua: "With the altainvitacion watermark",
-      mesas: "No table planning",
+      mesas: "The full seating plan is Premium",
       ingreso: "No door check-in",
       aperturas: "No way to see who opened the invitation",
     },
@@ -523,7 +522,6 @@ const en: Landing = {
       invitados: "Up to {max} guests",
       album: "Photo album (up to {fotos} photos)",
       ingreso: "Door check-in: scan the QR at the entrance",
-      unaMesa: "One table, to try out the seating plan",
     },
 
     premium: {
@@ -832,7 +830,7 @@ const pt: Landing = {
       live: "Sem o recurso LIVE",
       liveDiamond: "Sem o recurso LIVE (exclusivo do Diamond)",
       marcaAgua: "Com marca d'água da altainvitacion",
-      mesas: "Sem organização das mesas",
+      mesas: "O salão completo é do Premium",
       ingreso: "Sem controle de entrada",
       aperturas: "Sem ver quem abriu o convite",
     },
@@ -846,7 +844,6 @@ const pt: Landing = {
       invitados: "Até {max} convidados",
       album: "Álbum de fotos (até {fotos} fotos)",
       ingreso: "Controle de entrada: escaneia o QR na porta",
-      unaMesa: "Uma mesa, para testar a organização do salão",
     },
 
     premium: {

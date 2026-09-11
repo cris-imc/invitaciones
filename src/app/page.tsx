@@ -442,10 +442,6 @@ export default async function Home() {
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
                   <span>{t("landing.planes.gratis.ingreso")}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
-                  <span>{t("landing.planes.gratis.unaMesa")}</span>
-                </li>
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>{t("landing.planes.sin.pagos")}</span>
@@ -461,10 +457,6 @@ export default async function Home() {
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>{t("landing.planes.sin.mesas")}</span>
-                </li>
-                <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>{t("landing.planes.sin.ingreso")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
@@ -525,14 +517,6 @@ export default async function Home() {
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>{t("landing.planes.sin.marcaAgua")}</span>
-                </li>
-                <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>{t("landing.planes.sin.mesas")}</span>
-                </li>
-                <li className="flex items-start gap-3 opacity-50">
-                  <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
-                  <span>{t("landing.planes.sin.ingreso")}</span>
                 </li>
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
