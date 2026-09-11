@@ -84,7 +84,7 @@ const es = {
     soloAca: "Sólo acá",
     pagos: {
       titulo: "Quién pagó y quién debe",
-      detalle: "Llevá la cuenta de la tarjeta invitado por invitado: precio por lugar, exentos y pagos parciales. El dinero va directo a vos.",
+      detalle: "Llevá la cuenta de la tarjeta invitado por invitado: precio por lugar, exentos y pagos parciales. Te pagan a vos directamente; la app sólo lleva la cuenta.",
     },
     live: {
       titulo: "Modo LIVE",
@@ -125,6 +125,10 @@ const es = {
     musica: {
       titulo: "Música de fondo",
       detalle: "La invitación suena con la canción que los identifica como pareja.",
+    },
+    cronograma: {
+      titulo: "Cronograma del evento",
+      detalle: "Recepción, ceremonia, cena, baile: tus invitados saben qué pasa a cada hora sin tener que preguntar.",
     },
   },
 
@@ -404,7 +408,7 @@ const en: Landing = {
     soloAca: "Only here",
     pagos: {
       titulo: "Who paid and who owes",
-      detalle: "Track the money guest by guest: price per seat, exemptions and partial payments. It goes straight to you.",
+      detalle: "Track the ticket guest by guest: price per seat, exemptions and partial payments. They pay you directly; the app just keeps the count.",
     },
     live: {
       titulo: "LIVE mode",
@@ -445,6 +449,10 @@ const en: Landing = {
     musica: {
       titulo: "Background music",
       detalle: "The invitation plays the song that's theirs.",
+    },
+    cronograma: {
+      titulo: "Event schedule",
+      detalle: "Reception, ceremony, dinner, dancing: your guests know what happens at each hour without having to ask.",
     },
   },
 
@@ -714,7 +722,7 @@ const pt: Landing = {
     soloAca: "Só aqui",
     pagos: {
       titulo: "Quem pagou e quem deve",
-      detalle: "Acompanhe o valor convidado por convidado: preço por lugar, isenções e pagamentos parciais. O dinheiro vai direto para você.",
+      detalle: "Acompanhe o valor convidado por convidado: preço por lugar, isenções e pagamentos parciais. Pagam direto para você; o app só faz a conta.",
     },
     live: {
       titulo: "Modo LIVE",
@@ -755,6 +763,10 @@ const pt: Landing = {
     musica: {
       titulo: "Música de fundo",
       detalle: "O convite toca a música que é a cara do casal.",
+    },
+    cronograma: {
+      titulo: "Programação do evento",
+      detalle: "Recepção, cerimônia, jantar, festa: seus convidados sabem o que acontece a cada hora sem precisar perguntar.",
     },
   },
 
