@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import { BackLink } from "@/components/ui/BackLink";
 import { isAdmin, ROLE_LABELS } from "@/lib/roles";
 import { getEventLabel, getEventEmoji } from "@/lib/invitation-card-helpers";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 const PLAN_LABEL: Record<string, string> = { FREE: "Gratis", PREMIUM: "Premium", DIAMOND: "Diamond", ADMIN: "Admin", ENTERPRISE: "Enterprise" };
 
@@ -52,7 +51,6 @@ export default async function ClienteDetallePage({ params }: { params: Promise<{
                     <h2>{client.name}</h2>
                     <p>{client.email}</p>
                 </div>
-                <PreferenciasUsuario />
             </div>
 
             <div className="p-stats">

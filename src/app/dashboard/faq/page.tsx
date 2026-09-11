@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { FAQ_ITEMS } from "@/lib/faq-data";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 
 // El título de la pestaña también sigue al idioma, así que se arma en tiempo
@@ -29,7 +28,6 @@ export default async function DashboardFaqPage() {
                 <h1 className="text-3xl font-display font-bold mb-2">{t("panel.faq.titulo")}</h1>
                 <p className="text-[var(--shell-fg-soft)]">{t("panel.faq.detalle")}</p>
                 </div>
-                <PreferenciasUsuario />
             </div>
 
             <div className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-sm border border-[var(--line)]">

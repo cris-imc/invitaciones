@@ -8,7 +8,6 @@ import { GreetingText } from "@/components/dashboard/GreetingText";
 import { getEventStatus } from "@/lib/expiration";
 import { isAdmin, isSuperUser } from "@/lib/roles";
 import { ClientInvitationsGrid } from "@/components/dashboard/ClientInvitationsGrid";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 
 // ── Data fetching ────────────────────────────────────────────────
@@ -114,7 +113,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
             <GreetingText userName={userName} />
             <p>{t("panel.inicio.resumenAdmin")}</p>
           </div>
-          <PreferenciasUsuario />
         </div>
         <div className="mt-6">
           <AdminDashboardClient clients={clients} admins={admins} isSuperUser={isSuperUser(role)} />
@@ -169,7 +167,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ ne
           </p>
         </div>
         <div className="p-topbar-acciones">
-          <PreferenciasUsuario />
           <div className="hidden md:block">
           <NewInvitationButton
             premiumCredits={dbUser?.premiumCredits || 0}

@@ -17,6 +17,7 @@ import { LandingLogo } from "@/components/ui/Logo";
 import { isAdmin } from "@/lib/roles";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
 import type { ClaveTexto } from "@/lib/i18n/texto";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 // El `id` es lo que identifica a cada item en los filtros de abajo: el título
 // visible ahora cambia con el idioma y no sirve para comparar.
@@ -140,7 +141,13 @@ export function Sidebar() {
                 );
             })}
 
-            <HelpMenu variant="desktop" />
+            {/* Ayuda y tema juntos, y en un solo lugar de toda la app: un
+                control de preferencias que cambia de lugar según la pantalla
+                hay que volver a buscarlo cada vez. */}
+            <div className="flex items-center justify-center gap-2 mt-4">
+                <ThemeToggle />
+                <HelpMenu variant="desktop" />
+            </div>
 
 
             {isAuthenticated && (
@@ -197,6 +204,7 @@ export function Sidebar() {
                             <LandingLogo className="h-[50px] w-auto" />
                         </div>
                         <div className="flex items-center gap-2">
+                            <ThemeToggle />
                             <HelpMenu variant="mobile" />
                         </div>
                     </header>

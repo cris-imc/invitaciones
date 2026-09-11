@@ -7,7 +7,6 @@ import { GuestStatsBar } from "@/components/dashboard/GuestStatsBar";
 import { GuestPageTabs } from "@/components/dashboard/GuestPageTabs";
 import { getEventStatus } from "@/lib/expiration";
 import { isAdmin } from "@/lib/roles";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 import type { Traductor } from "@/lib/i18n/texto";
 
@@ -68,7 +67,6 @@ export default async function GuestManagementPage({ params }: { params: Promise<
         </div>
         {/* Mobile/tablet: alineado con el breadcrumb, justificado a la derecha */}
         <div className="flex items-center gap-3 shrink-0">
-          <PreferenciasUsuario />
           <div className="xl:hidden">
             <LiveStatusBadge live={isLive} size="xs" t={t} />
           </div>

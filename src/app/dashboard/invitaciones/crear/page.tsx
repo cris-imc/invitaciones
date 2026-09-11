@@ -6,7 +6,6 @@ import { useEffect, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { esCodigoPais } from "@/lib/paises";
 import { paisDelVisitanteEnCliente, recordarPaisDelVisitante } from "@/lib/pais-visitante";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 // Sincroniza el store con la elección gratis/premium/diamond hecha en el
 // modal de NewInvitationButton, leída de la URL en vez de confiar en el
@@ -80,7 +79,6 @@ export default function CrearInvitacionPage() {
                 <WizardBootstrap />
             </Suspense>
             <div className="flex justify-end mb-3">
-                <PreferenciasUsuario />
             </div>
             <WizardSteps />
         </div>

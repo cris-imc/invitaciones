@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { EditWizardContainer } from "@/components/dashboard/EditWizardContainer";
 import { BackLink } from "@/components/ui/BackLink";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 async function getInvitation(id: string) {
     const invitation = await prisma.invitation.findUnique({
@@ -37,7 +36,6 @@ export default async function EditInvitationPage({
                     Modificá cualquier paso de tu invitación "{invitation.nombreEvento}".
                 </p>
                 </div>
-                <PreferenciasUsuario />
             </div>
 
             <EditWizardContainer invitation={invitation} />

@@ -9,7 +9,6 @@ import { getStripClass, getEventEmoji, getEventLabel } from "@/lib/invitation-ca
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 
 async function getInvitations() {
@@ -81,7 +80,6 @@ export default async function InvitacionesPage() {
                     </p>
                 </div>
                 <div className="p-topbar-acciones">
-                    <PreferenciasUsuario />
                     <NewInvitationButton premiumCredits={dbUser?.premiumCredits || 0} diamondCredits={dbUser?.diamondCredits || 0} totalInvitations={invitations.length} planTier={dbUser?.planTier} hasFreeInvitation={hasFreeInvitation} />
                 </div>
             </div>

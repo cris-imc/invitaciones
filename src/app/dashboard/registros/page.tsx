@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { BackLink } from "@/components/ui/BackLink";
 import { isAdmin } from "@/lib/roles";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 const DAYS = 14;
 
@@ -84,7 +83,6 @@ export default async function RegistrosPage() {
                     <h2>Registros y actividad</h2>
                     <p>Cuentas nuevas, tarjetas creadas y logueos de los últimos {DAYS} días.</p>
                 </div>
-                <PreferenciasUsuario />
             </div>
 
             <div className="p-stats">

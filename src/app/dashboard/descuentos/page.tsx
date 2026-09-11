@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import { BackLink } from "@/components/ui/BackLink";
 import { DiscountCodesClient } from "@/components/dashboard/DiscountCodesClient";
 import { isAdmin } from "@/lib/roles";
-import { PreferenciasUsuario } from "@/components/dashboard/PreferenciasUsuario";
 
 export default async function DescuentosPage() {
     const session = await auth().catch(() => null);
@@ -26,7 +25,6 @@ export default async function DescuentosPage() {
                     <h2>Códigos de descuento</h2>
                     <p>Códigos que dan un % extra sobre el precio de Premium/Diamond al registrarse.</p>
                 </div>
-                <PreferenciasUsuario />
             </div>
 
             <DiscountCodesClient
