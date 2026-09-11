@@ -1,14 +1,14 @@
-Logos oficiales de quien procesa el cobro.
+Logos oficiales de quien procesa el cobro. Los usa src/components/pagos/LogoDePago.tsx.
 
-Van acá con estos nombres exactos:
+  paypal.svg        PayPal, lockup horizontal a color (170x48).
+                    https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-color.svg
 
-  mercadopago.svg
-  paypal.svg
+  mercadopago.png   Mercado Pago, lockup a color con fondo transparente (284x74).
+                    El mismo que usa la barra de mercadopago.com.ar:
+                    https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/<version>/mercadopago/logo__large@2x.png
+                    Ojo: ese host devuelve 403 sin cabecera Referer, y la
+                    <version> cambia -- se saca del HTML de la home.
 
-De dónde sacarlos (las dos marcas piden que se use su archivo, no una copia):
-
-  Mercado Pago  https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/mercado-pago-brand-manual
-  PayPal        https://www.paypal.com/us/webapps/mpp/logo-center
-
-Si falta alguno, el botón muestra el nombre de la marca en su color en vez de
-un ícono roto (ver LogoDePago.tsx).
+Los dos son azul oscuro sobre transparente, asi que van sobre una pastilla
+blanca (la pinta el componente). No reemplazarlos por versiones dibujadas a
+mano: un logo mal calcado genera justo la desconfianza que se quiere evitar.
