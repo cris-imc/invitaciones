@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { FAQ_ITEMS } from "@/lib/faq-data";
+import { FAQ_CLAVES } from "@/lib/faq-claves";
+import type { ClaveTexto } from "@/lib/i18n/texto";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
 
 // El título de la pestaña también sigue al idioma, así que se arma en tiempo
@@ -10,9 +11,12 @@ export async function generateMetadata() {
     return { title: t("panel.faq.tituloPagina") };
 }
 
-// Misma lista que la sección #faq de la landing pública (src/app/page.tsx),
-// pero accesible sin salir del panel -- se llega acá desde el menú de Ayuda
-// (Sidebar.tsx), tanto en desktop como en mobile.
+// Las mismas preguntas que /preguntas, pero sin salir del panel -- se llega
+// acá desde el menú de Ayuda (Sidebar.tsx), en desktop y en mobile.
+//
+// Salen del diccionario y no de una lista propia: antes había dos copias del
+// texto, una acá y otra en la landing, y se desincronizaron -- una pregunta
+// agregada de un lado no aparecía del otro.
 export default async function DashboardFaqPage() {
     const session = await auth();
     if (!session?.user) {
@@ -32,13 +36,13 @@ export default async function DashboardFaqPage() {
 
             <div className="bg-[var(--ink)]/50 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-sm border border-[var(--line)]">
                 <div className="space-y-0 divide-y divide-[var(--line)]">
-                    {FAQ_ITEMS.map((item) => (
-                        <details key={item.q} className="group py-5">
+                    {FAQ_CLAVES.map((clave) => (
+                        <details key={clave} className="group py-5">
                             <summary className="flex justify-between items-center cursor-pointer list-none font-semibold text-sm md:text-base gap-4 hover:text-[var(--accent)] transition-colors">
-                                {item.q}
+                                {t(`landing.faq.${clave}.q` as ClaveTexto)}
                                 <span className="text-[var(--accent)] text-xl shrink-0 transition-transform duration-200 group-open:rotate-45">+</span>
                             </summary>
-                            <p className="mt-3 text-[var(--shell-fg-soft)] text-sm leading-relaxed">{item.a}</p>
+                            <p className="mt-3 text-[var(--shell-fg-soft)] text-sm leading-relaxed">{t(`landing.faq.${clave}.a` as ClaveTexto)}</p>
                         </details>
                     ))}
                 </div>

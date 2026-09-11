@@ -18,6 +18,22 @@
  */
 
 export const ES_AR: Record<string, string> = {
+  "landing.faq.idiomaPais.a": "Sí. Al registrarte elegís tu país, y de ahí salen la moneda, los medios de pago y los datos bancarios que se le piden a tus invitados para transferir — no es lo mismo un CBU argentino que una CLABE mexicana. Hoy funciona en Argentina, México, Colombia, Uruguay, España y Estados Unidos.",
+  "landing.faq.idiomaPais.q": "¿Puedo usarlo desde fuera de Argentina?",
+  "landing.faq.despuesDelEvento.a": "El link sigue funcionando, pero cambia: deja de mostrar la cuenta regresiva y el formulario de confirmación, y pasa a mostrar el álbum con las fotos de la fiesta. Queda disponible tres meses después de la fecha del evento, para que tus invitados puedan volver a abrirlo y ver las fotos.",
+  "landing.faq.despuesDelEvento.q": "¿Qué pasa con la invitación después de la fiesta?",
+  "landing.faq.moneda.a": "En Argentina, en pesos argentinos y con la posibilidad de pagar en cuotas sin interés. En el resto de los países el precio se muestra en la moneda local y el cobro se hace en dólares a través de PayPal; el aviso aparece antes de que llegues al checkout, no después. Lo que ves en la página de planes es lo que se cobra.",
+  "landing.faq.moneda.q": "¿En qué moneda me cobran?",
+  "landing.faq.restricciones.a": "Cuando un invitado confirma su asistencia puede dejar sus restricciones alimentarias. Las ves en la lista de invitados y viajan a la planilla que le pasás al salón, junto a la mesa donde va sentado, que es como lo necesita la cocina.",
+  "landing.faq.restricciones.q": "¿Cómo sé si alguien es celíaco o vegetariano?",
+  "landing.faq.cargaMasiva.a": "No. Podés pegar la lista entera de una vez, tal como la tengas escrita en el teléfono, en un mail o en una planilla. Una línea por invitado o por grupo: sólo el nombre es un invitado individual, y con un número es un grupo (\"Los Rodríguez, 4\"). Si detallás las edades también las carga (\"2 adultos, 1 niño\"). Antes de agregar nada te muestra qué entendió de cada línea para que lo revises.",
+  "landing.faq.cargaMasiva.q": "¿Tengo que cargar los invitados de a uno?",
+  "landing.faq.planillaSalon.a": "Sí. Desde el panel de mesas bajás una planilla que se abre con Excel: quién se sienta en cada mesa, cuántas personas son y qué restricciones alimentarias tiene cada uno. Las restricciones salen de lo que cada invitado contestó al confirmar, así que no las tenés que juntar a mano. Los que todavía no tienen mesa aparecen marcados al final.",
+  "landing.faq.planillaSalon.q": "¿Le puedo pasar al salón cómo quedaron las mesas?",
+  "landing.faq.ingreso.a": "Cada invitación termina con un código QR propio de esa persona. En la puerta lo escaneás desde tu teléfono y ves al instante quién es, cuántos vienen con él y, si armaste el salón, a qué mesa mandarlos. Sirve para saber quién llegó sin ir tachando nombres en una lista impresa. Está incluido en todos los planes, también en el Gratis.",
+  "landing.faq.ingreso.q": "¿Qué es el control de ingreso por QR?",
+  "landing.faq.mesas.a": "Dibujás el salón y arrastrás a cada invitado a su mesa. Una familia que no entra en una sola se reparte entre dos, y el sistema lleva la cuenta de cuántos lugares quedan. Cada invitado ve su mesa dentro de su propia invitación, así que el día del evento nadie pregunta dónde sentarse. Está en Premium y Diamond; en el plan Gratis podés armar una mesa para probar cómo funciona.",
+  "landing.faq.mesas.q": "¿Cómo funciona la organización de mesas?",
   "wizard.limitePlan.confirmarVarios": "Tenés {cantidad} créditos {plan} disponibles. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
   "wizard.limitePlan.confirmarUno": "Tenés 1 crédito {plan} disponible. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
   "wizard.trivia.avisoPendienteEditar": "Tenés una pregunta a medio completar en el formulario. Completala o borrá el texto antes de editar otra.",

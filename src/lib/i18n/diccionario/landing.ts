@@ -249,12 +249,16 @@ const es = {
     },
   },
 
-  // Las mismas preguntas viven en src/lib/faq-data.ts para /dashboard/faq,
-  // que todavía no está traducido. Cuando ese panel se traduzca, conviene que
-  // las dos pantallas lean de acá y borrar el archivo de datos.
+  // La ÚNICA fuente de las preguntas frecuentes. Las leen las tres pantallas
+  // que las muestran: la landing (las primeras seis), /preguntas (todas) y
+  // /dashboard/faq (todas). Antes había una copia acá y otra en faq-data.ts,
+  // y se desincronizaron -- una pregunta agregada de un lado no aparecía del
+  // otro. Qué preguntas hay y en qué orden está en src/lib/faq-claves.ts.
   faq: {
     kicker: "Preguntas frecuentes",
     titulo: "¿Tienes dudas?",
+    verTodas: "Ver todas las preguntas",
+    volver: "Volver al inicio",
     sinDiseno: {
       q: "¿Necesito saber de diseño o programación para armar mi invitación?",
       a: "No. Eliges una plantilla y la personalizas con un wizard guiado paso a paso: nombres, fecha, lugar, fotos y mensaje. Vas viendo la vista previa en vivo, tal cual la va a ver cada invitado en su teléfono, así que no hay sorpresas al final.",
@@ -298,6 +302,38 @@ const es = {
     cantidadConfirmada: {
       q: "Un invitado ya confirmó su asistencia, ¿puedo modificar la cantidad de invitados después?",
       a: "Sí. Desde \"Gestionar invitados\" puedes editar la cantidad aunque ya haya confirmado. Si la aumentas (por ejemplo, de 3 a 5 personas), el invitado va a poder entrar a su link y confirmar hasta esa nueva cantidad. Si en cambio la reduces por debajo de lo que ya había confirmado, su respuesta se reinicia automáticamente y va a tener que volver a confirmar su asistencia.",
+    },
+    mesas: {
+      q: "¿Cómo funciona la organización de mesas?",
+      a: "Dibujas el salón y arrastras a cada invitado a su mesa. Una familia que no entra en una sola se reparte entre dos, y el sistema lleva la cuenta de cuántos lugares quedan. Cada invitado ve su mesa dentro de su propia invitación, así que el día del evento nadie pregunta dónde sentarse. Está en Premium y Diamond; en el plan Gratis puedes armar una mesa para probar cómo funciona.",
+    },
+    ingreso: {
+      q: "¿Qué es el control de ingreso por QR?",
+      a: "Cada invitación termina con un código QR propio de esa persona. En la puerta lo escaneas desde tu teléfono y ves al instante quién es, cuántos vienen con él y, si armaste el salón, a qué mesa mandarlos. Sirve para saber quién llegó sin ir tachando nombres en una lista impresa. Está incluido en todos los planes, también en el Gratis.",
+    },
+    planillaSalon: {
+      q: "¿Le puedo pasar al salón cómo quedaron las mesas?",
+      a: "Sí. Desde el panel de mesas descargas una planilla que se abre con Excel: quién se sienta en cada mesa, cuántas personas son y qué restricciones alimentarias tiene cada uno. Las restricciones salen de lo que cada invitado contestó al confirmar, así que no las tienes que juntar a mano. Los que todavía no tienen mesa aparecen marcados al final.",
+    },
+    cargaMasiva: {
+      q: "¿Tengo que cargar los invitados de a uno?",
+      a: "No. Puedes pegar la lista entera de una vez, tal como la tengas escrita en el teléfono, en un mail o en una planilla. Una línea por invitado o por grupo: solo el nombre es un invitado individual, y con un número es un grupo (\"Los Rodríguez, 4\"). Si detallas las edades también las carga (\"2 adultos, 1 niño\"). Antes de agregar nada te muestra qué entendió de cada línea para que lo revises.",
+    },
+    restricciones: {
+      q: "¿Cómo sé si alguien es celíaco o vegetariano?",
+      a: "Cuando un invitado confirma su asistencia puede dejar sus restricciones alimentarias. Las ves en la lista de invitados y viajan a la planilla que le pasas al salón, junto a la mesa donde va sentado, que es como lo necesita la cocina.",
+    },
+    moneda: {
+      q: "¿En qué moneda me cobran?",
+      a: "En Argentina, en pesos argentinos y con la posibilidad de pagar en cuotas sin interés. En el resto de los países el precio se muestra en la moneda local y el cobro se hace en dólares a través de PayPal; el aviso aparece antes de que llegues al checkout, no después. Lo que ves en la página de planes es lo que se cobra.",
+    },
+    despuesDelEvento: {
+      q: "¿Qué pasa con la invitación después de la fiesta?",
+      a: "El link sigue funcionando, pero cambia: deja de mostrar la cuenta regresiva y el formulario de confirmación, y pasa a mostrar el álbum con las fotos de la fiesta. Queda disponible tres meses después de la fecha del evento, para que tus invitados puedan volver a abrirlo y ver las fotos.",
+    },
+    idiomaPais: {
+      q: "¿Puedo usarlo desde fuera de Argentina?",
+      a: "Sí. Al registrarte eliges tu país, y de ahí salen la moneda, los medios de pago y los datos bancarios que se le piden a tus invitados para transferir — no es lo mismo un CBU argentino que una CLABE mexicana. Hoy funciona en Argentina, México, Colombia, Uruguay, España y Estados Unidos.",
     },
   },
 
@@ -581,6 +617,8 @@ const en: Landing = {
   faq: {
     kicker: "Frequently asked questions",
     titulo: "Got questions?",
+    verTodas: "See all questions",
+    volver: "Back to home",
     sinDiseno: {
       q: "Do I need design or coding skills to build my invitation?",
       a: "No. You pick a template and customize it with a step-by-step guided wizard: names, date, venue, photos and message. You see the preview live, exactly as each guest will see it on their phone, so there are no surprises at the end.",
@@ -624,6 +662,38 @@ const en: Landing = {
     cantidadConfirmada: {
       q: "A guest already confirmed — can I still change how many people they're bringing?",
       a: "Yes. From \"Manage guests\" you can edit the number even after they've confirmed. If you raise it (say, from 3 to 5 people), the guest can open their link again and confirm up to the new number. If you lower it below what they had already confirmed, their answer resets automatically and they'll have to confirm again.",
+    },
+    mesas: {
+      q: "How does the seating plan work?",
+      a: "You lay out the room and drag each guest to their table. A family that doesn't fit at one table can be split across two, and the system keeps count of the seats left. Each guest sees their own table inside their invitation, so nobody has to ask where to sit. It's in Premium and Diamond; the Free plan lets you build one table to try it out.",
+    },
+    ingreso: {
+      q: "What is QR door check-in?",
+      a: "Every invitation ends with a QR code unique to that person. At the door you scan it with your phone and instantly see who they are, how many are coming with them and, if you built the seating plan, which table to send them to. It saves you crossing names off a printed list. Included in every plan, Free too.",
+    },
+    planillaSalon: {
+      q: "Can I send the venue the final seating plan?",
+      a: "Yes. From the tables panel you download a spreadsheet that opens in Excel: who sits at each table, how many people, and each one's dietary restrictions. The restrictions come from what each guest answered when confirming, so you don't have to collect them by hand. Anyone without a table yet is flagged at the end.",
+    },
+    cargaMasiva: {
+      q: "Do I have to add guests one by one?",
+      a: "No. You can paste the whole list at once, however you have it written — on your phone, in an email or in a spreadsheet. One line per guest or group: a name alone is a single guest, and with a number it's a group (\"The Rodriguez family, 4\"). If you spell out ages it takes those too (\"2 adults, 1 child\"). Before adding anything it shows you what it understood from each line so you can check it.",
+    },
+    restricciones: {
+      q: "How do I know if someone is coeliac or vegetarian?",
+      a: "When a guest confirms, they can leave their dietary restrictions. You see them in the guest list and they travel into the spreadsheet you hand the venue, next to the table they're seated at, which is how the kitchen needs it.",
+    },
+    moneda: {
+      q: "What currency am I charged in?",
+      a: "In Argentina, Argentine pesos, with interest-free instalments available. Everywhere else the price is shown in the local currency and charged in US dollars through PayPal; the notice appears before you reach checkout, not after. What you see on the plans page is what gets charged.",
+    },
+    despuesDelEvento: {
+      q: "What happens to the invitation after the party?",
+      a: "The link keeps working, but it changes: the countdown and the RSVP form go away and the album with the party photos takes their place. It stays up for three months after the event date so your guests can open it again and see the photos.",
+    },
+    idiomaPais: {
+      q: "Can I use it from outside Argentina?",
+      a: "Yes. When you sign up you pick your country, and that decides the currency, the payment methods and the bank details your guests are asked for — an Argentine CBU is not a Mexican CLABE. It currently works in Argentina, Mexico, Colombia, Uruguay, Spain and the United States.",
     },
   },
 
@@ -903,6 +973,8 @@ const pt: Landing = {
   faq: {
     kicker: "Perguntas frequentes",
     titulo: "Ficou com dúvida?",
+    verTodas: "Ver todas as perguntas",
+    volver: "Voltar ao início",
     sinDiseno: {
       q: "Preciso saber de design ou programação para montar meu convite?",
       a: "Não. Você escolhe um modelo e personaliza com um assistente guiado passo a passo: nomes, data, local, fotos e mensagem. A prévia aparece ao vivo, igual ao que cada convidado vai ver no celular, então não tem surpresa no final.",
@@ -946,6 +1018,38 @@ const pt: Landing = {
     cantidadConfirmada: {
       q: "Um convidado já confirmou presença, posso mudar a quantidade depois?",
       a: "Sim. Em \"Gerenciar convidados\" você pode editar a quantidade mesmo que ele já tenha confirmado. Se aumentar (por exemplo, de 3 para 5 pessoas), o convidado pode entrar no link dele e confirmar até essa nova quantidade. Se reduzir abaixo do que ele já havia confirmado, a resposta é reiniciada automaticamente e ele vai ter que confirmar de novo.",
+    },
+    mesas: {
+      q: "Como funciona a organização de mesas?",
+      a: "Você desenha o salão e arrasta cada convidado para a sua mesa. Uma família que não cabe em uma só se divide entre duas, e o sistema conta quantos lugares sobram. Cada convidado vê a sua mesa dentro do próprio convite, então no dia ninguém pergunta onde sentar. Está no Premium e no Diamond; no plano Grátis você pode montar uma mesa para experimentar.",
+    },
+    ingreso: {
+      q: "O que é o controle de entrada por QR?",
+      a: "Cada convite termina com um QR próprio daquela pessoa. Na porta você escaneia com o celular e vê na hora quem é, quantos vêm com ela e, se você montou o salão, para qual mesa mandá-la. Serve para saber quem chegou sem riscar nomes numa lista impressa. Incluído em todos os planos, inclusive no Grátis.",
+    },
+    planillaSalon: {
+      q: "Posso passar ao salão como ficaram as mesas?",
+      a: "Sim. No painel de mesas você baixa uma planilha que abre no Excel: quem senta em cada mesa, quantas pessoas são e quais restrições alimentares cada um tem. As restrições saem do que cada convidado respondeu ao confirmar, então você não precisa juntá-las à mão. Quem ainda não tem mesa aparece marcado no final.",
+    },
+    cargaMasiva: {
+      q: "Preciso cadastrar os convidados um por um?",
+      a: "Não. Você pode colar a lista inteira de uma vez, do jeito que ela estiver — no celular, num e-mail ou numa planilha. Uma linha por convidado ou grupo: só o nome é um convidado individual, e com um número é um grupo (\"Família Rodrigues, 4\"). Se detalhar as idades, ele também as carrega (\"2 adultos, 1 criança\"). Antes de adicionar qualquer coisa, mostra o que entendeu de cada linha para você revisar.",
+    },
+    restricciones: {
+      q: "Como sei se alguém é celíaco ou vegetariano?",
+      a: "Quando um convidado confirma, ele pode deixar as suas restrições alimentares. Você as vê na lista de convidados e elas vão para a planilha que você entrega ao salão, ao lado da mesa onde ele senta, que é como a cozinha precisa.",
+    },
+    moneda: {
+      q: "Em que moeda me cobram?",
+      a: "Na Argentina, em pesos argentinos e com parcelas sem juros. Nos demais países o preço aparece na moeda local e a cobrança é feita em dólares pelo PayPal; o aviso aparece antes de você chegar ao checkout, não depois. O que você vê na página de planos é o que é cobrado.",
+    },
+    despuesDelEvento: {
+      q: "O que acontece com o convite depois da festa?",
+      a: "O link continua funcionando, mas muda: a contagem regressiva e o formulário de confirmação saem, e no lugar aparece o álbum com as fotos da festa. Fica disponível por três meses depois da data do evento, para os convidados voltarem a abrir e ver as fotos.",
+    },
+    idiomaPais: {
+      q: "Posso usar de fora da Argentina?",
+      a: "Sim. Ao se cadastrar você escolhe o seu país, e daí saem a moeda, os meios de pagamento e os dados bancários que se pedem aos seus convidados — um CBU argentino não é uma CLABE mexicana. Hoje funciona na Argentina, no México, na Colômbia, no Uruguai, na Espanha e nos Estados Unidos.",
     },
   },
 

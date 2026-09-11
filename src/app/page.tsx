@@ -17,24 +17,9 @@ import { costumbresDeVisitante } from "@/lib/costumbres-por-pais";
 import { precioDePlan, precioConDescuento, formatearPrecio, cobraEnOtraMoneda, precioParaPayPal } from "@/lib/precios-por-pais";
 import { idiomaDelAnfitrion } from "@/lib/i18n/servidor";
 import { urlDeInvitacionDeEjemplo } from "@/lib/invitacion-de-ejemplo";
+import { FAQ_CLAVES_LANDING } from "@/lib/faq-claves";
 
 
-// El orden de las preguntas es el de la sección: las claves viven en el
-// diccionario (landing.faq) y acá sólo se dice cuáles se muestran y en qué
-// orden.
-const FAQ_CLAVES = [
-  "sinDiseno",
-  "proceso",
-  "editar",
-  "compartir",
-  "limite",
-  "planes",
-  "cambiarPlan",
-  "celular",
-  "otrosEventos",
-  "costoGratis",
-  "cantidadConfirmada",
-] as const;
 
 export default async function Home() {
   const session = await auth();
@@ -606,7 +591,7 @@ export default async function Home() {
               <h2 id="faq-title" className="text-3xl md:text-5xl font-display font-semibold tracking-tight text-[var(--foreground)]">{t("landing.faq.titulo")}</h2>
             </div>
             <div className="space-y-0 divide-y" style={{ borderColor: 'var(--line)' }}>
-              {FAQ_CLAVES.map((clave) => (
+              {FAQ_CLAVES_LANDING.map((clave) => (
                 <details key={clave} className="group py-5">
                   <summary className="flex justify-between items-center cursor-pointer list-none text-[var(--foreground)] font-semibold text-sm md:text-base gap-4 hover:text-[var(--accent)] transition-colors">
                     {t(`landing.faq.${clave}.q` as ClaveTexto)}
@@ -615,6 +600,20 @@ export default async function Home() {
                   <p className="mt-3 text-[var(--shell-fg-mid)] text-sm leading-relaxed">{t(`landing.faq.${clave}.a` as ClaveTexto)}</p>
                 </details>
               ))}
+            </div>
+
+            {/* Acá van seis de diecinueve. La lista completa creció con cada
+                función nueva, y diecinueve preguntas plegadas al final de una
+                página de venta se leen como un muro: nadie las abre. Las seis
+                de arriba son las que frenan la decisión; el resto se busca
+                cuando ya se está usando, y para eso está /preguntas. */}
+            <div className="text-center mt-8">
+              <Link
+                href="/preguntas"
+                className="inline-flex items-center gap-2 text-sm text-[var(--shell-fg-mid)] underline underline-offset-4 decoration-[var(--tinte-4)] transition-colors hover:text-[var(--foreground)] hover:decoration-[var(--foreground)]/60 font-ui"
+              >
+                {t("landing.faq.verTodas")} →
+              </Link>
             </div>
           </div>
         </section>
