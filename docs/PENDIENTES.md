@@ -70,14 +70,17 @@ así queda el registro de qué se verificó y cómo.
 
 ---
 
-## Reportados, pendientes
+- [x] **El teléfono del registro sale del país.** El prefijo se pone solo y
+  el tramo del medio cambia de nombre y de largo: Cód. área en Argentina,
+  Lada en México, Area code en Estados Unidos, y un solo campo en España,
+  Colombia y Uruguay, que no usan código de área.
 
-- [ ] **El teléfono del registro está pensado para Argentina.** Hoy son dos
-  campos fijos, "Cód. área" y "Número", con el prefijo del país puesto al
-  margen (ver img/telefono.jpg). Tiene que salir del país elegido: el código
-  de país se pone solo, y lo del medio cambia de nombre y de largo según el
-  país -- no en todos lados existe un "código de área", y donde existe no se
-  llama igual ni mide lo mismo.
+- [x] **El importador ofrece ampliar el plan.** Avisa antes de mandar nada
+  cuántas entran, y ofrece pasar de plan en vez de dejar media lista en rojo.
+
+---
+
+## Reportados, pendientes
 
 - [x] **Post evento en las 177 Storytelling.** Hecho: ninguna lo tenía, la
   cuenta regresiva quedaba clavada en cero. Un solo componente
@@ -85,26 +88,9 @@ así queda el registro de qué se verificó y cómo.
   del código de cada variante. Verificado con una Crystal 3D vencida y una
   Guest Pass VIP futura.
 
-- [ ] **Sección de bienvenida en las 177 Storytelling.** En curso. Hoy la
-  invitación abre directo en "Save the Date" y no dice en ningún lado de
-  quién es la fiesta. El mockup (`mockup/Guest Pass VIP - En accion.html`,
-  sección `data-screen-label="Bienvenida"`) la pone primero, sin numerar, con:
-  pase activado · tipo de evento · **los nombres** · fecha y lugar · un
-  mensaje · nº de pase y cuántas personas. Las 36 familias tienen prefijo de
-  clase propio (gpv-, c3d-, ifs-…) y el mismo andamiaje, así que la sección
-  puede usar `${pref}-section` y `${pref}-kicker` y salir temática sola.
-  Al ir SIN numerar no hay que renumerar los kickers existentes.
-
-- [ ] **El importador ignora `upgradable`.** Si pegás 40 en una invitación
-  Gratis entran 20 y el resto sale en rojo, cuando agregar uno solo de más sí
-  ofrece pasar a Premium. Es el peor momento para no ofrecerlo.
-
- Las plantillas sí; lo
-  que falta es cómo se ve el post evento en esa colección.
-
----
-
-## De antes, sin reportar por él
+- [x] **Sección de bienvenida en las 177 Storytelling.** Hecha: abren diciendo
+  de quién es la fiesta, con nombre, fecha, lugar y número de pase, y con las
+  clases de cada familia para que salga temática.
 
 - [ ] **Un pago real con su tarjeta, y devolvérselo.** Sandbox no prueba los
   medios de pago reales ni los límites de la cuenta. Es lo único que todavía
