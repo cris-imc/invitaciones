@@ -49,6 +49,7 @@ import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma"
 import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 import { esVistaMiniatura } from "@/lib/miniatura";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
+import { BienvenidaStorytelling } from "@/components/invitation/BienvenidaStorytelling";
 
 const phlPlayfair = Playfair_Display({
   subsets: ["latin"],
@@ -751,6 +752,22 @@ export function PapeleriaDeHotelDeLujoTemplateBorgonaOroRosa({ invitation, guest
       <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="phl-scroller">
+        {/* De quién es la fiesta. Va PRIMERO porque hasta ahora la invitación
+            abría directo en la fecha: alguien que la recibe por WhatsApp veía
+            "12 dic" sin saber si era la boda de su prima o la inauguración de
+            un local. Ver BienvenidaStorytelling. */}
+        <BienvenidaStorytelling
+          prefijo="phl"
+          acento="#E3A99A"
+          titulo={namesTitle}
+          tipo={invitation.tipo ? String(invitation.tipo) : null}
+          fechaEvento={fechaEvento}
+          lugar={invitation.lugarNombre ? String(invitation.lugarNombre) : null}
+          invitado={isPersonalized && guest?.name ? guest.name : null}
+          numeroDePase={guest?.orderNumber ?? null}
+          personas={guest?.expectedCount ?? null}
+        />
+
         <section data-tone="dark" data-screen-label="Save the Date" className="phl-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #2A1520 0%, #22111A 55%, #170A10 100%)" }}>
           <span data-xin="1" data-dist="-60" className="phl-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="phl-date-stack">

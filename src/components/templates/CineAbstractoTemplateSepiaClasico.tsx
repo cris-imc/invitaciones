@@ -45,6 +45,7 @@ import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma"
 import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 import { esVistaMiniatura } from "@/lib/miniatura";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
+import { BienvenidaStorytelling } from "@/components/invitation/BienvenidaStorytelling";
 
 // Frank Ruhl Libre solo expone la variante "normal" en next/font/google
 // (aunque Google Fonts sirve itálica para esta familia) -- los usos en
@@ -777,6 +778,22 @@ export function CineAbstractoTemplateSepiaClasico({ invitation, guest, isPersona
       <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="cab-scroller">
+        {/* De quién es la fiesta. Va PRIMERO porque hasta ahora la invitación
+            abría directo en la fecha: alguien que la recibe por WhatsApp veía
+            "12 dic" sin saber si era la boda de su prima o la inauguración de
+            un local. Ver BienvenidaStorytelling. */}
+        <BienvenidaStorytelling
+          prefijo="cab"
+          acento="#B98A3E"
+          titulo={namesTitle}
+          tipo={invitation.tipo ? String(invitation.tipo) : null}
+          fechaEvento={fechaEvento}
+          lugar={invitation.lugarNombre ? String(invitation.lugarNombre) : null}
+          invitado={isPersonalized && guest?.name ? guest.name : null}
+          numeroDePase={guest?.orderNumber ?? null}
+          personas={guest?.expectedCount ?? null}
+        />
+
         <section data-tone="dark" data-screen-label="Save the Date" className="cab-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #241C10 0%, #0B0B10 55%, #08080B 100%)" }}>
           <span data-xin="1" data-dist="-60" className="cab-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="cab-date-stack">

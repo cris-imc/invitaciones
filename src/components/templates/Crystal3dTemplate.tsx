@@ -42,6 +42,7 @@ import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma"
 import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 import { esVistaMiniatura } from "@/lib/miniatura";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
+import { BienvenidaStorytelling } from "@/components/invitation/BienvenidaStorytelling";
 
 const c3dPoppins = Poppins({
   subsets: ["latin"],
@@ -714,6 +715,22 @@ export function Crystal3dTemplate({ invitation, guest, isPersonalized = false }:
       <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="c3d-scroller">
+        {/* De quién es la fiesta. Va PRIMERO porque hasta ahora la invitación
+            abría directo en la fecha: alguien que la recibe por WhatsApp veía
+            "12 dic" sin saber si era la boda de su prima o la inauguración de
+            un local. Ver BienvenidaStorytelling. */}
+        <BienvenidaStorytelling
+          prefijo="c3d"
+          acento="#C9A9F5"
+          titulo={namesTitle}
+          tipo={invitation.tipo ? String(invitation.tipo) : null}
+          fechaEvento={fechaEvento}
+          lugar={invitation.lugarNombre ? String(invitation.lugarNombre) : null}
+          invitado={isPersonalized && guest?.name ? guest.name : null}
+          numeroDePase={guest?.orderNumber ?? null}
+          personas={guest?.expectedCount ?? null}
+        />
+
         <section data-tone="dark" data-screen-label="Save the Date" className="c3d-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #17141F 0%, #0A0E14 55%, #080B10 100%)" }}>
           <span data-xin="1" data-dist="-60" className="c3d-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="c3d-date-stack">

@@ -56,6 +56,14 @@ const es = {
   },
 
   // ── Save the date y cuenta regresiva ─────────────────────────
+  bienvenida: {
+    bienvenido: "Bienvenido",
+    hola: "Hola, {nombre}",
+    pase: "Pase N° {numero}",
+    paraVarios: "Para {cantidad} personas",
+    noTransferible: "No transferible",
+  },
+
   saveTheDate: {
     guardaLaFecha: "Guardá la fecha",
     agregarAlCalendario: "Agregar al calendario",
@@ -585,6 +593,14 @@ const en: Invitacion = {
     invitadoEspecial: "Special guest",
   },
 
+  bienvenida: {
+    bienvenido: "Welcome",
+    hola: "Hi, {nombre}",
+    pase: "Pass No. {numero}",
+    paraVarios: "For {cantidad} guests",
+    noTransferible: "Non-transferable",
+  },
+
   saveTheDate: {
     guardaLaFecha: "Save the date",
     agregarAlCalendario: "Add to calendar",
@@ -1085,6 +1101,14 @@ const pt: Invitacion = {
     invitado: "Convidado",
     invitadoAnonimo: "Convidado anônimo",
     invitadoEspecial: "Convidado Especial",
+  },
+
+  bienvenida: {
+    bienvenido: "Bem-vindo",
+    hola: "Olá, {nombre}",
+    pase: "Passe N° {numero}",
+    paraVarios: "Para {cantidad} pessoas",
+    noTransferible: "Não transferível",
   },
 
   saveTheDate: {

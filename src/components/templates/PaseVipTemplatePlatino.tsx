@@ -61,6 +61,7 @@ import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma"
 import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 import { esVistaMiniatura } from "@/lib/miniatura";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
+import { BienvenidaStorytelling } from "@/components/invitation/BienvenidaStorytelling";
 
 const pvpBodoni = Bodoni_Moda({
   subsets: ["latin"],
@@ -731,6 +732,22 @@ export function PaseVipTemplatePlatino({ invitation, guest, isPersonalized = fal
       <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} data-scroller="1" className="pvp-scroller">
+        {/* De quién es la fiesta. Va PRIMERO porque hasta ahora la invitación
+            abría directo en la fecha: alguien que la recibe por WhatsApp veía
+            "12 dic" sin saber si era la boda de su prima o la inauguración de
+            un local. Ver BienvenidaStorytelling. */}
+        <BienvenidaStorytelling
+          prefijo="pvp"
+          acento="#8FB4D9"
+          titulo={namesTitle}
+          tipo={invitation.tipo ? String(invitation.tipo) : null}
+          fechaEvento={fechaEvento}
+          lugar={invitation.lugarNombre ? String(invitation.lugarNombre) : null}
+          invitado={isPersonalized && guest?.name ? guest.name : null}
+          numeroDePase={guest?.orderNumber ?? null}
+          personas={guest?.expectedCount ?? null}
+        />
+
         <section data-tone="dark" data-screen-label="Save the Date" className="pvp-section" style={{ background: "radial-gradient(120% 80% at 50% 0%, #131B24 0%, #0A0E14 55%, #0A0D12 100%)" }}>
           <span data-xin="1" data-dist="-60" className="pvp-kicker">{"01 — " + tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
           <div className="pvp-date-stack">

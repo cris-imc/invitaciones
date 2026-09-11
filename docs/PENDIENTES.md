@@ -79,7 +79,27 @@ así queda el registro de qué se verificó y cómo.
   país -- no en todos lados existe un "código de área", y donde existe no se
   llama igual ni mide lo mismo.
 
-- [ ] **El post evento no se probó en las Storytelling.** Las plantillas sí; lo
+- [x] **Post evento en las 177 Storytelling.** Hecho: ninguna lo tenía, la
+  cuenta regresiva quedaba clavada en cero. Un solo componente
+  (`PostEventoStorytelling`) al que cada plantilla le pasa su paleta, leída
+  del código de cada variante. Verificado con una Crystal 3D vencida y una
+  Guest Pass VIP futura.
+
+- [ ] **Sección de bienvenida en las 177 Storytelling.** En curso. Hoy la
+  invitación abre directo en "Save the Date" y no dice en ningún lado de
+  quién es la fiesta. El mockup (`mockup/Guest Pass VIP - En accion.html`,
+  sección `data-screen-label="Bienvenida"`) la pone primero, sin numerar, con:
+  pase activado · tipo de evento · **los nombres** · fecha y lugar · un
+  mensaje · nº de pase y cuántas personas. Las 36 familias tienen prefijo de
+  clase propio (gpv-, c3d-, ifs-…) y el mismo andamiaje, así que la sección
+  puede usar `${pref}-section` y `${pref}-kicker` y salir temática sola.
+  Al ir SIN numerar no hay que renumerar los kickers existentes.
+
+- [ ] **El importador ignora `upgradable`.** Si pegás 40 en una invitación
+  Gratis entran 20 y el resto sale en rojo, cuando agregar uno solo de más sí
+  ofrece pasar a Premium. Es el peor momento para no ofrecerlo.
+
+ Las plantillas sí; lo
   que falta es cómo se ve el post evento en esa colección.
 
 ---
