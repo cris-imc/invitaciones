@@ -8,7 +8,7 @@
     "build:railway": "node ./scripts/prepare-railway.js && prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "start:railway": "node ./scripts/prepare-railway.js && prisma db push && prisma db seed && next start",
+    "start:railway": "node ./scripts/prepare-railway.js && node ./scripts/db-push-railway.js && prisma db seed && next start",
     "lint": "eslint"
   },
   "dependencies": {
