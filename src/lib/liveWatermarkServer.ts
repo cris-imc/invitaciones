@@ -13,11 +13,10 @@ async function getLogo() {
   return cachedLogo;
 }
 
-/** Versión servidor (sharp) de la marca de agua de src/lib/liveShare.ts --
- * mismo criterio visual (logo centrado abajo, con scrim degradado), pero acá
- * corre en Node para las fotos que se empaquetan en el ZIP de descarga,
- * donde no hay Canvas/Image del navegador disponibles. */
-export async function buildWatermarkedJpegBuffer(photoPath: string): Promise<Buffer> {
+/** Arma la tubería de sharp con la marca de agua puesta, sin ejecutarla.
+ * El objeto que devuelve es un stream: no lee la foto ni ocupa memoria hasta
+ * que alguien empieza a consumirlo. */
+async function buildWatermarkedJpegPipeline(photoPath: string) {
   const logo = await getLogo();
   const photo = sharp(photoPath).rotate(); // aplica la orientación EXIF antes de medir
   const meta = await photo.metadata();
@@ -48,6 +47,25 @@ export async function buildWatermarkedJpegBuffer(photoPath: string): Promise<Buf
       { input: scrimSvg, top: height - scrimHeight, left: 0 },
       { input: resizedLogo, top: height - marginBottom - logoHeight, left: Math.round((width - logoWidth) / 2) },
     ])
-    .jpeg({ quality: 90 })
-    .toBuffer();
+    .jpeg({ quality: 90 });
+}
+
+/** Versión servidor (sharp) de la marca de agua de src/lib/liveShare.ts --
+ * mismo criterio visual (logo centrado abajo, con scrim degradado), pero acá
+ * corre en Node para las fotos que se empaquetan en el ZIP de descarga,
+ * donde no hay Canvas/Image del navegador disponibles.
+ *
+ * Devuelve un STREAM, no un Buffer: el ZIP de un evento puede tener 200 fotos
+ * y, con buffers, las 200 quedaban en memoria a la vez (~400 MB) antes de
+ * mandar un solo byte. El archivador consume estos streams de a uno, así que
+ * la memoria queda acotada a la foto que se está procesando, sin importar
+ * cuántas haya. */
+export async function buildWatermarkedJpegStream(photoPath: string) {
+  return buildWatermarkedJpegPipeline(photoPath);
+}
+
+/** Igual que la anterior pero materializada en un Buffer. Para quien necesite
+ * la imagen entera en memoria a propósito. */
+export async function buildWatermarkedJpegBuffer(photoPath: string): Promise<Buffer> {
+  return (await buildWatermarkedJpegPipeline(photoPath)).toBuffer();
 }
