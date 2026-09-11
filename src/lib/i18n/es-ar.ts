@@ -18,6 +18,23 @@
  */
 
 export const ES_AR: Record<string, string> = {
+  "wizard.limitePlan.confirmarVarios": "Tenés {cantidad} créditos {plan} disponibles. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
+  "wizard.limitePlan.confirmarUno": "Tenés 1 crédito {plan} disponible. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
+  "wizard.trivia.avisoPendienteEditar": "Tenés una pregunta a medio completar en el formulario. Completala o borrá el texto antes de editar otra.",
+  "wizard.trivia.avisoCompletar": "Tenés que completar la pregunta y todas las opciones.",
+  "wizard.trivia.otro2": "¿Cuánto Sabés?",
+  "wizard.trivia.quince3": "¿Qué Tanto Sabés de Mí?",
+  "wizard.trivia.casamiento3": "¿Qué Tanto Sabés de Nosotros?",
+  "wizard.trivia.infoTexto": "El juego de Trivia les permite a tus invitados responder preguntas divertidas sobre {sujeto} directamente desde la tarjeta digital. Podés cargar preguntas con opciones múltiples, marcar la respuesta correcta y desafiar a tus amigos y familiares a demostrar cuánto los conocen durante la fiesta.",
+  "wizard.cronograma.infoTexto": "El cronograma organiza y comunica las distintas etapas de tu fiesta (ej: Recepción, Cena, Brindis, Baile). Podés personalizar los horarios, editar los títulos e íconos de cada momento, agregar nuevas etapas o eliminar las que no necesites.",
+  "wizard.frase.infoTexto": "Esta frase o poema se despliega como cita destacada en el cuerpo de la invitación. Podés redactar tu propio mensaje o elegir una de nuestras sugerencias listas para usar.",
+  "panel.escaner.sinPermiso": "El navegador no dio permiso para usar la cámara. Habilitalo y volvé a intentar.",
+  "landing.faq.titulo": "¿Tenés dudas?",
+  "landing.pasos.compartis.n": "Compartís",
+  "landing.pasos.personalizas.n": "Personalizás",
+  "landing.pasos.elegis.n": "Elegís",
+  "landing.caracteristicas.aperturas.detalle": "Sabés a quién le llegó y a quién conviene volver a escribirle, antes de insistir a ciegas por WhatsApp.",
+  "landing.gratisParaEmpezar": "Gratis para empezar · Sin tarjeta · Pagás una vez, sin suscripción",
   "invitacion.kicker.aqui": "ACÁ",
   "invitacion.kicker.guarda": "GUARDÁ",
   "comun.error": "Ocurrió un error. Probá de nuevo.",

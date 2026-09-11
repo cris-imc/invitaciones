@@ -5,7 +5,7 @@ const es = {
   empezarGratis: "Empezar gratis",
   verInvitacionReal: "Ver una invitación real",
   yaTengoCuenta: "Ya tengo cuenta",
-  gratisParaEmpezar: "Gratis para empezar · Sin tarjeta · Pagás una vez, sin suscripción",
+  gratisParaEmpezar: "Gratis para empezar · Sin tarjeta · Pagas una vez, sin suscripción",
   planesDesde: "Planes desde {precio}",
   cuotasSinInteres: "Hasta {cuotas} cuotas sin interés",
   verModelos: "Ver modelos",
@@ -103,7 +103,7 @@ const es = {
     },
     aperturas: {
       titulo: "Quién abrió la invitación",
-      detalle: "Sabés a quién le llegó y a quién conviene volver a escribirle, antes de insistir a ciegas por WhatsApp.",
+      detalle: "Sabes a quién le llegó y a quién conviene volver a escribirle, antes de insistir a ciegas por WhatsApp.",
     },
     rsvp: {
       titulo: "Confirmación de asistencia",
@@ -137,17 +137,17 @@ const es = {
 
   pasos: {
     elegis: {
-      n: "Elegís",
+      n: "Eliges",
       titulo: "Una plantilla para tu evento",
       detalle: "Boda, cumpleaños, bautismo o lo que estés celebrando: cada una trae su propio tono, tipografía y estructura.",
     },
     personalizas: {
-      n: "Personalizás",
+      n: "Personalizas",
       titulo: "Nombres, fecha, lugar y mensaje",
       detalle: "Wizard guiado paso a paso. Vista previa en vivo, igual a como la va a ver cada invitado en su teléfono.",
     },
     compartis: {
-      n: "Compartís",
+      n: "Compartes",
       titulo: "Un link, listo para enviar",
       detalle: "RSVP, mapa y módulo social incluidos. Vas viendo las confirmaciones a medida que entran.",
     },
@@ -254,14 +254,14 @@ const es = {
   // las dos pantallas lean de acá y borrar el archivo de datos.
   faq: {
     kicker: "Preguntas frecuentes",
-    titulo: "¿Tenés dudas?",
+    titulo: "¿Tienes dudas?",
     sinDiseno: {
       q: "¿Necesito saber de diseño o programación para armar mi invitación?",
-      a: "No. Elegís una plantilla y la personalizas con un wizard guiado paso a paso: nombres, fecha, lugar, fotos y mensaje. Vas viendo la vista previa en vivo, tal cual la va a ver cada invitado en su teléfono, así que no hay sorpresas al final.",
+      a: "No. Eliges una plantilla y la personalizas con un wizard guiado paso a paso: nombres, fecha, lugar, fotos y mensaje. Vas viendo la vista previa en vivo, tal cual la va a ver cada invitado en su teléfono, así que no hay sorpresas al final.",
     },
     proceso: {
       q: "¿Cómo es el proceso, paso a paso?",
-      a: "Elegís una plantilla según tu evento, la personalizas con tus datos y fotos en el wizard viendo la vista previa en tiempo real, y publicas para compartir el link por WhatsApp, Instagram o el medio que prefieras. No hay tiempos de espera ni formularios que enviar a un tercero: tú controlas todo el proceso.",
+      a: "Eliges una plantilla según tu evento, la personalizas con tus datos y fotos en el wizard viendo la vista previa en tiempo real, y publicas para compartir el link por WhatsApp, Instagram o el medio que prefieras. No hay tiempos de espera ni formularios que enviar a un tercero: tú controlas todo el proceso.",
     },
     editar: {
       q: "¿Puedo editar mi invitación después de haberla publicado?",

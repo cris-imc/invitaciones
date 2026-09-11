@@ -9,11 +9,11 @@ export interface FaqItem {
 export const FAQ_ITEMS: FaqItem[] = [
     {
         q: "¿Necesito saber de diseño o programación para armar mi invitación?",
-        a: "No. Elegís una plantilla y la personalizas con un wizard guiado paso a paso: nombres, fecha, lugar, fotos y mensaje. Vas viendo la vista previa en vivo, tal cual la va a ver cada invitado en su teléfono, así que no hay sorpresas al final."
+        a: "No. Eliges una plantilla y la personalizas con un wizard guiado paso a paso: nombres, fecha, lugar, fotos y mensaje. Vas viendo la vista previa en vivo, tal cual la va a ver cada invitado en su teléfono, así que no hay sorpresas al final."
     },
     {
         q: "¿Cómo es el proceso, paso a paso?",
-        a: "Elegís una plantilla según tu evento, la personalizas con tus datos y fotos en el wizard viendo la vista previa en tiempo real, y publicas para compartir el link por WhatsApp, Instagram o el medio que prefieras. No hay tiempos de espera ni formularios que enviar a un tercero: tú controlas todo el proceso."
+        a: "Eliges una plantilla según tu evento, la personalizas con tus datos y fotos en el wizard viendo la vista previa en tiempo real, y publicas para compartir el link por WhatsApp, Instagram o el medio que prefieras. No hay tiempos de espera ni formularios que enviar a un tercero: tú controlas todo el proceso."
     },
     {
         q: "¿Puedo editar mi invitación después de haberla publicado?",

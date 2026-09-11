@@ -148,7 +148,7 @@ export default function LoginPage() {
                 href="/register"
                 className="text-[var(--paper)] hover:underline font-semibold opacity-100"
               >
-                Registrate aquí
+                Regístrate aquí
               </Link>
             </p>
           </div>

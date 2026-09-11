@@ -49,7 +49,7 @@ const es = {
         verCambios: "Ver cambios",
         avisoCambiosTitulo: "Cambios sin guardar",
         avisoCambiosTexto:
-            "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que quieres salir sin aplicar los cambios?",
+            "Tienes cambios sin guardar en la invitación. ¿Estás seguro de que quieres salir sin aplicar los cambios?",
         avisoSalirTitulo: "¿Salir sin terminar?",
         avisoSalirTexto:
             "Todavía no creaste la invitación. Si sales ahora vas a perder todo lo que cargaste hasta aquí.",
@@ -230,7 +230,7 @@ const es = {
         placeholderOtro: "Ej: “Bienvenidos a nuestra celebración. Gracias por estar aquí.”",
         infoTitulo: "¿Cómo se muestra la Frase Personalizada?",
         infoTexto:
-            "Esta frase o poema se despliega como cita destacada en el cuerpo de la invitación. Podés redactar tu propio mensaje o elegir una de nuestras sugerencias listas para usar.",
+            "Esta frase o poema se despliega como cita destacada en el cuerpo de la invitación. Puedes redactar tu propio mensaje o elegir una de nuestras sugerencias listas para usar.",
         habilitar: "Habilitar Frase Personalizada",
         elegiOEscribi: "Elige una frase o escribe la tuya:",
         escribirPropia: "Escribir mi propia frase…",
@@ -305,7 +305,7 @@ const es = {
         subtitulo: "Definí los momentos principales de tu celebración",
         infoTitulo: "¿Cómo funciona el Cronograma?",
         infoTexto:
-            "El cronograma organiza y comunica las distintas etapas de tu fiesta (ej: Recepción, Cena, Brindis, Baile). Podés personalizar los horarios, editar los títulos e íconos de cada momento, agregar nuevas etapas o eliminar las que no necesites.",
+            "El cronograma organiza y comunica las distintas etapas de tu fiesta (ej: Recepción, Cena, Brindis, Baile). Puedes personalizar los horarios, editar los títulos e íconos de cada momento, agregar nuevas etapas o eliminar las que no necesites.",
         etapa: "Etapa #{numero}",
         hora: "Hora",
         actividad: "Actividad / Momento",
@@ -332,7 +332,7 @@ const es = {
         avisoTexto:
             "Las fotos se seleccionan una a una. Al subir cada imagen, el sistema te deja ajustar y elegir el encuadre exacto en formato cuadrado (1:1) para que se adapte perfecto al carrusel.",
         avisoAnonimo:
-            "Podés cargar hasta {max} fotos para probar (Premium o Diamond). Si al crear tu cuenta eliges Gratis, la invitación va a mostrar solo las primeras {gratis}.",
+            "Puedes cargar hasta {max} fotos para probar (Premium o Diamond). Si al crear tu cuenta eliges Gratis, la invitación va a mostrar solo las primeras {gratis}.",
         agregarFoto: "Agregar nueva foto (de a una)",
         limiteAlcanzado: "Llegaste al límite de fotos de tu plan",
         sinFotos:
@@ -344,7 +344,7 @@ const es = {
         altFoto: "Foto {numero}",
         limiteTitulo: "Llegaste al límite de fotos",
         limiteAnonimo:
-            "Podés cargar hasta {max} fotos para probar (Premium o Diamond). Acuérdate de que si eliges Gratis al crear tu cuenta, la invitación va a mostrar solo las primeras {gratis}.",
+            "Puedes cargar hasta {max} fotos para probar (Premium o Diamond). Acuérdate de que si eliges Gratis al crear tu cuenta, la invitación va a mostrar solo las primeras {gratis}.",
         limitePlan:
             "Tu plan {plan} permite hasta {max} fotos en el álbum. Actualiza tu plan para agregar más.",
     },
@@ -440,7 +440,7 @@ const es = {
             "Crea un juego divertido para que tus invitados demuestren cuánto conocen a {sujeto}",
         infoTitulo: "¿Cómo funciona el Quiz o Juego de Trivia?",
         infoTexto:
-            "El juego de Trivia les permite a tus invitados responder preguntas divertidas sobre {sujeto} directamente desde la tarjeta digital. Podés cargar preguntas con opciones múltiples, marcar la respuesta correcta y desafiar a tus amigos y familiares a demostrar cuánto los conocen durante la fiesta.",
+            "El juego de Trivia les permite a tus invitados responder preguntas divertidas sobre {sujeto} directamente desde la tarjeta digital. Puedes cargar preguntas con opciones múltiples, marcar la respuesta correcta y desafiar a tus amigos y familiares a demostrar cuánto los conocen durante la fiesta.",
         sujetoPareja: "la pareja",
         sujetoQuinceanera: "la quinceañera",
         sujetoAgasajado: "el agasajado",
@@ -450,12 +450,12 @@ const es = {
         tituloCampo: "Título",
         casamiento1: "¿Cuánto Nos Conocés?",
         casamiento2: "Trivia de los Novios",
-        casamiento3: "¿Qué Tanto Sabés de Nosotros?",
+        casamiento3: "¿Qué Tanto Sabes de Nosotros?",
         quince1: "¿Cuánto Me Conocés?",
         quince2: "Trivia de mis 15",
-        quince3: "¿Qué Tanto Sabés de Mí?",
+        quince3: "¿Qué Tanto Sabes de Mí?",
         otro1: "Trivia del Festejo",
-        otro2: "¿Cuánto Sabés?",
+        otro2: "¿Cuánto Sabes?",
         otro3: "Pon a Prueba tu Memoria",
         personalizado: "Personalizado",
         tituloPlaceholder: "Escribe un título personalizado",
@@ -471,11 +471,11 @@ const es = {
         agregarYOtra: "Agregar y cargar otra",
         listoCerrar: "Listo, cerrar",
         avisoAgregada: "Pregunta agregada.",
-        avisoCompletar: "Tenés que completar la pregunta y todas las opciones.",
+        avisoCompletar: "Tienes que completar la pregunta y todas las opciones.",
         avisoPendienteEditar:
-            "Tenés una pregunta a medio completar en el formulario. Completala o borrá el texto antes de editar otra.",
+            "Tienes una pregunta a medio completar en el formulario. Completala o borrá el texto antes de editar otra.",
         avisoPendiente:
-            "Tenés una pregunta a medio completar: escribe la pregunta y las 4 opciones, o borrá el texto para descartarla.",
+            "Tienes una pregunta a medio completar: escribe la pregunta y las 4 opciones, o borrá el texto para descartarla.",
         avisoGuardada: "Pregunta guardada.",
         avisoUltima: "Se agregó tu última pregunta antes de continuar.",
         avisoSinPreguntas: "Agrega al menos una pregunta a la Trivia, o deshabilitá la sección.",
@@ -519,9 +519,9 @@ const es = {
             "Ya tienes una invitación Gratis activa -- elige Premium o Diamond para crear esta.",
         confirmarTitulo: "Confirmar uso de crédito {plan}",
         confirmarUno:
-            "Tenés 1 crédito {plan} disponible. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
+            "Tienes 1 crédito {plan} disponible. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
         confirmarVarios:
-            "Tenés {cantidad} créditos {plan} disponibles. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
+            "Tienes {cantidad} créditos {plan} disponibles. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",
         confirmarUsar: "Confirmar y usar crédito",
         usarPremium: "Usar Premium",
         usarDiamond: "Usar Diamond",

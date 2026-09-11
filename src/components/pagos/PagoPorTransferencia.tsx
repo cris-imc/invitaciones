@@ -140,7 +140,7 @@ export function PagoPorTransferencia({ concepto, className, pais }: Props) {
 
       {abierto && !cargando && !cobro && (
         <p className="mt-1 text-xs text-muted-foreground text-center py-3">
-          Por ahora no tenemos transferencia para tu país. Podés pagar con los otros medios.
+          Por ahora no tenemos transferencia para tu país. Puedes pagar con los otros medios.
         </p>
       )}
 

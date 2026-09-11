@@ -192,7 +192,7 @@ export function ImportarInvitados({ slug, onImportado, onCerrar, cupoRestante = 
             Pegar una lista de invitados
           </DialogTitle>
           <DialogDescription className="pt-1">
-            Una línea por invitado o grupo. Podés pegar desde el celular, un mail
+            Una línea por invitado o grupo. Puedes pegar desde el celular, un mail
             o una planilla.
           </DialogDescription>
         </DialogHeader>
@@ -370,7 +370,7 @@ export function ImportarInvitados({ slug, onImportado, onCerrar, cupoRestante = 
               <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-px" />
               <span>
                 Hay nombres repetidos ({resultado.duplicadosEnLaLista.join(", ")}).
-                Si es a propósito está bien; si se coló al copiar, sacalos antes.
+                Si es a propósito está bien; si se coló al copiar, sácalos antes.
               </span>
             </p>
           )}

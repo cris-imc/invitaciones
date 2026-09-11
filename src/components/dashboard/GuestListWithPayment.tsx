@@ -997,7 +997,7 @@ export function GuestListWithPayment({
           <DialogHeader>
             <DialogTitle>{detailGuest?.name}</DialogTitle>
             <DialogDescription>
-              Marca qué lugares están pagos. Podés ponerle el nombre a cada uno y darle
+              Marca qué lugares están pagos. Puedes ponerle el nombre a cada uno y darle
               un precio propio distinto del general.
             </DialogDescription>
           </DialogHeader>

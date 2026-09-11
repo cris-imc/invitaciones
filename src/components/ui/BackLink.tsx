@@ -72,7 +72,7 @@ export function BackLink({
             <DialogDescription>
               {isNewInvitation
                 ? "Todavía no creaste la invitación. Si sales ahora vas a perder todo lo que cargaste hasta aquí."
-                : "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que quieres salir sin aplicar los cambios?"}
+                : "Tienes cambios sin guardar en la invitación. ¿Estás seguro de que quieres salir sin aplicar los cambios?"}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

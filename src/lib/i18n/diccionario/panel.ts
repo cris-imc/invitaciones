@@ -34,7 +34,7 @@ const es = {
     salirNuevaDetalle:
       "Todavía no creaste la invitación. Si sales ahora vas a perder todo lo que cargaste hasta aquí.",
     salirEdicionDetalle:
-      "Tenés cambios sin guardar en la invitación. ¿Seguro que quieres salir sin aplicar los cambios?",
+      "Tienes cambios sin guardar en la invitación. ¿Seguro que quieres salir sin aplicar los cambios?",
     salirYPerder: "Salir y perder los cambios",
     salirSinGuardar: "Salir sin guardar",
   },
@@ -192,7 +192,7 @@ const es = {
 
     editarTitulo: "Editar Invitado",
     yaConfirmoAviso:
-      "Este invitado ya confirmó asistencia. Podés aumentar la cantidad de invitados para que después pueda entrar a su link y sumar más gente. Si en cambio la reduces por debajo de lo que ya confirmó, su respuesta se reinicia y va a tener que volver a confirmar.",
+      "Este invitado ya confirmó asistencia. Puedes aumentar la cantidad de invitados para que después pueda entrar a su link y sumar más gente. Si en cambio la reduces por debajo de lo que ya confirmó, su respuesta se reinicia y va a tener que volver a confirmar.",
     tipoDeInvitacion: "Tipo de Invitación",
 
     precioAdulto: "💰 Precio Adulto",
@@ -206,7 +206,7 @@ const es = {
 
     limiteTitulo: "Llegaste al límite de invitados del plan Gratis",
     limiteDetalle:
-      "El plan Gratis admite hasta 20 personas: cámbiate a Premium o Diamond para seguir agregando invitados sin perder los que ya cargaste.",
+      "El plan Gratis admite hasta 20 personas: pásate a Premium o Diamond para seguir agregando invitados sin perder los que ya cargaste.",
 
     // Avisos
     montoInvalido: "Ingresa un monto válido",
@@ -225,7 +225,7 @@ const es = {
   },
 
   mesas: {
-    limiteTitulo: "¿Seguís armando mesas? Cámbiate a Premium",
+    limiteTitulo: "¿Sigues armando mesas? Pásate a Premium",
     limiteDetalle:
       "Con Premium armas todas las mesas que necesites, repartes a las familias que no entran en una sola y cada invitado ve la suya en su invitación.",
     titulo: "Mesas e ingresos",
@@ -303,7 +303,7 @@ const es = {
     apagar: "Apagar",
     escanearOtro: "Escanear otro",
     noPudeLeer: "No pude leer ese código",
-    sinPermiso: "El navegador no dio permiso para usar la cámara. Habilitalo y volvé a intentar.",
+    sinPermiso: "El navegador no dio permiso para usar la cámara. Habilitalo y vuelve a intentar.",
     sinCamara: "No encontré ninguna cámara en este dispositivo.",
     noPudeAbrir: "No pude abrir la cámara.",
     rechazado: "RECHAZADO",
