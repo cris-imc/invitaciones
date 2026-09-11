@@ -37,12 +37,10 @@ así queda el registro de qué se verificó y cómo.
 
 ## Reportados, pendientes
 
-- [ ] **Logos de Mercado Pago y PayPal** en los botones de pago: le da al
-  visitante la sensación de que el cobro lo maneja una marca conocida.
-
-- [ ] **Carga masiva de invitados.** Ya está hecha: es el commit `d66dffb` de
-  la rama `mesas` (pegar una lista + tabla de vista previa antes de guardar).
-  Falta traerlo con cherry-pick a `internacional`.
+- [ ] **Bajar los logos oficiales** de Mercado Pago y PayPal a
+  `public/marcas/` (`mercadopago.svg` y `paypal.svg`). El componente ya está
+  y los usa apenas aparezcan; mientras tanto muestra el nombre de la marca en
+  su color. Los enlaces están en `public/marcas/LEEME.txt`.
 
 - [ ] **El post evento no se probó en las Storytelling.** Las plantillas sí; lo
   que falta es cómo se ve el post evento en esa colección.
