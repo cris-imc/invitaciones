@@ -46,7 +46,7 @@ export function DeleteInvitationButton({ invitationId }: { invitationId: string 
                 <DialogHeader>
                     <DialogTitle>Eliminar Invitación</DialogTitle>
                     <DialogDescription className="pt-2">
-                        ¿Estás seguro de que querés eliminar esta invitación? 
+                        ¿Estás seguro de que quieres eliminar esta invitación? 
                         Esta acción no se puede deshacer y se perderán todos los datos asociados (RSVP, Álbum, etc).
                     </DialogDescription>
                 </DialogHeader>

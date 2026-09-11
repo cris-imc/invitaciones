@@ -34,7 +34,7 @@ export function DiscountCodesClient({ codes }: { codes: DiscountCodeRow[] }) {
     const handleCreate = async () => {
         const percentageNum = Number(percentage);
         if (!code.trim()) {
-            showToast("Ingresá un código", "error");
+            showToast("Ingresa un código", "error");
             return;
         }
         if (!Number.isInteger(percentageNum) || percentageNum < 1 || percentageNum > 100) {

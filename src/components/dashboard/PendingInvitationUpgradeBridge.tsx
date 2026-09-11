@@ -58,7 +58,7 @@ export function PendingInvitationUpgradeBridge() {
                     return;
                 } catch (error) {
                     console.error("Error upgrading pending invitation:", error);
-                    showToast("No pudimos convertir la invitación. Probá de nuevo desde ahí.", "error");
+                    showToast("No pudimos convertir la invitación. Prueba de nuevo desde ahí.", "error");
                     return;
                 }
             }

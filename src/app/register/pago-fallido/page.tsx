@@ -11,7 +11,7 @@ export default function PagoFallidoPage() {
       icon={XCircle}
       iconClassName="text-red-500"
       title="El pago no se completó"
-      message="Tu cuenta ya está creada como Gratis, sin crédito. Iniciá sesión para seguir usándola, y escribinos por WhatsApp si querés completar el pago."
+      message="Tu cuenta ya está creada como Gratis, sin crédito. Inicia sesión para seguir usándola, y escribinos por WhatsApp si quieres completar el pago."
       ctaHref="/login"
       ctaLabel="Iniciar sesión"
       secondaryHref={WHATSAPP_URL}

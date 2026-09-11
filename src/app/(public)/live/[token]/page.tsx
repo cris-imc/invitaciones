@@ -60,7 +60,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok || !data.acceptanceId) {
-                setErrorModal(data.error || "No pudimos registrar la aceptación de los Términos. Probá de nuevo.");
+                setErrorModal(data.error || "No pudimos registrar la aceptación de los Términos. Prueba de nuevo.");
                 return;
             }
             localStorage.setItem(`live_guest_name_${token}`, guestName.trim());
@@ -68,7 +68,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             setAcceptanceId(data.acceptanceId);
             setHasName(true);
         } catch {
-            setErrorModal("No pudimos registrar la aceptación de los Términos. Probá de nuevo.");
+            setErrorModal("No pudimos registrar la aceptación de los Términos. Prueba de nuevo.");
         } finally {
             setAcceptingTerms(false);
         }

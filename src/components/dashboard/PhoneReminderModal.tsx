@@ -80,10 +80,10 @@ export function PhoneReminderModal() {
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Phone className="w-5 h-5 text-[var(--accent)]" />
-                        Sumá tu teléfono
+                        Suma tu teléfono
                     </DialogTitle>
                     <DialogDescription className="pt-2">
-                        Nos falta tu número para poder contactarte si lo necesitás. Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234).
+                        Nos falta tu número para poder contactarte si lo necesitas. Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234).
                     </DialogDescription>
                 </DialogHeader>
 

@@ -69,7 +69,7 @@ export function NoCreditsDialog({
                         <span>⚠️</span> Sin créditos {planLabel}
                     </DialogTitle>
                     <DialogDescription className="pt-2">
-                        No tenés créditos {planLabel} disponibles en tu cuenta. Pagá con {medio} para conseguir uno al instante{onCreateFree ? ", o creá una invitación gratis por ahora" : ""}.
+                        No tienes créditos {planLabel} disponibles en tu cuenta. Pagá con {medio} para conseguir uno al instante{onCreateFree ? ", o crea una invitación gratis por ahora" : ""}.
                     </DialogDescription>
                 </DialogHeader>
                 {/* Div plano (no DialogFooter): ese componente fuerza

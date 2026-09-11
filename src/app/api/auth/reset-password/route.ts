@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
         if (!resetToken || resetToken.usedAt || resetToken.expiresAt < new Date()) {
             return NextResponse.json(
-                { error: "El link para resetear la contraseña venció o ya fue usado -- pedí uno nuevo." },
+                { error: "El link para resetear la contraseña venció o ya fue usado -- pide uno nuevo." },
                 { status: 400 }
             );
         }

@@ -41,7 +41,7 @@ export function StepPreview() {
         <div className="space-y-6">
             <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold">¡Todo listo!</h2>
-                <p className="text-muted-foreground">Revisá los datos antes de crear tu invitación.</p>
+                <p className="text-muted-foreground">Revisa los datos antes de crear tu invitación.</p>
             </div>
 
             <div className="border rounded-xl overflow-hidden shadow-sm bg-slate-100 min-h-[600px] flex items-center justify-center relative">

@@ -308,7 +308,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         month: 'long',
         year: 'numeric',
     });
-    const description = `Estás invitado a ${getInvitePhrase(invitation.tipo)} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ''}. Confirmá tu asistencia.`;
+    const description = `Estás invitado a ${getInvitePhrase(invitation.tipo)} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ''}. Confirma tu asistencia.`;
     const ogImage = invitation.portadaImagenFondo
         ? [{ url: invitation.portadaImagenFondo, width: 1200, height: 630, alt: invitation.nombreEvento }]
         : undefined;

@@ -35,7 +35,7 @@ export function FreePlanBanner() {
         className="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-[10px] sm:text-xs font-semibold whitespace-nowrap hover:opacity-90 transition-opacity"
         style={{ background: "#C79A4B", color: "#0F1613" }}
       >
-        Creá tu invitación Premium
+        Crea tu invitación Premium
       </Link>
     </div>
   );

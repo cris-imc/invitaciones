@@ -7,7 +7,7 @@ export default function PagoExitosoPage() {
       icon={CheckCircle2}
       iconClassName="text-green-500"
       title="¡Pago aprobado!"
-      message="Tu pago fue aprobado. En unos segundos vas a ver tu crédito acreditado en la cuenta -- iniciá sesión para continuar."
+      message="Tu pago fue aprobado. En unos segundos vas a ver tu crédito acreditado en la cuenta -- inicia sesión para continuar."
       ctaHref="/login"
       ctaLabel="Iniciar sesión"
     />

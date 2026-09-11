@@ -196,7 +196,7 @@ export async function POST(
             // que reintente en vez de devolverle un 500.
             if (esChoqueDeSerializacion(error)) {
                 return NextResponse.json(
-                    { error: "Hubo dos cambios a la vez. Probá de nuevo.", code: "CONFLICTO" },
+                    { error: "Hubo dos cambios a la vez. Prueba de nuevo.", code: "CONFLICTO" },
                     { status: 409 }
                 );
             }

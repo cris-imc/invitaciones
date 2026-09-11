@@ -101,7 +101,7 @@ export function PasosPendientes({ resumen, slug }: Props) {
               que saber para seguir. */}
           {!abierto && resumen.siguiente && (
             <p className="mt-2 text-xs text-muted-foreground truncate">
-              Seguí con: {resumen.siguiente.titulo}
+              Sigue con: {resumen.siguiente.titulo}
             </p>
           )}
         </div>

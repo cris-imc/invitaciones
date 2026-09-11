@@ -282,7 +282,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                             )}
                                             {rawLocked && isAdmin && (
                                                 <p className="text-xs text-green-400 font-medium">
-                                                    👑 Modo Administrador: podés modificar la fecha libremente.
+                                                    👑 Modo Administrador: puedes modificar la fecha libremente.
                                                 </p>
                                             )}
                                         </>
@@ -376,7 +376,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                     placeholder="Ej: Sofi, Valentina, Mafe..."
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Ingresá el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.
+                                    Ingresa el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.
                                 </p>
                             </div>
                         )}
@@ -445,7 +445,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                 value={formData.mapUrl}
                                 onChange={(e) => handleInputChange('mapUrl', e.target.value)}
                                 className="w-full p-2 border rounded-md"
-                                placeholder="Pegá el link que copiaste de Google Maps"
+                                placeholder="Pega el link que copiaste de Google Maps"
                             />
                             <p className="text-xs text-muted-foreground">
                                 Vale cualquier link de Google Maps (el de "Compartir" o el de la barra de direcciones).
@@ -509,7 +509,7 @@ export function EditInvitationForm({ invitation }: EditInvitationFormProps) {
                                             value={formData.portadaMensaje ?? ''}
                                             onChange={(e) => handleInputChange('portadaMensaje', e.target.value)}
                                             className="w-full p-2 border rounded-md"
-                                            placeholder="Ej: Queremos compartir este momento único con vos."
+                                            placeholder="Ej: Queremos compartir este momento único contigo."
                                         />
                                     </div>
                                     <div className="space-y-2">

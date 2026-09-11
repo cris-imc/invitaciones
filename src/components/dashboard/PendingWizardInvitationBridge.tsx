@@ -62,7 +62,7 @@ export function PendingWizardInvitationBridge() {
                         );
                     } else {
                         showToast(
-                            `No pudimos terminar de crear la invitación que armaste antes: ${error instanceof Error ? error.message : "error desconocido"}. Podés crearla de nuevo desde acá.`,
+                            `No pudimos terminar de crear la invitación que armaste antes: ${error instanceof Error ? error.message : "error desconocido"}. Podés crearla de nuevo desde aquí.`,
                             "error"
                         );
                     }

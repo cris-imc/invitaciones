@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     // se graba abajo en el registro del usuario.
     if (acceptedTerms !== true) {
       return NextResponse.json(
-        { error: "Debés aceptar los Términos y Condiciones para registrarte" },
+        { error: "Debes aceptar los Términos y Condiciones para registrarte" },
         { status: 400 }
       );
     }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // inventado dejaría al usuario con formularios de Argentina sin avisarle.
     if (!esCodigoPais(pais)) {
       return NextResponse.json(
-        { error: "Elegí un país válido" },
+        { error: "Elige un país válido" },
         { status: 400 }
       );
     }

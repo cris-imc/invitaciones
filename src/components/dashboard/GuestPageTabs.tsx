@@ -32,12 +32,12 @@ interface Props {
 }
 
 const TAB_DESCRIPTIONS: Record<Tab, string> = {
-  agregar: "Agregá invitados, familias y enviales su enlace único por WhatsApp...",
-  invitados: "Revisá quién confirmó asistencia y llevá el control exacto de los pagos...",
-  precio: "Modificá el precio de la tarjeta y mantené informado a tus invitados...",
-  canciones: "Aprobá o rechazá las canciones que sugieren para la fiesta...",
-  mesas: "Armá el salón, asigná mesas y controlá quién llega escaneando el QR en la puerta...",
-  live: "Modo Fiesta: Proyectá fotos en vivo y moderá la pantalla gigante...",
+  agregar: "Agrega invitados, familias y enviales su enlace único por WhatsApp...",
+  invitados: "Revisa quién confirmó asistencia y lleva el control exacto de los pagos...",
+  precio: "Modifica el precio de la tarjeta y mantén informado a tus invitados...",
+  canciones: "Aprueba o rechaza las canciones que sugieren para la fiesta...",
+  mesas: "Arma el salón, asigna mesas y controla quién llega escaneando el QR en la puerta...",
+  live: "Modo Fiesta: Proyecta fotos en vivo y moderá la pantalla gigante...",
 };
 
 function AnimatedTabDescription({ text }: { text: string }) {
@@ -311,7 +311,7 @@ export function GuestPageTabs({
                   cambio se guarda (Invitation.regaloMontoUpdatedAt) y viaja hasta
                   la invitación, pero ninguna plantilla la muestra todavía. */}
               <p className="text-muted-foreground text-sm mb-6">
-                Modificá el valor por persona. El cambio se ve en la invitación apenas
+                Modifica el valor por persona. El cambio se ve en la invitación apenas
                 la abren, y alcanza sólo a los lugares que todavía no marcaste como
                 pagos: lo ya cobrado queda al precio de ese momento.
               </p>

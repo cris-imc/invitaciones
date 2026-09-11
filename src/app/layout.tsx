@@ -70,7 +70,7 @@ const allFonts = [
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   title: "Invitaciones Digitales para tus eventos",
-  description: "Creá invitaciones digitales personalizadas para bodas, XV años, cumpleaños y más. Compartí por WhatsApp, gestioná confirmaciones y seguí los pagos desde un solo lugar.",
+  description: "Crea invitaciones digitales personalizadas para bodas, XV años, cumpleaños y más. Comparte por WhatsApp, gestioná confirmaciones y sigue los pagos desde un solo lugar.",
   keywords: ["invitaciones digitales", "boda", "quince años", "cumpleaños", "argentina", "RSVP online"],
   openGraph: {
     siteName: "Invitaciones Digitales",

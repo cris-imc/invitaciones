@@ -48,8 +48,8 @@ export default function ForgotPasswordPage() {
             <h1 className="font-display text-3xl mb-2">Recuperar contraseña</h1>
             <p className="opacity-70 font-body">
               {sent
-                ? "Revisá tu email para continuar."
-                : "Ingresá tu email y te mandamos un link para resetear tu contraseña."}
+                ? "Revisa tu email para continuar."
+                : "Ingresa tu email y te mandamos un link para resetear tu contraseña."}
             </p>
           </div>
 

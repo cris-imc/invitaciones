@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
         const email = String(body.email || "").trim().toLowerCase();
 
         if (!email) {
-            return NextResponse.json({ error: "Ingresá tu email" }, { status: 400 });
+            return NextResponse.json({ error: "Ingresa tu email" }, { status: 400 });
         }
 
         const genericResponse = NextResponse.json({
@@ -72,9 +72,9 @@ export async function POST(request: NextRequest) {
             subject: "Resetear tu contraseña -- Alta Invitación",
             html: `
                 <p>Hola${user.name ? " " + user.name : ""},</p>
-                <p>Pediste resetear tu contraseña en Alta Invitación. Hacé click en el siguiente link para elegir una nueva (válido por 30 minutos):</p>
+                <p>Pediste resetear tu contraseña en Alta Invitación. Haz click en el siguiente link para elegir una nueva (válido por 30 minutos):</p>
                 <p><a href="${resetUrl}">${resetUrl}</a></p>
-                <p>Si no fuiste vos, ignorá este mail -- tu contraseña actual sigue funcionando igual.</p>
+                <p>Si no fuiste tú, ignora este mail -- tu contraseña actual sigue funcionando igual.</p>
             `,
         });
         if (sendError) {

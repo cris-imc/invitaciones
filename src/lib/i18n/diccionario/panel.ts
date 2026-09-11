@@ -32,9 +32,9 @@ const es = {
     salirSinTerminar: "¿Salir sin terminar?",
     cambiosSinGuardar: "Cambios sin guardar",
     salirNuevaDetalle:
-      "Todavía no creaste la invitación. Si salís ahora vas a perder todo lo que cargaste hasta acá.",
+      "Todavía no creaste la invitación. Si sales ahora vas a perder todo lo que cargaste hasta aquí.",
     salirEdicionDetalle:
-      "Tenés cambios sin guardar en la invitación. ¿Seguro que querés salir sin aplicar los cambios?",
+      "Tenés cambios sin guardar en la invitación. ¿Seguro que quieres salir sin aplicar los cambios?",
     salirYPerder: "Salir y perder los cambios",
     salirSinGuardar: "Salir sin guardar",
   },
@@ -50,7 +50,7 @@ const es = {
   inicio: {
     anfitrion: "anfitrión",
     resumenAdmin: "Gestioná los clientes activos y sus invitaciones.",
-    resumen: "Acá tenés el resumen de tus eventos en tiempo real.",
+    resumen: "Aquí tienes el resumen de tus eventos en tiempo real.",
     kpiActivas: "Invitaciones activas",
     kpiActivasDetalle: "{total} en total",
     kpiConfirmaron: "Confirmaron",
@@ -60,7 +60,7 @@ const es = {
     kpiCanciones: "Canciones pendientes",
     kpiCancionesDetalle: "requieren moderación",
     tusActivas: "Tus invitaciones activas",
-    sinActivas: "Todavía no tenés invitaciones activas.",
+    sinActivas: "Todavía no tienes invitaciones activas.",
     verInactivas: "Ver invitaciones inactivas ({cantidad}) →",
   },
 
@@ -74,7 +74,7 @@ const es = {
     planGratis: "Gratis",
     administrar: "Administrar →",
     vacio:
-      "No tenés invitaciones inactivas. Las vas a encontrar acá cuando queden en borrador, finalicen, o venzan 3 meses después del evento.",
+      "No tienes invitaciones inactivas. Las vas a encontrar aquí cuando queden en borrador, finalicen, o venzan 3 meses después del evento.",
   },
 
   evento: {
@@ -100,7 +100,7 @@ const es = {
     agregarInvitado: "Agrega un invitado",
     buscarInvitado: "Buscar invitado…",
     listaDeInvitados: "Lista de Invitados",
-    gestionaTusInvitados: "Gestioná tus invitados y compartí sus enlaces.",
+    gestionaTusInvitados: "Gestioná tus invitados y comparte sus enlaces.",
     borrarLaBusqueda: "Borrar la búsqueda",
 
     // Cuándo abrió la invitación, y con qué certeza lo sabemos.
@@ -126,7 +126,7 @@ const es = {
     enlaceUnico: "Generá un enlace único para cada invitado/a.",
     saludarPorNombre: "Saludar por nombre del invitado/familia",
     queHaceEsteInterruptor: "Qué hace este interruptor",
-    queTipoDeInvitacion: "¿Qué tipo de invitación querés crear?",
+    queTipoDeInvitacion: "¿Qué tipo de invitación quieres crear?",
     disponibleEnPremium: "Disponible en Premium",
     cambiarTipo: "Cambiar tipo de invitación",
     nombreDelGrupo: "Nombre del Grupo/Familia",
@@ -151,7 +151,7 @@ const es = {
     copiarLink: "Copiar Link",
     asiSeComparte: "¡Así se comparte!",
     asiSeComparteDetalle:
-      "Copiá este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.",
+      "Copia este enlace único y enviáselo a tu invitado para que vea su invitación personalizada y confirme su asistencia.",
 
     pagina: "Página {actual} de {total}",
 
@@ -182,7 +182,7 @@ const es = {
     saludarNombreQuinceanera: "el nombre de la quinceañera",
     saludarNombreEvento: "el nombre del evento",
     saludarNota:
-      "Vale para todos los invitados a la vez, y podés cambiarlo cuando quieras: la próxima vez que alguien abra su enlace ya lo ve aplicado.",
+      "Vale para todos los invitados a la vez, y puedes cambiarlo cuando quieras: la próxima vez que alguien abra su enlace ya lo ve aplicado.",
     entendido: "Entendido",
 
     eliminarTitulo: "¿Eliminar invitado?",
@@ -192,24 +192,24 @@ const es = {
 
     editarTitulo: "Editar Invitado",
     yaConfirmoAviso:
-      "Este invitado ya confirmó asistencia. Podés aumentar la cantidad de invitados para que después pueda entrar a su link y sumar más gente. Si en cambio la reducís por debajo de lo que ya confirmó, su respuesta se reinicia y va a tener que volver a confirmar.",
+      "Este invitado ya confirmó asistencia. Podés aumentar la cantidad de invitados para que después pueda entrar a su link y sumar más gente. Si en cambio la reduces por debajo de lo que ya confirmó, su respuesta se reinicia y va a tener que volver a confirmar.",
     tipoDeInvitacion: "Tipo de Invitación",
 
     precioAdulto: "💰 Precio Adulto",
     precioAdolescente: "🎓 Precio Adolescente",
     precioNino: "👶 Precio Niño",
     sinPrecioDetalle:
-      "No hay precio configurado para esta categoría. Ingresá el monto para habilitarla.",
+      "No hay precio configurado para esta categoría. Ingresa el monto para habilitarla.",
     monto: "Monto ($)",
     ejemploMonto: "Ej: 5000",
     guardarYHabilitar: "Guardar y Habilitar",
 
     limiteTitulo: "Llegaste al límite de invitados del plan Gratis",
     limiteDetalle:
-      "El plan Gratis admite hasta 20 personas: pasate a Premium o Diamond para seguir agregando invitados sin perder los que ya cargaste.",
+      "El plan Gratis admite hasta 20 personas: cámbiate a Premium o Diamond para seguir agregando invitados sin perder los que ya cargaste.",
 
     // Avisos
-    montoInvalido: "Ingresá un monto válido",
+    montoInvalido: "Ingresa un monto válido",
     precioGuardado: "Precio guardado correctamente",
     errorPrecio: "Error al guardar el precio",
     preferenciaGuardada: "Preferencia guardada",
@@ -225,9 +225,9 @@ const es = {
   },
 
   mesas: {
-    limiteTitulo: "¿Seguís armando mesas? Pasate a Premium",
+    limiteTitulo: "¿Seguís armando mesas? Cámbiate a Premium",
     limiteDetalle:
-      "Con Premium armás todas las mesas que necesites, repartís a las familias que no entran en una sola y cada invitado ve la suya en su invitación.",
+      "Con Premium armas todas las mesas que necesites, repartes a las familias que no entran en una sola y cada invitado ve la suya en su invitación.",
     titulo: "Mesas e ingresos",
     agregarMesa: "Agregar mesa",
     escanearIngreso: "Escanear ingreso",
@@ -256,15 +256,15 @@ const es = {
       "Aparece en su pase, dentro de la invitación. Si una familia quedó repartida, ve las dos mesas, sin el detalle de quién va en cada una.",
     controlarIngreso: "Controlar el ingreso con QR",
     controlarIngresoDetalle:
-      "Cada invitación termina con un QR. Lo escaneás en la puerta y ves quiénes son, cuántos vienen y a qué mesa mandarlos. Queda registrado quién llegó y a qué hora.",
+      "Cada invitación termina con un QR. Lo escaneas en la puerta y ves quiénes son, cuántos vienen y a qué mesa mandarlos. Queda registrado quién llegó y a qué hora.",
 
     salonVacio:
-      "Todavía no hay mesas. Agregá la primera y arrastrala para armar el salón como va a estar el día del evento.",
-    ahoraTocaUnaMesa: "Ahora tocá una mesa del salón.",
+      "Todavía no hay mesas. Agrega la primera y arrastrala para armar el salón como va a estar el día del evento.",
+    ahoraTocaUnaMesa: "Ahora toca una mesa del salón.",
     comoUbicar:
-      "Arrastrá un invitado o familia hasta la mesa, o tocalo y después tocá la mesa.",
+      "Arrastrá un invitado o familia hasta la mesa, o tocalo y después toca la mesa.",
     nadieConfirmoTodavia:
-      "Todavía no confirmó nadie. Si querés ir adelantando, tildá la opción de arriba para ubicar también a los que no contestaron.",
+      "Todavía no confirmó nadie. Si quieres ir adelantando, tildá la opción de arriba para ubicar también a los que no contestaron.",
     sinCoincidencias: "Nadie sin ubicar coincide con “{busqueda}”.",
     sinConfirmar: "sin confirmar",
     faltan: "faltan {cantidad}",
@@ -272,7 +272,7 @@ const es = {
     siguienteCorto: "Siguiente ›",
     deTotal: "{actual} de {total}",
 
-    apodo: "Apodo para vos (ej: Primos)",
+    apodo: "Apodo para ti (ej: Primos)",
     quitarLugar: "Quitar un lugar",
     agregarLugar: "Agregar un lugar",
     excedida:
@@ -290,10 +290,10 @@ const es = {
     errorCargar: "No se pudieron cargar las mesas",
     errorGuardar: "No se pudo guardar",
     mesasVisibles: "Listo: cada invitado va a ver su mesa en la portada de su invitación.",
-    mesasOcultas: "Las mesas quedan sólo para vos. Los invitados no ven nada.",
-    qrActivado: "Listo: cada invitación termina con un QR y podés escanear en la puerta.",
+    mesasOcultas: "Las mesas quedan sólo para ti. Los invitados no ven nada.",
+    qrActivado: "Listo: cada invitación termina con un QR y puedes escanear en la puerta.",
     qrDesactivado: "Sin control en la puerta: el QR desaparece de las invitaciones.",
-    mesaCompleta: "{mesa} ya está completa. Agrandala o elegí otra.",
+    mesaCompleta: "{mesa} ya está completa. Agrandala o elige otra.",
     entraronParte: "{nombre}: {ubicados} en {mesa}, quedan {faltan} por ubicar.",
   },
 
@@ -341,8 +341,8 @@ const es = {
 
   nueva: {
     boton: "+ Nueva invitación",
-    titulo: "Elegí tu tipo de invitación",
-    detalle: "¿Qué tipo de invitación querés crear?",
+    titulo: "Elige tu tipo de invitación",
+    detalle: "¿Qué tipo de invitación quieres crear?",
     crearGratis: "Crear Gratis",
     usarPremium: "Usar Crédito Premium",
     usarDiamond: "Usar Crédito Diamond",
@@ -373,7 +373,7 @@ const es = {
   perfil: {
     tituloPagina: "Mi Perfil | Convite",
     titulo: "Mi Perfil",
-    detalle: "Administrá tus datos personales",
+    detalle: "Administra tus datos personales",
     nombreCompleto: "Nombre Completo",
     tuNombre: "Tu nombre",
     correo: "Correo Electrónico",

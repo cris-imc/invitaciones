@@ -68,9 +68,9 @@ export async function shareWatermarkedPhoto(photoUrl: string): Promise<string | 
     a.download = file.name;
     a.click();
     URL.revokeObjectURL(url);
-    return "Tu navegador no deja compartir directo -- te descargamos la foto para que la compartas vos.";
+    return "Tu navegador no deja compartir directo -- te descargamos la foto para que la compartas tú.";
   } catch (err: unknown) {
     if ((err as { name?: string })?.name === "AbortError") return null;
-    return "No pudimos preparar la foto para compartir. Probá de nuevo.";
+    return "No pudimos preparar la foto para compartir. Prueba de nuevo.";
   }
 }

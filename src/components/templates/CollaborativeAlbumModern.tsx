@@ -80,7 +80,7 @@ export function CollaborativeAlbumModern({
       {/* Upload Section */}
       <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-2xl p-8">
         <h3 className="text-2xl font-bold mb-4 text-center">
-          Compartí tus fotos
+          Comparte tus fotos
         </h3>
         <p className="text-center text-muted-foreground mb-6">
           Ayudanos a crear un álbum colaborativo del evento

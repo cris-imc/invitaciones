@@ -30,7 +30,7 @@ type ValidateResult =
 export async function validateDiscountCode(rawCode: string): Promise<ValidateResult> {
   const code = normalizeDiscountCode(rawCode);
   if (!code) {
-    return { valid: false, error: "Ingresá un código" };
+    return { valid: false, error: "Ingresa un código" };
   }
 
   const discountCode = await prisma.discountCode.findUnique({ where: { code } });

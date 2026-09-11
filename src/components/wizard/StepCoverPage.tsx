@@ -91,7 +91,7 @@ export function StepCoverPage() {
                     <Sparkles className="w-5 h-5 text-amber-500" />
                 </h2>
                 <p className="text-muted-foreground text-sm">
-                    Personalizá la pantalla inicial (sobre virtual) que verán tus invitados al abrir su tarjeta.
+                    Personaliza la pantalla inicial (sobre virtual) que verán tus invitados al abrir su tarjeta.
                 </p>
             </div>
 
@@ -178,7 +178,7 @@ export function StepCoverPage() {
                                 <Input
                                     id="portadaKicker"
                                     className="bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl text-sm mt-3 animate-in fade-in zoom-in-95"
-                                    placeholder="Escribí tu propio encabezado..."
+                                    placeholder="Escribe tu propio encabezado..."
                                     value={d.portadaKicker || ""}
                                     onChange={(e) => setData({ portadaKicker: e.target.value })}
                                 />

@@ -80,7 +80,7 @@ export async function PATCH(
         // un Admin comun podia auto-asignarse creditos o tocar los de otro
         // Admin/Super Usuario con solo llamar a este PATCH.
         if (userId === session.user.id) {
-            return NextResponse.json({ error: 'No podés modificar tus propios créditos' }, { status: 400 });
+            return NextResponse.json({ error: 'No puedes modificar tus propios créditos' }, { status: 400 });
         }
         const target = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
         if (!target) {

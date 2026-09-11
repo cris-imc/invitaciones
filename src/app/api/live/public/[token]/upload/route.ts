@@ -32,11 +32,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         // para esta sesión, no se procesa ningún archivo -- el checkbox del
         // cliente no es suficiente evidencia por sí solo.
         if (!acceptanceId) {
-            return NextResponse.json({ error: 'Debés aceptar los Términos y Condiciones para subir contenido' }, { status: 403 });
+            return NextResponse.json({ error: 'Debes aceptar los Términos y Condiciones para subir contenido' }, { status: 403 });
         }
         const acceptance = await prisma.liveTermsAcceptance.findUnique({ where: { id: acceptanceId } });
         if (!acceptance || acceptance.sessionId !== liveSession.id) {
-            return NextResponse.json({ error: 'Debés aceptar los Términos y Condiciones para subir contenido' }, { status: 403 });
+            return NextResponse.json({ error: 'Debes aceptar los Términos y Condiciones para subir contenido' }, { status: 403 });
         }
 
         // Basic validation

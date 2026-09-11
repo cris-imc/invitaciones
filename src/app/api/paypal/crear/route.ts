@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     await prisma.payment.update({ where: { id: pago.id }, data: { status: "FAILED" } });
     console.error("[PayPal] No se pudo crear la orden:", error);
     return NextResponse.json(
-      { error: "No pudimos iniciar el pago. Probá de nuevo." },
+      { error: "No pudimos iniciar el pago. Prueba de nuevo." },
       { status: 502 }
     );
   }

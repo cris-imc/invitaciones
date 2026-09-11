@@ -49,6 +49,7 @@ const PLAN_CARDS: {
       "Gestión de invitados",
       "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum`,
+      "Control de ingreso por QR",
     ],
     negativeFeatures: ["Sin gestión de pagos", "Sin musica de fondo", "Sin Modo LIVE (fotos y mensajes en vivo)", "Sin Trivia", "Sin sugerencias DJ"],
   },
@@ -64,8 +65,10 @@ const PLAN_CARDS: {
       "Con musica de fondo",
       "Con Trivia",
       "Con sugerencias DJ",
+      "Con organización de mesas",
+      "Con control de ingreso por QR",
     ],
-    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)", "Sin organización de mesas", "Sin control de ingreso por QR", "Sin ver quién abrió la invitación"],
+    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)", "Sin ver quién abrió la invitación"],
   },
   {
     key: "DIAMOND",
@@ -112,7 +115,7 @@ export default function RegisterPage() {
         <div className="max-w-md w-full text-center bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-8 shadow-2xl">
           <h1 className="text-2xl font-display mb-3">Registro no disponible</h1>
           <p className="opacity-70 mb-6">
-            Por ahora no se pueden crear cuentas nuevas de forma pública. Si ya tenés una cuenta, iniciá sesión; si necesitás una, contactanos.
+            Por ahora no se pueden crear cuentas nuevas de forma pública. Si ya tienes una cuenta, inicia sesión; si necesitas una, contactanos.
           </p>
           <Link href="/login">
             <Button className="w-full l-cta bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--paper)]/90 border-none">
@@ -240,7 +243,7 @@ function RegisterForm() {
 
     if (!acceptedTerms) {
       hapticoError();
-      showToast("Debés aceptar los Términos y Condiciones para registrarte", "error");
+      showToast("Debes aceptar los Términos y Condiciones para registrarte", "error");
       return;
     }
 
@@ -269,7 +272,7 @@ function RegisterForm() {
 
     if (discountInput.trim() && !appliedDiscount) {
       hapticoError();
-      showToast("Aplicá el código de descuento antes de continuar, o borralo si no lo vas a usar", "error");
+      showToast("Aplica el código de descuento antes de continuar, o borralo si no lo vas a usar", "error");
       return;
     }
 
@@ -350,7 +353,7 @@ function RegisterForm() {
         {fromWizard && (
           <div className="max-w-md mx-auto mb-6 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/30 text-sm text-center justify-center">
             <Check className="w-4 h-4 text-[var(--accent)] shrink-0" />
-            <span>Ya armaste tu invitación -- creá tu cuenta para publicarla.</span>
+            <span>Ya armaste tu invitación -- crea tu cuenta para publicarla.</span>
           </div>
         )}
         {/* Header */}
@@ -358,8 +361,8 @@ function RegisterForm() {
           <h1 className="text-4xl font-display mb-2">Crea tu cuenta</h1>
           <p className="opacity-70 text-lg font-body">
             {step === 1
-              ? "Elegí la invitación que mejor se adapta a tu evento"
-              : "Ya casi terminamos, completá tus datos"}
+              ? "Elige la invitación que mejor se adapta a tu evento"
+              : "Ya casi terminamos, completa tus datos"}
           </p>
         </div>
 
@@ -612,7 +615,7 @@ function RegisterForm() {
                     className="border-none"
                   />
                   <p className="text-xs opacity-50 mt-1.5">
-                    Define en qué moneda cobrás y qué datos bancarios te vamos a pedir para que tus invitados te transfieran.
+                    Define en qué moneda cobras y qué datos bancarios te vamos a pedir para que tus invitados te transfieran.
                   </p>
                 </div>
 

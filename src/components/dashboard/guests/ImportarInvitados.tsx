@@ -207,7 +207,7 @@ export function ImportarInvitados({ slug, onImportado, onCerrar, cupoRestante = 
           {/* ── Izquierda: donde se pega ── */}
           <div className="flex flex-col gap-2 min-w-0">
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              Pegá acá
+              Pega aquí
             </p>
             {/* Alto fijo y `resize-none`: si la lista pasa el alto, scrollea
                 adentro. Si el campo creciera, las dos mitades dejarían de
@@ -245,7 +245,7 @@ export function ImportarInvitados({ slug, onImportado, onCerrar, cupoRestante = 
             >
               {!hayAlgo ? (
                 <p className="m-auto px-4 text-center text-xs text-muted-foreground">
-                  Acá vas a ver, línea por línea, qué entendió de lo que pegues.
+                  Aquí vas a ver, línea por línea, qué entendió de lo que pegues.
                 </p>
               ) : (
                 <>
@@ -303,7 +303,7 @@ export function ImportarInvitados({ slug, onImportado, onCerrar, cupoRestante = 
           </div>
 
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Las edades son opcionales. Si ponés el total y sólo algunas, el
+            Las edades son opcionales. Si pones el total y sólo algunas, el
             resto entran como adultos.
           </p>
 

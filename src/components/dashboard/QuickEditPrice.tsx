@@ -98,7 +98,7 @@ export function QuickEditPrice({
                         Actualizar Valores de Tarjeta
                     </DialogTitle>
                     <DialogDescription className="text-[var(--shell-fg-mid)] pt-2">
-                        Modificá rápidamente los montos por categoría que deben abonar tus invitados.
+                        Modifica rápidamente los montos por categoría que deben abonar tus invitados.
                     </DialogDescription>
                 </DialogHeader>
                 

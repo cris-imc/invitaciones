@@ -564,7 +564,7 @@ export function GuestListWithPayment({
             {showPaymentInfo && (
                 <div className="px-4 pb-5 pt-1 border-t border-amber-500/20 text-[13px] leading-relaxed opacity-95 space-y-3">
                     <p>
-                      <strong>Importante:</strong> acá llevás tu propio control de quién te pagó. La plataforma <strong>no mueve dinero</strong>: lo que marcás es un registro tuyo, y lo que cargues mal queda a tu cargo.
+                      <strong>Importante:</strong> aquí llevas tu propio control de quién te pagó. La plataforma <strong>no mueve dinero</strong>: lo que marcas es un registro tuyo, y lo que cargues mal queda a tu cargo.
                     </p>
                     <div className="w-full h-px bg-amber-500/20" />
                     <div className="space-y-2">
@@ -574,15 +574,15 @@ export function GuestListWithPayment({
                       </p>
                       <p className="flex gap-2">
                           <span>🧾</span>
-                          <span>En <strong>Ver detalles</strong> marcás lugar por lugar, le ponés el nombre a cada uno y, si hace falta, no cobrarle o cobrarle un precio diferente a un invitado específico.</span>
+                          <span>En <strong>Ver detalles</strong> marcas lugar por lugar, le pones el nombre a cada uno y, si hace falta, no cobrarle o cobrarle un precio diferente a un invitado específico.</span>
                       </p>
                       <p className="flex gap-2">
                           <span>🔒</span>
-                          <span>Lo que marcás pago queda al precio de ese momento. Si después subís los precios, sólo alcanza a los lugares que todavía no pagaron.</span>
+                          <span>Lo que marcas pago queda al precio de ese momento. Si después subes los precios, sólo alcanza a los lugares que todavía no pagaron.</span>
                       </p>
                       <p className="flex gap-2">
                           <span>📝</span>
-                          <span>En <strong>Anotaciones</strong> guardás cuánta plata te entregaron y notas sueltas. Eso no lo ve nadie más que vos.</span>
+                          <span>En <strong>Anotaciones</strong> guardas cuánta plata te entregaron y notas sueltas. Eso no lo ve nadie más que tú.</span>
                       </p>
                       <p className="font-medium text-amber-300 flex gap-2">
                           <span>💡</span>
@@ -857,7 +857,7 @@ export function GuestListWithPayment({
                             : requestPaymentChange(guest, s)
                         }
                         disabled={updatingId === guest.id}
-                        title={s === "PARTIAL" ? "Marcá cupos en el detalle para dejarla en parcial" : undefined}
+                        title={s === "PARTIAL" ? "Marca cupos en el detalle para dejarla en parcial" : undefined}
                         // En celular el grupo ocupa todo el ancho, asi que los
                         // botones se lo reparten: sin esto quedaban con su ancho
                         // natural y sobraba un hueco muerto despues del ultimo.
@@ -997,7 +997,7 @@ export function GuestListWithPayment({
           <DialogHeader>
             <DialogTitle>{detailGuest?.name}</DialogTitle>
             <DialogDescription>
-              Marcá qué lugares están pagos. Podés ponerle el nombre a cada uno y darle
+              Marca qué lugares están pagos. Podés ponerle el nombre a cada uno y darle
               un precio propio distinto del general.
             </DialogDescription>
           </DialogHeader>
@@ -1223,15 +1223,15 @@ export function GuestListWithPayment({
             <DialogDescription asChild>
               <div className="space-y-3 text-sm">
                 <p>
-                  Cada lugar que marcás como pago queda registrado con el precio que la
-                  tarjeta tenía <strong>en ese momento</strong>. Si más adelante subís el
+                  Cada lugar que marcas como pago queda registrado con el precio que la
+                  tarjeta tenía <strong>en ese momento</strong>. Si más adelante subes el
                   valor, esos lugares no se tocan: ya están saldados.
                 </p>
                 <p>
                   El aumento alcanza <strong>solo a los lugares que siguen pendientes</strong>.
                 </p>
                 <p className="rounded-lg border bg-muted/40 p-3 text-xs">
-                  Una familia de 3 paga 2 tarjetas cuando valían $10.000. Después subís la
+                  Una familia de 3 paga 2 tarjetas cuando valían $10.000. Después subes la
                   tarjeta a $15.000. Esos 2 lugares siguen valiendo $10.000 y el que falta
                   pasa a $15.000: el total de esa familia queda en <strong>$35.000</strong>,
                   no en $45.000.
@@ -1267,7 +1267,7 @@ export function GuestListWithPayment({
                   .
                 </p>
                 <p>
-                  Si más adelante lo volvés a marcar, se cobra{" "}
+                  Si más adelante lo vuelves a marcar, se cobra{" "}
                   <strong>al precio que tenga la tarjeta en ese momento</strong>, no al que
                   tiene ahora. Si el precio subió en el medio, va a costar más.
                 </p>
@@ -1343,7 +1343,7 @@ export function GuestListWithPayment({
           <DialogHeader>
             <DialogTitle>Anotaciones de {notesFor?.name}</DialogTitle>
             <DialogDescription>
-              Solo las ves vos. No cambian el estado de la tarjeta ni los cupos marcados.
+              Solo las ves tú. No cambian el estado de la tarjeta ni los cupos marcados.
             </DialogDescription>
           </DialogHeader>
 

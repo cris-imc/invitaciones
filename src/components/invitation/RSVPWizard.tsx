@@ -314,7 +314,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
 
                             <div className="space-y-2">
                                 <Label htmlFor="song" className="text-sm uppercase tracking-wider text-gray-600">
-                                    🎵 Pedí tu canción favorita
+                                    🎵 Pide tu canción favorita
                                 </Label>
                                 <Input
                                     id="song"
@@ -350,7 +350,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                         >
                             <div className="text-center mb-8">
                                 <h3 className="text-4xl mb-4" style={{ fontFamily: "'Parisienne', cursive", color: 'var(--color-primary)' }}>
-                                    Nos gustaría saber de vos
+                                    Nos gustaría saber de ti
                                 </h3>
                                 <p className="text-gray-600">Aunque no puedas acompañarnos</p>
                             </div>
@@ -382,7 +382,7 @@ export function RSVPWizard({ invitationId, eventType }: RSVPWizardProps) {
                                 <h3 className="text-4xl mb-4" style={{ fontFamily: "'Parisienne', cursive", color: 'var(--color-primary)' }}>
                                     Confirmación
                                 </h3>
-                                <p className="text-gray-600">Revisá tus datos antes de enviar</p>
+                                <p className="text-gray-600">Revisa tus datos antes de enviar</p>
                             </div>
 
                             <div className="bg-gray-50 rounded-2xl p-6 space-y-4">

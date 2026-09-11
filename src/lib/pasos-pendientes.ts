@@ -36,28 +36,28 @@ export function pasosDe(inv: DatosInvitacion): PasoPendiente[] {
   return [
     {
       id: "portada",
-      titulo: "Subí la foto de portada",
+      titulo: "Sube la foto de portada",
       ayuda: "Es lo primero que ve cada invitado al abrir el link.",
       hecho: Boolean(inv.portadaImagenFondo),
       ir: `/dashboard/invitaciones/editar/${inv.slug}`,
     },
     {
       id: "lugar",
-      titulo: "Cargá dónde es",
+      titulo: "Carga dónde es",
       ayuda: "Sin dirección ni mapa, tus invitados te van a escribir uno por uno para preguntarte.",
       hecho: Boolean(inv.direccion || inv.mapUrl),
       ir: `/dashboard/invitaciones/editar/${inv.slug}`,
     },
     {
       id: "invitados",
-      titulo: "Agregá tus invitados",
-      ayuda: "Cada uno recibe su propio link, y por eso podés saber quién confirmó y quién no.",
+      titulo: "Agrega tus invitados",
+      ayuda: "Cada uno recibe su propio link, y por eso puedes saber quién confirmó y quién no.",
       hecho: inv.cantidadInvitados > 0,
       ir: `${base}/guests`,
     },
     {
       id: "compartir",
-      titulo: "Compartí los links",
+      titulo: "Comparte los links",
       ayuda: "Se mandan por WhatsApp desde la lista de invitados, uno por uno.",
       // No hay forma de saber si los mandó: se marca cuando ya hay invitados
       // cargados y la invitación está activa, que es cuando ya puede hacerlo.

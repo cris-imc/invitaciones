@@ -164,7 +164,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
             } else {
                 const errText = await res.text();
                 console.error("API error", errText);
-                setErrorMsg("Error al activar LIVE: " + errText + "\n\n(Si dice Internal Error, probá reiniciar el servidor npm run dev para que cargue la nueva base de datos)");
+                setErrorMsg("Error al activar LIVE: " + errText + "\n\n(Si dice Internal Error, prueba reiniciar el servidor npm run dev para que cargue la nueva base de datos)");
             }
         } catch (err) {
             console.error("Error toggling live", err);
@@ -185,7 +185,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
             if (res.ok) {
                 fetchSession();
             } else {
-                setErrorMsg("Error al cambiar moderación.\n\nProbá detener la terminal y volver a correr `npm run dev` para que tome los últimos cambios de la base de datos.");
+                setErrorMsg("Error al cambiar moderación.\n\nPrueba detener la terminal y volver a correr `npm run dev` para que tome los últimos cambios de la base de datos.");
             }
         } catch (err) {
             console.error("Error toggling moderation", err);
@@ -305,7 +305,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                     )}
                     {!isActive && isAdmin && status !== "EVENT_DAY" && status !== "POST_EVENT" && (
                         <p className="text-xs text-amber-400 mt-1">
-                            👑 Modo Administrador: podés activarlo aunque falte para el evento.
+                            👑 Modo Administrador: puedes activarlo aunque falte para el evento.
                         </p>
                     )}
                 </div>
@@ -589,7 +589,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                     <DialogHeader>
                         <DialogTitle>Eliminar contenido</DialogTitle>
                         <DialogDescription>
-                            ¿Estás seguro de que querés eliminar este contenido ahora mismo? No se podrá recuperar.
+                            ¿Estás seguro de que quieres eliminar este contenido ahora mismo? No se podrá recuperar.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -605,7 +605,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                     <DialogHeader>
                         <DialogTitle>Eliminar contenido seleccionado</DialogTitle>
                         <DialogDescription>
-                            ¿Estás seguro de que querés eliminar {selectedIds.size} {selectedIds.size === 1 ? "elemento" : "elementos"} ahora mismo? No se podrán recuperar.
+                            ¿Estás seguro de que quieres eliminar {selectedIds.size} {selectedIds.size === 1 ? "elemento" : "elementos"} ahora mismo? No se podrán recuperar.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>

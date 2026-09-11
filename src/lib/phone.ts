@@ -98,7 +98,7 @@ export function validarTelefono(
   //
   // Los mensajes usan la etiqueta tal cual, sin artículo: "el lada" y "la
   // area code" están mal, y el género de la palabra cambia con el país.
-  if (f.etiquetaArea && !area) return `Completá ${f.etiquetaArea}`;
+  if (f.etiquetaArea && !area) return `Completa ${f.etiquetaArea}`;
   if (!resto) return "Falta el número";
 
   // Argentina tiene dos trampas propias, y son el error más común: el 0 del

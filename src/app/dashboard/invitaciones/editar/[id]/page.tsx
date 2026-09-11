@@ -33,7 +33,7 @@ export default async function EditInvitationPage({
                 <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tight">Editar Invitación</h1>
                 <p className="text-muted-foreground">
-                    Modificá cualquier paso de tu invitación "{invitation.nombreEvento}".
+                    Modifica cualquier paso de tu invitación "{invitation.nombreEvento}".
                 </p>
                 </div>
             </div>

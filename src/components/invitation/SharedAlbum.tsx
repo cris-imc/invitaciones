@@ -27,7 +27,7 @@ interface SharedAlbumProps {
 export function SharedAlbum({
     invitationSlug,
     titulo = "Álbum Colaborativo",
-    descripcion = "Subí tus fotos favoritas del evento y mirá las de los demás invitados",
+    descripcion = "Sube tus fotos favoritas del evento y mira las de los demás invitados",
     colorPrimario = "#000000",
     fechaEvento,
     horaEvento,

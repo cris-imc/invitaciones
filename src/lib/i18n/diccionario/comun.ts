@@ -37,7 +37,7 @@ const es = {
   obligatorio: "Obligatorio",
   ninguno: "Ninguno",
   todos: "Todos",
-  error: "Ocurrió un error. Probá de nuevo.",
+  error: "Ocurrió un error. Prueba de nuevo.",
 } as const;
 
 export type Comun = ConCualquierTexto<typeof es>;

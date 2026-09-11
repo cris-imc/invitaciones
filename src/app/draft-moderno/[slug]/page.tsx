@@ -56,7 +56,7 @@ export async function generateMetadata({
     month: "long",
     year: "numeric",
   });
-  const description = `${eventTitle} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ""}. Confirmá tu asistencia.`;
+  const description = `${eventTitle} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ""}. Confirma tu asistencia.`;
 
   const ogImage = invitation.portadaImagenFondo
     ? [{ url: invitation.portadaImagenFondo, width: 1200, height: 630, alt: eventTitle }]

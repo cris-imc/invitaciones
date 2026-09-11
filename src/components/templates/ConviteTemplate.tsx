@@ -779,7 +779,7 @@ export function ConviteTemplate({ invitation, guest, isPersonalized = false }: C
               <DrawLucideIcon icon={HelpCircle} size={46} color="var(--t-acc)" strokeWidth={1.5} />
             </div>
             <p className="t-kicker">{tx("invitacion.quiz.cuantoSabes")}</p>
-            <h2>{String(invitation.triviaTitulo ?? "Un juego para vos")}</h2>
+            <h2>{String(invitation.triviaTitulo ?? "Un juego para ti")}</h2>
             <ProgressiveQuiz 
               preguntas={triviaPreguntas} 
               invitationId={String(invitation.id ?? "")}

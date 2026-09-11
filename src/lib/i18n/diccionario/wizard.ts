@@ -6,7 +6,7 @@ const es = {
     guardarYSalir: "Guardar y salir",
     vistaPrevia: "Vista previa",
     entendido: "Entendido",
-    elegiTuPais: "Elegí tu país",
+    elegiTuPais: "Elige tu país",
     paisAyuda: "Con esto sabemos qué medios de pago y qué datos bancarios mostrar.",
 
     /**
@@ -39,7 +39,7 @@ const es = {
     /** La cabecera del wizard y la fila de botones que se repite en cada paso. */
     nav: {
         paso: "PASO {numero}",
-        creaTuInvitacion: "Creá tu invitación",
+        creaTuInvitacion: "Crea tu invitación",
         atras: "Atrás",
         siguientePaso: "Siguiente Paso",
         aplicarCambios: "Aplicar cambios",
@@ -49,10 +49,10 @@ const es = {
         verCambios: "Ver cambios",
         avisoCambiosTitulo: "Cambios sin guardar",
         avisoCambiosTexto:
-            "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que querés salir sin aplicar los cambios?",
+            "Tenés cambios sin guardar en la invitación. ¿Estás seguro de que quieres salir sin aplicar los cambios?",
         avisoSalirTitulo: "¿Salir sin terminar?",
         avisoSalirTexto:
-            "Todavía no creaste la invitación. Si salís ahora vas a perder todo lo que cargaste hasta acá.",
+            "Todavía no creaste la invitación. Si sales ahora vas a perder todo lo que cargaste hasta aquí.",
         salirSinGuardar: "Salir sin guardar",
         salirYPerder: "Salir y perder los cambios",
     },
@@ -66,7 +66,7 @@ const es = {
 
     tipoEvento: {
         titulo: "¿Qué tipo de evento estás organizando?",
-        subtitulo: "Elegí la categoría para ver las plantillas ideales.",
+        subtitulo: "Elige la categoría para ver las plantillas ideales.",
         bloqueadoEtiqueta: "Tipo de evento:",
         bloqueadoAviso: "No se puede cambiar después de creada",
         casamiento: "Casamiento",
@@ -92,10 +92,10 @@ const es = {
         nombreQuinceanera: "Nombre o Apodo de la Quinceañera",
         placeholderQuinceanera: "Ej: Sofi, Valentina, Mafe…",
         ayudaQuinceanera:
-            "Ingresá el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.",
+            "Ingresa el nombre o apodo de la quinceañera que aparecerá destacado en toda la tarjeta.",
         nombreFestejado: "Nombre del Festejado/a (Opcional)",
         placeholderFestejado: "Nombre de la persona o empresa",
-        ayudaFestejado: "Si lo dejás vacío, se usa el nombre del evento.",
+        ayudaFestejado: "Si lo dejas vacío, se usa el nombre del evento.",
         errorNovia: "El nombre de la novia es obligatorio",
         errorNovio: "El nombre del novio es obligatorio",
         errorQuinceanera: "El nombre o apodo de la quinceañera es obligatorio",
@@ -108,24 +108,24 @@ const es = {
         infoTexto:
             "Esta información establece los cimientos de tu invitación: el nombre del evento, la fecha de celebración y los nombres de los agasajados. Con estos datos se calcula la cuenta regresiva, se encabeza la portada y se organiza la agenda de tus invitados.",
         fecha: "Fecha del Evento",
-        elegirFecha: "Elegí una fecha",
+        elegirFecha: "Elige una fecha",
         desbloqueadoAdmin: "Desbloqueado (Admin)",
         bloqueada30d: "Bloqueada (30d)",
         fechaBloqueadaTexto:
             "Fecha bloqueada por seguridad. Faltan 30 días o menos para la fecha del evento.",
         fechaAdminTexto:
-            "👑 Habilitado por rol Administrador: tenés permiso para editar la fecha aunque falten menos de 30 días.",
+            "👑 Habilitado por rol Administrador: tienes permiso para editar la fecha aunque falten menos de 30 días.",
         ciudad: "Ciudad / Localidad del Evento",
         ciudadPlaceholder: "Ej: Buenos Aires, Rosario, Mendoza…",
         ciudadAyuda: "Aparece junto a la fecha en la tarjeta de bienvenida de tus invitados.",
         idioma: "Idioma de la invitación",
-        idiomaAyuda: "En este idioma la van a ver tus invitados, sin importar el idioma de su celular. Lo que escribas vos —nombres, dirección, tu mensaje— va tal cual, sin traducir.",
+        idiomaAyuda: "En este idioma la van a ver tus invitados, sin importar el idioma de su celular. Lo que escribas tú —nombres, dirección, tu mensaje— va tal cual, sin traducir.",
     },
 
     plantilla: {
-        titulo: "Elegí tu Plantilla",
-        subtituloDiseno: "Elegí el estilo y la gama de colores para tu invitación",
-        subtituloOtro: "Elegí el estilo que mejor represente tu evento",
+        titulo: "Elige tu Plantilla",
+        subtituloDiseno: "Elige el estilo y la gama de colores para tu invitación",
+        subtituloOtro: "Elige el estilo que mejor represente tu evento",
         coleccionFlat: "Colección Flat",
         coleccionStorytelling: "Colección Storytelling",
         nuevas: "Nuevas",
@@ -140,7 +140,7 @@ const es = {
     },
 
     modalPlantillas: {
-        titulo: "Elegí tu plantilla",
+        titulo: "Elige tu plantilla",
         anteriores: "Ver plantillas anteriores",
         siguientes: "Ver más plantillas",
         tituloIframe: "Vista previa de la plantilla",
@@ -153,25 +153,25 @@ const es = {
         subtitulo: "Imágenes de fondo principales que visten la presentación de tu tarjeta.",
         infoTitulo: "¿Para qué sirven las Fotos de Portada y Fondo?",
         infoStorytelling:
-            "El Recorte celular y el Recorte PC son opcionales. Si cargás alguno, reemplaza el fondo decorativo original -- tanto en la tapa como en la foto principal que se ve dentro de la invitación, debajo de “Guardá la fecha” (son las mismas 2 fotos en los dos lugares). Si no cargás ninguno, no aparece foto de fondo en ningún lado: la invitación se ve tal cual la plantilla que elegiste, sin cambios.",
+            "El Recorte celular y el Recorte PC son opcionales. Si cargas alguno, reemplaza el fondo decorativo original -- tanto en la tapa como en la foto principal que se ve dentro de la invitación, debajo de “Guarda la fecha” (son las mismas 2 fotos en los dos lugares). Si no cargas ninguno, no aparece foto de fondo en ningún lado: la invitación se ve tal cual la plantilla que elegiste, sin cambios.",
         infoFlat:
-            "La Portada Invitación es la que se ve como foto de portada de la invitación (obligatoria, todas las plantillas la usan). La Portada de bienvenida es opcional: si cargás una foto ahí, reemplaza el fondo original de la portada de bienvenida por esa foto. Si la dejás vacía, la portada se ve tal cual la plantilla que elegiste, sin cambios.",
+            "La Portada Invitación es la que se ve como foto de portada de la invitación (obligatoria, todas las plantillas la usan). La Portada de bienvenida es opcional: si cargas una foto ahí, reemplaza el fondo original de la portada de bienvenida por esa foto. Si la dejas vacía, la portada se ve tal cual la plantilla que elegiste, sin cambios.",
         recortePc: "Recorte PC",
         portadaBienvenida: "Portada de bienvenida",
         recorteCelular: "Recorte celular",
         portadaInvitacion: "Portada Invitación *",
         ayudaPcStorytelling:
-            "Opcional. Si la cargás, reemplaza el fondo decorativo original en pantallas anchas -- tanto en la tapa como en la foto principal de adentro de la invitación.",
+            "Opcional. Si la cargas, reemplaza el fondo decorativo original en pantallas anchas -- tanto en la tapa como en la foto principal de adentro de la invitación.",
         ayudaPcFlat:
-            "Si cargás una foto acá, reemplaza el fondo original de la portada de bienvenida por esta foto.",
+            "Si cargas una foto aquí, reemplaza el fondo original de la portada de bienvenida por esta foto.",
         ayudaCelularStorytelling:
-            "Opcional. Si la cargás, reemplaza el fondo decorativo original en mobile -- tanto en la tapa como en la foto principal de adentro de la invitación, debajo de “Guardá la fecha”.",
+            "Opcional. Si la cargas, reemplaza el fondo decorativo original en mobile -- tanto en la tapa como en la foto principal de adentro de la invitación, debajo de “Guarda la fecha”.",
         ayudaCelularFlat:
             "Se ve como foto de portada de la invitación. Obligatoria: todas las plantillas la usan como imagen principal.",
         tipCinematico:
-            "Probá los dos: con foto (efecto cinemático) y sin foto (fondo decorativo propio de la plantilla).",
+            "Prueba los dos: con foto (efecto cinemático) y sin foto (fondo decorativo propio de la plantilla).",
         obligatoria: "Esta imagen es obligatoria para poder continuar.",
-        faltaImagen: "Cargá la imagen de portada mobile antes de continuar.",
+        faltaImagen: "Carga la imagen de portada mobile antes de continuar.",
     },
 
     recorrido: {
@@ -187,14 +187,14 @@ const es = {
 
     tipografia: {
         etiqueta: "Tipografía",
-        titulo: "Elegí la tipografía",
-        subtitulo: "Define el carácter visual de tu invitación. La podés cambiar después.",
+        titulo: "Elige la tipografía",
+        subtitulo: "Define el carácter visual de tu invitación. La puedes cambiar después.",
         titulos: "Títulos",
         texto: "Texto",
         verMas: "Ver más tipografías",
-        modalTitulos: "Elegí la tipografía de los Títulos",
+        modalTitulos: "Elige la tipografía de los Títulos",
         modalTitulosDesc: "Todas las tipografías disponibles para tus títulos.",
-        modalTexto: "Elegí la tipografía del Texto",
+        modalTexto: "Elige la tipografía del Texto",
         modalTextoDesc: "Todas las tipografías disponibles para tus textos.",
         muestraTexto: "Abrir invitación",
         muestraNombre: "María",
@@ -204,7 +204,7 @@ const es = {
 
     countdown: {
         etiqueta: "Countdown",
-        titulo: "Elegí el estilo de la cuenta regresiva",
+        titulo: "Elige el estilo de la cuenta regresiva",
         subtitulo: "Así se va a ver el countdown en tu invitación pública.",
         clasico: "Clásico",
         clasicoDetalle: "Bloques con número grande",
@@ -227,18 +227,18 @@ const es = {
         ayudaOtro: "Una frase institucional o de bienvenida para el evento.",
         placeholderCasamiento: "Ej: “Lo mejor de la vida es compartirla con quien amás…”",
         placeholderQuince: "Ej: “Este es el comienzo del resto de mi vida…”",
-        placeholderOtro: "Ej: “Bienvenidos a nuestra celebración. Gracias por estar acá.”",
+        placeholderOtro: "Ej: “Bienvenidos a nuestra celebración. Gracias por estar aquí.”",
         infoTitulo: "¿Cómo se muestra la Frase Personalizada?",
         infoTexto:
             "Esta frase o poema se despliega como cita destacada en el cuerpo de la invitación. Podés redactar tu propio mensaje o elegir una de nuestras sugerencias listas para usar.",
         habilitar: "Habilitar Frase Personalizada",
-        elegiOEscribi: "Elegí una frase o escribí la tuya:",
+        elegiOEscribi: "Elige una frase o escribe la tuya:",
         escribirPropia: "Escribir mi propia frase…",
         tuFrase: "Tu Frase Personalizada",
         casamiento1:
             "El amor no consiste en mirarse el uno al otro, sino en mirar juntos en la misma dirección.",
         casamiento2: "Unimos nuestras vidas para siempre, porque juntos todo es mejor.",
-        casamiento3: "Donde hay amor, hay vida. ¡Y queremos celebrar la nuestra con vos!",
+        casamiento3: "Donde hay amor, hay vida. ¡Y queremos celebrar la nuestra contigo!",
         casamiento4: "Lo mejor de la vida es compartirla con quien amás… y con quienes te aman.",
         casamiento5: "Hoy comienza la mejor de nuestras aventuras.",
         quince1: "Este es el comienzo del resto de mi vida. ¡Gracias por acompañarme!",
@@ -253,7 +253,7 @@ const es = {
         subtitulo: "¿Dónde y a qué hora es la celebración?",
         infoTitulo: "¿Cómo configurar la Ubicación del Salón?",
         infoTexto:
-            "Ingresá el nombre del salón o quinta, la dirección física y el enlace a Google Maps. Tus invitados van a tener un botón interactivo “Cómo llegar” que abre la ubicación directamente en el GPS de su celular.",
+            "Ingresa el nombre del salón o quinta, la dirección física y el enlace a Google Maps. Tus invitados van a tener un botón interactivo “Cómo llegar” que abre la ubicación directamente en el GPS de su celular.",
         lugarNombre: "Nombre del Lugar / Salón",
         lugarPlaceholder: "Ej: Salón Los Olivos",
         excesoNombre: "Te pasaste por {cantidad} caracteres -- acortá el nombre para poder continuar.",
@@ -263,7 +263,7 @@ const es = {
             "Te pasaste por {cantidad} caracteres -- acortá la dirección para poder continuar.",
         horario: "Horario",
         mapa: "Enlace Google Maps (Opcional)",
-        mapaPlaceholder: "Pegá el link que copiaste de Google Maps",
+        mapaPlaceholder: "Pega el link que copiaste de Google Maps",
         mapaAyuda: "Vale cualquier link de Google Maps (el de “Compartir” o el de la barra de direcciones).",
         vestimenta: "Código de Vestimenta",
         vestimentaAyuda: "Se muestra en la portada de bienvenida de forma sobria.",
@@ -310,33 +310,33 @@ const es = {
         hora: "Hora",
         actividad: "Actividad / Momento",
         actividadPlaceholder: "Ej: Recepción / Cena",
-        etapaIncompleta: "Completá la hora y el título de esta etapa, o eliminala.",
+        etapaIncompleta: "Completa la hora y el título de esta etapa, o eliminala.",
         agregar: "Agregar Etapa al Cronograma",
         faltanDatos:
-            "Completá la hora y el título de todas las etapas del cronograma antes de continuar.",
+            "Completa la hora y el título de todas las etapas del cronograma antes de continuar.",
         errorHoraTitulo: "La primera etapa empieza antes que el evento",
         errorHoraTexto:
             "Tu evento empieza a las {hora}, pero la primera etapa del cronograma ({etapa}) está cargada a las {horaEtapa}, antes de esa hora.",
         errorHoraAyuda:
-            "Revisá el horario del evento en el paso “Detalles de la Fiesta”, o ajustá la hora de esta etapa para que no sea anterior al inicio del evento.",
+            "Revisa el horario del evento en el paso “Detalles de la Fiesta”, o ajustá la hora de esta etapa para que no sea anterior al inicio del evento.",
     },
 
     galeria: {
         titulo: "Galería de Fotos",
-        subtitulo: "Subí tus mejores fotos para lucir en la invitación.",
+        subtitulo: "Sube tus mejores fotos para lucir en la invitación.",
         infoTitulo: "¿Cómo funciona la Galería de Fotos?",
         infoTexto:
-            "Las fotos que subas acá arman un carrusel interactivo continuo en la tarjeta. Conviene subir fotos en formato cuadrado u horizontal para que se vean bien en celulares.",
+            "Las fotos que subas aquí arman un carrusel interactivo continuo en la tarjeta. Conviene subir fotos en formato cuadrado u horizontal para que se vean bien en celulares.",
         mostrar: "Mostrar galería de fotos en la tarjeta",
         avisoTitulo: "Importante sobre la selección de fotos",
         avisoTexto:
             "Las fotos se seleccionan una a una. Al subir cada imagen, el sistema te deja ajustar y elegir el encuadre exacto en formato cuadrado (1:1) para que se adapte perfecto al carrusel.",
         avisoAnonimo:
-            "Podés cargar hasta {max} fotos para probar (Premium o Diamond). Si al crear tu cuenta elegís Gratis, la invitación va a mostrar solo las primeras {gratis}.",
+            "Podés cargar hasta {max} fotos para probar (Premium o Diamond). Si al crear tu cuenta eliges Gratis, la invitación va a mostrar solo las primeras {gratis}.",
         agregarFoto: "Agregar nueva foto (de a una)",
         limiteAlcanzado: "Llegaste al límite de fotos de tu plan",
         sinFotos:
-            "Subí al menos una foto o destildá “Mostrar galería de fotos” para continuar.",
+            "Sube al menos una foto o destildá “Mostrar galería de fotos” para continuar.",
         fotosAgregadas: "Fotos agregadas ({cantidad})",
         fotosAgregadasDeMax: "Fotos agregadas ({cantidad}/{max})",
         premiumODiamond: "Premium o Diamond",
@@ -344,14 +344,14 @@ const es = {
         altFoto: "Foto {numero}",
         limiteTitulo: "Llegaste al límite de fotos",
         limiteAnonimo:
-            "Podés cargar hasta {max} fotos para probar (Premium o Diamond). Acordate de que si elegís Gratis al crear tu cuenta, la invitación va a mostrar solo las primeras {gratis}.",
+            "Podés cargar hasta {max} fotos para probar (Premium o Diamond). Acuérdate de que si eliges Gratis al crear tu cuenta, la invitación va a mostrar solo las primeras {gratis}.",
         limitePlan:
-            "Tu plan {plan} permite hasta {max} fotos en el álbum. Actualizá tu plan para agregar más.",
+            "Tu plan {plan} permite hasta {max} fotos en el álbum. Actualiza tu plan para agregar más.",
     },
 
     album: {
         etiqueta: "Álbum",
-        titulo: "Elegí el estilo del álbum de fotos",
+        titulo: "Elige el estilo del álbum de fotos",
         subtitulo:
             "Así se van a ver las fotos que cargaste en la Galería, dentro de tu invitación pública.",
         carrusel: "Carrusel",
@@ -366,9 +366,9 @@ const es = {
 
     musica: {
         titulo: "Música de Fondo",
-        subtitulo: "Agregá música para que suene mientras ven la invitación",
+        subtitulo: "Agrega música para que suene mientras ven la invitación",
         modoAdminTexto:
-            "Esta invitación está en Plan Gratis (bloqueada para el cliente), pero tenés permiso de Admin para editar/activar la música.",
+            "Esta invitación está en Plan Gratis (bloqueada para el cliente), pero tienes permiso de Admin para editar/activar la música.",
         activar: "Activar música de fondo",
         archivo: "Archivo de Audio",
         autoplay: "Reproducir automáticamente",
@@ -383,8 +383,8 @@ const es = {
     banco: {
         titulo: "Datos Bancarios (Regalos y Tarjetas)",
         subtitulo:
-            "Configurá tus datos de transferencia para regalos del evento y/o cobro de entradas. Te pedimos los datos que se usan en {pais}.",
-        infoTitulo: "¿Por qué podés configurar hasta 2 Cuentas Bancarias?",
+            "Configura tus datos de transferencia para regalos del evento y/o cobro de entradas. Te pedimos los datos que se usan en {pais}.",
+        infoTitulo: "¿Por qué puedes configurar hasta 2 Cuentas Bancarias?",
         infoTexto1:
             "En muchos eventos (casamientos o fiestas de 15) hace falta separar la cuenta para el pago de la tarjeta / catering (que va al salón o tarjetero) de la cuenta personal para regalos.",
         infoTexto2:
@@ -397,7 +397,7 @@ const es = {
         avisoLegal:
             "⚠️ La plataforma no se hace responsable por la pérdida de fondos ocasionada por errores de tipeo en la carga de datos bancarios.",
         modoAdminTexto:
-            "Esta invitación está en Plan Gratis (bloqueada para el cliente), pero tenés permiso de Admin para editar/activar las cuentas bancarias.",
+            "Esta invitación está en Plan Gratis (bloqueada para el cliente), pero tienes permiso de Admin para editar/activar las cuentas bancarias.",
         seccionRegalo: "1. Cuenta para Regalos del Evento",
         seccionRegaloAyuda:
             "Datos de transferencia para que tus invitados te hagan un regalo voluntario",
@@ -406,7 +406,7 @@ const es = {
             "Datos de transferencia destinados a saldar la tarjeta de invitación o pase del evento",
         tituloSeccion: "Título de la Sección",
         personalizado: "Personalizado",
-        tituloPersonalizadoPlaceholder: "Escribí un título personalizado",
+        tituloPersonalizadoPlaceholder: "Escribe un título personalizado",
         regaloTitulo1: "Regalo",
         regaloTitulo2: "Mesa de Regalos",
         regaloTitulo3: "Colaboración",
@@ -417,8 +417,8 @@ const es = {
         bancoPlaceholderRegalo: "Ej: Mercado Pago / Banco Galicia",
         bancoPlaceholderTarjeta: "Ej: Banco BBVA / Mercado Pago",
         opcional: "(opcional)",
-        elegiOpcion: "Elegí una opción",
-        alMenosUno: "Cargá al menos uno de estos datos: {campos}.",
+        elegiOpcion: "Elige una opción",
+        alMenosUno: "Carga al menos uno de estos datos: {campos}.",
         titular: "Titular de la Cuenta",
         titularPlaceholderRegalo: "Ej: María Pérez",
         titularPlaceholderTarjeta: "Ej: Salón Los Olivos",
@@ -431,13 +431,13 @@ const es = {
         tarifaNino: "3. Tarifa diferenciada para NIÑOS",
         tarifaNinoAyuda: "Permite ingresar un valor específico para niños de menor edad",
         revisarDatos:
-            "Revisá los datos bancarios: hay campos obligatorios o con un formato inválido.",
+            "Revisa los datos bancarios: hay campos obligatorios o con un formato inválido.",
     },
 
     trivia: {
         titulo: "Quiz / Trivia",
         subtitulo:
-            "Creá un juego divertido para que tus invitados demuestren cuánto conocen a {sujeto}",
+            "Crea un juego divertido para que tus invitados demuestren cuánto conocen a {sujeto}",
         infoTitulo: "¿Cómo funciona el Quiz o Juego de Trivia?",
         infoTexto:
             "El juego de Trivia les permite a tus invitados responder preguntas divertidas sobre {sujeto} directamente desde la tarjeta digital. Podés cargar preguntas con opciones múltiples, marcar la respuesta correcta y desafiar a tus amigos y familiares a demostrar cuánto los conocen durante la fiesta.",
@@ -445,7 +445,7 @@ const es = {
         sujetoQuinceanera: "la quinceañera",
         sujetoAgasajado: "el agasajado",
         modoAdminTexto:
-            "Esta función está en Plan Gratis para el cliente, pero tenés permiso de Admin para activarla y cargar preguntas.",
+            "Esta función está en Plan Gratis para el cliente, pero tienes permiso de Admin para activarla y cargar preguntas.",
         activar: "Activar Quiz/Trivia",
         tituloCampo: "Título",
         casamiento1: "¿Cuánto Nos Conocés?",
@@ -456,9 +456,9 @@ const es = {
         quince3: "¿Qué Tanto Sabés de Mí?",
         otro1: "Trivia del Festejo",
         otro2: "¿Cuánto Sabés?",
-        otro3: "Poné a Prueba tu Memoria",
+        otro3: "Pon a Prueba tu Memoria",
         personalizado: "Personalizado",
-        tituloPlaceholder: "Escribí un título personalizado",
+        tituloPlaceholder: "Escribe un título personalizado",
         preguntasAgregadas: "Preguntas agregadas ({cantidad})",
         agregarNueva: "Agregar nueva pregunta",
         pregunta: "Pregunta",
@@ -467,7 +467,7 @@ const es = {
         opcionPlaceholder: "Opción {letra}",
         correcta: "Correcta",
         pendienteAviso:
-            "Esta pregunta está a medio completar. Completá la pregunta y las 4 opciones, o borrá el texto para descartarla, antes de continuar.",
+            "Esta pregunta está a medio completar. Completa la pregunta y las 4 opciones, o borrá el texto para descartarla, antes de continuar.",
         agregarYOtra: "Agregar y cargar otra",
         listoCerrar: "Listo, cerrar",
         avisoAgregada: "Pregunta agregada.",
@@ -475,19 +475,19 @@ const es = {
         avisoPendienteEditar:
             "Tenés una pregunta a medio completar en el formulario. Completala o borrá el texto antes de editar otra.",
         avisoPendiente:
-            "Tenés una pregunta a medio completar: escribí la pregunta y las 4 opciones, o borrá el texto para descartarla.",
+            "Tenés una pregunta a medio completar: escribe la pregunta y las 4 opciones, o borrá el texto para descartarla.",
         avisoGuardada: "Pregunta guardada.",
         avisoUltima: "Se agregó tu última pregunta antes de continuar.",
-        avisoSinPreguntas: "Agregá al menos una pregunta a la Trivia, o deshabilitá la sección.",
+        avisoSinPreguntas: "Agrega al menos una pregunta a la Trivia, o deshabilitá la sección.",
     },
 
     infoAdicional: {
-        titulo: "¿Qué necesitás que sepan tus invitados?",
+        titulo: "¿Qué necesitas que sepan tus invitados?",
         subtitulo:
             "Datos prácticos como alojamiento, estacionamiento o transporte -- aparecen en un botón aparte dentro de la invitación, así no se mezclan con el resto del contenido.",
         interruptor: "Mostrar esta sección en la invitación",
         interruptorAyuda:
-            "Es el interruptor general: si está apagado, el botón “¿Qué necesitás saber?” no aparece aunque hayas cargado información abajo -- podés dejar todo preparado y activarlo cuando quieras.",
+            "Es el interruptor general: si está apagado, el botón “¿Qué necesitas saber?” no aparece aunque hayas cargado información abajo -- puedes dejar todo preparado y activarlo cuando quieras.",
         alojamiento: "Alojamiento",
         alojamientoDetalle: "Hoteles o alojamientos recomendados cerca del evento",
         alojamientoPlaceholder:
@@ -506,7 +506,7 @@ const es = {
             "Ej: El evento es al aire libre, te recomendamos llevar un abrigo liviano para la noche.",
         textoInvitados: "Texto que van a ver tus invitados",
         exceso: "Te pasaste por {cantidad} caracteres -- acortá el texto para poder continuar.",
-        faltaTexto: "Completá el texto de las secciones que activaste, o desactivalas.",
+        faltaTexto: "Completa el texto de las secciones que activaste, o desactivalas.",
         avisoExceso: "El texto de “{seccion}” se pasó del límite -- acortalo para poder continuar.",
         errorCrear: "Error al crear la invitación: {mensaje}",
         errorDesconocido: "Error desconocido",
@@ -516,7 +516,7 @@ const es = {
     limitePlan: {
         titulo: "Llegaste al límite del plan Gratis",
         descripcion:
-            "Ya tenés una invitación Gratis activa -- elegí Premium o Diamond para crear esta.",
+            "Ya tienes una invitación Gratis activa -- elige Premium o Diamond para crear esta.",
         confirmarTitulo: "Confirmar uso de crédito {plan}",
         confirmarUno:
             "Tenés 1 crédito {plan} disponible. Al confirmar, se usa uno para convertir esta invitación -- no se te cobra nada.",

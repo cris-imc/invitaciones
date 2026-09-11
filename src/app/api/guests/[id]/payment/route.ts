@@ -74,7 +74,7 @@ export async function PATCH(
 
   if (!hasSeat && !hasReceived && !hasNotes && !["PENDING", "EXEMPT", "PAID"].includes(status)) {
     return NextResponse.json(
-      { error: "Enviá seat, receivedAmount, notes, o status PENDING, EXEMPT o PAID" },
+      { error: "Envía seat, receivedAmount, notes, o status PENDING, EXEMPT o PAID" },
       { status: 400 }
     );
   }

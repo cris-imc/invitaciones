@@ -37,7 +37,7 @@ function ResetPasswordForm() {
         showToast(data.error || "Error al resetear la contraseña", "error");
         return;
       }
-      showToast("¡Contraseña actualizada! Ya podés iniciar sesión.", "success");
+      showToast("¡Contraseña actualizada! Ya puedes iniciar sesión.", "success");
       router.push("/login");
     } catch {
       showToast("Error al resetear la contraseña", "error");
@@ -51,7 +51,7 @@ function ResetPasswordForm() {
       <p className="text-center opacity-80 font-body">
         Este link no es válido.{" "}
         <Link href="/forgot-password" className="text-[var(--paper)] hover:underline font-semibold">
-          Pedí uno nuevo
+          Pide uno nuevo
         </Link>
         .
       </p>
@@ -112,7 +112,7 @@ export default function ResetPasswordPage() {
       <div className="max-w-md mx-auto w-full relative z-10 text-[var(--on-ink)]">
         <div className="bg-[var(--ink)]/80 backdrop-blur-md rounded-3xl border border-[var(--ink-2)] p-8 shadow-2xl text-[var(--on-ink)]">
           <div className="text-center mb-8">
-            <h1 className="font-display text-3xl mb-2">Elegí tu nueva contraseña</h1>
+            <h1 className="font-display text-3xl mb-2">Elige tu nueva contraseña</h1>
           </div>
           <Suspense fallback={null}>
             <ResetPasswordForm />
