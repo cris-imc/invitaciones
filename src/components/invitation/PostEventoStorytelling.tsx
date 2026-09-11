@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LiveAlbumStrip } from "@/components/templates/LiveAlbumStrip";
+import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
+import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
 import { getEventStatus, getInvitationExpirationDate, type EventStatus } from "@/lib/expiration";
@@ -12,13 +13,19 @@ import { getEventStatus, getInvitationExpirationDate, type EventStatus } from "@
  * Las 177 plantillas de la colección Storytelling no tenían ninguna: la cuenta
  * regresiva llegaba a cero, se quedaba clavada en 00:00:00:00 y la invitación
  * seguía mostrando "guardá la fecha" y el formulario de confirmación de una
- * fiesta que ya había pasado. La colección Flat sí la tiene, pero escrita a
- * mano dentro de cada archivo -- 184 copias de la misma idea.
+ * fiesta que ya había pasado.
  *
- * Acá va una sola, y cada plantilla le pasa SU paleta. No es un genérico gris
- * pegado a todas: el fondo, la tinta y el acento salen del contenedor raíz de
- * cada variante, así que la de Cine Abstracto sigue siendo Cine Abstracto y la
- * Infantil Safari sigue siendo Infantil Safari.
+ * ES LA MISMA QUE LA DE LAS FLAT, a propósito, y no un diseño nuevo: la tarjeta
+ * centrada con el halo detrás, el título "Un momento" con la palabra que rota,
+ * el hilo con el punto en el medio, el agradecimiento, la píldora con hasta
+ * cuándo está el álbum y el carrusel abajo. Un cliente que probó una plantilla
+ * Flat y después eligió una Storytelling tiene que encontrar lo mismo después
+ * de su fiesta.
+ *
+ * Lo único que cambia por plantilla es la paleta, que sale del contenedor raíz
+ * de cada variante. En las Flat también es así -- cada familia pinta su post
+ * evento con sus colores --, sólo que allá está escrito a mano en cada uno de
+ * los 184 archivos y acá hay uno solo.
  */
 
 export interface PaletaDeVariante {
@@ -74,112 +81,111 @@ export function PostEventoStorytelling({ titulo, fechaEvento, paleta, fotos }: P
 
   const vence = getInvitationExpirationDate(fechaEvento);
   const venceStr = vence.toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
-  const fechaStr = fechaEvento.toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
 
-  // El acento sobre el fondo de la variante: algunas son claras y otras
-  // oscuras, así que el velo de las superficies se calcula, no se fija.
+  // El velo de las superficies se calcula, no se fija: la mayoría de las
+  // variantes son oscuras pero no todas, y una tarjeta negra translúcida sobre
+  // un fondo claro no se ve.
   const oscuro = esOscuro(paleta.fondo);
-  const velo = oscuro ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.05)";
-  const hilo = oscuro ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.12)";
+  const velo = oscuro ? "rgba(0,0,0,.40)" : "rgba(255,255,255,.55)";
+  const hilo = oscuro ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.10)";
+  const veloSuave = oscuro ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.04)";
 
   return (
     <div
-      className={paleta.clase}
-      style={{
-        minHeight: "calc(var(--vh, 1vh) * 100)",
-        background: paleta.fondo,
-        color: paleta.tinta,
-        fontFamily: paleta.fuente,
-        display: "flex",
-        flexDirection: "column",
-      }}
+      className={`min-h-dvh w-full relative overflow-x-hidden flex flex-col justify-between ${paleta.clase ?? ""}`}
+      style={{ background: paleta.fondo, color: paleta.tinta, fontFamily: paleta.fuente }}
     >
-      <main
-        style={{
-          flex: 1,
-          width: "100%",
-          maxWidth: 880,
-          margin: "0 auto",
-          padding: "72px 24px 48px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 32,
-          textAlign: "center",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <span
-            style={{
-              fontSize: 11,
-              letterSpacing: ".22em",
-              textTransform: "uppercase",
-              color: paleta.acento,
-            }}
-          >
-            {fechaStr}
-          </span>
-          <h1 style={{ fontSize: "clamp(30px, 7vw, 54px)", lineHeight: 1.05, margin: 0, fontWeight: 400 }}>
-            {titulo}
-          </h1>
-        </div>
+      {/* Los dos halos del fondo, como en las Flat. */}
+      <div
+        className="absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none"
+        style={{ background: `${paleta.acento}1A` }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute right-0 bottom-0 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none"
+        style={{ background: `${paleta.acento}1A` }}
+        aria-hidden="true"
+      />
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, opacity: 0.5 }}>
-          <span style={{ height: 1, width: 52, background: hilo }} />
-          <span style={{ width: 5, height: 5, borderRadius: "50%", background: paleta.acento }} />
-          <span style={{ height: 1, width: 52, background: hilo }} />
-        </div>
+      <main className="relative z-10 max-w-5xl mx-auto w-full px-4 md:px-6 py-12 lg:py-20">
+        <div
+          className="rounded-[2rem] shadow-2xl backdrop-blur-3xl text-center max-w-4xl mx-auto relative overflow-hidden flex flex-col"
+          style={{ background: velo, border: `1px solid ${hilo}` }}
+        >
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px]"
+            style={{ background: `linear-gradient(to right, transparent, ${paleta.acento}80, transparent)` }}
+          />
 
-        <p style={{ fontSize: 15, lineHeight: 1.7, opacity: 0.8, margin: "0 auto", maxWidth: 540 }}>
-          {tx("invitacion.frase.graciasPorAcompanarnosCorto")}
-        </p>
+          <div className="p-10 md:p-16 space-y-8">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-wide drop-shadow-md">
+              {tx("invitacion.frase.unMomento")}{" "}
+              <AnimatedSynonyms
+                words={[
+                  tx("invitacion.frase.inolvidable"),
+                  tx("invitacion.frase.unico"),
+                  tx("invitacion.frase.eterno"),
+                  tx("invitacion.frase.magico"),
+                ]}
+                className="italic"
+              />
+            </h1>
 
-        {/* El álbum es la razón por la que alguien vuelve a abrir el link
-            después de la fiesta. Va primero que cualquier otra cosa. */}
-        <section style={{ marginTop: 8 }}>
-          {fotos.length > 0 ? (
-            <LiveAlbumStrip photos={fotos} tone={oscuro ? "dark" : "light"} accentColor={paleta.acento} />
-          ) : (
-            <div
-              style={{
-                border: `1px solid ${hilo}`,
-                background: velo,
-                borderRadius: 16,
-                padding: "36px 20px",
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-              }}
-            >
-              <h2 style={{ fontSize: 17, margin: 0, fontWeight: 400 }}>{tx("invitacion.album.fotografico")}</h2>
-              <p style={{ fontSize: 13, opacity: 0.65, margin: 0 }}>{tx("invitacion.album.sinCapturas")}</p>
+            {/* De quién fue la fiesta. Las Flat lo dan por sabido porque su
+                post evento suele venir después de haber visto la invitación;
+                acá el link se abre meses después y "un momento inolvidable"
+                sin nombre no dice de quién. */}
+            <p className="text-sm uppercase tracking-[0.2em]" style={{ color: paleta.acento }}>
+              {titulo}
+            </p>
+
+            <div className="flex justify-center items-center gap-4 py-2 opacity-60">
+              <div className="h-[1px] w-12" style={{ background: hilo }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: `${paleta.acento}80` }} />
+              <div className="h-[1px] w-12" style={{ background: hilo }} />
             </div>
-          )}
-        </section>
 
-        {fotos.length > 0 && (
-          <span
-            style={{
-              alignSelf: "center",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "9px 18px",
-              borderRadius: 999,
-              border: `1px solid ${hilo}`,
-              background: velo,
-              fontSize: 11,
-              letterSpacing: ".14em",
-              textTransform: "uppercase",
-              opacity: 0.8,
-            }}
-          >
-            <span style={{ width: 5, height: 5, borderRadius: "50%", background: paleta.acento }} />
-            {tx("invitacion.album.disponibleHasta")} {venceStr}
-          </span>
-        )}
+            <p className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto font-light tracking-wide opacity-75">
+              {tx("invitacion.frase.graciasPorAcompanarnos")}
+            </p>
+
+            <div className="pt-6">
+              <span
+                className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-xs tracking-widest uppercase backdrop-blur-md opacity-80"
+                style={{ background: veloSuave, border: `1px solid ${hilo}` }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: paleta.acento }} />
+                <span>
+                  {tx("invitacion.album.disponibleHasta")} {venceStr}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div className="w-full py-8 md:py-12" style={{ background: veloSuave, borderTop: `1px solid ${hilo}` }}>
+            <div className="px-4 md:px-10">
+              {fotos.length > 0 ? (
+                <div className="w-full overflow-hidden rounded-2xl shadow-xl" style={{ outline: `1px solid ${hilo}` }}>
+                  <AlbumCarousel photos={fotos} dark={oscuro} hideHeader />
+                </div>
+              ) : (
+                <div className="text-center space-y-3">
+                  <h3 className="font-light text-xl tracking-wide opacity-85">
+                    {tx("invitacion.album.fotografico")}
+                  </h3>
+                  <p className="text-sm font-light tracking-wide opacity-60">
+                    {tx("invitacion.album.sinCapturas")}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </main>
 
-      <LogoFooterCredit bgColor="transparent" textColor={paleta.tinta} />
+      <footer className="relative z-10 pt-4 pb-2 text-center" style={{ borderTop: `1px solid ${hilo}` }}>
+        <LogoFooterCredit bgColor="transparent" textColor={paleta.tinta} />
+      </footer>
     </div>
   );
 }
