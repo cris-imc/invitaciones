@@ -40,6 +40,7 @@ import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 import { tituloEnDosLineas, useTextos } from "@/components/i18n/ProveedorIdioma";
 import { useFormatoDeMoneda, useFormatoDeNumero } from "@/components/i18n/ProveedorIdioma";
 import { esVistaMiniatura } from "@/lib/miniatura";
+import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
 
 const flbArchivo = Archivo_Black({
   subsets: ["latin"],
@@ -249,7 +250,11 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
   const livePhotos = liveItems
     .filter((item) => item.fileUrl && (item.type === "PHOTO" || !item.type || /\.(jpg|jpeg|png|webp|gif)$/i.test(item.fileUrl)))
     .map((item) => item.fileUrl);
-  const eventHasStarted = Date.now() >= eventDateTime.getTime();
+  // El estado del evento se recalcula mientras la página está abierta: si
+  // se calculara una sola vez, quien la deja abierta cruzando la fecha se
+  // queda para siempre en la cuenta regresiva clavada en cero.
+  const estadoDelEvento = useEstadoDelEvento(eventDateTime);
+  const eventHasStarted = estadoDelEvento !== "PRE_EVENT";
 
   const rsvpEnabled = Boolean(invitation.rsvpEnabled ?? true);
   const sugerenciaMusicaHabilitada = Boolean(invitation.sugerenciaMusicaHabilitada ?? false);
@@ -684,6 +689,20 @@ export function FashionLookbookTemplateMilitar({ invitation, guest, isPersonaliz
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Después de la fiesta la invitación deja de invitar: no tiene sentido
+  // pedir confirmación de asistencia ni mostrar una cuenta regresiva en
+  // cero. Lo que sí importa a partir de acá es el álbum.
+  if (estadoDelEvento === "POST_EVENT" || estadoDelEvento === "EXPIRED") {
+    return (
+      <PostEventoStorytelling
+        titulo={namesTitle}
+        fechaEvento={eventDateTime}
+        fotos={livePhotos}
+        paleta={{ fondo: "#080906", tinta: "#F4F1EA", acento: "#6B8F3B", clase: `${flbArchivo.variable} ${flbMono.variable}`, fuente: "var(--flb-mono), monospace" }}
+      />
+    );
+  }
 
   return (
     <div
