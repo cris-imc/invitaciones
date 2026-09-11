@@ -53,14 +53,17 @@ export function CampoFecha({ value, onChange, locale, textoVacio, deshabilitado,
 
   return (
     <>
-      {/* Celular: el selector del sistema. */}
+      {/* Celular: el selector del sistema. `campo-nativo` por el mismo motivo
+          que en CampoHora: el ícono del calendario y el panel los dibuja el
+          navegador, y sin avisarle de qué lado está el tema los pinta para
+          fondo claro -- negro sobre el verde oscuro del wizard. */}
       <input
         type="date"
         disabled={deshabilitado}
         min={minimo}
         value={aTextoDeInput(value)}
         onChange={(e) => onChange(desdeTextoDeInput(e.target.value))}
-        className={cn(CLASES_CAMPO, "md:hidden pr-3")}
+        className={cn(CLASES_CAMPO, "campo-nativo md:hidden pr-3")}
       />
 
       {/* Escritorio: el calendario, que se apunta con el mouse. */}
