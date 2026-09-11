@@ -1136,7 +1136,7 @@ export function BotanicaEditorialTemplateBorgona({ invitation, guest, isPersonal
         )}
 
         <section data-tone="dark" data-screen-label={tx("invitacion.sabor.tuLamina")} className="bte-section bte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #261018 0%, #180C10 55%, #120A0C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="bte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LÁMINA</span>
+          <span data-xin="1" data-dist="-60" className="bte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="bte-final-card">
             <div className="bte-medallion bte-medallion--final">
               <BteMedallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="bteArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

@@ -56,6 +56,13 @@ const es = {
   },
 
   // ── Save the date y cuenta regresiva ─────────────────────────
+  // Las dos palabras de los kickers de plantilla que cambian con el país.
+  // Van en mayúscula porque así se usan: los kickers son versales.
+  kicker: {
+    guarda: "GUARDA",
+    aqui: "AQUÍ",
+  },
+
   bienvenida: {
     bienvenido: "Bienvenido",
     hola: "Hola, {nombre}",
@@ -593,6 +600,11 @@ const en: Invitacion = {
     invitadoEspecial: "Special guest",
   },
 
+  kicker: {
+    guarda: "KEEP",
+    aqui: "HERE",
+  },
+
   bienvenida: {
     bienvenido: "Welcome",
     hola: "Hi, {nombre}",
@@ -1101,6 +1113,11 @@ const pt: Invitacion = {
     invitado: "Convidado",
     invitadoAnonimo: "Convidado anônimo",
     invitadoEspecial: "Convidado Especial",
+  },
+
+  kicker: {
+    guarda: "GUARDE",
+    aqui: "AQUI",
   },
 
   bienvenida: {

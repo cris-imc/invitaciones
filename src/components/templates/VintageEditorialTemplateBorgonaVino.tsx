@@ -1124,7 +1124,7 @@ export function VintageEditorialTemplateBorgonaVino({ invitation, guest, isPerso
         )}
 
         <section data-tone="dark" data-screen-label={tx("invitacion.sabor.tuEdicion")} className="vte-section vte-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1B1015 0%, #1F1014 55%, #130A0C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="vte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU EDICIÓN</span>
+          <span data-xin="1" data-dist="-60" className="vte-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU EDICIÓN</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="vte-final-card">
             <div className="vte-medallion vte-medallion--final">
               <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="vteArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

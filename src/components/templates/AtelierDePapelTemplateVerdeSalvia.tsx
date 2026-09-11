@@ -1134,7 +1134,7 @@ export function AtelierDePapelTemplateVerdeSalvia({ invitation, guest, isPersona
         )}
 
         <section data-tone="dark" data-screen-label={tx("invitacion.sabor.tuLamina")} className="adp-section adp-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #151E23 0%, #11150F 55%, #11150F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="adp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LÁMINA</span>
+          <span data-xin="1" data-dist="-60" className="adp-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU LÁMINA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="adp-final-card">
             <div className="adp-medallion adp-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="adpArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

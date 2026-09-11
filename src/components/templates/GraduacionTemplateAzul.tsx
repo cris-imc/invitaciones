@@ -815,7 +815,7 @@ export function GraduacionTemplateAzul({ invitation, guest, isPersonalized = fal
                 </div>
               )}
             </div>
-            <span data-xin="1" data-dist="-60" className="grd-kicker grd-hero-photo-kicker">02 — EL CAMINO HASTA ACÁ</span>
+            <span data-xin="1" data-dist="-60" className="grd-kicker grd-hero-photo-kicker">02 — EL CAMINO HASTA {tx("invitacion.kicker.aqui")}</span>
           </section>
         )}
 

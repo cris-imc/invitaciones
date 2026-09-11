@@ -45,7 +45,12 @@ export async function idiomaDelAnfitrion(): Promise<Idioma> {
  *
  */
 export async function textosDelAnfitrion(): Promise<Traductor> {
-  return traductorDe(await idiomaDelAnfitrion());
+  // El país va junto con el idioma porque decide el TRATO: voseo en
+  // Argentina, neutro en el resto. Sale de lo mismo que los precios y los
+  // medios de pago, así que no puede pasar que a alguien le ofrezcan cuotas
+  // sin interés y en la misma pantalla le hablen como de afuera.
+  const [idioma, pais] = await Promise.all([idiomaDelAnfitrion(), paisDelAnfitrion()]);
+  return traductorDe(idioma, pais);
 }
 
 /**

@@ -50,7 +50,9 @@ export function ProveedorIdioma({
   children: React.ReactNode;
 }) {
   const valor = useMemo<Valor>(
-    () => ({ idioma, t: traductorDe(idioma), pais }),
+    // El país entra al traductor: de ahí sale el trato (voseo en Argentina,
+    // neutro en el resto). Ver traductorDe.
+    () => ({ idioma, t: traductorDe(idioma, pais), pais }),
     [idioma, pais]
   );
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;

@@ -771,7 +771,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
                 </div>
               )}
             </div>
-            <span data-xin="1" data-dist="-60" className="cne-kicker cne-hero-photo-kicker">02 — LA REALEZA EMPIEZA ACÁ</span>
+            <span data-xin="1" data-dist="-60" className="cne-kicker cne-hero-photo-kicker">02 — LA REALEZA EMPIEZA {tx("invitacion.kicker.aqui")}</span>
           </section>
         )}
 
@@ -1079,7 +1079,7 @@ export function CoronaEscarlataTemplateMedianoche({ invitation, guest, isPersona
         )}
 
         <section data-tone="dark" data-screen-label="Tu corona" className="cne-section cne-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #131315 0%, #18181B 55%, #0A0A0C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cne-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU CORONA</span>
+          <span data-xin="1" data-dist="-60" className="cne-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU CORONA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cne-final-card">
             <div className="cne-medallion cne-medallion--final">
               <CoronaMedallion sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cneArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

@@ -1081,7 +1081,7 @@ export function JewelryBoxTemplateRubi({ invitation, guest, isPersonalized = fal
         )}
 
         <section data-tone="dark" data-screen-label="Tu pieza" className="jwb-section jwb-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1A0A0F 0%, #3D1420 55%, #240D14 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="jwb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
+          <span data-xin="1" data-dist="-60" className="jwb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="jwb-final-card">
             <div className="jwb-medallion jwb-medallion--final">
               <JwbMedallion label="15" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="jwbArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

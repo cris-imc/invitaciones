@@ -1,3 +1,5 @@
+import { traductorDe } from "@/lib/i18n/texto";
+import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/db";
@@ -56,7 +58,7 @@ export async function generateMetadata({
     month: "long",
     year: "numeric",
   });
-  const description = `${eventTitle} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ""}. Confirma tu asistencia.`;
+  const description = `${eventTitle} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ""}. ${traductorDe(esIdiomaValido(invitation.idioma) ? invitation.idioma : idiomaSegunPais(invitation.pais), invitation.pais)("invitacion.rsvp.kicker")}.`;
 
   const ogImage = invitation.portadaImagenFondo
     ? [{ url: invitation.portadaImagenFondo, width: 1200, height: 630, alt: eventTitle }]

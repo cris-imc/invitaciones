@@ -1088,7 +1088,7 @@ export function PrincesaTemplateRosaAntiguo({ invitation, guest, isPersonalized 
         )}
 
         <section data-tone="dark" data-screen-label="Tu tiara" className="prc-section prc-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1F1013 0%, #3A1F26 55%, #2E151D 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="prc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU TIARA</span>
+          <span data-xin="1" data-dist="-60" className="prc-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU TIARA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="prc-final-card">
             <div className="prc-medallion prc-medallion--final">
               <TiaraMedallion sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="prcArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

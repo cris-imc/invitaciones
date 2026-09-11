@@ -1127,7 +1127,7 @@ export function CeramicaEditorialTemplateCobalto({ invitation, guest, isPersonal
         )}
 
         <section data-tone="dark" data-screen-label="Tu pieza" className="cme-section cme-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #161A33 0%, #16202E 55%, #0E131C 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cme-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
+          <span data-xin="1" data-dist="-60" className="cme-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cme-final-card">
             <div className="cme-medallion cme-medallion--final">
               <CmeMedallion label={monograma} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cmeArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

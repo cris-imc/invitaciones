@@ -1,3 +1,4 @@
+import { traductorDe } from "@/lib/i18n/texto";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { resolveCardPayment, resolveGuestPaymentView } from "@/lib/card-payments";
@@ -293,6 +294,7 @@ import { autoRejectStalePending } from "@/lib/live-cleanup";
 import { getInvitePhrase } from "@/lib/invitation-copy";
 import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
 import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
+import { esCodigoPais } from "@/lib/paises";
 import { ProveedorInvitacion } from "@/components/invitation/ContextoInvitacion";
 import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
 
@@ -308,7 +310,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         month: 'long',
         year: 'numeric',
     });
-    const description = `Estás invitado a ${getInvitePhrase(invitation.tipo)} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ''}. Confirma tu asistencia.`;
+    const description = `Estás invitado a ${getInvitePhrase(invitation.tipo)} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ''}. ${traductorDe(esIdiomaValido(invitation.idioma) ? invitation.idioma : idiomaSegunPais(invitation.pais), invitation.pais)("invitacion.rsvp.kicker")}.`;
     const ogImage = invitation.portadaImagenFondo
         ? [{ url: invitation.portadaImagenFondo, width: 1200, height: 630, alt: invitation.nombreEvento }]
         : undefined;
@@ -1071,8 +1073,10 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
         ? validInvitation.idioma
         : idiomaSegunPais(validInvitation.pais);
 
+    // El país de LA INVITACIÓN, no el de quien la abre: de ahí sale el
+    // trato, igual que el idioma.
     return (
-        <ProveedorIdioma idioma={idiomaInvitacion}>
+        <ProveedorIdioma idioma={idiomaInvitacion} pais={esCodigoPais(validInvitation.pais) ? validInvitation.pais : null}>
             <ProveedorInvitacion datos={validInvitation}>
                 <div data-invitado data-plan-tier={String(validInvitation.planTier ?? 'FREE')}>
                     {isFree && <FreePlanBanner />}

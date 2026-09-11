@@ -1124,7 +1124,7 @@ export function PapeleriaDeHotelDeLujoTemplate({ invitation, guest, isPersonaliz
         )}
 
         <section data-tone="dark" data-screen-label="Tu reserva" className="phl-section phl-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #17141F 0%, #0C1712 55%, #0A140F 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="phl-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU RESERVA</span>
+          <span data-xin="1" data-dist="-60" className="phl-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU RESERVA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="phl-final-card">
             <div className="phl-medallion phl-medallion--final">
               <Medallion label="LM" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="phlArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

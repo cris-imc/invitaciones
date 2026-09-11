@@ -13,6 +13,7 @@ import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink"
 import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
 import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
+import { esCodigoPais } from "@/lib/paises";
 import { ProveedorInvitacion } from "@/components/invitation/ContextoInvitacion";
 import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
 
@@ -178,8 +179,9 @@ export default async function InvitationPage({ params }: { params: Promise<{ slu
         ? invitation.idioma
         : idiomaSegunPais(invitation.pais);
 
+    // El país de LA INVITACIÓN, no el de quien la abre.
     return (
-        <ProveedorIdioma idioma={idiomaInvitacion}>
+        <ProveedorIdioma idioma={idiomaInvitacion} pais={esCodigoPais(invitation.pais) ? invitation.pais : null}>
       <div data-invitado>
             <ProveedorInvitacion datos={invitation}>
                 {isFree && <FreePlanBanner />}

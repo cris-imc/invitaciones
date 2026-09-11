@@ -1149,7 +1149,7 @@ export function LiquidGlassTemplateCuarzo({ invitation, guest, isPersonalized = 
         )}
 
         <section data-tone="dark" data-screen-label="Tu panel" className="lqg-section lqg-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1F1714 0%, #110A0D 55%, #0D080A 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="lqg-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PANEL</span>
+          <span data-xin="1" data-dist="-60" className="lqg-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU PANEL</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="lqg-final-card">
             <div className="lqg-medallion lqg-medallion--final">
               <Medallion label={coupleInitials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="lqgArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" size={30} />

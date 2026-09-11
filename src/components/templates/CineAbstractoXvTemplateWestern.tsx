@@ -1089,7 +1089,7 @@ export function CineAbstractoXvTemplateWestern({ invitation, guest, isPersonaliz
         )}
 
         <section data-tone="dark" data-screen-label="Tu entrada" className="cxv-section cxv-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1F150C 0%, #150E08 55%, #0D0704 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cxv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ENTRADA</span>
+          <span data-xin="1" data-dist="-60" className="cxv-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cxv-final-card">
             <div className="cxv-medallion cxv-medallion--final">
               <CxvMedallion sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cxvArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

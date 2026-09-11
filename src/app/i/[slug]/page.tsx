@@ -1,3 +1,4 @@
+import { traductorDe } from "@/lib/i18n/texto";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/db";
@@ -6,6 +7,7 @@ import { checkAndCleanupIfExpired } from "@/lib/expiration-server";
 import { autoRejectStalePending } from "@/lib/live-cleanup";
 import { FreePlanBanner, FreePlanBannerSpacer } from "@/components/invitation/FreePlanBanner";
 import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
+import { esCodigoPais } from "@/lib/paises";
 import { ProveedorInvitacion } from "@/components/invitation/ContextoInvitacion";
 import { esIdiomaValido, idiomaSegunPais } from "@/lib/i18n/idiomas";
 
@@ -63,7 +65,7 @@ export async function generateMetadata({
     month: "long",
     year: "numeric",
   });
-  const description = `${eventTitle} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ""}. Confirma tu asistencia.`;
+  const description = `${eventTitle} · ${fecha}${invitation.lugarNombre ? ` · ${invitation.lugarNombre}` : ""}. ${traductorDe(esIdiomaValido(invitation.idioma) ? invitation.idioma : idiomaSegunPais(invitation.pais), invitation.pais)("invitacion.rsvp.kicker")}.`;
 
   const ogImage = invitation.portadaImagenFondo
     ? [{ url: invitation.portadaImagenFondo, width: 1200, height: 630, alt: eventTitle }]
@@ -561,8 +563,11 @@ export default async function InvitationPage({
     ? invitation.idioma
     : idiomaSegunPais(invitation.pais);
 
+  // El país de LA INVITACIÓN, no el de quien la abre: de ahí sale el trato,
+  // igual que el idioma. Una boda en Córdoba habla como en Córdoba aunque el
+  // link lo abra un primo de Madrid.
   return (
-    <ProveedorIdioma idioma={idiomaInvitacion}>
+    <ProveedorIdioma idioma={idiomaInvitacion} pais={esCodigoPais(invitation.pais) ? invitation.pais : null}>
       <ProveedorInvitacion datos={invitation}>
         <div data-invitado data-plan-tier={String(invitation.planTier ?? 'FREE')}>
           {isFree && <FreePlanBanner />}

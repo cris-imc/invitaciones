@@ -1,5 +1,6 @@
 import { DICCIONARIOS, type Diccionario } from "./diccionario/index";
 import { IDIOMA_POR_DEFECTO, idiomaEfectivo, type Idioma } from "./idiomas";
+import { ES_AR } from "./es-ar";
 
 /**
  * Todas las claves posibles, como "panel.mesas.agregarMesa".
@@ -48,15 +49,30 @@ function reemplazar(texto: string, valores?: Record<string, string | number>): s
  * cruda: un texto en español dentro de una pantalla en inglés se lee mal, pero
  * "panel.mesas.agregarMesa" en un botón no se lee de ninguna manera.
  */
-export function traductorDe(idiomaPedido: Idioma) {
+export function traductorDe(idiomaPedido: Idioma, pais?: string | null) {
   // Todo lo que se pinta pasa por acá, así que es el lugar donde el
   // interruptor del multiidioma tiene efecto real: con el multiidioma
   // apagado, un "en" guardado en una invitación vieja igual sale en español.
   const idioma = idiomaEfectivo(idiomaPedido);
   const dic = DICCIONARIOS[idioma] ?? DICCIONARIOS[IDIOMA_POR_DEFECTO];
 
+  /**
+   * El español de Argentina, que es el mismo idioma con otro trato.
+   *
+   * No es un idioma aparte ni una opción que alguien elija: es una capa de
+   * excepciones que se aplica sola según el país, encima del español neutro.
+   * Lo que no esté en la capa cae al neutro, que es la respuesta correcta
+   * para cualquier texto nuevo hasta que alguien decida lo contrario.
+   *
+   * Va atada al país y no al idioma a propósito: el idioma del panel se
+   * elige libremente (alguien de México puede quererlo en inglés), pero el
+   * trato depende de dónde está la gente, no de qué idioma prefiere leer.
+   */
+  const variante = idioma === "es" && pais === "AR" ? ES_AR : null;
+
   return function t(clave: ClaveTexto, valores?: Record<string, string | number>): string {
     const texto =
+      variante?.[clave] ??
       buscar(dic, clave) ??
       buscar(DICCIONARIOS[IDIOMA_POR_DEFECTO], clave);
 

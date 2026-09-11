@@ -1094,7 +1094,7 @@ export function FashionLookbookTemplateMagenta({ invitation, guest, isPersonaliz
         )}
 
         <section data-tone="dark" data-screen-label="Tu look" className="flb-section flb-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))" }}>
-          <span data-xin="1" data-dist="-60" className="flb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU LOOK</span>
+          <span data-xin="1" data-dist="-60" className="flb-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU LOOK</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="flb-final-card">
             <div className="flb-medallion flb-medallion--final">
               <FlbMedallion main="15" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="flbArc3" arcText={textoArco(namesTitle, fechaCompacta)} spin="reverse" />

@@ -1149,7 +1149,7 @@ export function CineAbstractoTemplateNoirEsmeralda({ invitation, guest, isPerson
         )}
 
         <section data-tone="dark" data-screen-label="Tu entrada" className="cab-section cab-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #101E18 0%, #0B0B10 55%, #08080B 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="cab-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU ENTRADA</span>
+          <span data-xin="1" data-dist="-60" className="cab-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU ENTRADA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="cab-final-card">
             <div className="cab-medallion cab-medallion--final">
               <CabMedallion label="35mm" sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="cabArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />

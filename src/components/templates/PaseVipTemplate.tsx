@@ -784,7 +784,7 @@ export function PaseVipTemplate({ invitation, guest, isPersonalized = false }: P
                 </div>
               )}
             </div>
-            <span data-xin="1" data-dist="-60" className="pvp-kicker pvp-hero-photo-kicker">02 — LA NOCHE EMPIEZA ACÁ</span>
+            <span data-xin="1" data-dist="-60" className="pvp-kicker pvp-hero-photo-kicker">02 — LA NOCHE EMPIEZA {tx("invitacion.kicker.aqui")}</span>
           </section>
         )}
 

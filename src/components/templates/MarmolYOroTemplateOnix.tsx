@@ -1145,7 +1145,7 @@ export function MarmolYOroTemplateOnix({ invitation, guest, isPersonalized = fal
         )}
 
         <section data-tone="dark" data-screen-label="Tu pieza" className="myo-section myo-section--between" style={{ padding: "96px max(30px, calc((100% - 560px) / 2)) 48px max(24px, calc((100% - 560px) / 2))", background: "radial-gradient(120% 70% at 50% 100%, #1A1B1D 0%, #121213 55%, #060607 100%)" }}>
-          <span data-xin="1" data-dist="-60" className="myo-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — GUARDÁ TU PIEZA</span>
+          <span data-xin="1" data-dist="-60" className="myo-kicker">{knAcc([sugerenciaMusicaHabilitada, showBankSection, quizEnabled].filter(Boolean).length + 6)} — {tx("invitacion.kicker.guarda")} TU PIEZA</span>
           <div data-xin="1" data-delay="100" data-dist="130" className="myo-final-card">
             <div className="myo-medallion myo-medallion--final">
               <Medallion label={initials} sub={confirmed ? "CONFIRMADO" : tx("invitacion.pase.pendiente").toUpperCase()} arcId="myoArc3" arcText={textoArco(namesTitle, fechaCorta)} spin="reverse" />
