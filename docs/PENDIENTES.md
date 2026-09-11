@@ -37,6 +37,10 @@ así queda el registro de qué se verificó y cómo.
 
 ## Reportados, pendientes
 
+- [ ] **Confirmar en el iPhone** que el video ya no abre la invitación, y que el
+  switch de tema quedó arriba a la derecha en escritorio y al lado de Ayuda
+  en mobile.
+
 - [ ] **Wizard, elegir fecha en mobile:** abre un calendario dibujado en HTML.
   Debería abrir el selector nativo del celular.
 
@@ -59,8 +63,6 @@ así queda el registro de qué se verificó y cómo.
 
 - [ ] **Punto 15 del FODA:** elegir una sola promesa para el hero. El de mayor
   impacto y no cuesta código.
-
-- [ ] `PreferenciasUsuario.tsx` quedó sin uso al mover el switch al sidebar.
 
 - [ ] Si alguna vez se prende `MULTIIDIOMA_HABILITADO`, antes hay que cerrar
   los 266 kickers de plantilla y el mensaje de WhatsApp, que siguen en

@@ -26,7 +26,7 @@ function leerCookie(nombre: string): string | null {
  * wizard: el panel lo ve el anfitrión, la invitación la ven sus invitados.
  *
  * El país sí es fijo dentro del panel y no se toca acá (ver
- * PreferenciasUsuario): de él dependen los precios, la moneda y los datos
+ * el layout del panel): de él dependen los precios, la moneda y los datos
  * bancarios de invitaciones que quizás ya están publicadas.
  */
 export function SelectorIdioma({ className }: Props) {

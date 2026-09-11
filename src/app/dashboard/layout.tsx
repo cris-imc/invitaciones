@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { PhoneReminderModal } from "@/components/dashboard/PhoneReminderModal";
 import { PendingWizardInvitationBridge } from "@/components/dashboard/PendingWizardInvitationBridge";
 import { PendingInvitationUpgradeBridge } from "@/components/dashboard/PendingInvitationUpgradeBridge";
@@ -22,6 +23,14 @@ export default async function DashboardLayout({
             <div className="panel w-full max-w-[1180px]">
                 <Sidebar />
                 <main className="p-main relative">
+                    {/* Arriba a la derecha, igual que en el nav de la landing:
+                        así no cambia de lugar al entrar al panel. Sólo en
+                        escritorio -- en mobile vive en la barra de arriba, al
+                        lado de Ayuda, porque acá se superpondría con el
+                        contenido. */}
+                    <div className="hidden md:block absolute top-6 right-6 z-30">
+                        <ThemeToggle />
+                    </div>
                     {children}
                 </main>
             </div>
