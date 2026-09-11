@@ -13,6 +13,7 @@
  *     Familia Pérez, 4                              -> grupo de 4
  *     Los Rodríguez, 2 adultos, 1 niño              -> grupo de 3, con franjas
  *     Ana y Marcos (2)                              -> grupo de 2
+ *     Flia Gómez 5                                  -> "Familia Gómez", grupo de 5
  *
  * Nada se guarda al interpretar: esto sólo devuelve qué entendió de cada
  * línea, para que el anfitrión lo revise en una tabla y corrija antes de
@@ -47,6 +48,49 @@ const SINONIMOS: { franja: FranjaEdad; palabras: RegExp }[] = [
   { franja: "ninos", palabras: /\b(niños?|ninos?|nenes?|chicos?|menores?|infantes?)\b/i },
 ];
 
+// "Flia", "Flia.", "Fam." -- así escribe medio mundo una lista de
+// casamiento. Antes quedaba tal cual, y "Flia Gómez" y "Familia Gómez"
+// terminaban siendo dos nombres distintos para la misma gente: el aviso de
+// repetidos no los agarra y en el salón aparecen dos veces.
+const ABREVIATURAS: { corta: RegExp; larga: string }[] = [
+  { corta: /^(?:flia|flía|fam)\.?\s+/i, larga: "Familia " },
+];
+
+function expandirAbreviaturas(nombre: string): string {
+  for (const a of ABREVIATURAS) {
+    if (a.corta.test(nombre)) return nombre.replace(a.corta, a.larga);
+  }
+  return nombre;
+}
+
+// Nombres que anuncian un grupo aunque no digan cuántos: "Familia Pérez",
+// "Los Rodríguez". El número no se puede adivinar -- pero sí avisar, que es
+// mejor que cargarlos como una persona sola y que se entere en la fiesta.
+const SUENA_A_GRUPO = /^(?:familia|flia|flía|fam|los|las)\b/i;
+
+// Palabras que acompañan a una cantidad sin aportar nada: "5 personas",
+// "4 pax". Se ignoran igual que las franjas al decidir si un número que
+// aparece dentro del nombre es realmente la cantidad del grupo.
+const RELLENO = /^(?:personas?|invitados?|pax|cubiertos?|lugares?|y|e|de|mas|más|\+)$/i;
+
+/**
+ * ¿Lo que viene después del nombre son cantidades y nada más?
+ *
+ * Es la diferencia entre "Flia Gómez 5" (un grupo de cinco) y "Los 3
+ * Chiflados" (un nombre que tiene un número adentro). Sin esta pregunta, el
+ * segundo se cargaba como un grupo de tres llamado "Los".
+ */
+function esSoloCantidades(texto: string): boolean {
+  const palabras = texto.trim().split(/[\s,]+/).filter(Boolean);
+  if (palabras.length === 0) return false;
+  return palabras.every(
+    (p) =>
+      /^\d+$/.test(p) ||
+      RELLENO.test(p) ||
+      SINONIMOS.some((s) => s.palabras.test(p))
+  );
+}
+
 /** Quita numeración de lista ("1.", "-", "•") que suele venir al pegar. */
 function limpiarPrefijo(texto: string): string {
   return texto.replace(/^\s*(?:\d+[.)]\s*|[-–—*•]\s*)/, "").trim();
@@ -77,7 +121,25 @@ function parsearLinea(bruta: string, numero: number): LineaImportada | null {
   const cuerpo = conParentesis ? `${conParentesis[1]}, ${conParentesis[2]}` : texto;
 
   const partes = cuerpo.split(",").map((p) => p.trim()).filter(Boolean);
-  const nombre = partes.shift() ?? "";
+  let nombre = partes.shift() ?? "";
+
+  // Sin ninguna coma, pero con un número adentro: "Flia Gómez 5", "Familia
+  // Pérez 2 adultos 1 niño". Es como escribe media lista, y antes el número
+  // se quedaba pegado al nombre: el grupo entraba como un invitado solo
+  // llamado "Flia Gómez 5". Se corta en el primer número y lo que sigue se
+  // lee igual que si hubiera puesto la coma.
+  if (partes.length === 0) {
+    const corte = nombre.search(/\s\d/);
+    // Sólo si lo que sigue al número son cantidades, y no un nombre que
+    // casualmente tiene un número adentro: "Los 3 Chiflados" es un nombre
+    // entero, no un grupo de tres apellidado "Los".
+    if (corte > 0 && esSoloCantidades(nombre.slice(corte + 1))) {
+      partes.push(nombre.slice(corte + 1).trim());
+      nombre = nombre.slice(0, corte).trim();
+    }
+  }
+
+  nombre = expandirAbreviaturas(nombre);
 
   if (!nombre) {
     return { ...base, error: "No encontré un nombre" };
@@ -88,8 +150,16 @@ function parsearLinea(bruta: string, numero: number): LineaImportada | null {
   base.nombre = nombre;
 
   if (partes.length === 0) {
-    // Sólo un nombre: individual.
-    return { ...base, total: 1, adultos: 1 };
+    // Sólo un nombre: individual. Si el nombre anuncia un grupo se avisa,
+    // porque casi siempre es que se olvidó de poner cuántos son.
+    return {
+      ...base,
+      total: 1,
+      adultos: 1,
+      aviso: SUENA_A_GRUPO.test(nombre)
+        ? "Parece un grupo pero no dice cuántos. Lo cargo como 1."
+        : null,
+    };
   }
 
   // Se buscan pares "número + palabra" en todo el resto de la línea, no parte
