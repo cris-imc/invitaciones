@@ -37,6 +37,9 @@ así queda el registro de qué se verificó y cómo.
 
 ## Reportados, pendientes
 
+- [ ] **Logos de Mercado Pago y PayPal** en los botones de pago: le da al
+  visitante la sensación de que el cobro lo maneja una marca conocida.
+
 - [ ] **Carga masiva de invitados.** Ya está hecha: es el commit `d66dffb` de
   la rama `mesas` (pegar una lista + tabla de vista previa antes de guardar).
   Falta traerlo con cherry-pick a `internacional`.

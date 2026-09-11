@@ -59,8 +59,10 @@ import {
   Eye,
   EyeOff,
   LogIn,
+  ClipboardList,
 } from "lucide-react";
 import { hapticoConfirmar, hapticoDeshacer, hapticoError } from "@/lib/haptics";
+import { ImportarInvitados } from "@/components/dashboard/guests/ImportarInvitados";
 import { useToast } from "@/components/ui/Toast";
 import { PLAN_LIMITS, canUseFeature, PlanTier } from "@/lib/plan-limits";
 import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
@@ -309,7 +311,7 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
   const [addGuestOpen, setAddGuestOpen] = useState(false);
   const [newGuestNombre, setNewGuestNombre] = useState("");
   const [newGuestApellido, setNewGuestApellido] = useState("");
-  const [newGuestType, setNewGuestType] = useState<"INDIVIDUAL" | "FAMILY" | null>(
+  const [newGuestType, setNewGuestType] = useState<"INDIVIDUAL" | "FAMILY" | "IMPORTAR" | null>(
     null,
   );
   const [newIndividualCategory, setNewIndividualCategory] = useState<'adult' | 'teen'>('adult');
@@ -537,7 +539,9 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
 
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newGuestType) return;
+    // "IMPORTAR" no llega acá -- tiene su propio componente y su propio
+    // envío --, pero comparte el estado que decide qué se está mostrando.
+    if (!newGuestType || newGuestType === "IMPORTAR") return;
     const guestType = newGuestType;
     setIsSubmitting(true);
 
@@ -796,6 +800,15 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                 </span>
                 <span className="font-medium">{t("panel.invitados.agregarInvitado")}</span>
               </button>
+            ) : newGuestType === "IMPORTAR" ? (
+              <ImportarInvitados
+                slug={slug}
+                onImportado={fetchGuests}
+                onCerrar={() => {
+                  setNewGuestType(null);
+                  setAddGuestOpen(false);
+                }}
+              />
             ) : newGuestType === null ? (
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">{t("panel.invitados.queTipoDeInvitacion")}</p>
@@ -829,6 +842,19 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     )}
                   </div>
                 </div>
+                {/* Pegar una lista, para no cargar 150 invitados de a uno.
+                    Va debajo y no como tercera opción de la grilla: la mayoría
+                    carga de a uno, y esto es el atajo para quien ya tiene la
+                    lista escrita en otro lado. */}
+                <button
+                  type="button"
+                  onClick={() => setNewGuestType("IMPORTAR")}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-muted-foreground/25 text-sm font-medium text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors"
+                >
+                  <ClipboardList className="w-4 h-4" />
+                  {t("panel.invitados.pegarLista")}
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setAddGuestOpen(false)}
