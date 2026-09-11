@@ -72,6 +72,13 @@ así queda el registro de qué se verificó y cómo.
 
 ## Reportados, pendientes
 
+- [ ] **El teléfono del registro está pensado para Argentina.** Hoy son dos
+  campos fijos, "Cód. área" y "Número", con el prefijo del país puesto al
+  margen (ver img/telefono.jpg). Tiene que salir del país elegido: el código
+  de país se pone solo, y lo del medio cambia de nombre y de largo según el
+  país -- no en todos lados existe un "código de área", y donde existe no se
+  llama igual ni mide lo mismo.
+
 - [ ] **El post evento no se probó en las Storytelling.** Las plantillas sí; lo
   que falta es cómo se ve el post evento en esa colección.
 
