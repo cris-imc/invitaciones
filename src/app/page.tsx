@@ -114,6 +114,23 @@ export default async function Home() {
           <p className="mt-5 text-xs sm:text-sm text-[var(--shell-fg-soft)] font-ui tracking-wide">
             {t("landing.gratisParaEmpezar")}
           </p>
+          {/* Cuánto sale, arriba de todo. Hasta ahora había que bajar hasta la
+              sección de planes para saber el precio, y mucha gente no baja: se
+              va sin saber si esto cuesta mil o cien mil.
+
+              Sale del precio del país del visitante, el mismo que va a ver más
+              abajo y el mismo que va a pagar -- no de una constante en pesos
+              argentinos, que a un colombiano le diría cualquier cosa.
+
+              Es un link a los planes y no un texto suelto: quien mira el
+              precio quiere ver qué incluye, y de paso ahí está la aclaración
+              de en qué moneda se cobra, que acá arriba sería ruido. */}
+          <a
+            href="#precios"
+            className="mt-1 block text-xs sm:text-sm text-[var(--shell-fg-mid)] font-ui tracking-wide underline underline-offset-4 decoration-[var(--tinte-4)] transition-colors hover:text-[var(--foreground)] hover:decoration-[var(--foreground)]/60"
+          >
+            {t("landing.planesDesde", { precio: precio(premiumConDescuento) })}
+          </a>
           {/* En píldora y no como una línea más de texto: las cuotas sin
               interés son de las pocas cosas que se comparan de un vistazo
               contra la competencia, y suelta entre otras frases grises no se
