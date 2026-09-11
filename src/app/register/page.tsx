@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
 import { REGISTRATION_ENABLED } from "@/lib/features";
 import { PagoPorTransferencia } from "@/components/pagos/PagoPorTransferencia";
-import { normalizeDigits, validarTelefono, prefijoTelefonico } from "@/lib/phone";
+import { normalizeDigits, validarTelefono, prefijoTelefonico, formatoTelefonico } from "@/lib/phone";
 import { validatePassword, PASSWORD_MIN_LENGTH } from "@/lib/password";
 import { setPendingWizardDesiredCredit } from "@/lib/pending-wizard-invitation";
 import { costumbresDe } from "@/lib/costumbres-por-pais";
@@ -188,6 +188,10 @@ function RegisterForm() {
   // argentino que no le sirve a nadie de afuera.
   const medios = costumbresDe(formData.pais).mediosDePago;
   const porMercadoPago = medios.includes("mercadopago");
+
+  // Cómo se escribe un teléfono en el país elegido: si lleva código de área,
+  // cómo se llama ahí y cuántos dígitos tiene cada tramo.
+  const formatoTel = formatoTelefonico(formData.pais);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   // Código de descuento: se valida en vivo contra el servidor (botón
@@ -256,6 +260,7 @@ function RegisterForm() {
     // El teléfono es opcional y sus reglas dependen del país: las que había
     // eran argentinas y le rechazaban a un colombiano un número válido.
     const errorTelefono = validarTelefono(formData.pais, formData.phoneAreaCode, formData.phoneNumber);
+
     if (errorTelefono) {
       hapticoError();
       showToast(errorTelefono, "error");
@@ -598,7 +603,11 @@ function RegisterForm() {
                     onCambio={(pais) => {
                       setPaisElegidoAMano(true);
                       recordarPaisElegido(pais);
-                      setFormData({ ...formData, pais });
+                      // Se limpia el código de área: cada país lo escribe
+                      // distinto y hay tres que no lo usan. Dejarlo cargado
+                      // le mete al número dígitos de otro país sin que se
+                      // entere.
+                      setFormData({ ...formData, pais, phoneAreaCode: "" });
                     }}
                     className="border-none"
                   />
@@ -613,17 +622,37 @@ function RegisterForm() {
                     Teléfono
                     <span className="font-normal text-[var(--shell-fg-soft)]">(opcional)</span>
                   </Label>
-                  <div className="grid grid-cols-[100px_1fr] gap-2">
-                    <Input
-                      id="phoneAreaCode"
-                      type="tel"
-                      inputMode="numeric"
-                      placeholder="Cód. área"
-                      value={formData.phoneAreaCode}
-                      onChange={(e) => setFormData({ ...formData, phoneAreaCode: normalizeDigits(e.target.value) })}
-                      maxLength={6}
-                      className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
-                    />
+                  {/* El prefijo del país se pone solo y no se escribe: ya lo
+                      eligió arriba, y pedírselo de nuevo es pedirle que sepa
+                      su propio código internacional.
+
+                      Y el tramo del medio sale del país. No todos tienen
+                      "código de área": en México es la lada, en Estados Unidos
+                      el area code, y en España, Colombia y Uruguay no existe
+                      -- ahí va un solo campo. Ver formatoTelefonico. */}
+                  <div
+                    className={`grid gap-2 ${formatoTel.etiquetaArea ? "grid-cols-[auto_100px_1fr]" : "grid-cols-[auto_1fr]"}`}
+                  >
+                    <span
+                      className="h-12 px-3 inline-flex items-center rounded-xl bg-[var(--ink-2)] text-[var(--on-ink)]/70 text-sm font-mono select-none"
+                      aria-label="Código del país"
+                    >
+                      {prefijoTelefonico(formData.pais) || "+"}
+                    </span>
+
+                    {formatoTel.etiquetaArea && (
+                      <Input
+                        id="phoneAreaCode"
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder={formatoTel.etiquetaArea}
+                        value={formData.phoneAreaCode}
+                        onChange={(e) => setFormData({ ...formData, phoneAreaCode: normalizeDigits(e.target.value) })}
+                        maxLength={formatoTel.areaMax}
+                        className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
+                      />
+                    )}
+
                     <Input
                       id="phoneNumber"
                       type="tel"
@@ -631,16 +660,19 @@ function RegisterForm() {
                       placeholder="Número"
                       value={formData.phoneNumber}
                       onChange={(e) => setFormData({ ...formData, phoneNumber: normalizeDigits(e.target.value) })}
-                      maxLength={12}
+                      maxLength={formatoTel.numeroMax}
                       className="w-full bg-[var(--ink-2)] border-none text-[var(--on-ink)] placeholder:text-[var(--shell-fg-faint)] h-12 rounded-xl"
                     />
                   </div>
-                  {/* La ayuda depende del país: la del 0 y el 15 son prefijos de
-                      marcado argentinos que no existen en ningún otro lado. */}
+                  {/* La ayuda es un ejemplo del país, que se entiende de un
+                      vistazo. Lo del 0 y el 15 son trampas argentinas que no
+                      existen en ningún otro lado. */}
                   <p className="text-xs opacity-50 mt-1.5">
                     {formData.pais === "AR"
-                      ? "Código de área sin el 0 (ej. 351) y número sin el 15 (ej. 5551234)"
-                      : `Código de área y número, sólo dígitos (${prefijoTelefonico(formData.pais)})`}
+                      ? "Sin el 0 del área ni el 15 del número. Ej. 351 5551234"
+                      : formatoTel.ejemplo
+                      ? `Ej. ${formatoTel.ejemplo}`
+                      : "Sólo dígitos"}
                   </p>
                 </div>
 
