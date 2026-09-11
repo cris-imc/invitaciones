@@ -49,9 +49,7 @@ import {
   XCircle,
   Clock,
   MessageCircle,
-  Pencil,
-  Lock,
-  Plus,
+  Pencil,  Plus,
   Minus,
   X,
   Info,
@@ -833,26 +831,21 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                     <UserPlus className="w-6 h-6" />
                     {t("panel.invitados.individual")}
                   </button>
-                  <div className="relative group">
-                    <button
-                      type="button"
-                      disabled={planTier === 'FREE'}
-                      onClick={() => setNewGuestType("FAMILY")}
-                      className={`w-full h-full flex flex-col items-center gap-2 py-6 px-3 rounded-xl border-2 text-sm font-medium transition-colors ${planTier === 'FREE' ? 'opacity-50 cursor-not-allowed border-muted-foreground/20' : 'border-muted-foreground/20 hover:border-primary hover:bg-primary/5'}`}
-                    >
-                      <Users className="w-6 h-6" />
-                      <span className="flex items-center gap-1.5">
-                        {t("panel.invitados.familiaOGrupo")}
-                        {planTier === 'FREE' && <Lock className="w-3.5 h-3.5 text-red-400" />}
-                      </span>
-                    </button>
-                    {planTier === 'FREE' && (
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                        {t("panel.invitados.disponibleEnPremium")}
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
-                      </div>
-                    )}
-                  </div>
+                  {/* Familia/grupo también en el plan Gratis. Estaba con
+                      candado, pero el candado no cerraba nada: la API nunca
+                      lo validó y pegar una lista ya creaba familias en Gratis
+                      (ver ImportarInvitados). Era un bloqueo que sólo frenaba
+                      a quien carga de a uno -- el que menos invitados tiene.
+                      Lo que de verdad separa a Gratis sigue siendo el tope de
+                      20 personas, que sí se valida en el servidor. */}
+                  <button
+                    type="button"
+                    onClick={() => setNewGuestType("FAMILY")}
+                    className="w-full h-full flex flex-col items-center gap-2 py-6 px-3 rounded-xl border-2 text-sm font-medium transition-colors border-muted-foreground/20 hover:border-primary hover:bg-primary/5"
+                  >
+                    <Users className="w-6 h-6" />
+                    <span>{t("panel.invitados.familiaOGrupo")}</span>
+                  </button>
                 </div>
                 {/* Pegar una lista, para no cargar 150 invitados de a uno.
                     Va debajo y no como tercera opción de la grilla: la mayoría
@@ -1400,27 +1393,18 @@ export function GuestManager({ slug, invitationId, initialRsvpEnabled, planTier,
                   />
                   <Label htmlFor="edit-individual">{t("panel.invitados.individual")}</Label>
                 </div>
-                <div className={`flex items-center space-x-2 relative group${planTier === 'FREE' ? ' opacity-50' : ''}`}>
+                {/* Sin candado, igual que al dar de alta: si se puede crear
+                    una familia en Gratis, poder convertir una también. */}
+                <div className="flex items-center space-x-2">
                   <input
                     type="radio"
                     id="edit-family"
                     name="edit-type"
                     checked={editGuestType === "FAMILY"}
                     onChange={() => setEditGuestType("FAMILY")}
-                    disabled={planTier === 'FREE'}
                     className="accent-primary"
                   />
-                  <Label htmlFor="edit-family" className={`flex items-center gap-2${planTier === 'FREE' ? ' cursor-not-allowed' : ''}`}>
-                      {t("panel.invitados.familiaOGrupo")}
-                      {planTier === 'FREE' && <Lock className="w-4 h-4 text-red-400" />}
-                  </Label>
-
-                  {planTier === 'FREE' && (
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                        {t("panel.invitados.disponibleEnPremium")}
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black"></div>
-                      </div>
-                  )}
+                  <Label htmlFor="edit-family">{t("panel.invitados.familiaOGrupo")}</Label>
                 </div>
               </div>
             </div>

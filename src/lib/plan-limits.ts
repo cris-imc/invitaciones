@@ -25,6 +25,16 @@ export interface PlanLimits {
   maxPhotos: number | null; // fotos en el álbum de la invitación
   maxLivePhotos: number | null; // fotos (y video, a futuro) guardadas/compartidas en LIVE
   allowedTemplates: string[] | "all"; // specific template IDs or "all"
+  /**
+   * Cuántas mesas se pueden armar. `null` = sin tope.
+   *
+   * El plan Gratis tiene mesas, pero una sola: alcanza para entender qué hace
+   * la función -- arrastrar invitados, ver el plano, escanear el ingreso --
+   * y no alcanza para organizar un salón, que es para lo que se paga. Probar
+   * la función y después no poder usarla de verdad es mejor argumento que
+   * una pestaña con candado, que no dice nada de lo que se está perdiendo.
+   */
+  maxMesas: number | null;
   features: PlanFeatures;
 }
 
@@ -42,6 +52,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       "vintage-elegance",
       "luxury-minimalist",
     ], // 4 plantillas premium
+    // Una sola mesa: alcanza para probar la función, no para armar un salón.
+    maxMesas: 1,
     features: {
       customMusic: false,
       trivia: false,
@@ -54,7 +66,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       whatsappReminders: false,
       dedicatedSupport: false,
       customDesign: false,
-      tableAssignment: false,
+      tableAssignment: true,
       readReceipts: false,
     },
   },
@@ -66,6 +78,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxPhotos: 15,
     maxLivePhotos: 0, // LIVE es exclusivo del plan Diamond (y superiores)
     allowedTemplates: "all",
+    maxMesas: null,
     features: {
       customMusic: true,
       trivia: true,
@@ -82,7 +95,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
       whatsappReminders: false,
       dedicatedSupport: true,
       customDesign: false,
-      tableAssignment: false,
+      tableAssignment: true,
       readReceipts: false,
     },
   },
@@ -94,6 +107,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxPhotos: 15,
     maxLivePhotos: 200,
     allowedTemplates: "all",
+    maxMesas: null,
     features: {
       customMusic: true,
       trivia: true,
@@ -122,6 +136,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxPhotos: 15,
     maxLivePhotos: 200,
     allowedTemplates: "all",
+    maxMesas: null,
     features: {
       customMusic: true,
       trivia: true,
@@ -146,6 +161,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxPhotos: null,
     maxLivePhotos: null,
     allowedTemplates: "all",
+    maxMesas: null,
     features: {
       customMusic: true,
       trivia: true,
@@ -170,6 +186,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxPhotos: null,
     maxLivePhotos: null,
     allowedTemplates: "all",
+    maxMesas: null,
     features: {
       customMusic: true,
       trivia: true,

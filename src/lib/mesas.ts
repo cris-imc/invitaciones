@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/roles";
-import { canUseFeature, PlanTier } from "@/lib/plan-limits";
+import { canUseFeature, PLAN_LIMITS, PlanTier } from "@/lib/plan-limits";
 
 export const FORMAS = ["REDONDA", "RECTANGULAR"] as const;
 export type FormaMesa = (typeof FORMAS)[number];
@@ -88,6 +88,14 @@ interface AccesoOk {
   invitationId: string;
   mesasHabilitadas: boolean;
   escaneoHabilitado: boolean;
+  /**
+   * Cuántas mesas admite el plan de esta invitación. `null` = sin tope.
+   *
+   * Viaja con el acceso y no se vuelve a consultar: la ruta ya pagó la
+   * consulta a la invitación para saber de quién es, y el plan viene en la
+   * misma fila.
+   */
+  maxMesas: number | null;
 }
 interface AccesoError {
   ok: false;
@@ -116,13 +124,16 @@ async function verificar(
     return { ok: false, status: 403, error: "Sin permiso" };
   }
   if (!admin && !canUseFeature(invitation.planTier as PlanTier, "tableAssignment")) {
-    return { ok: false, status: 403, error: "Las mesas están disponibles en Diamond" };
+    return { ok: false, status: 403, error: "Las mesas no están disponibles en este plan" };
   }
   return {
     ok: true,
     invitationId: invitation.id,
     mesasHabilitadas: invitation.mesasHabilitadas,
     escaneoHabilitado: invitation.escaneoHabilitado,
+    // El admin no tiene tope: entra a las invitaciones de todos y no puede
+    // quedar trabado por el plan de un cliente.
+    maxMesas: admin ? null : PLAN_LIMITS[invitation.planTier as PlanTier]?.maxMesas ?? null,
   };
 }
 

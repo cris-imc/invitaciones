@@ -225,6 +225,9 @@ const es = {
   },
 
   mesas: {
+    limiteTitulo: "El plan Gratis arma una sola mesa",
+    limiteDetalle:
+      "Ya probaste cómo funciona: arrastrás invitados, ves el plano y escaneás el ingreso. Para organizar el salón entero -- todas las mesas que necesites -- pasate a Premium o Diamond.",
     titulo: "Mesas e ingresos",
     agregarMesa: "Agregar mesa",
     escanearIngreso: "Escanear ingreso",
@@ -604,6 +607,9 @@ const en: Panel = {
   },
 
   mesas: {
+    limiteTitulo: "The Free plan allows a single table",
+    limiteDetalle:
+      "You already saw how it works: drag guests in, see the floor plan and scan people at the door. To lay out the whole venue -- as many tables as you need -- move up to Premium or Diamond.",
     titulo: "Tables and check-in",
     agregarMesa: "Add table",
     escanearIngreso: "Scan check-in",
@@ -979,6 +985,9 @@ const pt: Panel = {
   },
 
   mesas: {
+    limiteTitulo: "O plano Grátis permite uma única mesa",
+    limiteDetalle:
+      "Você já viu como funciona: arrasta convidados, vê a planta e escaneia a entrada. Para organizar o salão inteiro -- quantas mesas precisar -- passe para Premium ou Diamond.",
     titulo: "Mesas e entrada",
     agregarMesa: "Adicionar mesa",
     escanearIngreso: "Escanear entrada",

@@ -4,6 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Trash2, Users, X, Minus, RotateCcw, Loader2, GripVertical, ScanLine, ArrowLeft, Download } from "lucide-react";
 import { EscanerIngreso } from "@/components/dashboard/mesas/EscanerIngreso";
 import { planillaDelSalonCsv } from "@/lib/planilla-del-salon";
+import { useRouter } from "next/navigation";
+import { WizardPlanLimitDialog } from "@/components/wizard/WizardPlanLimitDialog";
+import { savePendingInvitationUpgrade } from "@/lib/pending-invitation-upgrade";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
 import type { Traductor } from "@/lib/i18n/texto";
 
@@ -149,6 +152,7 @@ function cunaLibre(mesas: MesaApi[]): Punto {
 
 export function MesasPanel({ slug }: Props) {
   const t = useTextos();
+  const router = useRouter();
   const [mesas, setMesas] = useState<MesaApi[]>([]);
   const [invitados, setInvitados] = useState<InvitadoApi[]>([]);
   const [habilitadas, setHabilitadas] = useState(false);
@@ -164,6 +168,8 @@ export function MesasPanel({ slug }: Props) {
   const [pagina, setPagina] = useState(0);
   const [escaneando, setEscaneando] = useState(false);
   const [incluirSinConfirmar, setIncluirSinConfirmar] = useState(false);
+  /** Se llenó el cupo de mesas del plan y se está ofreciendo ampliarlo. */
+  const [topeDeMesas, setTopeDeMesas] = useState(false);
 
   const lienzoRef = useRef<HTMLDivElement>(null);
   const fantasmaRef = useRef<HTMLDivElement>(null);
@@ -286,6 +292,50 @@ export function MesasPanel({ slug }: Props) {
     (mesa: MesaApi) => mesa.lugares.reduce((a, l) => a + l.lugares, 0),
     []
   );
+
+  /**
+   * Ya tiene el crédito: convierte la invitación y cierra el cartel. No hay
+   * nada que reintentar -- la mesa se crea tocando "+ Mesa" de nuevo, que es
+   * justo lo que estaba haciendo.
+   */
+  const ampliarConCredito = async (tier: "PREMIUM" | "DIAMOND") => {
+    try {
+      const res = await fetch(`/api/invitations/${slug}/upgrade-plan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planTier: tier }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || t("panel.compartir.errorPlan"));
+      setTopeDeMesas(false);
+      mostrarAviso(t(tier === "DIAMOND" ? "panel.compartir.listoDiamond" : "panel.compartir.listoPremium"));
+      router.refresh();
+      await cargar();
+    } catch (error) {
+      mostrarAviso(error instanceof Error ? error.message : t("panel.compartir.errorPlan"));
+    }
+  };
+
+  /**
+   * Sin crédito: se va a Mercado Pago. Al volver, PendingInvitationUpgradeBridge
+   * termina la conversión -- por eso se deja anotado antes de salir de la
+   * página, que se lleva puesto todo el estado en memoria.
+   */
+  const ampliarPagando = async (tier: "PREMIUM" | "DIAMOND") => {
+    try {
+      savePendingInvitationUpgrade({ slug, desiredCredit: tier });
+      const res = await fetch("/api/user/buy-credit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planTier: tier }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.checkoutUrl) throw new Error(data.error || t("panel.compartir.errorPago"));
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      mostrarAviso(error instanceof Error ? error.message : t("panel.compartir.errorPago"));
+    }
+  };
 
   /**
    * Baja la planilla del salón.
@@ -417,13 +467,34 @@ export function MesasPanel({ slug }: Props) {
   };
 
   const crearMesa = async () => {
-    const nueva = await pedir(`/api/invitations/${slug}/mesas`, {
-      method: "POST",
-      body: JSON.stringify(cunaLibre(mesas)),
-    });
-    if (nueva) {
+    setOcupado(true);
+    try {
+      const res = await fetch(`/api/invitations/${slug}/mesas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cunaLibre(mesas)),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        // Se llenó el cupo de mesas del plan. No es un error del que haya que
+        // recuperarse: es el momento de ofrecer el plan. Armar la primera
+        // mesa y querer la segunda es exactamente cuando se entiende para qué
+        // sirve la función.
+        if (data.code === "TABLE_LIMIT_REACHED") {
+          setTopeDeMesas(true);
+          return;
+        }
+        mostrarAviso(data.error || t("panel.mesas.errorGuardar"));
+        return;
+      }
+
       await cargar();
-      setMesaAbierta(nueva.id);
+      setMesaAbierta(data.id);
+    } catch {
+      mostrarAviso(t("panel.mesas.errorGuardar"));
+    } finally {
+      setOcupado(false);
     }
   };
 
@@ -935,6 +1006,19 @@ export function MesasPanel({ slug }: Props) {
           {arrastrado.name} · {arrastrado.aSentar - arrastrado.ubicados}
         </div>
       )}
+
+      {/* El plan Gratis arma una mesa. Al pedir la segunda se ofrece ampliar,
+          que es el momento en que la función ya se entendió: el que llegó
+          hasta acá arrastró invitados y vio el plano, y sabe exactamente qué
+          está por comprar. */}
+      <WizardPlanLimitDialog
+        open={topeDeMesas}
+        onOpenChange={setTopeDeMesas}
+        onUseCredit={ampliarConCredito}
+        onPayMercadoPago={ampliarPagando}
+        title={t("panel.mesas.limiteTitulo")}
+        description={t("panel.mesas.limiteDetalle")}
+      />
     </div>
   );
 }

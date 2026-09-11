@@ -91,6 +91,25 @@ export async function POST(
       );
     }
 
+    // El tope del plan. El plan Gratis tiene mesas, pero una sola: alcanza
+    // para entender qué hace la función y no para organizar un salón, que es
+    // para lo que se paga. Se responde con `upgradable` para que el panel
+    // ofrezca ahí mismo pasar de plan, en vez de un error sin salida.
+    if (acceso.maxMesas !== null && cuantas >= acceso.maxMesas) {
+      return NextResponse.json(
+        {
+          error:
+            acceso.maxMesas === 1
+              ? "El plan Gratis permite una sola mesa"
+              : `Tu plan permite hasta ${acceso.maxMesas} mesas`,
+          code: "TABLE_LIMIT_REACHED",
+          upgradable: true,
+          maxMesas: acceso.maxMesas,
+        },
+        { status: 400 }
+      );
+    }
+
     // El número sale del mayor que haya, no de la cantidad: si se borró la
     // mesa 3 de 5, contar da 4 y la nueva sería otra "Mesa 5". Dos mesas con
     // el mismo número el día del evento es gente parada sin saber dónde ir.
