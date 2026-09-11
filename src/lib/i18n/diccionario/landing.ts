@@ -81,7 +81,10 @@ const es = {
   caracteristicas: {
     kicker: "Incluido en tu invitación",
     titulo: "Todo lo que incluye tu invitación",
-    soloAca: "Sólo acá",
+    exclusiva: "Exclusiva",
+    enGratis: "Gratis",
+    enPremium: "Premium",
+    enDiamond: "Diamond",
     pagos: {
       titulo: "Quién pagó y quién debe",
       detalle: "Llevá la cuenta de la tarjeta invitado por invitado: precio por lugar, exentos y pagos parciales. Te pagan a vos directamente; la app sólo lleva la cuenta.",
@@ -96,7 +99,7 @@ const es = {
     },
     ingreso: {
       titulo: "Control de ingreso",
-      detalle: "Cada invitación termina con un QR. Lo escaneás en la puerta y ves quiénes son, cuántos vienen y a qué mesa mandarlos.",
+      detalle: "Cada invitación termina con un QR. Lo escaneás en la puerta y ves quiénes son y cuántos vienen. Si armaste el salón, también a qué mesa mandarlos.",
     },
     aperturas: {
       titulo: "Quién abrió la invitación",
@@ -189,6 +192,8 @@ const es = {
       rsvp: "Gestión de confirmaciones (RSVP)",
       invitados: "Hasta {max} invitados",
       album: "Álbum de fotos (hasta {fotos} fotos)",
+      ingreso: "Control de ingreso: escaneás el QR en la puerta",
+      unaMesa: "Una mesa, para probar la organización del salón",
     },
 
     premium: {
@@ -198,6 +203,10 @@ const es = {
       ilimitados: { titulo: "Invitados ilimitados", detalle: "y sin restricciones" },
       album: { titulo: "Álbum de fotos premium", detalle: "(hasta {fotos} fotos)" },
       musica: "Música de fondo, trivias y sugerencias de DJ",
+      mesas: {
+        titulo: "Organización de mesas:",
+        detalle: "armá el salón completo y asigná a cada familia su mesa, que cada invitado ve en su invitación",
+      },
       pagos: {
         titulo: "Gestión de pagos:",
         detalle: "cuentas bancarias para regalos y cobro de tarjetas/entradas",
@@ -205,7 +214,7 @@ const es = {
     },
 
     diamond: {
-      detalle: "Todo Premium, más el Modo Live, la organización de mesas y el control de ingreso.",
+      detalle: "Todo Premium, más el Modo LIVE y saber quién abrió su invitación.",
       cta: "Elegir Diamond",
       todoPremium: "Todo lo del plan Premium, más:",
       live: {
@@ -405,7 +414,10 @@ const en: Landing = {
   caracteristicas: {
     kicker: "Included in your invitation",
     titulo: "Everything your invitation comes with",
-    soloAca: "Only here",
+    exclusiva: "Exclusive",
+    enGratis: "Free",
+    enPremium: "Premium",
+    enDiamond: "Diamond",
     pagos: {
       titulo: "Who paid and who owes",
       detalle: "Track the ticket guest by guest: price per seat, exemptions and partial payments. They pay you directly; the app just keeps the count.",
@@ -510,6 +522,8 @@ const en: Landing = {
       rsvp: "RSVP management",
       invitados: "Up to {max} guests",
       album: "Photo album (up to {fotos} photos)",
+      ingreso: "Door check-in: scan the QR at the entrance",
+      unaMesa: "One table, to try out the seating plan",
     },
 
     premium: {
@@ -519,6 +533,10 @@ const en: Landing = {
       ilimitados: { titulo: "Unlimited guests", detalle: "and no restrictions" },
       album: { titulo: "Premium photo album", detalle: "(up to {fotos} photos)" },
       musica: "Background music, trivia and DJ song requests",
+      mesas: {
+        titulo: "Seating plan:",
+        detalle: "lay out the whole venue and give every family its table, which each guest sees in their invitation",
+      },
       pagos: {
         titulo: "Payment tracking:",
         detalle: "bank accounts for gifts and collecting card or ticket payments",
@@ -526,7 +544,7 @@ const en: Landing = {
     },
 
     diamond: {
-      detalle: "Everything in Premium, plus LIVE mode, table planning and door check-in.",
+      detalle: "Everything in Premium, plus LIVE mode and seeing who opened their invitation.",
       cta: "Choose Diamond",
       todoPremium: "Everything in Premium, plus:",
       live: {
@@ -719,7 +737,10 @@ const pt: Landing = {
   caracteristicas: {
     kicker: "Incluído no seu convite",
     titulo: "Tudo o que o seu convite inclui",
-    soloAca: "Só aqui",
+    exclusiva: "Exclusiva",
+    enGratis: "Grátis",
+    enPremium: "Premium",
+    enDiamond: "Diamond",
     pagos: {
       titulo: "Quem pagou e quem deve",
       detalle: "Acompanhe o valor convidado por convidado: preço por lugar, isenções e pagamentos parciais. Pagam direto para você; o app só faz a conta.",
@@ -824,6 +845,8 @@ const pt: Landing = {
       rsvp: "Gestão de confirmações (RSVP)",
       invitados: "Até {max} convidados",
       album: "Álbum de fotos (até {fotos} fotos)",
+      ingreso: "Controle de entrada: escaneia o QR na porta",
+      unaMesa: "Uma mesa, para testar a organização do salão",
     },
 
     premium: {
@@ -833,6 +856,10 @@ const pt: Landing = {
       ilimitados: { titulo: "Convidados ilimitados", detalle: "e sem restrições" },
       album: { titulo: "Álbum de fotos premium", detalle: "(até {fotos} fotos)" },
       musica: "Música de fundo, quiz e sugestões para o DJ",
+      mesas: {
+        titulo: "Organização de mesas:",
+        detalle: "monte o salão inteiro e dê a cada família a sua mesa, que cada convidado vê no seu convite",
+      },
       pagos: {
         titulo: "Gestão de pagamentos:",
         detalle: "contas bancárias para presentes e cobrança de convites/ingressos",
@@ -840,7 +867,7 @@ const pt: Landing = {
     },
 
     diamond: {
-      detalle: "Tudo do Premium, mais o Modo LIVE, a organização das mesas e o controle de entrada.",
+      detalle: "Tudo do Premium, mais o Modo LIVE e saber quem abriu o convite.",
       cta: "Escolher Diamond",
       todoPremium: "Tudo do plano Premium, mais:",
       live: {

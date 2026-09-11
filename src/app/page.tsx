@@ -246,35 +246,63 @@ export default async function Home() {
                 atención con "Música de fondo" -- que ofrece cualquiera. Van
                 primero y marcados. */}
             {[
-              { clave: "pagos", icon: <Gift className="w-6 h-6" />, premium: false, destacado: true },
-              { clave: "live", icon: <Rss className="w-6 h-6" />, premium: true, destacado: true },
-              { clave: "mesas", icon: <Armchair className="w-6 h-6" />, premium: true, destacado: true },
-              { clave: "ingreso", icon: <ScanLine className="w-6 h-6" />, premium: true, destacado: true },
-              { clave: "aperturas", icon: <Eye className="w-6 h-6" />, premium: true, destacado: true },
-              { clave: "rsvp", icon: <ListChecks className="w-6 h-6" />, premium: false, destacado: false },
-              { clave: "social", icon: <MessageCircleHeart className="w-6 h-6" />, premium: false, destacado: false },
-              { clave: "saveTheDate", icon: <CalendarDays className="w-6 h-6" />, premium: false, destacado: false },
-              { clave: "ubicacion", icon: <MapPin className="w-6 h-6" />, premium: false, destacado: false },
-              { clave: "album", icon: <Images className="w-6 h-6" />, premium: false, destacado: false },
-              { clave: "musica", icon: <Music className="w-6 h-6" />, premium: false, destacado: false },
-              { clave: "cronograma", icon: <Clock className="w-6 h-6" />, premium: false, destacado: false },
+              { clave: "pagos", icon: <Gift className="w-6 h-6" />, plan: "premium", exclusiva: true },
+              { clave: "live", icon: <Rss className="w-6 h-6" />, plan: "diamond", exclusiva: true },
+              { clave: "mesas", icon: <Armchair className="w-6 h-6" />, plan: "premium", exclusiva: true },
+              { clave: "ingreso", icon: <ScanLine className="w-6 h-6" />, plan: "gratis", exclusiva: true },
+              { clave: "aperturas", icon: <Eye className="w-6 h-6" />, plan: "diamond", exclusiva: true },
+              { clave: "rsvp", icon: <ListChecks className="w-6 h-6" />, plan: "gratis", exclusiva: false },
+              { clave: "social", icon: <MessageCircleHeart className="w-6 h-6" />, plan: "premium", exclusiva: false },
+              { clave: "saveTheDate", icon: <CalendarDays className="w-6 h-6" />, plan: "gratis", exclusiva: false },
+              { clave: "ubicacion", icon: <MapPin className="w-6 h-6" />, plan: "gratis", exclusiva: false },
+              { clave: "album", icon: <Images className="w-6 h-6" />, plan: "gratis", exclusiva: false },
+              { clave: "musica", icon: <Music className="w-6 h-6" />, plan: "premium", exclusiva: false },
+              { clave: "cronograma", icon: <Clock className="w-6 h-6" />, plan: "gratis", exclusiva: false },
             ].map((f) => (
               <div
                 key={f.clave}
-                className={`rounded-2xl p-5 flex flex-col gap-3 relative ${
-                  f.destacado
+                className={`rounded-2xl p-5 flex flex-col gap-2 relative ${
+                  f.exclusiva
                     ? "border border-[var(--accent)]/40 bg-gradient-to-b from-[var(--tinte-3)] to-[var(--background)] shadow-[0_0_30px_rgba(202,171,115,0.12)]"
                     : "bg-[var(--tinte-1)] border border-[var(--line)]"
                 }`}
               >
-                {f.premium ? (
-                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--accent)] text-[var(--ink)]">Diamond</span>
-                ) : f.destacado ? (
-                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[var(--accent)]/50 text-[var(--accent)]">{t("landing.caracteristicas.soloAca")}</span>
-                ) : null}
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${f.destacado ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-[var(--tinte-2)] text-[var(--accent)]"}`}>
+                {/* En qué plan está cada cosa, dicho en la card y no sólo en
+                    la tabla de precios. Antes la única marca era "Diamond", y
+                    la llevaban tanto lo que de verdad es de Diamond como lo
+                    que no: alguien que quería mesas leía Diamond y se iba, o
+                    peor, pagaba Diamond por algo que tiene Premium.
+
+                    Gratis va con borde y no relleno: lo que se quiere
+                    destacar es lo que se paga, pero decir qué entra sin pagar
+                    es lo que hace creíble al resto. */}
+                <span
+                  className={`absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                    f.plan === "gratis"
+                      ? "border border-[var(--foreground)]/25 text-[var(--shell-fg-mid)]"
+                      : "bg-[var(--accent)] text-[var(--ink)]"
+                  }`}
+                >
+                  {t(
+                    f.plan === "gratis"
+                      ? "landing.caracteristicas.enGratis"
+                      : f.plan === "premium"
+                      ? "landing.caracteristicas.enPremium"
+                      : "landing.caracteristicas.enDiamond"
+                  )}
+                </span>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${f.exclusiva ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "bg-[var(--tinte-2)] text-[var(--accent)]"}`}>
                   {f.icon}
                 </div>
+                {/* "Exclusiva" antes decía "Sólo acá", que no se entendía --
+                    ¿sólo en esta sección? ¿sólo en este plan? Lo que quiere
+                    decir es que ningún competidor la tiene, y ahora está en
+                    una línea propia porque la esquina la ocupa el plan. */}
+                {f.exclusiva && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)]">
+                    {t("landing.caracteristicas.exclusiva")}
+                  </span>
+                )}
                 <h3 className="font-semibold text-[var(--foreground)] text-sm leading-snug">{t(`landing.caracteristicas.${f.clave}.titulo` as ClaveTexto)}</h3>
                 <p className="text-[var(--shell-fg-mid)] text-xs leading-relaxed">{t(`landing.caracteristicas.${f.clave}.detalle` as ClaveTexto)}</p>
               </div>
@@ -405,6 +433,19 @@ export default async function Home() {
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
                   <span>{t("landing.planes.gratis.album", { fotos: PLAN_LIMITS.FREE.maxPhotos ?? 0 })}</span>
                 </li>
+                {/* El control de ingreso pasó a Gratis, y con él una mesa. No
+                    es un regalo: el que escanea en la puerta y quiere una
+                    segunda mesa ya entendió para qué sirve, y ahí el paso a
+                    Premium se explica solo. Un candado, en cambio, no dice
+                    nada de lo que se está perdiendo. */}
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>{t("landing.planes.gratis.ingreso")}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></div></div>
+                  <span>{t("landing.planes.gratis.unaMesa")}</span>
+                </li>
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>{t("landing.planes.sin.pagos")}</span>
@@ -470,6 +511,13 @@ export default async function Home() {
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span><strong className="text-[var(--foreground)]">{t("landing.planes.premium.pagos.titulo")}</strong> {t("landing.planes.premium.pagos.detalle")}</span>
                 </li>
+                {/* La organización de mesas ya no es exclusiva de Diamond. Lo
+                    que separa a Diamond pasa a ser el Modo LIVE y saber quién
+                    abrió su invitación. */}
+                <li className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
+                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.premium.mesas.titulo")}</strong> {t("landing.planes.premium.mesas.detalle")}</span>
+                </li>
                 <li className="flex items-start gap-3 opacity-50">
                   <span className="text-[var(--danger)] font-bold w-5 text-center flex-shrink-0">✕</span>
                   <span>{t("landing.planes.sin.liveDiamond")}</span>
@@ -522,14 +570,9 @@ export default async function Home() {
                     Premium y la tarjeta ya arranca diciendo "todo lo del plan
                     Premium". Repetirlo hacía que la lista de lo que suma
                     Diamond pareciera más larga de lo que realmente es. */}
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.mesas.titulo")}</strong> {t("landing.planes.diamond.mesas.detalle")}</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
-                  <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.ingreso.titulo")}</strong> {t("landing.planes.diamond.ingreso.detalle")}</span>
-                </li>
+                {/* Mesas y control de ingreso salieron de acá: las mesas son
+                    de Premium y el control de ingreso, de Gratis. Repetirlas
+                    en Diamond haría parecer que se pagan dos veces. */}
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
                   <span><strong className="text-[var(--foreground)]">{t("landing.planes.diamond.aperturas.titulo")}</strong> {t("landing.planes.diamond.aperturas.detalle")}</span>
