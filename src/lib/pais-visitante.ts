@@ -13,12 +13,29 @@ import { esCodigoPais } from "./paises";
  * bancarios de su invitación -- se le pregunta al registrarse y manda ése,
  * siempre. Esto es sólo para no mentirle a un visitante anónimo.
  *
- * Tampoco se hace geolocalización por IP: pide un servicio externo, agrega
- * latencia a la primera pintura y manda la IP del visitante a un tercero,
- * las tres cosas por un cartelito.
+ * La geolocalización por IP no se hace desde acá pidiéndole a un servicio
+ * externo (latencia en la primera pintura y la IP del visitante en manos de
+ * un tercero): se toma de la cabecera que deja el CDN cuando hay uno adelante
+ * (`cf-ipcountry` de Cloudflare), que es exacta y gratis. Ver
+ * `paisSegunCabeceras`.
+ *
+ * Hay DOS cookies y la diferencia importa:
+ *
+ * - `pais-visitante`: lo que se DETECTÓ (zona horaria, cabecera). Es un
+ *   recuerdo para que la próxima carga del servidor salga bien; una
+ *   detección nueva y mejor (la cabecera del CDN) la pisa sin preguntar.
+ * - `pais-elegido`: lo que la persona ELIGIÓ a mano en el selector. Manda
+ *   sobre cualquier detección: adivinar por encima de una elección explícita
+ *   es de las cosas más molestas que puede hacer un sitio.
+ *
+ * Con una sola cookie no se puede distinguir, y pasaba esto: la primera
+ * visita guardaba "AR" por la zona horaria y desde ahí nada -- ni la cabecera
+ * del CDN -- podía cambiarlo, o al revés, la cabecera pisaba lo que la
+ * persona acababa de elegir.
  */
 
 export const COOKIE_PAIS_VISITANTE = "pais-visitante";
+export const COOKIE_PAIS_ELEGIDO = "pais-elegido";
 
 /**
  * Zonas horarias -> país, sólo para los países que manejamos.
@@ -73,25 +90,57 @@ export function paisSegunZonaHoraria(zona: string | null | undefined): CodigoPai
   return null;
 }
 
+/** El valor de una cookie dentro de la cabecera `cookie` cruda, o null. */
+function cookieEnCabecera(cabecera: string | null, nombre: string): string | null {
+  if (!cabecera) return null;
+  // Anclado al inicio o a "; " para que `pais-visitante` no matchee dentro
+  // de otra cookie con el mismo sufijo.
+  const m = cabecera.match(new RegExp(`(?:^|;\\s*)${nombre}=([A-Za-z]{2})`));
+  return m ? m[1].toUpperCase() : null;
+}
+
 /**
- * Lo que se puede saber en el servidor, para la primera pintura.
+ * Lo que se sabe del país con FIRMEZA, en el servidor: la elección a mano y
+ * la cabecera de país del CDN (Cloudflare la manda en `cf-ipcountry` con el
+ * plan gratis; es la única detección por IP real que hay -- Railway solo no
+ * la manda). Null si no hay ninguna de las dos.
  *
- * Si hay un CDN adelante (Cloudflare, Vercel) el país viene en una cabecera y
- * es exacto. Hoy no lo hay -- se sirve desde Railway, que no las manda -- así
- * que en la práctica manda la cookie que deja el detector del cliente. Se lee
- * igual para que el día que se ponga un CDN adelante funcione solo.
+ * Es lo que baja al navegador como pista (ver ProveedorIdioma): sólo estas
+ * dos fuentes merecen pasar por encima de la zona horaria del dispositivo.
+ * Las señales débiles del servidor -- la cookie detectada y sobre todo la
+ * región del `accept-language` -- no bajan, porque un navegador instalado
+ * en "es-AR" no dice dónde está la persona y la zona horaria sí.
  */
-export function paisSegunCabeceras(get: (nombre: string) => string | null): CodigoPais | null {
+export function paisFirmeSegunCabeceras(get: (nombre: string) => string | null): CodigoPais | null {
+  const elegido = cookieEnCabecera(get("cookie"), COOKIE_PAIS_ELEGIDO);
+  if (esCodigoPais(elegido)) return elegido;
+
   for (const cabecera of ["cf-ipcountry", "x-vercel-ip-country", "x-country-code"]) {
     const v = get(cabecera)?.toUpperCase();
     if (esCodigoPais(v)) return v;
   }
+  return null;
+}
 
-  const cookie = get("cookie");
-  if (cookie) {
-    const m = cookie.match(new RegExp(`${COOKIE_PAIS_VISITANTE}=([A-Z]{2})`));
-    if (m && esCodigoPais(m[1])) return m[1];
-  }
+/**
+ * Lo que se puede saber en el servidor, para la primera pintura.
+ *
+ * Orden, de más a menos confiable:
+ *
+ * 1. Lo que la persona eligió a mano (`pais-elegido`).
+ * 2. La cabecera de país del CDN, si hay uno adelante.
+ * 3. Lo detectado antes en el navegador (`pais-visitante`, por zona horaria).
+ * 4. La región del `accept-language` ("es-AR" sí, "es" a secas no).
+ *
+ * Devuelve null cuando no se puede afirmar nada: es preferible no mostrar
+ * una promesa de pago a mostrarla mal.
+ */
+export function paisSegunCabeceras(get: (nombre: string) => string | null): CodigoPais | null {
+  const firme = paisFirmeSegunCabeceras(get);
+  if (firme) return firme;
+
+  const detectado = cookieEnCabecera(get("cookie"), COOKIE_PAIS_VISITANTE);
+  if (esCodigoPais(detectado)) return detectado;
 
   // El idioma no dice el país, pero "es-AR" sí. "es" a secas, "es-419" o
   // "pt-BR" sin región útil no alcanzan y se devuelven como desconocido: es
@@ -119,16 +168,29 @@ function leerCookieCruda(nombre: string): string | null {
 /**
  * El país de quien está mirando, resuelto en el navegador.
  *
- * Orden: lo que ya eligió o se detectó antes (la cookie), y si no hay nada, lo
- * que sugiere la zona horaria. Devuelve null cuando no se puede afirmar nada,
- * para que cada pantalla decida su propio respaldo en vez de recibir un
+ * Orden: lo que eligió a mano; lo que el servidor sabe con firmeza
+ * (`sugeridoPorElServidor`: la cuenta o la IP según el CDN, baja por
+ * ProveedorIdioma); lo detectado en una visita anterior; y si no hay nada, la
+ * zona horaria. Devuelve null cuando no se puede afirmar
+ * nada, para que cada pantalla decida su propio respaldo en vez de recibir un
  * "Argentina" inventado.
+ *
+ * El dato del servidor va ANTES que la cookie detectada a propósito: es la
+ * única forma de que una detección mejor (la IP) le gane a una peor que quedó
+ * guardada (la zona horaria de la primera visita).
  *
  * Se usa en el registro y en el wizard del embudo, donde no hay cuenta de la
  * cual sacar el país: sin esto, un colombiano que entra por "Empezar gratis"
  * arrancaba con formulario argentino y datos bancarios de CBU.
  */
-export function paisDelVisitanteEnCliente(): CodigoPais | null {
+export function paisDelVisitanteEnCliente(
+  sugeridoPorElServidor?: string | null
+): CodigoPais | null {
+  const elegido = leerCookieCruda(COOKIE_PAIS_ELEGIDO);
+  if (esCodigoPais(elegido)) return elegido;
+
+  if (esCodigoPais(sugeridoPorElServidor)) return sugeridoPorElServidor;
+
   const guardado = leerCookieCruda(COOKIE_PAIS_VISITANTE);
   if (esCodigoPais(guardado)) return guardado;
 
@@ -139,11 +201,25 @@ export function paisDelVisitanteEnCliente(): CodigoPais | null {
   }
 }
 
+function guardarCookieDeUnAnio(nombre: string, valor: string): void {
+  if (typeof document === "undefined") return;
+  document.cookie = `${nombre}=${valor}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+}
+
 /**
- * Deja registrado el país detectado para que la próxima carga del servidor ya
- * salga bien (precios, medios de pago y textos se resuelven allá).
+ * Deja registrado el país DETECTADO para que la próxima carga del servidor ya
+ * salga bien (precios, medios de pago y textos se resuelven allá). No pisa
+ * una elección a mano: si hay `pais-elegido`, esa sigue mandando.
  */
 export function recordarPaisDelVisitante(pais: CodigoPais): void {
-  if (typeof document === "undefined") return;
-  document.cookie = `${COOKIE_PAIS_VISITANTE}=${pais}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+  guardarCookieDeUnAnio(COOKIE_PAIS_VISITANTE, pais);
+}
+
+/**
+ * Deja registrado el país que la persona ELIGIÓ a mano. Desde acá manda ése
+ * sobre cualquier detección, hasta que vuelva a elegir otro.
+ */
+export function recordarPaisElegido(pais: CodigoPais): void {
+  guardarCookieDeUnAnio(COOKIE_PAIS_ELEGIDO, pais);
+  guardarCookieDeUnAnio(COOKIE_PAIS_VISITANTE, pais);
 }

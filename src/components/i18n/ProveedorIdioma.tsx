@@ -5,10 +5,19 @@ import { IDIOMA_POR_DEFECTO, type Idioma } from "@/lib/i18n/idiomas";
 import { traductorDe, type Traductor } from "@/lib/i18n/texto";
 import { formatearMonto, formatearNumero } from "@/lib/i18n/moneda";
 import { useDatosDeInvitacion } from "@/components/invitation/ContextoInvitacion";
+import type { CodigoPais } from "@/lib/paises";
 
 interface Valor {
   idioma: Idioma;
   t: Traductor;
+  /**
+   * El país que el servidor sabe CON FIRMEZA para esta carga (la cuenta, la
+   * elección a mano o la IP según la cabecera del CDN), o null. Es la única
+   * vía por la que la detección por IP llega al navegador: el cliente no ve
+   * las cabeceras. Los consumidores lo pasan a `paisDelVisitanteEnCliente`,
+   * que lo pone por encima de la zona horaria y por debajo de la elección.
+   */
+  pais: CodigoPais | null;
 }
 
 const Contexto = createContext<Valor | null>(null);
@@ -33,12 +42,17 @@ const Contexto = createContext<Valor | null>(null);
  */
 export function ProveedorIdioma({
   idioma,
+  pais = null,
   children,
 }: {
   idioma: Idioma;
+  pais?: CodigoPais | null;
   children: React.ReactNode;
 }) {
-  const valor = useMemo<Valor>(() => ({ idioma, t: traductorDe(idioma) }), [idioma]);
+  const valor = useMemo<Valor>(
+    () => ({ idioma, t: traductorDe(idioma), pais }),
+    [idioma, pais]
+  );
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }
 
@@ -52,7 +66,7 @@ export function ProveedorIdioma({
 export function useIdioma(): Valor {
   const v = useContext(Contexto);
   return useMemo(
-    () => v ?? { idioma: IDIOMA_POR_DEFECTO, t: traductorDe(IDIOMA_POR_DEFECTO) },
+    () => v ?? { idioma: IDIOMA_POR_DEFECTO, t: traductorDe(IDIOMA_POR_DEFECTO), pais: null },
     [v]
   );
 }

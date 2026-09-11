@@ -6,6 +6,7 @@ import { useEffect, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { esCodigoPais } from "@/lib/paises";
 import { paisDelVisitanteEnCliente, recordarPaisDelVisitante } from "@/lib/pais-visitante";
+import { useIdioma } from "@/components/i18n/ProveedorIdioma";
 
 // Sincroniza el store con la elección gratis/premium/diamond hecha en el
 // modal de NewInvitationButton, leída de la URL en vez de confiar en el
@@ -23,6 +24,9 @@ function WizardBootstrap() {
     const premiumParam = searchParams.get("premium");
     const diamondParam = searchParams.get("diamond");
     const [listo, setListo] = useState(false);
+    // Lo que el servidor resolvió para esta carga (con CDN adelante, la IP
+    // real): manda sobre la zona horaria si no hay cuenta.
+    const { pais: paisDelServidor } = useIdioma();
 
     useEffect(() => {
         reset();
@@ -55,7 +59,7 @@ function WizardBootstrap() {
             });
 
         function aplicarPaisDelVisitante() {
-            const detectado = paisDelVisitanteEnCliente();
+            const detectado = paisDelVisitanteEnCliente(paisDelServidor);
             if (!detectado) return;
             setData({ pais: detectado });
             // Se deja registrado además de usarlo: los precios y los medios de
@@ -67,7 +71,7 @@ function WizardBootstrap() {
         return () => {
             vigente = false;
         };
-    }, [listo, setData]);
+    }, [listo, setData, paisDelServidor]);
 
     return null;
 }

@@ -5,7 +5,8 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ViewportHeightFix } from "@/components/ViewportHeightFix";
 import { Fraunces, Space_Grotesk, Space_Mono, Inter, Cormorant_Garamond, Bricolage_Grotesque, Fredoka, Baloo_2, Sora, Dancing_Script, Playfair_Display, Great_Vibes, Merriweather, Lora, DM_Sans, Cinzel, Parisienne, Sacramento, Abril_Fatface, Prata, Montserrat, Open_Sans, Nunito, Lato } from 'next/font/google';
 import localFont from 'next/font/local';
-import { idiomaDelAnfitrion, paisDelAnfitrion } from "@/lib/i18n/servidor";
+import { idiomaDelAnfitrion, paisFirmeDelAnfitrion } from "@/lib/i18n/servidor";
+import { esCodigoPais } from "@/lib/paises";
 import { ProveedorIdioma } from "@/components/i18n/ProveedorIdioma";
 
 // Sólo las 4 fuentes del chrome de la app (display / ui / mono / body en
@@ -88,7 +89,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const idioma = await idiomaDelAnfitrion();
+  // El país también se resuelve acá y baja por el mismo proveedor: es la
+  // única forma de que la detección por IP (una cabecera que sólo ve el
+  // servidor) llegue al selector de la landing, al registro y al wizard.
+  // Baja sólo lo firme (cuenta, elección, IP): lo débil lo decide el
+  // navegador con su zona horaria.
+  const [idioma, paisCrudo] = await Promise.all([idiomaDelAnfitrion(), paisFirmeDelAnfitrion()]);
+  const pais = esCodigoPais(paisCrudo) ? paisCrudo : null;
 
   return (
     // suppressHydrationWarning: el script de abajo corre antes de que React
@@ -116,7 +123,7 @@ export default async function RootLayout({
         <ViewportHeightFix />
         <AuthProvider>
           <ToastProvider>
-            <ProveedorIdioma idioma={idioma}>
+            <ProveedorIdioma idioma={idioma} pais={pais}>
               {children}
             </ProveedorIdioma>
           </ToastProvider>

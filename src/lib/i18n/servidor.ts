@@ -1,9 +1,10 @@
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { COOKIE_IDIOMA, IDIOMA_POR_DEFECTO, esIdiomaValido, idiomaSegunNavegador, idiomaSegunPais, type Idioma } from "./idiomas";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { traductorDe, type Traductor } from "./texto";
-import { paisSegunCabeceras } from "@/lib/pais-visitante";
+import { paisFirmeSegunCabeceras, paisSegunCabeceras } from "@/lib/pais-visitante";
 
 /**
  * El idioma del anfitrión, resuelto en el servidor.
@@ -72,13 +73,35 @@ export async function paisDelAnfitrion(): Promise<string | null> {
 }
 
 /**
+ * El país que se sabe CON FIRMEZA: la cuenta, la elección a mano o la IP
+ * según el CDN. Sin cookie detectada ni accept-language.
+ *
+ * Es lo que el layout raíz baja al navegador como pista para el selector, el
+ * registro y el wizard: sólo estas fuentes merecen ganarle a la zona horaria
+ * del dispositivo (ver paisFirmeSegunCabeceras).
+ */
+export async function paisFirmeDelAnfitrion(): Promise<string | null> {
+  const dePerfil = await paisDeLaCuenta();
+  if (dePerfil) return dePerfil;
+  try {
+    const cabeceras = await headers();
+    return paisFirmeSegunCabeceras((n) => cabeceras.get(n));
+  } catch {
+    return null;
+  }
+}
+
+/**
  * El país guardado en la cuenta, o null si no hay sesión.
  *
  * Se consulta la base y no la sesión porque el país no viaja en el token:
  * agregarlo obligaría a que todos vuelvan a iniciar sesión para que su token
  * lo tenga, y es una consulta por id, indexada.
+ *
+ * Va en `cache` de React para que valga una sola vez por petición: el layout
+ * raíz resuelve idioma y país juntos y los dos pasan por acá.
  */
-async function paisDeLaCuenta(): Promise<string | null> {
+const paisDeLaCuenta = cache(async function paisDeLaCuenta(): Promise<string | null> {
   try {
     const session = await auth();
     if (!session?.user?.id) return null;
@@ -90,4 +113,4 @@ async function paisDeLaCuenta(): Promise<string | null> {
   } catch {
     return null;
   }
-}
+});
