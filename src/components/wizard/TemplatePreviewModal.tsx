@@ -609,7 +609,15 @@ function TemplatePreviewModalBody({
               un iframe para que sus media queries evalúen un ancho mobile
               real y renderice la versión mobile de verdad, tipografías
               incluidas) */}
-          <div className="flex-1 min-h-0 flex items-center justify-center bg-neutral-950 p-4 md:p-8">
+          {/* El fondo del escenario sigue el tema del panel. Estaba fijo en
+              neutral-950 y en modo claro quedaba un rectángulo negro en medio
+              de una pantalla crema.
+
+              El TELÉFONO no: el marco y su pantalla se quedan oscuros en los
+              dos temas, porque es un teléfono y los teléfonos son negros. Lo
+              que se está mirando adentro es la invitación, que tiene su
+              propia paleta y no participa del tema del panel. */}
+          <div className="flex-1 min-h-0 flex items-center justify-center bg-[var(--tinte-2)] p-4 md:p-8">
             <div
               ref={frameBoxRef}
               className="relative h-full max-h-[720px] rounded-[2rem] border-[6px] border-neutral-800 shadow-2xl overflow-hidden bg-black"
