@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Trash2, Users, X, Minus, RotateCcw, Loader2, GripVertical, ScanLine, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, Users, X, Minus, RotateCcw, Loader2, GripVertical, ScanLine, ArrowLeft, Download } from "lucide-react";
 import { EscanerIngreso } from "@/components/dashboard/mesas/EscanerIngreso";
+import { planillaDelSalonCsv } from "@/lib/planilla-del-salon";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
 import type { Traductor } from "@/lib/i18n/texto";
 
@@ -30,6 +31,8 @@ interface InvitadoApi {
   expectedCount: number;
   attendingCount: number;
   aSentar: number;
+  /** Lo que contestó al confirmar. Va en la planilla del salón. */
+  dietaryRestrictions?: string | null;
 }
 interface Pendiente extends InvitadoApi {
   ubicados: number;
@@ -283,6 +286,24 @@ export function MesasPanel({ slug }: Props) {
     (mesa: MesaApi) => mesa.lugares.reduce((a, l) => a + l.lugares, 0),
     []
   );
+
+  /**
+   * Baja la planilla del salón.
+   *
+   * Se arma en el navegador con lo que ya está en pantalla: no hace falta ir
+   * al servidor a pedir de nuevo lo mismo que el panel acaba de cargar, y así
+   * lo que se descarga es exactamente lo que se está viendo.
+   */
+  const bajarPlanilla = useCallback(() => {
+    const csv = planillaDelSalonCsv(mesas, invitados);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mesas-${slug}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [mesas, invitados, slug]);
 
   const totales = useMemo(() => {
     const aSentar = invitados.filter(seSienta).reduce((a, i) => a + i.aSentar, 0);
@@ -601,6 +622,22 @@ export function MesasPanel({ slug }: Props) {
           >
             <ScanLine className="w-4 h-4" />
             {t("panel.mesas.escanearIngreso")}
+          </button>
+        )}
+
+        {/* La planilla para el salón. El plano vive en esta pantalla, pero el
+            salón necesita el mismo dato en Excel el día anterior, y con las
+            restricciones alimentarias al lado: la cocina no arma los platos
+            por invitado, los arma por mesa. Ver planilla-del-salon.ts. */}
+        {mesas.length > 0 && (
+          <button
+            type="button"
+            onClick={bajarPlanilla}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--campo-borde)] text-sm font-semibold px-4 py-2 transition-all hover:bg-[var(--tinte-2)]"
+            title="Descarga un Excel con quién se sienta en cada mesa y qué no come"
+          >
+            <Download className="w-4 h-4" />
+            Planilla para el salón
           </button>
         )}
 

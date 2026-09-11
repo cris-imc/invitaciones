@@ -47,6 +47,10 @@ export async function GET(
           status: true,
           expectedCount: true,
           attendingCount: true,
+          // Lo que cada invitado contestó al confirmar. Va acá porque el
+          // salón lo necesita junto con la mesa: la cocina no arma los platos
+          // por invitado, los arma por mesa.
+          dietaryRestrictions: true,
         },
       }),
     ]);
