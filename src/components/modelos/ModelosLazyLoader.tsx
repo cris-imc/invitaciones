@@ -3,34 +3,37 @@
 import { useEffect } from "react";
 
 /**
- * Cuántas miniaturas pueden estar vivas a la vez.
+ * LO QUE HACE Y LO QUE NO HACE, Y POR QUÉ.
  *
- * Cada una es una página de Next entera adentro de un iframe, así que el
- * límite no es estético: en un teléfono, ocho de estas hacen que Safari se
- * quede sin memoria, mate la pestaña y la recargue sola. Ya pasó una vez (ver
- * el commit "la pestaña de modelos se colgaba") y volvió a pasar.
+ * Carga cada miniatura cuando se acerca a la pantalla, de a pocas por vez, y
+ * NO LA SUELTA NUNCA MÁS. Eso último es la decisión importante de este
+ * archivo, y va contra la intuición.
  *
- * En el teléfono el techo es más bajo que en escritorio: no por la pantalla
- * sino por el presupuesto de memoria, que es mucho más chico.
+ * La versión original cargaba las 8 miniaturas de una y no las tocaba más, y
+ * andaba. Después se intentó "apagar las que no se ven" al scrollear, para
+ * poder mostrar más modelos. Eso fue lo que rompió /modelos en el teléfono:
+ * cada miniatura es una página de Next entera, y al scrollear se soltaban y
+ * recargaban de a varias. Un documento recién soltado no devuelve su memoria
+ * al instante, así que en el medio conviven el viejo y el nuevo, y en un
+ * teléfono eso alcanza para que el navegador mate la pestaña ("No se puede
+ * abrir esta página", "carga un rato, scrolleo y muere").
  *
- * Cuatro y no menos porque en un teléfono entran cuatro miniaturas en
- * pantalla: con un techo más bajo, las que sobran quedan en NEGRO a la vista,
- * que es peor que el problema que se quiere evitar. Lo que descomprime la
- * memoria no es bajar este número sino no cargar un Google Maps por miniatura
- * (ver `miniatura=1` en la página de preview).
+ * Con 8 modelos por pestaña (MODELOS_POR_PESTANA en app/modelos/page.tsx),
+ * apagar no ahorra nada que valga ese riesgo: lo que de verdad pesaba era el
+ * Google Maps que cada miniatura embebía, y eso ya no se carga (ver
+ * `miniatura=1` en la página de preview). Así que: se carga una vez y queda.
+ *
+ * Si alguna vez una pestaña tiene muchos más de 8 modelos, la respuesta es
+ * paginar la lista, no volver a soltar iframes.
  */
-const VIVAS_TELEFONO = 4;
-const VIVAS_ESCRITORIO = 8;
-const ANCHO_TELEFONO = 768;
 
 /**
- * Cuántas pueden estar CARGANDO a la vez. Distinto del techo de vivas: ese
- * acota la memoria, este acota las conexiones.
+ * Cuántas pueden estar CARGANDO a la vez.
  *
  * Los navegadores abren como mucho ~6 conexiones por dominio. Ocho páginas
  * arrancando juntas se pisan entre ellas, se encolan y varias se quedan a
  * medio cargar -- "cargan de a 8 y no se cargan todas". De a dos, cada una
- * termina rápido y las demás entran enseguida.
+ * termina rápido y la siguiente entra enseguida.
  */
 const CARGANDO_MAX = 2;
 
@@ -38,136 +41,83 @@ const CARGANDO_MAX = 2;
 const MARGEN_CARGA_PX = 300;
 
 /**
- * A qué distancia se suelta una que ya cargó. Bien holgado respecto del margen
- * de carga: si los dos números estuvieran cerca, una miniatura parada justo en
- * el borde entraría en un ciclo de cargarse y soltarse con cada ajuste chico
- * de scroll.
+ * Red de seguridad para el turno de carga: si una miniatura muere sin
+ * disparar `load`, su turno se libera igual pasado este tiempo. Sin esto, dos
+ * cargas rotas trabarían todas las demás para siempre.
  */
-const MARGEN_SOLTAR_PX = 1200;
+const GUARDIA_CARGA_MS = 8000;
 
 // Un solo componente para todas las miniaturas (no un hook por tarjeta). Usa
 // scroll/resize + getBoundingClientRect en vez de IntersectionObserver a
-// proposito: es mas facil de razonar y no depende de que el compositor del
-// browser dispare callbacks (en algunos entornos de test automatizado
+// propósito: es más fácil de razonar y no depende de que el compositor del
+// navegador dispare callbacks (en algunos entornos de prueba automatizada
 // IntersectionObserver no disparaba aunque el elemento estuviera visible).
 export function ModelosLazyLoader() {
   useEffect(() => {
-    // "Cargada" se marca a mano y no se deduce de el.src: para soltar una hay
-    // que navegarla a about:blank (quitar el atributo no descarga el documento
-    // que ya se pintó), y entonces el.src queda con valor -- si el estado
-    // saliera de ahí, una miniatura soltada no volvería a cargarse nunca.
     const estaCargada = (el: HTMLIFrameElement) => el.dataset.modeloCargada === "1";
+    const estaCargando = (el: HTMLIFrameElement) => el.dataset.modeloCargando === "1";
 
-    /**
-     * La distancia de una miniatura al viewport: 0 si se ve aunque sea en
-     * parte, y si no, cuántos píxeles falta scrollear para alcanzarla.
-     *
-     * Se mide contra el VIEWPORT y no contra su centro, y esa es la
-     * corrección que hace que esto funcione. Con la distancia al centro, una
-     * miniatura que se ve abajo de todo y otra que está fuera de pantalla dan
-     * números parecidos; el intercambio pedía además una "ventaja mínima" que
-     * casi nunca se daba, el cupo quedaba trabado y varias miniaturas no
-     * cargaban NUNCA -- se quedaban en negro para siempre. Con esta medida,
-     * todo lo visible vale 0 y nunca lo desaloja algo que no se ve.
-     */
+    /** Píxeles que faltan scrollear para que se vea; 0 si ya se ve algo. */
     const distancia = (el: HTMLIFrameElement): number => {
       const r = el.getBoundingClientRect();
-      const alto = window.innerHeight;
       if (r.bottom < 0) return -r.bottom;
-      if (r.top > alto) return r.top - alto;
+      if (r.top > window.innerHeight) return r.top - window.innerHeight;
       return 0;
     };
 
-    /** Una miniatura sin tamaño no está en pantalla aunque su rect caiga
-     *  dentro: pasa con las que quedan en un árbol montado pero oculto (la
-     *  pestaña que no está activa). */
+    /** Una miniatura sin tamaño está en una pestaña oculta: no se toca. */
     const tieneTamano = (el: HTMLIFrameElement) => {
       const r = el.getBoundingClientRect();
       return r.width >= 2 && r.height >= 2;
     };
 
-    const estaCargando = (el: HTMLIFrameElement) => el.dataset.modeloCargando === "1";
+    let pendiente = false;
+    const programar = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(() => {
+        pendiente = false;
+        revisar();
+      });
+    };
 
     const cargar = (el: HTMLIFrameElement) => {
       el.dataset.modeloCargada = "1";
       el.dataset.modeloCargando = "1";
-      // El `load` avisa que terminó y libera el lugar para la siguiente. El
-      // temporizador es la red de seguridad: si la carga muere sin disparar
-      // `load`, sin él ese lugar quedaría ocupado para siempre y no cargaría
-      // ninguna más.
       const listo = () => {
         delete el.dataset.modeloCargando;
         el.removeEventListener("load", listo);
         window.clearTimeout(guardia);
-        alScrollear();
+        // Terminó una: que entre la siguiente sin esperar a que alguien
+        // scrollee.
+        programar();
       };
-      const guardia = window.setTimeout(listo, 8000);
+      const guardia = window.setTimeout(listo, GUARDIA_CARGA_MS);
       el.addEventListener("load", listo);
       el.src = el.getAttribute("data-modelo-src")!;
     };
 
-    const soltar = (el: HTMLIFrameElement) => {
-      delete el.dataset.modeloCargada;
-      delete el.dataset.modeloCargando;
-      // Navegar a about:blank y no quitar el atributo: sacar el src no
-      // descarga el documento que ya se pintó, y es justamente la memoria que
-      // hay que devolver.
-      el.src = "about:blank";
-    };
-
     const revisar = () => {
-      // Con la pestaña del navegador en segundo plano no se carga nada nuevo:
-      // cada miniatura es una página entera y no tiene sentido pagar esa
-      // memoria por algo que nadie está mirando.
+      // Con la pestaña del navegador en segundo plano no se arranca nada
+      // nuevo: cada miniatura es una página entera y no tiene sentido pagar
+      // esa memoria por algo que nadie está mirando. Lo ya cargado se queda.
       if (document.hidden) return;
 
       const todas = Array.from(
         document.querySelectorAll<HTMLIFrameElement>("iframe[data-modelo-iframe]")
       ).filter((el) => el.getAttribute("data-modelo-src"));
 
-      const vivasMax =
-        window.innerWidth < ANCHO_TELEFONO ? VIVAS_TELEFONO : VIVAS_ESCRITORIO;
+      let enVuelo = todas.filter(estaCargando).length;
+      if (enVuelo >= CARGANDO_MAX) return;
 
-      // 1. Soltar lo que quedó lejos o lo que dejó de tener tamaño (cambio de
-      //    pestaña): libera memoria y hace lugar en la misma pasada.
-      for (const el of todas) {
-        if (!estaCargada(el)) continue;
-        if (!tieneTamano(el) || distancia(el) > MARGEN_SOLTAR_PX) soltar(el);
-      }
-
-      // 2. Las que deberían estar cargadas, de la más cercana a la más lejana.
+      // Las que faltan, de la más cercana a la más lejana. Nunca se
+      // desaloja nada: acá sólo se suma.
       const candidatas = todas
         .filter((el) => !estaCargada(el) && tieneTamano(el) && distancia(el) <= MARGEN_CARGA_PX)
         .sort((a, b) => distancia(a) - distancia(b));
 
-      if (candidatas.length === 0) return;
-
-      // Cuántos lugares de carga hay libres ahora mismo.
-      let enVuelo = todas.filter(estaCargando).length;
-      if (enVuelo >= CARGANDO_MAX) return;
-
-      // 3. Cargarlas, haciendo lugar si el cupo está lleno.
-      //
-      //    Acá estaba el bloqueo viejo: para desalojar una cargada se le
-      //    exigía superar a la candidata por un margen extra, y como se medía
-      //    al centro de la pantalla esa diferencia casi nunca aparecía. Ahora
-      //    alcanza con que la cargada esté ESTRICTAMENTE más lejos: como todo
-      //    lo visible mide 0, una miniatura a la vista jamás es desalojada por
-      //    otra que no se ve, y el ciclo de cargar/soltar no puede armarse.
       for (const candidata of candidatas) {
-        const cargadas = todas
-          .filter(estaCargada)
-          .sort((a, b) => distancia(b) - distancia(a)); // la más lejana primero
-
         if (enVuelo >= CARGANDO_MAX) break;
-
-        if (cargadas.length >= vivasMax) {
-          // No se desaloja algo que todavía está cargando: sería tirar a la
-          // basura una descarga a medio hacer y volver a empezarla.
-          const lejana = cargadas.find((el) => !estaCargando(el));
-          if (!lejana || distancia(lejana) <= distancia(candidata)) break;
-          soltar(lejana);
-        }
         cargar(candidata);
         enVuelo++;
       }
@@ -178,32 +128,22 @@ export function ModelosLazyLoader() {
     // Sin un "ya terminamos, dejar de escuchar": las pestañas de /modelos
     // (ModelosTabs) montan iframes nuevos al cambiar de pestaña, mucho después
     // de que los de la primera hayan terminado de cargar.
-    let pendiente = false;
-    const alScrollear = () => {
-      if (pendiente) return;
-      pendiente = true;
-      requestAnimationFrame(() => {
-        revisar();
-        pendiente = false;
-      });
-    };
-
-    window.addEventListener("scroll", alScrollear, { passive: true });
-    window.addEventListener("resize", alScrollear);
+    window.addEventListener("scroll", programar, { passive: true });
+    window.addEventListener("resize", programar);
     // Al volver a la pestaña hay que revisar de nuevo: mientras estuvo oculta
-    // se saltearon todas las pasadas, y puede haber quedado scroll sin atender.
-    document.addEventListener("visibilitychange", alScrollear);
+    // se saltearon todas las pasadas.
+    document.addEventListener("visibilitychange", programar);
 
     // Las miniaturas de una pestaña recién abierta son iframes que acaban de
     // montarse y, sin scroll de por medio, ningún evento avisa.
-    const observador = new MutationObserver(alScrollear);
+    const observador = new MutationObserver(programar);
     observador.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       observador.disconnect();
-      window.removeEventListener("scroll", alScrollear);
-      window.removeEventListener("resize", alScrollear);
-      document.removeEventListener("visibilitychange", alScrollear);
+      window.removeEventListener("scroll", programar);
+      window.removeEventListener("resize", programar);
+      document.removeEventListener("visibilitychange", programar);
     };
   }, []);
 
