@@ -1,19 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { BanderaPais } from "./BanderaPais";
-import { PAISES_ORDENADOS, esCodigoPais, type CodigoPais } from "@/lib/paises";
-import { COOKIE_PAIS_VISITANTE, paisSegunZonaHoraria } from "@/lib/pais-visitante";
+import { PAISES_ORDENADOS, type CodigoPais } from "@/lib/paises";
+import {
+  paisDelVisitanteEnCliente,
+  recordarPaisDelVisitante,
+  recordarPaisElegido,
+} from "@/lib/pais-visitante";
 import { COOKIE_IDIOMA, idiomaSegunPais } from "@/lib/i18n/idiomas";
+import { useIdioma } from "./ProveedorIdioma";
 
 interface Props {
   className?: string;
 }
 
-function leerCookie(nombre: string): string | null {
-  const par = document.cookie.split("; ").find((c) => c.startsWith(`${nombre}=`));
-  return par ? decodeURIComponent(par.split("=").slice(1).join("=")) : null;
-}
+// Las cookies no avisan cuando cambian; el valor se relee en cada render y
+// al elegir se recarga la página entera, así que no hay nada que suscribir.
+const suscribirANada = () => () => {};
 
 function guardarCookie(nombre: string, valor: string) {
   // Un año, en la raíz: la preferencia es de la persona, no de la página.
@@ -31,42 +35,43 @@ function guardarCookie(nombre: string, valor: string) {
  * El idioma ya no se deriva de acá: hoy la app entera va en español para
  * todos los países (ver MULTIIDIOMA_HABILITADO en lib/i18n/idiomas.ts).
  *
- * Al elegir se guardan las dos cookies -- país e idioma -- porque el servidor
- * lee cada una por su lado y así ninguna pantalla tiene que volver a derivar
- * el idioma del país.
+ * Al elegir se guardan el país (como ELECCIÓN, que manda sobre cualquier
+ * detección, ver lib/pais-visitante.ts) y el idioma, porque el servidor lee
+ * cada cookie por su lado.
  *
- * La primera vez arranca en lo que sugiere la zona horaria del navegador, que
- * es lo mejor que se puede saber sin pedirle nada a nadie ni mirar la IP.
+ * Arranca en el país que el servidor ya resolvió para esta carga (baja por
+ * ProveedorIdioma; con un CDN adelante es la IP real). Así la bandera sale
+ * bien desde el primer HTML, sin parpadeo de "AR" y sin diferencia entre lo
+ * que renderiza el servidor y lo que hidrata el cliente. Recién si el
+ * servidor no pudo, se recurre a la zona horaria del navegador.
  */
 export function SelectorPais({ className }: Props) {
-  const [pais, setPais] = useState<CodigoPais>("AR");
+  const { pais: delServidor } = useIdioma();
+  // useSyncExternalStore y no useState+useEffect: durante la hidratación
+  // React usa el valor del servidor (sin mismatch) y recién después el del
+  // navegador, que además puede mirar cookies y zona horaria. Sin Argentina
+  // inventada: es el último recurso cuando nada se puede afirmar, porque es
+  // el mercado principal y el único con el cobro resuelto.
+  const pais = useSyncExternalStore<CodigoPais>(
+    suscribirANada,
+    () => paisDelVisitanteEnCliente(delServidor) ?? "AR",
+    () => delServidor ?? "AR"
+  );
   const [abierto, setAbierto] = useState(false);
 
   useEffect(() => {
-    const guardado = leerCookie(COOKIE_PAIS_VISITANTE);
-    if (esCodigoPais(guardado)) {
-      setPais(guardado);
-      return;
-    }
-    // Sin elección previa: lo que sugiere la zona horaria. No se recarga la
-    // página por esto -- se deja la cookie y la próxima carga ya sale bien.
-    try {
-      const sugerido = paisSegunZonaHoraria(Intl.DateTimeFormat().resolvedOptions().timeZone);
-      if (sugerido) {
-        setPais(sugerido);
-        guardarCookie(COOKIE_PAIS_VISITANTE, sugerido);
-        guardarCookie(COOKIE_IDIOMA, idiomaSegunPais(sugerido));
-      }
-    } catch {
-      // Sin zona horaria disponible se queda en Argentina, que es el mercado
-      // principal y el único con el cobro resuelto.
-    }
-  }, []);
+    const detectado = paisDelVisitanteEnCliente(delServidor);
+    if (!detectado) return;
+    // Se deja la cookie DETECTADA (no la de elección) para que la próxima
+    // carga del servidor ya salga bien aun sin CDN. No se recarga la página
+    // por esto.
+    recordarPaisDelVisitante(detectado);
+    guardarCookie(COOKIE_IDIOMA, idiomaSegunPais(detectado));
+  }, [delServidor]);
 
   const elegir = (nuevo: CodigoPais) => {
-    guardarCookie(COOKIE_PAIS_VISITANTE, nuevo);
+    recordarPaisElegido(nuevo);
     guardarCookie(COOKIE_IDIOMA, idiomaSegunPais(nuevo));
-    setPais(nuevo);
     setAbierto(false);
     // Recarga completa y no un cambio de estado: los textos y los precios se
     // resuelven en el servidor, así que hay que volver a pedir la página.

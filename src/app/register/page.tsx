@@ -27,7 +27,8 @@ import {
   precioConDescuento,
   formatearPrecio,
 } from "@/lib/precios-por-pais";
-import { paisDelVisitanteEnCliente, recordarPaisDelVisitante } from "@/lib/pais-visitante";
+import { paisDelVisitanteEnCliente, recordarPaisDelVisitante, recordarPaisElegido } from "@/lib/pais-visitante";
+import { useIdioma } from "@/components/i18n/ProveedorIdioma";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
 
@@ -167,15 +168,18 @@ function RegisterForm() {
   // El país de quien está entrando, para no hacerle buscar el suyo en la
   // lista. Sólo pisa el valor inicial: si ya tocó el selector, manda su
   // elección (por eso depende de `paisElegidoAMano`).
+  // `paisDelServidor` es lo que el servidor resolvió para esta carga (con un
+  // CDN adelante, la IP real): pasa por encima de la zona horaria.
+  const { pais: paisDelServidor } = useIdioma();
   const [paisElegidoAMano, setPaisElegidoAMano] = useState(false);
   useEffect(() => {
     if (paisElegidoAMano) return;
-    const detectado = paisDelVisitanteEnCliente();
+    const detectado = paisDelVisitanteEnCliente(paisDelServidor);
     if (detectado) {
       setFormData((previo) => ({ ...previo, pais: detectado }));
       recordarPaisDelVisitante(detectado);
     }
-  }, [paisElegidoAMano]);
+  }, [paisElegidoAMano, paisDelServidor]);
 
   // Qué medios de pago corresponden al país elegido. Fuera de Argentina
   // sólo PayPal: una cuenta común de Mercado Pago Argentina no puede
@@ -592,7 +596,7 @@ function RegisterForm() {
                     valor={formData.pais}
                     onCambio={(pais) => {
                       setPaisElegidoAMano(true);
-                      recordarPaisDelVisitante(pais);
+                      recordarPaisElegido(pais);
                       setFormData({ ...formData, pais });
                     }}
                     className="border-none"
