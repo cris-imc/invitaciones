@@ -16,6 +16,7 @@ import { paisSegunCabeceras } from "@/lib/pais-visitante";
 import { costumbresDeVisitante } from "@/lib/costumbres-por-pais";
 import { precioDePlan, precioConDescuento, formatearPrecio, cobraEnOtraMoneda, precioParaPayPal } from "@/lib/precios-por-pais";
 import { idiomaDelAnfitrion } from "@/lib/i18n/servidor";
+import { urlDeInvitacionDeEjemplo } from "@/lib/invitacion-de-ejemplo";
 
 
 // El orden de las preguntas es el de la sección: las claves viven en el
@@ -76,7 +77,13 @@ export default async function Home() {
   const whatsappEnterpriseUrl = `https://wa.me/5493517660000?text=${encodeURIComponent(
     t("landing.planes.enterprise.whatsapp")
   )}`;
-  const ejemploRealUrl = "https://altainvitacion.com/invite/nos-casamos-1786233859965/864f7d5912140fecee1eca69fd5dd17b";
+  // La invitación que se muestra al tocar "Ver una invitación real". Sale de
+  // la base y ya no de una URL escrita a mano: la que había apuntaba a una
+  // invitación del plan Gratis -- con el cartel arriba y sin música ni trivia
+  // -- y encima llevaba el token personal de un invitado de verdad, que es el
+  // secreto con el que cualquiera puede confirmar en su nombre. Ver
+  // invitacion-de-ejemplo.ts.
+  const ejemploRealUrl = await urlDeInvitacionDeEjemplo();
   return (
     // PRUEBA (revertir = volver a `items-center justify-center ... p-0 md:p-6`):
     // el md:p-6 dejaba aire alrededor de la tarjeta, y el centrado vertical
@@ -167,16 +174,20 @@ export default async function Home() {
               loading="lazy"
             />
           </div>
-          <div className="text-center mt-10">
-            <a
-              href={ejemploRealUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-[var(--campo-borde)] text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-[var(--tinte-2)] hover:border-[var(--foreground)]/40 hover:-translate-y-0.5"
-            >
-              {t("landing.verInvitacionReal")} →
-            </a>
-          </div>
+          {/* Sin un ejemplo que valga la pena mostrar, no se muestra el botón:
+              es mejor no ofrecer el ejemplo que ofrecer uno malo. */}
+          {ejemploRealUrl && (
+            <div className="text-center mt-10">
+              <a
+                href={ejemploRealUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-[var(--campo-borde)] text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-[var(--tinte-2)] hover:border-[var(--foreground)]/40 hover:-translate-y-0.5"
+              >
+                {t("landing.verInvitacionReal")} →
+              </a>
+            </div>
+          )}
         </section>
 
         {/* STRIP (FEATURES) */}
@@ -335,16 +346,18 @@ export default async function Home() {
               </video>
             </div>
           </div>
-          <div className="text-center mt-24 md:mt-10">
-            <a
-              href={ejemploRealUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-[var(--campo-borde)] text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-[var(--tinte-2)] hover:border-[var(--foreground)]/40 hover:-translate-y-0.5"
-            >
-              {t("landing.verInvitacionReal")} →
-            </a>
-          </div>
+          {ejemploRealUrl && (
+            <div className="text-center mt-24 md:mt-10">
+              <a
+                href={ejemploRealUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-[var(--campo-borde)] text-[var(--paper)] font-ui text-sm transition-all duration-200 hover:bg-[var(--tinte-2)] hover:border-[var(--foreground)]/40 hover:-translate-y-0.5"
+              >
+                {t("landing.verInvitacionReal")} →
+              </a>
+            </div>
+          )}
         </section>
 
         {/* PRECIOS */}
