@@ -6,7 +6,7 @@ import { TemplateShowcase } from "@/components/landing/TemplateShowcase";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingLogo } from "@/components/ui/Logo";
 import { HeroFondoFiesta } from "@/components/landing/HeroFondoFiesta";
-import { Settings2, Users, Radio, CalendarDays, MapPin, ListChecks, Gift, Images, Music, MessageCircleHeart, Rss, Armchair, ScanLine, Eye } from "lucide-react";
+import { Settings2, Users, Radio, CalendarDays, MapPin, ListChecks, Gift, Images, Music, MessageCircleHeart, Rss, Armchair, ScanLine, Eye, Clock } from "lucide-react";
 import { auth } from "@/auth";
 import { PLAN_LIMITS, formatPrice, PREMIUM_DISCOUNT_PRICE, DIAMOND_DISCOUNT_PRICE, PREMIUM_DISCOUNT_PERCENTAGE, DIAMOND_DISCOUNT_PERCENTAGE } from "@/lib/plan-limits";
 import { textosDelAnfitrion } from "@/lib/i18n/servidor";
@@ -229,6 +229,7 @@ export default async function Home() {
               { clave: "ubicacion", icon: <MapPin className="w-6 h-6" />, premium: false, destacado: false },
               { clave: "album", icon: <Images className="w-6 h-6" />, premium: false, destacado: false },
               { clave: "musica", icon: <Music className="w-6 h-6" />, premium: false, destacado: false },
+              { clave: "cronograma", icon: <Clock className="w-6 h-6" />, premium: false, destacado: false },
             ].map((f) => (
               <div
                 key={f.clave}
