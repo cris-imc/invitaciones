@@ -597,7 +597,7 @@ export function MesasPanel({ slug }: Props) {
           <button
             type="button"
             onClick={() => setEscaneando(true)}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 text-sm font-semibold px-4 py-2 transition-all hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--campo-borde)] text-sm font-semibold px-4 py-2 transition-all hover:bg-[var(--tinte-2)]"
           >
             <ScanLine className="w-4 h-4" />
             {t("panel.mesas.escanearIngreso")}
@@ -621,7 +621,7 @@ export function MesasPanel({ slug }: Props) {
             type="button"
             onClick={() => setEspacio((z) => Math.max(ESPACIO_MIN, +(z - ESPACIO_PASO).toFixed(2)))}
             disabled={espacio <= ESPACIO_MIN}
-            className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+            className="w-7 h-7 rounded-full border border-[var(--campo-borde)] flex items-center justify-center hover:bg-[var(--tinte-2)] disabled:opacity-40"
             aria-label={t("panel.mesas.achicarSalon")}
           >
             <Minus className="w-3.5 h-3.5" />
@@ -630,7 +630,7 @@ export function MesasPanel({ slug }: Props) {
             type="button"
             onClick={() => setEspacio((z) => Math.min(ESPACIO_MAX, +(z + ESPACIO_PASO).toFixed(2)))}
             disabled={espacio >= ESPACIO_MAX}
-            className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+            className="w-7 h-7 rounded-full border border-[var(--campo-borde)] flex items-center justify-center hover:bg-[var(--tinte-2)] disabled:opacity-40"
             aria-label={t("panel.mesas.agrandarSalon")}
           >
             <Plus className="w-3.5 h-3.5" />
@@ -640,7 +640,7 @@ export function MesasPanel({ slug }: Props) {
 
       {/* Mostrarlas o no es una decisión aparte de armarlas: el anfitrión puede
           querer el plano para sí mismo y que la invitación no diga nada. */}
-      <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-card p-3 cursor-pointer">
+      <label className="flex items-start gap-3 rounded-xl border border-[var(--campo-borde-suave)] bg-card p-3 cursor-pointer">
         <input
           type="checkbox"
           checked={habilitadas}
@@ -659,7 +659,7 @@ export function MesasPanel({ slug }: Props) {
       {/* Aparte del anterior a propósito: son dos decisiones distintas. Hay
           eventos que asignan mesas y reciben a la gente sin registrar nada, y
           otros que quieren saber quién llegó aunque sea todo libre. */}
-      <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-card p-3 cursor-pointer">
+      <label className="flex items-start gap-3 rounded-xl border border-[var(--campo-borde-suave)] bg-card p-3 cursor-pointer">
         <input
           type="checkbox"
           checked={escaneo}
@@ -688,7 +688,7 @@ export function MesasPanel({ slug }: Props) {
             más ancho que el teléfono -- y el desborde se lo come toda la
             página en vez de quedar contenido en este recuadro con scroll. */}
         <div
-          className="min-w-0 overflow-auto max-h-[72vh] rounded-xl border border-white/10"
+          className="min-w-0 overflow-auto max-h-[72vh] rounded-xl border border-[var(--campo-borde-suave)]"
           style={{ height: altoVisible }}
         >
           <div
@@ -700,7 +700,7 @@ export function MesasPanel({ slug }: Props) {
               setSeleccionado(null);
               setMesaAbierta(null);
             }}
-            className="relative bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,.05),transparent_65%)] bg-black/25"
+            className="relative bg-[radial-gradient(circle_at_50%_40%,var(--tinte-1),transparent_65%)] bg-[var(--tinte-2)]"
             // Sin mesas, el salón toma el ancho de la pantalla en vez de sus
             // 880px: el cartel de "todavía no hay mesas" se centra respecto
             // del lienzo, y en un teléfono ese centro caía fuera de lo que se
@@ -714,7 +714,7 @@ export function MesasPanel({ slug }: Props) {
           >
             {mesas.length === 0 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center px-6 pointer-events-none">
-                <Users className="w-7 h-7 text-white/20" />
+                <Users className="w-7 h-7 text-[var(--foreground)]/35" />
                 <p className="text-sm text-muted-foreground max-w-xs">
                   {t("panel.mesas.salonVacio")}
                 </p>
@@ -753,7 +753,7 @@ export function MesasPanel({ slug }: Props) {
             />
           ) : null}
 
-          <div className="min-w-0 rounded-xl border border-white/10 bg-card p-3">
+          <div className="min-w-0 rounded-xl border border-[var(--campo-borde-suave)] bg-card p-3">
             <div className="flex items-baseline justify-between gap-2 mb-1">
               <h3 className="text-sm font-semibold">{t("panel.mesas.sinUbicar")}</h3>
               <span className="text-xs text-muted-foreground shrink-0">
@@ -787,7 +787,7 @@ export function MesasPanel({ slug }: Props) {
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 placeholder={t("comun.buscar")}
-                className="w-full mb-2 rounded-lg bg-white/5 border border-white/10 px-2.5 py-1.5 text-sm focus:outline-none focus:border-[var(--accent)] placeholder:text-white/25"
+                className="w-full mb-2 rounded-lg bg-[var(--tinte-1)] border border-[var(--campo-borde)] px-2.5 py-1.5 text-sm focus:outline-none focus:border-[var(--accent)] placeholder:text-[var(--foreground)]/50"
               />
             )}
 
@@ -821,12 +821,12 @@ export function MesasPanel({ slug }: Props) {
                         className={`w-full flex items-center gap-2 rounded-lg px-2 py-2 text-left text-sm touch-none select-none transition-colors ${
                           elegido
                             ? "bg-[var(--accent)] text-[var(--ink)] font-semibold"
-                            : "hover:bg-white/5"
+                            : "hover:bg-[var(--tinte-1)]"
                         } ${arrastrando === p.id ? "opacity-40" : ""}`}
                       >
                         <GripVertical
                           className={`w-3.5 h-3.5 shrink-0 ${
-                            elegido ? "text-[var(--ink)]/50" : "text-white/25"
+                            elegido ? "text-[var(--ink)]/50" : "text-[var(--foreground)]/55"
                           }`}
                         />
                         <span className="min-w-0 flex-1 truncate">
@@ -862,12 +862,12 @@ export function MesasPanel({ slug }: Props) {
                 tira obliga a recordar por dónde ibas cada vez que asignás uno
                 y la lista se reordena sola bajo el dedo. */}
             {paginas > 1 && (
-              <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-white/10">
+              <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-[var(--campo-borde-suave)]">
                 <button
                   type="button"
                   onClick={() => setPagina((p) => Math.max(0, p - 1))}
                   disabled={paginaActual === 0}
-                  className="rounded-lg border border-white/15 px-2.5 py-1 text-xs hover:bg-white/10 disabled:opacity-30"
+                  className="rounded-lg border border-[var(--campo-borde)] px-2.5 py-1 text-xs hover:bg-[var(--tinte-2)] disabled:opacity-30"
                 >
                   {t("panel.mesas.anteriorCorto")}
                 </button>
@@ -878,7 +878,7 @@ export function MesasPanel({ slug }: Props) {
                   type="button"
                   onClick={() => setPagina((p) => Math.min(paginas - 1, p + 1))}
                   disabled={paginaActual >= paginas - 1}
-                  className="rounded-lg border border-white/15 px-2.5 py-1 text-xs hover:bg-white/10 disabled:opacity-30"
+                  className="rounded-lg border border-[var(--campo-borde)] px-2.5 py-1 text-xs hover:bg-[var(--tinte-2)] disabled:opacity-30"
                 >
                   {t("panel.mesas.siguienteCorto")}
                 </button>
@@ -939,7 +939,7 @@ function MesaDibujo({
     ? "border-[var(--accent)]"
     : resaltada && libres > 0
     ? "border-emerald-400/70"
-    : "border-white/25";
+    : "border-[var(--campo-borde)]";
 
   const { titulo, secundario } = rotulo(mesa, t);
 
@@ -983,7 +983,7 @@ function MesaDibujo({
           return (
             <span
               key={i}
-              style={{ ...estilo, background: color ?? "rgba(255,255,255,.2)" }}
+              style={{ ...estilo, background: color ?? "var(--silla-vacia)" }}
               className="block w-2.5 h-2.5 rounded-full"
             />
           );
@@ -991,7 +991,7 @@ function MesaDibujo({
 
         {/* tablero */}
         <div
-          className={`w-full h-full border-2 ${borde} bg-white/[0.06] flex flex-col items-center justify-center gap-0.5 transition-colors ${
+          className={`w-full h-full border-2 ${borde} bg-[var(--tinte-1)] flex flex-col items-center justify-center gap-0.5 transition-colors ${
             redonda ? "rounded-full" : "rounded-lg"
           }`}
         >
@@ -999,13 +999,13 @@ function MesaDibujo({
             {titulo}
           </span>
           {secundario && (
-            <span className="text-[8px] leading-none text-white/40 tracking-wide">
+            <span className="text-[8px] leading-none text-[var(--foreground)]/65 tracking-wide">
               ({secundario})
             </span>
           )}
           <span
             className={`text-[10px] leading-none ${
-              excedida ? "text-red-400 font-semibold" : "text-white/50"
+              excedida ? "text-red-400 font-semibold" : "text-[var(--foreground)]/65"
             }`}
           >
             {ocupadas}/{mesa.sillas}
@@ -1091,7 +1091,7 @@ function EditorMesa({
             onBlur={() => alias !== (mesa.alias ?? "") && onCambiar({ alias })}
             maxLength={40}
             placeholder={t("panel.mesas.apodo")}
-            className="w-full mt-1 bg-transparent border-b border-white/15 text-xs text-muted-foreground focus:outline-none focus:border-[var(--accent)] focus:text-foreground pb-1 placeholder:text-white/25"
+            className="w-full mt-1 bg-transparent border-b border-[var(--campo-borde)] text-xs text-muted-foreground focus:outline-none focus:border-[var(--accent)] focus:text-foreground pb-1 placeholder:text-[var(--foreground)]/50"
           />
         </div>
         <button
@@ -1112,7 +1112,7 @@ function EditorMesa({
             type="button"
             disabled={ocupado || mesa.sillas <= 2}
             onClick={() => onCambiar({ sillas: mesa.sillas - 1 })}
-            className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+            className="w-7 h-7 rounded-full border border-[var(--campo-borde)] flex items-center justify-center hover:bg-[var(--tinte-2)] disabled:opacity-40"
             aria-label={t("panel.mesas.quitarLugar")}
           >
             <Minus className="w-3.5 h-3.5" />
@@ -1122,7 +1122,7 @@ function EditorMesa({
             type="button"
             disabled={ocupado || mesa.sillas >= 20}
             onClick={() => onCambiar({ sillas: mesa.sillas + 1 })}
-            className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+            className="w-7 h-7 rounded-full border border-[var(--campo-borde)] flex items-center justify-center hover:bg-[var(--tinte-2)] disabled:opacity-40"
             aria-label={t("panel.mesas.agregarLugar")}
           >
             <Plus className="w-3.5 h-3.5" />
@@ -1133,7 +1133,7 @@ function EditorMesa({
       {/* forma */}
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">{t("panel.mesas.forma")}</span>
-        <div className="flex rounded-full border border-white/15 p-0.5">
+        <div className="flex rounded-full border border-[var(--campo-borde)] p-0.5">
           {(["REDONDA", "RECTANGULAR"] as const).map((f) => (
             <button
               key={f}
@@ -1168,7 +1168,7 @@ function EditorMesa({
             {mesa.lugares.map((l, i) => (
               <li
                 key={l.id}
-                className="flex items-center justify-between gap-2 rounded-lg bg-white/[0.04] px-2 py-1.5"
+                className="flex items-center justify-between gap-2 rounded-lg bg-[var(--tinte-1)] px-2 py-1.5"
               >
                 {/* El mismo color que sus sillas en el plano: sin esto hay que
                     adivinar cuál de los grupos de la mesa es cada nombre. */}
@@ -1203,7 +1203,7 @@ function EditorMesa({
                         type="button"
                         disabled={ocupado}
                         onClick={() => onLugares(l.guestId, l.lugares - 1)}
-                        className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+                        className="w-6 h-6 rounded-full border border-[var(--campo-borde)] flex items-center justify-center hover:bg-[var(--tinte-2)] disabled:opacity-40"
                         aria-label={t("panel.mesas.unLugarMenos")}
                       >
                         <Minus className="w-3 h-3" />
@@ -1213,7 +1213,7 @@ function EditorMesa({
                         type="button"
                         disabled={ocupado}
                         onClick={() => onLugares(l.guestId, l.lugares + 1)}
-                        className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center hover:bg-white/10 disabled:opacity-40"
+                        className="w-6 h-6 rounded-full border border-[var(--campo-borde)] flex items-center justify-center hover:bg-[var(--tinte-2)] disabled:opacity-40"
                         aria-label={t("panel.mesas.unLugarMas")}
                       >
                         <Plus className="w-3 h-3" />
@@ -1224,7 +1224,7 @@ function EditorMesa({
                     type="button"
                     disabled={ocupado}
                     onClick={() => onLugares(l.guestId, 0)}
-                    className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center text-muted-foreground hover:text-red-400 hover:border-red-400/40 disabled:opacity-40"
+                    className="w-6 h-6 rounded-full border border-[var(--campo-borde)] flex items-center justify-center text-muted-foreground hover:text-red-400 hover:border-red-400/40 disabled:opacity-40"
                     aria-label={t("panel.mesas.sacarDeLaMesa")}
                   >
                     <RotateCcw className="w-3 h-3" />
@@ -1250,7 +1250,7 @@ function EditorMesa({
           <button
             type="button"
             onClick={() => setConfirmaBorrar(false)}
-            className="rounded-full border border-white/20 text-xs px-3 py-2 hover:bg-white/10"
+            className="rounded-full border border-[var(--campo-borde)] text-xs px-3 py-2 hover:bg-[var(--tinte-2)]"
           >
             {t("comun.no")}
           </button>
