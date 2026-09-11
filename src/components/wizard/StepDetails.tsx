@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { MapPin, Clock, Info, ChevronDown, ChevronUp, Shirt } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import { CampoHora } from "./CampoHora";
 
 export function StepDetails() {
     const { data, setData, nextStep } = useWizardStore();
@@ -166,15 +167,12 @@ export function StepDetails() {
                                 <FormItem className="flex flex-col justify-end">
                                     <FormLabel>{t("wizard.salon.horario")}</FormLabel>
                                     <FormControl>
-                                        <div className="relative">
-                                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
-                                            <Input
-                                                type="time"
-                                                className="pl-9 [&::-webkit-calendar-picker-indicator]:hidden cursor-pointer"
-                                                onClick={(e) => "showPicker" in e.currentTarget && typeof e.currentTarget.showPicker === 'function' && e.currentTarget.showPicker()}
-                                                {...field}
+                                        <CampoHora
+                                                name={field.name}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
                                             />
-                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

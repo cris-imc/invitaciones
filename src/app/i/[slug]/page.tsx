@@ -564,7 +564,7 @@ export default async function InvitationPage({
   return (
     <ProveedorIdioma idioma={idiomaInvitacion}>
       <ProveedorInvitacion datos={invitation}>
-        <div data-plan-tier={String(invitation.planTier ?? 'FREE')}>
+        <div data-invitado data-plan-tier={String(invitation.planTier ?? 'FREE')}>
           {isFree && <FreePlanBanner />}
           {isFree && <FreePlanBannerSpacer />}
           {renderTemplate()}

@@ -301,7 +301,7 @@ export default async function Home() {
                 controls
                 playsInline
                 preload="none"
-                className="w-full block md:hidden"
+                className="w-full block md:hidden aspect-[720/1080]"
               >
                 {t("landing.video.sinSoporte")}
               </video>
@@ -312,13 +312,13 @@ export default async function Home() {
                 controls
                 playsInline
                 preload="none"
-                className="w-full hidden md:block"
+                className="w-full hidden md:block aspect-[1080/720]"
               >
                 {t("landing.video.sinSoporte")}
               </video>
             </div>
           </div>
-          <div className="text-center mt-10">
+          <div className="text-center mt-24 md:mt-10">
             <a
               href={ejemploRealUrl}
               target="_blank"

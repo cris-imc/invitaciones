@@ -29,6 +29,7 @@ import {
 } from "@/lib/precios-por-pais";
 import { paisDelVisitanteEnCliente, recordarPaisDelVisitante, recordarPaisElegido } from "@/lib/pais-visitante";
 import { useIdioma } from "@/components/i18n/ProveedorIdioma";
+import { LogoDePago } from "@/components/pagos/LogoDePago";
 
 type PlanType = "FREE" | "PREMIUM" | "DIAMOND";
 
@@ -711,6 +712,17 @@ function RegisterForm() {
                     : "Continuar a PayPal"}
                 </Button>
 
+                {/* Quién procesa el cobro, con su marca. El visitante está por
+                    poner plata en un sitio que no conoce: ver una marca que ya
+                    usó le dice que no le está dando la tarjeta a un
+                    desconocido. */}
+                {selectedPlan !== "FREE" && (
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    <span className="text-xs text-muted-foreground">Pago procesado por</span>
+                    <LogoDePago marca={porMercadoPago ? "mercadopago" : "paypal"} />
+                  </div>
+                )}
+
                 {/* PayPal no cobra en pesos colombianos ni uruguayos, así que
                     ahí se muestra el precio local pero la orden va en dólares.
                     Se avisa ANTES de mandarlo al checkout: llegar a PayPal y
@@ -735,7 +747,7 @@ function RegisterForm() {
                     lib/cobro.ts) --, pero se sigue consultando `medios` porque
                     la lista de cada país es la que manda. */}
                 {selectedPlan !== "FREE" && medios.includes("transferencia") && (
-                  <PagoPorTransferencia concepto="tu plan" className="mt-1" />
+                  <PagoPorTransferencia concepto="tu plan" className="mt-1" pais={formData.pais} />
                 )}
 
                 <div className="text-center pt-4">

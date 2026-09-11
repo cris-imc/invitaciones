@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Church, MapPin, Clock, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
+import { CampoHora } from "./CampoHora";
 
 export function StepCeremonia() {
     const { data, setData, nextStep, prevStep } = useWizardStore();
@@ -189,15 +190,13 @@ export function StepCeremonia() {
                                         <FormItem>
                                             <FormLabel>{t("wizard.ceremonia.hora")}</FormLabel>
                                             <FormControl>
-                                                <div className="relative">
-                                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
-                                                    <Input
-                                                        type="time"
-                                                        className="pl-9 bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl [&::-webkit-calendar-picker-indicator]:hidden cursor-pointer"
-                                                        onClick={(e) => "showPicker" in e.currentTarget && typeof e.currentTarget.showPicker === 'function' && e.currentTarget.showPicker()}
-                                                        {...field}
-                                                    />
-                                                </div>
+                                                <CampoHora
+                                                    name={field.name}
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    onBlur={field.onBlur}
+                                                    className="pl-9 bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl"
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

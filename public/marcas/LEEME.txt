@@ -1,0 +1,14 @@
+Logos oficiales de quien procesa el cobro.
+
+Van acá con estos nombres exactos:
+
+  mercadopago.svg
+  paypal.svg
+
+De dónde sacarlos (las dos marcas piden que se use su archivo, no una copia):
+
+  Mercado Pago  https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/mercado-pago-brand-manual
+  PayPal        https://www.paypal.com/us/webapps/mpp/logo-center
+
+Si falta alguno, el botón muestra el nombre de la marca en su color en vez de
+un ícono roto (ver LogoDePago.tsx).

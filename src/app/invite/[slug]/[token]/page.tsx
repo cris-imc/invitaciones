@@ -1074,7 +1074,7 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
     return (
         <ProveedorIdioma idioma={idiomaInvitacion}>
             <ProveedorInvitacion datos={validInvitation}>
-                <div data-plan-tier={String(validInvitation.planTier ?? 'FREE')}>
+                <div data-invitado data-plan-tier={String(validInvitation.planTier ?? 'FREE')}>
                     {isFree && <FreePlanBanner />}
                     {isFree && <FreePlanBannerSpacer />}
                     {renderTemplate()}

@@ -50,7 +50,9 @@ export default async function PreviewLayout({
 
   return (
     <ProveedorIdioma idioma={idioma}>
+      <div data-invitado>
       <ProveedorInvitacion datos={invitation}>{children}</ProveedorInvitacion>
+      </div>
     </ProveedorIdioma>
   );
 }

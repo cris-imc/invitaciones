@@ -40,7 +40,7 @@ export function HeroV2({
     : {
         background: `
           linear-gradient(180deg, rgba(18,32,25,.15) 0%, rgba(18,32,25,.75) 100%),
-          radial-gradient(120% 90% at 30% 15%, var(--ink-2), var(--ink) 70%)
+          radial-gradient(120% 90% at 30% 15%, var(--t-ink2), var(--t-ink) 70%)
         `,
       };
 

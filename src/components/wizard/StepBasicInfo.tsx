@@ -21,6 +21,7 @@ import { isAdmin as isAdminRole } from "@/lib/roles";
 import { SaveStepButtons } from "./SaveStepButtons";
 import { useIdioma } from "@/components/i18n/ProveedorIdioma";
 import { SelectorIdiomaInvitacion } from "./SelectorIdiomaInvitacion";
+import { CampoFecha } from "./CampoFecha";
 
 // El formato largo de fecha ("12 de marzo de 2027") lo arma date-fns, no el
 // diccionario: el nombre del mes y el orden de las partes cambian con el
@@ -133,41 +134,16 @@ export function StepBasicInfo() {
                                             </span>
                                         )}
                                     </FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                 <Button
-                                                    variant={"outline"}
-                                                    disabled={isDateLocked}
-                                                    className={cn(
-                                                        "w-full pl-3 text-left font-normal bg-[var(--ink-2)] border border-[var(--campo-borde)] text-[var(--on-ink)] h-12 rounded-xl hover:bg-[var(--ink-2)]/80 hover:text-[var(--on-ink)] disabled:opacity-60 disabled:cursor-not-allowed",
-                                                        !field.value && "text-[var(--shell-fg-faint)]"
-                                                    )}
-                                                >
-                                                    {field.value ? (
-                                                        format(field.value, "PPP", { locale: LOCALES_FECHA[idioma] })
-                                                    ) : (
-                                                        <span>{t("wizard.basicos.elegirFecha")}</span>
-                                                    )}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        {!isDateLocked && (
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    locale={LOCALES_FECHA[idioma]}
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) =>
-                                                        !isAdmin && date < new Date()
-                                                    }
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        )}
-                                    </Popover>
+                                    <FormControl>
+                                        <CampoFecha
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            locale={LOCALES_FECHA[idioma]}
+                                            textoVacio={t("wizard.basicos.elegirFecha")}
+                                            deshabilitado={isDateLocked}
+                                            permitirPasado={isAdmin}
+                                        />
+                                    </FormControl>
                                     {showLockStatus && !isAdmin && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400">
                                             {t("wizard.basicos.fechaBloqueadaTexto")}

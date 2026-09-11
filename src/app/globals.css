@@ -2766,3 +2766,42 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 /* La sigla del país, más angosta ahora que la bandera hace el trabajo de
    identificar de un vistazo. */
 .selector-idioma-lista .selector-idioma-sigla{ width:22px; }
+
+/* --------------------------------------------------
+   Lo que ve el invitado no sigue el tema del anfitrión
+   --------------------------------------------------
+   Las invitaciones, el modo LIVE y el post evento los mira el INVITADO, que
+   no tiene nada que ver con que el anfitrión haya elegido el modo claro para
+   su panel. Se ven siempre como los diseñó quien los mandó.
+
+   Con el modo claro, --ink y --paper cambian de rol: --ink pasa a ser el
+   fondo crema del shell. Las 365 plantillas no los usan -- cada una tiene sus
+   --t-* --, pero sí los usan las piezas de alrededor: el cartel de "Creada
+   gratis", el fondo del hero sin foto, la pantalla del LIVE. Con el tema
+   claro puesto quedaban crema sobre crema.
+
+   Perseguirlo pieza por pieza es una carrera que se pierde: cada componente
+   nuevo que use --ink vuelve a romperse. Acá se devuelven los tokens a sus
+   valores oscuros para todo el subárbol, así que cualquier cosa que cuelgue
+   de una invitación queda bien sin tener que acordarse.
+
+   Se marca con `data-invitado` en la raíz de cada ruta pública. */
+[data-invitado] {
+  --ink: #0F1613;
+  --ink-2: #182420;
+  --paper: #F6F3EC;
+  --paper-2: #EAE4D4;
+  --on-ink: #F6F3EC;
+  --line: rgba(246, 243, 236, .12);
+  --line-soft: rgba(15, 22, 19, .1);
+  --accent: #C79A4B;
+  --accent-2: #5C8A7A;
+  --danger: #C0604A;
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --card: var(--ink-2);
+  --card-foreground: var(--paper);
+  --border: var(--line);
+  --input: var(--line);
+  color-scheme: dark;
+}

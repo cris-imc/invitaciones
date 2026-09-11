@@ -141,13 +141,7 @@ export function Sidebar() {
                 );
             })}
 
-            {/* Ayuda y tema juntos, y en un solo lugar de toda la app: un
-                control de preferencias que cambia de lugar según la pantalla
-                hay que volver a buscarlo cada vez. */}
-            <div className="flex items-center justify-center gap-2 mt-4">
-                <ThemeToggle />
-                <HelpMenu variant="desktop" />
-            </div>
+            <HelpMenu variant="desktop" />
 
 
             {isAuthenticated && (
