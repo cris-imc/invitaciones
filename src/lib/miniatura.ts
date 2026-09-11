@@ -85,3 +85,21 @@ export function invitacionParaMiniatura<T extends Record<string, unknown>>(invit
   }
   return salida as T;
 }
+
+/**
+ * Si esta página se está dibujando como miniatura (`?miniatura=1`), visto
+ * desde el navegador. Para que un componente de cliente pueda ahorrarse
+ * trabajo que en un recuadro de 170px no se ve.
+ *
+ * Lo usan las plantillas Storytelling para NO arrancar su bucle de
+ * `requestAnimationFrame`: ese bucle mueve el parallax, los reveals y las
+ * tiras de fotos que están DETRÁS de la portada, y en la miniatura la
+ * portada nunca se abre. Medido: cada uno de esos bucles corre a 25 fps
+ * (está saturado) y crea 30–40 capas de composición extra; ocho a la vez en
+ * un teléfono es lo que tumbaba /modelos. La portada animada no pasa por
+ * acá: es CSS y sigue igual.
+ */
+export function esVistaMiniatura(): boolean {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("miniatura") === "1";
+}
