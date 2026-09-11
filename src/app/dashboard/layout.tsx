@@ -27,8 +27,14 @@ export default async function DashboardLayout({
                         así no cambia de lugar al entrar al panel. Sólo en
                         escritorio -- en mobile vive en la barra de arriba, al
                         lado de Ayuda, porque acá se superpondría con el
-                        contenido. */}
-                    <div className="hidden md:block absolute top-6 right-6 z-30">
+                        contenido.
+
+                        40px y no 24: el botón de acción de la cabecera va al
+                        lado, y con 24 quedaban a distinta altura. El que baja
+                        es el switch -- el botón se centra con el saludo, y
+                        moverlo lo dejaría desalineado con el texto de al lado.
+                        Su centro está medido en 54px, y el switch mide 28. */}
+                    <div className="hidden md:block absolute top-[40px] right-6 z-30">
                         <ThemeToggle />
                     </div>
                     {children}

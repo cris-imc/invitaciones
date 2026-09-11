@@ -75,7 +75,6 @@
   --tinte-2: rgba(246, 243, 236, .08);
   --tinte-3: rgba(246, 243, 236, .12);
   --tinte-4: rgba(246, 243, 236, .18);
-
   /* Silla vacía del plano de mesas. Es un punto de 10px: con la opacidad de
      un velo de fondo (--tinte-4 da 1.20:1 sobre el plano) directamente no se
      ve, así que lleva la suya, calculada para quedar alrededor de 3:1 en los
@@ -1322,6 +1321,26 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
 
 .p-main{padding:26px 30px 40px;}
 .p-topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;}
+/* El switch de tema vive fijo arriba a la derecha del panel (ver el layout),
+   y ahi mismo cae el boton de accion de la cabecera. Dos cosas hay que
+   resolver, y el switch no se mueve en ninguna: cambiarlo de lugar segun la
+   pantalla es justo lo que marea.
+
+   1. QUE NO SE ENCIMEN. La cabecera le deja el hueco:
+      58px del switch + 24px del borde - 30px que ya tiene .p-main de padding
+      + 12px de aire = 64px.
+
+   2. QUE QUEDEN A LA MISMA ALTURA. El que baja es el switch, no el boton: el
+      boton se centra con el saludo, y subirlo lo dejaria desalineado con el
+      texto que tiene al lado. Medido en pantalla: el centro del boton cae en
+      54px desde el borde de .p-main, asi que el switch (28px de alto) va con
+      `top: 40px`. Eso esta en el layout, no aca.
+
+   Solo en escritorio: en mobile el switch esta en la barra de arriba, no
+   encima del contenido. */
+@media (min-width: 768px) {
+  .p-main .p-topbar{ padding-right:64px; }
+}
 /* Idioma y tema en la barra superior del panel, a la izquierda del boton
    de accion. Van ahi y no en el sidebar porque es donde la gente busca
    sus preferencias: arriba a la derecha. */
