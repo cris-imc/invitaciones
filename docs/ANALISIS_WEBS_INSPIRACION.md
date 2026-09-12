@@ -2,15 +2,16 @@
 
 > Complemento de `docs/PROMPTS_CLAUDE_DESIGN_NUEVAS_COLECCIONES.md`. Fecha: 2026-09-12.
 >
-> **Nota metodológica.** El entorno donde se hizo este análisis no pudo descargar
-> el HTML ni sacar capturas de las 12 webs: la política de red de la organización
-> devolvió 403 a los 12 hosts y también a awwwards, tympanus (Codrops), framer,
-> webflow, web.archive.org y cdnjs. Solo pasaron npm, GitHub y el buscador.
-> Por eso el informe se basa en:
-> 1. **Sitio 1**: código fuente real (repo público `craftedbygc/2018-in-review`), **verificado**.
-> 2. **Sitios 2-12**: fichas de Awwwards (tags de tecnología y paleta), Codrops,
->    Framer Gallery/Blog, Webflow Blog, Orpetron, Immersive Garden y Unseen Studio
->    vía snippets de búsqueda, más memoria previa del sitio, marcada *[memoria]*.
+> **Nota metodológica.** Este documento tiene dos partes. La primera (secciones
+> 1 a 12) se escribió cuando la red del entorno todavía bloqueaba las webs: se
+> basa en el código fuente público del sitio 1 (verificado), en fichas de
+> Awwwards / Codrops / Framer / Webflow vía búsquedas y en memoria previa,
+> marcada *[memoria]*. La segunda parte ("Medido en navegador", al final) se
+> hizo después de habilitar la red: HTML y JS descargados de los 12 sitios,
+> video de 30-40 s por sitio con carga + 6 pasos de scroll, tira de fotogramas y
+> una traza del DOM (posición, transform y opacidad de hasta 450 elementos en la
+> intro, en 6 posiciones de scroll y en reposo). **Donde las dos partes
+> difieren, vale la segunda.**
 >
 > Leyenda de fiabilidad: **[verificado]**, **[fuente secundaria]**, **[memoria]**.
 > Restricciones del proyecto para la viabilidad: un componente React por
@@ -297,3 +298,210 @@ assets y CSS 3D de cada sitio) y `shoot.mjs` (Playwright, capturas a 1440×900
 en 0/25/50/75% del scroll + móvil 390×844). Si querés capturas reales, se
 pueden correr localmente y adjuntar las imágenes al prompt de Claude Design
 como moodboard.
+
+
+---
+
+# Medido en navegador (2026-09-12, con la red habilitada)
+
+Método: Chromium sin GPU (WebGL por software) a 1280×720, video de la carga +
+6 ruedas de 900 px separadas 1,8 s, tira de fotogramas a 2 fps, y traza del
+DOM que compara cada elemento entre pasos: factor de parallax = desplazamiento
+del elemento / desplazamiento del scroll; "fijo" = position sticky o fixed;
+"en reposo" = cambia sin scroll durante 3 s. Las tiras están en
+`mockup/inspire/webs/`.
+
+| # | Sitio | Estado de la medición |
+|---|---|---|
+| 1 | craftedbygc 2018 | **No renderizó**: el loader se queda en ~45% porque los ~25 videos de la escena ya no se sirven (`ERR_ABORTED`). Vale el análisis de código de la sección 1. |
+| 2 | shapestudio | **No renderizó**: todo el sitio es un canvas WebGL (Unseen); con GL por software queda en blanco. Vale la sección 2 (fuentes secundarias). |
+| 3 | indnegev | **Completo** (2 tiras + captura del hero). |
+| 4 | parallax webflow | **Completo**. |
+| 5 | unifiersofjapan | **Completo**. |
+| 6 | hausofwords | **Completo**. |
+| 7 | ponpon-mania | **Parcial**: se ve el preloader con la oveja (parpadea y cambia de expresión) y después solo el fondo violeta con un disco; el cómic en sí es WebGL y no se dibuja sin GPU. |
+| 8 | epic | **Completo** (el auto 3D sí se renderizó). |
+| 9 | eszterbial | **Completo**. |
+| 10 | alireza | **Completo** (la palmera WebGL se renderizó; el scroll es virtual). |
+| 11 | marsrejects | **Completo**. |
+| 12 | discodungeon | **Completo**. |
+
+## 3. indnegev — medido
+
+- **Lo que se ve**: no es "desierto en papel recortado" como decía la parte 1.
+  Es una ilustración tipo aerógrafo/risografía sobre papel con grano y marcas
+  de doblez a 45°: pasto y flores en los bordes, una mariposa con un portal
+  circular en el centro, nubes recortadas como stickers con borde blanco, cielo
+  en degradé azul → rosa → durazno. Logotipo serif itálico enorme arriba.
+  Paleta aprox.: cielo #8FA3C8 → #E9B8B0 → #F1C9A0, verde lima #C8D26A, azul
+  #2F4F82, crema #F3E9D6, tinta #1F2A44.
+- **Intro**: el hero ya está compuesto a los 2 s; no hay stagger de entrada
+  visible. El bloque del lineup (título + filtro) sube 40 px al cargar.
+- **Scroll**: el hero se queda ~10 s en pantalla porque las capas se mueven
+  con parallax: las nubes al 0,82-0,85 de la velocidad del scroll (quedan
+  atrás), las plantas de los flancos reciben `translateY(+72px)` en la primera
+  pantalla (se adelantan). Después, el lineup: un montón de círculos de
+  colores (azul, rojo, verde) que caen y se acomodan con rotación, como una
+  pila con física (matrices con rotación de ±7°, desplazamientos en X de 200 a
+  1000 px, factores 0,4-0,8). Después un mapa ilustrado (misma técnica) y
+  secciones de información con tarjetas.
+- **En reposo**: nada se mueve solo.
+- **Receta**: cabecera de 5-7 capas con `data-drift` (-40 lejano, 0 medio,
+  +60/+90 cercano); textura de papel `feTurbulence` al 6-8% + líneas de
+  doblez al 6% de opacidad; nubes como formas con borde claro de 3 px; portal
+  circular como marco del nombre.
+
+## 4. parallax webflow — medido
+
+- **Lo que se ve**: preloader oscuro con logo (3 s) que se retira hacia arriba
+  en tres bandas (`preloader__bg-top/middle/bottom` con -536/-179/-357 px:
+  cortina en tres tiempos), después el paisaje: montañas en degradé rosa →
+  violeta, nubes rosadas, pinos oscuros a los lados, logo centrado. Al bajar,
+  sección oscura de texto y al final una puerta iluminada.
+- **Scroll (medido)**: las 8 nubes se mueven al 0,76-0,83 de la velocidad del
+  scroll (más lento = más lejos); las capas del paisaje reciben `translateY`
+  crecientes hacia el frente: capa 10 +43 px, capa 9 +64, capa 8 +85… en la
+  primera pantalla (es decir, cada capa más cercana se adelanta ~21 px más).
+  El título hace fade 0 → 1 al entrar la sección siguiente.
+- **En reposo**: las nubes derivan solas en X: entre 1 y 12 px en 3 s según la
+  capa (≈0,3 a 4 px/s), la más cercana más rápido.
+- **Receta**: `data-drift` escalonado de 21 px por capa; deriva autónoma de
+  nubes con keyframes de 20-40 s y amplitud 30-60 px; preloader en tres bandas.
+
+## 5. unifiersofjapan — medido
+
+- **Lo que se ve**: rojo pleno #C8102E, cara de samurái en vector plano rojo/
+  negro/crema, y el nombre "ODA NOBUNAGA" en blanco gigante (≈20 vw) detrás
+  del personaje, partido en piezas.
+- **Intro (medido)**: las piezas del título entran desde abajo: `y` 563 → 243
+  y 866 → 546 px (320 px de recorrido) entre 1,8 y 6 s, con stagger; un bloque
+  de fondo se desplaza en diagonal (-460, +547 px).
+- **Scroll (medido)**: el hero está casi fijo: factor 0,12 en la primera
+  pantalla, 0,06, 0,04, 0,03, 0,02 después (se mueve cada vez menos: es una
+  sección sticky con un leve empuje). El contenido siguiente pasa por encima:
+  el personaje se acerca (cara en primer plano), después secciones crema con
+  "stats" (nacimiento, castillo, años en el poder), párrafos, mapa, "BATTLE /
+  STRATEGY" a pantalla completa, y un patrón de tejas.
+- **En reposo**: un fondo grande se desplaza solo (819 px en X y 749 en Y en
+  3 s): marquesina diagonal.
+- **Receta**: hero sticky con factor 0,05-0,12; nombre en 2-3 piezas con
+  translateY 320 → 0 y stagger 150 ms; capítulos que pasan por encima.
+
+## 6. hausofwords — medido
+
+- **Lo que se ve**: crema #F1ECE2, "HAUS OF WORDS" en negro condensado a todo
+  el ancho, un bloque azul con patrón tipográfico, después un bloque naranja
+  #FF6A3D con "STRATEGISCHE KOMMUNIKATION FÜR HIDDEN CHAMPIONS".
+- **Scroll (medido)**: el sitio usa scroll suavizado con mucha inercia (900 px
+  de rueda → 50 px de avance). La barra de navegación se esconde
+  (`translateY(-68px)`) al bajar. Los títulos entran con `translateY(40 → 0)`
+  + opacity, con factor 1,16-1,2 (se adelantan un poco al scroll).
+- **En reposo**: la marquesina de logos corre sola 241 px en 3 s (≈80 px/s).
+- **Receta**: marquesina a 80 px/s; títulos con entrada de 40 px; bloques de
+  color pleno por sección.
+
+## 7. ponpon-mania — parcial
+
+- Preloader: oveja de línea negra sobre crema que parpadea y cambia de
+  expresión (a los 6-7 s pone cara de enojo y vuelve). Es un rig por partes.
+- Después, fondo violeta #7E7EFF con un disco (vinilo) que gira: el cómic es
+  WebGL y no se dibuja sin GPU. Vale la sección 7 de la parte 1.
+
+## 8. epic — medido
+
+- **Lo que se ve**: preloader negro con logo (1,5 s), página blanca con un
+  auto rojo 3D (renderizado) y el título "AVD revival" en serif.
+- **Intro (medido)**: el auto entra de chico y girado: a los 4,5 s es un punto,
+  a los 5,5 s está a tamaño completo (≈1,2 s, scale ~0,15 → 1 con rotación).
+  El contenido del home sube 100 px al cargar.
+- **Scroll (medido)**: al cambiar de caso (16 s) el auto se reduce y gira hacia
+  afuera en ~0,6 s y la sección siguiente es cian con un video. El botón
+  circular de CTA gira (matriz de rotación 90°) y tiene parallax 0,1-0,33.
+- **En reposo**: las letras de "AVD revival" (spans `split-char`) se deslizan
+  en X entre 19 y 54 px: texto que "respira" letra a letra.
+- **Receta**: entrada de objeto scale 0,15 → 1 + rotateY 40° → 0 en 1,2 s;
+  salida inversa en 0,6 s; letras con deslizamiento sutil.
+
+## 9. eszterbial — medido
+
+- **Lo que se ve**: preloader negro con contador "0%" → "100%" (1,5 → 2,5 s),
+  después una cortina de 4 columnas (`loader-col`, `scaleY` 1 → 0) que se
+  retiran con stagger entre 1,9 y 2,4 s, y aparece "UX/UI *brand* DESIGNER"
+  gigante en crema #E8E2D6 con un dibujo de línea (carita) detrás.
+- **En reposo (medido)**: letras que se intercambian: cada letra tiene un
+  original y un clon; el original sale deslizando (68-170 px) y el clon entra,
+  una letra cada pocos segundos ("D:ISIGNER" a los 8,5 s, "UX/UI|" a los 11 s).
+  Al final, un sticker de flor violeta que gira.
+- **Scroll (medido)**: el fondo de grilla es fijo; cada sección entra por
+  máscara de línea; "selected PROJECTS" con itálica + condensada; sección
+  negra "FEEL LIKE COLLABORATING?".
+- **Receta**: contador 0 → 100 en 1 s; cortina de 4 columnas con stagger 80 ms
+  y 500 ms de duración; intercambio de letras cada 3-5 s.
+
+## 10. alireza — medido
+
+- **Lo que se ve**: fondo verde-azul profundo #0E2B2D; loader con un diamante
+  pequeño que crece hasta un anillo (4 → 11 s); después la palmera 3D
+  (renderizada) en tonos verde y dorado, y el texto "A Story of Growth" en
+  serif clara.
+- **Intro (medido)**: cada bloque de texto entra con `translateY 60 → 0` y
+  opacity 0 → 1, escalonado (60 → 18 → 8 → 2 px en pasos sucesivos; los
+  bloques siguientes van 0 → 0,42 → 0,66 → 0,96 de opacidad): stagger de
+  ~120 ms y ~0,9 s por bloque.
+- **Scroll**: virtual (Lenis); el DOM no se mueve, la cámara recorre la
+  palmera. Las hojas giran despacio en reposo.
+- **En reposo**: la sección de texto flota ±29 px (respiración lenta).
+- **Receta**: loader que crece a anillo; textos que suben 60 px con stagger 120
+  ms; un objeto único recorrido con el scroll; respiración de ±20-30 px.
+
+## 11. marsrejects — medido
+
+- **Lo que se ve**: preloader azul noche (3 s); hero con personajes de cómic en
+  tinta blanco y negro (línea gruesa, sombreado a rayas) y el título "MARS
+  REJECTS" en rojo #E63B2E detrás. Después la sección invierte: fondo rojo,
+  título negro. Después una portada de revista ("Mars") fija con tarjetas de
+  historia y globos de texto que entran alrededor.
+- **Intro (medido)**: el hero hace fade 0 → 1 en ~1,2 s; el `ul` de
+  personajes ya viene desplazado (-236 px): es un ticker.
+- **Scroll (medido)**: el hero es casi fijo (factor 0,02-0,06); el ticker de
+  personajes avanza -166 px por paso además de su marcha; el título
+  (`framer-k7infy`) hace fade 1 → 0 al pasar a la sección roja; contenedores
+  sticky para la portada de revista mientras las tarjetas entran.
+- **En reposo**: el ticker corre 147 px en 3 s (≈50 px/s).
+- **Receta**: ticker de ilustraciones a 50 px/s detrás del título; inversión
+  de color al cambiar de sección; portada sticky + tarjetas que entran con
+  rotación ±3°.
+
+## 12. discodungeon — medido
+
+- **Lo que se ve**: hero oscuro violeta #1A1033 con dos estatuas enmarcando,
+  un personaje sentado sobre una plataforma luminosa en el centro y el
+  logotipo "DISCO DUNGEON" con volumen. Al bajar: "Puzzle RPG Adventure",
+  secciones con plataformas isométricas inclinadas, un carrusel de capturas.
+- **Intro (medido)**: el título y el bloque principal hacen fade 0 → 1 en
+  ~4,5 s (lento a propósito); el personaje baja 22-32 px (`y` 182 → 204) y
+  la plataforma escala levemente (1 → 1,004): respiración.
+- **Scroll**: el hero se va rápido (no está pineado en esta versión) y las
+  secciones siguientes entran con fade + desplazamiento de 10-20 px.
+- **En reposo**: personaje y plataforma respiran (±16 px, ~3,5 s).
+- **Receta**: hero con fade lento de 4 s; personaje que respira ±16 px en 3,5
+  s; marcos/estatuas como capas laterales; plataforma con escala sutil.
+
+## Qué cambia respecto de la parte 1
+
+- indnegev (3): el estilo es aerógrafo/risografía con grano y dobleces, no
+  papel recortado plano. La mecánica (capas con parallax) sí era correcta.
+- discodungeon (12): en la versión actual el hero no queda pineado con marcos
+  que escalan; lo que hay es respiración del personaje y fade lento. La idea
+  de "marcos concéntricos que se abren" queda como propuesta nuestra, no como
+  algo medido.
+- unifiers (5): confirmado el hero casi fijo (factor 0,02-0,12) con el nombre
+  en piezas de 320 px de recorrido.
+- hausofwords (6): confirmada la marquesina a ~80 px/s; el scroll tiene mucha
+  inercia.
+- eszterbial (9): confirmado el contador + cortina de columnas + intercambio
+  de letras.
+- epic (8): confirmada la entrada del objeto por escala + rotación en ~1,2 s.
+- alireza (10): confirmadas las entradas de texto de 60 px con stagger.
+- marsrejects (11): confirmado el ticker (~50 px/s), la inversión de color y
+  la portada fija con tarjetas.

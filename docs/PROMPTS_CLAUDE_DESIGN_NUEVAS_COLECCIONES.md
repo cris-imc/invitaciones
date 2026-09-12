@@ -1,475 +1,487 @@
 # Prompts para Claude Design — nuevas colecciones de plantillas
 
-> Documento de trabajo. Contiene (1) el análisis de las 12 webs de inspiración que
-> elegiste y cómo se agrupan en familias de estilo, (2) el **bloque común** que
-> hay que pegar al principio de CADA prompt (el contrato con el backend y con
-> las secciones actuales), y (3) **un prompt por colección**, listo para pegar
-> en Claude Design.
+> Versión final (2026-09-12). Contiene: (0) qué heredan las colecciones nuevas
+> de Flat y Storytelling, (1) el **Bloque común** que se pega al principio de
+> cada prompt, (2) las tres colecciones y por qué se agrupan así, con el
+> movimiento **medido** en las webs de referencia, (3) **un prompt por
+> colección** listo para pegar, (4) prompts de moodboard, (5) el flujo hasta
+> portar a React.
 >
-> Cómo usarlo: abrí Claude Design con el repo `cris-imc/invitaciones` sincronizado
-> (como se hizo para la Colección Storytelling, ver `mockup/nuevo/github.md`),
-> pegá **Bloque común + Prompt de la colección** en un solo mensaje, y adjuntá el
-> moodboard si generaste uno. El resultado esperado es un `.dc.html` panorámico
-> por plantilla (mismo formato que `mockup/Pase VIP - Panoramica.dc.html`), que
-> después se porta a React siguiendo `docs/GUIA_TECNICA_PLANTILLAS.md`.
+> El análisis web por web (qué se vio, qué se midió y qué no se pudo ver) está
+> en `docs/ANALISIS_WEBS_INSPIRACION.md`. Las tiras de fotogramas de cada web
+> están en `mockup/inspire/webs/` y se adjuntan al prompt como referencia
+> visual (Claude Design no navega esas webs; los links van solo como nombre).
+>
+> Reglas fijadas por el dueño del producto:
+> - Prioridad **casamiento y XV**; cumpleaños de adulto, corporativo e infantil
+>   son variantes opcionales.
+> - **Mobile primero** (la invitación llega por WhatsApp), pero el escritorio
+>   tiene que verse compuesto, no una columna estirada.
+> - **Ilustración en SVG inline**, por ahora. Sin fondos de video.
 
 ---
 
 ## 0. Qué tienen en común Flat y Storytelling (y qué heredan las colecciones nuevas)
 
-Las dos colecciones actuales son dos *layouts* distintos de una misma idea, y esa
-idea es la que conservan las nuevas:
-
-| Idea común | Cómo la resuelve Flat | Cómo la resuelve Storytelling |
+| Idea común | Flat | Storytelling |
 |---|---|---|
-| **Una invitación = una historia que se recorre bajando**, en un orden fijo de capítulos | Secciones apiladas con `SectionWrapper`, nav pill inferior | Pantallas de 100vh, riel lateral con el nombre del capítulo, paneles laterales pineados |
-| **Tapa cerrada con el nombre del invitado + botón "Abrir invitación"** | Splash mobile a pantalla completa | `BienvenidaStorytelling` (de quién es la fiesta, fecha, lugar, pase) |
-| **Iconografía SVG inline dibujada a mano, temática, nunca íconos de librería** | 10 slots fijos de doodle | Medallones, sellos, rutas dibujadas con `stroke-dashoffset` |
-| **Un gesto de luz/movimiento sobre la foto de portada, coherente con el tema** | Haz de luz, lens flare, shimmer (anime.js `onScroll`) | Ken Burns + enfoque + tinte (`AnimatedCoverPhoto`) |
-| **Una familia = 1 base + 4/5 variantes de color donde el acento principal cambia DE VERDAD** | Script de generación (`--t-acc`) | Ídem (`PLAN_VARIANTES_COLOR_STORYTELLING.md`) |
-| **Tipografía Google Fonts: 1 display + 1 texto (a veces 1 mono)** | Fraunces/Sora, Cormorant/Montserrat… | Bodoni Moda/IBM Plex Mono… |
-| **Mobile-first**: el diseño se piensa a 430px, escritorio es una adaptación | Grid `440px 1fr` con columna fija | Columna centrada de 560px, foto enmarcada a 900px |
-| **Los mismos componentes compartidos del backend** | Countdown, RSVPWizardV2, Album, SongSuggestion, quiz, BankDetailsCard, QR de ingreso | Ídem, con estilo propio sobre las mismas props |
-| **Post-evento**: la invitación deja de invitar y muestra el álbum | `PostEvento*` | `PostEventoStorytelling` |
+| **Una invitación = una historia que se recorre bajando**, capítulos en orden fijo | Secciones apiladas, nav pill inferior | Pantallas de 100vh, riel lateral con el capítulo, paneles laterales pineados |
+| **Tapa cerrada con el nombre del invitado + "Abrir invitación"** | Splash mobile | `BienvenidaStorytelling` (de quién es la fiesta, fecha, lugar, pase) |
+| **Iconografía SVG inline dibujada, temática, nunca íconos de librería** | 10 slots de doodle | Medallones, sellos, rutas con `stroke-dashoffset` |
+| **Un gesto de luz/movimiento sobre la foto de portada** | Haz, lens flare, shimmer (anime.js `onScroll`) | Ken Burns + enfoque + tinte (`AnimatedCoverPhoto`) |
+| **1 base + 4 variantes de color; el acento principal cambia de verdad** | Script (`--t-acc`) | Ídem |
+| **Google Fonts: 1 display + 1 texto (+ 1 mono)** | | |
+| **Mobile-first, escritorio adaptado** | Grid `440px 1fr` | Columna 560px, foto enmarcada a 900px |
+| **Mismos componentes compartidos** | Countdown, RSVPWizardV2, Album, SongSuggestion, quiz, BankDetailsCard, QrDeIngreso | Ídem con estilo propio |
+| **Post-evento: solo álbum** | `PostEvento*` | `PostEventoStorytelling` |
 
-Las colecciones nuevas **no cambian ese contrato**: cambian el *lenguaje visual y
-de movimiento* de cada capítulo (profundidad 3D, capas de papel ilustradas,
-tipografía cinética / cómic), no qué capítulos hay ni qué datos leen.
+Las colecciones nuevas usan el **mecanismo Storytelling** (scroller propio,
+`data-screen-label`, `data-tone`, `data-pan/data-strip`, riel lateral) porque es
+el que ya soporta paneles pineados y pantallas completas. Cambian el lenguaje
+visual y el movimiento de cada capítulo, no qué capítulos hay ni qué datos leen.
 
 ---
 
 ## 1. Bloque común (pegar al principio de TODOS los prompts)
 
 ```text
-CONTEXTO DEL PRODUCTO
-Estás diseñando plantillas de invitación digital para altainvitacion.com
-(Argentina / Latinoamérica; público: casamientos, quince años y cumpleaños de
-adultos; ocasionalmente cumpleaños infantiles). El proyecto ya tiene dos
-colecciones en producción: "Flat" (22 familias) y "Storytelling" (36 familias).
-Esta es una colección NUEVA que convive con ellas: cambia el lenguaje visual y
-el movimiento, NO cambia las secciones ni los datos que se muestran.
+CONTEXTO
+Diseñás plantillas de invitación digital para altainvitacion.com (Argentina y
+Latinoamérica). Público principal: CASAMIENTOS y QUINCE AÑOS; secundario:
+cumpleaños de adultos, eventos corporativos, cumpleaños infantiles. Ya existen
+dos colecciones en producción ("Flat", 22 familias, y "Storytelling", 36). Esta
+es una colección NUEVA que convive con ellas: cambia el lenguaje visual y el
+movimiento, NO cambia las secciones ni los datos.
 
-Tenés el repo sincronizado. Antes de diseñar, leé:
-- docs/GUIA_TECNICA_PLANTILLAS.md (cómo se porta un mockup a React y qué
-  componentes compartidos existen)
-- docs/PLAN_VARIANTES_COLOR_STORYTELLING.md (cómo funcionan las variantes de color)
+Tenés el repo sincronizado. Antes de diseñar leé:
+- docs/GUIA_TECNICA_PLANTILLAS.md (cómo se porta un mockup a React)
 - mockup/Pase VIP - Panoramica.dc.html y mockup/Acrylic Pop - Panoramica.dc.html
-  (formato de entrega esperado, atributos data-* y script de la Storytelling)
-- src/components/templates/GuestPassVipTemplate.tsx (una Storytelling real ya
-  portada, para ver qué props y componentes compartidos consume)
-- src/lib/schemas/invitation.ts (los campos reales que existen; no inventes otros)
+  (formato de entrega, atributos data-* y el script de la Storytelling)
+- src/components/templates/GuestPassVipTemplate.tsx (una Storytelling portada)
+- src/lib/schemas/invitation.ts (los campos que existen; no inventes otros)
+Adjunto tiras de fotogramas de las webs de referencia (mockup/inspire/webs/):
+usalas para entender el MOVIMIENTO, no para copiar el estilo.
 
 FORMATO DE ENTREGA (no negociable)
-- Un archivo .dc.html panorámico por plantilla, nombre "<Nombre> - Panoramica.dc.html",
-  igual que los de mockup/. Un solo componente, estado y estilos en el mismo archivo.
-- Preview base 430x932 (mobile). Todo se diseña primero a ese ancho. El escritorio
-  es una adaptación: contenido centrado en una columna de 560px, la foto principal
-  enmarcada a 900px (ver .gpv-hero-photo-frame en GuestPassVipTemplate.tsx). Nunca
-  estirar recortes verticales de celular a pantalla ancha.
-- Solo HTML + CSS + SVG inline + JS plano en el script del componente. NADA de
-  WebGL, three.js, GSAP, Lottie, Rive, canvas ni imágenes PNG/JPG para ilustrar.
-  Toda ilustración es SVG inline dibujado (paths, circles, gradients, filters,
-  masks). Las fotos reales entran solo por los campos de foto del backend.
-- Todo el movimiento se logra con: CSS transforms 3D (perspective, translateZ,
-  rotateX/Y, transform-style: preserve-3d), position: sticky + scroll pineado,
-  IntersectionObserver / progreso de scroll leído en un requestAnimationFrame,
-  @keyframes, clip-path, mask, mix-blend-mode, stroke-dashoffset, filter: blur().
-  En React se portará a framer-motion + anime.js (onScroll) + CSS: no diseñes
-  nada que dependa de una librería que el proyecto no tiene.
-- Respetar prefers-reduced-motion (todo se ve bien quieto).
-- Texto siempre en español neutro, tono cálido y sobrio (sin signos de admiración
-  apilados, sin emojis).
-- Google Fonts únicamente: 1 display + 1 texto (+ 1 mono opcional).
+- Un .dc.html panorámico por familia: "<Nombre> - Panoramica.dc.html", igual que
+  los de mockup/. Un solo componente; estado, estilos y script en el archivo.
+- Preview base 430x932 (celular). Se diseña primero ahí.
+- Solo HTML + CSS + SVG inline + JS plano dentro del script del componente.
+  NADA de WebGL, three.js, GSAP, Lottie, Rive, canvas, video, ni PNG/JPG para
+  ilustrar. Toda ilustración es SVG inline (paths, gradients, filters, masks,
+  patterns). Las fotos reales entran solo por los campos de foto del backend
+  (mostralas como bloques con la palabra FOTO).
+- Movimiento permitido: transforms 2D/3D (perspective, translateZ, rotateX/Y,
+  preserve-3d), position: sticky + scroll pineado, progreso de scroll leído en
+  requestAnimationFrame, IntersectionObserver, @keyframes, clip-path, mask,
+  mix-blend-mode, stroke-dashoffset. Se portará a framer-motion + anime.js
+  (onScroll) + CSS: no dependas de ninguna otra librería.
+- Convenciones del proyecto: data-xin + data-dist + data-delay para entradas al
+  scroll; data-w para reveal palabra por palabra; data-tone="dark|light" y
+  data-screen-label en cada pantalla; contenedor data-scroller; paneles
+  laterales con data-pan / data-strip / data-dot; data-drift para parallax.
+- prefers-reduced-motion: todo se ve bien quieto. La captura estática se usa en
+  el catálogo, así que cada pantalla tiene que verse compuesta sin moverse.
+- Texto en español neutro, cálido y sobrio (sin signos de admiración apilados,
+  sin emojis). Google Fonts únicamente: 1 display + 1 texto (+ 1 mono opcional).
 
-SECCIONES / CAPÍTULOS (mismos que Storytelling, mismo orden, no se agregan ni
-quitan ni reordenan; cada uno con data-screen-label y data-tone="dark|light"):
- 0. Bienvenida (la pone la app: BienvenidaStorytelling; diseñá solo cómo se ve
-    con las clases de tu familia: tipo de evento, NOMBRE grande, fecha, lugar,
-    pase Nº y cantidad de personas)
- 1. "Save the Date" — fecha grande, kicker "01 — GUARDÁ LA FECHA", link
-    "agregar al calendario", foto principal opcional (portadaImagenFondo)
- 2. "Countdown" — días/horas/minutos/segundos (los valores los pone la app)
- 3. "Frase" — frasePersonalizadaTexto, con reveal palabra por palabra (data-w)
- 4. "Cuándo y dónde" — paneles: salón (lugarNombre, direccion, hora, dress code),
+MOBILE PRIMERO, ESCRITORIO COMPUESTO
+- Todo el movimiento funciona con el dedo: scroll vertical natural, arrastre
+  lateral en los paneles pineados, tap. Nada depende de hover. Lo que en
+  escritorio reacciona al mouse, en celular reacciona al giroscopio (con
+  permiso en iOS) y, si no hay permiso, a una animación autónoma suave.
+- Presupuesto para un Android de gama media: solo transform y opacity animados;
+  máximo 3 capas grandes en movimiento a la vez; will-change acotado; cero
+  filter: blur() animado; cero box-shadow animado; SVG livianos (sin paths de
+  miles de puntos); 60 fps al bajar.
+- Ergonomía: botones de 48px de alto mínimo; acciones principales alcanzables
+  con el pulgar; datos (dirección, alias, horarios) nunca por debajo de 14px;
+  contraste AA; safe areas (env(safe-area-inset-*)).
+- Tipografía gigante con clamp() y vw; mostrá la portada con un nombre corto
+  ("Valentina") y uno largo ("María Florencia") para verificar que no rompe.
+- Escritorio (≥1024px): NO es una columna angosta estirada. Contenido centrado a
+  560px para lo que es lectura, pero el escenario (capas, profundidad, grilla
+  editorial) ocupa el ancho completo: más escena a los costados, la foto
+  principal enmarcada a 900px (ver .gpv-hero-photo-frame), el parallax pasa a
+  mouse. Es una invitación, no una landing: sin menú, sin secciones extra.
+
+CAPÍTULOS (los de Storytelling, mismo orden, no se agregan ni quitan ni
+reordenan; cada uno con data-screen-label y data-tone):
+ 0. Bienvenida (la pone la app con BienvenidaStorytelling; diseñá cómo se ve con
+    las clases de tu familia): tipo de evento, NOMBRE grande, fecha, lugar,
+    pase Nº y cantidad de personas, saludo al invitado, botón "Abrir invitación".
+ 1. "Save the Date": fecha grande, kicker "01 — GUARDÁ LA FECHA", link
+    "agregar al calendario", foto principal opcional (portadaImagenFondo).
+ 2. "Countdown": días/horas/minutos/segundos (los valores los pone la app).
+ 3. "Frase": frasePersonalizadaTexto, reveal palabra por palabra (data-w).
+ 4. "Cuándo y dónde": paneles salón (lugarNombre, direccion, hora, dress code),
     ceremonia si ceremoniaHabilitada, "cómo llegar" (mapUrl), cronograma
-    (cronogramaEventos). Se recorren de costado con scroll pineado
-    (data-pan / data-strip / data-dot) Y tienen que funcionar apilados en
-    vertical (storytellingScrollVertical=true: mismo diseño, uno abajo del otro)
- 5. "Check-in" — RSVP: confirmación, cantidad de personas, restricciones
-    alimentarias, mensaje; precios por edad si aplica (precioNino/
-    precioAdolescente); estado PENDIENTE → CONFIRMADO con un gesto propio
- 6. "Álbum" — fotos de galeriaPrincipalFotos en páginas (también pineado
-    lateral o vertical), y después del evento las fotos de "Momentos"
- 7. "Música" — sugerí una canción (título + artista) y votación
- 8. "Regalos" — regaloTitulo/regaloMensaje + datos bancarios (BankDetailsCard,
-    puede haber 2: regalo y pago de tarjeta) con copiar al portapapeles
- 9. "Quiz" — trivia opcional (triviaHabilitada)
-10. "Tu pase" — cierre: número de pase, QR de ingreso (QrDeIngreso), sector/
-    mesa, info adicional (alojamiento, estacionamiento, transporte), firma y
-    crédito "altainvitacion.com"
-Además: riel lateral de progreso con el nombre del capítulo actual, botón
-flotante de música, burbuja de pase (BurbujaPase), y el estado post-evento
-(solo álbum).
+    (cronogramaEventos). Recorrido lateral pineado (data-pan/data-strip/
+    data-dot) Y apilado vertical (storytellingScrollVertical=true): mismo
+    diseño, mostrá los dos modos. Numeración 01/03 dinámica.
+ 5. "Check-in": RSVP con confirmación, cantidad, restricciones alimentarias,
+    mensaje; precios por edad si aplica; estado PENDIENTE → CONFIRMADO con un
+    gesto propio de la familia (hay callback onConfirmed).
+ 6. "Álbum": galeriaPrincipalFotos en hojas de hasta 5 fotos (pineado lateral o
+    vertical); después del evento, las fotos de "Momentos".
+ 7. "Música": sugerí una canción (título + artista) y votación; botón de música.
+ 8. "Regalos": regaloTitulo/regaloMensaje + datos bancarios (BankDetailsCard,
+    puede haber dos: regalo y pago de tarjeta) con copiar.
+ 9. "Quiz": trivia opcional (triviaHabilitada).
+10. "Tu pase": número de pase, QR de ingreso (QrDeIngreso), sector/mesa, info
+    adicional (alojamiento, estacionamiento, transporte), firma y crédito
+    "altainvitacion.com" (LogoFooterCredit).
+Además: riel lateral de progreso con el capítulo actual, botón flotante de
+música, burbuja de pase (BurbujaPase), estado post-evento (solo álbum).
 
-DATOS: usá SOLO campos que existen en src/lib/schemas/invitation.ts y en Guest
-(name, expectedCount, status, orderNumber). Mostrá datos de ejemplo realistas
-en español (nombres, fecha 2027, salón en Buenos Aires o Córdoba).
+DATOS: solo campos de src/lib/schemas/invitation.ts y de Guest (name,
+expectedCount, status, orderNumber). Datos de muestra realistas en español,
+fecha FUTURA (2027), salón en Córdoba o Buenos Aires.
 
-VARIANTES DE COLOR: cada familia se entrega con su paleta base + 4 paletas
-alternativas (nombre + hex de fondo, fondo alterno, tinta, tinta suave, acento
-principal, acento secundario). El ACENTO PRINCIPAL tiene que cambiar de forma
-notoria entre variantes; los neutros del álbum y de los formularios se
-mantienen. Indicá la lista de variantes en un bloque de "handoff" al final del
-archivo, junto con las fuentes y las animaciones clave (nombre del keyframe,
-duración, easing) para el equipo que lo porta.
+VARIANTES DE COLOR: paleta base + 4 alternativas por familia (nombre en
+español + hex de fondo, fondo alterno, tinta, tinta suave, acento principal,
+acento secundario). El ACENTO PRINCIPAL cambia de forma notoria entre
+variantes; los neutros del álbum y de los formularios se mantienen. Al final
+del archivo: bloque "handoff" con variantes, fuentes, y cada animación clave
+(nombre, duración, easing, stagger, factor de parallax) para quien lo porta.
 
-CRITERIOS DE CALIDAD QUE SE EVALÚAN
-- Identidad propia, no un reskin: iconografía y gestos de movimiento
-  específicos del tema.
-- Un gesto de luz/movimiento propio sobre la foto de portada.
-- Legibilidad primero: contraste AA, cuerpo de texto nunca en script ni en
-  display condensada; lo grande y expresivo va en títulos, fecha y frase.
-- Performance: nada de blur pesado animado en loop sobre áreas grandes;
-  máximo ~30 elementos animados simultáneos; will-change solo donde haga falta.
-- Tiene que verse bien también quieto (captura estática para el catálogo).
+CRITERIOS DE CALIDAD
+- Identidad propia, no un reskin: iconografía y gestos específicos del tema.
+- Un "momento wow" por capítulo, y un gesto de luz/movimiento propio sobre la
+  foto de portada.
+- Sobriedad: el movimiento acompaña la lectura, nunca compite con ella. Lo
+  expresivo va en nombre, fecha y frase; los datos se leen quietos.
+- Belleza en reposo: cada pantalla es un afiche aunque nada se mueva.
 ```
 
 ---
 
-## 2. Las 12 webs, agrupadas en colecciones
+## 2. Las tres colecciones, y por qué
 
-> Nota de método: el entorno donde se armó este documento no pudo abrir las 12
-> webs (la política de red de la organización bloquea todo salvo GitHub y npm).
-> El análisis técnico sale de: el código fuente público de la web 1
-> (`github.com/craftedbygc/2018-in-review`, verificado), fichas de Awwwards /
-> Framer / Webflow / Codrops vía búsquedas (snippets) y conocimiento previo de
-> esos sitios. El informe completo, web por web y con el nivel de evidencia de
-> cada dato, está en `docs/ANALISIS_WEBS_INSPIRACION.md`. Lo que importa para
-> el prompt no es replicar la tecnología de cada web (la mayoría usa WebGL,
-> GSAP, Framer o Webflow, que el proyecto no tiene) sino **traducir el efecto
-> que te gustó a algo que se logra con CSS + SVG + scroll**, y eso sí está
-> resuelto abajo.
+Las 12 webs se midieron en navegador (video + traza del DOM) donde fue posible.
+Lo que quedó claro es que hay **tres mecánicas** distintas detrás de lo que te
+gustó, y que no conviven en una sola familia:
 
-### 2.1 Qué pediste, web por web, y cómo se traduce
-
-| # | Web | Lo que te gustó | Cómo lo hace (probable) | Se puede en CSS/SVG? | Traducción para una invitación |
-|---|---|---|---|---|---|
-| 1 | craftedbygc 2018 | Scroll = viajar "hacia adentro" en 3D | **Verificado en su código**: three.js, scroll virtual (rueda/touch) que mueve todo el grupo en Z (dolly); cada tarjeta a `z = -300·i`; **niebla del color del fondo** (#AEC7C3) que funde lo lejano; título serif en outline como capa más lejana; tilt de cámara con el mouse | **Sí, aproximado** (MEDIUM): `perspective` en el contenedor + capas hijas con `translateZ` negativo; el scroll suma `translateZ` a todo el grupo, así las capas "vienen hacia vos" y pasan de largo. Sin cámara real, pero el efecto de túnel se percibe igual | Cada capítulo es una "sala": el kicker, la fecha y los ornamentos están a distintas profundidades; al bajar, entrás a la sala siguiente |
-| 2 | shapestudio.co.uk | Scroll lateral, cosas que aparecen, tamaño del texto | GSAP + WebGL (Unseen Studio): track horizontal con `translateX` según el progreso, reveals por máscara de línea, distorsión de imágenes por velocidad | **Sí** (EASY): es exactamente lo que ya hace Storytelling con `data-pan/data-strip` | Extenderlo: no solo "Cuándo y dónde" y el álbum, también la frase y el countdown se pueden contar de costado |
-| 3 | indnegev.co.il | Ilustración superior, movimiento por capas, look a papel | Ilustración en 4-6 capas (PNG/SVG) con parallax por scroll; texturas de papel | **Sí** (MEDIUM): capas SVG con `data-drift` a distintas velocidades; papel con `feTurbulence` + sombras de recorte | Cabecera ilustrada por familia (skyline, jardín, mar, montaña) en capas; texturas de papel y sombras de recorte en las tarjetas |
-| 4 | parallax-bgsprod.webflow.io | Ilustración superior, movimiento por capas | Webflow: interacciones de scroll sobre capas de imagen | **Sí** (EASY-MEDIUM): igual que 3 | Igual que 3; la diferencia es solo el tema de la ilustración |
-| 5 | unifiersofjapan.framer.website | Texto grande, motion de textos, caricaturas | Framer: reveals de texto por palabra/letra, ilustraciones vectoriales con animaciones simples | **Sí** (MEDIUM): reveal por palabra ya existe (`data-w`); personajes/objetos como SVG de formas simples con 2-3 keyframes (flotar, parpadear, girar) | Personajes NO infantiles: siluetas elegantes, figuras estilizadas, objetos con "cara" sutil |
-| 6 | hausofwords.com | Colorido, composición del texto, motions de texto | Bloques de color plenos, tipografía como imagen, reveals | **Sí** (EASY): color blocking por sección + tipografía a escala de viewport (`clamp`) + reveals | Cada capítulo un color pleno distinto, el texto ES la ilustración |
-| 7 | ponpon-mania.com | Caricaturas y sus efectos; "cómo lograr ese nivel de dibujo y animación" | Ilustración profesional de Illustrator separada por capas (cuerpo, ojos, boca, brazos) y animada por partes con GSAP sobre WebGL; física (Matter.js) para arrastrar objetos; base blanco y negro, el color entra solo en la fiesta | **Parcial** (HARD): ese nivel de dibujo no sale de código; lo que sí sale es un estilo geométrico/flat con pocas formas, bien compuesto, con animación simple | Ver §2.3 "sobre el dibujo" |
-| 8 | epic.net | Gráficos y movimiento 3D, motion de textos | WebGL + motion de texto | **Aproximado** (MEDIUM): objetos "3D" en SVG (isométricos/extruidos con sombra) que rotan con `rotateX/rotateY` + scroll | Sellos, medallones, números del countdown como "bloques" extruidos |
-| 9 | eszterbial.com | Motion del texto de bienvenida | Split de letras + stagger (blur/desplazamiento) | **Sí** (EASY): igual que el `intro()` de la Storytelling, por letra en vez de por línea | La Bienvenida (nombre) entra letra por letra, con blur y desplazamiento |
-| 10 | alireza.com | Gráficos 3D de fondo que reaccionan al scroll | three.js + Lenis: la cámara recorre UN solo modelo (una palmera) de arriba a abajo por tramos; paleta verde profundo #0E2B2D + dorado #C38C5C | **Aproximado** (MEDIUM): formas SVG grandes en capas `translateZ` que rotan/escalan con el progreso del scroll | Fondo de "objetos flotantes" (pétalos, esferas, cintas) que giran al bajar |
-| 11 | marsrejects.com | Contraste de color, look cómic, motions de texto y scroll, tipografía cómic, diseño editorial de revista | Framer: cabecera ilustrada que se desplaza en horizontal al bajar, "story cards" que entran flotando mientras el fondo fijo acumula detalles, ticker, carrusel arrastrable; semitono y sombra dura | **Sí** (EASY-MEDIUM): tramas de puntos con `<pattern>` SVG, contornos gruesos, viñetas, onomatopeyas como SVG, grillas de revista | Colección "Cómic editorial" completa |
-| 12 | discodungeongame.com | El 3D de la parte superior (no el estilo) | **No es WebGL**: Framer, pseudo-3D por capas: marcos con hueco central que escalan a distinta velocidad con el scroll (túnel vertical) y un personaje que desciende | **Sí** (EASY-MEDIUM): 4-6 marcos SVG concéntricos con `scale` creciente + `perspective`, los cercanos se desvanecen primero; es el sitio 1 en eje vertical | "Descenso a la fiesta": marcos concéntricos (arcos de flores, marcos dorados) como túnel de bienvenida |
-
-### 2.2 Las tres colecciones que salen de ahí
-
-Las 12 webs no son compatibles entre sí en una sola familia (un túnel 3D oscuro y
-un cómic a colores plenos no conviven), pero sí se agrupan en **tres lenguajes**
-claros. Cada colección se pide con un prompt propio y da 3 familias (una por
-tipo de evento: casamiento, XV, cumpleaños de adulto) + 1 opcional infantil.
-
-| Colección | Webs que la inspiran | Lenguaje | Movimiento distintivo |
+| Colección | Webs | Mecánica medida | Para qué evento rinde mejor |
 |---|---|---|---|
-| **A. Profundidad** ("Túnel") | 1, 8, 10, 12 (+ 2 para los paneles) | Oscura o de fondo profundo, capas a distintas distancias, objetos "3D" en SVG | El scroll avanza hacia adentro (`perspective` + `translateZ`), los objetos giran al pasar |
-| **B. Papel** ("Capas ilustradas") | 3, 4, 5, 7 | Clara, texturas de papel, ilustración por capas, personajes/objetos estilizados no infantiles | Parallax por capas (`data-drift`), sombras de recorte, elementos que "se despegan" |
-| **C. Tipográfica** ("Cómic editorial") | 6, 9, 11 (+ 2, 5 para el texto) | Colores plenos de alto contraste, tipografía display enorme, tramas, contornos, grilla de revista | Texto que entra letra por letra, marquesinas, paneles laterales, viñetas |
+| **A. Profundidad** | craftedbygc (1), epic (8), alireza (10), discodungeon (12) | Túnel/dolly en Z con niebla (1, verificado en código); hero con volumen donde el personaje y la plataforma respiran ±16px y el título entra con fade lento (12, medido); un objeto que entra escalando y girando en 1,2 s y sale igual al cambiar de sección (8, medido); recorrido por un solo objeto con textos que suben 60px con stagger (10, medido) | Casamiento de gala nocturno, XV de noche, aniversario, corporativo premium |
+| **B. Capas de papel** | indnegev (3), parallax webflow (4), discodungeon (12, mecánica), unifiers (5) y ponpon (7) para figuras | Parallax por capas con factores 0,76-0,85 en lo lejano y desplazamientos crecientes en lo cercano; nubes que derivan solas 2-4 px/s; personaje que respira ±16px; texturas de papel y sombras de recorte | Casamiento de día/campo/jardín, XV jardín o cielo, infantil |
+| **C. Tipográfica editorial** | shapestudio (2), unifiers (5), hausofwords (6), eszterbial (9), marsrejects (11), epic texto (8) | Hero pineado (factor 0,02-0,12) con nombre gigante en piezas que entran escalonadas; preloader con contador y cortina de columnas; letras que se intercambian en loop; marquesina ~80 px/s; ticker de ilustraciones ~50 px/s; inversión de color por sección; tarjetas de historia que entran sobre una portada fija | XV pop, casamiento moderno blanco y negro, cumpleaños de adulto, corporativo |
 
-Los tres comparten con Flat y Storytelling todo lo del §0. Lo que cambia entre
-sí es solo el lenguaje visual y el gesto de movimiento.
+La tipografía cinética (5, 6, 9) es además una **capa transversal**: las tres
+colecciones la usan en la Bienvenida y la Frase; por eso el Bloque común ya la
+pide.
 
-La "tipografía cinética" (texto que entra por letra/palabra, marquesinas,
-contadores: webs 5, 6, 9) no es exclusiva de C: es una **capa transversal** que
-las tres colecciones usan en la Bienvenida y en la Frase. Por eso el bloque
-común ya la pide (`data-w`, reveal por letra en la Bienvenida).
+Si empezás por una: **B** es la de mejor relación esfuerzo/impacto para
+casamiento y XV; **A** es la más "wow" y la más cara de portar y optimizar;
+**C** es la más rápida y la más distinta de lo que ya tenés.
 
-Si preferís empezar por una sola colección: **B (Papel)** es la de mejor
-relación esfuerzo/impacto y la más segura en celular; **A (Profundidad)** es la
-más vistosa pero la más costosa de portar y de optimizar; **C (Tipográfica)**
-es la más rápida de producir.
+### 2.1 Respuestas a tus preguntas
 
-### 2.3 Sobre "¿es difícil dibujar eso?" (webs 3, 4, 5, 7)
-
-- **Capas ilustradas con look a papel (3, 4): no es difícil.** Una cabecera de
-  4-6 capas SVG (cielo, fondo lejano, medio, primer plano, detalles) con
-  formas simples se dibuja bien en código. El "papel" sale de tres recursos
-  que Claude Design maneja: textura con `feTurbulence` a baja opacidad,
-  sombra de recorte (`drop-shadow` corta y dura) en cada capa, y bordes
-  levemente irregulares. Pedilo explícitamente como "papel recortado
-  (cut-paper), 5 capas, cada capa con su sombra".
-- **Caricaturas nivel ponpon-mania (7): eso sí es difícil de lograr por
-  código.** Esas webs tienen ilustradores dibujando personajes con volumen,
-  expresiones y animación cuadro a cuadro (Lottie/Rive). Lo que sí funciona
-  en SVG generado: **personajes y objetos geométricos** (una figura de 6-10
-  formas: cabeza, cuerpo, brazos como cápsulas), estilo "flat" con dos tonos
-  por color y una sombra, y animación de 2-3 keyframes (flotar, parpadear,
-  saludar, girar). Para adultos se pide "figuras estilizadas, elegantes,
-  proporciones alargadas, sin ojos grandes ni estética infantil". Si querés
-  el nivel de 7 de verdad, el camino es: ilustrador humano → SVG limpio →
-  animar en Rive/Lottie; eso queda fuera de esta colección.
-- **Texto grande + motion (5, 6, 9, 11): es lo más fácil** y lo que mejor
-  rinde en una invitación, porque el contenido ya es texto (nombre, fecha,
-  frase). Es el eje de la colección C.
-- **3D (1, 8, 10, 12): se logra la sensación, no el render.** Con CSS 3D
-  (`perspective`, `preserve-3d`, `translateZ`) y objetos SVG isométricos o
-  "extruidos" (3 caras + sombra) se consigue profundidad real al hacer
-  scroll. No hay iluminación ni materiales como en WebGL, pero para una
-  invitación en celular la percepción de túnel y de objetos que giran es
-  suficiente y rinde bien.
+- **"¿Se puede imitar viajar hacia adentro?" (1)**: sí, la sensación. El sitio
+  real mueve todo el grupo en Z con three.js y funde lo lejano con una niebla
+  del color del fondo. En CSS: `perspective` + capas a `translateZ` negativo +
+  un padre cuyo `translateZ` crece con el scroll, y opacidad por distancia como
+  niebla. Sin luces ni materiales, pero en celular alcanza y rinde.
+- **"¿Es difícil dibujar eso?" (3, 4)**: no. Son 11 a 20 capas recortadas
+  (confirmado en su HTML) movidas a distinta velocidad. Lo que lleva trabajo
+  es dibujar bien cada capa; en SVG se logra con formas simples, textura de
+  papel (`feTurbulence` a baja opacidad, una sola vez) y sombra de recorte.
+- **"¿Cómo se logra ese nivel de dibujo y animación?" (7)**: con un ilustrador
+  que dibuja el personaje por partes y un desarrollador que anima cada parte
+  sobre WebGL. Por código se logra un personaje geométrico (6-12 formas) que
+  respira, parpadea y se mece; no un personaje con volumen y expresiones. Para
+  adultos: figuras estilizadas y elegantes, sin ojos grandes.
+- **"¿Se puede lograr el 3D de arriba sin ese estilo?" (12)**: sí, y ni
+  siquiera es 3D: son capas planas (estatuas a los lados, plataforma, personaje)
+  con un personaje que respira y un título que se funde despacio; en versiones
+  anteriores, marcos que escalaban con el scroll. Cambian los dibujos, no la
+  técnica.
 
 ---
 
-## 3. Prompts por colección (pegar después del bloque común)
+## 3. Prompts por colección (pegar después del Bloque común)
 
 ### 3.1 Prompt — Colección A "Profundidad"
 
 ```text
-COLECCIÓN: "Profundidad"
-Referencias de movimiento (las conozco por descripción; traducí el efecto, no la
-tecnología): 2018.craftedbygc.com (el scroll se siente como VIAJAR HACIA
-ADENTRO de la escena), alireza.com (objetos 3D de fondo que giran y se
-acercan con el scroll), epic.net (objetos 3D + texto que entra con energía),
-discodungeongame.com (una escena con volumen en la cabecera; tomá el concepto
-de volumen, NO el estilo de videojuego).
+COLECCIÓN "PROFUNDIDAD"
+Referencias (por nombre; adjunto tiras de fotogramas): 2018.craftedbygc.com
+(viajar hacia adentro), discodungeongame.com (marcos que se abren hacia vos al
+bajar), epic.net (un objeto con volumen entra girando), alireza.com (un solo
+objeto recorrido de arriba a abajo, textos que suben con fade). Tomá el
+concepto de volumen y avance, no el estilo de ninguna.
 
 CONCEPTO
-Cada capítulo de la invitación es una "sala" a la que se entra. El scroll no
-baja: avanza. El contenedor de cada sección tiene perspective (~900px) y
-transform-style: preserve-3d; adentro hay 3-4 capas a distintas profundidades
-(fondo lejano translateZ(-600px), ornamentos medios -300px, texto 0, detalles
-adelantados +120px). Un progreso de scroll (rAF sobre el scroller) desplaza el
-grupo en Z, así lo lejano se acerca, lo cercano pasa de largo y se desvanece,
-y aparece la sala siguiente. Los objetos decorativos son SVG con volumen:
-isométricos (3 caras, sombra plana) o "extruidos" (misma forma repetida 6-8
-veces con offset y tono más oscuro), y giran en rotateY/rotateX según el
-progreso. En reduced-motion y en la captura estática, cada sala se ve como
-una composición en capas, sin movimiento.
+Cada capítulo es una sala a la que se entra. El scroll no baja: avanza.
+Motor (explicalo en un comentario al inicio del script):
+- Contenedor de cada sección: perspective 1000px, transform-style: preserve-3d,
+  sticky de 100vh dentro de una sección de 250-300vh.
+- Adentro, 3-4 capas: fondo lejano translateZ(-700px), ornamentos -350px, texto
+  0, detalles adelantados +120px. El progreso de scroll (0→1) mueve el grupo de
+  0 a +900px en Z: lo lejano se acerca, lo cercano pasa de largo y desaparece.
+- NIEBLA (es lo que hace creíble la profundidad, tomado del código de
+  craftedbygc): cada capa lleva un velo del color de fondo cuya opacidad baja a
+  medida que se acerca (lejano 0,65 → cerca 0). Nunca filter: blur animado.
+- Los objetos decorativos son SVG con volumen: extruidos (la misma forma
+  repetida 6-8 veces con offset de 1-2px y tono más oscuro) o isométricos (3
+  caras + sombra plana). Giran en rotateY según el progreso (0° → 25°).
+- Entrada de objeto (medido en epic.net): scale 0,15 → 1 + rotateY 40° → 0 en
+  ~1,2 s, easing cubic-bezier(.16,1,.3,1); al cambiar de capítulo sale igual,
+  al revés y más rápido (0,6 s).
+- Textos (medido en alireza.com): cada bloque entra con translateY 60px → 0 y
+  opacity 0 → 1, 0,9 s, stagger de 120 ms entre líneas.
+- Descenso (propuesta nuestra a partir de discodungeon; su versión actual
+  solo hace respirar al personaje ±16px y funde el título en 4 s): en la
+  Bienvenida, 4-6 marcos SVG concéntricos (arcos, aros, molduras) escalan de 1
+  a 2,2 con el progreso y se desvanecen al superar 1,8; el elemento central
+  baja 60vh y se reduce a 0,85. Sumá la respiración medida (±16px, 3,5 s) al
+  objeto central de cada sala.
+- Escritorio: la sala se ensancha (más capas a los costados), tilt de ±3° con
+  el mouse; en celular, giroscopio ±3°.
+- Reduced-motion y captura estática: cada sala es una composición en capas,
+  quieta.
 
-DISEÑÁ 3 FAMILIAS (+1 opcional), cada una con su base + 4 variantes de color:
-1. Casamiento — "Bóveda": salas oscuras (negro azulado, grafito) con objetos de
-   vidrio/metal: anillos entrelazados, copas, arcos, una luna; acento
-   champagne. Elegante, nocturno, cero fiesta infantil.
-2. Quince años — "Constelación": fondo profundo violeta/azul noche, objetos que
-   flotan: estrellas facetadas, una corona de volumen, cintas; el countdown
-   son bloques extruidos que giran al pasar; acento rosa cuarzo o lila.
-3. Cumpleaños de adulto — "Estudio": salas de color pleno saturado (terracota,
-   verde botella, azul cobalto) con objetos cotidianos con volumen: discos de
-   vinilo, botellas, un cóctel, globos de cristal; tipografía sans gruesa.
-4. Opcional infantil — "Túnel de juguete": mismo mecanismo con objetos de
-   madera/plástico, colores primarios suavizados.
+FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad:
+1. CASAMIENTO — "Bóveda": salas negro azulado/grafito, objetos de vidrio y
+   metal (anillos entrelazados, copas, un arco, una luna), acento champagne.
+   Serif fina (Cormorant Garamond o Bodoni Moda) + sans (Jost o Sora).
+   Nocturno, elegante, nada de fiesta.
+2. QUINCE — "Constelación": violeta/azul noche profundo, estrellas facetadas,
+   una corona con volumen, cintas; el countdown son bloques extruidos que giran
+   al pasar; acento rosa cuarzo o lila. Display con carácter (Fraunces itálica
+   o Unbounded) + sans.
+3. Opcional CUMPLEAÑOS ADULTO — "Estudio": salas de color pleno (terracota,
+   verde botella, cobalto), objetos con volumen: vinilo, botella, cóctel.
+4. Opcional CORPORATIVO — "Atrio": grafito y plata, objetos geométricos puros,
+   sin ornamento, tipografía grotesk.
 
-GESTOS OBLIGATORIOS DE LA COLECCIÓN
-- Bienvenida: el nombre entra desde el fondo (translateZ(-400px) → 0) con blur
-  que se aclara; el botón "Abrir invitación" es el "portal" de la primera sala.
-- Save the Date: la fecha en 3 capas (día atrás, mes en el medio, año adelante)
-  que se alinean al llegar.
-- Countdown: cuatro bloques con volumen; los segundos giran como un cubo
-  (rotateX 90° por tick).
-- Frase: palabra por palabra, cada palabra viene de una profundidad distinta.
-- Cuándo y dónde: paneles laterales pineados (data-pan/data-strip), y cada
-  panel es una sala con su propio objeto; funcional también apilado vertical.
-- Check-in: al confirmar, la tarjeta del pase "sale" hacia el frente
-  (translateZ) y se sella.
-- Álbum: las fotos como planos a distinta profundidad; en desktop, enmarcadas.
-- Tu pase: el QR sobre un bloque con volumen, el riel lateral muestra la
-  profundidad recorrida.
-- Foto de portada: gesto de luz propio = un reflejo que recorre el plano de
-  la foto al girar levemente en rotateY con el scroll.
-- NIEBLA (clave de la profundidad, tomada de craftedbygc): cada capa lejana
-  se funde con el color de fondo de la sala (opacidad o un velo del mismo
-  color), así lo que "viene" emerge de la niebla en vez de aparecer de golpe.
-- Al menos una familia usa el "descenso" de discodungeon: marcos concéntricos
-  (arcos, aros, marcos dorados) que escalan a distinta velocidad formando un
-  túnel vertical hacia la Bienvenida.
-- Opcional en desktop: tilt de toda la sala de ±3° siguiendo el mouse.
+GESTOS POR CAPÍTULO
+- Bienvenida: marcos concéntricos que se abren (descenso) y el nombre viene
+  desde el fondo (translateZ -400px → 0, blur que se aclara, 1,2 s); el botón
+  es el portal.
+- Save the Date: día, mes y año en tres profundidades que se alinean al llegar.
+- Countdown: cuatro bloques con volumen; los segundos giran como cubo (rotateX
+  90° por tick, 300 ms).
+- Frase: palabra por palabra, cada palabra desde una profundidad distinta.
+- Cuándo y dónde: paneles laterales pineados, cada panel una sala con su
+  objeto; también apilado vertical.
+- Check-in: al confirmar, la tarjeta del pase sale hacia el frente
+  (translateZ 0 → 120px, 700 ms) y se sella.
+- Álbum: fotos como planos a distinta profundidad; en escritorio, enmarcadas.
+- Tu pase: QR sobre un bloque con volumen; el riel lateral muestra la
+  profundidad recorrida como un ascensor (01 → 10).
+- Foto de portada: un reflejo recorre el plano de la foto mientras gira 4° en
+  rotateY con el scroll.
 
-ENTREGA
-Un .dc.html panorámico por familia (base) + tabla de variantes al pie, y una
-tarjeta "handoff" que explique en 10 líneas cómo se calcula el progreso de
-scroll → translateZ (y la niebla por capa) para que el equipo lo porte a
-anime.js onScroll.
+ENTREGA: un .dc.html por familia + handoff con la fórmula progreso → translateZ
+y la niebla por capa.
 ```
 
-### 3.2 Prompt — Colección B "Papel"
+### 3.2 Prompt — Colección B "Capas de papel"
 
 ```text
-COLECCIÓN: "Papel"
-Referencias (traducí el efecto, no la tecnología): indnegev.co.il (ilustración
-superior en capas con look a papel, movimiento por capas al bajar),
-parallax-bgsprod.webflow.io (cabecera ilustrada por capas),
-unifiersofjapan.framer.website (texto grande + ilustraciones de personajes
-estilizados), ponpon-mania.com (personajes con carácter y micro-animaciones;
-NO infantil: acá van para casamientos, quince y adultos).
+COLECCIÓN "CAPAS DE PAPEL"
+Referencias (por nombre; adjunto tiras de fotogramas): indnegev.co.il (capas
+con look de papel y grano, portal circular, nubes recortadas),
+parallax-bgsprod.webflow.io (11 capas de paisaje + 8 nubes, cielo de
+crepúsculo), discodungeongame.com (personaje que respira sobre un escenario),
+unifiersofjapan.framer.website y ponpon-mania.com (figuras estilizadas con
+micro-animaciones; acá NO infantiles: casamientos, quince, adultos).
 
 CONCEPTO
-Toda la invitación es papel recortado y apilado. Cada sección tiene una
-cabecera ilustrada de 4-6 capas SVG (cielo/fondo, plano lejano, medio,
-primer plano, detalles sueltos) con parallax por scroll (data-drift con
-amplitudes distintas por capa: -18, -8, 0, +12, +24 px por viewport). Cada
-capa lleva sombra de recorte corta y dura (drop-shadow 0 2px 0 + 0 6px 12px a
-baja opacidad) y una textura de papel (feTurbulence + feColorMatrix a 6-8% de
-opacidad, UNA sola vez por sección, no animada). Las tarjetas (countdown,
-RSVP, banco) son "papelitos" apilados con rotaciones de 1-2°. Los personajes
-y objetos son geométricos: 6-12 formas por figura, dos tonos por color más una
-sombra, proporciones alargadas y elegantes, sin ojos grandes; animación de 2-3
-keyframes por elemento (flotar, parpadear, mecerse, una bandera que ondea).
+Toda la invitación es papel recortado y apilado, con la ilustración en capas
+que se separan al bajar. Motor:
+- Cabecera de cada capítulo: 5-7 capas SVG con id="layer-1…7", de atrás hacia
+  adelante: cielo con degradé y grano; luna o sol; plano lejano; portal o arco
+  que enmarca el texto; follaje medio; objetos flotantes (3-5, con flote);
+  primer plano que asoma por los bordes.
+- Parallax medido en indnegev y en el template de Webflow: lo lejano se mueve al
+  0,76-0,85 de la velocidad del scroll (queda atrás), el plano medio al 1,0, el
+  primer plano se adelanta (translateY crece 40 → 180 px a lo largo de la
+  pantalla, según la capa). Usá data-drift con estos valores: -40, -25, 0, +30,
+  +60, +90.
+- Deriva autónoma (medida): las nubes/objetos flotantes se mueven solos en X
+  a 2-4 px/s, cada uno con fase distinta; el personaje u objeto central respira
+  (translateY ±16px, 3,5 s, ease-in-out) y parpadea cada 3-5 s.
+- Papel: cada capa con sombra de recorte corta y dura (0 2px 0 rgba(0,0,0,.12)
+  + 0 8px 14px rgba(0,0,0,.08)); textura con feTurbulence + feColorMatrix al
+  6-8% de opacidad, UNA vez por sección, nunca animada; bordes levemente
+  irregulares (feDisplacementMap scale 1-2). Marcas de doblez sutiles como en
+  indnegev (líneas claras a 45°, opacidad 0,06).
+- Tarjetas (countdown, RSVP, banco) como papelitos apilados con rotaciones de
+  1-2° y esquinas dobladas.
+- Figuras: geométricas, 6-12 formas, dos tonos por color más una sombra,
+  proporciones alargadas y elegantes, sin rostro detallado; 2-3 keyframes
+  (mecerse, saludar, una cinta que ondea).
+- Escritorio: la escena se ensancha (más cielo y follaje a los costados), no se
+  escala; las capas responden al mouse ±10px; en celular al giroscopio ±6px.
+- Reduced-motion: las capas quedan apiladas en su posición final.
 
-DISEÑÁ 3 FAMILIAS (+1 opcional), cada una con su base + 4 variantes de color:
-1. Casamiento — "Jardín de papel": cabecera con cerros, árboles, una casona,
-   dos figuras estilizadas de espaldas; paleta crema/salvia/terracota, acento
-   cobre. Tipografía serif humanista + sans.
-2. Quince años — "Ciudad de noche": skyline recortado en capas, farolitos,
-   una figura con vestido largo que se mece; paleta noche azul + papel
-   rosado/dorado. Display con carácter + sans.
-3. Cumpleaños de adulto — "Mesa larga": vista desde arriba de una mesa con
-   platos, copas, guirnaldas y manos que brindan (solo manos y objetos);
-   paleta mostaza/azul petróleo/rojo ladrillo. Sans gruesa.
-4. Opcional infantil — "Circo de papel": carpa, banderines, animales
+FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad:
+1. CASAMIENTO — "Jardín de papel": cerros, árboles, una casona, dos figuras
+   de espaldas; crema #F3EBDD, tinta #2B2A33, acento terracota #C86B5A,
+   secundario salvia #7C9A7E. Serif humanista (Fraunces o Cormorant) + sans
+   (DM Sans). Variantes: Noche estrellada (azul noche + dorado), Bosque (verde
+   profundo + cobre), Rosa empolvado (rosa viejo + borgoña), Viñedo (crema +
+   uva y oro).
+2. QUINCE — "Cielo de papel": portal circular como en indnegev con el nombre
+   adentro, nubes recortadas, luna, una figura con vestido largo que se mece,
+   mariposas; noche azul + papel rosado/dorado. Display con carácter + sans.
+3. Opcional CUMPLEAÑOS ADULTO — "Mesa larga": mesa vista desde arriba con
+   platos, copas, guirnaldas y manos que brindan; mostaza, azul petróleo, rojo
+   ladrillo. Sans gruesa.
+4. Opcional INFANTIL — "Circo de papel": carpa, banderines, animales
    geométricos; primarios suavizados.
 
-GESTOS OBLIGATORIOS DE LA COLECCIÓN
-- Bienvenida: el nombre es un cartel de papel que "se despega" (rotateX
-  desde -12° con sombra que crece) y las capas de la cabecera entran una por
-  una desde abajo con stagger.
-- Save the Date: la fecha como números recortados, cada uno con su sombra;
-  el mes en una cinta.
-- Countdown: cuatro papelitos apilados; los segundos cambian con un giro de
-  hoja (rotateX 180° por tick).
-- Frase: palabra por palabra, cada palabra un recorte que cae a su lugar.
-- Cuándo y dónde: paneles pineados laterales (data-pan/data-strip); cada
-  panel tiene su mini-escena en capas (la puerta del salón, el camino con la
-  ruta dibujada stroke-dashoffset, la iglesia si hay ceremonia); funcional
-  también apilado vertical.
-- Check-in: al confirmar, un sello de papel cae y se estampa (scale 1.6 → 1
-  con rebote) y el estado pasa a CONFIRMADO.
-- Álbum: fotos como polaroids con cinta de papel; en desktop, enmarcadas.
-- Tu pase: el QR sobre una entrada de papel con borde troquelado (perf strip).
-- Foto de portada: gesto de luz propio = una "ventana" de papel que se abre
-  (clip-path) sobre la foto al bajar, con luz cálida en el borde.
-- El cielo de la cabecera cambia de color a lo largo de la invitación (de
-  tarde a noche entre Save the Date y Tu pase), y el sol/la luna asciende
-  con el scroll.
-- En desktop, las capas también responden al mouse (±10px), como en indnegev.
+GESTOS POR CAPÍTULO
+- Bienvenida: las capas entran de abajo hacia arriba con stagger de 90 ms
+  (fondo primero, primer plano último), 900 ms cubic-bezier(.16,1,.3,1); el
+  nombre es un cartel que se despega (rotateX -12° → 0 con la sombra que
+  crece).
+- Save the Date: números recortados con sombra propia; el mes en una cinta.
+- Countdown: cuatro papelitos; los segundos giran como hoja (rotateX 180°).
+- Frase: cada palabra un recorte que cae a su lugar (translateY -24 → 0 +
+  rotate 3° → 0, stagger 120 ms).
+- Cuándo y dónde: paneles pineados; cada panel una mini-escena en capas (la
+  puerta del salón, el camino con la ruta dibujada con stroke-dashoffset, la
+  iglesia si hay ceremonia); también apilado vertical.
+- Check-in: al confirmar cae un sello de papel (scale 1,6 → 1 con rebote) y
+  suelta 8-12 pétalos SVG; el estado pasa a CONFIRMADO.
+- Álbum: polaroids con cinta de papel; en escritorio, enmarcadas a 900px.
+- Tu pase: entrada troquelada con el QR y el número de pase.
+- Foto de portada: una ventana de papel se abre (clip-path) sobre la foto al
+  bajar, con luz cálida en el borde.
+- El cielo cambia de tarde a noche entre Save the Date y Tu pase; el sol/luna
+  asciende con el scroll.
 
-ENTREGA
-Un .dc.html panorámico por familia (base) + tabla de variantes al pie, y una
-tarjeta "handoff" con la lista de capas de cada cabecera (nombre, amplitud de
-drift, z-index) y los keyframes de los personajes.
+ENTREGA: un .dc.html por familia + handoff con la lista de capas de cada
+cabecera (nombre, data-drift, z-index) y los keyframes de las figuras.
 ```
 
-### 3.3 Prompt — Colección C "Tipográfica / Cómic editorial"
+### 3.3 Prompt — Colección C "Tipográfica editorial"
 
 ```text
-COLECCIÓN: "Tipográfica"
-Referencias (traducí el efecto, no la tecnología): marsrejects.com (contraste
-de color, look cómic, tipografía cómic, motions de texto y de scroll, diseño
-editorial de revista), hausofwords.com (colorido, composición del texto, el
-texto como imagen), eszterbial.com (el texto de bienvenida entra con motion
-letra por letra), shapestudio.co.uk (scroll lateral con cosas que aparecen,
-tamaño del texto), unifiersofjapan.framer.website (texto grande + motion).
+COLECCIÓN "TIPOGRÁFICA EDITORIAL"
+Referencias (por nombre; adjunto tiras de fotogramas): eszterbial.com (contador
+0→100%, cortina de columnas, letras que se intercambian), unifiersofjapan
+(nombre gigante en piezas sobre un hero fijo mientras el contenido pasa por
+encima), hausofwords.com (colores plenos, patrón tipográfico, marquesina),
+marsrejects.com (revista + cómic: ticker de ilustraciones, inversión de color
+por sección, portada fija con tarjetas que entran), shapestudio.co.uk (texto a
+escala de viewport con recorrido lateral), epic.net (letras que se deslizan).
 
 CONCEPTO
-El texto ES la ilustración. Cada capítulo es una doble página de revista:
-un color pleno de fondo (alto contraste, 2 colores por sección, nunca
-degradés suaves), tipografía display a escala de viewport (clamp(64px, 22vw,
-180px) para el dato principal), grilla editorial (kicker, folio "01/10",
-columnas, pie), y recursos de cómic hechos en SVG: tramas de puntos
-(<pattern> halftone), contornos gruesos de 2-3px, viñetas con borde
-irregular, globos de texto, onomatopeyas dibujadas como lettering SVG,
-flechas y subrayados a mano. Movimiento: reveal por letra (stagger 30-40ms,
-translateY + blur o rotate 6°), marquesinas horizontales en el kicker de
-sección, paneles pineados laterales que descubren "viñetas" una por una,
-y texto en arco (textPath) para sellos.
+El texto ES la ilustración. Cada capítulo es una doble página: color pleno de
+fondo (dos colores por sección, alto contraste, nada de degradés suaves),
+display a escala de viewport (clamp(64px, 22vw, 180px) para el dato
+principal), grilla editorial (kicker, folio "01/10", columnas, pie). Motor:
+- Preloader tipográfico (medido en eszterbial): contador 0% → 100% en 1 s en
+  mono; después una cortina de 4 columnas que se retiran con stagger de 80 ms
+  (scaleY 1 → 0, 500 ms) y descubren la Bienvenida.
+- Nombre en piezas (medido en unifiers): el nombre se parte en 2-3 piezas
+  (sílabas o nombre/apellido), cada pieza entra desde abajo 320 px → 0 con
+  stagger de 150 ms, 1,4 s, cubic-bezier(.16,1,.3,1); el hero queda casi fijo
+  (se mueve al 0,05-0,12 de la velocidad del scroll) mientras el capítulo
+  siguiente pasa por encima.
+- Letras vivas (medido en eszterbial y epic): en el título, cada 3-5 s una
+  letra se intercambia por otra (la original sale deslizando 60-170 px y la
+  clon entra), o las letras se deslizan 20-50 px en X; sutil, una a la vez.
+- Marquesina (medida en hausofwords): 80 px/s, dos direcciones, se pausa con
+  reduced-motion; ticker de ilustraciones (medido en marsrejects) 50 px/s
+  detrás del título.
+- Inversión de color (marsrejects): al pasar de capítulo el fondo y el título
+  intercambian colores (crema/tinta ↔ tinta/crema, o rojo/negro ↔ negro/rojo).
+- Portada fija + tarjetas (marsrejects): en "Cuándo y dónde", la tarjeta
+  principal queda sticky y los datos entran como tarjetas con rotación de
+  ±3° y translateX desde los bordes, una por paso de scroll.
+- Recursos SVG: tramas halftone (<pattern> de círculos), contornos de 2-4px,
+  subrayados y flechas a mano, sellos con texto en arco (textPath),
+  viñetas con borde irregular. Nada de PNG.
+- Escritorio: doble página real (dos columnas, el nombre cruza el lomo);
+  celular: una página por pantalla.
 
-DISEÑÁ 3 FAMILIAS (+1 opcional), cada una con su base + 4 variantes de color:
-1. Casamiento — "Editorial Blanc & Noir": revista de moda; blanco roto,
-   negro, un acento (rojo lacre o azul klein); serif display extra grande +
-   grotesk; viñetas como fotos de editorial; cómic solo en los detalles
-   (subrayados, flechas, sellos). Elegante, no gracioso.
-2. Quince años — "Cómic Pop": colores plenos vibrantes (fucsia, amarillo,
-   cian sobre negro o crema), tramas halftone, onomatopeyas en la bienvenida
-   ("¡Mis 15!" dibujado como lettering), globos de texto para la frase;
-   display cómica pero legible (no Comic Sans; pensá Bangers/Anton/Rubik Mono
-   One o similares de Google Fonts) + sans redondeada.
-3. Cumpleaños de adulto — "Fanzine": papel obra/ negro/ un flúo; tipografía
-   grotesk condensada gigante, tramas gruesas, fotocopia (contraste alto,
-   grano), stickers; texto de la frase en marquesina.
-4. Opcional infantil — "Historieta": misma mecánica de viñetas con paleta
-   primaria y globos de texto.
+FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad:
+1. CASAMIENTO — "Editorial Blanc & Noir": revista de moda; blanco roto
+   #F5F1EA, negro #141414, un acento (rojo lacre #E63B2E o azul klein
+   #1F4FD1); serif display extra grande (Instrument Serif o Bodoni Moda) +
+   grotesk (Archivo o Space Grotesk); cómic solo en los detalles (subrayados,
+   sellos). Elegante, no gracioso.
+2. QUINCE — "Pop": fucsia #FF2E63, amarillo #FFD84D, cian #2EC4FF sobre negro
+   o crema; tramas halftone; el nombre como lettering de portada; globos de
+   texto para la frase; display cómica legible (Bangers, Anton, Rubik Mono
+   One) SOLO en titulares, datos en sans redondeada.
+3. Opcional CUMPLEAÑOS ADULTO — "Fanzine": papel obra, negro, un flúo;
+   grotesk condensada gigante, grano de fotocopia, stickers, frase en
+   marquesina.
+4. Opcional CORPORATIVO — "Anuario": grilla estricta, dos tintas, folios y
+   tablas; el movimiento se reduce a las entradas por línea.
 
-GESTOS OBLIGATORIOS DE LA COLECCIÓN
-- Bienvenida: el nombre entra letra por letra (stagger) con desplazamiento y
-  blur; el tipo de evento como sello en arco; el botón es un "globo" de cómic.
-- Save the Date: la fecha ocupa toda la pantalla como titular de tapa; el
-  año como folio; una trama halftone detrás.
-- Countdown: cuatro números enormes en columnas de revista; los segundos
-  cambian con "flip" de letra; etiquetas en marquesina.
-- Frase: palabra por palabra, cada palabra con un color de fondo alternado
-  (resaltador) y una palabra clave en globo de cómic.
-- Cuándo y dónde: paneles pineados laterales, cada panel una viñeta con borde
-  irregular y su onomatopeya sutil; funcional también apilado vertical.
-- Check-in: el pase es una tarjeta "recortada de la revista" con líneas de
-  corte; al confirmar aparece un sticker "CONFIRMADO" con rotación.
-- Álbum: contact sheet / grilla de revista con folios; en desktop enmarcado.
+GESTOS POR CAPÍTULO
+- Bienvenida: contador + cortina; el nombre en piezas; el tipo de evento como
+  sello en arco que gira despacio; el botón, un sello o un globo.
+- Save the Date: la fecha como titular de tapa en 3 líneas (21 / MAR / 2027)
+  que entran de direcciones opuestas; el año como folio; trama detrás.
+- Countdown: cuatro números en columnas de revista; los segundos cambian con
+  flip de letra; etiquetas en marquesina.
+- Frase: palabra por palabra con resaltador de color alternado y una palabra
+  clave en globo.
+- Cuándo y dónde: tarjeta principal fija + tarjetas que entran; también en
+  paneles pineados y apilado vertical; cada panel con folio.
+- Check-in: cupón "recortá por acá" con línea punteada; al confirmar cae un
+  sticker CONFIRMADO con rotación.
+- Álbum: contact sheet en blanco y negro que toma color al pasar por el
+  centro (grayscale 1 → 0).
 - Tu pase: contratapa: QR grande, sello en arco, créditos como colofón.
-- Foto de portada: gesto de luz propio = trama halftone que se disuelve para
-  revelar la foto (mask animada) al bajar.
-- Una sección "en cifras" dentro de Cuándo y dónde o Tu pase (ej. "15 años ·
-  200 invitados · 1 noche"), con contadores, como hausofwords.
-- El álbum o el cronograma como carrusel arrastrable (drag horizontal) al
-  estilo "meet the squad" de marsrejects; sirve también para la corte de
-  honor / padrinos si hay fotos.
-- Opcional para la familia de cumpleaños: la invitación arranca en blanco y
-  negro y el color entra al llegar a "Cuándo y dónde" (grayscale → color),
-  como el golpe de color de ponpon-mania.
+- Foto de portada: trama halftone que se disuelve para revelar la foto (mask
+  animada) al bajar.
 
-ENTREGA
-Un .dc.html panorámico por familia (base) + tabla de variantes al pie, y una
-tarjeta "handoff" con las fuentes elegidas (y por qué), los patrones SVG de
-trama y los timings de los reveals por letra.
+ENTREGA: un .dc.html por familia + handoff con las fuentes (y por qué), los
+patrones SVG de trama y los timings de los reveals por letra.
 ```
 
 ---
 
-## 4. Prompts opcionales de moodboard (ChatGPT Image / Gemini), uno por colección
+## 4. Moodboard (opcional, antes del prompt de Claude Design)
 
-Como en `Skills/GUIA_PEDIR_NUEVA_PLANTILLA.md`, conviene generar un moodboard y
-adjuntarlo al prompt de Claude Design. Uno por colección:
+Como en `Skills/GUIA_PEDIR_NUEVA_PLANTILLA.md`, un moodboard adjunto ayuda a
+fijar paleta e ilustración. Uno por colección, para Gemini o ChatGPT Image:
 
-- **A. Profundidad**: "Moodboard 3x3 para invitaciones digitales de lujo,
-  estética de profundidad: salas oscuras azul-grafito con objetos de vidrio y
-  metal (anillos, copas, arcos, estrellas facetadas, una corona) flotando a
-  distintas distancias, perspectiva de túnel, luz champagne, tipografía serif
-  fina; sin personas, sin texto, sin estética de videojuego."
-- **B. Papel**: "Moodboard 3x3 de ilustración en papel recortado (cut-paper) en
-  capas: cerros, jardín, skyline nocturno, mesa vista desde arriba con copas,
-  figuras humanas estilizadas de proporciones alargadas sin rostro, sombras de
-  recorte cortas, textura de papel, paleta crema/salvia/terracota y noche
-  azul/rosa; sin texto, elegante, no infantil."
-- **C. Tipográfica**: "Moodboard 3x3 de diseño editorial de revista con toques
-  de cómic: dobles páginas con colores plenos de alto contraste (blanco roto,
-  negro, rojo lacre, fucsia, amarillo, cian), tipografía display gigante,
-  tramas halftone, viñetas con borde irregular, globos de texto, sellos en arco;
-  sin personajes, sin texto legible."
+- **A. Profundidad**: "Moodboard 3x3, invitaciones de lujo, salas oscuras
+  azul-grafito con objetos de vidrio y metal (anillos, copas, arcos, estrellas
+  facetadas, una corona) flotando a distintas distancias, perspectiva de
+  túnel, niebla del color del fondo, luz champagne, serif fina; sin personas,
+  sin texto, sin videojuego."
+- **B. Capas de papel**: "Moodboard 3x3 de ilustración en papel recortado por
+  capas con grano y marcas de doblez: cerros, jardín, portal circular con
+  nubes recortadas, cielo nocturno con luna, figuras humanas estilizadas de
+  proporciones alargadas sin rostro, sombras de recorte cortas; paleta
+  crema/salvia/terracota y noche azul/rosa; elegante, no infantil, sin texto."
+- **C. Tipográfica editorial**: "Moodboard 3x3 de diseño editorial de revista
+  con toques de cómic: dobles páginas con colores plenos de alto contraste
+  (blanco roto, negro, rojo lacre, fucsia, amarillo, cian), tipografía display
+  gigante, tramas halftone, viñetas con borde irregular, globos de texto,
+  sellos en arco; sin personajes, sin texto legible."
 
 ---
 
-## 5. Flujo completo, de punta a punta
+## 5. Flujo completo
 
-1. (Opcional) Generar el moodboard de la colección con el prompt de §4.
-2. En Claude Design, con el repo sincronizado: pegar **§1 (bloque común) +
-   §3.x (la colección)** en un mensaje; adjuntar el moodboard.
+1. (Opcional) moodboard con §4.
+2. Claude Design con el repo sincronizado: pegar **§1 + §3.x**, adjuntar el
+   moodboard y las tiras de `mockup/inspire/webs/` de esa colección.
 3. Revisar que cada `.dc.html` tenga las 11 pantallas con `data-screen-label`,
-   los paneles con `data-pan/data-strip`, la tabla de variantes y el handoff.
-4. Guardar los archivos en `mockup/<coleccion>/<Nombre> - Panoramica.dc.html`.
-5. Portar a React con `docs/GUIA_TECNICA_PLANTILLAS.md` (una Storytelling como
-   base: `GuestPassVipTemplate.tsx`), generar variantes por script, wirear los
-   8 puntos y agregar cada familia a `template-labels.ts`,
-   `wizard-steps-config.ts` (`STORYTELLING_TEMPLATE_TIPOS`, porque usan el
-   mismo mecanismo de paneles) y al gating por tipo de evento.
-
+   los paneles con `data-pan/data-strip` en los dos modos, la tabla de
+   variantes y el handoff con los valores de movimiento.
+4. Guardar en `mockup/<coleccion>/<Nombre> - Panoramica.dc.html`.
+5. Portar con `docs/GUIA_TECNICA_PLANTILLAS.md` sobre una Storytelling como base
+   (`GuestPassVipTemplate.tsx`), generar variantes por script, wirear los 8
+   puntos, agregar a `template-labels.ts` y a `STORYTELLING_TEMPLATE_TIPOS` (usan
+   el mismo mecanismo de paneles) y al gating por tipo de evento.
+6. Decisión pendiente para el wizard: `StepDesign.tsx` hoy distingue solo
+   `FLAT | STORYTELLING`. Lo más barato es que las nuevas entren en la pestaña
+   Storytelling con una etiqueta de colección; pestañas nuevas tocan
+   `StepDesign`, `TemplatePreviewModal` y textos i18n.
+7. Si más adelante el SVG de alguna capa queda pobre, el DOM y el movimiento
+   permiten reemplazar esa capa por una imagen con transparencia sin tocar
+   nada más. Por ahora, todo SVG.
