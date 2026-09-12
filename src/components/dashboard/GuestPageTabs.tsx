@@ -139,7 +139,7 @@ export function GuestPageTabs({
     ...(pagoTarjetaHabilitado ? [{ id: "precio" as Tab, label: "Gestionar precios", highlight: "default" as const }] : []),
     { id: "mesas", label: "Mesas e ingresos", highlight: "default" },
     { id: "canciones", label: "Música sugerida", highlight: "default" },
-    { id: "live" as Tab, label: "LIVE", highlight: "live" },
+    { id: "live" as Tab, label: "Momentos", highlight: "live" },
   ];
 
   // Contra plan-limits y no contra una lista de planes escrita a mano acá: la
@@ -204,7 +204,7 @@ export function GuestPageTabs({
                       }}
                     />
                   </span>
-                  LIVE
+                  Momentos
                 </>
               ) : (
                 t.label
@@ -342,7 +342,7 @@ export function GuestPageTabs({
           {tab === "live" && (
             <div className="bg-card border border-[var(--line)] rounded-lg p-4 md:p-6">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                LIVE
+                Momentos
                 <Camera className="w-5 h-5 text-muted-foreground" strokeWidth={1.75} />
               </h2>
               <LiveAdminPanel invitationId={invitationId} fechaEvento={fechaEvento} />
@@ -377,7 +377,7 @@ export function GuestPageTabs({
                    t.id === "invitados" ? "Lista" :
                    t.id === "precio" ? "Precio" :
                    t.id === "mesas" ? "Mesas" :
-                   t.id === "canciones" ? "Música" : "LIVE"}
+                   t.id === "canciones" ? "Música" : "Momentos"}
                 </span>
               </button>
             );

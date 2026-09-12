@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { TermsDocument } from "@/components/legal/TermsDocument";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones del servicio LIVE · Alta Invitación",
+  title: "Términos y Condiciones del servicio Momentos · Alta Invitación",
 };
 
 export default async function TerminosLivePage() {

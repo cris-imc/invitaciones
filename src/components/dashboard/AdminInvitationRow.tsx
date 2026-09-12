@@ -35,7 +35,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
             const val = maxLivePhotos ? parseInt(maxLivePhotos, 10) : null;
             const res = await updateInvitationMaxLivePhotos(invitation.id, val);
             if (res.success) {
-                showToast("Límite de fotos LIVE actualizado", "success");
+                showToast("Límite de fotos de Momentos actualizado", "success");
             } else {
                 showToast(res.error || "Error", "error");
             }
@@ -82,10 +82,10 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                     <button
                         onClick={() => router.push(`/dashboard/invitaciones/${invitation.slug}/guests`)}
                         className="px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                        title="Gestión del evento: invitados, pagos, precios, mesas, música y LIVE"
+                        title="Gestión del evento: invitados, pagos, precios, mesas, música y Momentos"
                     >
                         {/* Decía "Invitados", pero lleva a la gestión completa del
-                            evento -- pagos, precios, mesas, música y LIVE -- así que
+                            evento -- pagos, precios, mesas, música y Momentos -- así que
                             prometía menos de lo que abre. */}
                         <SlidersHorizontal className="w-3.5 h-3.5" />
                         <span>Gestionar</span>
@@ -110,7 +110,7 @@ export function AdminInvitationRow({ invitation }: { invitation: any }) {
                     <AdminPlanSelect invitationId={invitation.id} currentPlan={invitation.planTier} />
                     
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold opacity-70">Fotos LIVE Máx:</span>
+                        <span className="text-xs font-semibold opacity-70">Fotos de Momentos (máx.):</span>
                         <Input
                             type="number"
                             value={maxLivePhotos}

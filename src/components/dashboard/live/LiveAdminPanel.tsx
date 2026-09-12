@@ -149,7 +149,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
     const toggleLive = async () => {
         const activating = !session?.isActive;
         if (activating && !canActivate) {
-            setErrorMsg("El LIVE solo se puede activar a partir del día del evento.");
+            setErrorMsg("Momentos solo se puede activar a partir del día del evento.");
             return;
         }
         setLoading(true);
@@ -164,7 +164,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
             } else {
                 const errText = await res.text();
                 console.error("API error", errText);
-                setErrorMsg("Error al activar LIVE: " + errText + "\n\n(Si dice Internal Error, prueba reiniciar el servidor npm run dev para que cargue la nueva base de datos)");
+                setErrorMsg("Error al activar Momentos: " + errText + "\n\n(Si dice Internal Error, prueba reiniciar el servidor npm run dev para que cargue la nueva base de datos)");
             }
         } catch (err) {
             console.error("Error toggling live", err);
@@ -285,7 +285,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
             <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-white/10 flex-wrap gap-3">
                 <div>
                     <h3 className="font-semibold flex items-center gap-2">
-                        Estado del LIVE
+                        Estado de Momentos
                         {isActive ? (
                             <span className="flex h-3 w-3 relative">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -296,7 +296,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                         )}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                        {isActive ? "Los invitados pueden subir contenido ahora." : "El LIVE está apagado."}
+                        {isActive ? "Los invitados pueden subir contenido ahora." : "Momentos está apagado."}
                     </p>
                     {!isActive && !canActivate && (
                         <p className="text-xs text-amber-500 mt-1">
@@ -325,7 +325,7 @@ export function LiveAdminPanel({ invitationId, fechaEvento }: { invitationId: st
                         className="gap-2"
                     >
                         <Power className="w-4 h-4" />
-                        {isActive ? "Apagar LIVE" : "Activar LIVE"}
+                        {isActive ? "Apagar Momentos" : "Activar Momentos"}
                     </Button>
                 </div>
             </div>

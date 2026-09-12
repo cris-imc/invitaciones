@@ -28,13 +28,13 @@ const es = {
   },
 
   // El titular del hero se tipea solo: un prefijo fijo y frases que rotan.
-  // La palabra LIVE se resalta buscándola dentro de la frase, así que tiene
+  // La palabra Momentos se resalta buscándola dentro de la frase, así que tiene
   // que seguir escrita igual en los tres idiomas.
   hero: {
     prefijo: "No somos solo una invitación digital. ",
     frase1: "Somos un link personal para cada invitado.",
     frase2: "Somos una invitación en tiempo real.",
-    frase3: "Con LIVE tu fiesta se anima.",
+    frase3: "Con Momentos tu fiesta se anima.",
   },
 
   showcase: {
@@ -73,7 +73,7 @@ const es = {
       detalle: "Recibe confirmaciones (RSVP) al instante, administra accesos y configura tu mesa de regalos o cuenta bancaria sin comisiones.",
     },
     live: {
-      titulo: "Con LIVE tu fiesta se anima",
+      titulo: "Con Momentos tu fiesta se anima",
       detalle: "Tus invitados pueden subir fotos y dejar mensajes desde sus teléfonos durante la fiesta. Todo se proyecta y queda guardado de recuerdo.",
     },
   },
@@ -90,7 +90,7 @@ const es = {
       detalle: "Lleva la cuenta de la tarjeta invitado por invitado: precio por lugar, exentos y pagos parciales. Te pagan a ti directamente; la app sólo lleva la cuenta.",
     },
     live: {
-      titulo: "Modo LIVE",
+      titulo: "Momentos",
       detalle: "Fotos y mensajes de tus invitados proyectados en vivo durante la fiesta.",
     },
     mesas: {
@@ -176,8 +176,8 @@ const es = {
     // traducción sin agregar nada.
     sin: {
       pagos: "Sin gestión de pagos",
-      live: "Sin función LIVE",
-      liveDiamond: "Sin función LIVE (exclusiva de Diamond)",
+      live: "Sin Momentos",
+      liveDiamond: "Sin Momentos (exclusivo de Diamond)",
       marcaAgua: "Con marca de agua de altainvitacion",
       mesas: "El salón completo es de Premium",
       ingreso: "Sin control de ingreso",
@@ -213,11 +213,11 @@ const es = {
     },
 
     diamond: {
-      detalle: "Todo Premium, más el Modo LIVE y saber quién abrió su invitación.",
+      detalle: "Todo Premium, más Momentos y saber quién abrió su invitación.",
       cta: "Elegir Diamond",
       todoPremium: "Todo lo del plan Premium, más:",
       live: {
-        titulo: "Interacción LIVE:",
+        titulo: "Momentos:",
         detalle: "proyección de fotos en vivo en tu fiesta (hasta {fotos} fotos)",
       },
       mesas: {
@@ -281,7 +281,7 @@ const es = {
     },
     planes: {
       q: "¿Qué diferencia hay entre los planes Gratis, Premium y Diamond?",
-      a: "El plan Gratis incluye invitación personalizable completa, RSVP y álbum de hasta 5 fotos para hasta 20 invitados: ideal para probar la plataforma o eventos íntimos. Premium suma invitados ilimitados, álbum de hasta 15 fotos, música de fondo, trivias, sugerencias de DJ y gestión de pagos. Diamond agrega el Modo LIVE, con proyección de fotos en vivo durante la fiesta.",
+      a: "El plan Gratis incluye invitación personalizable completa, RSVP y álbum de hasta 5 fotos para hasta 20 invitados: ideal para probar la plataforma o eventos íntimos. Premium suma invitados ilimitados, álbum de hasta 15 fotos, música de fondo, trivias, sugerencias de DJ y gestión de pagos. Diamond agrega Momentos, con proyección de fotos en vivo durante la fiesta.",
     },
     cambiarPlan: {
       q: "¿Puedo cambiar de plan después de haber empezado?",
@@ -402,7 +402,7 @@ const en: Landing = {
     prefijo: "We're not just a digital invitation. ",
     frase1: "We're a personal link for every guest.",
     frase2: "We're an invitation in real time.",
-    frase3: "With LIVE your party comes alive.",
+    frase3: "With Momentos your party comes alive.",
   },
 
   showcase: {
@@ -441,7 +441,7 @@ const en: Landing = {
       detalle: "Get RSVPs instantly, manage access and set up your gift registry or bank account with no commission.",
     },
     live: {
-      titulo: "With LIVE your party comes alive",
+      titulo: "With Momentos your party comes alive",
       detalle: "Your guests upload photos and leave messages from their phones during the party. It all goes up on the screen and stays as a keepsake.",
     },
   },
@@ -458,7 +458,7 @@ const en: Landing = {
       detalle: "Track the ticket guest by guest: price per seat, exemptions and partial payments. They pay you directly; the app just keeps the count.",
     },
     live: {
-      titulo: "LIVE mode",
+      titulo: "Momentos",
       detalle: "Photos and messages from your guests, up on the screen during the party.",
     },
     mesas: {
@@ -541,8 +541,8 @@ const en: Landing = {
 
     sin: {
       pagos: "No payment tracking",
-      live: "No LIVE feature",
-      liveDiamond: "No LIVE feature (Diamond only)",
+      live: "Momentos not included",
+      liveDiamond: "Momentos not included (Diamond only)",
       marcaAgua: "With the altainvitacion watermark",
       mesas: "The full seating plan is Premium",
       ingreso: "No door check-in",
@@ -578,11 +578,11 @@ const en: Landing = {
     },
 
     diamond: {
-      detalle: "Everything in Premium, plus LIVE mode and seeing who opened their invitation.",
+      detalle: "Everything in Premium, plus Momentos and seeing who opened their invitation.",
       cta: "Choose Diamond",
       todoPremium: "Everything in Premium, plus:",
       live: {
-        titulo: "LIVE interaction:",
+        titulo: "Momentos:",
         detalle: "photos up on the screen during your party (up to {fotos} photos)",
       },
       mesas: {
@@ -641,7 +641,7 @@ const en: Landing = {
     },
     planes: {
       q: "What's the difference between the Free, Premium and Diamond plans?",
-      a: "The Free plan includes a fully customizable invitation, RSVP and an album of up to 5 photos for up to 20 guests: great for trying the platform or for intimate events. Premium adds unlimited guests, an album of up to 15 photos, background music, trivia, DJ song requests and payment tracking. Diamond adds LIVE mode, with photos up on the screen during the party.",
+      a: "The Free plan includes a fully customizable invitation, RSVP and an album of up to 5 photos for up to 20 guests: great for trying the platform or for intimate events. Premium adds unlimited guests, an album of up to 15 photos, background music, trivia, DJ song requests and payment tracking. Diamond adds Momentos, with photos up on the screen during the party.",
     },
     cambiarPlan: {
       q: "Can I change plans after I've started?",
@@ -758,7 +758,7 @@ const pt: Landing = {
     prefijo: "Não somos só um convite digital. ",
     frase1: "Somos um link pessoal para cada convidado.",
     frase2: "Somos um convite em tempo real.",
-    frase3: "Com o LIVE sua festa se anima.",
+    frase3: "Com Momentos sua festa se anima.",
   },
 
   showcase: {
@@ -797,7 +797,7 @@ const pt: Landing = {
       detalle: "Receba as confirmações na hora, controle os acessos e configure sua lista de presentes ou conta bancária sem comissões.",
     },
     live: {
-      titulo: "Com o LIVE sua festa se anima",
+      titulo: "Com Momentos sua festa se anima",
       detalle: "Seus convidados sobem fotos e deixam mensagens pelo celular durante a festa. Tudo vai para o telão e fica guardado de lembrança.",
     },
   },
@@ -814,7 +814,7 @@ const pt: Landing = {
       detalle: "Acompanhe o valor convidado por convidado: preço por lugar, isenções e pagamentos parciais. Pagam direto para você; o app só faz a conta.",
     },
     live: {
-      titulo: "Modo LIVE",
+      titulo: "Momentos",
       detalle: "Fotos e mensagens dos seus convidados no telão, ao vivo, durante a festa.",
     },
     mesas: {
@@ -897,8 +897,8 @@ const pt: Landing = {
 
     sin: {
       pagos: "Sem gestão de pagamentos",
-      live: "Sem o recurso LIVE",
-      liveDiamond: "Sem o recurso LIVE (exclusivo do Diamond)",
+      live: "Sem Momentos",
+      liveDiamond: "Sem Momentos (exclusivo do Diamond)",
       marcaAgua: "Com marca d'água da altainvitacion",
       mesas: "O salão completo é do Premium",
       ingreso: "Sem controle de entrada",
@@ -934,11 +934,11 @@ const pt: Landing = {
     },
 
     diamond: {
-      detalle: "Tudo do Premium, mais o Modo LIVE e saber quem abriu o convite.",
+      detalle: "Tudo do Premium, mais Momentos e saber quem abriu o convite.",
       cta: "Escolher Diamond",
       todoPremium: "Tudo do plano Premium, mais:",
       live: {
-        titulo: "Interação LIVE:",
+        titulo: "Momentos:",
         detalle: "projeção de fotos ao vivo na sua festa (até {fotos} fotos)",
       },
       mesas: {
@@ -997,7 +997,7 @@ const pt: Landing = {
     },
     planes: {
       q: "Qual é a diferença entre os planos Grátis, Premium e Diamond?",
-      a: "O plano Grátis inclui convite totalmente personalizável, RSVP e álbum de até 5 fotos para até 20 convidados: ideal para testar a plataforma ou para eventos íntimos. O Premium soma convidados ilimitados, álbum de até 15 fotos, música de fundo, quiz, sugestões para o DJ e gestão de pagamentos. O Diamond acrescenta o Modo LIVE, com projeção de fotos ao vivo durante a festa.",
+      a: "O plano Grátis inclui convite totalmente personalizável, RSVP e álbum de até 5 fotos para até 20 convidados: ideal para testar a plataforma ou para eventos íntimos. O Premium soma convidados ilimitados, álbum de até 15 fotos, música de fundo, quiz, sugestões para o DJ e gestão de pagamentos. O Diamond acrescenta Momentos, com projeção de fotos ao vivo durante a festa.",
     },
     cambiarPlan: {
       q: "Posso mudar de plano depois de começar?",

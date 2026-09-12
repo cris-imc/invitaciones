@@ -285,7 +285,7 @@ export default function SubscriptionPage() {
                         ) : (
                           <X className="w-4 h-4 text-gray-300" />
                         )}
-                        <span>Modo Live (fotos en vivo)</span>
+                        <span>Momentos (fotos en vivo)</span>
                       </li>
                       <li className="flex items-center gap-2">
                         {plan.features.tableAssignment ? (

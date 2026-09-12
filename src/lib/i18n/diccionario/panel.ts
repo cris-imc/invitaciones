@@ -328,7 +328,7 @@ const es = {
     cambiarPlantilla: "Cambiar Plantilla",
     esGratis: "Esta invitación está en plan Gratis",
     esGratisDetalle:
-      "Convertila a Premium o Diamond para sumar música, trivia, gestión de pagos y el Modo LIVE.",
+      "Convertila a Premium o Diamond para sumar música, trivia, gestión de pagos y Momentos.",
     habilitar: "Habilitar Premium/Diamond",
     habilitarTitulo: "Habilitar funciones Premium/Diamond",
     habilitarDetalle:
@@ -708,7 +708,7 @@ const en: Panel = {
     cambiarPlantilla: "Change template",
     esGratis: "This invitation is on the Free plan",
     esGratisDetalle:
-      "Move it to Premium or Diamond to add music, trivia, payment tracking and LIVE Mode.",
+      "Move it to Premium or Diamond to add music, trivia, payment tracking and Momentos.",
     habilitar: "Enable Premium/Diamond",
     habilitarTitulo: "Enable Premium/Diamond features",
     habilitarDetalle:
@@ -1087,7 +1087,7 @@ const pt: Panel = {
     cambiarPlantilla: "Trocar modelo",
     esGratis: "Este convite está no plano Grátis",
     esGratisDetalle:
-      "Mude para Premium ou Diamond para somar música, quiz, gestão de pagamentos e o Modo LIVE.",
+      "Mude para Premium ou Diamond para somar música, quiz, gestão de pagamentos e Momentos.",
     habilitar: "Habilitar Premium/Diamond",
     habilitarTitulo: "Habilitar recursos Premium/Diamond",
     habilitarDetalle:

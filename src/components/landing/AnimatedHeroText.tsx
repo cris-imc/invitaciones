@@ -46,14 +46,14 @@ export function AnimatedHeroText() {
     return () => clearTimeout(timeout);
   }, [currentText, phase, suffixIndex, PREFIX, SUFFIXES]);
 
-  // "LIVE" tiene tratamiento propio dentro del texto tipeado: verde de
+  // "Momentos" tiene tratamiento propio dentro del texto tipeado: verde de
   // marca, brillo pulsante ("encendido") y el ™ de marca -- en vez de
   // heredar el itálica/dorado del resto del texto que se está tipeando en
   // cada mensaje.
   const renderSuffix = (suffix: string) => {
-    const parts = suffix.split(/(LIVE)/g);
+    const parts = suffix.split(/(Momentos)/g);
     return parts.map((part, i) =>
-      part === "LIVE" ? (
+      part === "Momentos" ? (
         <motion.span
           key={i}
           className="not-italic font-semibold"
@@ -67,7 +67,7 @@ export function AnimatedHeroText() {
           }}
           transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
         >
-          LIVE
+          Momentos
           <sup className="text-[0.5em] ml-px">™</sup>
         </motion.span>
       ) : (

@@ -1,24 +1,25 @@
-Términos y Condiciones de uso del servicio LIVE
+Términos y Condiciones de uso del servicio Momentos
 Alta Invitación — altainvitacion.com
-Última actualización: agosto de 2026
+Última actualización: septiembre de 2026
+(El servicio Momentos se llamaba LIVE hasta septiembre de 2026; son el mismo servicio.)
 
 ────────────────────────────────────────────────────────────────
 
 1. Aceptación de los términos
 
-Al escanear el código QR y acceder al servicio LIVE de Alta Invitación, usted ("el Usuario") declara haber leído, comprendido y aceptado en su totalidad los presentes Términos y Condiciones. Si no está de acuerdo con alguna de las condiciones aquí establecidas, deberá abstenerse de utilizar el servicio.
+Al escanear el código QR y acceder al servicio Momentos de Alta Invitación, usted ("el Usuario") declara haber leído, comprendido y aceptado en su totalidad los presentes Términos y Condiciones. Si no está de acuerdo con alguna de las condiciones aquí establecidas, deberá abstenerse de utilizar el servicio.
 
 ────────────────────────────────────────────────────────────────
 
 2. Descripción del servicio
 
-El servicio LIVE es una funcionalidad de la plataforma altainvitacion.com que permite a los invitados a un evento cargar fotografías, videos y mensajes en tiempo real, los cuales serán visibles para el organizador del evento y, según la configuración elegida por este, para otros participantes.
+El servicio Momentos es una funcionalidad de la plataforma altainvitacion.com que permite a los invitados a un evento cargar fotografías, videos y mensajes en tiempo real, los cuales serán visibles para el organizador del evento y, según la configuración elegida por este, para otros participantes.
 
 ────────────────────────────────────────────────────────────────
 
 3. Propiedad del contenido subido
 
-Todo el material digital cargado a través del servicio LIVE — incluyendo fotografías, videos, mensajes de texto y cualquier otro tipo de archivo — pasa a ser propiedad exclusiva del organizador del evento que habilitó dicho servicio. El Usuario cede de manera gratuita, irrevocable y sin limitación territorial todos los derechos sobre el contenido subido, incluyendo el derecho de reproducción, distribución, exhibición, almacenamiento y edición, tanto en medios digitales como físicos, con fines personales o de recuerdo del evento.
+Todo el material digital cargado a través del servicio Momentos — incluyendo fotografías, videos, mensajes de texto y cualquier otro tipo de archivo — pasa a ser propiedad exclusiva del organizador del evento que habilitó dicho servicio. El Usuario cede de manera gratuita, irrevocable y sin limitación territorial todos los derechos sobre el contenido subido, incluyendo el derecho de reproducción, distribución, exhibición, almacenamiento y edición, tanto en medios digitales como físicos, con fines personales o de recuerdo del evento.
 
 Alta Invitación actúa únicamente como intermediario técnico de almacenamiento y transmisión, sin adquirir propiedad ni derechos sobre el contenido cargado por los usuarios.
 
@@ -38,7 +39,7 @@ c) El Usuario se compromete a no fotografiar, filmar ni registrar a personas que
 
 5. Prohibición absoluta: fotografías y videos de menores de edad
 
-Queda estrictamente prohibido subir al servicio LIVE cualquier fotografía, video o material que muestre, identifique o permita identificar a personas menores de 18 años, sin excepción. Esta restricción aplica incluso cuando el menor sea familiar del Usuario o cuando la imagen sea de carácter inocente o recreativo.
+Queda estrictamente prohibido subir al servicio Momentos cualquier fotografía, video o material que muestre, identifique o permita identificar a personas menores de 18 años, sin excepción. Esta restricción aplica incluso cuando el menor sea familiar del Usuario o cuando la imagen sea de carácter inocente o recreativo.
 
 El incumplimiento de esta disposición constituye una violación grave de los presentes Términos y Condiciones y podrá dar lugar a la eliminación inmediata del contenido, la inhabilitación del acceso al servicio y, de corresponder, la denuncia ante las autoridades competentes.
 
@@ -64,7 +65,7 @@ f) Sea técnicamente dañino, incluyendo virus, malware o cualquier código mali
 
 7. Responsabilidad del Usuario
 
-El Usuario es el único y exclusivo responsable del contenido que suba al servicio LIVE. Al cargar cualquier material, el Usuario declara y garantiza que:
+El Usuario es el único y exclusivo responsable del contenido que suba al servicio Momentos. Al cargar cualquier material, el Usuario declara y garantiza que:
 
 a) Es el autor o titular de los derechos sobre dicho material, o cuenta con las autorizaciones necesarias para compartirlo.
 
@@ -78,15 +79,15 @@ c) Asume plena responsabilidad civil y penal por cualquier daño que el contenid
 
 Alta Invitación actúa como proveedor de la infraestructura técnica que facilita la carga y visualización de contenido entre los participantes de un evento privado. En consecuencia:
 
-a) Alta Invitación no revisa, modera ni aprueba de manera previa el contenido subido por los usuarios al servicio LIVE.
+a) Alta Invitación no revisa, modera ni aprueba de manera previa el contenido subido por los usuarios al servicio Momentos.
 
 b) Alta Invitación no se responsabiliza por el contenido cargado por los usuarios, ni por los daños directos, indirectos, accidentales o consecuentes que dicho contenido pudiera ocasionar a terceros, al organizador del evento o al propio Usuario.
 
-c) Alta Invitación no garantiza la disponibilidad continua, ininterrumpida o libre de errores del servicio LIVE.
+c) Alta Invitación no garantiza la disponibilidad continua, ininterrumpida o libre de errores del servicio Momentos.
 
 d) Alta Invitación se reserva el derecho de eliminar sin previo aviso cualquier contenido que, a su criterio, viole los presentes Términos y Condiciones o la legislación vigente, sin que ello genere responsabilidad alguna de su parte.
 
-e) El organizador del evento es responsable de comunicar a sus invitados la existencia y el contenido de estos Términos y Condiciones antes de habilitarles el acceso al servicio LIVE.
+e) El organizador del evento es responsable de comunicar a sus invitados la existencia y el contenido de estos Términos y Condiciones antes de habilitarles el acceso al servicio Momentos.
 
 ────────────────────────────────────────────────────────────────
 
@@ -100,7 +101,7 @@ Alta Invitación eliminará el contenido dentro de un plazo razonable una vez ve
 
 10. Retención y eliminación de datos
 
-El contenido subido al servicio LIVE se almacenará durante un plazo máximo de tres (3) meses contados desde la fecha del evento. Transcurrido dicho plazo, el contenido será eliminado automáticamente de los servidores de Alta Invitación, sin necesidad de notificación previa al organizador ni a los usuarios.
+El contenido subido al servicio Momentos se almacenará durante un plazo máximo de tres (3) meses contados desde la fecha del evento. Transcurrido dicho plazo, el contenido será eliminado automáticamente de los servidores de Alta Invitación, sin necesidad de notificación previa al organizador ni a los usuarios.
 
 Sin perjuicio de lo anterior, el contenido también será eliminado en forma anticipada si el organizador elimina la invitación o su cuenta antes de cumplirse dicho plazo. Alta Invitación no conserva copias de seguridad del contenido de usuarios con posterioridad a su eliminación, ya sea por vencimiento del plazo o por solicitud del organizador.
 
@@ -116,14 +117,14 @@ Los presentes Términos y Condiciones se rigen por las leyes de la República Ar
 
 12. Modificaciones
 
-Alta Invitación se reserva el derecho de modificar los presentes Términos y Condiciones en cualquier momento. Los cambios serán publicados en altainvitacion.com e informados mediante los canales habituales de comunicación. El uso continuado del servicio LIVE con posterioridad a dichos cambios implicará la aceptación de los nuevos términos.
+Alta Invitación se reserva el derecho de modificar los presentes Términos y Condiciones en cualquier momento. Los cambios serán publicados en altainvitacion.com e informados mediante los canales habituales de comunicación. El uso continuado del servicio Momentos con posterioridad a dichos cambios implicará la aceptación de los nuevos términos.
 
 ────────────────────────────────────────────────────────────────
 
 13. Contacto
 
-Para consultas relacionadas con estos Términos y Condiciones o con el contenido subido al servicio LIVE, podés comunicarte con nosotros a través de altainvitacion.com o mediante WhatsApp al +54 9 351 766 0000.
+Para consultas relacionadas con estos Términos y Condiciones o con el contenido subido al servicio Momentos, podés comunicarte con nosotros a través de altainvitacion.com o mediante WhatsApp al +54 9 351 766 0000.
 
 ────────────────────────────────────────────────────────────────
 
-Al escanear el código QR y acceder al servicio LIVE, usted confirma haber leído y aceptado la totalidad de estos Términos y Condiciones.
+Al escanear el código QR y acceder al servicio Momentos, usted confirma haber leído y aceptado la totalidad de estos Términos y Condiciones.

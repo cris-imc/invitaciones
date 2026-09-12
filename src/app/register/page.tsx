@@ -51,7 +51,7 @@ const PLAN_CARDS: {
       `Hasta ${PLAN_LIMITS.FREE.maxPhotos} fotos en el álbum`,
       "Control de ingreso por QR",
     ],
-    negativeFeatures: ["Sin gestión de pagos", "Sin musica de fondo", "Sin Modo LIVE (fotos y mensajes en vivo)", "Sin Trivia", "Sin sugerencias DJ"],
+    negativeFeatures: ["Sin gestión de pagos", "Sin musica de fondo", "Sin Momentos (fotos y mensajes en vivo)", "Sin Trivia", "Sin sugerencias DJ"],
   },
   {
     key: "PREMIUM",
@@ -68,7 +68,7 @@ const PLAN_CARDS: {
       "Con organización de mesas",
       "Con control de ingreso por QR",
     ],
-    negativeFeatures: ["Sin Modo LIVE (fotos y mensajes en vivo)", "Sin ver quién abrió la invitación"],
+    negativeFeatures: ["Sin Momentos (fotos y mensajes en vivo)", "Sin ver quién abrió la invitación"],
   },
   {
     key: "DIAMOND",
@@ -80,7 +80,7 @@ const PLAN_CARDS: {
       "Cuenta regresiva",
       `Hasta ${PLAN_LIMITS.DIAMOND.maxPhotos} fotos en el álbum`,
       "Con musica de fondo",
-      "Con LIVE (fotos y mensajes en vivo)",
+      "Con Momentos (fotos y mensajes en vivo)",
       "Con organización de mesas",
       "Con control de ingreso por QR",
       "Ver quién abrió la invitación",
@@ -424,11 +424,11 @@ function RegisterForm() {
 
                     <ul className="space-y-2 opacity-90 text-xs sm:text-sm flex-1">
                       {plan.features.map((f) => {
-                        // LIVE es LA diferencia entre Premium y Diamond -- se
+                        // Momentos es LA diferencia entre Premium y Diamond -- se
                         // destaca aparte del resto del check-list (que es
                         // igual en ambos) para que quede clarísimo qué es lo
                         // que realmente se paga de más.
-                        if (f.startsWith("Con LIVE")) {
+                        if (f.startsWith("Con Momentos")) {
                           return (
                             <li
                               key={f}
@@ -439,7 +439,7 @@ function RegisterForm() {
                                 <span>{f}</span>
                               </div>
                               <p className="text-[11px] font-normal text-[var(--on-ink)]/70 mt-1 leading-snug">
-                                Único plan con &ldquo;Modo LIVE&rdquo;: las fotos y mensajes que suben tus invitados se proyectan en pantalla en tiempo real, durante la fiesta.
+                                Único plan con &ldquo;Momentos&rdquo;: las fotos y mensajes que suben tus invitados se proyectan en pantalla en tiempo real, durante la fiesta.
                               </p>
                             </li>
                           );

@@ -243,7 +243,7 @@ export const PLAN_FEATURE_HIGHLIGHTS: Record<"FREE" | "PREMIUM" | "DIAMOND", str
   ],
   DIAMOND: [
     "Todo lo de Premium",
-    "Modo LIVE: fotos y mensajes en vivo durante la fiesta",
+    "Momentos: fotos y mensajes en vivo durante la fiesta",
   ],
 };
 

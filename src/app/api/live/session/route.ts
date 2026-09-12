@@ -128,10 +128,10 @@ export async function POST(req: Request) {
 
         if (action === "create" && !liveSession) {
             if (!hasLiveFeature) {
-                return new NextResponse("Tu plan no incluye LIVE. Actualiza a Diamond para habilitarlo.", { status: 403 });
+                return new NextResponse("Tu plan no incluye Momentos. Actualiza a Diamond para habilitarlo.", { status: 403 });
             }
             if (!canActivate) {
-                return new NextResponse("El LIVE solo se puede activar a partir del día del evento.", { status: 403 });
+                return new NextResponse("Momentos solo se puede activar a partir del día del evento.", { status: 403 });
             }
             liveSession = await prisma.liveSession.create({
                 data: {
@@ -143,10 +143,10 @@ export async function POST(req: Request) {
         } else if (action === "toggle" && liveSession) {
             const activating = !liveSession.isActive;
             if (activating && !hasLiveFeature) {
-                return new NextResponse("Tu plan no incluye LIVE. Actualiza a Diamond para habilitarlo.", { status: 403 });
+                return new NextResponse("Tu plan no incluye Momentos. Actualiza a Diamond para habilitarlo.", { status: 403 });
             }
             if (activating && !canActivate) {
-                return new NextResponse("El LIVE solo se puede activar el día del evento.", { status: 403 });
+                return new NextResponse("Momentos solo se puede activar el día del evento.", { status: 403 });
             }
             liveSession = await prisma.liveSession.update({
                 where: { invitationId },

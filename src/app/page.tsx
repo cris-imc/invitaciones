@@ -489,7 +489,7 @@ export default async function Home() {
                   <span><strong className="text-[var(--foreground)]">{t("landing.planes.premium.pagos.titulo")}</strong> {t("landing.planes.premium.pagos.detalle")}</span>
                 </li>
                 {/* La organización de mesas ya no es exclusiva de Diamond. Lo
-                    que separa a Diamond pasa a ser el Modo LIVE y saber quién
+                    que separa a Diamond pasa a ser Momentos y saber quién
                     abrió su invitación. */}
                 <li className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div></div>
