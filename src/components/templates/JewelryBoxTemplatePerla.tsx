@@ -954,7 +954,7 @@ export function JewelryBoxTemplatePerla({ invitation, guest, isPersonalized = fa
           )}
         </section>
 
-        <div id="album" data-pan="1" data-scroll={scrollVertical ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="jwb-pan">
+        <div id="album" data-pan="1" data-scroll={scrollVertical || photoPages.length <= 1 ? "vertical" : "lateral"} data-screen-label={tx("invitacion.album.titulo")} className="jwb-pan" style={{ "--st-pasos": Math.max(0, photoPages.length - 1) } as React.CSSProperties}>
           <div className="jwb-pan-sticky">
             <div data-strip="1" className="jwb-strip">
               {photoPages.map((page, pageIndex) => (
@@ -984,7 +984,7 @@ export function JewelryBoxTemplatePerla({ invitation, guest, isPersonalized = fa
                   </div>
                   <div className="jwb-seguir jwb-seguir--split">
                     <span>{tx("invitacion.album.fotosSubidas", { n: allPhotos.length }).toUpperCase()}</span>
-                    <span className="jwb-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + " →"}</span>
+                    <span className="jwb-accent-serif-2">{tx("invitacion.portada.segui").toUpperCase() + (!scrollVertical && photoPages.length > 1 ? " →" : " ↓")}</span>
                   </div>
                 </div>
               ))}
@@ -1209,6 +1209,9 @@ function JwbCdBox({ refEl, delay, dist, label }: { refEl: React.RefObject<HTMLSp
 }
 
 function JwbDots({ count = 3 }: { count?: number }) {
+  // Un punto solo no pagina nada.
+  if (count <= 1) return null;
+
   return (
     <div data-dots="1" className="jwb-dots">
       {Array.from({ length: count }).map((_, i) => (
@@ -1927,7 +1930,7 @@ const JWB_CSS = `
   .jwb-accent-serif-2 { color: #D6D2DC; }
   .jwb-h2 { margin: 0; font-family: var(--jwb-cormorant), serif; font-weight: 400; font-size: clamp(40px, 12vw, 68px); line-height: 0.96; }
 
-  .jwb-pan { height: 260vh; position: relative; }
+  .jwb-pan { height: calc(100vh + var(--st-pasos, 2) * 80vh); position: relative; }
   .jwb-pan-sticky { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
   .jwb-strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform; }
   .jwb-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 84px max(24px, calc((100vw - 560px) / 2)) 100px; gap: 22px; }
