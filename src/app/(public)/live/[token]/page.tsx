@@ -7,6 +7,7 @@ import EmojiPicker, { Theme } from "emoji-picker-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LivePhotoGallery } from "@/components/live/LivePhotoGallery";
 import { LiveMyPhotosCarousel } from "@/components/live/LiveMyPhotosCarousel";
+import { BarraDeReacciones } from "@/components/live/BarraDeReacciones";
 
 import { LiveItem } from "@prisma/client";
 
@@ -164,7 +165,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                 const newItem = await res.json();
                 setItems(prev => [newItem, ...prev]);
             } else if (res.status === 404) {
-                setErrorModal("El LIVE ha sido desactivado por el anfitrión.");
+                setErrorModal("Momentos fue desactivado por el anfitrión.");
             } else {
                 const data = await res.json().catch(() => ({}));
                 setErrorModal(data.error || "Error al subir la foto.");
@@ -201,7 +202,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                 setMessage("");
                 setShowTextForm(false);
             } else if (res.status === 404) {
-                setErrorModal("El LIVE ha sido desactivado por el anfitrión.");
+                setErrorModal("Momentos fue desactivado por el anfitrión.");
             } else {
                 const data = await res.json().catch(() => ({}));
                 setErrorModal(data.error || "Error al enviar el mensaje.");
@@ -215,7 +216,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
     };
 
     if (loading) return <div className="min-h-dvh flex items-center justify-center bg-black text-white"><Loader2 className="animate-spin" /></div>;
-    if (!session) return <div className="min-h-dvh flex items-center justify-center bg-black text-white p-6 text-center">La sesión LIVE no existe o ha sido cerrada por el anfitrión.</div>;
+    if (!session) return <div className="min-h-dvh flex items-center justify-center bg-black text-white p-6 text-center">Esta sesión de Momentos no existe o fue cerrada por el anfitrión.</div>;
 
     if (!hasName) {
         return (
@@ -223,8 +224,8 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                 <div className="w-16 h-16 rounded-full bg-[#182420] border border-[#F6F3EC]/10 flex items-center justify-center mb-6">
                     <Camera className="w-8 h-8 text-[#C79A4B]" />
                 </div>
-                <h1 className="text-2xl font-serif mb-2">¡Bienvenido al LIVE!</h1>
-                <p className="opacity-70 text-sm mb-8 max-w-xs">Tus fotos y audios aparecerán en vivo en la pantalla gigante de la fiesta.</p>
+                <h1 className="text-2xl font-serif mb-2">¡Bienvenido a Momentos!</h1>
+                <p className="opacity-70 text-sm mb-8 max-w-xs">Tus fotos y mensajes aparecerán en vivo en la pantalla gigante de la fiesta.</p>
                 <form onSubmit={handleNameSubmit} className="w-full max-w-sm flex flex-col gap-4">
                     <input
                         type="text"
@@ -251,7 +252,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
                             >
                                 Términos y Condiciones
                             </Link>{" "}
-                            del servicio LIVE
+                            del servicio Momentos
                         </span>
                     </label>
                     {errorModal && (
@@ -398,7 +399,7 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             <div className="w-full max-w-sm mx-auto mt-10 px-4">
                 <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Fotos de la Fiesta</p>
                 {items.length > 0 ? (
-                    <LivePhotoGallery items={items} />
+                    <LivePhotoGallery items={items} token={token} />
                 ) : (
                     <p className="text-center text-white/30 text-sm">Aún no hay fotos ni mensajes.</p>
                 )}
@@ -407,11 +408,21 @@ export default function LiveUploadPage({ params }: { params: Promise<{ token: st
             {items.some(item => item.type === "TEXT") && (
                 <div className="w-full max-w-sm mx-auto mt-10 px-4">
                     <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Mensajes</p>
-                    <div className="grid grid-cols-3 gap-2">
-                        {items.filter(item => item.type === "TEXT").slice(0, 9).map(item => (
-                            <div key={item.id} className="aspect-square rounded-lg overflow-hidden bg-indigo-900/20 border border-white/10 flex flex-col items-center justify-center text-indigo-400 p-2">
-                                <MessageSquare className="w-4 h-4 mb-1 opacity-50" />
-                                <p className="text-[8px] text-center line-clamp-3 text-white/70 px-1 leading-tight">{item.fileUrl}</p>
+                    {/* Antes esto era una grilla de cuadraditos con el texto a 8px:
+                        el mensaje que alguien escribió para los novios no se leía.
+                        Ahora es una lista, que es como se lee un mensaje. */}
+                    <div className="flex flex-col gap-3">
+                        {items.filter(item => item.type === "TEXT").slice(0, 12).map(item => (
+                            <div key={item.id} className="rounded-2xl bg-white/[0.04] border border-white/10 p-4">
+                                <p className="text-sm text-white/90 leading-snug whitespace-pre-wrap break-words">{item.fileUrl}</p>
+                                {item.guestName && (
+                                    <p className="text-[11px] text-white/40 mt-2">
+                                        — <span className="text-[#C79A4B]">{item.guestName}</span>
+                                    </p>
+                                )}
+                                <div className="mt-3">
+                                    <BarraDeReacciones token={token} item={item} tamano="chico" />
+                                </div>
                             </div>
                         ))}
                     </div>

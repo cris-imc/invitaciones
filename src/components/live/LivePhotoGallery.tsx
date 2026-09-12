@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { LiveItem } from "@prisma/client";
+import { BarraDeReacciones } from "./BarraDeReacciones";
 
 const AUTO_ADVANCE_MS = 4000;
 const RESUME_AFTER_MANUAL_MS = 6000;
@@ -11,7 +12,7 @@ const RESUME_AFTER_MANUAL_MS = 6000;
 // LiveMyPhotosCarousel (solo las propias), acá deliberadamente no hay botón
 // de compartir: un invitado no puede reenviar a sus redes una foto que subió
 // otra persona.
-export function LivePhotoGallery({ items }: { items: LiveItem[] }) {
+export function LivePhotoGallery({ items, token }: { items: LiveItem[]; token: string }) {
   const photos = items.filter((item) => item.type === "PHOTO");
   const [index, setIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
@@ -89,6 +90,15 @@ export function LivePhotoGallery({ items }: { items: LiveItem[] }) {
             )}
           </div>
         </button>
+
+        {/* Fuera del botón de la foto a propósito: un botón dentro de otro no
+            es HTML válido y el navegador lo desarma donde menos conviene.
+            Tocar una reacción pausa el avance automático -- si no, la foto se
+            cambia sola justo mientras el invitado apunta con el dedo. */}
+        <div className="mt-3 flex justify-center" onClick={pauseAutoplay}>
+          <BarraDeReacciones token={token} item={current} />
+        </div>
+
         {photos.length > 1 && (
           <div className="flex justify-center gap-1.5 mt-3">
             {photos.map((p, i) => (
@@ -153,11 +163,14 @@ export function LivePhotoGallery({ items }: { items: LiveItem[] }) {
             )}
           </div>
 
-          {current.guestName && (
-            <p className="text-center text-white/60 text-xs py-3 shrink-0">
-              Enviado por <span className="text-[#C79A4B] font-semibold">{current.guestName}</span>
-            </p>
-          )}
+          <div className="shrink-0 py-3 flex flex-col items-center gap-3" onClick={(e) => e.stopPropagation()}>
+            <BarraDeReacciones token={token} item={current} />
+            {current.guestName && (
+              <p className="text-center text-white/60 text-xs">
+                Enviado por <span className="text-[#C79A4B] font-semibold">{current.guestName}</span>
+              </p>
+            )}
+          </div>
         </div>
       )}
     </>

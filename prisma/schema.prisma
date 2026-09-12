@@ -581,6 +581,19 @@ model LiveItem {
   acceptanceId String?               // Trazabilidad: qué aceptación de T&C autorizó este item puntual
   acceptance   LiveTermsAcceptance?  @relation(fields: [acceptanceId], references: [id])
 
+  // Reacciones de los invitados, en vivo. Contadores sueltos y no una tabla
+  // con una fila por reacción: en la fiesta nadie va a preguntar QUIÉN puso
+  // el corazón -- lo que se proyecta es el número --, y una tabla aparte
+  // significaría una consulta más cada tres segundos en la pantalla grande,
+  // que es justo lo que no conviene cuando el salón tiene wifi de salón.
+  // Que alguien reaccione dos veces se frena del lado del teléfono; si
+  // alguien igual insiste, el daño es un número inflado en una fiesta.
+  reaccionSalud     Int @default(0)
+  reaccionMeGusta   Int @default(0)
+  reaccionMeEncanta Int @default(0)
+  reaccionMeDivierte Int @default(0)
+  reaccionSorpresa  Int @default(0)
+
   @@index([sessionId, isActive, createdAt(sort: Desc)])
   @@index([sessionId, status, createdAt(sort: Desc)])
 }

@@ -2832,3 +2832,157 @@ footer.tpl-footer small { font-size:11px; opacity:.55; }
   --input: var(--line);
   color-scheme: dark;
 }
+
+/* ============================================================
+   LIVE — la pantalla grande del salón
+   ============================================================
+   Esto se proyecta sobre una pared de tres metros durante cinco horas,
+   mientras la gente baila de espaldas. Dos consecuencias de diseño:
+
+   1. El fondo no puede ser negro plano. En un proyector, el negro plano es
+      gris sucio y se nota cada banda del degradado; y una pared apagada en
+      medio de una fiesta se lee como "se colgó".
+   2. Pero tampoco puede competir. Lo que importa son las fotos y los
+      mensajes que manda la gente. Entonces: movimiento lento (nada baja de
+      veinte segundos), contraste bajo (ningún brillo pasa del 30%) y todo
+      por detrás del contenido.
+
+   Todo se anima con transform/opacity, que es lo único que la GPU compone
+   sin repintar -- una notebook vieja conectada al proyector lo agradece.
+   ============================================================ */
+
+.live-escena{
+  position:relative;
+  background:#050807;
+  overflow:hidden;
+  isolation:isolate;
+}
+/* Todo lo que no sea fondo va por encima de la viñeta. El :not() es a
+   propósito y no un adorno: sin él, las dos capas de fondo entran en esta
+   misma regla y terminan tapando lo que tienen que ambientar. */
+.live-escena > *:not(.live-aura):not(.live-luces){position:relative; z-index:2;}
+
+/* Las dos auroras. Son elipses enormes y muy desenfocadas que se cruzan
+   despacio: una dorada arriba a la izquierda, una verde salvia abajo a la
+   derecha. Nunca se ven como formas -- se ven como que la pared respira. */
+.live-aura{position:absolute; inset:-20%; z-index:0; pointer-events:none;}
+.live-aura::before,
+.live-aura::after{
+  content:"";
+  position:absolute;
+  width:70%; aspect-ratio:1.4;
+  border-radius:50%;
+  filter:blur(90px);
+  will-change:transform;
+}
+.live-aura::before{
+  left:-6%; top:-14%;
+  background:radial-gradient(closest-side, rgba(199,154,75,.30), rgba(199,154,75,.10) 55%, transparent 76%);
+  animation:liveAuraUno 38s ease-in-out infinite alternate;
+}
+.live-aura::after{
+  right:-8%; bottom:-16%;
+  background:radial-gradient(closest-side, rgba(92,138,122,.28), rgba(92,138,122,.09) 55%, transparent 76%);
+  animation:liveAuraDos 46s ease-in-out infinite alternate;
+}
+@keyframes liveAuraUno{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  100%{transform:translate3d(14%,10%,0) scale(1.18);}
+}
+@keyframes liveAuraDos{
+  0%{transform:translate3d(0,0,0) scale(1.1);}
+  100%{transform:translate3d(-12%,-8%,0) scale(.92);}
+}
+
+/* Las luces que suben. Son primas de las del hero pero bajadas de tono:
+   menos, más chicas y con la mitad de brillo. Acá no tienen que llamar la
+   atención, tienen que hacer que el aire de la pared no esté quieto. */
+.live-luces{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none;}
+.live-luces i{
+  position:absolute; bottom:-6%;
+  border-radius:50%;
+  opacity:0;
+  background:radial-gradient(circle at 38% 34%, #FFF8E7, rgba(233,199,133,.8) 38%, rgba(199,154,75,0) 72%);
+  box-shadow:0 0 10px 3px rgba(199,154,75,.30);
+  animation:liveSubir linear infinite;
+  will-change:transform,opacity;
+}
+@keyframes liveSubir{
+  0%{transform:translate3d(0,0,0) scale(.5); opacity:0;}
+  12%{opacity:.55;}
+  80%{opacity:.35;}
+  100%{transform:translate3d(var(--dx,0px),-108vh,0) scale(1.1); opacity:0;}
+}
+
+/* Viñeta y grano, en la misma capa para no sumar un elemento más.
+   La viñeta empuja la mirada al centro, que es donde están las fotos; el
+   grano existe sólo para romper el bandeado del degradado, que en un
+   proyector se ve como anillos. */
+.live-escena::after{
+  content:"";
+  position:absolute; inset:0; z-index:1;
+  pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 42%, rgba(0,0,0,.55) 100%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.025) .5px, transparent .6px);
+  background-size:auto, 3px 3px;
+}
+
+/* La foto respira: un zoom lentísimo que nunca vuelve al punto de partida en
+   el mismo sentido, así no se percibe el rebote. Es el truco de Ken Burns, y
+   es lo que separa "una foto pegada en la pared" de "una foto proyectada". */
+.live-foto img{
+  animation:liveRespira 26s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes liveRespira{
+  0%{transform:scale(1);}
+  100%{transform:scale(1.09);}
+}
+
+/* Lo que acaba de llegar. El borde dorado late tres veces y se apaga: es el
+   "miren esto" sin cartel ni sonido. */
+.live-recien{
+  animation:liveRecien 2.4s ease-out 3;
+}
+@keyframes liveRecien{
+  0%{box-shadow:0 0 0 0 rgba(199,154,75,.55), 0 20px 60px rgba(0,0,0,.5);}
+  70%{box-shadow:0 0 0 16px rgba(199,154,75,0), 0 20px 60px rgba(0,0,0,.5);}
+  100%{box-shadow:0 0 0 0 rgba(199,154,75,0), 0 20px 60px rgba(0,0,0,.5);}
+}
+
+/* El brillo que cruza la foto cuando entra en grande, como un flash de
+   cámara pasando por el papel. Una sola vez, y se va. */
+.live-destello{
+  position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:inherit;
+}
+.live-destello::before{
+  content:"";
+  position:absolute; top:-60%; bottom:-60%; width:45%;
+  background:linear-gradient(100deg, transparent, rgba(255,248,231,.22), transparent);
+  transform:translateX(-220%) rotate(8deg);
+  animation:liveDestello 1.5s cubic-bezier(.22,.8,.28,1) .35s 1 forwards;
+}
+@keyframes liveDestello{
+  to{transform:translateX(420%) rotate(8deg);}
+}
+
+/* El número de una reacción, cuando sube. Un golpecito y listo. */
+.live-conteo-sube{animation:liveConteo .45s cubic-bezier(.22,1.4,.4,1);}
+@keyframes liveConteo{
+  0%{transform:scale(1);}
+  45%{transform:scale(1.45);}
+  100%{transform:scale(1);}
+}
+
+/* Quien pidió menos movimiento se queda con el fondo quieto y las fotos
+   quietas. La pantalla sigue siendo legible, que es lo que importa. */
+@media (prefers-reduced-motion: reduce){
+  .live-luces{display:none;}
+  .live-aura::before,
+  .live-aura::after{animation:none;}
+  .live-foto img{animation:none;}
+  .live-recien{animation:none;}
+  .live-destello{display:none;}
+  .live-conteo-sube{animation:none;}
+}
