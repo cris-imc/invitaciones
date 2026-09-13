@@ -164,7 +164,7 @@ gustó, y que no conviven en una sola familia:
 
 | Colección | Webs | Mecánica medida | Para qué evento rinde mejor |
 |---|---|---|---|
-| **A. Profundidad** | craftedbygc (1), epic (8), alireza (10), discodungeon (12) | Túnel/dolly en Z con niebla (1, verificado en código); hero con volumen donde el personaje y la plataforma respiran ±16px y el título entra con fade lento (12, medido); un objeto que entra escalando y girando en 1,2 s y sale igual al cambiar de sección (8, medido); recorrido por un solo objeto con textos que suben 60px con stagger (10, medido) | Casamiento de gala nocturno, XV de noche, aniversario, corporativo premium |
+| **A. Profundidad** | craftedbygc (1), epic (8), alireza (10), discodungeon (12) | Túnel/dolly en Z con niebla (1, verificado en código y grabado: el título de cada sala crece hasta 3-4 veces el ancho y sale por un borde, las tarjetas se abren desde el centro, el cambio de sala es un fundido de color de fondo de 1 s); hero con volumen donde el personaje y la plataforma respiran ±16px y el título entra con fade lento (12, medido); un objeto que entra escalando y girando en 1,2 s y sale igual al cambiar de sección (8, medido); recorrido por un solo objeto con textos que suben 60px con stagger (10, medido) | Casamiento de gala nocturno, XV de noche, aniversario, corporativo premium |
 | **B. Capas de papel** | indnegev (3), parallax webflow (4), discodungeon (12, mecánica), unifiers (5) y ponpon (7) para figuras | Parallax por capas con factores 0,76-0,85 en lo lejano y desplazamientos crecientes en lo cercano; nubes que derivan solas 2-4 px/s; personaje que respira ±16px; texturas de papel y sombras de recorte | Casamiento de día/campo/jardín, XV jardín o cielo, infantil |
 | **C. Tipográfica editorial** | shapestudio (2), unifiers (5), hausofwords (6), eszterbial (9), marsrejects (11), epic texto (8) | Hero pineado (factor 0,02-0,12) con nombre gigante en piezas que entran escalonadas; preloader con contador y cortina de columnas; letras que se intercambian en loop; marquesina ~80 px/s; ticker de ilustraciones ~50 px/s; inversión de color por sección; tarjetas de historia que entran sobre una portada fija | XV pop, casamiento moderno blanco y negro, cumpleaños de adulto, corporativo |
 
@@ -229,6 +229,11 @@ Motor (explicalo en un comentario al inicio del script):
 - Entrada de objeto (medido en epic.net): scale 0,15 → 1 + rotateY 40° → 0 en
   ~1,2 s, easing cubic-bezier(.16,1,.3,1); al cambiar de capítulo sale igual,
   al revés y más rápido (0,6 s).
+- Título de sala (medido en craftedbygc): el título del capítulo nace al 30%
+  de su tamaño en el centro y crece con el progreso del scroll hasta ~350%
+  mientras se desplaza hacia un borde y sale; las tarjetas/objetos se abren
+  desde el centro hacia los bordes (los laterales salen antes). El cambio de
+  sala es un fundido del color de fondo de ~1 s, no un corte.
 - Textos (medido en alireza.com): cada bloque entra con translateY 60px → 0 y
   opacity 0 → 1, 0,9 s, stagger de 120 ms entre líneas.
 - Descenso (propuesta nuestra a partir de discodungeon; su versión actual

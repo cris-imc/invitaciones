@@ -313,7 +313,7 @@ del elemento / desplazamiento del scroll; "fijo" = position sticky o fixed;
 
 | # | Sitio | Estado de la medición |
 |---|---|---|
-| 1 | craftedbygc 2018 | **No renderizó**: el loader se queda en ~45% porque los ~25 videos de la escena ya no se sirven (`ERR_ABORTED`). Vale el análisis de código de la sección 1. |
+| 1 | craftedbygc 2018 | **Completo en el tercer intento**: los ~25 videos de la escena ya no se sirven y el loader se quedaba en 45%; se interceptaron los pedidos `.mp4` y se respondieron con un clip de 1 s, con eso el loader llegó a 100%, apareció "Enter" y se grabó el recorrido. Las tarjetas se ven como rectángulos blancos/grises (sin sus videos), el movimiento es el real. |
 | 2 | shapestudio | **No renderizó**: todo el sitio es un canvas WebGL (Unseen); con GL por software queda en blanco. Vale la sección 2 (fuentes secundarias). |
 | 3 | indnegev | **Completo** (2 tiras + captura del hero). |
 | 4 | parallax webflow | **Completo**. |
@@ -325,6 +325,35 @@ del elemento / desplazamiento del scroll; "fijo" = position sticky o fixed;
 | 10 | alireza | **Completo** (la palmera WebGL se renderizó; el scroll es virtual). |
 | 11 | marsrejects | **Completo**. |
 | 12 | discodungeon | **Completo**. |
+
+## 1. craftedbygc 2018 — medido (con los videos reemplazados por un clip vacío)
+
+- **Lo que se ve**: fondo salvia #AEC7C3 con tipografía azul eléctrico
+  #1B42D8. Al entrar: "2018" gigante en serif outline al fondo, "YEAR IN
+  REVIEW" en sans bold adelante, y una mano de escultura blanca con manchas
+  flotando entre ambos. Al bajar, la cámara AVANZA: las letras de "YEAR IN
+  REVIEW" crecen hasta salir por los bordes, la mano pasa por delante y sale de
+  cuadro, entran dos líneas curvas azules (rieles), y aparece "JANUARY" en
+  serif dorada sobre fondo verde petróleo #3E8A82 con tarjetas (videos)
+  repartidas a distintas profundidades. Al seguir bajando, "JANUARY" crece
+  hasta que solo se ven trozos de letras ("NUA") y pasa de largo; después
+  "FEBRUARY" en salmón sobre azul marino #0F2A38, y lo mismo.
+- **Cómo se mueve (medido en la tira, 2 fps)**: cada mes es una "sala" de
+  ~8-10 s de rueda: el título aparece chico y centrado, crece de forma
+  acelerada durante ~3 s hasta ocupar 3-4 veces el ancho de pantalla, y sale;
+  las tarjetas entran chicas desde el centro y se abren hacia los bordes
+  (las de los costados salen antes que las centrales); el cambio de mes es un
+  cambio de color de fondo de toda la escena (no un corte), que dura ~1 s.
+  El scroll es virtual: la rueda no mueve el documento, empuja la cámara y
+  el movimiento sigue unos instantes después de soltar (inercia).
+- **En reposo**: la mano de la portada flota despacio; el título no se mueve.
+- **Receta para la invitación**: cada capítulo con su color de fondo pleno; el
+  título del capítulo nace al 30% de tamaño en el centro y crece con el
+  progreso del scroll hasta 350% mientras se desplaza hacia un borde; las
+  tarjetas (fotos, sellos) reparten en 3 profundidades (translateZ -700/-350/0)
+  y se separan del centro al avanzar; la transición de capítulo es un fundido
+  de color de fondo de 1 s; el elemento escultórico (anillo, corona, flor)
+  flota en reposo ±10 px.
 
 ## 3. indnegev — medido
 
@@ -489,6 +518,10 @@ del elemento / desplazamiento del scroll; "fijo" = position sticky o fixed;
 
 ## Qué cambia respecto de la parte 1
 
+- craftedbygc (1): ahora sí visto en movimiento: confirma el dolly (todo se
+  acerca y sale por los bordes) y suma un dato que el código no mostraba tan
+  claro: el título de cada sección es la capa que más crece (hasta 3-4 veces
+  el ancho) y el cambio de sección es un fundido de color de fondo.
 - indnegev (3): el estilo es aerógrafo/risografía con grano y dobleces, no
   papel recortado plano. La mecánica (capas con parallax) sí era correcta.
 - discodungeon (12): en la versión actual el hero no queda pineado con marcos
