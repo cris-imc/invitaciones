@@ -257,14 +257,14 @@ volver a generarlas** salvo que quieras piezas nuevas.
 
 | Familia | Piezas | Peso |
 |---|---|---|
-| `sobre-sello` | lacre, ramo-esquina, lazo, pluma | 325 KB |
-| `acuarela-corona` | corona, ramo-esquina, guirnalda, mariposa-1/2, petalo-1/2/3 | 438 KB |
-| `manuscrita` | cupido, candelabro, copas, olivo | 350 KB |
-| `tinta-vinilo` | vinilo, brazo, sello-goma, sello-tinta, ticket | 184 KB |
+| `sobre-sello` | lacre, ramo-esquina, lazo, pluma | 318 KB |
+| `acuarela-corona` | corona, ramo-esquina, guirnalda, mariposa-1/2, petalo-1/2/3 | 437 KB |
+| `manuscrita` | cupido, candelabro, copas, olivo | 352 KB |
+| `tinta-vinilo` | vinilo, brazo, sello-goma, sello-tinta, ticket | 186 KB |
 
 - **Archivos**: `public/templates/<familia>/<nombre>.webp`, servidos en
   `/templates/<familia>/<nombre>.webp`. Transparencia real, lado mayor entre
-  137 y 673 px, ninguna pieza supera 174 KB.
+  137 y 681 px, ninguna pieza supera 173 KB.
 - **Inventario con rutas, medidas y uso previsto de cada pieza**:
   `public/templates/INVENTARIO.md`.
 - **Láminas originales**: `mockup/inspire/assets/` (PNG de 1254×1254, cuatro con
