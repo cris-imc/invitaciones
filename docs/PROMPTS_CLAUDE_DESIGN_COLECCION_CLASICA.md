@@ -70,12 +70,20 @@ FORMATO DE ENTREGA (no negociable)
   con las dos vistas (Celular 430x932 y Escritorio 1440x900) en el mismo
   componente y el toggle arriba, igual que mockup/nuevo/*.dc.html.
 - Solo HTML + CSS + SVG inline + JS plano. NADA de WebGL, GSAP, Lottie, Rive,
-  canvas, video ni PNG/JPG para ilustrar. Toda ilustración (hojas, flores,
-  pampas, sellos, íconos, florituras) es SVG inline dibujado a mano con
-  paths y gradientes; el look acuarela se logra con gradientes radiales
-  superpuestos, feTurbulence a baja opacidad y bordes irregulares, no con
-  imágenes. Las fotos reales entran solo por los campos del backend (bloque
-  con la palabra FOTO).
+  canvas ni video. Íconos, sellos, sobres, filetes, marcos, bordes rasgados,
+  divisores, florituras y viñetas: SVG inline dibujado a mano.
+- PIEZAS PICTÓRICAS (excepción acotada): cada familia puede tener HASTA DOS
+  imágenes con transparencia (WebP/PNG) para lo que en SVG pierde nivel:
+  típicamente el ornamento botánico de esquina y la corona del countdown.
+  Reglas: cada pieza se declara en el mockup como un bloque con
+  data-asset="nombre" y su tamaño en px, con un SVG simplificado adentro
+  como placeholder; máximo 1200 px de lado y 150 KB en WebP; colores
+  naturales que sirvan para las 5 variantes (el acento de color lo ponen el
+  texto y el SVG, no la imagen); nunca fotos de textura a pantalla completa
+  (satén, madera). Al final del archivo, en el handoff, listá las piezas con
+  una descripción para generarlas (estilo, motivo, encuadre, fondo
+  transparente). Las fotos reales entran solo por los campos del backend
+  (bloque con la palabra FOTO).
 - Movimiento con CSS (@keyframes, transitions), IntersectionObserver y el
   progreso de scroll leído en requestAnimationFrame. Se portará a
   framer-motion + anime.js (onScroll). Respetá prefers-reduced-motion.
@@ -157,9 +165,9 @@ GESTOS MEDIDOS QUE SE ADOPTAN (con valores)
   despliega como una hoja que se desdobla (scaleY 0 → 1 desde arriba, 0,4 s).
 - Borde de papel rasgado (tomado de si-quiero y bento): path SVG irregular de
   20-30 nodos entre la foto y la sección siguiente, con sombra de 1 px.
-- Ornamento en SVG, no en PNG: las referencias cargan entre 1 y 3,5 MB de
-  hojas y pampas en PNG; acá el mismo ornamento se dibuja en SVG (20-60 KB) y
-  se recolorea por variante.
+- Ornamento en SVG salvo las dos piezas pictóricas por familia: las
+  referencias cargan entre 1 y 3,5 MB de hojas y pampas en PNG; acá el
+  presupuesto es de 300 KB de imágenes por familia y el resto en SVG.
 
 MOMENTO WOW DE LA COLECCIÓN: LA APERTURA (uno distinto por familia)
 El splash se cierra con un gesto físico de 1-1,2 s que revela la portada:
@@ -241,7 +249,35 @@ sello de confirmación, de la corona y del vinilo.
 
 ---
 
-## 3. Moodboard (opcional, para Gemini o ChatGPT Image)
+## 3. Piezas pictóricas: cómo se generan (Gemini o ChatGPT Image)
+
+Una o dos por familia, según lo que Claude Design declare con `data-asset` en
+el handoff. Mismo prompt base para que las piezas de una familia sean
+coherentes entre sí; fondo transparente; se exportan a WebP de 1200 px y se
+guardan en `public/templates/<familia>/<nombre>.webp`. Los colores van en
+tonos naturales para que sirvan a las 5 variantes.
+
+- **Sobre & Sello, `lacre`** (opcional; el sello suele salir bien en SVG):
+  "Sello de lacre bordó visto de frente, relieve con monograma en serif,
+  brillo especular suave, bordes irregulares de cera, fondo transparente,
+  iluminación cálida desde arriba a la izquierda, sin texto adicional,
+  1200x1200."
+- **Acuarela & Corona, `corona`**: "Corona circular de peonías rosa antiguo,
+  hojas de eucalipto y ramas finas en acuarela, trazos con agua y bordes
+  difusos, centro vacío, vista frontal, fondo transparente, paleta rosa
+  empolvado, salvia y crema, sin texto, 1200x1200."
+- **Acuarela & Corona, `esquina`**: "Ramo de esquina en acuarela: peonías,
+  eucalipto y ramas secas que salen de la esquina superior izquierda hacia el
+  centro, bordes difusos, fondo transparente, misma paleta que la corona,
+  1200x1200."
+- **Manuscrita, `linea`**: "Ilustración a un solo trazo de tinta (cupido con
+  arco, candelabro de tres velas, dos copas), línea fina irregular como pluma,
+  tinta verde oliva, fondo transparente, sin sombreado, 1200x1200."
+- **Tinta & Vinilo, `vinilo`**: "Disco de vinilo negro con etiqueta central
+  crema, surcos visibles, reflejo suave, vista cenital, fondo transparente,
+  1200x1200."
+
+## 4. Moodboard (opcional, para Gemini o ChatGPT Image)
 
 - **Sobre & Sello**: "Moodboard 3x3 de papelería de casamiento de lujo: sobre
   de papel de algodón crema con solapa en V y sello de lacre bordó con
@@ -252,7 +288,7 @@ sello de confirmación, de la corona y del vinilo.
   corona botánica circular, bordes de papel rasgado, papel crema, tipografía
   serif y script fina; delicado y elegante, no infantil, sin texto."
 
-## 4. Flujo
+## 5. Flujo
 
 1. Pegar el prompt de §2 en Claude Design con el repo sincronizado; adjuntar
    las tiras `mockup/inspire/webs/2x-*.jpg` y el moodboard si lo generaste.
@@ -260,7 +296,10 @@ sello de confirmación, de la corona y del vinilo.
    Escritorio, la apertura especificada con keyframes, las variantes y el
    handoff.
 3. Guardar en `mockup/clasica/<Nombre> - Panoramica.dc.html`.
-4. Portar con `docs/GUIA_TECNICA_PLANTILLAS.md` sobre `ModernoTemplate.tsx`
+4. Generar las piezas pictóricas declaradas (§3), guardarlas en
+   `public/templates/<familia>/` y reemplazar el placeholder SVG de cada
+   `data-asset` por la imagen.
+5. Portar con `docs/GUIA_TECNICA_PLANTILLAS.md` sobre `ModernoTemplate.tsx`
    como base (es Flat), invertir a tema claro con las trampas de la sección
    3.4 y 3.5 (`--chic-ink`), generar variantes por script, wirear los 8
    puntos, agregar a `template-labels.ts` y al gating por tipo de evento.
