@@ -1,6 +1,7 @@
-# Análisis de 7 invitaciones "clásicas" de la competencia (momento.vip y bento)
+# Análisis de 10 invitaciones "clásicas" de la competencia (momento.vip, bento y si-quiero)
 
 > Fecha: 2026-09-14. Complemento de `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_CLASICA.md`.
+> Sitios 21-27: momento y bento. Sitios 28-30: si-quiero (agregados después).
 >
 > **Método**: cada invitación se abrió en Chromium emulando un iPhone (430×932,
 > touch), se tocó "Abrir invitación" cuando había tapa, se grabó video de la
@@ -22,6 +23,26 @@
 
 Ninguna usa WebGL para la invitación en sí. Todo el movimiento que se ve es
 CSS + IntersectionObserver, salvo el confeti (probable canvas) y la música.
+
+### 0.1 Inventario de assets (medido en la red del navegador)
+
+Sí: la decoración de bento son **imágenes con transparencia**, no SVG. momento
+casi no usa decoración de imagen; si-quiero usa PNG para todo.
+
+| Sitio | Assets de decoración | Peso |
+|---|---|---|
+| bento Autumn | `dryLeaves.png` 700×700 (hojas de esquina), `countdownAutumn-Photoroom.webp` 1200×1200 (la corona), `borderTop.webp` 1776×493 (el borde ondulado con hojas), `rsvpLeaves.webp`; fotos de Unsplash; 44 SVG inline (íconos) | 578 KB + 228 + 95 + 192 ≈ **1,1 MB** de ornamento |
+| bento Shimmer | `backgroundSlate.webp` y `backgroundElegante.webp` 941×1672 (el satén, foto de tela), fuente propia `DarrelAlluraMonoline.otf`; 54 SVG inline | ≈ 240 KB + fuente |
+| bento Campestre | `PAMPAS (1-4).png` 1555×2200 cada una (440-650 KB), `Tree Texture/1 (1).jpg` 1,4 MB de fondo; 51 SVG inline | ≈ **3,5 MB** de ornamento |
+| momento (las tres) | fotos AVIF de Pexels (190-660 KB c/u), un patrón de papel como SVG en data-URI, 68 SVG inline (íconos, sello, vinilo), tiles de Google Maps, miniaturas de Mercado Libre para el registro de regalos | sin PNG decorativo |
+| si-quiero (las tres) | 18-28 PNG por página: íconos (icons8: copas, iglesia, cena, fiesta, silla, regalo, rsvp, instagram, nota musical), ilustraciones de línea (cupido, candelabro), bordes de papel rasgado, corona de eucalipto en acuarela, fotos con borde; un `.mp3` de fondo | no medido, PNG sin optimizar |
+
+Conclusión para nosotros: el look acuarela/pampas de bento cuesta entre 1 y
+3,5 MB de imágenes por invitación. Con la regla "ilustración en SVG" el mismo
+ornamento pesa 20-60 KB y se recolorea por variante sin regenerar nada. Lo que
+sí conviene tomar de ellos es la **composición** del ornamento (esquinas
+superpuestas al borde de la foto, corona alrededor del número, borde ondulado
+entre secciones), no el formato.
 
 ## 1. momento.vip — XV de Victoria (21)
 
@@ -182,6 +203,46 @@ contenido siguiente la tapa); las pampas decorativas **giran** al entrar
 (`rotate` de ~140° a ~50°) y derivan 11 px en reposo; ítems de la línea de
 tiempo desde ±60 px; títulos 60 → 0; bloques 16 → 0.
 
+## 7b. si-quiero — olivayvino "Si hay boda, hay joda" (28), luciayjuan (29), sofiaynicolas (30)
+
+**Técnica**: HTML estático con la librería AOS (`data-aos="fade-up"` en 52-61
+elementos, `fade-in` en 5), Montserrat 100/300 (muy fina) o Ibarra Real Nova,
+un reproductor de mp3 (mediaelement), formularios con SweetAlert. Cada
+plantilla se reutiliza con otro nombre (los `<title>` dicen "LucreyPipe",
+"EXPRESS PLUS", "JUAN Y CAMILA"). Escritorio: la misma columna, sin adaptar.
+
+**Movimiento medido**: un solo gesto en toda la invitación: cada bloque entra
+con `translateY(100px → 0)` + opacity 0 → 1 (AOS, ~0,8 s) al cruzar el
+viewport; el botón de música flota. Nada más.
+
+- **olivayvino (28)**: papel con textura, título manuscrito bordó "Si hay
+  boda, hay joda", fecha en script, "JESI Y JUAN" tracked; cupido y candelabro
+  como ilustraciones de línea (PNG) en las esquinas; secciones verde oliva
+  #8A9A6E con una **lista de preguntas frecuentes desplegables** ("¿Cómo me
+  visto?", "¿Qué les regalo?", "¿Dónde estaciono?", "¿Podemos llevar a los
+  peques?", "¿Dónde compartimos las fotos?"); RSVP "Sólo faltás vos, ¿Venís?"
+  con formulario; una foto con marco de rayas y borde rasgado; cierre
+  manuscrito "Lucre y Pipe / Te esperamos".
+- **luciayjuan (29)**: foto a pantalla completa con **borde de papel rasgado**
+  abajo, "NUESTRA BODA / Lucía & Juan" (script) / fecha tracked; countdown
+  "FALTAN" (vencido: 0 0 0 0); tarjetas "Ceremonia" y "Fiesta" con ícono de
+  línea, hora y "CÓMO LLEGAR"; cronograma con íconos (20:00 Tomá tu lugar,
+  20:30 Ceremonia, 21:30 Brindis, 22:00 1er plato, 00:00 Fiesta); fotos con
+  borde rasgado alternando; Instagram; Playlist; Dress code "Elegante";
+  RSVP; Mesa de regalos con CBU y alias; cierre "TE ESPERAMOS" sobre foto.
+  Beige #E8D5B7 y crema, serif Ibarra + script.
+- **sofiaynicolas (30)**: crema, fecha tracked arriba, **corona de eucalipto
+  en acuarela** (PNG) con "SOFIA & NICOLAS" en serif mayúsculas y el "&" en
+  script dorado, "¡NOS CASAMOS!"; secciones verde oliva con formulario "¿Venís?"
+  (Sí/No, apellido, restricciones); cierre con la misma corona; footer.
+
+**Qué aportan**: son el escalón "clásico económico". Confirman tres cosas: el
+público espera **script manuscrita + serif + mayúsculas tracked**, ornamento
+botánico y papel; el gesto de entrada único y sobrio no molesta; y la sección
+de **preguntas frecuentes** ("¿Dónde estaciono?", "¿Podemos llevar a los
+peques?") es exactamente nuestra `InfoAdicionalSection` (alojamiento,
+estacionamiento, transporte, adicional): conviene mostrarla como preguntas.
+
 ## 8. Qué tienen en común (el "look clásico") y qué podemos tomar
 
 **Lenguaje visual compartido**
@@ -262,6 +323,9 @@ Hay **dos sistemas** y un tercero opcional:
 - **"Noir" (bento Phantom)**: oscuro, sans pesada en mayúsculas, un acento
   flúo, tipografía en dos colores. Cumpleaños de adulto y XV nocturna. Es el
   más cercano a lo que ya tenemos en Ónix/Neon, así que va como opcional.
+- **si-quiero** entra en "Acuarela" (sofiaynicolas, luciayjuan con el papel
+  rasgado) y aporta la variante **manuscrita** (olivayvino): título a mano
+  alzada, ilustración de línea en las esquinas, preguntas frecuentes.
 
 Cómo se traduce esto a una colección propia, sin copiar y con "algo distinto",
 está en `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_CLASICA.md`.

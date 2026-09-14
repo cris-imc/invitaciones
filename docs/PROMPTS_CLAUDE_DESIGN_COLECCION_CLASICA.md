@@ -1,7 +1,7 @@
 # Prompt para Claude Design — Colección D "Papelería Viva" (clásica, con gestos memorables)
 
-> Fecha: 2026-09-14. Basado en `docs/ANALISIS_INVITACIONES_CLASICAS.md` (7
-> invitaciones de momento.vip y bento medidas en celular y escritorio). Las
+> Fecha: 2026-09-14. Basado en `docs/ANALISIS_INVITACIONES_CLASICAS.md` (10
+> invitaciones de momento.vip, bento y si-quiero medidas en celular y escritorio). Las
 > tiras de fotogramas para adjuntar están en `mockup/inspire/webs/2x-*.jpg`.
 >
 > Qué se pidió: una familia con **look clásico** (como esas invitaciones), con
@@ -151,6 +151,15 @@ GESTOS MEDIDOS QUE SE ADOPTAN (con valores)
   música.
 - Pase de acceso: tarjeta con número de pase grande, mesa, QR y "Presentá tu
   pase al ingresar", con borde troquelado.
+- Info adicional como preguntas (tomado de si-quiero): "¿Dónde estaciono?",
+  "¿Dónde me alojo?", "¿Cómo llego?", "¿Podemos llevar a los chicos?" como
+  filas desplegables (InfoAdicionalSection); al abrir, la respuesta se
+  despliega como una hoja que se desdobla (scaleY 0 → 1 desde arriba, 0,4 s).
+- Borde de papel rasgado (tomado de si-quiero y bento): path SVG irregular de
+  20-30 nodos entre la foto y la sección siguiente, con sombra de 1 px.
+- Ornamento en SVG, no en PNG: las referencias cargan entre 1 y 3,5 MB de
+  hojas y pampas en PNG; acá el mismo ornamento se dibuja en SVG (20-60 KB) y
+  se recolorea por variante.
 
 MOMENTO WOW DE LA COLECCIÓN: LA APERTURA (uno distinto por familia)
 El splash se cierra con un gesto físico de 1-1,2 s que revela la portada:
@@ -196,12 +205,20 @@ FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad:
    script grande.
    Escritorio: la columna fija es la foto enmarcada por la corona botánica.
 
-3. Opcional CUMPLEAÑOS ADULTO — "Tinta & Vinilo"
+3. Opcional CASAMIENTO INFORMAL — "Manuscrita"
+   Papel con textura #F1EDE4, tinta bordó #7A2F3A o verde oliva #6E7A52;
+   título a mano alzada (Caveat o Homemade Apple, grande, solo para el
+   título y el cierre), ilustraciones de línea a un solo trazo en las esquinas
+   (cupido, candelabro, copas, ramas), preguntas frecuentes desplegables,
+   fotos con marco de rayas y borde rasgado. Apertura: la hoja se desdobla
+   en dos (rotateX en el pliegue central). Para bodas relajadas y cumpleaños.
+
+4. Opcional CUMPLEAÑOS ADULTO — "Tinta & Vinilo"
    Papel obra #EFE9DF, tinta negra, un acento (rojo lacre o azul klein);
    serif condensada + mono; el vinilo como pieza central del splash: el
    disco gira y el brazo del tocadiscos baja para abrir. Sobrio, editorial.
 
-4. Opcional CORPORATIVO — "Membrete"
+5. Opcional CORPORATIVO — "Membrete"
    Blanco roto, gris grafito, un acento institucional; grilla estricta, sello
    seco (relieve simulado con dos sombras), sin script.
 
