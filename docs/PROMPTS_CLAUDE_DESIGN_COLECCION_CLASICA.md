@@ -252,10 +252,28 @@ sello de confirmación, de la corona y del vinilo.
 ## 3. Piezas pictóricas: cómo se generan (Gemini o ChatGPT Image)
 
 Una o dos por familia, según lo que Claude Design declare con `data-asset` en
-el handoff. Mismo prompt base para que las piezas de una familia sean
-coherentes entre sí; fondo transparente; se exportan a WebP de 1200 px y se
-guardan en `public/templates/<familia>/<nombre>.webp`. Los colores van en
-tonos naturales para que sirvan a las 5 variantes.
+el handoff. Los colores van en tonos naturales para que sirvan a las 5
+variantes.
+
+**Método: una sola lámina por familia, después se corta.** En vez de generar
+las piezas de a una, se pide una sola imagen con todas, y un script las
+separa, les quita el fondo y las exporta a WebP con transparencia de 1200 px
+en `public/templates/<familia>/<nombre>.webp`. Condiciones de la lámina:
+
+- 2048×2048 (o 3072×2048 si son seis piezas), dividida en cuadrantes iguales.
+- **Fondo liso magenta puro #FF00FF** (o verde puro #00FF00), sin sombras
+  proyectadas, sin damero: los generadores no entregan transparencia real y
+  el fondo plano se quita por color. Blanco no sirve (la acuarela y el papel
+  tienen blancos).
+- Cada pieza centrada en su cuadrante, sin tocar los bordes ni a las vecinas.
+- Sin texto ni etiquetas dentro de la imagen; el orden se indica en el prompt.
+
+Encabezado para la lámina (se antepone a las descripciones de abajo):
+"Una sola imagen de 2048x2048 dividida en cuatro cuadrantes iguales, fondo
+liso magenta puro #FF00FF sin sombras ni degradés, una pieza centrada en cada
+cuadrante sin tocar los bordes, sin texto. Cuadrante 1 (arriba izquierda):
+… Cuadrante 2 (arriba derecha): … Cuadrante 3 (abajo izquierda): …
+Cuadrante 4 (abajo derecha): …". Mismo estilo pictórico en las cuatro.
 
 - **Sobre & Sello, `lacre`** (opcional; el sello suele salir bien en SVG):
   "Sello de lacre bordó visto de frente, relieve con monograma en serif,
