@@ -112,14 +112,20 @@ FORMATO DE ENTREGA (no negociable)
     para nada de eso.
   * Los FILETES, marcos, reglas y el monograma van en SVG inline dibujado por
     vos, trazo 0,75-1 px.
-  * El ORNAMENTO DIBUJADO (íconos de línea hechos a mano, ramas, flores,
-    garabatos) va en PIEZAS WebP con transparencia que YA EXISTEN. No las
-    inventes ni las describas para generar: leé public/templates/INVENTARIO.md
-    antes de componer y usá las de tu familia, con
-    <img src="/templates/<familia>/<nombre>.webp" alt="" aria-hidden="true"> y
-    pointer-events:none. Son tinta a un color: usalas como máscara CSS
-    (mask / -webkit-mask con background: var(--t-acc)) para que se recoloreen
-    en cada variante, como muestra el INVENTARIO.
+  * El ORNAMENTO DIBUJADO (íconos de línea hechos a mano, ramas, garabatos,
+    puntilla) va en PIEZAS WebP con transparencia que YA EXISTEN, cortadas y
+    listas. No las inventes ni las describas para generar: leé
+    public/templates/INVENTARIO_PAPEL_PRENSADO.md antes de componer y usá sólo
+    las de tu familia más el set compartido de íconos. Son 29 piezas en total:
+    12 íconos de línea, 4 de herbario, 9 de trazo y 4 de naipe.
+    Hay DOS formas de usarlas y no son intercambiables:
+      - iconos-linea, trazo y naipe son TINTA PLANA: van como máscara CSS
+        (mask / -webkit-mask con background: var(--t-acc)), y así toman el
+        color de cada variante sin generar un archivo por color.
+      - herbario está PINTADO con luces y sombras: la máscara lo aplastaría en
+        una mancha. Va como <img> y se tiñe con un duotono de filtros; los
+        cinco valores probados están en el INVENTARIO.
+    En los dos casos: alt="", aria-hidden="true" y pointer-events:none.
   * Las fotos reales entran solo por los campos del backend (bloque FOTO).
 - Movimiento con CSS (@keyframes, transitions), IntersectionObserver y el
   progreso de scroll leído en requestAnimationFrame. Se portará a
@@ -351,7 +357,7 @@ quinta es opcional. Las cinco comparten el set de íconos de línea.
    aire. Único ornamento: los íconos de línea compartidos, uno por sección. Es
    la que más se parece a /emboss y /editorial y la que mejor muestra de qué se
    trata la colección.
-   Piezas: sólo public/templates/iconos-linea/ (el set compartido).
+   Piezas: sólo public/templates/iconos-linea/ (el set compartido de 12).
    Papel #F4ECE2, papel alterno #EFE5D9, tinta #514842, tinta suave #8A756D,
    sombra 120,103,86.
    Variantes (cambia el tono del papel, NUNCA se agrega color de acento):
@@ -383,21 +389,21 @@ quinta es opcional. Las cinco comparten el set de íconos de línea.
    trazo botánico #6E7A5E, sombra 116,110,92.
    Variantes: "Salvia" #6E7A5E · "Eucalipto" #7C8B7A · "Oliva" #7A7A55 ·
    "Ceniza" #8A8A82 · "Tinta" #55605C.
-   Piezas: public/templates/herbario/ (rama-esquina, rama-cabecera,
-   rama-vertical) + el set compartido de íconos de línea.
+   Piezas: public/templates/herbario/ (rama-esquina, rama-cabecera, magnolia,
+   hoja) + el set compartido de íconos de línea.
    Ornamento: las TRES piezas y nada más, reutilizadas en cinco tamaños según
    las reglas de composición de arriba. rama-esquina en el tercio inferior
    izquierdo sangrando por el borde; rama-cabecera arriba a la derecha cortada
-   por el borde superior; rama-vertical sólo en la portada y en la columna fija
-   de escritorio, corriendo dos tercios de la altura. Van como máscara, teñidas
-   con el verde de la variante. Quietas: no rotan ni cambian de opacidad.
+   por el borde superior; magnolia sólo en la portada y en la columna fija de
+   escritorio, corriendo dos tercios de la altura. Van como <img> con el duotono
+   de la variante (NO como máscara). Quietas: no rotan ni cambian de opacidad.
    Portada: nombre de la quinceañera en serif a 44 px con relieve, "MIS XV" en
    versalitas con 0,39 em, ramita en la esquina superior derecha.
    Countdown: el número grande y, alrededor, un círculo de 0,75 px con doce
    marcas finas, como un herbario prensado bajo vidrio.
    Álbum: polaroids con 10 px de margen de papel y una cinta de papel SVG en la
    esquina; nada de sombras grandes.
-   RSVP: al confirmar, tres hojitas (la pieza hojita del set, a 24 px) caen
+   RSVP: al confirmar, tres hojitas (herbario/hoja.webp, a 24 px) caen
    desde arriba de la hoja y se apoyan, en 900 ms, con easing
    cubic-bezier(.22,.61,.36,1). Es el único momento con movimiento "de más" de
    toda la colección y la única excepción a la regla de ornamento quieto.
@@ -433,8 +439,9 @@ quinta es opcional. Las cinco comparten el set de íconos de línea.
    sombra 112,106,94.
    Variantes: "Grafito" #3C3A35 · "Tinta" #2E3A4A · "Terracota" #8A5340 ·
    "Verde" #3F5347 · "Ciruela" #54364A.
-   Piezas: public/templates/trazo/ (garabato-largo, garabato-corto, corazones,
-   destellos, marco-circular) + el set compartido.
+   Piezas: public/templates/trazo/ (garabato-largo, garabato-corto,
+   corazon-grande, corazon-chico, marco-circular, destello-1..4) + el set
+   compartido.
    Composición: el garabato-largo va pegado al borde izquierdo o derecho de la
    hoja, sangrando arriba y abajo, a 0,30 de ancho; el corto cierra la esquina
    inferior contraria. Nunca los dos del mismo lado. El marco-circular sólo
@@ -452,8 +459,8 @@ quinta es opcional. Las cinco comparten el set de íconos de línea.
    sombra 120,103,86.
    Variantes: "Bordó" #7A2F3A · "Tinta" #2B3A57 · "Verde mesa" #2F5244 ·
    "Ciruela" #5B3550 · "Cobre" #9A5A34.
-   Piezas: public/templates/naipe/ (puntilla-marco, palo-corazon, palo-trebol)
-   + el set compartido.
+   Piezas: public/templates/naipe/ (puntilla-marco, palo-corazon, palo-trebol,
+   esquina-filigrana) + el set compartido.
    Portada: la foto dentro de un naipe (hoja con radio 12 px, filete doble a
    8 px y 12 px, y el palo de baraja en dos esquinas opuestas, a 0,08 de ancho).
    El naipe entra con la rotación de 6° de siempre, nada de "dar vuelta la
@@ -482,13 +489,24 @@ CHEQUEO ANTES DE ENTREGAR
 
 ---
 
-## 3. Las láminas de assets (pedirlas ANTES que las plantillas)
+## 3. Las láminas de assets — YA ESTÁN HECHAS Y CORTADAS
 
-Mismo flujo que funcionó en la Colección D: vos generás **una lámina PNG por
-set**, con todas las piezas separadas sobre fondo transparente, y yo las corto,
-las paso a WebP con transparencia y las dejo en `public/templates/<set>/` con su
-entrada en `public/templates/INVENTARIO.md`. Recién ahí se le pide a Claude
-Design la plantilla.
+Las cuatro láminas se generaron, se cortaron y quedaron listas: **29 piezas** en
+`public/templates/`, con su inventario en
+`public/templates/INVENTARIO_PAPEL_PRENSADO.md`. **No hay que volver a generarlas**
+salvo que quieras piezas nuevas.
+
+| Set | Piezas | Peso | Cómo se usa |
+|---|---|---|---|
+| `iconos-linea` | 12 (iglesia, copas, anillos, tarjeta, sobre, confeti, polaroids, nota-musical, torta, reloj, auto, regalo) | 225 KB | máscara CSS |
+| `herbario` | 4 (rama-esquina, rama-cabecera, magnolia, hoja) | 277 KB | `<img>` + duotono |
+| `trazo` | 9 (garabato-largo/corto, 2 corazones, marco-circular, 4 destellos) | 101 KB | máscara CSS |
+| `naipe` | 4 (puntilla-marco, palo-corazon, palo-trebol, esquina-filigrana) | 310 KB | máscara CSS |
+
+Las capturas de control: `mockup/inspire/webs/4y-piezas-cortadas.jpg` (las 29 a
+escala) y `4y-herbario-variantes.jpg` (una rama en las cinco variantes).
+
+Los prompts de abajo quedan por si más adelante querés piezas nuevas.
 
 Reglas para las cuatro láminas:
 - Cuadrada, 1500×1500 o más, **fondo transparente**.
@@ -599,7 +617,7 @@ sobre transparente, sin color, sin sombra, sin fondo.
 Nada de texto, nada de números, nada de firma.
 ```
 
-### Qué hago yo con las láminas
+### Qué hago yo con una lámina nueva
 
 Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
 `mockup/inspire/assets/`) y yo:
@@ -607,7 +625,7 @@ Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
    ni con pedazos de la vecina).
 2. Las paso a WebP con transparencia, lado mayor máximo 1200 px.
 3. Las dejo en `public/templates/iconos-linea/`, `/herbario/`, `/trazo/`,
-   `/naipe/` y las agrego a `public/templates/INVENTARIO.md` con ruta, medida,
+   `/naipe/` y las agrego a `public/templates/INVENTARIO_PAPEL_PRENSADO.md` con ruta, medida,
    peso, para qué es cada una y el snippet de máscara CSS.
 4. Recién entonces le pasás el prompt de la plantilla a Claude Design.
 
@@ -630,12 +648,11 @@ Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
 
 ## 5. Orden sugerido
 
-0. **Generar la Lámina 0 (íconos de línea) y pasármela.** Es la que usan las
-   cuatro familias; sin ella ninguna plantilla queda completa.
-1. **Prensa** primero y sola, ya con los íconos cortados. Es la que define la
-   colección; si el relieve y el grano no quedan bien ahí, no quedan bien en
-   ninguna.
+Las cuatro láminas ya están cortadas, así que se puede arrancar directo:
+
+1. **Prensa** primero y sola. Es la que define la colección; si el relieve y el
+   grano no quedan bien ahí, no quedan bien en ninguna.
 2. Revisarla en celular real antes de pedir las otras.
-3. Generar las **Láminas 1 y 2** y pedir **Herbario** (XV) y **Trazo**.
-4. **Noche** (oscura / corporativa): no necesita lámina nueva, usa la 0 en hueso.
-5. **Naipe** y su Lámina 3, sólo si las cuatro anteriores cerraron.
+3. **Herbario** (XV) y **Trazo**.
+4. **Noche** (oscura / corporativa): usa el mismo set de íconos, en hueso.
+5. **Naipe**, sólo si las cuatro anteriores cerraron.
