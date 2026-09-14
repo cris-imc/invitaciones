@@ -386,3 +386,62 @@ con dos correcciones sobre el original:
 
 Las láminas a pedir y sus prompts están en
 `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_PAPEL.md`, §5.
+
+---
+
+## 9. La tipografía script: Final Parade Script
+
+Las referencias cargan **Final Parade Script** (se ve en su stack de fuentes
+como `orig_final_parade_script`), a **29 px** y en tinta plana. Es la misma que
+se compró para este proyecto y la que usa la Colección E.
+
+**Ficha del archivo** (leída del TTF):
+
+| Campo | Valor |
+|---|---|
+| Familia | Final Parade Script · Regular · v1.002 |
+| Autoría | Putracetol Studio, Karanganyar — Putra Novembria Candra Kusuma, ©2022 |
+| Licencia | "please refer to the license on the website where you bought this font" → putracetol.com/licenses/ |
+| `fsType` | **0** (Installable Embedding: el archivo no restringe el empotrado) |
+| Glifos | 361 — cubre todos los acentos, `ñ`, `ü`, `¿`, `¡`, cifras y puntuación |
+| Features | `liga` (ligaduras), `kern`, `aalt` |
+| Métrica | 1000 upem · asc 900 · desc −400 |
+
+Conversión: el TTF de 131,9 KB pasó a **WOFF2 de 59,8 KB**, sin subsetear, para
+no perder las ligaduras ni el kerning — en una script, eso es el efecto.
+Queda en `src/app/fonts/final-parade-script.woff2` y se registra en
+`src/app/layout.tsx` con `next/font/local`, variable `--font-final-parade`, con
+`preload: false` (sólo la pintan las plantillas de esta colección). También
+quedó como opción de título en `src/lib/typography-map.ts`.
+
+> Nota legal, una sola vez: `fsType 0` es un permiso técnico del archivo, no una
+> licencia. Las licencias de estos estudios suelen separar *desktop* de
+> *webfont*, y el uso en **plantillas que se venden a terceros** a veces pide una
+> licencia extendida. Conviene confirmar esos dos puntos con Putracetol antes de
+> publicar la colección. La fuente ya está instalada y funcionando.
+
+### 9.1 El límite medido: relieve vs tinta plana
+
+Final Parade es **monolineal y muy fina**. El relieve de §5.2, que funciona
+perfecto con un serif, se la come. Se probaron cinco combinaciones
+(`mockup/inspire/webs/4z-final-parade-relieve-vs-plana.jpg`):
+
+| | Tamaño | Tratamiento | Resultado |
+|---|---|---|---|
+| A | 34 px | tinta plana | **Perfecto.** Es como la usan las referencias (29 px). |
+| B | 34 px | tinta de color | Perfecto; es la opción de la familia Naipe. |
+| C | 46 px | relieve estándar | **Se borra.** El trazo no tiene cuerpo para sostener tres sombras. |
+| D | 56 px | relieve reforzado | El mínimo que aguanta. |
+| E | 72 px | relieve reforzado | Muy bien; es el tamaño de lucimiento. |
+
+Reglas que salen de ahí, y que están en el prompt:
+
+- Por defecto, **tinta plana a 30-36 px**.
+- Si se quiere en relieve, **56 px o más y con el contraste reforzado**:
+  offsets de 1,5 px, sombra al 80 % y luz al 100 %, en vez de 1 px / 55 % / 92 %.
+- Nunca relieve estándar a tamaño de título, nunca por debajo de 28 px, nunca en
+  mayúsculas ni con `letter-spacing`.
+
+El relieve, entonces, es de la **serif** (Cormorant Garamond 300). La script
+entra en tinta, que además es lo que hace que la hoja tenga dos niveles de
+lectura en vez de uno.

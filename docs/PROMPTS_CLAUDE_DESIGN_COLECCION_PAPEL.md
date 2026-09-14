@@ -306,9 +306,25 @@ Tres fuentes de Google Fonts, no más:
   sección: Cormorant Garamond 300 (primera opción) o Bodoni Moda 400. Es la
   fuente de la colección; usala en italic para los títulos de sección cuando la
   familia no lleve script.
-- SCRIPT, sólo para títulos de sección y el "&": Pinyon Script, Mrs Saint
-  Delafield o Style Script. Una sola palabra o frase corta por vez, nunca un
-  párrafo.
+- SCRIPT: **Final Parade Script**, obligatoria, no la cambies por una de Google.
+  Es la misma que usan las referencias y ya está instalada y auto-hospedada en
+  el proyecto: se usa como var(--font-final-parade, 'Final Parade Script'),
+  cursive. Peso 400, es el único que hay. Sólo para títulos de sección, el "&"
+  de la portada y la frase de cierre: una palabra o una frase corta por vez,
+  nunca un párrafo ni un dato.
+  OJO, ESTO SE MIDIÓ Y ES UNA RESTRICCIÓN REAL: el trazo es monolineal y muy
+  fino, así que el relieve estándar se la come. Las reglas son:
+    * En TINTA PLANA: de 30 a 36 px. Así la usan las referencias (miden 29 px)
+      y así se lee perfecto. Es la opción por defecto.
+    * En RELIEVE: mínimo 56 px, y con el contraste reforzado, no el estándar:
+        color: <papel −8 %>;
+        text-shadow: -1.5px -1.5px 0 rgba(<sombra>,.80),
+                      1.5px  1.5px 0 rgba(255,255,255,1),
+                      3px    4px  5px rgba(<sombra>,.26);
+    * NUNCA: relieve estándar a tamaño de título (46 px o menos). Se borra.
+    * NUNCA por debajo de 28 px, ni en mayúsculas, ni con letter-spacing.
+  La comparación de las cinco opciones está en
+  mockup/inspire/webs/4z-final-parade-relieve-vs-plana.jpg.
 - SANS para datos, versalitas y kickers: Jost 300 (primera opción) o Archivo.
 
 Escala medida en las referencias, respetala:
@@ -317,9 +333,12 @@ Escala medida en las referencias, respetala:
   colección se cae.
 - Datos (fecha, ciudad, hora): 13 px, tracking 0,16 em, mayúsculas.
 - Numeración de sección: serif 300, 26 px, con punto.
-- Título de sección: script 42-46 px, o serif italic 34 px.
-- Nombres de portada: serif 300, 38 px, una línea por nombre, el "&" en script
-  a 30 px en la línea del medio.
+- Título de sección: Final Parade en tinta plana 34 px (por defecto), o en
+  relieve reforzado 56-72 px, o serif italic 34 px cuando la familia no lleve
+  script.
+- Nombres de portada: serif 300, 38 px, una línea por nombre, el "&" en Final
+  Parade a 34 px en la línea del medio (en relieve va con el serif, porque el
+  "&" es un solo glifo grande y ahí sí aguanta).
 - Número grande del countdown: serif 300, 86 px, line-height 0,9.
 - Texto corrido: 15 px, line-height 1,75, nunca menos de 14 px.
 
@@ -454,6 +473,8 @@ CHEQUEO ANTES DE ENTREGAR
   Si dudás, subí el contraste de la sombra, no el tamaño.
 - ¿Todas las animaciones duran 1,2 s o menos y son solo opacity y transform?
 - ¿Las versalitas chicas tienen 0,39 em de tracking?
+- ¿Final Parade quedó en tinta plana a 30-36 px, o en relieve reforzado a 56 px
+  o más? ¿No quedó ningún título con relieve estándar?
 - ¿Las cinco variantes siguen siendo monocromas?
 - ¿El texto corrido bajó de 14 px en algún lado?
 - ¿Se ve bien con prefers-reduced-motion activado?
@@ -602,6 +623,7 @@ Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
 | `mockup/inspire/webs/4x-rame-relieve-css-vs-png.jpg` | **la comparación CSS contra PNG**: es la que más importa |
 | `mockup/inspire/webs/4x-rame-prototipo-css.jpg` | la hoja completa ya hecha en CSS |
 | `mockup/inspire/webs/4y-rame-assets-*.jpg` | **el ornamento real de seis familias, recortado y a escala**: los íconos a mano, las ramas, los garabatos |
+| `mockup/inspire/webs/4z-final-parade-relieve-vs-plana.jpg` | Final Parade en tinta plana y en relieve, a cinco tamaños: por qué hay un mínimo |
 | `docs/ANALISIS_RAMESTUDIO.md` | los números, y en §8 el inventario de ornamento con las reglas de composición medidas |
 
 ---

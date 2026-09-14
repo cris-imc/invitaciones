@@ -24,6 +24,10 @@ export const TITLE_FONT_OPTIONS: FontOption[] = [
   { id: "sacramento", label: "Sacramento", fontFamily: "var(--font-sacramento, 'Sacramento'), cursive" },
   { id: "abril-fatface", label: "Abril Fatface", fontFamily: "var(--font-abril-fatface, 'Abril Fatface'), cursive" },
   { id: "prata", label: "Prata", fontFamily: "var(--font-prata, 'Prata'), serif" },
+  // Auto-hospedada (no está en Google Fonts). Trazo monolineal muy fino: por
+  // debajo de 28 px pierde legibilidad y en relieve necesita el contraste
+  // reforzado -- ver docs/PROMPTS_CLAUDE_DESIGN_COLECCION_PAPEL.md.
+  { id: "final-parade", label: "Final Parade Script", fontFamily: "var(--font-final-parade, 'Final Parade Script'), cursive" },
 ];
 
 export const BODY_FONT_OPTIONS: FontOption[] = [
