@@ -23,6 +23,11 @@
 > con gestos físicos, mecanismo Flat), con su propio prompt en
 > `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_CLASICA.md` y su análisis en
 > `docs/ANALISIS_INVITACIONES_CLASICAS.md`.
+>
+> Y una quinta, **E "Papel Prensado"** (papel real y relieve, monocroma, sin
+> una sola imagen de ornamento; mecanismo Flat), en
+> `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_PAPEL.md`, con su análisis en
+> `docs/ANALISIS_RAMESTUDIO.md`.
 
 ---
 
