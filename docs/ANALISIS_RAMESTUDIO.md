@@ -37,6 +37,12 @@ nada, se recolorea por variante con una variable CSS, y el texto sigue siendo
 texto (se puede seleccionar, buscar, leer con lector de pantalla y cambiar por
 los datos reales del backend).
 
+**Eso vale para el papel, el relieve y el pliegue. NO vale para el ornamento.**
+Las flores pintadas, las ramas, los garabatos y los íconos dibujados a mano son
+dibujo, y el dibujo hay que dibujarlo. Son, además, la mitad de lo que hace
+lindas a estas plantillas, y están compuestos con criterio: el inventario
+completo y las reglas de colocación medidas están en §8.
+
 ---
 
 ## 1. Las 13, agrupadas
@@ -169,7 +175,9 @@ cinco animaciones en total.
 |---|---|---|---|
 | Títulos de sección ("La ceremonia", "Nuestra historia") | **PNG horneado de texto en relieve** — `PRESETS DE EMBOSS.png`, `01. TEXTOS PARA MODELO EMBOSS.png` | 280×75 px, 4–8 kB | 3.649×953, 450–640 kB |
 | Fondo de tarjeta | **PNG generado con IA** — el `alt` dice literalmente `ChatGPT Image 3 jul 2026, 15…` | 281×422, ~24 kB | 931×1689, 1,9–2,6 MB |
-| Íconos (iglesia, música, fiesta, anillos) | The Noun Project — `noun-church-2684219_edited.png`, `noun-music-2684263…` | 31–66 px | — |
+| Íconos de línea dibujados a mano (iglesia, anillos en cajita, copas, sobre, confeti, tarjeta) | **PNG generado**, `ChatGPT Image 9 jul 2026` — un lote entero el mismo día | 41–128 px | — |
+| Íconos sólidos (algunas familias) | The Noun Project — `noun-church-2684219_edited.png`, `noun-diamond-ring-5305964.png` | 31–66 px | — |
+| Ornamento botánico (ramas, flores, pampas, magnolia) | PNG con transparencia, 2 a 3 piezas por familia | 77–520 px | — |
 | Fotos | JPG | 305–320 px de ancho | — |
 
 El cliente tenía razón. Y esto explica el costo del método: **cada título es una
@@ -274,7 +282,15 @@ trivia y datos bancarios como sección propia. Los tres entran sin forzar nada.
 - Los fondos de tarjeta generados con IA. Van en `feTurbulence`.
 - La ausencia de splash: nuestras plantillas Flat lo tienen y sirve para el
   nombre del invitado. Se hace quieto, no espectacular.
-- Los íconos de The Noun Project. Van en SVG inline dibujado.
+- Los íconos de The Noun Project sólidos, que además vienen con la atribución
+  impresa adentro del PNG y sin recortar (se ve en `noun-diamond-ring-5305964`).
+  Los que sí se toman son los **dibujados a mano** (§8), que son propios.
+
+**Lo que NO se toca (y en la primera versión de este documento me equivoqué):**
+el ornamento dibujado. Las ramas pintadas, los garabatos de trazo suelto y los
+íconos hechos a mano son la mitad del encanto de estas plantillas y no salen de
+un `feTurbulence`. Se diseñan, se generan y se recortan, igual que las piezas de
+la Colección D. Las reglas de composición están medidas en §8.
 
 **Lo que agregamos y ellos no tienen** (el "algo distinto"):
 - El relieve reacciona a la luz: al scrollear, el ángulo de la sombra del
@@ -284,3 +300,89 @@ trivia y datos bancarios como sección propia. Los tres entran sin forzar nada.
 - El papel se puede **recolorear entero** con una variable, porque no es una
   imagen. Cuatro variantes por familia salen gratis.
 - Pase con QR, trivia y datos bancarios, que ellos no cubren.
+
+---
+
+## 8. El ornamento: inventario y reglas de composición
+
+Esta sección faltaba en la primera versión y es la que más importa para el
+diseño. Se midió descargando **todas** las imágenes de siete familias
+(`/botanico`, `/magnolia`, `/pampagrass`, `/doodles`, `/church`, `/lucky`,
+`/chilling`), con su tamaño renderizado y su posición relativa dentro de la
+hoja que las contiene. Las láminas de referencia quedaron en
+`mockup/inspire/webs/4y-rame-assets-*.jpg`.
+
+### 8.1 Los tres registros de dibujo
+
+**a) Íconos de línea dibujados a mano** — el vocabulario compartido, el que más
+se repite y el que más carácter da. Trazo único de peso uniforme (~2 px al
+tamaño original), puntas redondeadas, temblor de mano evidente, monocromo, sin
+relleno. Anillos en su cajita abierta, iglesia con cruz y destellitos, copas
+brindando con chispas, tarjeta doblada con un corazón, sobre con un tilde,
+confeti saliendo, polaroids apiladas, nota musical con corazones, rama fina.
+Aparecen en `/pampagrass`, `/doodles`, `/botanico` y `/church` — el mismo set.
+Están generados: los nombres dicen `ChatGPT Image 9 jul 2026`, todos del mismo
+día, o sea **una sola tanda**.
+
+**b) Botánica pintada monocroma** — 2 o 3 piezas por familia, en acuarela o
+lápiz teñido de un solo color: rama de magnolia sepia de 145×520, espigas secas
+color trigo, ramita de eucalipto verde con florcitas blancas, corona circular de
+doble filete con hojitas.
+
+**c) Garabatos sueltos** (sólo `/doodles`) — trazos largos y curvos, sin objeto:
+una línea que recorre el borde de la hoja, dos corazones a mano alzada,
+destellos sueltos. Son el elemento más informal de las 13 y el que hace que la
+plantilla se lea como un cuaderno.
+
+Y aparte, fuera de registro: `/church` tiene un **dibujo a pluma de una catedral**
+(199×272), grabado fino, que es la pieza más linda de las 13 y la única
+ilustración "seria" del set.
+
+### 8.2 Cómo están compuestos — las reglas medidas
+
+Sobre una hoja de 301 px de ancho (§3), midiendo cada pieza como fracción del
+ancho de su hoja:
+
+| Regla | Valor medido |
+|---|---|
+| **Ningún ornamento tiene transform ni blend mode** | 159 de 159 imágenes: `transform: none`, `mix-blend-mode: normal`, `opacity: 1` |
+| Ícono de línea sobre el título | ancho **0,19** de la hoja (mediana; rango 0,10–0,30) → **57 px**, rango 30–90 |
+| Ícono: posición | centrado, `relX` 0,36–0,43; justo encima del número de sección |
+| Botánica de esquina | ancho 0,28–0,38 · `relX` **−0,05 a 0** · `relY` 0,55–0,74 |
+| Botánica de cabecera | ancho 0,40–0,63 · `relX` 0,37–0,56 · `relY` 0,00–0,10 |
+| Botánica vertical de costado | ancho 0,45 · alto 520 px sobre una portada de 773 → recorre **2/3 de la altura** |
+| Par espejado | la misma pieza a `relX` 0 y `relX` 0,67, reflejada |
+| Título de sección en relieve | ancho 0,59 de la hoja (190 px) |
+
+Tres conclusiones, que son las que hay que trasladar:
+
+1. **Toda pieza grande sangra por un borde de la hoja.** Ninguna flota en el
+   medio. Las de esquina arrancan en `relX −0,05` (o sea, entran cortadas desde
+   afuera); las de cabecera se cortan arriba. Es lo que hace que la hoja se lea
+   como un papel impreso y no como una página web con una calcomanía pegada.
+
+2. **Dos o tres piezas por familia, reutilizadas en tres a cinco tamaños.**
+   `/botanico` usa **dos archivos** en toda la invitación: una ramita de esquina
+   (a 123×155 y a 77×156) y una rama horizontal (a 201×83, 146×60 y 127×52).
+   Nada más. La riqueza sale de la repetición a distintas escalas, no de tener
+   muchos dibujos.
+
+3. **El ornamento está quieto.** Cero rotación, cero opacidad parcial, cero
+   modo de fusión. Entra con el mismo fundido que el resto de la sección y se
+   queda donde está. Cualquier ornamento que se mueva o brille rompe el registro.
+
+### 8.3 Qué hacemos nosotros
+
+Lo mismo, generado y recortado con el flujo que ya usamos en la Colección D
+(lámina PNG → recorte por etiquetas → WebP con transparencia → `INVENTARIO.md`),
+con dos correcciones sobre el original:
+
+- **Un set de íconos para toda la colección**, no uno por familia. Son el
+  vocabulario común y hacen que las cuatro familias se lean como una.
+- **Monocromo de verdad**: cada pieza sale en tinta a un solo color, para usarse
+  como máscara CSS (`mask` con `background: var(--t-acc)`) y recolorearse por
+  variante sin regenerar nada. Ramé no puede hacer eso: sus flores vienen con el
+  color quemado, y por eso `/botanico` y `/magnolia` no tienen variantes.
+
+Las láminas a pedir y sus prompts están en
+`docs/PROMPTS_CLAUDE_DESIGN_COLECCION_PAPEL.md`, §5.

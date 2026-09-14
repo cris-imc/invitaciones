@@ -13,11 +13,17 @@
 > Colección D.
 >
 > Diferencia con la Colección D "Papelería Viva": aquélla es papelería clásica
-> **ilustrada** (flores, lacre, vinilo, piezas pictóricas WebP). Ésta es
-> papelería **prensada y monocroma**: sin ilustración, sin color de acento
-> saturado, sin imágenes de ornamento. Todo el peso visual lo llevan el grano
-> del papel, el relieve de la letra y el aire. Son complementarias, no
-> competidoras.
+> **ilustrada en color** (flores en acuarela, lacre bordó, vinilo). Ésta es
+> papelería **prensada y monocroma**: el papel, el relieve y el aire llevan el
+> peso, y el dibujo entra en tinta a un solo color — íconos hechos a mano, ramas
+> de herbario, garabatos sueltos —, siempre sangrando por un borde de la hoja y
+> siempre recoloreable por variante. Son complementarias, no competidoras.
+>
+> **Corrección sobre la primera versión de este documento:** decía "cero
+> imágenes de ornamento" y estaba mal. El dibujo a mano es la mitad de lo que
+> hace lindas a estas plantillas y no sale de un filtro CSS. Las láminas de
+> assets a pedir están en §3, y las reglas de composición medidas (dónde va cada
+> pieza, de qué tamaño y cuántas) dentro del prompt.
 
 ---
 
@@ -26,11 +32,15 @@
 Las 13 referencias son un solo sistema con 13 pieles. Su fuerza no está en
 ningún efecto: está en lo que **no** hacen. Trece invitaciones y cinco
 animaciones en total, ninguna llamativa. Lo que queda cuando sacás todo lo
-demás es una hoja de papel con grano, una letra en relieve, márgenes enormes y
-un fundido de 1,2 segundos.
+demás son tres cosas: una hoja de papel con grano, una letra en relieve y un
+dibujo a mano apoyado en el borde de la hoja.
 
-Ellos hornean el papel y el relieve como PNG porque están sobre Wix. Nosotros
-no tenemos esa limitación, y ahí está el "algo distinto":
+Esas tres cosas se consiguen de dos maneras distintas y conviene no
+confundirlas.
+
+**El papel y el relieve se hacen en CSS.** Ellos los hornean como PNG porque
+están sobre Wix; nosotros no tenemos esa limitación, y ahí está una parte del
+"algo distinto":
 
 - **El papel es CSS** (`feTurbulence` en un `data:` URI de 400 bytes), así que
   se recolorea con una variable y cuatro variantes por familia salen gratis.
@@ -45,6 +55,21 @@ Las dos recetas están probadas contra el PNG original de ramestudio antes de
 escribir este prompt; la comparación está en
 `mockup/inspire/webs/4x-rame-relieve-css-vs-png.jpg` y el prototipo completo de
 una hoja en `mockup/inspire/webs/4x-rame-prototipo-css.jpg`.
+
+**El dibujo, en cambio, se dibuja.** Los íconos hechos a mano, las ramas de
+herbario y los garabatos sueltos son la otra mitad del encanto y no salen de un
+filtro. Lo que sí podemos hacer mejor es cómo se usan: ellos generan cada pieza
+con el color quemado adentro del PNG, y por eso `/botanico` y `/magnolia` no
+tienen variantes de color. Nosotros las pedimos en **tinta a un solo color** y
+las usamos como máscara CSS, así la misma rama sale verde salvia, oliva o
+ceniza según la variante, sin regenerar un solo archivo.
+
+Y sobre cómo se colocan, medí las siete familias con dibujo y las reglas son
+pocas y estrictas: **toda pieza grande sangra por un borde de la hoja**, se usan
+**dos o tres piezas reutilizadas en tres a cinco tamaños** (la familia mejor
+compuesta usa literalmente dos archivos en toda la invitación), y **el ornamento
+está quieto**: de 159 imágenes medidas, ninguna tiene rotación, opacidad parcial
+ni modo de fusión. Todo eso está adentro del prompt, con números.
 
 ---
 
@@ -81,12 +106,21 @@ FORMATO DE ENTREGA (no negociable)
   componente y el toggle arriba, igual que mockup/nuevo/*.dc.html.
 - Solo HTML + CSS + SVG inline + JS plano. NADA de WebGL, GSAP, Lottie, Rive,
   canvas ni video.
-- CERO IMÁGENES DE ORNAMENTO. Esta colección no usa ni WebP ni PNG ni las
-  piezas de public/templates/. El grano del papel va con feTurbulence en un
-  data: URI; el relieve con text-shadow; los pliegues con clip-path; los
-  filetes, monogramas, íconos y viñetas con SVG inline dibujado por vos, de
-  trazo 0,75-1 px. Las fotos reales entran solo por los campos del backend
-  (bloque con la palabra FOTO).
+- QUÉ VA EN CSS Y QUÉ VA EN DIBUJO, que no es lo mismo:
+  * El PAPEL, el RELIEVE y el PLIEGUE van en CSS: grano con feTurbulence en un
+    data: URI, relieve con text-shadow, esquina con clip-path. No uses imágenes
+    para nada de eso.
+  * Los FILETES, marcos, reglas y el monograma van en SVG inline dibujado por
+    vos, trazo 0,75-1 px.
+  * El ORNAMENTO DIBUJADO (íconos de línea hechos a mano, ramas, flores,
+    garabatos) va en PIEZAS WebP con transparencia que YA EXISTEN. No las
+    inventes ni las describas para generar: leé public/templates/INVENTARIO.md
+    antes de componer y usá las de tu familia, con
+    <img src="/templates/<familia>/<nombre>.webp" alt="" aria-hidden="true"> y
+    pointer-events:none. Son tinta a un color: usalas como máscara CSS
+    (mask / -webkit-mask con background: var(--t-acc)) para que se recoloreen
+    en cada variante, como muestra el INVENTARIO.
+  * Las fotos reales entran solo por los campos del backend (bloque FOTO).
 - Movimiento con CSS (@keyframes, transitions), IntersectionObserver y el
   progreso de scroll leído en requestAnimationFrame. Se portará a
   framer-motion + anime.js (onScroll). Respetá prefers-reduced-motion: con
@@ -121,7 +155,8 @@ SECCIONES (las 9 de Flat, mismo orden, sin agregar ni quitar):
  (triviaHabilitada), pase con QR (QrDeIngreso, número de pase, mesa), info
  adicional (alojamiento, estacionamiento, transporte) y estado post-evento
  (solo álbum). Los 10 slots de doodle de la guía son fijos en cantidad y
- posición: acá los doodles son SVG de trazo fino, nunca imágenes.
+ posición: acá los llenás con las piezas WebP de tu familia siguiendo las
+ reglas de composición de abajo.
 
 NUMERACIÓN DE SECCIONES (tomado de las referencias, es gratis y ordena todo):
  cada sección lleva arriba, centrado, su número en serif ligera a 26 px con
@@ -158,6 +193,43 @@ GEOMETRÍA — VALORES MEDIDOS, USALOS TAL CUAL
 - Separación entre hojas: 22 px.
 - Largo total en celular: entre 6 y 8,5 pantallas. Si te pasás, sacá aire de
   las secciones de datos, nunca de la portada.
+
+=========================================================================
+COMPOSICIÓN DEL ORNAMENTO — REGLAS MEDIDAS, SON LO QUE HACE LINDA A LA HOJA
+=========================================================================
+Medidas sobre las siete familias con dibujo de las referencias. Los tamaños van
+como fracción del ancho de la hoja (301 px en celular), no en píxeles.
+
+1) TODA PIEZA GRANDE SANGRA POR UN BORDE. Ninguna flota en el medio de la hoja.
+   - De esquina: ancho 0,28-0,38, pegada al borde izquierdo (left: -5% a 0),
+     en el tercio inferior (top 55-74 %). Entra cortada desde afuera.
+   - De cabecera: ancho 0,40-0,63, arriba a la derecha (left 37-56 %,
+     top 0-10 %), cortada por el borde superior.
+   - Vertical de costado: ancho 0,45, corriendo dos tercios de la altura de la
+     portada, cortada arriba y abajo.
+   - Par espejado: la misma pieza a left 0 y left 67 %, una de ellas con
+     transform: scaleX(-1). Es el recurso más barato para llenar una hoja.
+2) DOS O TRES PIEZAS POR FAMILIA, REUTILIZADAS EN TRES A CINCO TAMAÑOS. La
+   referencia con mejor composición usa DOS archivos en toda la invitación: una
+   ramita de esquina a dos tamaños y una rama horizontal a tres. No pidas ni uses
+   una pieza distinta por sección: la riqueza sale de repetir a distintas
+   escalas, no de acumular dibujos.
+3) EL ÍCONO DE LÍNEA VA ARRIBA DEL NÚMERO DE SECCIÓN, centrado, ancho 0,19 de la
+   hoja (rango 0,10-0,30). Uno por sección, siempre el mismo para la misma
+   sección en todas las familias: así las cuatro se leen como una colección.
+4) EL ORNAMENTO ESTÁ QUIETO. Cero rotación, cero opacidad parcial, cero
+   mix-blend-mode. Las 159 imágenes medidas en las referencias tienen
+   transform:none, opacity:1 y blend normal. Entra con el mismo fundido de
+   1200 ms del resto de la sección y se queda donde está. Un ornamento que rota,
+   late o brilla rompe el registro entero.
+5) NUNCA ORNAMENTO SOBRE TEXTO. Si se pisan, gana el texto: mové la pieza o
+   achicala. El ornamento vive en los márgenes de la hoja.
+6) COMO ES TINTA A UN COLOR, se usa de máscara y se recolorea por variante:
+     .orn-rama{ width:38%; background:var(--t-acc);
+       -webkit-mask:url(/templates/<familia>/rama.webp) no-repeat center/contain;
+               mask:url(/templates/<familia>/rama.webp) no-repeat center/contain; }
+   Eso es lo que las referencias NO pueden hacer (tienen el color quemado en el
+   PNG) y por eso no tienen variantes de color. Nosotros sí.
 
 =========================================================================
 LAS DOS RECETAS CENTRALES — YA PROBADAS, NO LAS REINVENTES
@@ -252,12 +324,15 @@ Escala medida en las referencias, respetala:
 - Texto corrido: 15 px, line-height 1,75, nunca menos de 14 px.
 
 =========================================================================
-FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad.
+FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad; la
+quinta es opcional. Las cinco comparten el set de íconos de línea.
 =========================================================================
 1. CASAMIENTO — "PRENSA"
-   La familia pura: papel crema, cero ornamento, todo el peso en el relieve y
-   el aire. Es la que más se parece a /emboss y /editorial y la que mejor
-   muestra de qué se trata la colección.
+   La familia pura: papel crema, sin botánica, todo el peso en el relieve y el
+   aire. Único ornamento: los íconos de línea compartidos, uno por sección. Es
+   la que más se parece a /emboss y /editorial y la que mejor muestra de qué se
+   trata la colección.
+   Piezas: sólo public/templates/iconos-linea/ (el set compartido).
    Papel #F4ECE2, papel alterno #EFE5D9, tinta #514842, tinta suave #8A756D,
    sombra 120,103,86.
    Variantes (cambia el tono del papel, NUNCA se agrega color de acento):
@@ -281,27 +356,32 @@ FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad.
    y la nav numerada impresa al pie en versalitas.
 
 2. QUINCE — "HERBARIO"
-   Papel crema y un solo verde apagado, usado únicamente en trazo de 0,75 px.
-   Es /botanico y /doodles: ramitas, hojas y tallos dibujados en SVG inline,
-   nunca rellenos, nunca imágenes. El verde no es un acento: es la tinta de un
-   sello de botánica, y aparece en no más de 5 lugares en toda la invitación.
+   Papel crema y un solo verde apagado. Es /botanico, /magnolia y /pampagrass:
+   ramas, hojas y espigas de lámina de herbario, teñidas de ese único verde. No
+   es un acento de color: es la tinta de un sello de botánica, y no aparece en
+   ningún otro lado de la invitación.
    Papel #F7F2EA, papel alterno #F1EADF, tinta #45443C, tinta suave #857F70,
    trazo botánico #6E7A5E, sombra 116,110,92.
    Variantes: "Salvia" #6E7A5E · "Eucalipto" #7C8B7A · "Oliva" #7A7A55 ·
    "Ceniza" #8A8A82 · "Tinta" #55605C.
-   Ornamento: cuatro ramitas SVG distintas (olivo, eucalipto, espiga, helecho)
-   de 60-90 px, una por esquina de hoja, siempre a media opacidad y siempre
-   cortadas por el borde de la hoja (entran desde afuera). Al entrar la sección,
-   la ramita rota de -4° a 0 junto con el fundido.
+   Piezas: public/templates/herbario/ (rama-esquina, rama-cabecera,
+   rama-vertical) + el set compartido de íconos de línea.
+   Ornamento: las TRES piezas y nada más, reutilizadas en cinco tamaños según
+   las reglas de composición de arriba. rama-esquina en el tercio inferior
+   izquierdo sangrando por el borde; rama-cabecera arriba a la derecha cortada
+   por el borde superior; rama-vertical sólo en la portada y en la columna fija
+   de escritorio, corriendo dos tercios de la altura. Van como máscara, teñidas
+   con el verde de la variante. Quietas: no rotan ni cambian de opacidad.
    Portada: nombre de la quinceañera en serif a 44 px con relieve, "MIS XV" en
    versalitas con 0,39 em, ramita en la esquina superior derecha.
    Countdown: el número grande y, alrededor, un círculo de 0,75 px con doce
    marcas finas, como un herbario prensado bajo vidrio.
    Álbum: polaroids con 10 px de margen de papel y una cinta de papel SVG en la
    esquina; nada de sombras grandes.
-   RSVP: al confirmar, tres hojitas SVG caen desde arriba de la hoja y se
-   apoyan, en 900 ms, con easing cubic-bezier(.22,.61,.36,1). Es el único
-   momento con movimiento "de más" de toda la colección.
+   RSVP: al confirmar, tres hojitas (la pieza hojita del set, a 24 px) caen
+   desde arriba de la hoja y se apoyan, en 900 ms, con easing
+   cubic-bezier(.22,.61,.36,1). Es el único momento con movimiento "de más" de
+   toda la colección y la única excepción a la regla de ornamento quieto.
    Escritorio: la columna fija lleva la foto con margen de papel y una rama
    larga que la cruza en diagonal, cortada por los dos bordes.
 
@@ -317,14 +397,35 @@ FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad.
    1.1 dentro de la hoja. Si queda plano, se ve barato.
    Monograma: dos iniciales en serif dentro de un óvalo de 0,75 px, arriba de
    los nombres.
-   Íconos de sección en SVG de línea (anillos, iglesia, copas, torta, sobre),
-   de 32-46 px, trazo 0,75 px, uno por sección, arriba del número.
+   Íconos de sección: el set compartido de public/templates/iconos-linea/,
+   usados como máscara con background: var(--t-ink) para que salgan en hueso
+   sobre el negro. Ancho 0,19 de la hoja, uno por sección, arriba del número.
    Para corporativo: misma familia, monograma reemplazado por el logo del
    cliente en un slot de 120x40, y el cronograma pasa a ser la agenda.
    Escritorio: la columna fija es una hoja negra con el filete interior y el
    monograma; la foto entra en la columna derecha.
 
-4. XV / CUMPLEAÑOS — "NAIPE" (opcional, si hay lugar)
+4. CASAMIENTO / XV — "TRAZO"
+   La informal de la colección, y la que el cliente señaló como "parece dibujado
+   a mano" (/doodles). Mismo papel y mismo relieve que Prensa, pero la hoja está
+   recorrida por trazos sueltos: una línea larga y curva que bordea el papel, dos
+   corazones a mano alzada, destellos. Nada de botánica.
+   Papel #F6F1E9, papel alterno #EFE8DC, tinta #3C3A35, tinta suave #7E7A70,
+   sombra 112,106,94.
+   Variantes: "Grafito" #3C3A35 · "Tinta" #2E3A4A · "Terracota" #8A5340 ·
+   "Verde" #3F5347 · "Ciruela" #54364A.
+   Piezas: public/templates/trazo/ (garabato-largo, garabato-corto, corazones,
+   destellos, marco-circular) + el set compartido.
+   Composición: el garabato-largo va pegado al borde izquierdo o derecho de la
+   hoja, sangrando arriba y abajo, a 0,30 de ancho; el corto cierra la esquina
+   inferior contraria. Nunca los dos del mismo lado. El marco-circular sólo
+   rodea el número del countdown.
+   El trazo es el color de la variante, así que la misma familia pasa de
+   cuaderno a lápiz de color sin regenerar nada.
+   Escritorio: la columna fija lleva el garabato-largo cruzando la foto por
+   detrás.
+
+5. XV / CUMPLEAÑOS — "NAIPE" (opcional, si hay lugar)
    La única que se permite un segundo color de tinta: /lucky y /chilling.
    Papel crema con un lunar de 1,5 px cada 14 px (SVG tileado, no imagen) y una
    tinta bordó para un solo elemento por sección.
@@ -332,15 +433,23 @@ FAMILIAS (base + 4 variantes cada una). Las dos primeras son la prioridad.
    sombra 120,103,86.
    Variantes: "Bordó" #7A2F3A · "Tinta" #2B3A57 · "Verde mesa" #2F5244 ·
    "Ciruela" #5B3550 · "Cobre" #9A5A34.
+   Piezas: public/templates/naipe/ (puntilla-marco, palo-corazon, palo-trebol)
+   + el set compartido.
    Portada: la foto dentro de un naipe (hoja con radio 12 px, filete doble a
-   8 px y 12 px, y un palo de baraja SVG en dos esquinas opuestas). El naipe
-   entra con la rotación de 6° de siempre, nada de "dar vuelta la carta".
+   8 px y 12 px, y el palo de baraja en dos esquinas opuestas, a 0,08 de ancho).
+   El naipe entra con la rotación de 6° de siempre, nada de "dar vuelta la
+   carta". La puntilla enmarca la foto de la sección de álbum, sangrando por los
+   cuatro bordes.
    El resto igual que Prensa, con el palo de baraja como viñeta de sección.
 
 =========================================================================
 CHEQUEO ANTES DE ENTREGAR
 =========================================================================
-- ¿Hay alguna imagen que no venga de un campo del backend? Si sí, sacala.
+- ¿Hay alguna imagen que no venga de un campo del backend o del INVENTARIO?
+  Si sí, sacala.
+- ¿Toda pieza grande sangra por un borde de la hoja? ¿Ninguna flota en el medio?
+- ¿Usaste dos o tres piezas reutilizadas, en vez de una distinta por sección?
+- ¿El ornamento quedó quieto (sin rotación, sin opacidad parcial, sin blend)?
 - ¿El relieve se lee sobre el papel a 320 px de ancho, en un celular al sol?
   Si dudás, subí el contraste de la sombra, no el tamaño.
 - ¿Todas las animaciones duran 1,2 s o menos y son solo opacity y transform?
@@ -352,7 +461,138 @@ CHEQUEO ANTES DE ENTREGAR
 
 ---
 
-## 3. Qué adjuntarle
+## 3. Las láminas de assets (pedirlas ANTES que las plantillas)
+
+Mismo flujo que funcionó en la Colección D: vos generás **una lámina PNG por
+set**, con todas las piezas separadas sobre fondo transparente, y yo las corto,
+las paso a WebP con transparencia y las dejo en `public/templates/<set>/` con su
+entrada en `public/templates/INVENTARIO.md`. Recién ahí se le pide a Claude
+Design la plantilla.
+
+Reglas para las cuatro láminas:
+- Cuadrada, 1500×1500 o más, **fondo transparente**.
+- Las piezas separadas entre sí por al menos 40 px de vacío, sin tocarse ni
+  superponerse. Es lo que me permite recortarlas por etiquetas sin que se mezclen.
+- **Tinta a UN SOLO color** (gris oscuro #3A342E sobre transparente). Nada de
+  color, nada de sombras, nada de fondo. El color lo pone la variante con una
+  máscara CSS.
+- Trazo de peso uniforme y puntas redondeadas.
+
+### Lámina 0 — Íconos de línea (la comparte TODA la colección)
+
+```text
+Generá una lámina cuadrada de 1500x1500 px, fondo TRANSPARENTE, con 12 íconos
+dibujados a mano, separados entre sí por al menos 40 px de espacio vacío, en
+una grilla de 4 columnas x 3 filas.
+
+Estilo: línea única de peso uniforme, puntas redondeadas, trazo con temblor de
+mano evidente (dibujados, no vectorizados), SIN relleno, SIN sombra, SIN color:
+todo en gris oscuro #3A342E sobre transparente. Cada ícono cabe en un cuadrado
+imaginario de 300 px y ocupa unos 220 px. Estética de cuaderno de bocetos de una
+diseñadora de bodas: delicado, fino, nada infantil, nada de clipart.
+
+Los 12 íconos, en este orden:
+ 1. Dos anillos de compromiso en una cajita abierta, con un destello arriba.
+ 2. Una iglesia chiquita con campanario y una cruz, dos destellos al costado.
+ 3. Dos copas de champán brindando, con tres chispas.
+ 4. Una tarjeta doblada parada, con un corazón chico en el frente.
+ 5. Un sobre abierto con un tilde adentro.
+ 6. Un cono de confeti explotando, con corazoncitos y estrellitas.
+ 7. Dos fotos polaroid apiladas y giradas, con un corazón en la de arriba.
+ 8. Una nota musical doble con dos corazones colgando.
+ 9. Una torta de dos pisos con una velita.
+10. Un reloj de agujas simple.
+11. Un auto de costado con dos latitas atadas atrás.
+12. Una cajita de regalo con un moño.
+
+Nada de texto, nada de marcas de agua, nada de firma.
+```
+
+### Lámina 1 — Herbario (familia 2)
+
+```text
+Generá una lámina cuadrada de 1800x1800 px, fondo TRANSPARENTE, con 4 piezas
+botánicas separadas entre sí por al menos 60 px de espacio vacío.
+
+Estilo: ilustración botánica delicada, dibujada a mano, en UN SOLO color gris
+oscuro #3A342E sobre transparente, sin color, sin sombra, sin fondo. Trazo fino
+con relleno suave en las hojas (tipo lápiz o acuarela de un solo tono), NO línea
+pura. Elegante y seco, estilo lámina de herbario antiguo.
+
+Las 4 piezas:
+ 1. RAMA DE ESQUINA: un ramito de eucalipto con tres florcitas chicas, que
+    crece en diagonal desde abajo a la izquierda hacia arriba a la derecha.
+    Formato vertical, unas 600x760 px.
+ 2. RAMA DE CABECERA: una rama horizontal de hojas finas y espigas, más ancha
+    que alta, unas 900x380 px, con el tallo entrando desde la izquierda.
+ 3. RAMA VERTICAL: una rama larga y angosta de magnolia con dos flores
+    abiertas y varias hojas, muy vertical, unas 400x1400 px.
+ 4. HOJITA SUELTA: una sola hoja ovalada con su tallito, unas 180x220 px.
+
+Cada pieza completa y entera, sin cortar por el borde de la lámina. Nada de
+texto, nada de marco, nada de firma.
+```
+
+### Lámina 2 — Trazo (familia 4)
+
+```text
+Generá una lámina cuadrada de 1500x1500 px, fondo TRANSPARENTE, con 5 piezas
+de trazo suelto, separadas entre sí por al menos 50 px de espacio vacío.
+
+Estilo: garabato a mano alzada, línea única de peso uniforme (unos 6 px a esta
+escala), puntas redondeadas, temblor de mano evidente, en gris oscuro #3A342E
+sobre transparente. Sin relleno, sin sombra, sin color.
+
+Las 5 piezas:
+ 1. GARABATO LARGO: una sola línea curva y ondulada, muy vertical (unos
+    260x1300 px), como la que alguien traza al costado de una hoja sin levantar
+    el lápiz. Sin objeto, pura línea.
+ 2. GARABATO CORTO: una línea curva más suelta y horizontal, unos 600x400 px,
+    con un rulo en el medio.
+ 3. CORAZONES: dos corazones a mano alzada de distinto tamaño, uno al lado del
+    otro, trazo abierto (no cierran del todo), unos 500x400 px.
+ 4. DESTELLOS: cinco chispitas de cuatro puntas de distinto tamaño, sueltas,
+    repartidas en unos 400x400 px.
+ 5. MARCO CIRCULAR: un círculo a mano alzada de doble filete fino, con tres
+    hojitas chiquitas apoyadas en el borde de abajo, unos 900x900 px, con el
+    centro completamente vacío.
+
+Nada de texto, nada de firma.
+```
+
+### Lámina 3 — Naipe (familia 5, sólo si se hace)
+
+```text
+Generá una lámina cuadrada de 1500x1500 px, fondo TRANSPARENTE, con 4 piezas,
+separadas entre sí por al menos 50 px de espacio vacío, en gris oscuro #3A342E
+sobre transparente, sin color, sin sombra, sin fondo.
+
+ 1. PUNTILLA MARCO: un marco rectangular vertical de encaje calado, tipo
+    carpeta de puntilla antigua, unos 900x1200 px, con el centro completamente
+    vacío y el calado bien definido (los huecos tienen que quedar transparentes).
+ 2. PALO CORAZÓN: un corazón de naipe, lleno, unos 260x280 px.
+ 3. PALO TRÉBOL: un trébol de naipe, lleno, unos 260x280 px.
+ 4. ESQUINA DE NAIPE: la ornamentación de una esquina de carta de baraja
+    española, filigrana fina de línea, unos 400x400 px.
+
+Nada de texto, nada de números, nada de firma.
+```
+
+### Qué hago yo con las láminas
+
+Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
+`mockup/inspire/assets/`) y yo:
+1. Las recorto por etiquetas (cada dibujo con sus propios píxeles, nada cortado
+   ni con pedazos de la vecina).
+2. Las paso a WebP con transparencia, lado mayor máximo 1200 px.
+3. Las dejo en `public/templates/iconos-linea/`, `/herbario/`, `/trazo/`,
+   `/naipe/` y las agrego a `public/templates/INVENTARIO.md` con ruta, medida,
+   peso, para qué es cada una y el snippet de máscara CSS.
+4. Recién entonces le pasás el prompt de la plantilla a Claude Design.
+
+---
+
+## 4. Qué adjuntarle
 
 | Archivo | Qué muestra |
 |---|---|
@@ -361,14 +601,19 @@ CHEQUEO ANTES DE ENTREGAR
 | `mockup/inspire/webs/4x-rame-detalle-papel-y-emboss.jpg` | el grano y el relieve reales, ampliados |
 | `mockup/inspire/webs/4x-rame-relieve-css-vs-png.jpg` | **la comparación CSS contra PNG**: es la que más importa |
 | `mockup/inspire/webs/4x-rame-prototipo-css.jpg` | la hoja completa ya hecha en CSS |
-| `docs/ANALISIS_RAMESTUDIO.md` | los números |
+| `mockup/inspire/webs/4y-rame-assets-*.jpg` | **el ornamento real de seis familias, recortado y a escala**: los íconos a mano, las ramas, los garabatos |
+| `docs/ANALISIS_RAMESTUDIO.md` | los números, y en §8 el inventario de ornamento con las reglas de composición medidas |
 
 ---
 
-## 4. Orden sugerido
+## 5. Orden sugerido
 
-1. **Prensa** primero y sola. Es la que define la colección; si el relieve y el
-   grano no quedan bien ahí, no quedan bien en ninguna.
+0. **Generar la Lámina 0 (íconos de línea) y pasármela.** Es la que usan las
+   cuatro familias; sin ella ninguna plantilla queda completa.
+1. **Prensa** primero y sola, ya con los íconos cortados. Es la que define la
+   colección; si el relieve y el grano no quedan bien ahí, no quedan bien en
+   ninguna.
 2. Revisarla en celular real antes de pedir las otras.
-3. **Herbario** (XV) y **Noche** (oscura / corporativa).
-4. **Naipe** sólo si las tres anteriores cerraron.
+3. Generar las **Láminas 1 y 2** y pedir **Herbario** (XV) y **Trazo**.
+4. **Noche** (oscura / corporativa): no necesita lámina nueva, usa la 0 en hueso.
+5. **Naipe** y su Lámina 3, sólo si las cuatro anteriores cerraron.
