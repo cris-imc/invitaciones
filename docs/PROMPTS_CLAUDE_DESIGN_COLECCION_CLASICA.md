@@ -72,18 +72,19 @@ FORMATO DE ENTREGA (no negociable)
 - Solo HTML + CSS + SVG inline + JS plano. NADA de WebGL, GSAP, Lottie, Rive,
   canvas ni video. Íconos, sellos, sobres, filetes, marcos, bordes rasgados,
   divisores, florituras y viñetas: SVG inline dibujado a mano.
-- PIEZAS PICTÓRICAS (excepción acotada): cada familia puede tener HASTA DOS
-  imágenes con transparencia (WebP/PNG) para lo que en SVG pierde nivel:
-  típicamente el ornamento botánico de esquina y la corona del countdown.
-  Reglas: cada pieza se declara en el mockup como un bloque con
-  data-asset="nombre" y su tamaño en px, con un SVG simplificado adentro
-  como placeholder; máximo 1200 px de lado y 150 KB en WebP; colores
-  naturales que sirvan para las 5 variantes (el acento de color lo ponen el
-  texto y el SVG, no la imagen); nunca fotos de textura a pantalla completa
-  (satén, madera). Al final del archivo, en el handoff, listá las piezas con
-  una descripción para generarlas (estilo, motivo, encuadre, fondo
-  transparente). Las fotos reales entran solo por los campos del backend
-  (bloque con la palabra FOTO).
+- PIEZAS PICTÓRICAS: YA EXISTEN, no las inventes ni las describas para generar.
+  Están cortadas y con transparencia en public/templates/<familia>/<nombre>.webp
+  y el inventario completo (ruta, tamaño en px, peso y para qué es cada una)
+  está en public/templates/INVENTARIO.md: LEELO antes de componer. Se usan como
+  <img src="/templates/<familia>/<nombre>.webp" alt="" aria-hidden="true"> con
+  pointer-events:none. Podés usar todas las de tu familia; no agregues imágenes
+  que no estén en ese inventario y no uses fotos de textura a pantalla completa.
+  Las de la familia Manuscrita son tinta a un color: usalas como máscara CSS
+  (mask / -webkit-mask con background: var(--t-acc)) para que se recoloreen en
+  cada variante, como muestra el INVENTARIO. Todo el resto de la ornamentación
+  (filetes, marcos, bordes rasgados, divisores, viñetas, íconos, monogramas)
+  sigue siendo SVG inline dibujado por vos. Las fotos reales entran solo por los
+  campos del backend (bloque con la palabra FOTO).
 - Movimiento con CSS (@keyframes, transitions), IntersectionObserver y el
   progreso de scroll leído en requestAnimationFrame. Se portará a
   framer-motion + anime.js (onScroll). Respetá prefers-reduced-motion.
@@ -249,145 +250,29 @@ sello de confirmación, de la corona y del vinilo.
 
 ---
 
-## 3. Piezas pictóricas: cómo se generan (Gemini o ChatGPT Image)
+## 3. Piezas pictóricas: ya están cortadas
 
-Una o dos por familia, según lo que Claude Design declare con `data-asset` en
-el handoff. Los colores van en tonos naturales para que sirvan a las 5
-variantes.
+Las cuatro láminas se generaron, se cortaron y quedaron listas. **No hay que
+volver a generarlas** salvo que quieras piezas nuevas.
 
-**Método: una sola lámina por estilo, después se corta.** Se pide una sola
-imagen con todas las piezas de un mismo estilo, y un script las separa. Hay
-dos tipos de lámina, y no se mezclan estilos en una misma lámina (si hay dos
-estilos, son dos prompts):
+| Familia | Piezas | Peso |
+|---|---|---|
+| `sobre-sello` | lacre, ramo-esquina, lazo, pluma | 325 KB |
+| `acuarela-corona` | corona, ramo-esquina, guirnalda, mariposa-1/2, petalo-1/2/3 | 438 KB |
+| `manuscrita` | cupido, candelabro, copas, olivo | 350 KB |
+| `tinta-vinilo` | vinilo, brazo, sello-goma, sello-tinta, ticket | 184 KB |
 
-1. **Dibujo de línea a un color** (trazo de tinta sobre blanco, tipo doodle):
-   lámina libre, sin grilla, fondo blanco liso, sin sombras. Cada dibujo
-   separado de los demás por al menos un dedo de espacio. Se corta por
-   "islas" de tinta y **se vectoriza a SVG**: pesa pocos KB, entra en la regla
-   del proyecto y se recolorea por variante. Sirve para íconos, cupido,
-   candelabro, copas, botella, bola de espejos, torta, ramo, anillos, cámara,
-   confeti, moños. **No pedir lettering** ("Nos casamos", "RSVP"): los textos
-   vienen del backend y los pone la tipografía.
-2. **Pictórico** (acuarela, lacre con brillo, vinilo con reflejos, satén):
-   2048×2048 (o 3072×2048 para seis piezas) en cuadrantes iguales, **fondo
-   liso magenta puro #FF00FF**, sin sombras proyectadas, sin damero (los
-   generadores no entregan transparencia real; el fondo plano se quita por
-   color; blanco no sirve porque la acuarela y el papel tienen blancos), cada
-   pieza centrada en su cuadrante sin tocar los bordes, sin texto. Sale como
-   WebP con transparencia de 1200 px.
+- **Archivos**: `public/templates/<familia>/<nombre>.webp`, servidos en
+  `/templates/<familia>/<nombre>.webp`. Transparencia real, lado mayor entre
+  137 y 673 px, ninguna pieza supera 174 KB.
+- **Inventario con rutas, medidas y uso previsto de cada pieza**:
+  `public/templates/INVENTARIO.md`.
+- **Láminas originales**: `mockup/inspire/assets/` (PNG de 1254×1254, cuatro con
+  transparencia y cuatro con fondo magenta), por si hay que recortar distinto.
+- **Si hacen falta piezas nuevas**: pedir una lámina más con el método de §3.1 y
+  volver a correr el corte (un estilo por lámina; ver los dos tipos de lámina).
 
-En los dos casos: mismo estilo, mismo grosor de trazo o misma paleta en toda la
-lámina; se guarda en `public/templates/<familia>/` (SVG o WebP).
-
-**Prompt de lámina de línea (para la familia Manuscrita y para íconos de
-cualquier familia):**
-
-```text
-Una sola imagen de 2048x2048 píxeles, fondo blanco liso, sin sombras ni
-texturas, sin texto ni letras. Doce dibujos de línea a un solo trazo, tinta
-verde oliva oscuro, línea fina e irregular como pluma estilográfica, sin
-relleno ni sombreado, todos del mismo grosor y estilo, distribuidos en la
-imagen con espacio libre entre cada uno y sin tocarse: dos copas brindando,
-una mano sosteniendo una copa de champagne, una botella de champagne
-descorchándose con burbujas, una bola de espejos colgando, una torta de dos
-pisos con flores, un ramo de flores atado con cinta, dos anillos
-entrelazados, una cámara instantánea con una foto saliendo, confeti y
-serpentinas sueltos, un moño de cinta, un candelabro de tres velas, una rama
-de olivo con aceitunas.
-```
-
-### Prompts de lámina, listos para pegar (uno por familia)
-
-Cada uno genera UNA imagen con todas las piezas de esa familia. Si Claude
-Design declaró menos piezas en el handoff, borrá los cuadrantes que sobren y
-pedí "dos cuadrantes" en vez de cuatro.
-
-**Sobre & Sello (casamiento)**
-
-```text
-Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
-fondo liso magenta puro #FF00FF en toda la imagen, sin sombras proyectadas,
-sin degradés, sin damero de transparencia, sin texto ni marcas. Una pieza
-centrada en cada cuadrante, sin tocar los bordes ni a las vecinas. Estilo
-pictórico coherente en las cuatro: papelería de casamiento de lujo, realista,
-iluminación cálida suave desde arriba a la izquierda.
-Cuadrante 1 (arriba izquierda): sello de lacre bordó visto de frente, relieve
-con un monograma genérico de dos iniciales entrelazadas en serif, cera con
-bordes irregulares y brillo especular suave.
-Cuadrante 2 (arriba derecha): ramo pequeño de esquina en acuarela con
-eucalipto, ruscus y una rosa crema, que sale de la esquina inferior izquierda
-del cuadrante hacia el centro, bordes difusos, tonos salvia, crema y un toque
-bordó.
-Cuadrante 3 (abajo izquierda): lazo de cinta de seda crema atado, visto de
-frente, con las puntas cayendo, textura de raso suave.
-Cuadrante 4 (abajo derecha): pluma caligráfica antigua apoyada en diagonal
-con una pequeña mancha de tinta bordó, realista, sin sombra sobre el fondo.
-```
-
-**Acuarela & Corona (quince)**
-
-```text
-Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
-fondo liso magenta puro #FF00FF en toda la imagen, sin sombras proyectadas,
-sin degradés, sin damero de transparencia, sin texto ni marcas. Una pieza
-centrada en cada cuadrante, sin tocar los bordes ni a las vecinas. Estilo
-coherente en las cuatro: acuarela botánica delicada, trazos con agua, bordes
-difusos, paleta rosa antiguo, rosa empolvado, salvia, crema y un toque dorado;
-elegante, no infantil.
-Cuadrante 1 (arriba izquierda): corona circular de peonías rosa antiguo,
-hojas de eucalipto y ramas finas, con el centro completamente vacío, vista
-frontal, apta para poner un número en el medio.
-Cuadrante 2 (arriba derecha): ramo de esquina con peonías, eucalipto y ramas
-secas que sale de la esquina superior izquierda del cuadrante hacia el
-centro.
-Cuadrante 3 (abajo izquierda): dos mariposas pequeñas y tres pétalos sueltos
-en acuarela, separados entre sí, para usar como piezas flotantes.
-Cuadrante 4 (abajo derecha): guirnalda horizontal de hojas y flores
-pequeñas, fina y alargada, para usar como divisor entre secciones.
-```
-
-**Manuscrita (casamiento informal)**
-
-```text
-Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
-fondo liso magenta puro #FF00FF en toda la imagen, sin sombras, sin degradés,
-sin damero, sin texto ni marcas. Una pieza centrada en cada cuadrante, sin
-tocar los bordes ni a las vecinas. Estilo coherente en las cuatro:
-ilustración a un solo trazo de tinta, línea fina e irregular como pluma
-estilográfica, tinta verde oliva oscuro, sin relleno ni sombreado, sin
-color adicional.
-Cuadrante 1 (arriba izquierda): cupido con arco y flecha, de perfil,
-apuntando hacia la derecha.
-Cuadrante 2 (arriba derecha): candelabro de tres velas encendidas.
-Cuadrante 3 (abajo izquierda): dos copas de vino brindando.
-Cuadrante 4 (abajo derecha): rama de olivo con aceitunas, alargada en
-diagonal.
-```
-
-**Tinta & Vinilo (cumpleaños de adulto)**
-
-```text
-Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
-fondo liso magenta puro #FF00FF en toda la imagen, sin sombras proyectadas,
-sin degradés, sin damero, sin texto ni marcas. Una pieza centrada en cada
-cuadrante, sin tocar los bordes ni a las vecinas. Estilo coherente en las
-cuatro: objetos realistas fotografiados en cenital sobre fondo neutro que
-después se elimina, iluminación de estudio suave, paleta negro, crema y un
-acento rojo lacre.
-Cuadrante 1 (arriba izquierda): disco de vinilo negro con etiqueta central
-crema sin texto, surcos visibles, reflejo suave.
-Cuadrante 2 (arriba derecha): brazo de tocadiscos plateado en diagonal,
-visto desde arriba.
-Cuadrante 3 (abajo izquierda): sello de goma con mango de madera, visto en
-ángulo, con una impresión de tinta roja al lado en forma de círculo vacío.
-Cuadrante 4 (abajo derecha): clip metálico y un ticket de entrada crema en
-blanco, sin texto, con borde troquelado.
-```
-
-Después de generar: mandame la lámina y digo el orden de las piezas si no es
-el del prompt; el corte, el quitado del fondo, el recorte al contenido y la
-exportación a WebP de 1200 px con transparencia los hago por script y dejo
-los archivos en `public/templates/<familia>/`.
+### 3.1 Prompts de lámina, por si se agregan piezas
 
 ## 4. Moodboard (opcional, para Gemini o ChatGPT Image)
 
