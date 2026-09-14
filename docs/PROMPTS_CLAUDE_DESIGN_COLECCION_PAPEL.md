@@ -35,7 +35,10 @@ animaciones en total, ninguna llamativa. Lo que queda cuando sacás todo lo
 demás son tres cosas: una hoja de papel con grano, una letra en relieve y un
 dibujo a mano apoyado en el borde de la hoja.
 
-Esas tres cosas se consiguen de dos maneras distintas y conviene no
+Y una cuarta, que es la letra: las referencias usan **Final Parade Script**, la
+misma que compraste. Ya está instalada en el repo (§6).
+
+Las tres primeras se consiguen de dos maneras distintas y conviene no
 confundirlas.
 
 **El papel y el relieve se hacen en CSS.** Ellos los hornean como PNG porque
@@ -63,6 +66,15 @@ con el color quemado adentro del PNG, y por eso `/botanico` y `/magnolia` no
 tienen variantes de color. Nosotros las pedimos en **tinta a un solo color** y
 las usamos como máscara CSS, así la misma rama sale verde salvia, oliva o
 ceniza según la variante, sin regenerar un solo archivo.
+
+**Las 29 piezas ya están cortadas** en `public/templates/` (12 íconos de línea
+compartidos, 4 de herbario, 9 de trazo, 4 de naipe), con su inventario y sus dos
+modos de uso en `public/templates/INVENTARIO_PAPEL_PRENSADO.md`. Y hay una
+distinción que descubrí al verificarlas y que importa: los íconos, los trazos y
+los naipes son **tinta plana** (luminancia 24-47), así que van como máscara CSS y
+toman el color de la variante; el herbario está **pintado** con luces y sombras
+(luminancia 2-255), así que la máscara lo aplastaría — va como imagen con un
+duotono de filtros, que conserva el pintado y también da las cinco variantes.
 
 Y sobre cómo se colocan, medí las siete familias con dibujo y las reglas son
 pocas y estrictas: **toda pieza grande sangra por un borde de la hoja**, se usan
@@ -95,10 +107,13 @@ Tenés el repo sincronizado. Antes de diseñar leé:
 - mockup/nuevo/Plantillas Casamiento.dc.html (formato de entrega Flat)
 - src/components/templates/ChicTemplate.tsx (una Flat clara ya portada)
 - src/lib/schemas/invitation.ts (campos reales; no inventes otros)
+- public/templates/INVENTARIO_PAPEL_PRENSADO.md (las 29 piezas ya cortadas: ruta,
+  medida, peso, para qué es cada una y cómo se usa cada set)
 Adjunto tiras de fotogramas de las 13 referencias
 (mockup/inspire/webs/4*-rame-*.jpg). Son la referencia de LOOK, no de contenido.
-No las copies: el objetivo es hacer lo mismo pero sin una sola imagen de
-ornamento y con el relieve vivo.
+No las copies: el objetivo es hacer lo mismo pero con el papel y el relieve en
+CSS en vez de horneados como PNG, con el ornamento recoloreable por variante, y
+con el relieve vivo.
 
 FORMATO DE ENTREGA (no negociable)
 - Un archivo .dc.html panorámico por familia, "<Nombre> - Panoramica.dc.html",
@@ -127,6 +142,20 @@ FORMATO DE ENTREGA (no negociable)
         cinco valores probados están en el INVENTARIO.
     En los dos casos: alt="", aria-hidden="true" y pointer-events:none.
   * Las fotos reales entran solo por los campos del backend (bloque FOTO).
+- LA TIPOGRAFÍA SCRIPT ES UN ARCHIVO DEL REPO, NO DE GOOGLE FONTS. En el
+  .dc.html declarala así, tal cual, arriba de todo:
+    @font-face{ font-family:'Final Parade Script';
+                src:url('/fonts/final-parade-script.woff2') format('woff2');
+                font-weight:400; font-display:swap; }
+  y usala como font-family:'Final Parade Script', cursive. NO la pidas a
+  fonts.googleapis.com (no existe ahí) y NO la reemplaces por Great Vibes,
+  Parisienne ni ninguna otra. Las otras dos fuentes (la serif y la sans) sí van
+  de Google Fonts con <link>.
+- LAS RUTAS DE PIEZAS Y FUENTE SON RAÍZ-RELATIVAS: /templates/<set>/<pieza>.webp
+  y /fonts/final-parade-script.woff2. Escribilas así aunque en el canvas no se
+  previsualicen: así es como resuelven una vez portadas a Next.js. Para componer
+  sabiendo cómo es cada pieza, mirá mockup/inspire/webs/4y-piezas-cortadas.jpg,
+  que las muestra a escala con su nombre.
 - Movimiento con CSS (@keyframes, transitions), IntersectionObserver y el
   progreso de scroll leído en requestAnimationFrame. Se portará a
   framer-motion + anime.js (onScroll). Respetá prefers-reduced-motion: con
@@ -313,9 +342,10 @@ Tres fuentes de Google Fonts, no más:
   fuente de la colección; usala en italic para los títulos de sección cuando la
   familia no lleve script.
 - SCRIPT: **Final Parade Script**, obligatoria, no la cambies por una de Google.
-  Es la misma que usan las referencias y ya está instalada y auto-hospedada en
-  el proyecto: se usa como var(--font-final-parade, 'Final Parade Script'),
-  cursive. Peso 400, es el único que hay. Sólo para títulos de sección, el "&"
+  Es la misma que usan las referencias y ya está en el repo. Peso 400, el único
+  que hay. En el .dc.html va con el @font-face de arriba; cuando se porte a
+  React ya está registrada con next/font/local y se usa como
+  var(--font-final-parade, 'Final Parade Script'), cursive. Sólo para títulos de sección, el "&"
   de la portada y la frase de cierre: una palabra o una frase corta por vez,
   nunca un párrafo ni un dato.
   OJO, ESTO SE MIDIÓ Y ES UNA RESTRICCIÓN REAL: el trazo es monolineal y muy
@@ -482,6 +512,13 @@ CHEQUEO ANTES DE ENTREGAR
 - ¿Las versalitas chicas tienen 0,39 em de tracking?
 - ¿Final Parade quedó en tinta plana a 30-36 px, o en relieve reforzado a 56 px
   o más? ¿No quedó ningún título con relieve estándar?
+- ¿La script se declaró con @font-face apuntando a /fonts/final-parade-script.woff2
+  y NO se pidió a Google Fonts?
+- ¿Las rutas de las piezas son /templates/<set>/<pieza>.webp, con los nombres
+  exactos del INVENTARIO? (no inventes nombres: si una pieza no está en la
+  tabla, no existe)
+- ¿Las piezas de herbario van como <img> con filtro, y las de los otros tres
+  sets como máscara? (al revés queda mal en los dos casos)
 - ¿Las cinco variantes siguen siendo monocromas?
 - ¿El texto corrido bajó de 14 px en algún lado?
 - ¿Se ve bien con prefers-reduced-motion activado?
@@ -642,6 +679,8 @@ Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
 | `mockup/inspire/webs/4x-rame-prototipo-css.jpg` | la hoja completa ya hecha en CSS |
 | `mockup/inspire/webs/4y-rame-assets-*.jpg` | **el ornamento real de seis familias, recortado y a escala**: los íconos a mano, las ramas, los garabatos |
 | `mockup/inspire/webs/4z-final-parade-relieve-vs-plana.jpg` | Final Parade en tinta plana y en relieve, a cinco tamaños: por qué hay un mínimo |
+| `mockup/inspire/webs/4y-piezas-cortadas.jpg` | **las 29 piezas ya cortadas, a escala y con su nombre** — es con lo que va a componer |
+| `mockup/inspire/webs/4y-herbario-variantes.jpg` | la misma rama en las cinco variantes, con el duotono de filtros |
 | `docs/ANALISIS_RAMESTUDIO.md` | los números, y en §8 el inventario de ornamento con las reglas de composición medidas |
 
 ---
@@ -656,3 +695,33 @@ Las cuatro láminas ya están cortadas, así que se puede arrancar directo:
 3. **Herbario** (XV) y **Trazo**.
 4. **Noche** (oscura / corporativa): usa el mismo set de íconos, en hueso.
 5. **Naipe**, sólo si las cuatro anteriores cerraron.
+
+---
+
+## 6. Qué queda de mi lado cuando entregue
+
+Esto no va en el prompt: es la lista de lo que hay que tocar en el repo para
+que una familia entregada pase de `.dc.html` a plantilla viva.
+
+1. **Portar** con `docs/GUIA_TECNICA_PLANTILLAS.md`, tomando
+   `src/components/templates/ChicTemplate.tsx` como base (es una Flat clara).
+2. **Variantes** por script, una por color de papel, como el resto de la
+   colección Flat.
+3. **Registrar el nombre visible** en `src/lib/template-labels.ts` (si falta, la
+   landing de modelos muestra la constante cruda en mayúsculas).
+4. **Gating por tipo de evento** en `src/components/wizard/wizard-steps-config.ts`:
+   estas familias usan el mecanismo Flat, así que NO van en
+   `STORYTELLING_TEMPLATE_TIPOS`.
+5. **La fuente ya está lista** en los dos lados: `src/app/fonts/` la registra
+   `next/font/local` para producción, y `public/fonts/` sirve la copia que usan
+   los `.dc.html` y cualquier mockup suelto. Si se agrega otra fuente propia,
+   hay que hacer las dos cosas.
+6. **Las piezas ya están servidas** desde `public/templates/`, así que no hay
+   nada que mover al portar: las rutas del mockup funcionan tal cual.
+
+### Pendiente antes de publicar
+
+Confirmar con Putracetol (putracetol.com/licenses/) que la licencia de Final
+Parade Script cubre **uso como webfont** y **uso en plantillas que se venden a
+terceros**. El archivo trae `fsType 0`, que es permiso técnico de empotrado, no
+licencia. Está instalada y andando; esto es sólo el trámite.
