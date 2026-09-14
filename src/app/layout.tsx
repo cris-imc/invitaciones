@@ -57,6 +57,17 @@ const roboto = localFont({
   variable: '--font-roboto',
   display: 'swap',
 });
+// Final Parade Script (Putracetol Studio) -- licencia comprada, no está en
+// Google Fonts, así que va auto-hospedada igual que Roboto. Es la script de la
+// Colección "Papel Prensado"; `preload: false` porque sólo la pintan esas
+// plantillas. El TTF original (131 KB) se pasó a WOFF2 sin subsetear: conserva
+// las ligaduras (`liga`) y el kerning, que en una script son el efecto.
+const finalParade = localFont({
+  src: [{ path: './fonts/final-parade-script.woff2', weight: '400', style: 'normal' }],
+  variable: '--font-final-parade',
+  display: 'swap',
+  preload: false,
+});
 const openSans = Open_Sans({ preload: false, subsets: ['latin'], variable: '--font-open-sans', display: 'swap' });
 const nunito = Nunito({ preload: false, subsets: ['latin'], variable: '--font-nunito', display: 'swap' });
 const lato = Lato({ preload: false, weight: ['400', '700'], subsets: ['latin'], variable: '--font-lato', display: 'swap' });
@@ -64,7 +75,7 @@ const lato = Lato({ preload: false, weight: ['400', '700'], subsets: ['latin'], 
 const allFonts = [
   fraunces, spaceGrotesk, spaceMono, inter, sora, cormorant, bricolage, fredoka, baloo,
   dancingScript, playfairDisplay, greatVibes, cinzel, parisienne, sacramento, abrilFatface, prata,
-  merriweather, lora, dmSans, montserrat, roboto, openSans, nunito, lato
+  merriweather, lora, dmSans, montserrat, roboto, finalParade, openSans, nunito, lato
 ].map(f => f.variable).join(" ");
 
 export const metadata: Metadata = {
