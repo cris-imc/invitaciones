@@ -18,6 +18,11 @@
 > - **Mobile primero** (la invitación llega por WhatsApp), pero el escritorio
 >   tiene que verse compuesto, no una columna estirada.
 > - **Ilustración en SVG inline**, por ahora. Sin fondos de video.
+>
+> Hay una cuarta colección, **D "Papelería Viva"** (look clásico de papelería
+> con gestos físicos, mecanismo Flat), con su propio prompt en
+> `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_CLASICA.md` y su análisis en
+> `docs/ANALISIS_INVITACIONES_CLASICAS.md`.
 
 ---
 
