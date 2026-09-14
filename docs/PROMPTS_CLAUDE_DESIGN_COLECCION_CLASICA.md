@@ -255,18 +255,46 @@ Una o dos por familia, según lo que Claude Design declare con `data-asset` en
 el handoff. Los colores van en tonos naturales para que sirvan a las 5
 variantes.
 
-**Método: una sola lámina por familia, después se corta.** En vez de generar
-las piezas de a una, se pide una sola imagen con todas, y un script las
-separa, les quita el fondo y las exporta a WebP con transparencia de 1200 px
-en `public/templates/<familia>/<nombre>.webp`. Condiciones de la lámina:
+**Método: una sola lámina por estilo, después se corta.** Se pide una sola
+imagen con todas las piezas de un mismo estilo, y un script las separa. Hay
+dos tipos de lámina, y no se mezclan estilos en una misma lámina (si hay dos
+estilos, son dos prompts):
 
-- 2048×2048 (o 3072×2048 si son seis piezas), dividida en cuadrantes iguales.
-- **Fondo liso magenta puro #FF00FF** (o verde puro #00FF00), sin sombras
-  proyectadas, sin damero: los generadores no entregan transparencia real y
-  el fondo plano se quita por color. Blanco no sirve (la acuarela y el papel
-  tienen blancos).
-- Cada pieza centrada en su cuadrante, sin tocar los bordes ni a las vecinas.
-- Sin texto ni etiquetas dentro de la imagen; el orden se indica en el prompt.
+1. **Dibujo de línea a un color** (trazo de tinta sobre blanco, tipo doodle):
+   lámina libre, sin grilla, fondo blanco liso, sin sombras. Cada dibujo
+   separado de los demás por al menos un dedo de espacio. Se corta por
+   "islas" de tinta y **se vectoriza a SVG**: pesa pocos KB, entra en la regla
+   del proyecto y se recolorea por variante. Sirve para íconos, cupido,
+   candelabro, copas, botella, bola de espejos, torta, ramo, anillos, cámara,
+   confeti, moños. **No pedir lettering** ("Nos casamos", "RSVP"): los textos
+   vienen del backend y los pone la tipografía.
+2. **Pictórico** (acuarela, lacre con brillo, vinilo con reflejos, satén):
+   2048×2048 (o 3072×2048 para seis piezas) en cuadrantes iguales, **fondo
+   liso magenta puro #FF00FF**, sin sombras proyectadas, sin damero (los
+   generadores no entregan transparencia real; el fondo plano se quita por
+   color; blanco no sirve porque la acuarela y el papel tienen blancos), cada
+   pieza centrada en su cuadrante sin tocar los bordes, sin texto. Sale como
+   WebP con transparencia de 1200 px.
+
+En los dos casos: mismo estilo, mismo grosor de trazo o misma paleta en toda la
+lámina; se guarda en `public/templates/<familia>/` (SVG o WebP).
+
+**Prompt de lámina de línea (para la familia Manuscrita y para íconos de
+cualquier familia):**
+
+```text
+Una sola imagen de 2048x2048 píxeles, fondo blanco liso, sin sombras ni
+texturas, sin texto ni letras. Doce dibujos de línea a un solo trazo, tinta
+verde oliva oscuro, línea fina e irregular como pluma estilográfica, sin
+relleno ni sombreado, todos del mismo grosor y estilo, distribuidos en la
+imagen con espacio libre entre cada uno y sin tocarse: dos copas brindando,
+una mano sosteniendo una copa de champagne, una botella de champagne
+descorchándose con burbujas, una bola de espejos colgando, una torta de dos
+pisos con flores, un ramo de flores atado con cinta, dos anillos
+entrelazados, una cámara instantánea con una foto saliendo, confeti y
+serpentinas sueltos, un moño de cinta, un candelabro de tres velas, una rama
+de olivo con aceitunas.
+```
 
 ### Prompts de lámina, listos para pegar (uno por familia)
 
