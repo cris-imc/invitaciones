@@ -268,32 +268,98 @@ en `public/templates/<familia>/<nombre>.webp`. Condiciones de la lámina:
 - Cada pieza centrada en su cuadrante, sin tocar los bordes ni a las vecinas.
 - Sin texto ni etiquetas dentro de la imagen; el orden se indica en el prompt.
 
-Encabezado para la lámina (se antepone a las descripciones de abajo):
-"Una sola imagen de 2048x2048 dividida en cuatro cuadrantes iguales, fondo
-liso magenta puro #FF00FF sin sombras ni degradés, una pieza centrada en cada
-cuadrante sin tocar los bordes, sin texto. Cuadrante 1 (arriba izquierda):
-… Cuadrante 2 (arriba derecha): … Cuadrante 3 (abajo izquierda): …
-Cuadrante 4 (abajo derecha): …". Mismo estilo pictórico en las cuatro.
+### Prompts de lámina, listos para pegar (uno por familia)
 
-- **Sobre & Sello, `lacre`** (opcional; el sello suele salir bien en SVG):
-  "Sello de lacre bordó visto de frente, relieve con monograma en serif,
-  brillo especular suave, bordes irregulares de cera, fondo transparente,
-  iluminación cálida desde arriba a la izquierda, sin texto adicional,
-  1200x1200."
-- **Acuarela & Corona, `corona`**: "Corona circular de peonías rosa antiguo,
-  hojas de eucalipto y ramas finas en acuarela, trazos con agua y bordes
-  difusos, centro vacío, vista frontal, fondo transparente, paleta rosa
-  empolvado, salvia y crema, sin texto, 1200x1200."
-- **Acuarela & Corona, `esquina`**: "Ramo de esquina en acuarela: peonías,
-  eucalipto y ramas secas que salen de la esquina superior izquierda hacia el
-  centro, bordes difusos, fondo transparente, misma paleta que la corona,
-  1200x1200."
-- **Manuscrita, `linea`**: "Ilustración a un solo trazo de tinta (cupido con
-  arco, candelabro de tres velas, dos copas), línea fina irregular como pluma,
-  tinta verde oliva, fondo transparente, sin sombreado, 1200x1200."
-- **Tinta & Vinilo, `vinilo`**: "Disco de vinilo negro con etiqueta central
-  crema, surcos visibles, reflejo suave, vista cenital, fondo transparente,
-  1200x1200."
+Cada uno genera UNA imagen con todas las piezas de esa familia. Si Claude
+Design declaró menos piezas en el handoff, borrá los cuadrantes que sobren y
+pedí "dos cuadrantes" en vez de cuatro.
+
+**Sobre & Sello (casamiento)**
+
+```text
+Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
+fondo liso magenta puro #FF00FF en toda la imagen, sin sombras proyectadas,
+sin degradés, sin damero de transparencia, sin texto ni marcas. Una pieza
+centrada en cada cuadrante, sin tocar los bordes ni a las vecinas. Estilo
+pictórico coherente en las cuatro: papelería de casamiento de lujo, realista,
+iluminación cálida suave desde arriba a la izquierda.
+Cuadrante 1 (arriba izquierda): sello de lacre bordó visto de frente, relieve
+con un monograma genérico de dos iniciales entrelazadas en serif, cera con
+bordes irregulares y brillo especular suave.
+Cuadrante 2 (arriba derecha): ramo pequeño de esquina en acuarela con
+eucalipto, ruscus y una rosa crema, que sale de la esquina inferior izquierda
+del cuadrante hacia el centro, bordes difusos, tonos salvia, crema y un toque
+bordó.
+Cuadrante 3 (abajo izquierda): lazo de cinta de seda crema atado, visto de
+frente, con las puntas cayendo, textura de raso suave.
+Cuadrante 4 (abajo derecha): pluma caligráfica antigua apoyada en diagonal
+con una pequeña mancha de tinta bordó, realista, sin sombra sobre el fondo.
+```
+
+**Acuarela & Corona (quince)**
+
+```text
+Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
+fondo liso magenta puro #FF00FF en toda la imagen, sin sombras proyectadas,
+sin degradés, sin damero de transparencia, sin texto ni marcas. Una pieza
+centrada en cada cuadrante, sin tocar los bordes ni a las vecinas. Estilo
+coherente en las cuatro: acuarela botánica delicada, trazos con agua, bordes
+difusos, paleta rosa antiguo, rosa empolvado, salvia, crema y un toque dorado;
+elegante, no infantil.
+Cuadrante 1 (arriba izquierda): corona circular de peonías rosa antiguo,
+hojas de eucalipto y ramas finas, con el centro completamente vacío, vista
+frontal, apta para poner un número en el medio.
+Cuadrante 2 (arriba derecha): ramo de esquina con peonías, eucalipto y ramas
+secas que sale de la esquina superior izquierda del cuadrante hacia el
+centro.
+Cuadrante 3 (abajo izquierda): dos mariposas pequeñas y tres pétalos sueltos
+en acuarela, separados entre sí, para usar como piezas flotantes.
+Cuadrante 4 (abajo derecha): guirnalda horizontal de hojas y flores
+pequeñas, fina y alargada, para usar como divisor entre secciones.
+```
+
+**Manuscrita (casamiento informal)**
+
+```text
+Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
+fondo liso magenta puro #FF00FF en toda la imagen, sin sombras, sin degradés,
+sin damero, sin texto ni marcas. Una pieza centrada en cada cuadrante, sin
+tocar los bordes ni a las vecinas. Estilo coherente en las cuatro:
+ilustración a un solo trazo de tinta, línea fina e irregular como pluma
+estilográfica, tinta verde oliva oscuro, sin relleno ni sombreado, sin
+color adicional.
+Cuadrante 1 (arriba izquierda): cupido con arco y flecha, de perfil,
+apuntando hacia la derecha.
+Cuadrante 2 (arriba derecha): candelabro de tres velas encendidas.
+Cuadrante 3 (abajo izquierda): dos copas de vino brindando.
+Cuadrante 4 (abajo derecha): rama de olivo con aceitunas, alargada en
+diagonal.
+```
+
+**Tinta & Vinilo (cumpleaños de adulto)**
+
+```text
+Una sola imagen de 2048x2048 píxeles dividida en cuatro cuadrantes iguales,
+fondo liso magenta puro #FF00FF en toda la imagen, sin sombras proyectadas,
+sin degradés, sin damero, sin texto ni marcas. Una pieza centrada en cada
+cuadrante, sin tocar los bordes ni a las vecinas. Estilo coherente en las
+cuatro: objetos realistas fotografiados en cenital sobre fondo neutro que
+después se elimina, iluminación de estudio suave, paleta negro, crema y un
+acento rojo lacre.
+Cuadrante 1 (arriba izquierda): disco de vinilo negro con etiqueta central
+crema sin texto, surcos visibles, reflejo suave.
+Cuadrante 2 (arriba derecha): brazo de tocadiscos plateado en diagonal,
+visto desde arriba.
+Cuadrante 3 (abajo izquierda): sello de goma con mango de madera, visto en
+ángulo, con una impresión de tinta roja al lado en forma de círculo vacío.
+Cuadrante 4 (abajo derecha): clip metálico y un ticket de entrada crema en
+blanco, sin texto, con borde troquelado.
+```
+
+Después de generar: mandame la lámina y digo el orden de las piezas si no es
+el del prompt; el corte, el quitado del fondo, el recorte al contenido y la
+exportación a WebP de 1200 px con transparencia los hago por script y dejo
+los archivos en `public/templates/<familia>/`.
 
 ## 4. Moodboard (opcional, para Gemini o ChatGPT Image)
 
