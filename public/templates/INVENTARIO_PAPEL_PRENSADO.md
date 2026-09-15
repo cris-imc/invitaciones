@@ -1,5 +1,10 @@
 # Inventario de piezas — Colección E "Papel Prensado"
 
+> **Falta el set `baraja`** (5 piezas de baraja española): la lámina está
+> pendiente de generar, su prompt es la Lámina 3 de
+> `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_PAPEL.md`. El set viejo `naipe`
+> (corazón, trébol, puntilla de póker) se descartó.
+
 > Cortadas de las láminas de `mockup/inspire/assets/` con el corte por
 > etiquetas: se etiqueta la lámina entera y cada pieza se recorta con el bbox de
 > sus propios píxeles, poniendo en alfa 0 todo lo que no es suyo. Ninguna queda
@@ -58,20 +63,9 @@ Tinta plana a un color → **se usa como máscara CSS** y se recolorea por varia
 | `/templates/trazo/garabato-largo.webp` | 176×1168 | 17 KB | Línea ondulada muy vertical. Va pegada a un borde lateral de la hoja, sangrando arriba y abajo, ancho 30 %. |
 | `/templates/trazo/marco-circular.webp` | 632×674 | 51.4 KB | Círculo a mano alzada con tres hojitas. SÓLO alrededor del número del countdown. |
 
-## naipe (4 piezas, 310 KB)
-
-Tinta plana a un color → **se usa como máscara CSS** y se recolorea por variante.
-
-| Ruta | Tamaño | Peso | Para qué es |
-|---|---|---|---|
-| `/templates/naipe/esquina-filigrana.webp` | 314×331 | 29.4 KB | Filigrana de esquina de baraja. Las cuatro esquinas de la portada, rotada 90° en cada una. |
-| `/templates/naipe/palo-corazon.webp` | 234×233 | 15.3 KB | Corazón de naipe, lleno. Viñeta de sección y esquinas de la portada. |
-| `/templates/naipe/palo-trebol.webp` | 237×243 | 16.4 KB | Trébol de naipe, lleno. Viñeta alterna. |
-| `/templates/naipe/puntilla-marco.webp` | 835×1144 | 248.4 KB | Marco de encaje calado con el centro vacío. Enmarca la foto del álbum, sangrando por los cuatro bordes. |
-
 ## Cómo se usan
 
-### Piezas de tinta plana (iconos-linea, trazo, naipe)
+### Piezas de tinta plana (iconos-linea, trazo)
 
 Se usan como **máscara**, no como imagen: así toman el color de la variante sin
 generar un archivo por color.
@@ -86,9 +80,9 @@ generar un archivo por color.
 }
 ```
 
-### Piezas pintadas (herbario)
+### Piezas pintadas (herbario y, cuando llegue, baraja)
 
-Están en sepia y tienen luces y sombras, así que la máscara las aplastaría. Van
+Están en sepia desteñido y tienen luces y sombras, así que la máscara las aplastaría. Van
 como `<img>` y se tiñen con un duotono de filtros, que conserva el pintado.
 Valores probados sobre `rama-esquina.webp`:
 

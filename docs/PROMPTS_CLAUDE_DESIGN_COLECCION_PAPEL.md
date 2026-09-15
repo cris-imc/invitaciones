@@ -68,13 +68,15 @@ las usamos como máscara CSS, así la misma rama sale verde salvia, oliva o
 ceniza según la variante, sin regenerar un solo archivo.
 
 **Las 29 piezas ya están cortadas** en `public/templates/` (12 íconos de línea
-compartidos, 4 de herbario, 9 de trazo, 4 de naipe), con su inventario y sus dos
-modos de uso en `public/templates/INVENTARIO_PAPEL_PRENSADO.md`. Y hay una
-distinción que descubrí al verificarlas y que importa: los íconos, los trazos y
-los naipes son **tinta plana** (luminancia 24-47), así que van como máscara CSS y
-toman el color de la variante; el herbario está **pintado** con luces y sombras
-(luminancia 2-255), así que la máscara lo aplastaría — va como imagen con un
-duotono de filtros, que conserva el pintado y también da las cinco variantes.
+compartidos, 4 de herbario, 9 de trazo), con su inventario y sus dos modos de
+uso en `public/templates/INVENTARIO_PAPEL_PRENSADO.md`; falta la lámina de
+baraja española, cuyo prompt está en §3. Y hay una distinción que descubrí al
+verificarlas y que importa: los íconos y los trazos son **tinta plana**
+(luminancia 24-47), así que van como máscara CSS y toman el color de la
+variante; el herbario está **pintado** con luces y sombras (luminancia 2-255),
+así que la máscara lo aplastaría — va como imagen con un duotono de filtros, que
+conserva el pintado y también da las cinco variantes. La baraja va en ese mismo
+registro pintado.
 
 Y sobre cómo se colocan, medí las siete familias con dibujo y las reglas son
 pocas y estrictas: **toda pieza grande sangra por un borde de la hoja**, se usan
@@ -128,18 +130,19 @@ FORMATO DE ENTREGA (no negociable)
   * Los FILETES, marcos, reglas y el monograma van en SVG inline dibujado por
     vos, trazo 0,75-1 px.
   * El ORNAMENTO DIBUJADO (íconos de línea hechos a mano, ramas, garabatos,
-    puntilla) va en PIEZAS WebP con transparencia que YA EXISTEN, cortadas y
-    listas. No las inventes ni las describas para generar: leé
+    piezas de baraja) va en PIEZAS WebP con transparencia que YA EXISTEN,
+    cortadas y listas. No las inventes ni las describas para generar: leé
     public/templates/INVENTARIO_PAPEL_PRENSADO.md antes de componer y usá sólo
-    las de tu familia más el set compartido de íconos. Son 29 piezas en total:
-    12 íconos de línea, 4 de herbario, 9 de trazo y 4 de naipe.
+    las de tu familia más el set compartido de íconos. Son 25 piezas cortadas:
+    12 íconos de línea, 4 de herbario y 9 de trazo (las 5 de baraja están
+    pendientes de generar; si todavía no están, no hagas esa familia).
     Hay DOS formas de usarlas y no son intercambiables:
-      - iconos-linea, trazo y naipe son TINTA PLANA: van como máscara CSS
+      - iconos-linea y trazo son TINTA PLANA: van como máscara CSS
         (mask / -webkit-mask con background: var(--t-acc)), y así toman el
         color de cada variante sin generar un archivo por color.
-      - herbario está PINTADO con luces y sombras: la máscara lo aplastaría en
-        una mancha. Va como <img> y se tiñe con un duotono de filtros; los
-        cinco valores probados están en el INVENTARIO.
+      - herbario y baraja están PINTADOS con luces y sombras: la máscara los
+        aplastaría en una mancha. Van como <img> y se tiñen con un duotono de
+        filtros; los cinco valores probados están en el INVENTARIO.
     En los dos casos: alt="", aria-hidden="true" y pointer-events:none.
   * Las fotos reales entran solo por los campos del backend (bloque FOTO).
 - LA TIPOGRAFÍA SCRIPT ES UN ARCHIVO DEL REPO, NO DE GOOGLE FONTS. En el
@@ -481,22 +484,74 @@ quinta es opcional. Las cinco comparten el set de íconos de línea.
    Escritorio: la columna fija lleva el garabato-largo cruzando la foto por
    detrás.
 
-5. XV / CUMPLEAÑOS — "NAIPE" (opcional, si hay lugar)
-   La única que se permite un segundo color de tinta: /lucky y /chilling.
-   Papel crema con un lunar de 1,5 px cada 14 px (SVG tileado, no imagen) y una
-   tinta bordó para un solo elemento por sección.
-   Papel #F6EFE4, tinta #34302C, tinta suave #8A7A72, tinta roja #7A2F3A,
+5. CASAMIENTO / XV / CUMPLEAÑOS — "BARAJA"
+   La invitación es una mano de cartas de BARAJA ESPAÑOLA. No de póker: nada de
+   corazones, tréboles, picas ni diamantes, nada de "J Q K", nada de dar vuelta
+   la carta. Los palos son oros, copas, espadas y bastos.
+   Papel #F6EFE4, papel alterno #EFE6D6, tinta #34302C, tinta suave #8A7A72,
    sombra 120,103,86.
-   Variantes: "Bordó" #7A2F3A · "Tinta" #2B3A57 · "Verde mesa" #2F5244 ·
-   "Ciruela" #5B3550 · "Cobre" #9A5A34.
-   Piezas: public/templates/naipe/ (puntilla-marco, palo-corazon, palo-trebol,
-   esquina-filigrana) + el set compartido.
-   Portada: la foto dentro de un naipe (hoja con radio 12 px, filete doble a
-   8 px y 12 px, y el palo de baraja en dos esquinas opuestas, a 0,08 de ancho).
-   El naipe entra con la rotación de 6° de siempre, nada de "dar vuelta la
-   carta". La puntilla enmarca la foto de la sección de álbum, sangrando por los
-   cuatro bordes.
-   El resto igual que Prensa, con el palo de baraja como viñeta de sección.
+   Variantes (el duotono de las piezas y el color de las pintas cambian juntos):
+   "Oro viejo" #9A7B3F · "Vino" #7A2F3A · "Verde mesa" #2F5244 ·
+   "Tinta" #2B3A57 · "Ceniza" #6E6A62.
+   Piezas: public/templates/baraja/ (as-de-copas, as-de-oros, ancho-de-espada,
+   ancho-de-basto, espada-y-basto) + el set compartido de íconos de línea.
+   Van como <img> con el duotono de la variante, NO como máscara: están
+   pintadas con luces y sombras, igual que el herbario.
+
+   EL GESTO PROPIO DE ESTA FAMILIA: LAS PINTAS.
+   En la baraja española, el marco de cada carta se interrumpe una cantidad
+   distinta de veces según el palo, y así se sabe el palo sin ver el dibujo:
+     oros    = marco continuo, SIN cortes
+     copas   = 1 corte arriba y 1 abajo
+     espadas = 2 cortes arriba y 2 abajo
+     bastos  = 3 cortes arriba y 3 abajo
+   Adoptalo tal cual: el filete interior de cada hoja lleva la pinta del palo
+   que le toca a esa sección, y la viñeta de la sección es la silueta de ese
+   palo. El invitado no va a saber por qué, pero va a sentir que las secciones
+   están ordenadas en cuatro grupos. Repartilos así:
+     COPAS   → portada, cuenta regresiva, frase
+     OROS    → detalles del evento, mapa, regalos y datos bancarios
+     ESPADAS → RSVP, pase con QR, confirmación
+     BASTOS  → álbum, canción, cierre
+   Se hace con el mismo filete inset 14px de siempre: en vez de un borde
+   entero, cuatro segmentos SVG con los huecos en el centro de cada lado. El
+   hueco mide 18 px y el corte doble o triple se separa 10 px. En la hoja de
+   oros el filete va entero, sin tocar.
+
+   Portada: EL ESCUDO DE LA PAREJA. La pieza espada-y-basto cruzados, centrada,
+   ancho 45 % de la hoja, y debajo los nombres en serif con relieve. El ancho de
+   espada y el ancho de basto son las dos cartas más altas del truco: son la
+   pareja, y esa es toda la idea de la familia. Si la variante es para XV o
+   cumpleaños, en vez del escudo va el as de copas solo.
+   El número de sección va DOS VECES, en la esquina superior izquierda y en la
+   inferior derecha rotado 180°, como el índice de una carta. Es el único lugar
+   donde el número se repite.
+
+   Countdown: el as de oros centrado, ancho 55 %, con el número de días en
+   serif 86 px en relieve encima del medallón. El oro no gira: está quieto como
+   todo el ornamento.
+   Detalles del evento: as de oros de cabecera, arriba a la derecha, ancho 40 %,
+   cortado por el borde superior.
+   Álbum: las fotos como cartas de una mano abierta — tres tarjetas con el mismo
+   filete y la misma proporción 301:432, superpuestas y rotadas -6°, 0° y +6°.
+   Es rotación de COMPOSICIÓN, no de animación: entran con el fundido de
+   siempre y se quedan quietas.
+   RSVP: el ancho de espada vertical pegado al borde izquierdo, sangrando arriba
+   y abajo, ancho 22 %. Al confirmar, el texto "CONFIRMADO" en relieve hueco,
+   igual que en Prensa. Sin barajar, sin repartir, sin voltear.
+   Canción y cierre: el ancho de basto del otro lado, en espejo.
+   As de copas: esquina inferior izquierda de la portada y del cierre, ancho
+   32 %, sangrando por el borde.
+
+   Escritorio: la columna fija es una carta entera de proporción 301:432 con el
+   escudo, los nombres y la nav numerada al pie; las pintas de la columna son
+   las de copas.
+
+   LO QUE NO SE HACE, aunque tiente: barajar, repartir, abanicar con animación,
+   voltear cartas, "elegí una carta", dorso de naipe repetido como fondo,
+   números romanos, sota/caballo/rey. Todo eso convierte una idea en un truco
+   de fiesta. El movimiento sigue siendo el mismo de la colección: fundido de
+   1200 ms y rotateY de 6°, nada más.
 
 =========================================================================
 CHEQUEO ANTES DE ENTREGAR
@@ -517,8 +572,10 @@ CHEQUEO ANTES DE ENTREGAR
 - ¿Las rutas de las piezas son /templates/<set>/<pieza>.webp, con los nombres
   exactos del INVENTARIO? (no inventes nombres: si una pieza no está en la
   tabla, no existe)
-- ¿Las piezas de herbario van como <img> con filtro, y las de los otros tres
-  sets como máscara? (al revés queda mal en los dos casos)
+- ¿Las piezas de herbario y baraja van como <img> con filtro, y las de
+  iconos-linea y trazo como máscara? (al revés queda mal en los dos casos)
+- En Baraja: ¿cada hoja lleva la pinta de SU palo (oros 0 cortes, copas 1,
+  espadas 2, bastos 3)? ¿No se coló ningún palo de póker?
 - ¿Las cinco variantes siguen siendo monocromas?
 - ¿El texto corrido bajó de 14 px en algún lado?
 - ¿Se ve bien con prefers-reduced-motion activado?
@@ -528,17 +585,18 @@ CHEQUEO ANTES DE ENTREGAR
 
 ## 3. Las láminas de assets — YA ESTÁN HECHAS Y CORTADAS
 
-Las cuatro láminas se generaron, se cortaron y quedaron listas: **29 piezas** en
-`public/templates/`, con su inventario en
-`public/templates/INVENTARIO_PAPEL_PRENSADO.md`. **No hay que volver a generarlas**
-salvo que quieras piezas nuevas.
+Tres de las cuatro láminas se generaron, se cortaron y quedaron listas:
+**25 piezas** en `public/templates/`, con su inventario en
+`public/templates/INVENTARIO_PAPEL_PRENSADO.md`. **No hay que volver a
+generarlas.** La cuarta, la de baraja española, está pendiente: su prompt es el
+de la Lámina 3, más abajo.
 
 | Set | Piezas | Peso | Cómo se usa |
 |---|---|---|---|
 | `iconos-linea` | 12 (iglesia, copas, anillos, tarjeta, sobre, confeti, polaroids, nota-musical, torta, reloj, auto, regalo) | 225 KB | máscara CSS |
 | `herbario` | 4 (rama-esquina, rama-cabecera, magnolia, hoja) | 277 KB | `<img>` + duotono |
 | `trazo` | 9 (garabato-largo/corto, 2 corazones, marco-circular, 4 destellos) | 101 KB | máscara CSS |
-| `naipe` | 4 (puntilla-marco, palo-corazon, palo-trebol, esquina-filigrana) | 310 KB | máscara CSS |
+| `baraja` | 5 (as-de-copas, as-de-oros, ancho-de-espada, ancho-de-basto, espada-y-basto) | — | **pendiente**: `<img>` + duotono |
 
 Las capturas de control: `mockup/inspire/webs/4y-piezas-cortadas.jpg` (las 29 a
 escala) y `4y-herbario-variantes.jpg` (una rama en las cinco variantes).
@@ -636,23 +694,57 @@ Las 5 piezas:
 Nada de texto, nada de firma.
 ```
 
-### Lámina 3 — Naipe (familia 5, sólo si se hace)
+### Lámina 3 — Baraja española (familia 5) · PENDIENTE DE GENERAR
+
+> Reemplaza a la lámina vieja de naipe de póker (corazón, trébol, puntilla),
+> que se descartó: era una copia directa de una carta de póker y no aportaba
+> nada. Estas cinco piezas van **pintadas y desteñidas**, en el mismo registro
+> que el herbario, no en línea plana: se usan como `<img>` con el duotono de la
+> variante.
 
 ```text
-Generá una lámina cuadrada de 1500x1500 px, fondo TRANSPARENTE, con 4 piezas,
-separadas entre sí por al menos 50 px de espacio vacío, en gris oscuro #3A342E
-sobre transparente, sin color, sin sombra, sin fondo.
+Generá una lámina cuadrada de 2000x2000 px, fondo TRANSPARENTE, con 5 piezas de
+baraja española, separadas entre sí por al menos 70 px de espacio vacío.
 
- 1. PUNTILLA MARCO: un marco rectangular vertical de encaje calado, tipo
-    carpeta de puntilla antigua, unos 900x1200 px, con el centro completamente
-    vacío y el calado bien definido (los huecos tienen que quedar transparentes).
- 2. PALO CORAZÓN: un corazón de naipe, lleno, unos 260x280 px.
- 3. PALO TRÉBOL: un trébol de naipe, lleno, unos 260x280 px.
- 4. ESQUINA DE NAIPE: la ornamentación de una esquina de carta de baraja
-    española, filigrana fina de línea, unos 400x400 px.
+ESTILO (esto es lo más importante, más que el dibujo):
+Ilustración pintada a mano en aguada, con luces y sombras suaves, trazo de
+contorno fino y algo tembloroso, textura de papel viejo. Colores DESTEÑIDOS y
+apagados, como una carta de baraja impresa hace ochenta años y gastada por el
+uso: nada de amarillo oro saturado, nada de rojo vivo, nada de negro puro.
+Una sola familia de tonos, sepia y tierra apagados (#8A7A64, #6E5F4C, #C9B9A0,
+#EFE6D6), con las luces en crema. Sin fondo, sin sombra proyectada, sin marco,
+sin borde de carta: sólo el dibujo recortado sobre transparente.
+NO uses el estilo plano de línea negra y color liso de la baraja moderna. El
+referente es una lámina de anticuario pintada, no un naipe impreso.
 
-Nada de texto, nada de números, nada de firma.
+LAS 5 PIEZAS:
+ 1. AS DE COPAS: una copa ceremonial ornamentada, con pie ancho, nudo labrado
+    en el tallo y boca abierta; guirnalda de hojas y volutas alrededor del
+    cuerpo. Vertical, unas 700x1100 px.
+ 2. AS DE OROS: un medallón circular tipo moneda antigua, con un rosetón o sol
+    de rayos en el centro y una orla de volutas en el canto. Casi cuadrado,
+    unas 900x900 px.
+ 3. ANCHO DE ESPADA: una espada recta vertical, de hoja lisa y empuñadura
+    labrada con guarda curva, punta hacia arriba. Muy vertical, unas
+    260x1300 px.
+ 4. ANCHO DE BASTO: un garrote de madera vertical, nudoso, con dos o tres
+    brotes de hojas saliendo de los nudos, extremo grueso abajo. Muy vertical,
+    unas 320x1300 px.
+ 5. ESPADA Y BASTO CRUZADOS: las dos piezas anteriores cruzadas en aspa, como
+    el escudo de un naipe, con un lazo fino atándolas en el cruce. Unas
+    1000x1000 px.
+
+Cada pieza completa y entera, sin cortar por el borde de la lámina, sin
+superponerse con las otras. Nada de texto, nada de números, nada de firma,
+nada de marca de agua.
 ```
+
+**Por qué cinco y no más:** las reglas de composición piden dos o tres piezas
+reutilizadas en varios tamaños, no una distinta por sección (§8.2 del análisis).
+Las cuatro pintas chicas que van como viñeta de sección NO se generan: son
+siluetas simples y las dibuja Claude Design en SVG inline, que a 57 px se lee
+mucho mejor que una aguada. Registro por tamaño: **pintado en grande, plano en
+chico.**
 
 ### Qué hago yo con una lámina nueva
 
@@ -662,7 +754,7 @@ Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
    ni con pedazos de la vecina).
 2. Las paso a WebP con transparencia, lado mayor máximo 1200 px.
 3. Las dejo en `public/templates/iconos-linea/`, `/herbario/`, `/trazo/`,
-   `/naipe/` y las agrego a `public/templates/INVENTARIO_PAPEL_PRENSADO.md` con ruta, medida,
+   `/baraja/` y las agrego a `public/templates/INVENTARIO_PAPEL_PRENSADO.md` con ruta, medida,
    peso, para qué es cada una y el snippet de máscara CSS.
 4. Recién entonces le pasás el prompt de la plantilla a Claude Design.
 
@@ -679,7 +771,7 @@ Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
 | `mockup/inspire/webs/4x-rame-prototipo-css.jpg` | la hoja completa ya hecha en CSS |
 | `mockup/inspire/webs/4y-rame-assets-*.jpg` | **el ornamento real de seis familias, recortado y a escala**: los íconos a mano, las ramas, los garabatos |
 | `mockup/inspire/webs/4z-final-parade-relieve-vs-plana.jpg` | Final Parade en tinta plana y en relieve, a cinco tamaños: por qué hay un mínimo |
-| `mockup/inspire/webs/4y-piezas-cortadas.jpg` | **las 29 piezas ya cortadas, a escala y con su nombre** — es con lo que va a componer |
+| `mockup/inspire/webs/4y-piezas-cortadas.jpg` | **las 25 piezas ya cortadas, a escala y con su nombre** — es con lo que va a componer |
 | `mockup/inspire/webs/4y-herbario-variantes.jpg` | la misma rama en las cinco variantes, con el duotono de filtros |
 | `docs/ANALISIS_RAMESTUDIO.md` | los números, y en §8 el inventario de ornamento con las reglas de composición medidas |
 
@@ -694,7 +786,7 @@ Las cuatro láminas ya están cortadas, así que se puede arrancar directo:
 2. Revisarla en celular real antes de pedir las otras.
 3. **Herbario** (XV) y **Trazo**.
 4. **Noche** (oscura / corporativa): usa el mismo set de íconos, en hueso.
-5. **Naipe**, sólo si las cuatro anteriores cerraron.
+5. **Baraja**, cuando esté cortada su lámina.
 
 ---
 
