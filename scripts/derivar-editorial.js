@@ -232,7 +232,7 @@ rep(
     "    // Cada renglón del nombre sube desde su propia máscara, uno atrás de",
     "    // otro. Es el gesto de una tapa armándose, no el de un cartel que se",
     "    // endereza.",
-    "    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>(\"span > span\")) : [];",
+    "    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>(\"[data-pieza]\")) : [];",
     "    renglones.forEach((linea, i) => {",
     '      linea.style.transition = "none";',
     '      linea.style.transform = "translate3d(0,110%,0)";',
@@ -256,8 +256,37 @@ rep(
 );
 rep(
   '          <span className={`ebn-cuenta-num${i === 3 ? " ebn-cuenta-num--acc" : ""}`}>{c.v}</span>',
-  "          <span className=\"ebn-cuenta-num\">{c.v}</span>",
+  "          <span className=\"ebn-cuenta-num\"><span key={c.v}>{c.v}</span></span>",
   "cifra"
+);
+
+// ── 5a'. Puntos con data-activo y baño de color del álbum ─────────────────
+// Los puntos de los paneles marcan cuál está activo también con un atributo
+// (Cartelera los pinta por opacidad, no por color de fondo), y las fotos del
+// álbum que traen [data-colorwash] se tiñen según lo cerca que pasen del
+// centro de la pantalla.
+rep(
+  L(
+    "          pan.querySelectorAll<HTMLElement>(\"[data-dot]\").forEach((punto, i) => {",
+    "            punto.style.background = i === activo ? PALETA.acc : \"rgba(43,42,51,.18)\";",
+    "          });"
+  ),
+  L(
+    "          pan.querySelectorAll<HTMLElement>(\"[data-dot]\").forEach((punto, i) => {",
+    "            punto.style.background = i === activo ? PALETA.acc : \"rgba(43,42,51,.18)\";",
+    "            punto.dataset.activo = i === activo ? \"1\" : \"\";",
+    "          });",
+    "          // El baño de color de las fotos: opaco en el centro de la pantalla,",
+    "          // transparente a más de un 40 % del ancho.",
+    "          tira.querySelectorAll<HTMLElement>(\"[data-sheet]\").forEach((hoja) => {",
+    "            const bano = hoja.querySelector<HTMLElement>(\"[data-colorwash]\");",
+    "            if (!bano) return;",
+    "            const rh = hoja.getBoundingClientRect();",
+    "            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);",
+    "            bano.style.opacity = String(Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3)));",
+    "          });"
+  ),
+  "puntos y baño de color"
 );
 
 // ── 5b. La foto no se abre: se REVELA ─────────────────────────────────────

@@ -26,19 +26,25 @@ const CARPETAS = [
 ];
 const CLAVES = ["bg", "bg2", "ink", "ink2", "acc", "acc2", "sky1", "sky2", "hill1", "hill2", "hill3", "night", "nightInk"];
 
-/** Completa las trece claves a partir de las seis que declara una ficha. */
-function completa(p) {
-  return {
+/**
+ * Completa las trece claves a partir de las seis que declara una ficha, más
+ * las claves extra de la familia (un tercer neón, el paño verde): si la
+ * variante no las trae, hereda las de la base.
+ */
+function completa(p, extras = []) {
+  const base = {
     bg: p.bg, bg2: p.bg2 || p.bg, ink: p.ink, ink2: p.ink2 || p.ink,
     acc: p.acc, acc2: p.acc2 || p.acc,
     sky1: p.sky1 || p.bg, sky2: p.sky2 || p.bg2 || p.bg,
     hill1: p.hill1 || p.bg2 || p.bg, hill2: p.hill2 || p.ink2 || p.ink, hill3: p.hill3 || p.ink,
     night: p.night || p.ink, nightInk: p.nightInk || p.bg,
   };
+  for (const k of extras) base[k] = p[k];
+  return base;
 }
 
-function bloqueDePaleta(p) {
-  return ["const PALETA = {", ...CLAVES.map((k) => `  ${k}: "${p[k]}",`), "};"].join("\n");
+function bloqueDePaleta(p, extras = []) {
+  return ["const PALETA = {", ...[...CLAVES, ...extras].map((k) => `  ${k}: "${p[k]}",`), "};"].join("\n");
 }
 
 const RE_PALETA = /const PALETA = \{[\s\S]*?\n\};/;
@@ -64,15 +70,16 @@ for (const carpeta of CARPETAS) {
 
     const hechas = [];
     for (const [sufijo, paleta] of Object.entries(variantes)) {
-      const p = completa(paleta);
-      const faltan = CLAVES.filter((k) => !p[k]);
+      const extras = fam.extras || [];
+      const p = completa({ ...Object.fromEntries(extras.map((k) => [k, fam.paleta[k]])), ...paleta }, extras);
+      const faltan = [...CLAVES, ...extras].filter((k) => !p[k]);
       if (faltan.length) {
         console.error(`${fam.archivo} · ${sufijo}: le faltan colores (${faltan.join(", ")})`);
         process.exitCode = 1;
         continue;
       }
       let salida = fuente
-        .replace(RE_PALETA, bloqueDePaleta(p))
+        .replace(RE_PALETA, bloqueDePaleta(p, extras))
         .replace(` * Variante: ${fam.varianteBase} (base)`, ` * Variante: ${paleta.etiqueta}`)
         .replace(`export function ${fam.archivo}(`, `export function ${fam.archivo}${sufijo}(`)
         .replace(

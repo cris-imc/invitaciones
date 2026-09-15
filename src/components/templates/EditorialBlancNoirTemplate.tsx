@@ -328,7 +328,7 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -561,6 +561,16 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            bano.style.opacity = String(Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3)));
           });
         });
 
@@ -1279,13 +1289,13 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
             </div>
             <h1 ref={cartelRef} className="ebn-tapa-nombres">
               {saludaAlInvitado ? (
-                <span className="ebn-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="ebn-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
               ) : (
                 <>
-                  <span className="ebn-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="ebn-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
                   {nombre2 && (
                     <span className="ebn-tapa-linea ebn-tapa-linea--sangra">
-                      <span><span className="ebn-acento">&amp;</span>{nombre2}</span>
+                      <span data-pieza="1"><span className="ebn-acento">&amp;</span>{nombre2}</span>
                     </span>
                   )}
                 </>
@@ -1423,7 +1433,7 @@ function CuentaEditorial({ targetDate }: { targetDate: Date }) {
     <div className="ebn-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`ebn-cuenta-caja ebn-cuenta-caja--${i + 1}`}>
-          <span className="ebn-cuenta-num">{c.v}</span>
+          <span className="ebn-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="ebn-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}

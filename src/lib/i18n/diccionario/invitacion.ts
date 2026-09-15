@@ -74,6 +74,8 @@ const es = {
   saveTheDate: {
     guardaLaFecha: "Guarda la fecha",
     agregarAlCalendario: "Agregar al calendario",
+    unaSolaNoche: "Una sola noche",
+    fecha: "Fecha",
   },
 
   cuentaRegresiva: {
@@ -104,6 +106,7 @@ const es = {
   // ── Cuándo y dónde ───────────────────────────────────────────
   ubicacion: {
     cuandoYDonde: "Cuándo y dónde",
+    ciudad: "Ciudad",
     tuUbicacion: "Tu ubicación",
     elLugar: "El lugar",
     elSalon: "El salón",
@@ -292,6 +295,7 @@ const es = {
   // ── El pase / QR de ingreso ──────────────────────────────────
   pase: {
     tuPase: "Tu pase",
+    losEsperamos: "Los esperamos.",
     guardaTuPase: "Guarda tu pase",
     paseEspecial: "Pase especial",
     acceso: "Acceso",
@@ -629,6 +633,8 @@ const en: Invitacion = {
   saveTheDate: {
     guardaLaFecha: "Save the date",
     agregarAlCalendario: "Add to calendar",
+    unaSolaNoche: "One night only",
+    fecha: "Date",
   },
 
   cuentaRegresiva: {
@@ -657,6 +663,7 @@ const en: Invitacion = {
 
   ubicacion: {
     cuandoYDonde: "When and where",
+    ciudad: "City",
     tuUbicacion: "Your location",
     elLugar: "The venue",
     elSalon: "The venue",
@@ -834,6 +841,7 @@ const en: Invitacion = {
 
   pase: {
     tuPase: "Your pass",
+    losEsperamos: "See you there.",
     guardaTuPase: "Save your pass",
     paseEspecial: "Special pass",
     acceso: "Access",
@@ -1157,6 +1165,8 @@ const pt: Invitacion = {
   saveTheDate: {
     guardaLaFecha: "Salve a data",
     agregarAlCalendario: "Adicionar ao calendário",
+    unaSolaNoche: "Uma noite só",
+    fecha: "Data",
   },
 
   cuentaRegresiva: {
@@ -1185,6 +1195,7 @@ const pt: Invitacion = {
 
   ubicacion: {
     cuandoYDonde: "Quando e onde",
+    ciudad: "Cidade",
     tuUbicacion: "Sua localização",
     elLugar: "O local",
     elSalon: "O salão",
@@ -1362,6 +1373,7 @@ const pt: Invitacion = {
 
   pase: {
     tuPase: "Seu passe",
+    losEsperamos: "Esperamos vocês.",
     guardaTuPase: "Salve seu passe",
     paseEspecial: "Passe especial",
     acceso: "Acesso",

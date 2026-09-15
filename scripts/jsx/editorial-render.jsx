@@ -525,13 +525,13 @@
             </div>
             <h1 ref={cartelRef} className="ebn-tapa-nombres">
               {saludaAlInvitado ? (
-                <span className="ebn-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="ebn-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
               ) : (
                 <>
-                  <span className="ebn-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="ebn-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
                   {nombre2 && (
                     <span className="ebn-tapa-linea ebn-tapa-linea--sangra">
-                      <span><span className="ebn-acento">&amp;</span>{nombre2}</span>
+                      <span data-pieza="1"><span className="ebn-acento">&amp;</span>{nombre2}</span>
                     </span>
                   )}
                 </>

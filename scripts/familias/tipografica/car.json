@@ -5,9 +5,10 @@
   "titulo": "CARTELERA",
   "varianteBase": "Strip",
   "resumen": [
-    "La marquesina: Limelight sobre negro, con los nombres encendidos como",
-    "las letras de un teatro. Karla para el texto, tres acentos de neón y el",
-    "fondo siempre oscuro."
+    "La marquesina de un teatro de Las Vegas: Limelight en neón rosa, un",
+    "marco de bombitas que se encienden en cadena, countdown tragamonedas,",
+    "frase en letrero celeste, naipes sobre paño verde, ticket de mesa, cabina",
+    "de fotos, jukebox y ficha VIP. Karla 400-800 para todo lo demás; sin mono."
   ],
   "serif": {
     "modulo": "Limelight",
@@ -21,7 +22,9 @@
     "css": "'Karla', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "700",
+      "800"
     ]
   },
   "mono": {
@@ -29,7 +32,9 @@
     "css": "'Karla', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "700",
+      "800"
     ]
   },
   "paleta": {
@@ -38,13 +43,10 @@
     "ink": "#FFF6E8",
     "ink2": "#A9A6C4",
     "acc": "#FF3CAC",
-    "acc2": "#FFC857"
+    "acc2": "#FFC857",
+    "acc3": "#00F0FF",
+    "felt": "#0E4D3A"
   },
-  "cssExtra": [
-    "/* Cartelera: las letras de la marquesina tienen el halo de las bombitas. */",
-    ".car-tapa-nombres, .car-h2, .car-panel-titulo, .car-fecha-linea { text-shadow: 0 0 20px color-mix(in srgb, var(--pp-acc) 55%, transparent); }",
-    ".car-trama { opacity: .08; }"
-  ],
   "variantes": {
     "Flamingo": {
       "etiqueta": "Flamingo",
@@ -53,7 +55,9 @@
       "ink": "#FFF6E8",
       "ink2": "#B0A4B4",
       "acc": "#FF5E5B",
-      "acc2": "#FFD166"
+      "acc2": "#FFD166",
+      "acc3": "#3DF2B0",
+      "felt": "#0E4D3A"
     },
     "Sapphire": {
       "etiqueta": "Zafiro",
@@ -62,7 +66,9 @@
       "ink": "#F4F6FF",
       "ink2": "#9FA7C9",
       "acc": "#4D7CFF",
-      "acc2": "#FFC857"
+      "acc2": "#FFC857",
+      "acc3": "#FF3CAC",
+      "felt": "#0E4D3A"
     },
     "Lime": {
       "etiqueta": "Lima",
@@ -71,7 +77,9 @@
       "ink": "#F4FFF7",
       "ink2": "#9CB5A8",
       "acc": "#B6FF3C",
-      "acc2": "#FFC857"
+      "acc2": "#FFC857",
+      "acc3": "#FF3CAC",
+      "felt": "#0E4D3A"
     },
     "Violet": {
       "etiqueta": "Violeta",
@@ -80,7 +88,15 @@
       "ink": "#FBF6FF",
       "ink2": "#AE9FC4",
       "acc": "#B455FF",
-      "acc2": "#FFD166"
+      "acc2": "#FFD166",
+      "acc3": "#00F0FF",
+      "felt": "#0E4D3A"
     }
-  }
+  },
+  "extras": [
+    "acc3",
+    "felt"
+  ],
+  "render": "car.jsx",
+  "css": "car.css"
 }
