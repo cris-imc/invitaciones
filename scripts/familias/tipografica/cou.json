@@ -1,0 +1,88 @@
+{
+  "archivo": "CoutureTemplate",
+  "prefijo": "cou",
+  "mote": "Couture",
+  "titulo": "COUTURE",
+  "varianteBase": "Oro",
+  "resumen": [
+    "La alta costura: Bodoni Moda en tamaños de tapa de revista de moda, con",
+    "Space Grotesk para los datos. El color aparece sólo en una palabra por",
+    "página -- el oro o el burdeos -- y el resto es blanco y negro."
+  ],
+  "serif": {
+    "modulo": "Bodoni_Moda",
+    "css": "'Bodoni Moda', serif",
+    "pesos": [
+      "400",
+      "500"
+    ],
+    "italica": true
+  },
+  "sans": {
+    "modulo": "Space_Grotesk",
+    "css": "'Space Grotesk', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "Space_Grotesk",
+    "css": "'Space Grotesk', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#FAF7F2",
+    "bg2": "#F1ECE3",
+    "ink": "#0B0B0B",
+    "ink2": "#6D675E",
+    "acc": "#B8862B",
+    "acc2": "#7A1E2C"
+  },
+  "cssExtra": [
+    "/* Couture: el titular es de tapa, con la itálica como acento. */",
+    ".cou-h2, .cou-cartel-nombres { letter-spacing: -.04em; }",
+    ".cou-kicker { letter-spacing: .32em; }"
+  ],
+  "variantes": {
+    "Burdeos": {
+      "etiqueta": "Burdeos",
+      "bg": "#FAF6F3",
+      "bg2": "#F1E9E4",
+      "ink": "#0B0B0B",
+      "ink2": "#6E6262",
+      "acc": "#7A1E2C",
+      "acc2": "#B8862B"
+    },
+    "Botella": {
+      "etiqueta": "Botella",
+      "bg": "#F8F7F2",
+      "bg2": "#EDEDE3",
+      "ink": "#0B0B0B",
+      "ink2": "#616860",
+      "acc": "#1F4A3A",
+      "acc2": "#B8862B"
+    },
+    "Noche": {
+      "etiqueta": "Noche",
+      "bg": "#F7F7F5",
+      "bg2": "#EAEBEA",
+      "ink": "#0B0B0B",
+      "ink2": "#5E626C",
+      "acc": "#1B2A5C",
+      "acc2": "#B8862B"
+    },
+    "Terracota": {
+      "etiqueta": "Terracota",
+      "bg": "#FAF5EF",
+      "bg2": "#F2E8DC",
+      "ink": "#0B0B0B",
+      "ink2": "#6F655B",
+      "acc": "#B4532E",
+      "acc2": "#1F4A3A"
+    }
+  }
+}

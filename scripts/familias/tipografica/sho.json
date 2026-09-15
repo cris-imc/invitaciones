@@ -1,0 +1,86 @@
+{
+  "archivo": "ShojoTemplate",
+  "prefijo": "sho",
+  "mote": "Shojo",
+  "titulo": "SHŌJO",
+  "varianteBase": "Sakura",
+  "resumen": [
+    "El manga romántico: Cherry Bomb One redondeada sobre pasteles, con",
+    "M PLUS Rounded para el texto. Todo tiene brillo y nada tiene esquinas."
+  ],
+  "serif": {
+    "modulo": "Cherry_Bomb_One",
+    "css": "'Cherry Bomb One', cursive",
+    "pesos": [
+      "400"
+    ]
+  },
+  "sans": {
+    "modulo": "M_PLUS_Rounded_1c",
+    "css": "'M PLUS Rounded 1c', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "M_PLUS_Rounded_1c",
+    "css": "'M PLUS Rounded 1c', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#FFE3EE",
+    "bg2": "#EFE6FF",
+    "ink": "#3B2A4A",
+    "ink2": "#8A7A9C",
+    "acc": "#FF6FAE",
+    "acc2": "#B58CFF"
+  },
+  "cssExtra": [
+    "/* Shōjo: nada tiene esquinas y todo tiene un brillo. */",
+    ".sho-tarjeta, .sho-ticket, .sho-btn-solido, .sho-portada-btn, .sho-opcion { border-radius: 18px; }",
+    ".sho-cartel-nombres, .sho-h2 { letter-spacing: 0; text-shadow: 0 3px 0 color-mix(in srgb, var(--pp-acc) 45%, transparent); }",
+    ".sho-trama { opacity: .25; background-image: radial-gradient(currentColor 1.2px, transparent 1.4px); background-size: 20px 20px; }"
+  ],
+  "variantes": {
+    "Lavanda": {
+      "etiqueta": "Lavanda",
+      "bg": "#EFE6FF",
+      "bg2": "#FFE3EE",
+      "ink": "#2F2440",
+      "ink2": "#857A99",
+      "acc": "#B58CFF",
+      "acc2": "#FF6FAE"
+    },
+    "Cielo": {
+      "etiqueta": "Cielo",
+      "bg": "#E3F3FF",
+      "bg2": "#FFF0F5",
+      "ink": "#243447",
+      "ink2": "#7C8A9C",
+      "acc": "#7FD3FF",
+      "acc2": "#FF8FC2"
+    },
+    "Menta": {
+      "etiqueta": "Menta",
+      "bg": "#E3FFF4",
+      "bg2": "#FFF3E0",
+      "ink": "#22403A",
+      "ink2": "#7C9A92",
+      "acc": "#5FE0B5",
+      "acc2": "#FF8FA3"
+    },
+    "Durazno": {
+      "etiqueta": "Durazno",
+      "bg": "#FFE9DC",
+      "bg2": "#FFF5E6",
+      "ink": "#4A2E2A",
+      "ink2": "#9C7F78",
+      "acc": "#FF9C7A",
+      "acc2": "#FF6FAE"
+    }
+  }
+}

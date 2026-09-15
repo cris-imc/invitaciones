@@ -1,0 +1,80 @@
+  /* ── Tipográfica Editorial ────────────────────────────────────────────
+     Acá no hay dibujo: hay tipografía, filetes y tramas. La página es una
+     revista -- cada sección es una hoja con su folio arriba, el titular
+     ocupa lo que quiera y el color aparece en una palabra o en un fondo
+     entero, nunca en un ornamento. */
+  .ebn-raiz { font-family: var(--ebn-sans), 'Archivo', sans-serif; }
+
+  /* La trama de semitono, que es lo único "impreso" de la familia: puntos de
+     1 px cada 12. Va como gradiente y no como SVG para que no cueste nada. */
+  .ebn-trama { position: absolute; inset: 0; pointer-events: none; opacity: .14; z-index: 0;
+    background-image: radial-gradient(currentColor .8px, transparent .9px); background-size: 12px 12px; }
+
+  /* Los kickers y los folios son mono: son los datos de la ficha técnica. */
+  .ebn-kicker, .ebn-panel-top, .ebn-panel-pie, .ebn-meta, .ebn-riel-top, .ebn-riel-etiqueta,
+  .ebn-ticket-kicker, .ebn-cuenta-etq, .ebn-tarjeta-kicker, .ebn-fila-etq, .ebn-portada-pase {
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; }
+
+  /* El titular: Instrument Serif enorme, con la segunda línea en itálica y en
+     el acento. Es la firma de la sub-colección. */
+  .ebn-h2, .ebn-frase, .ebn-tarjeta-titulo, .ebn-std-dia, .ebn-cartel-nombres, .ebn-ticket-nombre, .ebn-cifra, .ebn-cuenta-num {
+    font-family: var(--ebn-serif), 'Instrument Serif', serif; letter-spacing: -.03em; }
+  .ebn-h2 em, .ebn-acento { font-style: italic; color: var(--pp-acc); }
+
+  /* Save the Date: el día ocupa la hoja entera. */
+  .ebn-std { background: var(--pp-ink); color: var(--pp-bg); padding: 64px max(22px, calc((100% - 560px) / 2)) 80px; justify-content: center; }
+  .ebn-std-dia { font-size: clamp(64px, 22vw, 180px); line-height: .82; text-shadow: none; color: inherit; }
+  .ebn-std-fila { justify-content: space-between; }
+  .ebn-cinta { background: none; color: var(--pp-acc); font-style: italic; clip-path: none; box-shadow: none;
+    animation: none; padding: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
+  .ebn-std-anio { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
+  .ebn-std .ebn-kicker, .ebn-std .ebn-meta { color: rgba(245,241,234,.62); }
+
+  /* La foto va enmarcada, como una foto de tapa. */
+  .ebn-foto-marco { border: 3px solid var(--pp-ink); }
+  .ebn-ventana { clip-path: none !important; box-shadow: none; }
+  .ebn-foto-firma { background: var(--pp-acc); color: var(--pp-bg); transform: none; box-shadow: none;
+    font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; }
+
+  /* Las tarjetas son bloques de color, no papelitos inclinados. */
+  .ebn-tarjeta { background: var(--pp-bg2); color: var(--pp-ink); box-shadow: none; border: 1px solid color-mix(in srgb, var(--pp-ink) 14%, transparent); }
+  .ebn-tarjeta--izq, .ebn-tarjeta--der, .ebn-tarjeta--talon, .ebn-tarjeta--hoy { transform: none; }
+  .ebn-doblez::before { display: none; }
+  .ebn-fila { border-bottom-color: color-mix(in srgb, var(--pp-ink) 14%, transparent); }
+  .ebn-chinche { display: none; }
+
+  /* La cuenta regresiva: cuatro cifras al hilo, separadas por filetes. */
+  .ebn-cuenta { grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 560px; }
+  .ebn-cuenta-caja { background: none; box-shadow: none; transform: none !important; margin: 0 !important;
+    border-left: 1px solid color-mix(in srgb, var(--pp-ink) 18%, transparent); padding: 10px 12px; }
+  .ebn-cuenta-caja:first-child { border-left: none; }
+  .ebn-cuenta-caja::before { display: none; }
+  .ebn-cuenta-num { font-size: clamp(38px, 12vw, 72px); line-height: .9; }
+
+  /* Los paneles del recorrido: cada uno es una hoja con su tono. El de
+     cronograma va en el acento, que es lo que le da el golpe editorial. */
+  .ebn-panel { padding: 64px max(22px, calc((100vw - 560px) / 2)) 80px; }
+  .ebn-panel[data-tone="dark"] { background: var(--pp-ink) !important; color: var(--pp-bg); }
+  .ebn-panel[data-tone="dark"] .ebn-tarjeta { background: transparent; border-color: rgba(245,241,234,.22); color: inherit; }
+  .ebn-panel-top, .ebn-panel-pie { letter-spacing: .22em; font-size: 11px; }
+
+  /* El pase es un cupón troquelado, no un ticket con muescas redondas. */
+  .ebn-ticket { background: var(--pp-bg); color: var(--pp-ink); border: 1px solid var(--pp-ink); border-radius: 0; transform: none; box-shadow: none; }
+  .ebn-ticket-izq { border-right: 1px dashed color-mix(in srgb, var(--pp-ink) 40%, transparent); }
+  .ebn-ticket-muesca { display: none; }
+
+  /* Botones: rectángulos con el acento, sin sombra ni inclinación. */
+  .ebn-btn-solido, .ebn-btn-papel, .ebn-portada-btn { border-radius: 0; box-shadow: none; transform: none; }
+  .ebn-btn-papel { background: transparent; border: 1px solid currentColor; }
+  .ebn-opcion { border-color: color-mix(in srgb, var(--pp-ink) 24%, transparent); border-radius: 0; }
+
+  /* La portada: sin capas de papel. Un titular enorme sobre la trama, el
+     folio arriba y el botón abajo. */
+  .ebn-portada { background: var(--pp-bg); }
+  .ebn-cartel { background: none; box-shadow: none; transform: none; padding: 0; }
+  .ebn-cartel-nombres { font-size: min(clamp(52px, 17vw, 120px), 13vh); line-height: .86; display: block; }
+  .ebn-cartel-amp { display: block; font-style: italic; color: var(--pp-acc); font-size: .7em; }
+  .ebn-cartel-chinche { display: none; }
+  .ebn-portada-datos { background: none; box-shadow: none; transform: none; padding: 0; gap: 12px; }
+  .ebn-portada-btn { background: var(--pp-ink); color: var(--pp-bg); }
+  @media (hover: hover) { .ebn-portada-btn:hover { background: var(--pp-acc); color: var(--pp-bg); } }

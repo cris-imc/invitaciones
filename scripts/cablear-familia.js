@@ -111,7 +111,10 @@ editar("src/lib/template-labels.ts", [{
   let s = fs.readFileSync(abs, "utf8");
   const original = s;
 
-  if (!s.includes(`${CODIGO}_COLORS`)) {
+  // La guarda mira la LÍNEA del import, no el nombre suelto: si mirara el
+  // nombre, una familia que ya figura en COLORS_BY_TIPO de una corrida
+  // anterior se saltearía el import y el archivo no compilaría.
+  if (!new RegExp(`^  ${CODIGO}_COLORS,$`, "m").test(s)) {
     // Se importa y se reexporta: StepDesign toma los colores de acá.
     s = s.replace(/^  PRENSA_COLORS,$/gm, `  PRENSA_COLORS,\n  ${CODIGO}_COLORS,`);
     s = s.replace("  PRENSA_COMPONENTS,", `  PRENSA_COMPONENTS,\n  ${CODIGO}_COMPONENTS,`);

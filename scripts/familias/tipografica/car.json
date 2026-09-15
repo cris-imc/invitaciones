@@ -1,0 +1,86 @@
+{
+  "archivo": "CarteleraTemplate",
+  "prefijo": "car",
+  "mote": "Cartelera",
+  "titulo": "CARTELERA",
+  "varianteBase": "Strip",
+  "resumen": [
+    "La marquesina: Limelight sobre negro, con los nombres encendidos como",
+    "las letras de un teatro. Karla para el texto, tres acentos de neón y el",
+    "fondo siempre oscuro."
+  ],
+  "serif": {
+    "modulo": "Limelight",
+    "css": "'Limelight', cursive",
+    "pesos": [
+      "400"
+    ]
+  },
+  "sans": {
+    "modulo": "Karla",
+    "css": "'Karla', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "Karla",
+    "css": "'Karla', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#07071A",
+    "bg2": "#FFF6E8",
+    "ink": "#FFF6E8",
+    "ink2": "#A9A6C4",
+    "acc": "#FF3CAC",
+    "acc2": "#FFC857"
+  },
+  "cssExtra": [
+    "/* Cartelera: las letras de la marquesina tienen halo, como las bombitas. */",
+    ".car-cartel-nombres, .car-h2 { text-shadow: 0 0 18px color-mix(in srgb, var(--pp-acc) 55%, transparent); }",
+    ".car-trama { opacity: .08; }"
+  ],
+  "variantes": {
+    "Flamingo": {
+      "etiqueta": "Flamingo",
+      "bg": "#07071A",
+      "bg2": "#FFF3F0",
+      "ink": "#FFF6E8",
+      "ink2": "#B0A4B4",
+      "acc": "#FF5E5B",
+      "acc2": "#FFD166"
+    },
+    "Sapphire": {
+      "etiqueta": "Zafiro",
+      "bg": "#05061C",
+      "bg2": "#F0F4FF",
+      "ink": "#F4F6FF",
+      "ink2": "#9FA7C9",
+      "acc": "#4D7CFF",
+      "acc2": "#FFC857"
+    },
+    "Lime": {
+      "etiqueta": "Lima",
+      "bg": "#06110E",
+      "bg2": "#F3FFF6",
+      "ink": "#F4FFF7",
+      "ink2": "#9CB5A8",
+      "acc": "#B6FF3C",
+      "acc2": "#FFC857"
+    },
+    "Violet": {
+      "etiqueta": "Violeta",
+      "bg": "#0B0618",
+      "bg2": "#F8F2FF",
+      "ink": "#FBF6FF",
+      "ink2": "#AE9FC4",
+      "acc": "#B455FF",
+      "acc2": "#FFD166"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "codigo": "BAUHAUS",
+  "etiqueta": "Bauhaus",
+  "archivo": "BauhausTemplate",
+  "componente": "BauhausTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#D4321F",
+  "eventos": [
+    "soloCasamiento"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Primarios",
+      "color": "#D4321F"
+    },
+    {
+      "id": "Klein",
+      "nombre": "Klein",
+      "color": "#1E3FBF"
+    },
+    {
+      "id": "Bosque",
+      "nombre": "Bosque",
+      "color": "#2E6B4A"
+    },
+    {
+      "id": "Terracota",
+      "nombre": "Terracota",
+      "color": "#C4552B"
+    },
+    {
+      "id": "Grafito",
+      "nombre": "Grafito",
+      "color": "#111111"
+    }
+  ]
+}

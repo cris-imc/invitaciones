@@ -1,0 +1,85 @@
+{
+  "archivo": "TropicalTemplate",
+  "prefijo": "tro",
+  "mote": "Tropical",
+  "titulo": "TROPICAL",
+  "varianteBase": "Sandía",
+  "resumen": [
+    "La isla: Lilita One sobre arena y mar, con Quicksand para el texto. El",
+    "acento es el de la fruta y el segundo el verde de las palmeras."
+  ],
+  "serif": {
+    "modulo": "Lilita_One",
+    "css": "'Lilita One', cursive",
+    "pesos": [
+      "400"
+    ]
+  },
+  "sans": {
+    "modulo": "Quicksand",
+    "css": "'Quicksand', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "Quicksand",
+    "css": "'Quicksand', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#FBEBD0",
+    "bg2": "#7FD8FF",
+    "ink": "#2C3A4A",
+    "ink2": "#2C3A4A",
+    "acc": "#FF5E7A",
+    "acc2": "#2E9E6B"
+  },
+  "cssExtra": [
+    "/* Tropical: el sol de fondo y los titulares redondos. */",
+    ".tro-h2, .tro-cartel-nombres { letter-spacing: 0; }",
+    ".tro-trama { opacity: .16; background-image: radial-gradient(currentColor 1px, transparent 1.2px); background-size: 18px 18px; }"
+  ],
+  "variantes": {
+    "Flamenco": {
+      "etiqueta": "Flamenco",
+      "bg": "#FFF4E0",
+      "bg2": "#FFD9E8",
+      "ink": "#3A2C4A",
+      "ink2": "#3A2C4A",
+      "acc": "#FF7BAC",
+      "acc2": "#3FBF9F"
+    },
+    "Coco": {
+      "etiqueta": "Coco",
+      "bg": "#F7EBD5",
+      "bg2": "#BDEFFF",
+      "ink": "#2C3A4A",
+      "ink2": "#2C3A4A",
+      "acc": "#FF8A3D",
+      "acc2": "#2E9E6B"
+    },
+    "Lima": {
+      "etiqueta": "Lima",
+      "bg": "#FFF6DC",
+      "bg2": "#DFFBE6",
+      "ink": "#233A2E",
+      "ink2": "#233A2E",
+      "acc": "#9BD83A",
+      "acc2": "#1E7A55"
+    },
+    "Atardecer": {
+      "etiqueta": "Atardecer",
+      "bg": "#FBE3C8",
+      "bg2": "#FFB27A",
+      "ink": "#3A2340",
+      "ink2": "#3A2340",
+      "acc": "#FF4F7A",
+      "acc2": "#2E7A5A"
+    }
+  }
+}

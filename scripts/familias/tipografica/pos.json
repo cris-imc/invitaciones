@@ -1,0 +1,84 @@
+{
+  "archivo": "PostalTemplate",
+  "prefijo": "pos",
+  "mote": "Postal",
+  "titulo": "POSTAL",
+  "varianteBase": "Aeropostal",
+  "resumen": [
+    "La postal de viaje: Alfa Slab One como el sello de un destino, Work Sans",
+    "para el texto y JetBrains Mono para los datos, como el matasellos."
+  ],
+  "serif": {
+    "modulo": "Alfa_Slab_One",
+    "css": "'Alfa Slab One', serif",
+    "pesos": [
+      "400"
+    ]
+  },
+  "sans": {
+    "modulo": "Work_Sans",
+    "css": "'Work Sans', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "JetBrains_Mono",
+    "css": "'JetBrains Mono', monospace",
+    "pesos": [
+      "400"
+    ]
+  },
+  "paleta": {
+    "bg": "#F3ECDD",
+    "bg2": "#F3ECDD",
+    "ink": "#1E3A5F",
+    "ink2": "#1E3A5F",
+    "acc": "#D9643A",
+    "acc2": "#2E8B8B"
+  },
+  "cssExtra": [
+    "/* Postal: el titular va con el contorno de una postal impresa. */",
+    ".pos-cartel-nombres, .pos-h2 { letter-spacing: -.01em; }",
+    ".pos-tarjeta { border-style: dashed; }"
+  ],
+  "variantes": {
+    "Mediterraneo": {
+      "etiqueta": "Mediterráneo",
+      "bg": "#F2EFE6",
+      "bg2": "#F2EFE6",
+      "ink": "#123456",
+      "ink2": "#123456",
+      "acc": "#E76F51",
+      "acc2": "#2A9D8F"
+    },
+    "Desierto": {
+      "etiqueta": "Desierto",
+      "bg": "#F5EDE0",
+      "bg2": "#F5EDE0",
+      "ink": "#3A2E22",
+      "ink2": "#3A2E22",
+      "acc": "#C1502E",
+      "acc2": "#7A8B6F"
+    },
+    "Artico": {
+      "etiqueta": "Ártico",
+      "bg": "#EEF1F0",
+      "bg2": "#EEF1F0",
+      "ink": "#28343D",
+      "ink2": "#28343D",
+      "acc": "#C0553A",
+      "acc2": "#5B7C8D"
+    },
+    "Tropico": {
+      "etiqueta": "Trópico",
+      "bg": "#F1EEDD",
+      "bg2": "#F1EEDD",
+      "ink": "#20463C",
+      "ink2": "#20463C",
+      "acc": "#E0603E",
+      "acc2": "#2E9E7D"
+    }
+  }
+}

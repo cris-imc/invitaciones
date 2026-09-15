@@ -1,0 +1,40 @@
+{
+  "codigo": "REINO",
+  "etiqueta": "Reino",
+  "archivo": "ReinoTemplate",
+  "componente": "ReinoTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#E24BA0",
+  "eventos": [
+    "soloQuince"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Medianoche",
+      "color": "#E24BA0"
+    },
+    {
+      "id": "Rosa",
+      "nombre": "Rosa",
+      "color": "#5A1E8A"
+    },
+    {
+      "id": "Esmeralda",
+      "nombre": "Esmeralda",
+      "color": "#F0587A"
+    },
+    {
+      "id": "Zafiro",
+      "nombre": "Zafiro",
+      "color": "#FF6FAE"
+    },
+    {
+      "id": "Lila",
+      "nombre": "Lila",
+      "color": "#FF7DBE"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "codigo": "POP",
+  "etiqueta": "Pop",
+  "archivo": "PopTemplate",
+  "componente": "PopTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#FF2E63",
+  "eventos": [
+    "soloQuince"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Fucsia",
+      "color": "#FF2E63"
+    },
+    {
+      "id": "Limon",
+      "nombre": "Limón",
+      "color": "#FFD84D"
+    },
+    {
+      "id": "Cian",
+      "nombre": "Cian",
+      "color": "#2EC4FF"
+    },
+    {
+      "id": "Lila",
+      "nombre": "Lila",
+      "color": "#B455FF"
+    },
+    {
+      "id": "Naranja",
+      "nombre": "Naranja",
+      "color": "#FF7A1A"
+    }
+  ]
+}

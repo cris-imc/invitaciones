@@ -1,0 +1,40 @@
+{
+  "codigo": "SHOJO",
+  "etiqueta": "Shōjo",
+  "archivo": "ShojoTemplate",
+  "componente": "ShojoTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#FF6FAE",
+  "eventos": [
+    "soloQuince"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Sakura",
+      "color": "#FF6FAE"
+    },
+    {
+      "id": "Lavanda",
+      "nombre": "Lavanda",
+      "color": "#B58CFF"
+    },
+    {
+      "id": "Cielo",
+      "nombre": "Cielo",
+      "color": "#7FD3FF"
+    },
+    {
+      "id": "Menta",
+      "nombre": "Menta",
+      "color": "#5FE0B5"
+    },
+    {
+      "id": "Durazno",
+      "nombre": "Durazno",
+      "color": "#FF9C7A"
+    }
+  ]
+}

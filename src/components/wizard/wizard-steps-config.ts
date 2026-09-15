@@ -80,6 +80,20 @@ export const PAPER_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
 };
 
 export const ICONIC_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
+    EDITORIALBLANCNOIR: "tipograficaEditorial",
+    ARCADE: "tipograficaEditorial",
+    Y2K: "tipograficaEditorial",
+    TROPICAL: "tipograficaEditorial",
+    REINO: "tipograficaEditorial",
+    SHOJO: "tipograficaEditorial",
+    POP: "tipograficaEditorial",
+    OBSERVATORIO: "tipograficaEditorial",
+    NOIR: "tipograficaEditorial",
+    POSTAL: "tipograficaEditorial",
+    RETROWAVE: "tipograficaEditorial",
+    BAUHAUS: "tipograficaEditorial",
+    CARTELERA: "tipograficaEditorial",
+    COUTURE: "tipograficaEditorial",
     TRAZODEPAPEL: "capasDePapel",
     CIUDADDEPAPEL: "capasDePapel",
     CUENTODEPAPEL: "capasDePapel",

@@ -1,0 +1,40 @@
+{
+  "codigo": "RETROWAVE",
+  "etiqueta": "Retrowave",
+  "archivo": "RetrowaveTemplate",
+  "componente": "RetrowaveTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#FF2D95",
+  "eventos": [
+    "soloCasamiento"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Miami",
+      "color": "#FF2D95"
+    },
+    {
+      "id": "Outrun",
+      "nombre": "Outrun",
+      "color": "#19E3FF"
+    },
+    {
+      "id": "Laser",
+      "nombre": "Láser",
+      "color": "#B6FF3C"
+    },
+    {
+      "id": "Sunset",
+      "nombre": "Sunset",
+      "color": "#FFB627"
+    },
+    {
+      "id": "Chrome",
+      "nombre": "Cromo",
+      "color": "#B455FF"
+    }
+  ]
+}

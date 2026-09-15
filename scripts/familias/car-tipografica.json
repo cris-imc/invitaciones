@@ -1,0 +1,40 @@
+{
+  "codigo": "CARTELERA",
+  "etiqueta": "Cartelera",
+  "archivo": "CarteleraTemplate",
+  "componente": "CarteleraTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#FF3CAC",
+  "eventos": [
+    "soloCasamiento"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Strip",
+      "color": "#FF3CAC"
+    },
+    {
+      "id": "Flamingo",
+      "nombre": "Flamingo",
+      "color": "#FF5E5B"
+    },
+    {
+      "id": "Sapphire",
+      "nombre": "Zafiro",
+      "color": "#4D7CFF"
+    },
+    {
+      "id": "Lime",
+      "nombre": "Lima",
+      "color": "#B6FF3C"
+    },
+    {
+      "id": "Violet",
+      "nombre": "Violeta",
+      "color": "#B455FF"
+    }
+  ]
+}

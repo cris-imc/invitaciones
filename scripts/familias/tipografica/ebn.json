@@ -1,0 +1,19 @@
+{
+  "esBase": true,
+  "archivo": "EditorialBlancNoirTemplate",
+  "prefijo": "ebn",
+  "mote": "Editorial",
+  "titulo": "EDITORIAL BLANC & NOIR",
+  "varianteBase": "Lacre",
+  "nota": "Es la familia base de la sub-colección: se deriva de Jardín con scripts/derivar-editorial.js y NO de sí misma (por eso esBase). Su ficha vive acá para que sus variantes salgan del mismo generador que las demás.",
+  "serif": { "modulo": "Instrument_Serif", "css": "'Instrument Serif', serif", "pesos": ["400"], "italica": true },
+  "sans": { "modulo": "Archivo", "css": "'Archivo', sans-serif", "pesos": ["400", "500"] },
+  "mono": { "modulo": "JetBrains_Mono", "css": "'JetBrains Mono', monospace", "pesos": ["400"] },
+  "paleta": { "bg": "#F5F1EA", "bg2": "#EAE4D8", "ink": "#141414", "ink2": "#6B6760", "acc": "#E63B2E", "acc2": "#1F4FD1" },
+  "variantes": {
+    "Klein": { "etiqueta": "Klein", "bg": "#F3F1EC", "bg2": "#E6E4DE", "ink": "#111318", "ink2": "#5F6470", "acc": "#1F4FD1", "acc2": "#E63B2E" },
+    "Bosque": { "etiqueta": "Bosque", "bg": "#F4F1E8", "bg2": "#E7E3D6", "ink": "#141614", "ink2": "#66695F", "acc": "#2E6B4A", "acc2": "#C9891C" },
+    "Ocre": { "etiqueta": "Ocre", "bg": "#F6F1E6", "bg2": "#ECE3D2", "ink": "#171512", "ink2": "#6E665A", "acc": "#C9891C", "acc2": "#141414" },
+    "Ciruela": { "etiqueta": "Ciruela", "bg": "#F5F0EC", "bg2": "#E9E1DC", "ink": "#151215", "ink2": "#6A6068", "acc": "#7B2D5A", "acc2": "#E63B2E" }
+  }
+}

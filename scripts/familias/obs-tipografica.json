@@ -1,0 +1,40 @@
+{
+  "codigo": "OBSERVATORIO",
+  "etiqueta": "Observatorio",
+  "archivo": "ObservatorioTemplate",
+  "componente": "ObservatorioTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#D4A957",
+  "eventos": [
+    "soloCasamiento"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Medianoche",
+      "color": "#D4A957"
+    },
+    {
+      "id": "Nebulosa",
+      "nombre": "Nebulosa",
+      "color": "#E0B98A"
+    },
+    {
+      "id": "Boreal",
+      "nombre": "Boreal",
+      "color": "#C9B86A"
+    },
+    {
+      "id": "Eclipse",
+      "nombre": "Eclipse",
+      "color": "#E2C275"
+    },
+    {
+      "id": "Amanecer",
+      "nombre": "Amanecer",
+      "color": "#B08637"
+    }
+  ]
+}

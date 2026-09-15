@@ -21,6 +21,76 @@ import { PrensaTemplateHueso } from "@/components/templates/PrensaTemplateHueso"
 import { PrensaTemplateArena } from "@/components/templates/PrensaTemplateArena";
 import { PrensaTemplatePiedra } from "@/components/templates/PrensaTemplatePiedra";
 import { PrensaTemplateHumo } from "@/components/templates/PrensaTemplateHumo";
+import { EditorialBlancNoirTemplate } from "@/components/templates/EditorialBlancNoirTemplate";
+import { EditorialBlancNoirTemplateKlein } from "@/components/templates/EditorialBlancNoirTemplateKlein";
+import { EditorialBlancNoirTemplateBosque } from "@/components/templates/EditorialBlancNoirTemplateBosque";
+import { EditorialBlancNoirTemplateOcre } from "@/components/templates/EditorialBlancNoirTemplateOcre";
+import { EditorialBlancNoirTemplateCiruela } from "@/components/templates/EditorialBlancNoirTemplateCiruela";
+import { ArcadeTemplate } from "@/components/templates/ArcadeTemplate";
+import { ArcadeTemplatePacman } from "@/components/templates/ArcadeTemplatePacman";
+import { ArcadeTemplateVapor } from "@/components/templates/ArcadeTemplateVapor";
+import { ArcadeTemplateGameboy } from "@/components/templates/ArcadeTemplateGameboy";
+import { ArcadeTemplateCandy } from "@/components/templates/ArcadeTemplateCandy";
+import { Y2kTemplate } from "@/components/templates/Y2kTemplate";
+import { Y2kTemplateFrutilla } from "@/components/templates/Y2kTemplateFrutilla";
+import { Y2kTemplateCielo } from "@/components/templates/Y2kTemplateCielo";
+import { Y2kTemplateLima } from "@/components/templates/Y2kTemplateLima";
+import { Y2kTemplateLavanda } from "@/components/templates/Y2kTemplateLavanda";
+import { TropicalTemplate } from "@/components/templates/TropicalTemplate";
+import { TropicalTemplateFlamenco } from "@/components/templates/TropicalTemplateFlamenco";
+import { TropicalTemplateCoco } from "@/components/templates/TropicalTemplateCoco";
+import { TropicalTemplateLima } from "@/components/templates/TropicalTemplateLima";
+import { TropicalTemplateAtardecer } from "@/components/templates/TropicalTemplateAtardecer";
+import { ReinoTemplate } from "@/components/templates/ReinoTemplate";
+import { ReinoTemplateRosa } from "@/components/templates/ReinoTemplateRosa";
+import { ReinoTemplateEsmeralda } from "@/components/templates/ReinoTemplateEsmeralda";
+import { ReinoTemplateZafiro } from "@/components/templates/ReinoTemplateZafiro";
+import { ReinoTemplateLila } from "@/components/templates/ReinoTemplateLila";
+import { ShojoTemplate } from "@/components/templates/ShojoTemplate";
+import { ShojoTemplateLavanda } from "@/components/templates/ShojoTemplateLavanda";
+import { ShojoTemplateCielo } from "@/components/templates/ShojoTemplateCielo";
+import { ShojoTemplateMenta } from "@/components/templates/ShojoTemplateMenta";
+import { ShojoTemplateDurazno } from "@/components/templates/ShojoTemplateDurazno";
+import { PopTemplate } from "@/components/templates/PopTemplate";
+import { PopTemplateLimon } from "@/components/templates/PopTemplateLimon";
+import { PopTemplateCian } from "@/components/templates/PopTemplateCian";
+import { PopTemplateLila } from "@/components/templates/PopTemplateLila";
+import { PopTemplateNaranja } from "@/components/templates/PopTemplateNaranja";
+import { ObservatorioTemplate } from "@/components/templates/ObservatorioTemplate";
+import { ObservatorioTemplateNebulosa } from "@/components/templates/ObservatorioTemplateNebulosa";
+import { ObservatorioTemplateBoreal } from "@/components/templates/ObservatorioTemplateBoreal";
+import { ObservatorioTemplateEclipse } from "@/components/templates/ObservatorioTemplateEclipse";
+import { ObservatorioTemplateAmanecer } from "@/components/templates/ObservatorioTemplateAmanecer";
+import { NoirTemplate } from "@/components/templates/NoirTemplate";
+import { NoirTemplateEsmeralda } from "@/components/templates/NoirTemplateEsmeralda";
+import { NoirTemplateAzul } from "@/components/templates/NoirTemplateAzul";
+import { NoirTemplateBurdeos } from "@/components/templates/NoirTemplateBurdeos";
+import { NoirTemplatePlata } from "@/components/templates/NoirTemplatePlata";
+import { PostalTemplate } from "@/components/templates/PostalTemplate";
+import { PostalTemplateMediterraneo } from "@/components/templates/PostalTemplateMediterraneo";
+import { PostalTemplateDesierto } from "@/components/templates/PostalTemplateDesierto";
+import { PostalTemplateArtico } from "@/components/templates/PostalTemplateArtico";
+import { PostalTemplateTropico } from "@/components/templates/PostalTemplateTropico";
+import { RetrowaveTemplate } from "@/components/templates/RetrowaveTemplate";
+import { RetrowaveTemplateOutrun } from "@/components/templates/RetrowaveTemplateOutrun";
+import { RetrowaveTemplateLaser } from "@/components/templates/RetrowaveTemplateLaser";
+import { RetrowaveTemplateSunset } from "@/components/templates/RetrowaveTemplateSunset";
+import { RetrowaveTemplateChrome } from "@/components/templates/RetrowaveTemplateChrome";
+import { BauhausTemplate } from "@/components/templates/BauhausTemplate";
+import { BauhausTemplateKlein } from "@/components/templates/BauhausTemplateKlein";
+import { BauhausTemplateBosque } from "@/components/templates/BauhausTemplateBosque";
+import { BauhausTemplateTerracota } from "@/components/templates/BauhausTemplateTerracota";
+import { BauhausTemplateGrafito } from "@/components/templates/BauhausTemplateGrafito";
+import { CarteleraTemplate } from "@/components/templates/CarteleraTemplate";
+import { CarteleraTemplateFlamingo } from "@/components/templates/CarteleraTemplateFlamingo";
+import { CarteleraTemplateSapphire } from "@/components/templates/CarteleraTemplateSapphire";
+import { CarteleraTemplateLime } from "@/components/templates/CarteleraTemplateLime";
+import { CarteleraTemplateViolet } from "@/components/templates/CarteleraTemplateViolet";
+import { CoutureTemplate } from "@/components/templates/CoutureTemplate";
+import { CoutureTemplateBurdeos } from "@/components/templates/CoutureTemplateBurdeos";
+import { CoutureTemplateBotella } from "@/components/templates/CoutureTemplateBotella";
+import { CoutureTemplateNoche } from "@/components/templates/CoutureTemplateNoche";
+import { CoutureTemplateTerracota } from "@/components/templates/CoutureTemplateTerracota";
 import { MembreteTemplate } from "@/components/templates/MembreteTemplate";
 import { MembreteTemplateVerde } from "@/components/templates/MembreteTemplateVerde";
 import { MembreteTemplateBorgona } from "@/components/templates/MembreteTemplateBorgona";
@@ -846,6 +916,118 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Grafito': return <MembreteTemplateGrafito invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Ocre': return <MembreteTemplateOcre invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <MembreteTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'COUTURE') {
+                switch (color) {
+                    case 'Burdeos': return <CoutureTemplateBurdeos invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Botella': return <CoutureTemplateBotella invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Noche': return <CoutureTemplateNoche invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Terracota': return <CoutureTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <CoutureTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'CARTELERA') {
+                switch (color) {
+                    case 'Flamingo': return <CarteleraTemplateFlamingo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Sapphire': return <CarteleraTemplateSapphire invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Lime': return <CarteleraTemplateLime invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Violet': return <CarteleraTemplateViolet invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <CarteleraTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'BAUHAUS') {
+                switch (color) {
+                    case 'Klein': return <BauhausTemplateKlein invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Bosque': return <BauhausTemplateBosque invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Terracota': return <BauhausTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Grafito': return <BauhausTemplateGrafito invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <BauhausTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'RETROWAVE') {
+                switch (color) {
+                    case 'Outrun': return <RetrowaveTemplateOutrun invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Laser': return <RetrowaveTemplateLaser invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Sunset': return <RetrowaveTemplateSunset invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Chrome': return <RetrowaveTemplateChrome invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <RetrowaveTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'POSTAL') {
+                switch (color) {
+                    case 'Mediterraneo': return <PostalTemplateMediterraneo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Desierto': return <PostalTemplateDesierto invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Artico': return <PostalTemplateArtico invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Tropico': return <PostalTemplateTropico invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <PostalTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'NOIR') {
+                switch (color) {
+                    case 'Esmeralda': return <NoirTemplateEsmeralda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Azul': return <NoirTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Burdeos': return <NoirTemplateBurdeos invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Plata': return <NoirTemplatePlata invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <NoirTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'OBSERVATORIO') {
+                switch (color) {
+                    case 'Nebulosa': return <ObservatorioTemplateNebulosa invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Boreal': return <ObservatorioTemplateBoreal invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Eclipse': return <ObservatorioTemplateEclipse invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Amanecer': return <ObservatorioTemplateAmanecer invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ObservatorioTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'POP') {
+                switch (color) {
+                    case 'Limon': return <PopTemplateLimon invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Cian': return <PopTemplateCian invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Lila': return <PopTemplateLila invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Naranja': return <PopTemplateNaranja invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <PopTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'SHOJO') {
+                switch (color) {
+                    case 'Lavanda': return <ShojoTemplateLavanda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Cielo': return <ShojoTemplateCielo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Menta': return <ShojoTemplateMenta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Durazno': return <ShojoTemplateDurazno invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ShojoTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'REINO') {
+                switch (color) {
+                    case 'Rosa': return <ReinoTemplateRosa invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Esmeralda': return <ReinoTemplateEsmeralda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Zafiro': return <ReinoTemplateZafiro invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Lila': return <ReinoTemplateLila invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ReinoTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'TROPICAL') {
+                switch (color) {
+                    case 'Flamenco': return <TropicalTemplateFlamenco invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Coco': return <TropicalTemplateCoco invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Lima': return <TropicalTemplateLima invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Atardecer': return <TropicalTemplateAtardecer invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <TropicalTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'Y2K') {
+                switch (color) {
+                    case 'Frutilla': return <Y2kTemplateFrutilla invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Cielo': return <Y2kTemplateCielo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Lima': return <Y2kTemplateLima invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Lavanda': return <Y2kTemplateLavanda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <Y2kTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'ARCADE') {
+                switch (color) {
+                    case 'Pacman': return <ArcadeTemplatePacman invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Vapor': return <ArcadeTemplateVapor invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Gameboy': return <ArcadeTemplateGameboy invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Candy': return <ArcadeTemplateCandy invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ArcadeTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'EDITORIALBLANCNOIR') {
+                switch (color) {
+                    case 'Klein': return <EditorialBlancNoirTemplateKlein invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Bosque': return <EditorialBlancNoirTemplateBosque invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Ocre': return <EditorialBlancNoirTemplateOcre invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Ciruela': return <EditorialBlancNoirTemplateCiruela invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <EditorialBlancNoirTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
             } else if (validInvitation.templateTipo === 'PRENSA') {
                 switch (color) {

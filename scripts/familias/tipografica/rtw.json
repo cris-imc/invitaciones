@@ -1,0 +1,87 @@
+{
+  "archivo": "RetrowaveTemplate",
+  "prefijo": "rtw",
+  "mote": "Retrowave",
+  "titulo": "RETROWAVE",
+  "varianteBase": "Miami",
+  "resumen": [
+    "1987: Righteous sobre un degradé de atardecer, con la grilla en fuga y",
+    "el sol partido en franjas. Manrope para el texto. Es la más nocturna de",
+    "la sub-colección."
+  ],
+  "serif": {
+    "modulo": "Righteous",
+    "css": "'Righteous', cursive",
+    "pesos": [
+      "400"
+    ]
+  },
+  "sans": {
+    "modulo": "Manrope",
+    "css": "'Manrope', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "Manrope",
+    "css": "'Manrope', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#1A0B2E",
+    "bg2": "#2A1050",
+    "ink": "#FFF3E0",
+    "ink2": "#FFF3E0",
+    "acc": "#FF2D95",
+    "acc2": "#19E3FF"
+  },
+  "cssExtra": [
+    "/* Retrowave: la grilla en fuga sobre el horizonte, y el titular con el",
+    "   resplandor de un tubo de neón. */",
+    ".rtw-cartel-nombres, .rtw-h2 { text-shadow: 0 0 22px color-mix(in srgb, var(--pp-acc) 60%, transparent); }",
+    ".rtw-trama { opacity: .22; background-image: linear-gradient(color-mix(in srgb, var(--pp-acc) 40%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--pp-acc) 40%, transparent) 1px, transparent 1px); background-size: 40px 40px; }"
+  ],
+  "variantes": {
+    "Outrun": {
+      "etiqueta": "Outrun",
+      "bg": "#0B0B2E",
+      "bg2": "#141A55",
+      "ink": "#FFF3E0",
+      "ink2": "#FFF3E0",
+      "acc": "#19E3FF",
+      "acc2": "#FF2D95"
+    },
+    "Laser": {
+      "etiqueta": "Láser",
+      "bg": "#0E1A12",
+      "bg2": "#14301F",
+      "ink": "#F4FFF7",
+      "ink2": "#F4FFF7",
+      "acc": "#B6FF3C",
+      "acc2": "#FF2D95"
+    },
+    "Sunset": {
+      "etiqueta": "Sunset",
+      "bg": "#2E0B1F",
+      "bg2": "#4A1030",
+      "ink": "#FFF3E0",
+      "ink2": "#FFF3E0",
+      "acc": "#FFB627",
+      "acc2": "#FF5E5B"
+    },
+    "Chrome": {
+      "etiqueta": "Cromo",
+      "bg": "#101018",
+      "bg2": "#1C1C2C",
+      "ink": "#F4F4FF",
+      "ink2": "#F4F4FF",
+      "acc": "#B455FF",
+      "acc2": "#19E3FF"
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "archivo": "ReinoTemplate",
+  "prefijo": "rei",
+  "mote": "Reino",
+  "titulo": "REINO",
+  "varianteBase": "Medianoche",
+  "resumen": [
+    "El cuento de princesas: Cinzel Decorative con filetes dorados sobre un",
+    "fondo profundo, y Nunito para el texto. El acento es el rosa de la",
+    "corona y el dorado el de los filetes."
+  ],
+  "serif": {
+    "modulo": "Cinzel_Decorative",
+    "css": "'Cinzel Decorative', serif",
+    "pesos": [
+      "400",
+      "700"
+    ]
+  },
+  "sans": {
+    "modulo": "Nunito",
+    "css": "'Nunito', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "Nunito",
+    "css": "'Nunito', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#2B1B4E",
+    "bg2": "#FFF4FA",
+    "ink": "#FFF4FA",
+    "ink2": "#FFF4FA",
+    "acc": "#E24BA0",
+    "acc2": "#F5C26B"
+  },
+  "cssExtra": [
+    "/* Reino: filete dorado arriba y abajo de cada titular. */",
+    ".rei-h2 { padding: 10px 0; border-top: 1px solid var(--pp-acc2); border-bottom: 1px solid var(--pp-acc2); }",
+    ".rei-trama { opacity: .18; }"
+  ],
+  "variantes": {
+    "Rosa": {
+      "etiqueta": "Rosa",
+      "bg": "#B0206E",
+      "bg2": "#FFF4FA",
+      "ink": "#FFF4FA",
+      "ink2": "#FFF4FA",
+      "acc": "#5A1E8A",
+      "acc2": "#FFD98A"
+    },
+    "Esmeralda": {
+      "etiqueta": "Esmeralda",
+      "bg": "#123E3A",
+      "bg2": "#F4FBF7",
+      "ink": "#F4FBF7",
+      "ink2": "#F4FBF7",
+      "acc": "#F0587A",
+      "acc2": "#F5C26B"
+    },
+    "Zafiro": {
+      "etiqueta": "Zafiro",
+      "bg": "#14245E",
+      "bg2": "#F3F6FF",
+      "ink": "#F3F6FF",
+      "ink2": "#F3F6FF",
+      "acc": "#FF6FAE",
+      "acc2": "#F5C26B"
+    },
+    "Lila": {
+      "etiqueta": "Lila",
+      "bg": "#5A3FA0",
+      "bg2": "#FBF6FF",
+      "ink": "#FBF6FF",
+      "ink2": "#FBF6FF",
+      "acc": "#FF7DBE",
+      "acc2": "#FFE08A"
+    }
+  }
+}

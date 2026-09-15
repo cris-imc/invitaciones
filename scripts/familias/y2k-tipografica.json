@@ -1,0 +1,40 @@
+{
+  "codigo": "Y2K",
+  "etiqueta": "Y2K",
+  "archivo": "Y2kTemplate",
+  "componente": "Y2kTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#FF5FB2",
+  "eventos": [
+    "soloQuince"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Bubblegum",
+      "color": "#FF5FB2"
+    },
+    {
+      "id": "Frutilla",
+      "nombre": "Frutilla",
+      "color": "#FF3D8A"
+    },
+    {
+      "id": "Cielo",
+      "nombre": "Cielo",
+      "color": "#3FA9FF"
+    },
+    {
+      "id": "Lima",
+      "nombre": "Lima",
+      "color": "#8BE03A"
+    },
+    {
+      "id": "Lavanda",
+      "nombre": "Lavanda",
+      "color": "#A66CFF"
+    }
+  ]
+}

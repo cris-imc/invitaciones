@@ -1,0 +1,40 @@
+{
+  "codigo": "POSTAL",
+  "etiqueta": "Postal",
+  "archivo": "PostalTemplate",
+  "componente": "PostalTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#D9643A",
+  "eventos": [
+    "soloCasamiento"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Aeropostal",
+      "color": "#D9643A"
+    },
+    {
+      "id": "Mediterraneo",
+      "nombre": "Mediterráneo",
+      "color": "#E76F51"
+    },
+    {
+      "id": "Desierto",
+      "nombre": "Desierto",
+      "color": "#C1502E"
+    },
+    {
+      "id": "Artico",
+      "nombre": "Ártico",
+      "color": "#C0553A"
+    },
+    {
+      "id": "Tropico",
+      "nombre": "Trópico",
+      "color": "#E0603E"
+    }
+  ]
+}

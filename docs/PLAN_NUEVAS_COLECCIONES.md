@@ -252,20 +252,20 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 
 | Familia | Código | Estado |
 |---|---|---|
-| Editorial Blanc & Noir | EDITORIALBLANCNOIR | — |
-| Couture | COUTURE | — |
-| Cartelera | CARTELERA | — |
-| Bauhaus | BAUHAUS | — |
-| Retrowave | RETROWAVE | — |
-| Postal | POSTAL | — |
-| Noir | NOIR | — |
-| Observatorio | OBSERVATORIO | — |
-| Pop | POP | — |
-| Shōjo | SHOJO | — |
-| Reino | REINO | — |
-| Tropical | TROPICAL | — |
-| Y2K | Y2K | — |
-| Arcade | ARCADE | — |
+| Editorial Blanc & Noir | EDITORIALBLANCNOIR | `verificada` — base de la sub-colección, derivada de Jardín con `scripts/derivar-editorial.js`: hereda el motor de Iconic (scroller, reveals, paneles pineados, riel, portada que se abre, check-in con sello) y le saca todo el dibujo. Instrument Serif + Archivo + JetBrains Mono, trama de semitono por CSS, bloques de color a página completa. Verificada en DOM: Save the Date sobre negro con el día en 88 px, kickers en mono, 5 tramas, **cero imágenes**. 5 variantes. |
+| Couture | COUTURE | `verificada` — Bodoni Moda en tamaños de tapa de moda con Space Grotesk para los datos; el color aparece en una palabra por página. 5 variantes. |
+| Cartelera | CARTELERA | `verificada` — Limelight sobre negro, con los nombres encendidos como la marquesina de un teatro (halo en el titular) y Karla para el texto. 5 variantes. |
+| Bauhaus | BAUHAUS | `verificada` — Jost en cajas y Work Sans para el texto; el acento no es un adorno sino un bloque detrás de la palabra, y no hay itálicas ni curvas. 5 variantes. |
+| Retrowave | RETROWAVE | `verificada` — Righteous sobre el degradé de un atardecer, con la grilla en fuga hecha con gradientes y el titular con resplandor de neón. Manrope para el texto. 5 variantes. |
+| Postal | POSTAL | `verificada` — Alfa Slab One como el sello de un destino, Work Sans para el texto y JetBrains Mono para los datos, como el matasellos; las tarjetas van con borde punteado. 5 variantes. |
+| Noir | NOIR | `verificada` — Playfair Display 700 sobre negro y Courier Prime para todo lo demás, como un guion mecanografiado; la luz entra de costado como una persiana. El dorado se repite entre variantes a propósito: lo que cambia es el fondo. 5 variantes. |
+| Observatorio | OBSERVATORIO | `verificada` — Cormorant Garamond sobre un cielo nocturno, IBM Plex Mono para las coordenadas y Jost para el texto; la trama son estrellas en dos tamaños, no puntos de imprenta. 5 variantes. |
+| Pop | POP | `verificada` — Bangers en mayúsculas sobre negro con contorno y sombra dura, como una viñeta; Nunito para el texto. 5 variantes. |
+| Shōjo | SHOJO | `verificada` — Cherry Bomb One sobre pasteles con M PLUS Rounded para el texto: nada tiene esquinas y todo tiene brillo. 5 variantes. |
+| Reino | REINO | `verificada` — Cinzel Decorative con filete dorado arriba y abajo de cada titular, sobre fondos profundos; Nunito para el texto. 5 variantes. |
+| Tropical | TROPICAL | `verificada` — Lilita One sobre arena y mar con Quicksand para el texto; el acento es el de la fruta y el segundo el verde de las palmeras. 5 variantes. |
+| Y2K | Y2K | `verificada` — Baloo 2 inflado, Comfortaa para el texto y VT323 para los datos, como la pantalla de un Tamagotchi: todo burbuja y cromo. Su paleta del mockup no declara tinta (es fija). 5 variantes. |
+| Arcade | ARCADE | `verificada` — Press Start 2P para los titulares y Rubik para el texto -- en píxel sería ilegible --, con sombra dura de dos colores y scanlines. Verificada en DOM: Press Start 2P 28 px, doble sombra rosa/cian, cero imágenes. 5 variantes. |
 
 ### Fase 8 — Cierre
 
@@ -374,3 +374,24 @@ componentes compartidos) vive en un solo lugar, y cada nivel agrega lo suyo.
 Para regenerar todo Paper después de tocar Prensa:
 
     node scripts/derivar-noche.js && node scripts/derivar-lumbre.js       && node scripts/derivar-herbario.js && node scripts/derivar-trazo.js       && node scripts/derivar-sobre-sello.js && node scripts/derivar-papeleria.js       && node scripts/gen-papel-prensado-variants.js       && node scripts/gen-papeleria-viva-variants.js       && node scripts/generar-plantillas-dinamicas.js
+
+### Tipográfica Editorial: catorce mundos, un solo motor
+
+La segunda sub-colección de Iconic comparte con Capas de papel el motor
+entero y no comparte ni un dibujo: acá la página es una revista. La base
+(Editorial Blanc & Noir) se deriva de Jardín sacándole las escenas y
+poniéndole el registro editorial; las otras trece se derivan de la base con
+`scripts/derivar-tipografica.js` y una ficha JSON cada una.
+
+Lo que trae la ficha es exactamente lo que hace reconocible a una familia en
+dos segundos: **las tres caras**, **la paleta** y **un puñado de reglas
+propias** (`cssExtra`) -- la sombra dura de Arcade, las estrellas de
+Observatorio, los bloques de Bauhaus, las burbujas de Y2K. Nada más, porque
+nada más cambia.
+
+Para regenerar toda la Colección Iconic:
+
+    node scripts/derivar-capas.js && node scripts/derivar-editorial.js \
+      && node scripts/derivar-tipografica.js \
+      && node scripts/gen-iconic-variants.js \
+      && node scripts/generar-plantillas-dinamicas.js

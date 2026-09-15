@@ -1,0 +1,86 @@
+{
+  "archivo": "ObservatorioTemplate",
+  "prefijo": "obs",
+  "mote": "Observatorio",
+  "titulo": "OBSERVATORIO",
+  "varianteBase": "Medianoche",
+  "resumen": [
+    "La carta celeste: Cormorant Garamond sobre un cielo nocturno, con IBM",
+    "Plex Mono para las coordenadas y Jost para el texto. El acento es el",
+    "dorado de una constelación dibujada."
+  ],
+  "serif": {
+    "modulo": "Cormorant_Garamond",
+    "css": "'Cormorant Garamond', serif",
+    "pesos": [
+      "300",
+      "400"
+    ],
+    "italica": true
+  },
+  "sans": {
+    "modulo": "Jost",
+    "css": "'Jost', sans-serif",
+    "pesos": [
+      "300",
+      "400"
+    ]
+  },
+  "mono": {
+    "modulo": "IBM_Plex_Mono",
+    "css": "'IBM Plex Mono', monospace",
+    "pesos": [
+      "400"
+    ]
+  },
+  "paleta": {
+    "bg": "#0B1426",
+    "bg2": "#101C33",
+    "ink": "#EFE6D2",
+    "ink2": "#EFE6D2",
+    "acc": "#D4A957",
+    "acc2": "#7FA3C4"
+  },
+  "cssExtra": [
+    "/* Observatorio: la trama son estrellas, no puntos de imprenta. */",
+    ".obs-trama { opacity: .35; background-image: radial-gradient(currentColor .6px, transparent .7px), radial-gradient(currentColor .4px, transparent .5px); background-size: 46px 46px, 23px 23px; background-position: 0 0, 12px 8px; }"
+  ],
+  "variantes": {
+    "Nebulosa": {
+      "etiqueta": "Nebulosa",
+      "bg": "#140F24",
+      "bg2": "#1B1531",
+      "ink": "#F1E9E0",
+      "ink2": "#F1E9E0",
+      "acc": "#E0B98A",
+      "acc2": "#9B8BC4"
+    },
+    "Boreal": {
+      "etiqueta": "Boreal",
+      "bg": "#0A1A1F",
+      "bg2": "#10242A",
+      "ink": "#E8F0EA",
+      "ink2": "#E8F0EA",
+      "acc": "#C9B86A",
+      "acc2": "#4FA39A"
+    },
+    "Eclipse": {
+      "etiqueta": "Eclipse",
+      "bg": "#0F0F10",
+      "bg2": "#181819",
+      "ink": "#EDE8DF",
+      "ink2": "#EDE8DF",
+      "acc": "#E2C275",
+      "acc2": "#8A8F99"
+    },
+    "Amanecer": {
+      "etiqueta": "Amanecer",
+      "bg": "#F1EBE0",
+      "bg2": "#E8E0D2",
+      "ink": "#1C2740",
+      "ink2": "#1C2740",
+      "acc": "#B08637",
+      "acc2": "#4E6A8A"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "codigo": "COUTURE",
+  "etiqueta": "Couture",
+  "archivo": "CoutureTemplate",
+  "componente": "CoutureTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#B8862B",
+  "eventos": [
+    "soloCasamiento"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Oro",
+      "color": "#B8862B"
+    },
+    {
+      "id": "Burdeos",
+      "nombre": "Burdeos",
+      "color": "#7A1E2C"
+    },
+    {
+      "id": "Botella",
+      "nombre": "Botella",
+      "color": "#1F4A3A"
+    },
+    {
+      "id": "Noche",
+      "nombre": "Noche",
+      "color": "#1B2A5C"
+    },
+    {
+      "id": "Terracota",
+      "nombre": "Terracota",
+      "color": "#B4532E"
+    }
+  ]
+}

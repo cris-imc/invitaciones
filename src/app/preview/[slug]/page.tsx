@@ -393,6 +393,118 @@ async function PreviewPageInterna({
         case 'Ocre': return <PlantillaDinamica nombre="MembreteTemplateOcre" invitation={invRecord} guest={null} isPersonalized={false} />;
         default: return <PlantillaDinamica nombre="MembreteTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
     }
+} else if (invitation.templateTipo === 'COUTURE') {
+    switch (color) {
+        case 'Burdeos': return <PlantillaDinamica nombre="CoutureTemplateBurdeos" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Botella': return <PlantillaDinamica nombre="CoutureTemplateBotella" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Noche': return <PlantillaDinamica nombre="CoutureTemplateNoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Terracota': return <PlantillaDinamica nombre="CoutureTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="CoutureTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'CARTELERA') {
+    switch (color) {
+        case 'Flamingo': return <PlantillaDinamica nombre="CarteleraTemplateFlamingo" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Sapphire': return <PlantillaDinamica nombre="CarteleraTemplateSapphire" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Lime': return <PlantillaDinamica nombre="CarteleraTemplateLime" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Violet': return <PlantillaDinamica nombre="CarteleraTemplateViolet" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="CarteleraTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'BAUHAUS') {
+    switch (color) {
+        case 'Klein': return <PlantillaDinamica nombre="BauhausTemplateKlein" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Bosque': return <PlantillaDinamica nombre="BauhausTemplateBosque" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Terracota': return <PlantillaDinamica nombre="BauhausTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Grafito': return <PlantillaDinamica nombre="BauhausTemplateGrafito" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="BauhausTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'RETROWAVE') {
+    switch (color) {
+        case 'Outrun': return <PlantillaDinamica nombre="RetrowaveTemplateOutrun" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Laser': return <PlantillaDinamica nombre="RetrowaveTemplateLaser" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Sunset': return <PlantillaDinamica nombre="RetrowaveTemplateSunset" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Chrome': return <PlantillaDinamica nombre="RetrowaveTemplateChrome" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="RetrowaveTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'POSTAL') {
+    switch (color) {
+        case 'Mediterraneo': return <PlantillaDinamica nombre="PostalTemplateMediterraneo" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Desierto': return <PlantillaDinamica nombre="PostalTemplateDesierto" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Artico': return <PlantillaDinamica nombre="PostalTemplateArtico" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Tropico': return <PlantillaDinamica nombre="PostalTemplateTropico" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="PostalTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'NOIR') {
+    switch (color) {
+        case 'Esmeralda': return <PlantillaDinamica nombre="NoirTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Azul': return <PlantillaDinamica nombre="NoirTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Burdeos': return <PlantillaDinamica nombre="NoirTemplateBurdeos" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Plata': return <PlantillaDinamica nombre="NoirTemplatePlata" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="NoirTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'OBSERVATORIO') {
+    switch (color) {
+        case 'Nebulosa': return <PlantillaDinamica nombre="ObservatorioTemplateNebulosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Boreal': return <PlantillaDinamica nombre="ObservatorioTemplateBoreal" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Eclipse': return <PlantillaDinamica nombre="ObservatorioTemplateEclipse" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Amanecer': return <PlantillaDinamica nombre="ObservatorioTemplateAmanecer" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="ObservatorioTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'POP') {
+    switch (color) {
+        case 'Limon': return <PlantillaDinamica nombre="PopTemplateLimon" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Cian': return <PlantillaDinamica nombre="PopTemplateCian" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Lila': return <PlantillaDinamica nombre="PopTemplateLila" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Naranja': return <PlantillaDinamica nombre="PopTemplateNaranja" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="PopTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'SHOJO') {
+    switch (color) {
+        case 'Lavanda': return <PlantillaDinamica nombre="ShojoTemplateLavanda" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Cielo': return <PlantillaDinamica nombre="ShojoTemplateCielo" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Menta': return <PlantillaDinamica nombre="ShojoTemplateMenta" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Durazno': return <PlantillaDinamica nombre="ShojoTemplateDurazno" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="ShojoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'REINO') {
+    switch (color) {
+        case 'Rosa': return <PlantillaDinamica nombre="ReinoTemplateRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Esmeralda': return <PlantillaDinamica nombre="ReinoTemplateEsmeralda" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Zafiro': return <PlantillaDinamica nombre="ReinoTemplateZafiro" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Lila': return <PlantillaDinamica nombre="ReinoTemplateLila" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="ReinoTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'TROPICAL') {
+    switch (color) {
+        case 'Flamenco': return <PlantillaDinamica nombre="TropicalTemplateFlamenco" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Coco': return <PlantillaDinamica nombre="TropicalTemplateCoco" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Lima': return <PlantillaDinamica nombre="TropicalTemplateLima" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Atardecer': return <PlantillaDinamica nombre="TropicalTemplateAtardecer" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="TropicalTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'Y2K') {
+    switch (color) {
+        case 'Frutilla': return <PlantillaDinamica nombre="Y2kTemplateFrutilla" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Cielo': return <PlantillaDinamica nombre="Y2kTemplateCielo" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Lima': return <PlantillaDinamica nombre="Y2kTemplateLima" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Lavanda': return <PlantillaDinamica nombre="Y2kTemplateLavanda" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="Y2kTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'ARCADE') {
+    switch (color) {
+        case 'Pacman': return <PlantillaDinamica nombre="ArcadeTemplatePacman" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Vapor': return <PlantillaDinamica nombre="ArcadeTemplateVapor" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Gameboy': return <PlantillaDinamica nombre="ArcadeTemplateGameboy" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Candy': return <PlantillaDinamica nombre="ArcadeTemplateCandy" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="ArcadeTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
+} else if (invitation.templateTipo === 'EDITORIALBLANCNOIR') {
+    switch (color) {
+        case 'Klein': return <PlantillaDinamica nombre="EditorialBlancNoirTemplateKlein" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Bosque': return <PlantillaDinamica nombre="EditorialBlancNoirTemplateBosque" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Ocre': return <PlantillaDinamica nombre="EditorialBlancNoirTemplateOcre" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Ciruela': return <PlantillaDinamica nombre="EditorialBlancNoirTemplateCiruela" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="EditorialBlancNoirTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
 } else if (invitation.templateTipo === 'PRENSA') {
             switch (color) {
                 case 'Hueso': return <PlantillaDinamica nombre="PrensaTemplateHueso" invitation={invRecord} guest={null} isPersonalized={false} />;

@@ -1,0 +1,40 @@
+{
+  "codigo": "NOIR",
+  "etiqueta": "Noir",
+  "archivo": "NoirTemplate",
+  "componente": "NoirTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#C9A24A",
+  "eventos": [
+    "soloCasamiento"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Clásico",
+      "color": "#0B0B0D"
+    },
+    {
+      "id": "Esmeralda",
+      "nombre": "Esmeralda",
+      "color": "#0A1210"
+    },
+    {
+      "id": "Azul",
+      "nombre": "Medianoche",
+      "color": "#0A0E1A"
+    },
+    {
+      "id": "Burdeos",
+      "nombre": "Burdeos",
+      "color": "#120608"
+    },
+    {
+      "id": "Plata",
+      "nombre": "Plata",
+      "color": "#111114"
+    }
+  ]
+}

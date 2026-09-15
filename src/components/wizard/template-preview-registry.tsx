@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL" | "TRAZODEPAPEL" | "SOBRESELLO" | "ACUARELACORONA" | "MANUSCRITA" | "TINTAVINILO" | "MEMBRETE";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL" | "TRAZODEPAPEL" | "SOBRESELLO" | "ACUARELACORONA" | "MANUSCRITA" | "TINTAVINILO" | "MEMBRETE" | "COUTURE" | "CARTELERA" | "BAUHAUS" | "RETROWAVE" | "POSTAL" | "NOIR" | "OBSERVATORIO" | "POP" | "SHOJO" | "REINO" | "TROPICAL" | "Y2K" | "ARCADE" | "EDITORIALBLANCNOIR";
 
 export interface ColorOption {
   id: string;
@@ -1378,4 +1378,228 @@ export const MEMBRETE_COMPONENTS: Record<string, PreviewComponent> = {
   Borgona: dynamic(() => import("@/components/templates/MembreteTemplateBorgona").then((m) => m.MembreteTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Grafito: dynamic(() => import("@/components/templates/MembreteTemplateGrafito").then((m) => m.MembreteTemplateGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Ocre: dynamic(() => import("@/components/templates/MembreteTemplateOcre").then((m) => m.MembreteTemplateOcre), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const COUTURE_COLORS: ColorOption[] = [
+  { id: "default", name: "Oro", color: "#B8862B" },
+  { id: "Burdeos", name: "Burdeos", color: "#7A1E2C" },
+  { id: "Botella", name: "Botella", color: "#1F4A3A" },
+  { id: "Noche", name: "Noche", color: "#1B2A5C" },
+  { id: "Terracota", name: "Terracota", color: "#B4532E" },
+];
+
+export const COUTURE_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CoutureTemplate").then((m) => m.CoutureTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Burdeos: dynamic(() => import("@/components/templates/CoutureTemplateBurdeos").then((m) => m.CoutureTemplateBurdeos), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Botella: dynamic(() => import("@/components/templates/CoutureTemplateBotella").then((m) => m.CoutureTemplateBotella), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Noche: dynamic(() => import("@/components/templates/CoutureTemplateNoche").then((m) => m.CoutureTemplateNoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/CoutureTemplateTerracota").then((m) => m.CoutureTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CARTELERA_COLORS: ColorOption[] = [
+  { id: "default", name: "Strip", color: "#FF3CAC" },
+  { id: "Flamingo", name: "Flamingo", color: "#FF5E5B" },
+  { id: "Sapphire", name: "Zafiro", color: "#4D7CFF" },
+  { id: "Lime", name: "Lima", color: "#B6FF3C" },
+  { id: "Violet", name: "Violeta", color: "#B455FF" },
+];
+
+export const CARTELERA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CarteleraTemplate").then((m) => m.CarteleraTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Flamingo: dynamic(() => import("@/components/templates/CarteleraTemplateFlamingo").then((m) => m.CarteleraTemplateFlamingo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Sapphire: dynamic(() => import("@/components/templates/CarteleraTemplateSapphire").then((m) => m.CarteleraTemplateSapphire), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lime: dynamic(() => import("@/components/templates/CarteleraTemplateLime").then((m) => m.CarteleraTemplateLime), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violet: dynamic(() => import("@/components/templates/CarteleraTemplateViolet").then((m) => m.CarteleraTemplateViolet), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const BAUHAUS_COLORS: ColorOption[] = [
+  { id: "default", name: "Primarios", color: "#D4321F" },
+  { id: "Klein", name: "Klein", color: "#1E3FBF" },
+  { id: "Bosque", name: "Bosque", color: "#2E6B4A" },
+  { id: "Terracota", name: "Terracota", color: "#C4552B" },
+  { id: "Grafito", name: "Grafito", color: "#111111" },
+];
+
+export const BAUHAUS_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/BauhausTemplate").then((m) => m.BauhausTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Klein: dynamic(() => import("@/components/templates/BauhausTemplateKlein").then((m) => m.BauhausTemplateKlein), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Bosque: dynamic(() => import("@/components/templates/BauhausTemplateBosque").then((m) => m.BauhausTemplateBosque), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/BauhausTemplateTerracota").then((m) => m.BauhausTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Grafito: dynamic(() => import("@/components/templates/BauhausTemplateGrafito").then((m) => m.BauhausTemplateGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const RETROWAVE_COLORS: ColorOption[] = [
+  { id: "default", name: "Miami", color: "#FF2D95" },
+  { id: "Outrun", name: "Outrun", color: "#19E3FF" },
+  { id: "Laser", name: "Láser", color: "#B6FF3C" },
+  { id: "Sunset", name: "Sunset", color: "#FFB627" },
+  { id: "Chrome", name: "Cromo", color: "#B455FF" },
+];
+
+export const RETROWAVE_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/RetrowaveTemplate").then((m) => m.RetrowaveTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Outrun: dynamic(() => import("@/components/templates/RetrowaveTemplateOutrun").then((m) => m.RetrowaveTemplateOutrun), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Laser: dynamic(() => import("@/components/templates/RetrowaveTemplateLaser").then((m) => m.RetrowaveTemplateLaser), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Sunset: dynamic(() => import("@/components/templates/RetrowaveTemplateSunset").then((m) => m.RetrowaveTemplateSunset), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Chrome: dynamic(() => import("@/components/templates/RetrowaveTemplateChrome").then((m) => m.RetrowaveTemplateChrome), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const POSTAL_COLORS: ColorOption[] = [
+  { id: "default", name: "Aeropostal", color: "#D9643A" },
+  { id: "Mediterraneo", name: "Mediterráneo", color: "#E76F51" },
+  { id: "Desierto", name: "Desierto", color: "#C1502E" },
+  { id: "Artico", name: "Ártico", color: "#C0553A" },
+  { id: "Tropico", name: "Trópico", color: "#E0603E" },
+];
+
+export const POSTAL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/PostalTemplate").then((m) => m.PostalTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Mediterraneo: dynamic(() => import("@/components/templates/PostalTemplateMediterraneo").then((m) => m.PostalTemplateMediterraneo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Desierto: dynamic(() => import("@/components/templates/PostalTemplateDesierto").then((m) => m.PostalTemplateDesierto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Artico: dynamic(() => import("@/components/templates/PostalTemplateArtico").then((m) => m.PostalTemplateArtico), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Tropico: dynamic(() => import("@/components/templates/PostalTemplateTropico").then((m) => m.PostalTemplateTropico), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const NOIR_COLORS: ColorOption[] = [
+  { id: "default", name: "Clásico", color: "#0B0B0D" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#0A1210" },
+  { id: "Azul", name: "Medianoche", color: "#0A0E1A" },
+  { id: "Burdeos", name: "Burdeos", color: "#120608" },
+  { id: "Plata", name: "Plata", color: "#111114" },
+];
+
+export const NOIR_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/NoirTemplate").then((m) => m.NoirTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/NoirTemplateEsmeralda").then((m) => m.NoirTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/NoirTemplateAzul").then((m) => m.NoirTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Burdeos: dynamic(() => import("@/components/templates/NoirTemplateBurdeos").then((m) => m.NoirTemplateBurdeos), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Plata: dynamic(() => import("@/components/templates/NoirTemplatePlata").then((m) => m.NoirTemplatePlata), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const OBSERVATORIO_COLORS: ColorOption[] = [
+  { id: "default", name: "Medianoche", color: "#D4A957" },
+  { id: "Nebulosa", name: "Nebulosa", color: "#E0B98A" },
+  { id: "Boreal", name: "Boreal", color: "#C9B86A" },
+  { id: "Eclipse", name: "Eclipse", color: "#E2C275" },
+  { id: "Amanecer", name: "Amanecer", color: "#B08637" },
+];
+
+export const OBSERVATORIO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/ObservatorioTemplate").then((m) => m.ObservatorioTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Nebulosa: dynamic(() => import("@/components/templates/ObservatorioTemplateNebulosa").then((m) => m.ObservatorioTemplateNebulosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Boreal: dynamic(() => import("@/components/templates/ObservatorioTemplateBoreal").then((m) => m.ObservatorioTemplateBoreal), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Eclipse: dynamic(() => import("@/components/templates/ObservatorioTemplateEclipse").then((m) => m.ObservatorioTemplateEclipse), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Amanecer: dynamic(() => import("@/components/templates/ObservatorioTemplateAmanecer").then((m) => m.ObservatorioTemplateAmanecer), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const POP_COLORS: ColorOption[] = [
+  { id: "default", name: "Fucsia", color: "#FF2E63" },
+  { id: "Limon", name: "Limón", color: "#FFD84D" },
+  { id: "Cian", name: "Cian", color: "#2EC4FF" },
+  { id: "Lila", name: "Lila", color: "#B455FF" },
+  { id: "Naranja", name: "Naranja", color: "#FF7A1A" },
+];
+
+export const POP_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/PopTemplate").then((m) => m.PopTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Limon: dynamic(() => import("@/components/templates/PopTemplateLimon").then((m) => m.PopTemplateLimon), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cian: dynamic(() => import("@/components/templates/PopTemplateCian").then((m) => m.PopTemplateCian), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lila: dynamic(() => import("@/components/templates/PopTemplateLila").then((m) => m.PopTemplateLila), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Naranja: dynamic(() => import("@/components/templates/PopTemplateNaranja").then((m) => m.PopTemplateNaranja), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const SHOJO_COLORS: ColorOption[] = [
+  { id: "default", name: "Sakura", color: "#FF6FAE" },
+  { id: "Lavanda", name: "Lavanda", color: "#B58CFF" },
+  { id: "Cielo", name: "Cielo", color: "#7FD3FF" },
+  { id: "Menta", name: "Menta", color: "#5FE0B5" },
+  { id: "Durazno", name: "Durazno", color: "#FF9C7A" },
+];
+
+export const SHOJO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/ShojoTemplate").then((m) => m.ShojoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lavanda: dynamic(() => import("@/components/templates/ShojoTemplateLavanda").then((m) => m.ShojoTemplateLavanda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cielo: dynamic(() => import("@/components/templates/ShojoTemplateCielo").then((m) => m.ShojoTemplateCielo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Menta: dynamic(() => import("@/components/templates/ShojoTemplateMenta").then((m) => m.ShojoTemplateMenta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Durazno: dynamic(() => import("@/components/templates/ShojoTemplateDurazno").then((m) => m.ShojoTemplateDurazno), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const REINO_COLORS: ColorOption[] = [
+  { id: "default", name: "Medianoche", color: "#E24BA0" },
+  { id: "Rosa", name: "Rosa", color: "#5A1E8A" },
+  { id: "Esmeralda", name: "Esmeralda", color: "#F0587A" },
+  { id: "Zafiro", name: "Zafiro", color: "#FF6FAE" },
+  { id: "Lila", name: "Lila", color: "#FF7DBE" },
+];
+
+export const REINO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/ReinoTemplate").then((m) => m.ReinoTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rosa: dynamic(() => import("@/components/templates/ReinoTemplateRosa").then((m) => m.ReinoTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Esmeralda: dynamic(() => import("@/components/templates/ReinoTemplateEsmeralda").then((m) => m.ReinoTemplateEsmeralda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Zafiro: dynamic(() => import("@/components/templates/ReinoTemplateZafiro").then((m) => m.ReinoTemplateZafiro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lila: dynamic(() => import("@/components/templates/ReinoTemplateLila").then((m) => m.ReinoTemplateLila), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const TROPICAL_COLORS: ColorOption[] = [
+  { id: "default", name: "Sandía", color: "#FF5E7A" },
+  { id: "Flamenco", name: "Flamenco", color: "#FF7BAC" },
+  { id: "Coco", name: "Coco", color: "#FF8A3D" },
+  { id: "Lima", name: "Lima", color: "#9BD83A" },
+  { id: "Atardecer", name: "Atardecer", color: "#FF4F7A" },
+];
+
+export const TROPICAL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/TropicalTemplate").then((m) => m.TropicalTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Flamenco: dynamic(() => import("@/components/templates/TropicalTemplateFlamenco").then((m) => m.TropicalTemplateFlamenco), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Coco: dynamic(() => import("@/components/templates/TropicalTemplateCoco").then((m) => m.TropicalTemplateCoco), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lima: dynamic(() => import("@/components/templates/TropicalTemplateLima").then((m) => m.TropicalTemplateLima), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Atardecer: dynamic(() => import("@/components/templates/TropicalTemplateAtardecer").then((m) => m.TropicalTemplateAtardecer), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const Y2K_COLORS: ColorOption[] = [
+  { id: "default", name: "Bubblegum", color: "#FF5FB2" },
+  { id: "Frutilla", name: "Frutilla", color: "#FF3D8A" },
+  { id: "Cielo", name: "Cielo", color: "#3FA9FF" },
+  { id: "Lima", name: "Lima", color: "#8BE03A" },
+  { id: "Lavanda", name: "Lavanda", color: "#A66CFF" },
+];
+
+export const Y2K_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/Y2kTemplate").then((m) => m.Y2kTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Frutilla: dynamic(() => import("@/components/templates/Y2kTemplateFrutilla").then((m) => m.Y2kTemplateFrutilla), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Cielo: dynamic(() => import("@/components/templates/Y2kTemplateCielo").then((m) => m.Y2kTemplateCielo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lima: dynamic(() => import("@/components/templates/Y2kTemplateLima").then((m) => m.Y2kTemplateLima), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lavanda: dynamic(() => import("@/components/templates/Y2kTemplateLavanda").then((m) => m.Y2kTemplateLavanda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const ARCADE_COLORS: ColorOption[] = [
+  { id: "default", name: "Neón", color: "#FF3CAC" },
+  { id: "Pacman", name: "Pac", color: "#FF5E5B" },
+  { id: "Vapor", name: "Vapor", color: "#FF71CE" },
+  { id: "Gameboy", name: "Game Boy", color: "#9BBC0F" },
+  { id: "Candy", name: "Candy", color: "#FF8FCF" },
+];
+
+export const ARCADE_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/ArcadeTemplate").then((m) => m.ArcadeTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Pacman: dynamic(() => import("@/components/templates/ArcadeTemplatePacman").then((m) => m.ArcadeTemplatePacman), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Vapor: dynamic(() => import("@/components/templates/ArcadeTemplateVapor").then((m) => m.ArcadeTemplateVapor), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Gameboy: dynamic(() => import("@/components/templates/ArcadeTemplateGameboy").then((m) => m.ArcadeTemplateGameboy), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Candy: dynamic(() => import("@/components/templates/ArcadeTemplateCandy").then((m) => m.ArcadeTemplateCandy), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const EDITORIALBLANCNOIR_COLORS: ColorOption[] = [
+  { id: "default", name: "Lacre", color: "#E63B2E" },
+  { id: "Klein", name: "Klein", color: "#1F4FD1" },
+  { id: "Bosque", name: "Bosque", color: "#2E6B4A" },
+  { id: "Ocre", name: "Ocre", color: "#C9891C" },
+  { id: "Ciruela", name: "Ciruela", color: "#7B2D5A" },
+];
+
+export const EDITORIALBLANCNOIR_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/EditorialBlancNoirTemplate").then((m) => m.EditorialBlancNoirTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Klein: dynamic(() => import("@/components/templates/EditorialBlancNoirTemplateKlein").then((m) => m.EditorialBlancNoirTemplateKlein), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Bosque: dynamic(() => import("@/components/templates/EditorialBlancNoirTemplateBosque").then((m) => m.EditorialBlancNoirTemplateBosque), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ocre: dynamic(() => import("@/components/templates/EditorialBlancNoirTemplateOcre").then((m) => m.EditorialBlancNoirTemplateOcre), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ciruela: dynamic(() => import("@/components/templates/EditorialBlancNoirTemplateCiruela").then((m) => m.EditorialBlancNoirTemplateCiruela), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };

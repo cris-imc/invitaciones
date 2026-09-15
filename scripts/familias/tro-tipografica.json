@@ -1,0 +1,40 @@
+{
+  "codigo": "TROPICAL",
+  "etiqueta": "Tropical",
+  "archivo": "TropicalTemplate",
+  "componente": "TropicalTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#FF5E7A",
+  "eventos": [
+    "soloQuince"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Sandía",
+      "color": "#FF5E7A"
+    },
+    {
+      "id": "Flamenco",
+      "nombre": "Flamenco",
+      "color": "#FF7BAC"
+    },
+    {
+      "id": "Coco",
+      "nombre": "Coco",
+      "color": "#FF8A3D"
+    },
+    {
+      "id": "Lima",
+      "nombre": "Lima",
+      "color": "#9BD83A"
+    },
+    {
+      "id": "Atardecer",
+      "nombre": "Atardecer",
+      "color": "#FF4F7A"
+    }
+  ]
+}

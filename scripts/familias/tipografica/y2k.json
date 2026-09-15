@@ -1,0 +1,86 @@
+{
+  "archivo": "Y2kTemplate",
+  "prefijo": "y2k",
+  "mote": "Y2k",
+  "titulo": "Y2K",
+  "varianteBase": "Bubblegum",
+  "resumen": [
+    "El 2000: Baloo 2 inflado, Comfortaa para el texto y VT323 para los datos,",
+    "como la pantalla de un Tamagotchi. Todo burbuja y cromo."
+  ],
+  "serif": {
+    "modulo": "Baloo_2",
+    "css": "'Baloo 2', cursive",
+    "pesos": [
+      "400",
+      "800"
+    ]
+  },
+  "sans": {
+    "modulo": "Comfortaa",
+    "css": "'Comfortaa', cursive",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "VT323",
+    "css": "'VT323', monospace",
+    "pesos": [
+      "400"
+    ]
+  },
+  "paleta": {
+    "bg": "#DDE6F2",
+    "bg2": "#C7A6FF",
+    "acc": "#FF5FB2",
+    "acc2": "#8FD3FF",
+    "ink": "#2A2340",
+    "ink2": "#6B6484"
+  },
+  "cssExtra": [
+    "/* Y2K: burbujas. Nada es cuadrado y el titular tiene brillo de cromo. */",
+    ".y2k-tarjeta, .y2k-ticket, .y2k-btn-solido, .y2k-portada-btn, .y2k-opcion, .y2k-cuenta-caja { border-radius: 22px; }",
+    ".y2k-cartel-nombres, .y2k-h2 { letter-spacing: -.01em; text-shadow: 0 2px 0 #fff, 0 6px 0 color-mix(in srgb, var(--pp-acc) 40%, transparent); }"
+  ],
+  "variantes": {
+    "Frutilla": {
+      "etiqueta": "Frutilla",
+      "bg": "#FFE3EE",
+      "bg2": "#FFB3D1",
+      "acc": "#FF3D8A",
+      "acc2": "#FFD6A8",
+      "ink": "#2A2340",
+      "ink2": "#6B6484"
+    },
+    "Cielo": {
+      "etiqueta": "Cielo",
+      "bg": "#E4F3FF",
+      "bg2": "#B5E1FF",
+      "acc": "#3FA9FF",
+      "acc2": "#C9B8FF",
+      "ink": "#2A2340",
+      "ink2": "#6B6484"
+    },
+    "Lima": {
+      "etiqueta": "Lima",
+      "bg": "#EAF7DD",
+      "bg2": "#FFF176",
+      "acc": "#8BE03A",
+      "acc2": "#8FD3FF",
+      "ink": "#2A2340",
+      "ink2": "#6B6484"
+    },
+    "Lavanda": {
+      "etiqueta": "Lavanda",
+      "bg": "#EEE6FF",
+      "bg2": "#FFB8E6",
+      "acc": "#A66CFF",
+      "acc2": "#B8F0FF",
+      "ink": "#2A2340",
+      "ink2": "#6B6484"
+    }
+  },
+  "nota": "El mockup de Y2K no declara tinta: su paleta son el fondo y los acentos. La tinta es fija (#2A2340), que es lo que usa el mockup en el texto."
+}

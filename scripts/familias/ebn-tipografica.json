@@ -1,0 +1,18 @@
+{
+  "codigo": "EDITORIALBLANCNOIR",
+  "etiqueta": "Editorial Blanc & Noir",
+  "archivo": "EditorialBlancNoirTemplate",
+  "componente": "EditorialBlancNoirTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#E63B2E",
+  "eventos": ["soloCasamiento"],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    { "id": "default", "nombre": "Lacre", "color": "#E63B2E" },
+    { "id": "Klein", "nombre": "Klein", "color": "#1F4FD1" },
+    { "id": "Bosque", "nombre": "Bosque", "color": "#2E6B4A" },
+    { "id": "Ocre", "nombre": "Ocre", "color": "#C9891C" },
+    { "id": "Ciruela", "nombre": "Ciruela", "color": "#7B2D5A" }
+  ]
+}

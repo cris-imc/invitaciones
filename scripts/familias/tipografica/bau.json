@@ -1,0 +1,89 @@
+{
+  "archivo": "BauhausTemplate",
+  "prefijo": "bau",
+  "mote": "Bauhaus",
+  "titulo": "BAUHAUS",
+  "varianteBase": "Primarios",
+  "resumen": [
+    "La escuela: Jost 500 en cajas, Work Sans para el texto y tres colores",
+    "primarios que se usan en bloques enteros, nunca en un adorno. Círculos,",
+    "cuadrados y triángulos como única decoración."
+  ],
+  "serif": {
+    "modulo": "Jost",
+    "css": "'Jost', sans-serif",
+    "pesos": [
+      "400",
+      "500",
+      "600"
+    ]
+  },
+  "sans": {
+    "modulo": "Work_Sans",
+    "css": "'Work Sans', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "mono": {
+    "modulo": "Work_Sans",
+    "css": "'Work Sans', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#F2ECE0",
+    "bg2": "#E8E1D2",
+    "ink": "#111111",
+    "ink2": "#5A5650",
+    "acc": "#D4321F",
+    "acc2": "#F2C319"
+  },
+  "cssExtra": [
+    "/* Bauhaus: sin itálicas y sin curvas. El acento es un bloque. */",
+    ".bau-h2 em, .bau-acento { font-style: normal; background: var(--pp-acc); color: var(--pp-bg); padding: 0 .12em; }",
+    ".bau-h2, .bau-cartel-nombres { letter-spacing: -.02em; text-transform: uppercase; }",
+    ".bau-trama { background-image: none; }"
+  ],
+  "variantes": {
+    "Klein": {
+      "etiqueta": "Klein",
+      "bg": "#F1EFE9",
+      "bg2": "#E5E2DA",
+      "ink": "#111111",
+      "ink2": "#575A66",
+      "acc": "#1E3FBF",
+      "acc2": "#F2C319"
+    },
+    "Bosque": {
+      "etiqueta": "Bosque",
+      "bg": "#F0EEE4",
+      "bg2": "#E3E0D3",
+      "ink": "#111111",
+      "ink2": "#5A5E55",
+      "acc": "#2E6B4A",
+      "acc2": "#E8A33D"
+    },
+    "Terracota": {
+      "etiqueta": "Terracota",
+      "bg": "#F4ECE2",
+      "bg2": "#E9DFD1",
+      "ink": "#111111",
+      "ink2": "#66584D",
+      "acc": "#C4552B",
+      "acc2": "#F2C319"
+    },
+    "Grafito": {
+      "etiqueta": "Grafito",
+      "bg": "#ECECEA",
+      "bg2": "#DEDEDB",
+      "ink": "#111111",
+      "ink2": "#5B5B5B",
+      "acc": "#111111",
+      "acc2": "#F2C319"
+    }
+  }
+}

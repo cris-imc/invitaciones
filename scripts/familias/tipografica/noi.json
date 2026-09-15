@@ -1,0 +1,89 @@
+{
+  "archivo": "NoirTemplate",
+  "prefijo": "noi",
+  "mote": "Noir",
+  "titulo": "NOIR",
+  "varianteBase": "Clásico",
+  "resumen": [
+    "El cine negro: Playfair Display 700 sobre negro, Courier Prime para todo",
+    "lo demás (como un guion mecanografiado) y el dorado apareciendo en una",
+    "sola palabra por pantalla."
+  ],
+  "serif": {
+    "modulo": "Playfair_Display",
+    "css": "'Playfair Display', serif",
+    "pesos": [
+      "400",
+      "700"
+    ],
+    "italica": true
+  },
+  "sans": {
+    "modulo": "Courier_Prime",
+    "css": "'Courier Prime', monospace",
+    "pesos": [
+      "400",
+      "700"
+    ]
+  },
+  "mono": {
+    "modulo": "Courier_Prime",
+    "css": "'Courier Prime', monospace",
+    "pesos": [
+      "400",
+      "700"
+    ]
+  },
+  "paleta": {
+    "bg": "#0B0B0D",
+    "bg2": "#0B0B0D",
+    "ink": "#F2EEE6",
+    "ink2": "#F2EEE6",
+    "acc": "#C9A24A",
+    "acc2": "#8E1B2C"
+  },
+  "cssExtra": [
+    "/* Noir: la luz entra de costado, como una persiana. */",
+    ".noi-trama { opacity: .10; background-image: repeating-linear-gradient(105deg, currentColor 0 2px, transparent 2px 22px); background-size: auto; }"
+  ],
+  "variantes": {
+    "Esmeralda": {
+      "etiqueta": "Esmeralda",
+      "bg": "#0A1210",
+      "bg2": "#0A1210",
+      "ink": "#EDF1EA",
+      "ink2": "#EDF1EA",
+      "acc": "#C9A24A",
+      "acc2": "#1F5C46"
+    },
+    "Azul": {
+      "etiqueta": "Medianoche",
+      "bg": "#0A0E1A",
+      "bg2": "#0A0E1A",
+      "ink": "#EEF0F4",
+      "ink2": "#EEF0F4",
+      "acc": "#B8C4D8",
+      "acc2": "#1F3A8A"
+    },
+    "Burdeos": {
+      "etiqueta": "Burdeos",
+      "bg": "#120608",
+      "bg2": "#120608",
+      "ink": "#F4ECE8",
+      "ink2": "#F4ECE8",
+      "acc": "#D9B26A",
+      "acc2": "#7A1E2E"
+    },
+    "Plata": {
+      "etiqueta": "Plata",
+      "bg": "#111114",
+      "bg2": "#111114",
+      "ink": "#F5F5F5",
+      "ink2": "#F5F5F5",
+      "acc": "#C8C8CC",
+      "acc2": "#3A3A44"
+    }
+  },
+  "acentosIguales": true,
+  "nota": "En Noir el dorado se repite entre variantes a propósito: lo que cambia es el fondo (medianoche, esmeralda, burdeos) y el segundo acento. Por eso el chequeo de acentos repetidos no aplica."
+}

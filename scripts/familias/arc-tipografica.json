@@ -1,0 +1,40 @@
+{
+  "codigo": "ARCADE",
+  "etiqueta": "Arcade",
+  "archivo": "ArcadeTemplate",
+  "componente": "ArcadeTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "tipograficaEditorial",
+  "acento": "#FF3CAC",
+  "eventos": [
+    "soloQuince"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Neón",
+      "color": "#FF3CAC"
+    },
+    {
+      "id": "Pacman",
+      "nombre": "Pac",
+      "color": "#FF5E5B"
+    },
+    {
+      "id": "Vapor",
+      "nombre": "Vapor",
+      "color": "#FF71CE"
+    },
+    {
+      "id": "Gameboy",
+      "nombre": "Game Boy",
+      "color": "#9BBC0F"
+    },
+    {
+      "id": "Candy",
+      "nombre": "Candy",
+      "color": "#FF8FCF"
+    }
+  ]
+}

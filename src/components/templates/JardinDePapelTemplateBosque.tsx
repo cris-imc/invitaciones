@@ -1,6 +1,6 @@
 "use client";
 
-// GENERADO por scripts/gen-capas-de-papel-variants.js a partir de
+// GENERADO por scripts/gen-iconic-variants.js a partir de
 // JardinDePapelTemplate.tsx — no editar a mano: los cambios se pierden al regenerar.
 
 /**
