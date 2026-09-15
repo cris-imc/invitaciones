@@ -8,15 +8,18 @@
  * Variante: Botella.
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
- * EditorialBlancNoirTemplate.tsx — no editar a mano: la sub-colección se
- * arregla en Editorial Blanc & Noir y se vuelve a derivar; lo propio de
- * esta familia está en scripts/familias/tipografica/cou.json.
+ * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/cou.jsx, los
+ * estilos en scripts/css/tipografica/cou.css y las caras y la paleta en
+ * scripts/familias/tipografica/cou.json.
  *
- * La alta costura: Bodoni Moda en tamaños de tapa de revista de moda, con
- * Space Grotesk para los datos. El color aparece sólo en una palabra por
- * página -- el oro o el burdeos -- y el resto es blanco y negro.
+ * La revista de moda: Bodoni Moda en cuerpos de tapa, Space Grotesk en
+ * versalitas con tracking, filetes de 1 px y el color en una sola palabra
+ * por página. Tapa con masthead, foto, recuadro de edición, sello del pase
+ * y código de barras; sumario, countdown en renglones, cita destacada,
+ * pasarela, tarjeta de suscripción, sesión de tapa, tracklist y contratapa.
  *
- * Sin imágenes propias: son tres fuentes y CSS.
+ * Sin imágenes propias: son fuentes y CSS.
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -31,7 +34,7 @@ import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
 import { useCountdown, pad } from "@/components/invitation/v2/useCountdown";
-import { useTextos, useFormatoDeMoneda, tituloEnDosLineas } from "@/components/i18n/ProveedorIdioma";
+import { useTextos, useFormatoDeMoneda } from "@/components/i18n/ProveedorIdioma";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { esVistaMiniatura } from "@/lib/miniatura";
 
@@ -44,7 +47,7 @@ const couSerif = Bodoni_Moda({
 });
 const couSans = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   display: "swap",
   variable: "--cou-sans",
 });
@@ -306,7 +309,7 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -539,6 +542,16 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            bano.style.opacity = String(Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3)));
           });
         });
 
@@ -736,6 +749,34 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El masthead: una línea por nombre, la segunda alineada a la derecha con
+  // el "&" chico en itálica y en el acento. El renglón más largo manda el
+  // cuerpo, porque una didona no se parte.
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(5, ...renglones.map((n) => n.length));
+  const totalLetras = Math.max(1, renglones.join("").replace(/\s/g, "").length);
+
+  // La frase: el medio en itálica y en el acento, el cierre subrayado con un
+  // filete de 3 px -- como una cita destacada de revista.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.7)) return "cou-subrayado";
+    if (i >= Math.floor(n * 0.25) && i < desdeAcento) return "cou-acento";
+    return undefined;
+  };
+
+  const kickerDelEvento = tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const mesCorto = mesLargo.slice(0, 3);
+  const fechaCodigo = `${anio} ${String(fechaEvento.getMonth() + 1).padStart(2, "0")} ${String(fechaEvento.getDate()).padStart(2, "0")} ${pase}`;
+
+  // El sumario de la tapa interior: los pliegos que esta invitación tiene.
+  const sumario = [
+    { n: nSaveTheDate, t: tx("invitacion.saveTheDate.guardaLaFecha"), p: `${diaSemana.toLowerCase()} ${diaNum} ${tx("invitacion.evento.de")} ${mesLargo}` },
+    { n: nCuando, t: tx("invitacion.ubicacion.cuandoYDonde"), p: lugarNombre || ciudad },
+    ...(nCheckin ? [{ n: nCheckin, t: "Check-in", p: tx("invitacion.rsvp.confirmar") }] : []),
+    { n: nPase, t: tx("invitacion.pase.tuPase"), p: guest?.mesas?.length ? `QR · ${tx("invitacion.pase.tuMesa")} ${guest.mesas[0]}` : "QR" },
+  ];
+
   return (
     <div
       ref={raizRef}
@@ -747,81 +788,82 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
 
       <div ref={scrollerRef} className="cou-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
-        <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="cou-section cou-std">
-          <div className="cou-trama cou-trama--media" aria-hidden="true" />
+            El sumario: el día enorme, el mes en itálica y en el acento, el
+            índice de pliegos con filetes y la foto con su pie de foto. */}
+        <section data-tone="light" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="cou-section cou-std">
+          <div className="cou-folio">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">SUMARIO · {folio(nSaveTheDate)}</span>
+          </div>
           <div className="cou-spread">
             <div className="cou-pagina">
-              <div className="cou-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
               <div className="cou-fecha">
-                <span data-xin="1" data-dist="-160" className="cou-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="cou-fecha-linea cou-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="cou-fecha-linea">{anio}</span>
+                <span data-xin="1" data-dist="-160" className="cou-fecha-dia">{diaNum}</span>
+                <div className="cou-fecha-columna">
+                  <span data-xin="1" data-dist="160" data-delay="120" className="cou-fecha-mes">{mesLargo}</span>
+                  <span data-xin="1" data-dist="160" data-delay="240" className="cou-fecha-anio">{anio}</span>
+                  <span data-xin="1" data-delay="360" className="cou-fecha-pie">{diaSemana} · {hora} H</span>
+                </div>
               </div>
-              <div data-xin="1" data-delay="360" className="cou-fecha-pie">
-                <span>{diaSemana} · {hora} H</span>
-                <AddToCalendarLink
-                  eventName={titulo}
-                  targetDate={fechaHora}
-                  location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="cou-link"
-                  showIcon={false}
-                >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
-                </AddToCalendarLink>
+              <div data-xin="1" data-delay="400" className="cou-sumario">
+                {sumario.map((s) => (
+                  <div key={s.n} className="cou-sumario-fila">
+                    <span><span className="cou-sumario-n">{s.n}</span><span className="cou-sumario-t">{s.t}</span></span>
+                    <span className="cou-sumario-p">{s.p}</span>
+                  </div>
+                ))}
               </div>
+              <AddToCalendarLink
+                eventName={titulo}
+                targetDate={fechaHora}
+                location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+                className="cou-cta cou-cta--chico"
+                showIcon={false}
+              >
+                {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} <span className="cou-cta-flecha">↗</span>
+              </AddToCalendarLink>
             </div>
 
             {hayFoto && (
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="cou-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only cou-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="11,11,11" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only cou-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="11,11,11" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --cou-punto. */}
                 <span className="cou-foto-revelado" aria-hidden="true" />
-                <span className="cou-foto-anio">{anio}</span>
-                <span className="cou-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="cou-foto-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="cou-foto-pie">{[lugarNombre, ciudad].filter(Boolean).join(", ")}</span>
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="cou-section cou-countdown">
+            Pliego de tinta: cuatro renglones -- la etiqueta, una línea de
+            puntos y la cifra -- y una marquesina en itálica abajo. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="cou-section cou-countdown">
           <div className="cou-folio">
             <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
+          </div>
+          <div className="cou-spread">
+            <div className="cou-pagina cou-pagina--entera">
+              <CuentaCouture targetDate={fechaHora} />
+            </div>
           </div>
           <div className="cou-marquesina" aria-hidden="true">
             <div className="cou-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
-                </span>
-              ))}
-            </div>
-          </div>
-          <CuentaCouture targetDate={fechaHora} />
-          <div className="cou-marquesina cou-marquesina--contraria" aria-hidden="true">
-            <div className="cou-marquesina-tira">
-              {[0, 1].map((i) => (
-                <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[`${diaSemana.toLowerCase()} ${diaNum} ${tx("invitacion.evento.de")} ${mesLargo}`, lugarNombre, ciudad, dressCode].filter(Boolean).join(" — ")} —&nbsp;
                 </span>
               ))}
             </div>
@@ -829,38 +871,42 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            La cita destacada: la comilla gigante en el acento detrás, la
+            frase en Bodoni y la firma con un filete a la izquierda. */}
         {hayFrase && (
-          <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="cou-section cou-frase-seccion">
+          <section data-tone="light" data-screen-label={tx("invitacion.frase.etiqueta")} className="cou-section cou-frase-seccion">
             <div className="cou-folio">
-              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nFrase} — EDITORIAL</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
             <div className="cou-spread">
-              <h2 ref={fraseRef} className="cou-frase">
-                {palabras.map((p, i) => (
-                  // El espacio va fuera del span: el motor pone cada palabra
-                  // en inline-block y un espacio adentro se colapsa a cero.
-                  <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "cou-acento" : undefined}>{p}</span>{" "}
-                  </span>
-                ))}
-              </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="cou-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+              <div className="cou-cita">
+                <span className="cou-comilla" aria-hidden="true">“</span>
+                <h2 ref={fraseRef} className="cou-frase">
+                  {palabras.map((p, i) => (
+                    // El espacio va fuera del span: el motor pone cada palabra
+                    // en inline-block y un espacio adentro se colapsa a cero.
+                    <span key={i}>
+                      <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
+                    </span>
+                  ))}
+                </h2>
+              </div>
+              <div data-xin="1" data-delay="900" data-dist="60" className="cou-firma">
+                <span className="cou-folio-etq">{tx("invitacion.frase.conAmor").toUpperCase()}</span>
+                <span className="cou-firma-texto">{titulo}{ciudad ? `, ${ciudad}.` : "."}</span>
               </div>
             </div>
             <div className="cou-folio cou-folio--pie">
-              <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+              <span>{titulo.toUpperCase()} · {mesLargo.toUpperCase()} {anio}</span>
+              <span>PÁGINA {nFrase}</span>
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            La pasarela: un pliego por lugar, el salón sobre crema, la
+            ceremonia sobre tinta, el cronograma sobre blanco. */}
         <div
           id="details"
           data-pan="1"
@@ -871,29 +917,29 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
         >
           <div className="cou-pan-fijo">
             <div data-strip="1" className="cou-tira">
-              <div data-tone={TONO} className="cou-panel">
+              <div data-tone="light" className="cou-panel">
                 <div className="cou-folio">
                   <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="cou-spread">
-                  <h2 className="cou-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="cou-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
+                  <div className="cou-pagina">
+                    <span className="cou-panel-sub">{(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}</span>
+                    <h2 className="cou-panel-titulo">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</h2>
+                  </div>
                   <div className="cou-lineas">
                     <div className="cou-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
                     {direccion && <div className="cou-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="cou-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cou-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="cou-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}<span className="cou-cta-flecha">→</span>
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="cou-folio cou-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                 </div>
               </div>
 
@@ -903,10 +949,10 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
                     <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="cou-spread">
-                    <h2 className="cou-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="cou-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
+                    <div className="cou-pagina">
+                      <span className="cou-panel-sub">{(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}</span>
+                      <h2 className="cou-panel-titulo">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</h2>
+                    </div>
                     <div className="cou-lineas">
                       {ceremoniaHora && <div className="cou-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="cou-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
@@ -914,20 +960,21 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
                   </div>
                   <div className="cou-folio cou-folio--pie">
                     <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="cou-panel">
+                <div id="location" data-tone="light" className="cou-panel">
                   <div className="cou-folio">
                     <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="cou-spread">
-                    <h2 className="cou-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
+                    <div className="cou-pagina">
+                      <span className="cou-panel-sub">{ciudad || lugarNombre}</span>
+                      <h2 className="cou-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
                     <div className="cou-lineas">
                       {embedMapUrl && (
                         <div className="cou-mapa">
@@ -943,27 +990,27 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cou-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="cou-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()}<span className="cou-cta-flecha">→</span>
                       </a>
                     </div>
                   </div>
                   <div className="cou-folio cou-folio--pie">
                     <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="cou-panel cou-panel--acento">
+                <div id="schedule" data-tone="light" className="cou-panel cou-panel--blanco">
                   <div className="cou-folio">
                     <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="cou-spread">
-                    <h2 className="cou-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="cou-acento cou-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
+                    <div className="cou-pagina">
+                      <span className="cou-panel-sub">{tx("invitacion.ubicacion.cronograma")}</span>
+                      <h2 className="cou-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
                     <div className="cou-lineas">
                       {cronograma.map((item, i) => (
                         <div key={i} className="cou-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
@@ -981,22 +1028,20 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            La tarjeta de suscripción: blanca, con filete, el punto de
+            estado parpadeando y el sello "sí" que cae al confirmar. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="cou-section cou-checkin">
+          <section id="rsvp" data-tone="light" data-screen-label={tx("invitacion.rsvp.confirmar")} className="cou-section cou-checkin">
             <div className="cou-folio">
               <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
             </div>
             <div className="cou-spread">
               <div className="cou-pagina">
-                <h2 data-xin="1" data-dist="-80" className="cou-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="cou-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
-                </h2>
+                <span data-xin="1" className="cou-panel-sub">{tx("invitacion.rsvp.confirmaLinea1")}</span>
+                <h2 data-xin="1" data-dist="-80" className="cou-h2">{tx("invitacion.rsvp.confirmaLinea2")}</h2>
               </div>
-              <div className="cou-cupon">
-                <span className="cou-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="cou-cupon">
                 <CheckinCouture
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1030,8 +1075,8 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            La sesión de tapa: hoja de contactos de seis columnas con
+            filete, y el baño de color que se enciende al pasar. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1041,23 +1086,22 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
             className="cou-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="cou-pan-fijo">
+            <div className="cou-pan-fijo cou-pan-fijo--album">
               <div data-strip="1" className="cou-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="cou-panel cou-panel--album">
+                  <div key={iHoja} data-tone="light" className={`cou-panel cou-panel--album${iHoja % 2 === 1 ? " cou-panel--album-b" : ""}`}>
                     <div className="cou-folio">
                       <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="cou-h2 cou-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="cou-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
+                    <h2 className="cou-h2 cou-h2--album">
+                      {tx("invitacion.album.titulo")} <span className="cou-italica">{tx("invitacion.album.deFotos")}</span>
+                    </h2>
                     <div className="cou-contactos" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
+                          data-sheet="1"
                           className="cou-contacto"
                           role="button"
                           tabIndex={0}
@@ -1067,14 +1111,14 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={url} alt="" loading="lazy" className="cou-contacto-img" />
-                          <span className="cou-contacto-tinta" aria-hidden="true" />
-                          <span className="cou-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <span data-colorwash="1" className={`cou-bano cou-bano--${(i % 5) + 1}`} aria-hidden="true" />
+                          <span className="cou-contacto-n">FOTO {String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
                     <div className="cou-folio cou-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1085,7 +1129,8 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            La banda sonora: pliego de tinta, "Lado A" en itálica y la
+            lista como un tracklist con filetes. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="cou-section cou-musica">
             <div className="cou-folio">
@@ -1094,11 +1139,10 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
             </div>
             <div className="cou-spread">
               <div className="cou-pagina">
-                <h2 data-xin="1" data-dist="-80" className="cou-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "cou-acento")}
-                </h2>
+                <span data-xin="1" className="cou-panel-sub">Lado A</span>
+                <h2 data-xin="1" data-dist="-80" className="cou-h2">{tx("invitacion.sabor.preguntaCancionFaltar")}</h2>
                 <div data-xin="1" data-delay="120" className="cou-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                  {[0, 1, 2, 3, 4].map((i) => <span key={i} style={{ animationDelay: `${i * 0.18}s` }} />)}
                 </div>
               </div>
               <div className="cou-pagina">
@@ -1113,18 +1157,17 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            Los créditos: fichas blancas con filete. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="cou-section cou-regalos">
+          <section id="banco" data-tone="light" data-screen-label={tx("invitacion.regalos.titulo")} className="cou-section cou-regalos">
             <div className="cou-folio">
               <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
             </div>
             <div className="cou-spread">
               <div className="cou-pagina">
-                <h2 data-xin="1" data-dist="-80" className="cou-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="cou-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
-                </h2>
+                <span data-xin="1" className="cou-panel-sub">{tx("invitacion.regalos.siQueresLinea1")}</span>
+                <h2 data-xin="1" data-dist="-80" className="cou-h2">{tx("invitacion.regalos.siQueresLinea2")}</h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="cou-parrafo">{String(invitation.regaloMensaje)}</p>
                 )}
@@ -1137,7 +1180,7 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1148,7 +1191,8 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1157,40 +1201,39 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            El cuestionario: el único pliego entero en el acento, con las
+            opciones en Bodoni y filete blanco. */}
         {quizHabilitado && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cou-section cou-quiz">
+          <section id="quiz" data-tone="light" data-screen-label="Quiz" className="cou-section cou-quiz">
             <div className="cou-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nQuiz} — {triviaTitulo.toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
             </div>
             <div className="cou-spread">
-              <div className="cou-pagina">
-                <h2 data-xin="1" data-dist="-80" className="cou-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="cou-pagina">
-                <TriviaCouture
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaCouture
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            La contratapa: el QR sobre un cuadrado de papel, el número de
+            pase enorme, el sello de la mesa girando y el colofón. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="cou-section cou-pase">
           <div className="cou-folio">
             <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
-            <span data-xin="1" data-dist="40">{folio(nPase)}</span>
+            <span data-xin="1" data-dist="40">CONTRATAPA · {folio(nPase)}</span>
           </div>
           <div className="cou-spread">
             <div data-xin="1" data-dist="-60" className="cou-pagina cou-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+              <div className="cou-qr">
+                <QrDeIngreso guest={guest as never} />
+                <span className="cou-qr-etq">{tx("invitacion.pase.tuPase").toUpperCase()}</span>
+              </div>
             </div>
             <div className="cou-pagina">
               <div data-xin="1" data-delay="100" className="cou-pase-cabeza">
@@ -1198,98 +1241,115 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
                   <span className="cou-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                <SelloCouture
+                  texto={`${(nombreInvitado || titulo).toUpperCase()} · ${lugaresDelPase} ${tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas").toUpperCase()} · `}
+                  centro={guest?.mesas?.[0] ?? pase}
+                />
               </div>
-              <div className="cou-lineas">
-                <div className="cou-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="cou-lineas cou-lineas--pase">
+                <div className="cou-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="cou-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="cou-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="cou-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="cou-linea"><span>{tx("invitacion.pase.tuMesa")}</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="cou-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="cou-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} H</span></div>
               </div>
               <div className="cou-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="cou-folio cou-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="cou-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="cou-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="cou-pase-pie">
+            <span className="cou-despedida">{tx("invitacion.pase.losEsperamos")} {iniciales(nombre1, nombre2)}</span>
+            <div className="cou-folio cou-folio--colofon">
+              <span className="cou-credito">COLOFÓN · <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} /></span>
+              <span className="cou-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="cou-riel">
-        <span ref={rielTopRef} className="cou-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="cou-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="cou-riel-linea">
           <span ref={rielBarraRef} className="cou-riel-barra" />
         </div>
         <span ref={rielEtiquetaRef} className="cou-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          La tapa de la revista y, a la vez, la bienvenida: cabecera con
+          número y edición, el masthead con los nombres, la foto con el
+          recuadro "en esta edición" y el sello del pase, y abajo el mensaje
+          con el código de barras. */}
       <div ref={portadaRef} data-tone={TONO} className="cou-portada">
         <div ref={escenaPortadaRef} className="cou-portada-hoja">
-          <div className="cou-trama cou-trama--tapa" aria-hidden="true" />
-
-          <div data-cl="1" className="cou-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
-            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
+          <div data-cl="1" className="cou-cabecera">
+            <span>Nº {pase} · {mesLargo.toUpperCase()} {anio}</span>
+            <span className="cou-cabecera-edicion">{kickerDelEvento}</span>
+            <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase() || `${diaSemana} · ${hora} H`}</span>
           </div>
 
-          <div data-cl="2" className="cou-tapa-centro">
-            <div className="cou-tapa-fila">
-              <span className="cou-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
-            </div>
-            <h1 ref={cartelRef} className="cou-tapa-nombres">
+          <div data-cl="2" className="cou-tapa-cuerpo">
+            <h1 ref={cartelRef} className="cou-masthead" style={{ "--largo": renglonMasLargo, "--n": totalLetras } as React.CSSProperties}>
               {saludaAlInvitado ? (
-                <span className="cou-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="cou-masthead-linea"><span data-pieza="1"><Letras texto={nombreInvitado} desde={0} /></span></span>
               ) : (
                 <>
-                  <span className="cou-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="cou-masthead-linea"><span data-pieza="1"><Letras texto={nombre1} desde={0} /></span></span>
                   {nombre2 && (
-                    <span className="cou-tapa-linea cou-tapa-linea--sangra">
-                      <span><span className="cou-acento">&amp;</span>{nombre2}</span>
+                    <span className="cou-masthead-linea cou-masthead-linea--der">
+                      <span data-pieza="1"><span className="cou-amp">&amp;</span><Letras texto={nombre2} desde={nombre1.replace(/\s/g, "").length} /></span>
                     </span>
                   )}
                 </>
               )}
             </h1>
-            <div className="cou-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="cou-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
+            <div className="cou-tapa-foto">
+              {hayFoto && fotoMobile && (
+                <div className="acp-mobile-only cou-foto-capa">
+                  <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="11,11,11" />
+                </div>
               )}
+              {hayFoto && fotoDesktop && (
+                <div className="acp-desktop-only cou-foto-capa">
+                  <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="11,11,11" />
+                </div>
+              )}
+              <span className="cou-tapa-trama" aria-hidden="true" />
+              <span className="cou-tapa-foto-etq">{hayFoto ? tx("invitacion.album.nuestraFoto").toUpperCase() : titulo.toUpperCase()}</span>
+              <div className="cou-edicion">
+                <span className="cou-folio-etq">{tx("invitacion.saveTheDate.enEstaEdicion").toUpperCase()}</span>
+                <span className="cou-edicion-titulo">{diaSemana.charAt(0) + diaSemana.slice(1).toLowerCase()} {diaNum} {tx("invitacion.evento.de")} {mesLargo}{lugarNombre ? `, ${lugarNombre}` : ""}</span>
+                <span className="cou-edicion-pie">{[ciudad, `${hora} h`].filter(Boolean).join(", ")}</span>
+              </div>
+              <div className="cou-tapa-sello">
+                <SelloCouture
+                  texto={`${kickerDelEvento.toUpperCase()} · ${isPersonalized && guest ? `${tx("invitacion.pase.pase").toUpperCase()} Nº ${pase} · ${lugaresDelPase} ${tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas").toUpperCase()}` : `${diaNum} ${mesCorto.toUpperCase()} ${anio}`} · `}
+                  centro={isPersonalized && guest ? pase.replace(/^0+/, "") || pase : diaNum}
+                  relleno
+                />
+              </div>
             </div>
           </div>
 
           <div data-cl="3" className="cou-tapa-pie">
-            <span className="cou-regla" aria-hidden="true" />
-            <p className="cou-tapa-mensaje">
-              {saludaAlInvitado
-                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
-                : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
-            </p>
-            <button type="button" onClick={abrir} className="cou-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
-            </button>
+            <div className="cou-tapa-pie-texto">
+              <p className="cou-tapa-mensaje">
+                {saludaAlInvitado
+                  ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
+                  : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
+              </p>
+              <button type="button" onClick={abrir} className="cou-tapa-btn">
+                <span>{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</span><span className="cou-cta-flecha">→</span>
+              </button>
+            </div>
+            <CodigoDeBarras texto={fechaCodigo} />
           </div>
         </div>
       </div>
@@ -1323,30 +1383,62 @@ export function CoutureTemplateBotella({ invitation, guest, isPersonalized = fal
   );
 }
 
+/** "V & T": las iniciales de la despedida de la contratapa. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El masthead letra por letra: cada tanto una se corre 20-40 px y vuelve,
+ * como plomo suelto en la caja. El CSS escalona el turno de cada letra.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
+function Letras({ texto, desde }: { texto: string; desde: number }) {
+  let k = desde;
+  return (
+    <>
+      {Array.from(texto).map((ch, i) =>
+        ch === " " ? " " : <span key={i} className="cou-letra" style={{ "--i": k++ } as React.CSSProperties}>{ch}</span>
+      )}
+    </>
+  );
+}
+
+/**
+ * El sello circular: un anillo con el texto siguiendo la circunferencia,
+ * girando, y un número en itálica en el centro. En la tapa va relleno de
+ * papel (sobre la foto); en la contratapa es sólo el anillo en el acento.
+ */
+function SelloCouture({ texto, centro, relleno = false }: { texto: string; centro: string; relleno?: boolean }) {
   // El id del arco tiene que ser único por instancia: dos <textPath> que
   // apuntan al mismo id hacen que el segundo no se dibuje.
   const id = useId().replace(/:/g, "");
   return (
-    <div className="cou-sello-circular" aria-hidden="true">
+    <div className={`cou-sello-circular${relleno ? " cou-sello-circular--relleno" : ""}`} aria-hidden="true">
       <svg viewBox="0 0 100 100">
         <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
+          <path id={`arc-${id}`} d="M50 50 m -36 0 a 36 36 0 1 1 72 0 a 36 36 0 1 1 -72 0" fill="none" />
         </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
+        <circle cx="50" cy="50" r="48.5" fill={relleno ? "var(--pp-bg)" : "none"} stroke="currentColor" strokeWidth="1.5" />
         <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
+          <textPath href={`#arc-${id}`}>{texto.repeat(3).slice(0, 62)}</textPath>
         </text>
       </svg>
-      {amp && <span className="cou-sello-amp">&amp;</span>}
+      <span className="cou-sello-centro">{centro}</span>
     </div>
+  );
+}
+
+/** El código de barras de la tapa: 17 barras y la fecha con el pase debajo. */
+function CodigoDeBarras({ texto }: { texto: string }) {
+  const barras = [[0, 2], [4, 1], [7, 3], [12, 1], [15, 2], [19, 1], [22, 3], [27, 2], [31, 1], [34, 3], [39, 1], [42, 2], [46, 1], [49, 3], [54, 2], [58, 1], [61, 3]];
+  return (
+    <svg width="64" height="50" viewBox="0 0 64 50" className="cou-barras" aria-hidden="true">
+      <g fill="currentColor">
+        {barras.map(([x, w]) => <rect key={x} x={x} y="0" width={w} height="40" />)}
+      </g>
+      <text x="32" y="49" textAnchor="middle">{texto}</text>
+    </svg>
   );
 }
 
@@ -1401,7 +1493,7 @@ function CuentaCouture({ targetDate }: { targetDate: Date }) {
     <div className="cou-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`cou-cuenta-caja cou-cuenta-caja--${i + 1}`}>
-          <span className="cou-cuenta-num">{c.v}</span>
+          <span className="cou-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="cou-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1894,13 +1986,13 @@ function TriviaCouture({ preguntas, invitationId, guestToken, guestName }: { pre
 // leen la Bienvenida y el Post-evento compartidos (esperan `cou-section` y
 // `cou-kicker`).
 const CSS_COU = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Couture ──────────────────────────────────────────────────────────
+     Una revista de moda: Bodoni Moda en cuerpos de tapa, Space Grotesk en
+     versalitas con tracking para todo lo chico, filetes de 1 px y el color
+     en una sola palabra por página. Sin sombras, sin redondeos. */
   .cou-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--cou-sans), 'Space Grotesk', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--cou-sans), 'Space Grotesk', sans-serif;
+    --cou-filete: 1px solid currentColor; }
   .cou-raiz a { color: inherit; text-decoration: none; }
   .cou-raiz button { font: inherit; }
 
@@ -1908,298 +2000,365 @@ const CSS_COU = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .cou-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .cou-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .cou-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .cou-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
-
   /* ── El pliego ─────────────────────────────────────────────────────── */
   .cou-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+    display: flex; flex-direction: column; gap: 26px;
+    padding: 56px max(18px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
   .cou-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .cou-std, .cou-regalos { background: var(--pp-bg2); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
-  .cou-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-  .cou-folio--pie { align-items: center; margin-top: auto; }
-  .cou-folio-etq { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+  /* El folio: versalitas con tracking y un filete debajo. */
+  .cou-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    border-bottom: 1px solid currentColor; padding-bottom: 8px; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 72%, transparent); }
+  .cou-section[data-tone="dark"] .cou-folio { border-bottom-color: color-mix(in srgb, currentColor 50%, transparent); }
+  .cou-folio--pie { margin-top: auto; border-bottom: 0; border-top: 1px solid currentColor; padding: 8px 0 0; align-items: center; }
+  .cou-folio--colofon { border-bottom: 0; border-top: 1px solid color-mix(in srgb, currentColor 30%, transparent); padding: 12px 0 0; align-items: center; }
+  .cou-folio-etq { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .cou-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .cou-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .cou-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .cou-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .cou-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .cou-pagina { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  @media (min-width: 1024px) {
+    .cou-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .cou-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .cou-spread > *:first-child { justify-self: end; }
+    .cou-spread > *:last-child { justify-self: start; }
+    .cou-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .cou-h2, .cou-panel-titulo, .cou-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--cou-serif), 'Bodoni Moda', serif;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .cou-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .cou-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .cou-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .cou-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
+  .cou-h2, .cou-panel-titulo, .cou-frase, .cou-fecha-dia, .cou-fecha-mes, .cou-fecha-anio, .cou-masthead {
+    font-family: var(--cou-serif), 'Bodoni Moda', serif; font-weight: 400; }
+  .cou-h2, .cou-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .86; letter-spacing: -.03em; }
+  .cou-h2 { font-size: clamp(52px, 15vw, 120px); }
+  .cou-h2--album { font-size: clamp(44px, 12vw, 96px); line-height: .9; }
+  .cou-panel-titulo { font-size: clamp(52px, 16vw, 130px); }
+  .cou-panel-sub { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: clamp(22px, 6vw, 36px); color: var(--pp-acc); }
+  .cou-italica { font-style: italic; }
   .cou-acento { font-style: italic; color: var(--pp-acc); }
-  .cou-acento--tinta { color: var(--pp-ink); }
-  .cou-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .cou-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .cou-regla { display: block; height: 2px; background: currentColor; }
+  .cou-subrayado { border-bottom: 3px solid currentColor; }
+  .cou-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 40ch; color: var(--pp-ink2); }
+  /* El botón de esta familia: filete, versalitas y la flecha en Bodoni. */
+  .cou-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    border: 1px solid currentColor; padding: 0 16px; font-weight: 600; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: inherit; }
+  .cou-cta--chico { align-self: flex-start; justify-content: flex-start; margin-top: 0; }
+  .cou-cta-flecha { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 20px; letter-spacing: 0; text-transform: none; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .cou-std { justify-content: center; }
-  .cou-fecha { display: flex; flex-direction: column; font-family: var(--cou-serif), 'Bodoni Moda', serif;
-    line-height: .82; letter-spacing: -.04em; }
-  .cou-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .cou-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .cou-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .cou-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
+  /* ── 01 Guardá la fecha: el sumario ────────────────────────────────── */
+  .cou-fecha { display: flex; align-items: flex-start; gap: 12px; }
+  .cou-fecha-dia { font-size: clamp(120px, 40vw, 300px); line-height: .78; letter-spacing: -.04em; }
+  .cou-fecha-columna { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; min-width: 0; }
+  .cou-fecha-mes { font-style: italic; font-size: clamp(40px, 12vw, 96px); line-height: .9; color: var(--pp-acc); }
+  .cou-fecha-anio { font-size: clamp(32px, 9vw, 72px); line-height: .9; letter-spacing: .02em; }
+  .cou-fecha-pie { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-ink2); padding-top: 6px; }
+  .cou-sumario { display: flex; flex-direction: column; border-top: 1px solid currentColor; }
+  .cou-sumario-fila { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 9px 0; font-size: 14px;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
+  .cou-sumario-fila > span:first-child { display: flex; gap: 12px; align-items: baseline; min-width: 0; }
+  .cou-sumario-n { font-weight: 600; letter-spacing: .1em; }
+  .cou-sumario-t { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 17px; }
+  .cou-sumario-p { color: var(--pp-ink2); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* La foto: filete de 1 px, sin marco, y los pies de foto sobre papel. */
+  .cou-foto { position: relative; width: 100%; aspect-ratio: 3 / 4; border: 1px solid currentColor; box-sizing: border-box; overflow: hidden;
+    background: repeating-linear-gradient(135deg, #D9D2C6 0 8px, #E7E1D6 8px 16px); }
   .cou-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
   .cou-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background-image: radial-gradient(var(--pp-ink) calc(var(--cou-punto, 7.2) * 1px), transparent calc(var(--cou-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .cou-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--cou-serif), 'Bodoni Moda', serif;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .cou-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--cou-sans), 'Space Grotesk', sans-serif;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .cou-foto-etq, .cou-foto-pie { position: absolute; bottom: 10px; z-index: 2; background: var(--pp-bg); color: var(--pp-ink); padding: 4px 8px; }
+  .cou-foto-etq { left: 12px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .cou-foto-pie { right: 12px; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 14px; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cou-foto-pie:empty { display: none; }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .cou-countdown { justify-content: space-between; }
-  .cou-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .cou-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
-  .cou-marquesina--contraria .cou-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  /* ── 02 Falta poco: renglones con línea de puntos ──────────────────── */
+  .cou-countdown { justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .cou-countdown > .cou-folio, .cou-countdown > .cou-spread { margin-left: max(18px, calc((100% - 1100px) / 2)); margin-right: max(18px, calc((100% - 1100px) / 2)); }
+  .cou-cuenta { display: flex; flex-direction: column; }
+  .cou-cuenta-caja { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 6px 0;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent); }
+  .cou-cuenta-etq { order: 1; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; flex: 0 0 auto; }
+  .cou-cuenta-caja::after { content: ""; order: 2; flex: 1; border-bottom: 1px dotted color-mix(in srgb, currentColor 35%, transparent); transform: translateY(-.35em); }
+  .cou-cuenta-num { order: 3; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(56px, 17vw, 130px); line-height: .9;
+    letter-spacing: -.03em; min-width: 2ch; text-align: right; font-variant-numeric: tabular-nums; }
+  .cou-cuenta-num > span { display: inline-block; animation: couCifra 300ms cubic-bezier(.16,1,.3,1); }
+  .cou-cuenta-caja:nth-child(4) .cou-cuenta-num, .cou-cuenta-caja:nth-child(4) .cou-cuenta-etq { color: var(--pp-acc); }
+  .cou-cuenta-caja:nth-child(4) .cou-cuenta-num { font-style: italic; }
+  @keyframes couCifra { from { transform: translateY(18%); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+  .cou-tarjeta--hoy { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; }
+  .cou-tarjeta--hoy .cou-tarjeta-kicker { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .cou-tarjeta--hoy .cou-tarjeta-titulo { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: clamp(40px, 11vw, 88px); line-height: .9; color: var(--pp-acc); }
+  .cou-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 10px 0; white-space: nowrap;
+    border-top: 1px solid color-mix(in srgb, currentColor 50%, transparent); border-bottom: 1px solid color-mix(in srgb, currentColor 50%, transparent);
+    font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 24px; }
+  .cou-marquesina-tira { display: flex; width: max-content; animation: couCorre 18s linear infinite; }
+  .cou-marquesina-tira > span { padding-right: 40px; }
+  @keyframes couCorre { to { transform: translate3d(-50%, 0, 0); } }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .cou-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .cou-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .cou-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .cou-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .cou-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .cou-cuenta-num, .cou-cuenta-dias, .cou-cifra { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .cou-cuenta-caja:nth-child(4) .cou-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .cou-cuenta-etq { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .cou-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: la cita destacada ───────────────────────────── */
+  .cou-frase-seccion { justify-content: space-between; gap: 30px; }
+  .cou-cita { position: relative; }
+  .cou-comilla { position: absolute; left: -6px; top: -.55em; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(120px, 34vw, 260px);
+    line-height: 1; color: var(--pp-acc); opacity: .35; pointer-events: none; }
+  .cou-frase { position: relative; margin: 0; padding-top: .6em; font-size: clamp(36px, 10.5vw, 88px); line-height: 1.04; letter-spacing: -.015em; max-width: 16ch; }
+  .cou-firma { display: flex; flex-direction: column; gap: 8px; max-width: 320px; align-self: flex-end; border-left: 1px solid currentColor; padding-left: 16px; }
+  .cou-firma-texto { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 22px; line-height: 1.2; }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .cou-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .cou-frase-seccion .cou-acento { color: var(--pp-bg); font-style: italic; }
-  .cou-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Paneles: la pasarela ───────────────────────────────────────── */
   .cou-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
-  .cou-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .cou-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg2); }
+  .cou-pan-fijo--album { background: #F7F5F0; }
   .cou-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .cou-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 20px;
+    padding: 56px max(18px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg2); color: var(--pp-ink); }
   .cou-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .cou-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .cou-panel--acento .cou-acento { color: var(--pp-ink); }
+  .cou-panel--blanco { background: #FFFFFF; }
+  .cou-panel > .cou-folio { opacity: .8; }
   .cou-pan[data-scroll="vertical"] { height: auto; }
   .cou-pan[data-scroll="vertical"] .cou-pan-fijo { position: static; height: auto; overflow: visible; }
   .cou-pan[data-scroll="vertical"] .cou-tira { position: static; display: block; width: 100%; transform: none !important; }
   .cou-pan[data-scroll="vertical"] .cou-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-
-  .cou-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .cou-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .cou-linea > span:first-child { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .cou-linea > span:last-child { text-align: right; font-size: 15px; }
-  .cou-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--cou-sans), 'Space Grotesk', sans-serif;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .cou-cta-flecha { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 22px; }
-  .cou-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .cou-lineas { display: flex; flex-direction: column; border-top: 1px solid currentColor; }
+  .cou-linea { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-bottom: 1px solid currentColor; font-size: 14px; line-height: 1.3; }
+  .cou-linea > span:first-child { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .75; flex: 0 0 auto; padding-top: 2px; }
+  .cou-linea > span:last-child { text-align: right; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 18px; }
+  .cou-mapa { height: 190px; border: 1px solid currentColor; overflow: hidden; margin-top: 14px; }
   .cou-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .cou-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
+  .cou-punto { width: 28px; height: 1px; background: currentColor !important; opacity: .3; transition: opacity 300ms ease; display: inline-block; }
+  .cou-punto[data-activo="1"] { opacity: 1; }
 
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .cou-checkin { background: var(--pp-bg2); }
-  .cou-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .cou-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .cou-cupon .cou-talon-top { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .2em; }
-  .cou-cupon input, .cou-cupon .cou-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .cou-cupon .cou-contador button { border: 2px solid var(--pp-ink); }
-  .cou-sello, .cou-cupon .cou-sello { color: inherit; }
+  /* ── 05 Check-in: la tarjeta de suscripción ────────────────────────── */
+  .cou-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 1px solid var(--pp-ink); padding: 18px 20px 20px;
+    display: flex; flex-direction: column; gap: 14px; overflow: hidden; transition: border-color 400ms ease; }
+  .cou-cupon:has(.cou-filas) { border-color: var(--pp-acc); }
+  .cou-cupon .cou-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .cou-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--pp-ink2); border-bottom: 1px dashed var(--pp-ink); padding-bottom: 12px; }
+  /* El punto de estado parpadea mientras está pendiente y se queda quieto,
+     en el acento, cuando se confirma. */
+  .cou-talon-estado { display: flex; align-items: center; gap: 6px; transition: color 400ms ease; }
+  .cou-talon-estado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pp-ink2); animation: couParpadeo 1.6s ease-in-out infinite; }
+  .cou-cupon:has(.cou-filas) .cou-talon-estado::before { animation: none; background: var(--pp-acc); }
+  @keyframes couParpadeo { 0%, 100% { opacity: 1; } 50% { opacity: .2; } }
+  .cou-campo { display: flex; flex-direction: column; gap: 6px; }
+  .cou-etiqueta { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-ink2); }
+  .cou-input { min-height: 48px; border: 0; border-bottom: 1px solid var(--pp-ink); border-radius: 0; background: transparent; color: var(--pp-ink);
+    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 15px; padding: 0; outline: none; }
+  .cou-contador { display: flex; align-items: center; border-bottom: 1px solid var(--pp-ink); min-height: 48px; }
+  .cou-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 26px; line-height: 1; }
+  .cou-contador button:disabled { opacity: .35; cursor: default; }
+  .cou-contador > span { flex: 1; text-align: center; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 30px; line-height: 1; }
+  .cou-filas { display: flex; flex-direction: column; }
+  .cou-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); font-size: 14px; }
+  .cou-fila--ultima { border-bottom: 0; }
+  .cou-fila-valor { text-align: right; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 17px; }
+  .cou-precio { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--pp-ink2); }
+  .cou-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; color: var(--pp-ink); text-transform: none; letter-spacing: 0; }
+  .cou-precio-total { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 22px; line-height: 1; }
+  .cou-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .cou-btn-solido { min-height: 52px; border: 1px solid var(--pp-ink); background: var(--pp-acc); color: #FFFFFF; cursor: pointer;
+    font-weight: 600; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; padding: 0 18px; transition: background 200ms ease; }
+  @media (hover: hover) { .cou-btn-solido:hover { background: var(--pp-ink); } }
+  .cou-btn-solido:disabled { opacity: .6; cursor: default; }
+  .cou-btn-fantasma { min-height: 48px; border: 1px solid currentColor; background: transparent; color: inherit; cursor: pointer;
+    font-weight: 600; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 0 18px; }
+  .cou-error { margin: 0; font-size: 12px; letter-spacing: .06em; color: var(--pp-acc2); }
+  /* El sello "sí": dos anillos en el acento, cae girando al confirmar. */
+  .cou-cupon .cou-sello { position: absolute; right: 14px; bottom: 80px; width: 128px; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px); color: var(--pp-acc);
+    border: 2px solid currentColor; box-shadow: inset 0 0 0 3px #FFFFFF, inset 0 0 0 3.8px currentColor;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 16px; box-sizing: border-box;
+    font-weight: 600; font-size: 8px; letter-spacing: .18em; text-transform: uppercase; }
+  .cou-cupon .cou-sello::before { content: "sí"; position: absolute; left: 0; right: 0; top: 34px; text-align: center;
+    font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 34px; letter-spacing: 0; text-transform: none; line-height: 1; }
+  .cou-petalos { display: none; }
 
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .cou-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .cou-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .cou-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .cou-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .cou-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .cou-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .cou-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--cou-sans), 'Space Grotesk', sans-serif;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
+  /* ── 06 Álbum: la sesión de tapa ───────────────────────────────────── */
+  .cou-panel--album { background: #F7F5F0; color: #0B0B0B; justify-content: flex-start; gap: 14px; }
+  .cou-panel--album-b { background: #EFEBE3; }
+  .cou-contactos { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 6px; max-width: 900px; }
+  .cou-contacto { position: relative; overflow: hidden; min-height: 0; border: 1px solid #0B0B0B; cursor: pointer;
+    background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); }
+  .cou-contacto-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1); }
+  .cou-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .cou-bano--1 { background: color-mix(in srgb, var(--pp-acc) 50%, transparent); }
+  .cou-bano--2 { background: color-mix(in srgb, var(--pp-acc2) 45%, transparent); }
+  .cou-bano--3 { background: rgba(31,74,58,.45); }
+  .cou-bano--4 { background: rgba(27,42,92,.45); }
+  .cou-bano--5 { background: rgba(180,83,46,.5); }
+  .cou-contacto-n { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-size: 11px; letter-spacing: .14em; color: #0B0B0B; }
+  .cou-contactos[data-cantidad="5"] .cou-contacto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .cou-contactos[data-cantidad="5"] .cou-contacto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .cou-contactos[data-cantidad="5"] .cou-contacto:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .cou-contactos[data-cantidad="5"] .cou-contacto:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .cou-contactos[data-cantidad="5"] .cou-contacto:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .cou-contactos[data-cantidad="4"] .cou-contacto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .cou-contactos[data-cantidad="4"] .cou-contacto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .cou-contactos[data-cantidad="4"] .cou-contacto:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .cou-contactos[data-cantidad="4"] .cou-contacto:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .cou-contactos[data-cantidad="3"] .cou-contacto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .cou-contactos[data-cantidad="3"] .cou-contacto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .cou-contactos[data-cantidad="3"] .cou-contacto:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .cou-contactos[data-cantidad="2"] .cou-contacto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .cou-contactos[data-cantidad="2"] .cou-contacto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .cou-contactos[data-cantidad="1"] .cou-contacto:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
 
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .cou-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .cou-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .cou-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .cou-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+  /* ── 07 Música: la banda sonora ────────────────────────────────────── */
+  .cou-eq { display: flex; align-items: flex-end; gap: 5px; height: 36px; }
+  .cou-eq span { width: 2px; height: 100%; background: currentColor; transform-origin: bottom; animation: couEq 1.1s ease-in-out infinite; }
+  .cou-eq span:nth-child(3) { background: var(--pp-acc); }
+  @keyframes couEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .cou-musica form.cou-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .cou-musica .cou-etiqueta { display: none; }
+  .cou-musica .cou-input { border-bottom-color: currentColor; color: inherit; min-width: 0; }
+  .cou-musica .cou-error { grid-column: 1 / -1; color: var(--pp-acc); }
+  .cou-musica .cou-btn-solido { grid-column: 1 / -1; min-height: 48px; border: 1px solid var(--pp-bg); background: var(--pp-bg); color: var(--pp-ink); }
+  @media (hover: hover) { .cou-musica .cou-btn-solido:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: #FFFFFF; } }
+  .cou-lista { display: flex; flex-direction: column; border-top: 1px solid currentColor; margin-top: 12px; counter-reset: tema; }
+  .cou-lista-fila { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); counter-increment: tema; }
+  .cou-lista-fila::before { content: counter(tema, decimal-leading-zero); font-size: 11px; letter-spacing: .14em; opacity: .6; flex: 0 0 auto; }
   .cou-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .cou-lista-tema { font-size: 15px; }
-  .cou-lista-quien { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
+  .cou-lista-tema { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 22px; line-height: 1; }
+  .cou-lista-quien { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
 
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .cou-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .cou-tarjeta + .cou-tarjeta { margin-top: 12px; }
-  .cou-tarjeta-kicker { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .cou-tarjeta-titulo { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 28px; line-height: 1; }
+  /* ── 08 Regalos: los créditos ──────────────────────────────────────── */
+  .cou-tarjeta--banco { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 1px solid var(--pp-ink); padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .cou-tarjeta--banco + .cou-tarjeta--banco { margin-top: 12px; }
+  .cou-tarjeta-kicker { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-ink2); }
   .cou-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .cou-tarjeta .cou-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .cou-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .cou-fila--ultima { border-bottom: none; }
   .cou-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .cou-fila-etq { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .cou-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .cou-fila-valor { text-align: right; }
-  .cou-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
+  .cou-fila-etq { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-ink2); }
+  .cou-fila-dato { font-size: 14px; letter-spacing: .06em; overflow-wrap: anywhere; }
+  .cou-fila--copiable:first-child { border-bottom: 1px solid var(--pp-ink); }
+  .cou-fila--copiable:first-child .cou-fila-dato { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 24px; line-height: 1; letter-spacing: 0; }
+  .cou-tarjeta--banco .cou-fila--ultima { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--pp-ink2); }
+  .cou-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 12px; border: 1px solid var(--pp-ink); background: transparent; color: var(--pp-ink);
+    font-weight: 600; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .cou-btn-copiar:hover { background: var(--pp-ink); color: #FFFFFF; } }
   .cou-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
 
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .cou-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .cou-quiz .cou-acento { color: var(--pp-ink); }
-  .cou-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .cou-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .cou-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .cou-opcion--mal { opacity: .55; }
+  /* ── 09 Trivia: el cuestionario, entero en el acento ───────────────── */
+  .cou-quiz { background: var(--pp-acc) !important; color: #FFFFFF; }
+  .cou-quiz .cou-folio { border-bottom-color: #FFFFFF; color: #FFFFFF; }
+  .cou-quiz .cou-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .cou-quiz .cou-tarjeta-kicker { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: clamp(22px, 6vw, 36px); text-transform: none; letter-spacing: 0; color: inherit; }
+  .cou-quiz .cou-tarjeta-pregunta, .cou-quiz .cou-tarjeta-titulo { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(40px, 11vw, 88px); line-height: .95; letter-spacing: -.02em; max-width: 16ch; }
+  .cou-quiz .cou-tarjeta-mensaje { margin: 0; font-size: 15px; color: inherit; opacity: .85; }
+  .cou-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .cou-opcion { min-height: 52px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; cursor: pointer; counter-increment: opcion;
+    font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 19px; text-align: left; padding: 0 16px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .cou-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .cou-opcion--bien { background: #FFFFFF; color: var(--pp-acc); }
+  .cou-opcion--bien::after { content: "Correcta"; }
+  .cou-opcion--mal { opacity: .6; }
+  .cou-opcion--mal::after { content: "Casi"; }
+  @media (min-width: 1024px) {
+    .cou-quiz .cou-spread > .cou-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .cou-quiz .cou-tarjeta-kicker, .cou-quiz .cou-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .cou-quiz .cou-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
 
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .cou-pase { background: var(--pp-ink); color: var(--pp-bg); }
+  /* ── 10 Tu pase: la contratapa ─────────────────────────────────────── */
+  .cou-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
   .cou-pagina--qr { align-items: flex-start; }
-  .cou-pagina--qr .qr-ingreso, .cou-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .cou-qr { position: relative; width: min(100%, 300px); aspect-ratio: 1; background: var(--pp-bg); padding: 16px; box-sizing: border-box; margin-bottom: 26px; }
+  .cou-qr .qr-ingreso, .cou-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .cou-qr img, .cou-qr svg, .cou-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .cou-qr-etq { position: absolute; left: 0; right: 0; bottom: -22px; text-align: center; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: color-mix(in srgb, var(--pp-bg) 60%, transparent); }
   .cou-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
   .cou-pase-numero { display: flex; flex-direction: column; }
-  .cou-pase-numero > span:last-child { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .cou-info-extra { margin-top: 12px; }
+  .cou-pase-numero > span:last-child { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(64px, 20vw, 140px); line-height: .82; letter-spacing: -.03em; }
+  .cou-lineas--pase .cou-linea { border-bottom-color: color-mix(in srgb, currentColor 30%, transparent); }
+  .cou-lineas--pase .cou-linea > span:first-child { opacity: .6; }
+  .cou-info-extra { margin-top: 4px; }
   .cou-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .cou-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--cou-sans), 'Space Grotesk', sans-serif !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
+  .cou-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 1px solid currentColor !important;
+    border-radius: 0 !important; font-weight: 600 !important; letter-spacing: .22em !important; text-transform: uppercase; }
   .cou-raiz .ia-icon-box, .cou-raiz svg.lucide { display: none !important; }
-  .cou-replay { cursor: pointer; }
-  .cou-credito { display: flex; justify-content: center; opacity: .6; }
-  .cou-error { margin: 0; font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 12px; }
+  .cou-pase-pie { display: flex; flex-direction: column; gap: 16px; }
+  .cou-despedida { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: clamp(30px, 8vw, 48px); line-height: 1; }
+  .cou-replay { cursor: pointer; color: var(--pp-acc); }
+  .cou-credito { display: inline-flex; align-items: center; gap: 8px; opacity: .7; }
 
   /* ── El sello circular ─────────────────────────────────────────────── */
-  .cou-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .cou-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .cou-sello-circular text { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .cou-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
+  .cou-sello-circular { position: relative; width: clamp(84px, 22vw, 110px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
+  .cou-sello-circular svg { position: absolute; inset: 0; animation: couGira 30s linear infinite; }
+  .cou-sello-circular text { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 9px; letter-spacing: 1.8px; font-weight: 600; fill: currentColor; }
+  .cou-sello-centro { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 26px; color: var(--pp-acc); }
+  .cou-sello-circular--relleno { color: var(--pp-ink); width: clamp(64px, 16vw, 84px); }
+  .cou-sello-circular--relleno svg { animation-duration: 28s; }
+  .cou-sello-circular--relleno .cou-sello-centro { font-size: 24px; }
+  @keyframes couGira { to { transform: rotate(360deg); } }
 
   /* ── La tapa ───────────────────────────────────────────────────────── */
   .cou-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .cou-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .cou-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .cou-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .cou-tapa-fecha { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .cou-tapa-nombres { margin: 0; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .cou-tapa-linea { overflow: hidden; display: block; }
-  .cou-tapa-linea > span { display: block; }
-  .cou-tapa-linea--sangra { padding-left: 14%; }
-  .cou-tapa-pase { text-align: right; }
-  .cou-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .cou-tapa-mensaje { margin: 0; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .cou-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .cou-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
+  .cou-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto; box-sizing: border-box;
+    padding: calc(14px + env(safe-area-inset-top)) max(18px, calc((100% - 1100px) / 2)) calc(18px + env(safe-area-inset-bottom)); }
+  .cou-cabecera { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--pp-ink); padding-bottom: 8px;
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase; }
+  .cou-cabecera > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cou-cabecera-edicion { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; text-transform: none; letter-spacing: 0; font-size: 15px; }
+  .cou-tapa-cuerpo { position: relative; min-height: 0; display: flex; flex-direction: column; }
+  /* El masthead: una didona enorme que no se parte; el renglón más largo
+     manda el cuerpo. */
+  .cou-masthead { margin: 10px 0 0; position: relative; z-index: 2; display: flex; flex-direction: column; line-height: .84; letter-spacing: -.02em;
+    font-size: min(clamp(64px, 22vw, 180px), 18vh, calc((100vw - 40px) / (var(--largo, 9) * 0.56))); }
+  @media (min-width: 1024px) { .cou-masthead { font-size: min(13vw, 220px, 24vh, calc((min(100vw, 1100px) - 40px) / (var(--largo, 9) * 0.56))); } }
+  .cou-masthead-linea { overflow: hidden; display: block; white-space: nowrap; }
+  .cou-masthead-linea > span { display: block; }
+  .cou-masthead-linea--der { text-align: right; }
+  .cou-amp { font-style: italic; color: var(--pp-acc); font-size: .6em; vertical-align: .25em; }
+  .cou-letra { display: inline-block; animation: couDeslizar calc(var(--n, 12) * 3.5s) cubic-bezier(.16,1,.3,1) infinite; animation-delay: calc(var(--i, 0) * -3.5s); }
+  @keyframes couDeslizar { 0%, 98.6% { transform: translateX(0); } 99.1% { transform: translateX(28px); } 100% { transform: translateX(0); } }
+  /* La foto de tapa, debajo del masthead, con la trama de imprenta suave
+     encima, el recuadro "en esta edición" y el sello del pase. */
+  .cou-tapa-foto { position: relative; flex: 1; min-height: 26vh; margin-top: -1.2em; overflow: hidden; border: 1px solid var(--pp-ink);
+    background: repeating-linear-gradient(135deg, #D9D2C6 0 8px, #E7E1D6 8px 16px); }
+  @media (min-width: 1024px) { .cou-tapa-foto { max-width: 900px; margin-left: auto; margin-right: auto; width: 100%; } }
+  .cou-tapa-trama { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .28;
+    background-image: radial-gradient(var(--pp-ink) 2.4px, transparent 2.6px); background-size: 11px 11px; }
+  .cou-tapa-foto-etq { position: absolute; left: 12px; bottom: 10px; z-index: 2; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .cou-edicion { position: absolute; right: 12px; top: 12px; z-index: 2; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right;
+    background: var(--pp-bg); padding: 10px 12px; border: 1px solid var(--pp-ink); max-width: 60%; }
+  .cou-edicion-titulo { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(18px, 4.8vw, 24px); line-height: 1.05; }
+  .cou-edicion-pie { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-style: italic; font-size: 15px; color: var(--pp-acc); }
+  .cou-tapa-sello { position: absolute; left: 12px; top: 12px; z-index: 2; }
+  .cou-tapa-pie { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: end; border-top: 1px solid var(--pp-ink); padding-top: 12px; }
+  .cou-tapa-pie-texto { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .cou-tapa-mensaje { margin: 0; font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: clamp(17px, 4.6vw, 22px); line-height: 1.2; }
+  .cou-tapa-btn { min-height: 50px; max-width: 320px; border: 1px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg); cursor: pointer;
+    font-weight: 600; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; padding: 0 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: background 200ms ease, border-color 200ms ease; }
+  @media (hover: hover) { .cou-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); } }
+  .cou-barras { flex: 0 0 auto; color: var(--pp-ink); }
+  .cou-barras text { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 7px; letter-spacing: 1.5px; fill: currentColor; }
 
   /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .cou-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .cou-riel-top, .cou-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--cou-sans), 'Space Grotesk', sans-serif;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .cou-riel-top { color: var(--pp-ink2); }
-  .cou-riel-etiqueta { color: var(--pp-acc); }
-  .cou-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .cou-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .cou-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+  .cou-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(14px + env(safe-area-inset-top)) 0 calc(14px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent) !important; }
+  .cou-riel-top, .cou-riel-etiqueta { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--pp-ink); }
+  .cou-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .cou-riel-barra { position: absolute; left: -1px; top: 0; width: 2px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .cou-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: couPista 2.4s ease-in-out infinite; }
+  @keyframes couPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
   .cou-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
     display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .cou-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
+  .cou-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--pp-bg);
     background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .cou-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
-  .cou-campo { display: flex; flex-direction: column; gap: 6px; }
-  .cou-etiqueta { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .cou-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .cou-input:focus { outline: none; border-color: var(--pp-acc); }
-  .cou-contador { display: flex; align-items: center; gap: 12px; }
-  .cou-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
-  .cou-contador button:disabled { opacity: .35; cursor: default; }
-  .cou-contador > span { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .cou-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .cou-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .cou-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .cou-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .cou-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .cou-precio-total { font-family: var(--cou-serif), 'Bodoni Moda', serif; font-size: 28px; line-height: 1; }
-  .cou-precio-detalle { font-family: var(--cou-sans), 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: .1em; }
-  .cou-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--cou-sans), 'Space Grotesk', sans-serif;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .cou-talon-estado { transition: color 400ms ease; }
-  .cou-filas { display: flex; flex-direction: column; }
-  .cou-petalos { display: none; }
-
-  /* Couture: el titular es de tapa de moda y la itálica es el acento. */
-  .cou-tapa-nombres, .cou-h2, .cou-panel-titulo { letter-spacing: -.045em; }
-  .cou-folio { letter-spacing: .3em; }
-  .cou-fecha-linea { text-transform: uppercase; }
+  .cou-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 1px solid var(--pp-bg); }
 
   @media (prefers-reduced-motion: reduce) {
     .cou-raiz * { animation: none !important; }
     .cou-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .cou-foto { --cou-punto: 0; }
   }
 `;

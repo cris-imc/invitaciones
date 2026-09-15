@@ -42,6 +42,7 @@ const es = {
    */
   evento: {
     nosCasamos: "Nos casamos",
+    de: "de",
     nuestraBoda: "Nuestra boda",
     misQuinceAnos: "Mis quince años",
     misQuince: "Mis quince",
@@ -68,6 +69,8 @@ const es = {
     hola: "Hola, {nombre}",
     pase: "Pase N° {numero}",
     paraVarios: "Para {cantidad} personas",
+    personas: "personas",
+    persona: "persona",
     noTransferible: "No transferible",
   },
 
@@ -75,6 +78,7 @@ const es = {
     guardaLaFecha: "Guarda la fecha",
     agregarAlCalendario: "Agregar al calendario",
     unaSolaNoche: "Una sola noche",
+    enEstaEdicion: "En esta edición",
     fecha: "Fecha",
   },
 
@@ -604,6 +608,7 @@ const en: Invitacion = {
 
   evento: {
     nosCasamos: "We're getting married",
+    de: "of",
     nuestraBoda: "Our wedding",
     misQuinceAnos: "My quinceañera",
     misQuince: "My quinceañera",
@@ -627,6 +632,8 @@ const en: Invitacion = {
     hola: "Hi, {nombre}",
     pase: "Pass No. {numero}",
     paraVarios: "For {cantidad} guests",
+    personas: "guests",
+    persona: "guest",
     noTransferible: "Non-transferable",
   },
 
@@ -634,6 +641,7 @@ const en: Invitacion = {
     guardaLaFecha: "Save the date",
     agregarAlCalendario: "Add to calendar",
     unaSolaNoche: "One night only",
+    enEstaEdicion: "In this issue",
     fecha: "Date",
   },
 
@@ -1136,6 +1144,7 @@ const pt: Invitacion = {
 
   evento: {
     nosCasamos: "Vamos nos casar",
+    de: "de",
     nuestraBoda: "Nosso casamento",
     misQuinceAnos: "Meus quinze anos",
     misQuince: "Meus quinze",
@@ -1159,6 +1168,8 @@ const pt: Invitacion = {
     hola: "Olá, {nombre}",
     pase: "Passe N° {numero}",
     paraVarios: "Para {cantidad} pessoas",
+    personas: "pessoas",
+    persona: "pessoa",
     noTransferible: "Não transferível",
   },
 
@@ -1166,6 +1177,7 @@ const pt: Invitacion = {
     guardaLaFecha: "Salve a data",
     agregarAlCalendario: "Adicionar ao calendário",
     unaSolaNoche: "Uma noite só",
+    enEstaEdicion: "Nesta edição",
     fecha: "Data",
   },
 

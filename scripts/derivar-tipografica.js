@@ -222,6 +222,13 @@ function derivar(rutaJson) {
           "import de useId"
         );
       }
+      if (!render.includes("tituloEnDosLineas(")) {
+        rep(
+          'import { useTextos, useFormatoDeMoneda, tituloEnDosLineas } from "@/components/i18n/ProveedorIdioma";',
+          'import { useTextos, useFormatoDeMoneda } from "@/components/i18n/ProveedorIdioma";',
+          "import de tituloEnDosLineas"
+        );
+      }
     }
     const desdeCss = s.indexOf(`const CSS_${P.toUpperCase()} = \``);
     const finCss = s.indexOf("\n`;", desdeCss);

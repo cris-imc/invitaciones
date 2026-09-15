@@ -5,9 +5,11 @@
   "titulo": "COUTURE",
   "varianteBase": "Oro",
   "resumen": [
-    "La alta costura: Bodoni Moda en tamaños de tapa de revista de moda, con",
-    "Space Grotesk para los datos. El color aparece sólo en una palabra por",
-    "página -- el oro o el burdeos -- y el resto es blanco y negro."
+    "La revista de moda: Bodoni Moda en cuerpos de tapa, Space Grotesk en",
+    "versalitas con tracking, filetes de 1 px y el color en una sola palabra",
+    "por página. Tapa con masthead, foto, recuadro de edición, sello del pase",
+    "y código de barras; sumario, countdown en renglones, cita destacada,",
+    "pasarela, tarjeta de suscripción, sesión de tapa, tracklist y contratapa."
   ],
   "serif": {
     "modulo": "Bodoni_Moda",
@@ -23,7 +25,8 @@
     "css": "'Space Grotesk', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "600"
     ]
   },
   "mono": {
@@ -31,7 +34,8 @@
     "css": "'Space Grotesk', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "600"
     ]
   },
   "paleta": {
@@ -42,12 +46,6 @@
     "acc": "#B8862B",
     "acc2": "#7A1E2C"
   },
-  "cssExtra": [
-    "/* Couture: el titular es de tapa de moda y la itálica es el acento. */",
-    ".cou-tapa-nombres, .cou-h2, .cou-panel-titulo { letter-spacing: -.045em; }",
-    ".cou-folio { letter-spacing: .3em; }",
-    ".cou-fecha-linea { text-transform: uppercase; }"
-  ],
   "variantes": {
     "Burdeos": {
       "etiqueta": "Burdeos",
@@ -85,5 +83,7 @@
       "acc": "#B4532E",
       "acc2": "#1F4A3A"
     }
-  }
+  },
+  "render": "cou.jsx",
+  "css": "cou.css"
 }
