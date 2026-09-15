@@ -1,0 +1,18 @@
+{
+  "codigo": "NOCHE",
+  "etiqueta": "Noche",
+  "archivo": "NocheTemplate",
+  "componente": "NocheTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papelPrensado",
+  "acento": "#F6EBE4",
+  "eventos": ["quinceYCasamiento"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Carbón", "color": "#141414" },
+    { "id": "Tinta", "nombre": "Tinta", "color": "#16191F" },
+    { "id": "Vino", "nombre": "Vino", "color": "#1B1315" },
+    { "id": "Bosque", "nombre": "Bosque", "color": "#121A16" },
+    { "id": "Bronce", "nombre": "Bronce", "color": "#1A1611" }
+  ]
+}

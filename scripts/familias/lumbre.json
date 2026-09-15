@@ -1,0 +1,18 @@
+{
+  "codigo": "LUMBRE",
+  "etiqueta": "Lumbre",
+  "archivo": "LumbreTemplate",
+  "componente": "LumbreTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papelPrensado",
+  "acento": "#3A322B",
+  "eventos": ["quinceYCasamiento"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Topo", "color": "#E9DFD3" },
+    { "id": "Tostado", "nombre": "Tostado", "color": "#EFE6DA" },
+    { "id": "Arcilla", "nombre": "Arcilla", "color": "#E2D6C6" },
+    { "id": "Ceniza", "nombre": "Ceniza", "color": "#DAD2C8" },
+    { "id": "Sombra", "nombre": "Sombra", "color": "#CFC6BA" }
+  ]
+}

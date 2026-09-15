@@ -46,9 +46,9 @@ export const STORYTELLING_TEMPLATE_TIPOS = new Set(["GUESTPASSVIP", "PRINCESA", 
  * Las cuatro colecciones que ofrece el wizard, y a cuál pertenece cada familia.
  *
  * Antes la colección era un binario deducido de STORYTELLING_TEMPLATE_TIPOS:
- * "está en el set → Storytelling, si no → Flat". Con Paper e Icon eso ya no
+ * "está en el set → Storytelling, si no → Flat". Con Paper e Iconic eso ya no
  * alcanza, porque Paper es arquitectura Flat (tipografía elegible, portada,
- * álbum compartido) e Icon es arquitectura Storytelling (scroller propio,
+ * álbum compartido) e Iconic es arquitectura Storytelling (scroller propio,
  * paneles, paso Recorrido) -- pero ninguna de las dos es "la de siempre".
  *
  * Por eso hay dos preguntas distintas y dos funciones:
@@ -56,38 +56,44 @@ export const STORYTELLING_TEMPLATE_TIPOS = new Set(["GUESTPASSVIP", "PRINCESA", 
  *   - isStorytellingTemplate(): qué ARQUITECTURA tiene, y por lo tanto qué
  *     pasos del wizard aparecen y cómo scrollea el preview. Sigue siendo
  *     booleana y sigue valiendo para los quince lugares que ya la usan: es
- *     true para Storytelling y también para Icon.
+ *     true para Storytelling y también para Iconic.
  *
- * Las familias Paper e Icon se van sumando acá a medida que se instalan (ver
+ * Las familias Paper e Iconic se van sumando acá a medida que se instalan (ver
  * docs/PLAN_NUEVAS_COLECCIONES.md, sección 6).
  */
-export type Coleccion = "FLAT" | "STORYTELLING" | "PAPER" | "ICON";
+export type Coleccion = "FLAT" | "STORYTELLING" | "PAPER" | "ICONIC";
 
-/** Sub-colección visible dentro de Paper e Icon (los mockups vienen agrupados así). */
+/** Sub-colección visible dentro de Paper e Iconic (los mockups vienen agrupados así). */
 export type Subcoleccion = "papeleriaViva" | "papelPrensado" | "capasDePapel" | "tipograficaEditorial";
 
 export const PAPER_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
+    HERBARIO: "papelPrensado",
+    TRAZO: "papelPrensado",
+    NOCHE: "papelPrensado",
+    LUMBRE: "papelPrensado",
     PRENSA: "papelPrensado",
 };
 
-export const ICON_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {};
+export const ICONIC_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
+    JARDINDEPAPEL: "capasDePapel",
+};
 
 export function coleccionDeFamilia(templateTipo: string | null | undefined): Coleccion {
     if (!templateTipo) return "FLAT";
     if (templateTipo in PAPER_TEMPLATE_TIPOS) return "PAPER";
-    if (templateTipo in ICON_TEMPLATE_TIPOS) return "ICON";
+    if (templateTipo in ICONIC_TEMPLATE_TIPOS) return "ICONIC";
     if (STORYTELLING_TEMPLATE_TIPOS.has(templateTipo)) return "STORYTELLING";
     return "FLAT";
 }
 
 export function subcoleccionDeFamilia(templateTipo: string | null | undefined): Subcoleccion | null {
     if (!templateTipo) return null;
-    return PAPER_TEMPLATE_TIPOS[templateTipo] ?? ICON_TEMPLATE_TIPOS[templateTipo] ?? null;
+    return PAPER_TEMPLATE_TIPOS[templateTipo] ?? ICONIC_TEMPLATE_TIPOS[templateTipo] ?? null;
 }
 
 export function isStorytellingTemplate(templateTipo: string | null | undefined): boolean {
     if (!templateTipo) return false;
-    return STORYTELLING_TEMPLATE_TIPOS.has(templateTipo) || templateTipo in ICON_TEMPLATE_TIPOS;
+    return STORYTELLING_TEMPLATE_TIPOS.has(templateTipo) || templateTipo in ICONIC_TEMPLATE_TIPOS;
 }
 
 // Fuente única del orden de pasos del wizard, usada tanto por WizardSteps.tsx
@@ -141,10 +147,16 @@ export function getWizardSteps({
         // Tipografía sólo para la Colección Flat de siempre. Paper trae las
         // caras como parte del diseño (el relieve de Papel Prensado está
         // calibrado para Cormorant 300; la script es la firma) y las fija en
-        // el archivo, igual que Storytelling e Icon.
+        // el archivo, igual que Storytelling e Iconic.
         ...(coleccionDeFamilia(templateTipo) === "FLAT" ? [{ component: StepTypography, label: "Tipografía", clave: "wizard.pasos.tipografia" as const }] : []),
         { component: StepBasicInfo, label: "Información Básica", clave: "wizard.pasos.informacionBasica" as const },
-        ...(!storytelling ? [{ component: StepCountdownStyle, label: "Countdown", clave: "wizard.pasos.countdown" as const }] : []),
+        // El estilo de countdown es, como la tipografía, sólo de la Colección
+        // Flat. Paper e Iconic traen su propia cuenta regresiva dibujada como
+        // parte del diseño -- en Papel Prensado son cuatro cifras en relieve
+        // separadas por filetes (ver CuentaPrensa en PrensaTemplate.tsx) --,
+        // así que ofrecer los cuatro estilos compartidos (cápsulas, flip,
+        // cajas) era ofrecer cuatro opciones que esa plantilla no usa.
+        ...(coleccionDeFamilia(templateTipo) === "FLAT" ? [{ component: StepCountdownStyle, label: "Countdown", clave: "wizard.pasos.countdown" as const }] : []),
         { component: StepPhrase, label: "Frase", clave: "wizard.pasos.frase" as const },
         // Orden Salón/Ceremonia: en las plantillas Flat el salón se pregunta
         // primero. En Guest Pass VIP (y el resto de Storytelling) el panel

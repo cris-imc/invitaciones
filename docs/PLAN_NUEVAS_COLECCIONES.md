@@ -1,4 +1,4 @@
-# Plan de instalación — Colecciones Paper e Icon
+# Plan de instalación — Colecciones Paper e Iconic
 
 > Rama: `nuevas-colecciones` (sale de `main` en `8e0b13c`).
 > Este documento es la bitácora viva: **el estado de cada familia se actualiza acá y se commitea en el mismo commit que el código**. Si la sesión se corta, `git log` + la tabla de la sección 6 dicen exactamente por dónde íbamos.
@@ -76,14 +76,14 @@ Hoy la colección es un binario en tres archivos (`type Collection = "FLAT" | "S
 
 ```ts
 // wizard-steps-config.ts — fuente única
-export type Coleccion = "FLAT" | "STORYTELLING" | "PAPER" | "ICON";
+export type Coleccion = "FLAT" | "STORYTELLING" | "PAPER" | "ICONIC";
 export const COLECCION_DE_FAMILIA: Record<string, Coleccion> = { … };
 export function coleccionDeFamilia(tipo): Coleccion  // default FLAT
 ```
 
 `isStorytellingTemplate()` **se conserva** pero pasa a significar *"arquitectura storytelling"* (scroller propio, paneles, paso Recorrido, sin paso de tipografía): devuelve `true` para STORYTELLING **e ICON**. Paper es arquitectura Flat en todo (tipografía elegible, portada, álbum). Así los ~15 usos actuales de `isStorytellingTemplate` (flujo del wizard, scroll del preview, showcase de la landing) siguen correctos sin tocarlos; sólo el selector y el filtro de tabs pasan a usar `coleccionDeFamilia`.
 
-Etiquetas visibles (es/en/pt + variante AR): **Colección Paper** y **Colección Icon**, como las nombró el pedido. Dentro del modal de familias, cada tab lleva su sub-colección como subtítulo chico (Papelería Viva / Papel Prensado / Capas de papel / Tipográfica Editorial) para que las 19 de Icon no sean una fila plana de 19 nombres.
+Etiquetas visibles (es/en/pt + variante AR): **Colección Paper** y **Colección Iconic**, como las nombró el pedido. Dentro del modal de familias, cada tab lleva su sub-colección como subtítulo chico (Papelería Viva / Papel Prensado / Capas de papel / Tipográfica Editorial) para que las 19 de Icon no sean una fila plana de 19 nombres.
 
 ### 2.2 Códigos de familia (`TemplateTipo`) y variantes
 
@@ -116,7 +116,7 @@ Regla: `XxxTemplate.tsx` exporta `XxxTemplate`; la variante `XxxTemplateNombre.t
 3. Theming en los dos wrappers (§3.2): `--t-bg --t-surface --t-muted --t-acc --t-acc2 --c-accent`, y `--chic-ink` literal en tema claro (§3.4). En Papel Prensado `--t-acc/--t-acc2` son la **tinta**, no un acento.
 4. Las 9 secciones y los 10 slots de doodle en su posición; el gesto de apertura, el efecto sobre la foto y el marco, **tal como los describe el handoff** (nombre · duración · easing · delay).
 5. Piezas: `iconos-linea/` y `manuscrita/` como **máscara CSS** con background en la tinta; `herbario/`, `sobre-sello/`, `acuarela-corona/`, `tinta-vinilo/`, `trazo/` como `<img alt="" aria-hidden>`; rutas canónicas `/templates/<familia>/x.webp` en una constante `PIEZAS`.
-6. Final Parade Script como `var(--font-final-parade)` (ya registrada). El resto por `next/font/google`. **Las caras son parte del diseño y quedan fijas en el archivo**: Paper no lee `--font-title/--font-body-custom` y el paso de Tipografía del wizard no aparece para esta colección (igual que Storytelling e Icon). Ojo con la especificidad: la regla genérica `.tpl h3` le ganaba a `.pr-titulo`; la script lleva `!important` en sus cuatro lugares (títulos de sección, &, frase de cierre, nombre del splash).
+6. Final Parade Script como `var(--font-final-parade)` (ya registrada). El resto por `next/font/google`. **Las caras son parte del diseño y quedan fijas en el archivo**: Paper no lee `--font-title/--font-body-custom` y el paso de Tipografía del wizard no aparece para esta colección (igual que Storytelling e Iconic). Ojo con la especificidad: la regla genérica `.tpl h3` le ganaba a `.pr-titulo`; la script lleva `!important` en sus cuatro lugares (títulos de sección, &, frase de cierre, nombre del splash).
 7. Variantes por script (§2.4), con la nota en el generador de qué cambia y qué no.
 8. Post-evento: el mismo mecanismo que usan las Flat actuales.
 
@@ -155,7 +155,7 @@ Primero lo que hace que **las cuatro colecciones existan y se puedan elegir**, d
 | Fase | Qué | Resultado si se corta acá |
 |---|---|---|
 | 0 | Rama, plan, assets (baraja + PNG de Icon a WebP), fuentes | Nada visible cambia; el repo tiene los assets. |
-| 1 | Infra de 4 colecciones (tipo, selector, i18n, gating, labels) sin familias nuevas | El wizard muestra 4 botones; Paper e Icon vacíos pero funcionales. |
+| 1 | Infra de 4 colecciones (tipo, selector, i18n, gating, labels) sin familias nuevas | El wizard muestra 4 botones; Paper e Iconic vacíos pero funcionales. |
 | 2 | **Prensa** completa (base + 5 variantes + wiring + verificación) | Paper tiene 1 familia y prueba el mecanismo Papel Prensado. |
 | 3 | **Jardín de papel** completa | Icon tiene 1 familia y prueba el mecanismo Capas. |
 | 4 | Noche, Lumbre, Trazo, Herbario (derivan del registro de Prensa) | Papel Prensado completo (5). |
@@ -210,11 +210,11 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 
 | Ítem | Estado |
 |---|---|
-| `Coleccion` + `PAPER/ICON_TEMPLATE_TIPOS` + `coleccionDeFamilia()` + `subcoleccionDeFamilia()` en wizard-steps-config | ✔ |
+| `Coleccion` + `PAPER/ICONIC_TEMPLATE_TIPOS` + `coleccionDeFamilia()` + `subcoleccionDeFamilia()` en wizard-steps-config | ✔ |
 | `isStorytellingTemplate` = STORYTELLING ∪ ICON | ✔ |
 | StepDesign: 4 botones + `familiaPorDefecto()` por colección | ✔ |
 | TemplatePreviewModal: filtro por `coleccionDeFamilia` + subtítulo de sub-colección | ✔ |
-| i18n es/en/pt: `coleccionPaper`, `coleccionIcon`, `verModelosPaper`, `verModelosIcon`, `subcoleccion.*` (AR no hace falta: no hay voseo en esos textos) | ✔ |
+| i18n es/en/pt: `coleccionPaper`, `coleccionIconic`, `verModelosPaper`, `verModelosIconic`, `subcoleccion.*` (AR no hace falta: no hay voseo en esos textos) | ✔ |
 | tsc limpio, eslint sin errores nuevos | ✔ |
 | Recorrer el wizard con Guest Pass VIP y Elegant en el navegador (nada cambió) | pendiente de navegador |
 
@@ -222,11 +222,11 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 
 | Familia | Código | Estado |
 |---|---|---|
-| Prensa | PRENSA | `wiring` — base `PrensaTemplate.tsx` (registro completo: hoja, relieve con luz que gira, entrada de sección, splash quieto, pastilla que se repliega, CONFIRMADO hueco), 4 variantes por `scripts/gen-papel-prensado-variants.js`, los 10 puntos de wiring, `PlantillaDinamica` regenerada, tsc y eslint limpios. Falta la **verificación en navegador**: el preview compila (200) pero la pestaña de Chrome está minimizada y no termina de cargar; queda para cuando haya pantalla. |
-| Noche | NOCHE | — |
-| Lumbre | LUMBRE | — |
-| Herbario | HERBARIO | — |
-| Trazo | TRAZO | — |
+| Prensa | PRENSA | `verificada` — base `PrensaTemplate.tsx` (hoja, relieve con luz que gira, entrada de sección, splash quieto, pastilla que se repliega, CONFIRMADO hueco), 4 variantes por `scripts/gen-papel-prensado-variants.js`, los 10 puntos de wiring, tsc y eslint limpios. Verificada en el navegador (DOM): íconos ≤ 49 px, cuenta propia en Cormorant 46 px, cero íconos de lucide visibles, logo del pie en negro. **Correcciones del 2026-09-15** (ver §7). |
+| Noche | NOCHE | `verificada` — derivada de Prensa con `scripts/derivar-noche.js`: relieve HUECO (la letra prensada hacia adentro, luz al 14 %), líneas claras (`LN`), grano 0.42, monograma en óvalo en vez del ícono y nombres en Final Parade. 5 negros (Carbón, Tinta, Vino, Bosque, Bronce). Verificada en DOM: papel #141414, tinta #F6EBE4, filetes rgba(246,235,228,.34), nombres en Final Parade 62 px, cero íconos de lucide. |
+| Lumbre | LUMBRE | `verificada` — derivada de Prensa con `scripts/derivar-lumbre.js`: portada A SANGRE (la foto del anfitrión a pantalla completa con velo de legibilidad .15→.78 y los nombres en Final Parade blancos encima) en las tres portadas (splash, columna de escritorio y portada del celular), papel topo más cálido. 5 papeles (Topo, Tostado, Arcilla, Ceniza, Sombra). Verificada en DOM: 2 portadas a sangre, 3 velos, nombres 66 px blancos, papel #E9DFD3. |
+| Herbario | HERBARIO | `verificada` — derivada de Prensa con `scripts/derivar-herbario.js`: botánica como `<img>` duotonizada por filtro CSS (4 WebP para las 5 variantes, no 20), cuenta regresiva con los días en grande y horas/minutos/segundos al costado, y tres hojas que caen sobre el CONFIRMADO (sólo cuando el RSVP confirma, vía `:has([role=status][aria-live=polite])`). 5 filtros (Salvia, Eucalipto, Oliva, Ceniza, Tinta). Verificada en DOM: 9 piezas botánicas con el duotono salvia, countdown partido, 3 hojas montadas. |
+| Trazo | TRAZO | `verificada` — derivada de Prensa con `scripts/derivar-trazo.js`: garabatos, destellos y corazones como máscaras pintadas con la tinta (se salen por el borde de la hoja a propósito) y marco circular alrededor de la cifra. Acá la variante cambia la TINTA, no el papel (Grafito, Tinta, Terracota, Verde, Ciruela). Verificada en DOM: 9 dibujos, tinta #3C3A35, papel #F6F1E9. |
 
 ### Paper · Papelería Viva
 
@@ -242,7 +242,7 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 
 | Familia | Código | Estado |
 |---|---|---|
-| Jardín de papel | JARDINDEPAPEL | — |
+| Jardín de papel | JARDINDEPAPEL | `verificada` — base `JardinDePapelTemplate.tsx` (2.150 líneas): escenas del mockup byte por byte en `escenas/JdpEscenas.ts`, motor propio (reveals, frase palabra por palabra, paneles pineados, parallax con mouse/giroscopio, ventana de la foto, riel), portada con las 7 capas que entran y se levantan al abrir, cuenta regresiva propia, check-in con sello y pétalos, álbum de polaroids, canciones, trivia y ticket con QR. 4 variantes por `scripts/gen-capas-de-papel-variants.js` (Noche estrellada, Bosque, Rosa empolvado, Viñedo; el tono claro/oscuro sale solo de la paleta). Los 10 puntos de wiring, `PlantillaDinamica` (374), tsc y eslint limpios. Verificada en el navegador (DOM): 8 secciones, 21 SVG de escena, 4 filtros de papel, las piezas WebP, Cormorant + DM Sans, cuenta viva. |
 | Cielo de papel | CIELODEPAPEL | — |
 | Cuento de papel | CUENTODEPAPEL | — |
 | Ciudad de papel | CIUDADDEPAPEL | — |
@@ -272,7 +272,69 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 | Ítem | Estado |
 |---|---|
 | Invitaciones demo `modelo-*` para /modelos (una por familia) | — |
-| TemplateShowcase de la landing incluye Paper e Icon | — |
+| TemplateShowcase de la landing incluye Paper e Iconic | — |
 | Auditoría final: acentos duplicados, exports, `generar-plantillas-dinamicas`, tsc, eslint | — |
 | GUIA_TECNICA_PLANTILLAS §1/§2.5 actualizadas con las 4 colecciones | — |
 | Mockups: `mockup/Paper` y `mockup/Icon` quedan como referencia (sin `uploads/` ni `screenshots/`, que no son del repo) | — |
+
+## 7. Correcciones del 2026-09-15 (aplican a toda familia nueva)
+
+Salieron de la primera revisión de Prensa en pantalla. No son detalles de esa
+familia: son reglas de las dos colecciones nuevas.
+
+1. **Cada colección trae su propia cuenta regresiva.** El `<Countdown>`
+   compartido tiene cuatro estilos (cápsulas, flip, cajas redondeadas) que son
+   de la Colección Flat; ninguno pega con el papel. Papel Prensado tiene
+   `CuentaPrensa` (cifras en relieve separadas por filetes) y Capas de papel
+   `CuentaJardin` (cuatro tarjetitas inclinadas con la esquina doblada). La
+   lógica del tiempo sí se comparte (`useCountdown`).
+2. **El paso "Countdown" del wizard queda sólo para Flat**, igual que
+   "Tipografía": Paper e Iconic fijan las dos cosas en el archivo.
+3. **Una sola iconografía por sección.** Los componentes compartidos traen sus
+   propios íconos de lucide (una nota musical en Canciones, un tilde en el
+   RSVP, una cama en Info Adicional) y al lado del ícono de la familia quedaban
+   dos dibujos distintos diciendo lo mismo. En Paper e Iconic se ocultan por
+   CSS (`svg.lucide`, `.ia-icon-box`) y manda el juego de la colección.
+4. **Los íconos se miden en píxeles, no en % del ancho.** El mismo 19 % que en
+   un teléfono da un sello de 70 px, en la columna de escritorio daba uno de
+   120 px. Van con tope: `width: min(19%, 58px)`.
+5. **El logo del pie necesita `textColor` oscuro en las familias de papel.**
+   `LogoFooterCredit` elige el isologotipo blanco o negro según ese color, y
+   el default está pensado para fondos oscuros: sobre papel, invisible.
+6. **La portada de bienvenida muestra UN nombre.** El kicker que escribe el
+   anfitrión ("Con mucho cariño para…") es un saludo y sólo va arriba del
+   nombre del invitado; arriba de los novios va la frase del evento ("Nos
+   casamos"). Y los nombres de los homenajeados no se repiten abajo cuando ya
+   son el nombre grande.
+7. **El reveal no puede pisar la inclinación del papel.** En Capas de papel el
+   movimiento de entrada va en `--jdp-y` y el giro en `--jdp-giro`, y el
+   `transform` los compone: si el reveal escribe `transform: none`, las
+   tarjetas terminan perfectamente derechas, que es justo lo que esta
+   colección no es.
+8. **La colección Icon se llama Iconic** (decisión del 2026-09-15). El código
+   del tipo es `ICONIC_TEMPLATE_TIPOS` y `Coleccion = "ICONIC"`.
+
+## 8. Cómo se instala una familia (a partir de Papel Prensado)
+
+Las cinco familias de Papel Prensado comparten el 92 % del archivo: en el
+mockup, Lumbre y Prensa se diferencian en 87 líneas de 1.037. Copiar y pegar
+1.250 líneas por familia habría dejado cinco copias que se desincronizan sin
+que nadie se entere. En vez de eso:
+
+1. **Una familia base escrita a mano** (Prensa), que es el registro de la
+   sub-colección.
+2. **Un script de derivación por familia** (`scripts/derivar-<familia>.js`)
+   que parte de la base y aplica SÓLO lo que esa familia tiene de propio, con
+   un comentario explicando por qué. Si un anclaje no aparece (porque la base
+   cambió), el script falla y lo dice: no genera un archivo a medias.
+3. **El generador de variantes** (`scripts/gen-papel-prensado-variants.js`),
+   que ahora entiende tres formas de variar: por papel (Prensa, Noche,
+   Lumbre), por tinta (Trazo) y por filtro botánico (Herbario).
+4. **El cableador** (`scripts/cablear-familia.js` + un JSON por familia en
+   `scripts/familias/`), que enchufa la familia en los diez puntos del wizard
+   y las rutas. Es idempotente y avisa qué hizo y qué ya estaba.
+
+Un arreglo en el registro se hace una vez en la base y llega a las cinco
+volviendo a correr las derivaciones:
+
+    node scripts/derivar-noche.js && node scripts/derivar-lumbre.js       && node scripts/derivar-herbario.js && node scripts/derivar-trazo.js       && node scripts/gen-papel-prensado-variants.js       && node scripts/generar-plantillas-dinamicas.js

@@ -1,0 +1,18 @@
+{
+  "codigo": "TRAZO",
+  "etiqueta": "Trazo",
+  "archivo": "TrazoTemplate",
+  "componente": "TrazoTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papelPrensado",
+  "acento": "#3C3A35",
+  "eventos": ["quinceYCasamiento"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Grafito", "color": "#3C3A35" },
+    { "id": "Tinta", "nombre": "Tinta", "color": "#2E3A4A" },
+    { "id": "Terracota", "nombre": "Terracota", "color": "#8A5340" },
+    { "id": "Verde", "nombre": "Verde", "color": "#3F5347" },
+    { "id": "Ciruela", "nombre": "Ciruela", "color": "#54364A" }
+  ]
+}

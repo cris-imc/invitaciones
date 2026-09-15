@@ -38,7 +38,7 @@ import { Cormorant_Garamond, Jost } from "next/font/google";
 import { Album } from "@/components/invitation/v2/Album";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
-import { Countdown } from "@/components/invitation/v2/Countdown";
+import { useCountdown, pad } from "@/components/invitation/v2/useCountdown";
 import { RSVPWizardV2 } from "@/components/invitation/v2/RSVPWizardV2";
 import { SongSuggestion } from "@/components/invitation/v2/SongSuggestion";
 import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSection";
@@ -49,7 +49,6 @@ import { AnimatedSynonyms } from "@/components/ui/AnimatedSynonyms";
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { LogoFooterCredit } from "@/components/ui/Logo";
 import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
-import { CreditCard, Gift, Ticket, Users } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
@@ -116,13 +115,22 @@ const ICONOS = {
 } as const;
 type NombreDeIcono = keyof typeof ICONOS;
 
-function IconoLinea({ nombre, ancho = "19%", margen = "0 auto 10px" }: { nombre: NombreDeIcono; ancho?: string; margen?: string }) {
+/**
+ * Un ícono de línea del juego de la colección.
+ *
+ * El ancho va en porcentaje PERO con tope en píxeles: el mismo 19 % que en un
+ * teléfono da un sello de 70 px, en la columna de escritorio (que es bastante
+ * más ancha) daba uno de 120 px y la hoja quedaba dominada por el ícono en vez
+ * de por los nombres. El tope lo deja siempre del tamaño de un sello de lacre,
+ * mida lo que mida la hoja.
+ */
+function IconoLinea({ nombre, ancho = "19%", tope = 58, margen = "0 auto 10px" }: { nombre: NombreDeIcono; ancho?: string; tope?: number; margen?: string }) {
   const i = ICONOS[nombre];
   const u = `url(${PIEZAS}${i.f}.webp) no-repeat center / contain`;
   return (
     <div
       aria-hidden="true"
-      style={{ width: ancho, aspectRatio: i.ar, margin: margen, background: TINTA, WebkitMask: u, mask: u, pointerEvents: "none" }}
+      style={{ width: `min(${ancho}, ${tope}px)`, aspectRatio: i.ar, margin: margen, background: TINTA, WebkitMask: u, mask: u, pointerEvents: "none" }}
     />
   );
 }
@@ -213,13 +221,69 @@ function Hoja({ children, className, style, portada = false }: { children: React
 }
 
 /** Cabecera de sección: ícono, número con punto y título en script. */
-function Cabecera({ icono, numero, titulo, anchoIcono }: { icono: NombreDeIcono; numero: string; titulo: string; anchoIcono?: string }) {
+function Cabecera({ icono, numero, titulo, anchoIcono, topeIcono }: { icono: NombreDeIcono; numero: string; titulo: string; anchoIcono?: string; topeIcono?: number }) {
   return (
     <Entra>
-      <IconoLinea nombre={icono} ancho={anchoIcono} />
+      <IconoLinea nombre={icono} ancho={anchoIcono} tope={topeIcono} />
       <p className="pr-num">{numero}.</p>
       <h3 className="pr-titulo">{titulo}</h3>
     </Entra>
+  );
+}
+
+
+/**
+ * La cuenta regresiva de Papel Prensado.
+ *
+ * Las plantillas Flat comparten un <Countdown> con cuatro estilos que el
+ * anfitrión elige en el wizard (cápsulas, flip, cajas redondeadas). Ninguno
+ * de esos cuatro es de esta colección: acá no hay cajas, ni sombras suaves,
+ * ni números que giran -- hay tinta prensada sobre papel. Por eso la
+ * colección trae la suya y el wizard ya no pregunta el estilo (ver
+ * wizard-steps-config.ts): cuatro cifras en relieve separadas por filetes,
+ * quietas, como estarían impresas.
+ *
+ * La lógica del tiempo sí es la compartida (useCountdown): eso no tiene
+ * nada de visual y duplicarlo sólo traería dos relojes que se desincronizan.
+ */
+function CuentaPrensa({ targetDate }: { targetDate: Date }) {
+  const tx = useTextos();
+  const { time, isEventDay, isPast, hasEnded } = useCountdown(targetDate);
+  const enCero = time.dias === 0 && time.hs === 0 && time.min === 0 && time.seg === 0;
+
+  if (isEventDay || (!isPast && enCero)) {
+    return (
+      <div id="countdown" className="pr-cuenta-aviso">
+        <p className="pr-script">{tx("invitacion.cuentaRegresiva.llegoElDia")}</p>
+        <p className="pr-cuerpo" style={{ marginBottom: 0 }}>{tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}</p>
+      </div>
+    );
+  }
+
+  if (hasEnded || isPast) {
+    return (
+      <div id="countdown" className="pr-cuenta-aviso">
+        <p className="pr-script">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
+      </div>
+    );
+  }
+
+  const celdas = [
+    { v: String(time.dias), l: tx("invitacion.cuentaRegresiva.dias") },
+    { v: pad(time.hs), l: tx("invitacion.cuentaRegresiva.horas") },
+    { v: pad(time.min), l: tx("invitacion.cuentaRegresiva.minutos") },
+    { v: pad(time.seg), l: tx("invitacion.cuentaRegresiva.segundos") },
+  ];
+
+  return (
+    <div id="countdown" className="pr-cuenta">
+      {celdas.map((c) => (
+        <div key={c.l} className="pr-cuenta-celda">
+          <span className="pr-cuenta-num">{c.v}</span>
+          <span className="pr-cuenta-etq">{c.l}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -347,7 +411,6 @@ function QuizPrensa({ preguntas, invitationId, guestToken, guestName }: { pregun
         ) : (
           stats && stats.count > 0 && (
             <p className="pr-cuerpo" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: TINTA_SUAVE }}>
-              <Users className="w-4 h-4" strokeWidth={1.5} />
               <span>{tx("invitacion.quiz.promedioGlobal", { n: stats.count })} <strong style={{ color: TINTA, fontWeight: 400 }}>{stats.avg}%</strong>.</span>
             </p>
           )
@@ -500,7 +563,18 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
 
   // ── Datos ──────────────────────────────────────────────────────────────
   const ciudad = String(invitation.ciudad ?? "");
-  const portadaKicker = String(invitation.portadaKicker || (esBoda ? tx("invitacion.evento.nosCasamos") : esXV ? tx("invitacion.evento.misQuinceAnos") : tx("invitacion.evento.teInvitamos")));
+  // Dos kickers distintos, porque encabezan dos cosas distintas.
+  //
+  // "kickerDelEvento" dice de quién es la fiesta ("Nos casamos", "Mis quince
+  // años") y es el que va arriba de los nombres de los homenajeados.
+  //
+  // "kickerDelSaludo" es el que escribe el anfitrión en el wizard, que casi
+  // siempre es un saludo dirigido al invitado ("Con mucho cariño para"). Ese
+  // sólo se usa cuando abajo va el nombre del invitado o su familia: arriba
+  // de los novios quedaba "Con mucho cariño para / Valentina & Tomás", como
+  // si los novios fueran los invitados de su propia boda.
+  const kickerDelEvento = esBoda ? tx("invitacion.evento.nosCasamos") : esXV ? tx("invitacion.evento.misQuinceAnos") : tx("invitacion.evento.teInvitamos");
+  const portadaKicker = String(invitation.portadaKicker || kickerDelEvento);
 
   const novia = String(invitation.nombreNovia ?? "");
   const novio = String(invitation.nombreNovio ?? "");
@@ -572,6 +646,10 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
   const portadaImagenFondoDesktopRaw = String(invitation.portadaImagenFondoDesktop ?? "") || undefined;
   const portadaFondoAnimado = Boolean(portadaImagenFondoDesktopRaw);
   const guestNameDisplay = resolveGuestNameDisplay(invitation, guest);
+  // ¿El nombre grande de la bienvenida es el del invitado, o el de los
+  // homenajeados? De eso dependen el saludo de arriba y si hace falta
+  // repetir los nombres abajo (ver la hoja del splash).
+  const saludaAlInvitado = Boolean(guest?.name) && invitation.mostrarNombreInvitadoEnSaludo !== false;
 
   const eventStatus = getEventStatus(fechaEvento);
   const expirationDate = getInvitationExpirationDate(fechaEvento);
@@ -628,7 +706,7 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
             </div>
           </Hoja>
         </main>
-        <LogoFooterCredit bgColor="transparent" />
+        <LogoFooterCredit bgColor="transparent" textColor={TINTA_SUAVE} />
       </div>
     );
   }
@@ -652,10 +730,14 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
             </div>
           )}
           <Hoja className="pr-splash-hoja">
-            <p className="pr-kicker">{portadaKicker}</p>
+            <p className="pr-kicker">{saludaAlInvitado ? portadaKicker : kickerDelEvento}</p>
             <p className="pr-splash-nombre">{guestNameDisplay}</p>
             <div className="pr-filete-corto" aria-hidden="true" />
-            <p className="pr-dato">{nombresLinea}</p>
+            {/* Los nombres de los novios sólo si arriba no están ya: cuando
+                el saludo es para el invitado son el dato que falta ("¿la boda
+                de quién?"); cuando el nombre grande ya es el de ellos,
+                repetirlos era escribir lo mismo dos veces. */}
+            {saludaAlInvitado && <p className="pr-dato">{nombresLinea}</p>}
             <p className="pr-dato" style={{ color: TINTA_SUAVE }}>{fechaCorta}{ciudad ? ` · ${ciudad}` : ""}</p>
             {Boolean(activeDressCode) && <p className="pr-kicker" style={{ marginTop: 6 }}>{tx("invitacion.ubicacion.dressCode")} {activeDressCode}</p>}
             <button type="button" onClick={openInvitation} className="pr-btn-solido" style={{ marginTop: 26 }}>
@@ -688,7 +770,7 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
             </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Ticket className="w-4 h-4" strokeWidth={1.5} style={{ color: TINTA }} />
+              <IconoPastilla nombre="tarjeta" />
               <span className="pr-kicker" style={{ margin: 0 }}>{tx("invitacion.pase.pase")}</span>
             </div>
           )}
@@ -706,8 +788,8 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
         {/* ── Escritorio: la hoja grande, fija a la izquierda ─────────── */}
         <aside className="d-left hide-mobile pr-izquierda">
           <Hoja portada className="pr-hoja-grande">
-            <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} />
-            <p className="pr-kicker">{portadaKicker}</p>
+            <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} tope={76} />
+            <p className="pr-kicker">{kickerDelEvento}</p>
             <h1 className="pr-nombres">
               <span>{nombre1}</span>
               {nombre2 && <span className="pr-amp">&amp;</span>}
@@ -732,8 +814,8 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
           <section className="hide-desktop pr-seccion pr-portada" data-sec="00">
             <Hoja portada className={isCoverOpen ? "pr-portada--sube" : ""}>
               <Entra>
-                <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} />
-                <p className="pr-kicker">{portadaKicker}</p>
+                <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} tope={76} />
+                <p className="pr-kicker">{kickerDelEvento}</p>
               </Entra>
               <Entra retraso={120}>
                 <h1 className="pr-nombres">
@@ -759,7 +841,8 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
               <Hoja>
                 <Cabecera icono="reloj" numero="01" titulo={tx("invitacion.cuentaRegresiva.kicker")} />
                 <Entra retraso={120}>
-                  <Countdown targetDate={fechaEvento} countdownStyle={invitation.countdownStyle as never} kicker={tx("invitacion.cuentaRegresiva.faltan")} dark />
+                  <p className="pr-kicker">{tx("invitacion.cuentaRegresiva.faltan")}</p>
+                  <CuentaPrensa targetDate={fechaEvento} />
                   <FileteConPunto />
                   <p className="pr-dato">{fechaLarga}{hora ? ` · ${hora} hs` : ""}</p>
                 </Entra>
@@ -956,13 +1039,13 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
             <SectionWrapper id="banco" delay={200} className="pr-seccion" style={{ padding: 0 }}>
               <div className="pr-seccion" data-sec="07">
                 <Hoja>
-                  <Cabecera icono="regalo" numero="07" titulo={tx("invitacion.regalos.banco")} />
+                  <Cabecera icono="sobre" numero="07" titulo={tx("invitacion.regalos.banco")} />
                   <Entra retraso={120}>
                     {Boolean(invitation.regaloMensaje) && <p className="pr-cuerpo">{String(invitation.regaloMensaje)}</p>}
                     <div style={{ display: "grid", gap: 14 }}>
                       {pagoTarjetaHabilitado && (
                         <BankDetailsCard
-                          icon={<CreditCard className="w-4 h-4" strokeWidth={1.5} />}
+                          icon={<IconoPastilla nombre="tarjeta" />}
                           data={{
                             titulo: String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas")),
                             mensaje: String(invitation.pagoTarjetaMensaje || ""),
@@ -981,7 +1064,7 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
                       )}
                       {regaloHabilitado && (
                         <BankDetailsCard
-                          icon={<Gift className="w-4 h-4" strokeWidth={1.5} />}
+                          icon={<IconoPastilla nombre="regalo" />}
                           data={{
                             titulo: String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento")),
                             mensaje: String(invitation.regaloMensaje || ""),
@@ -1045,7 +1128,7 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
           </section>
 
           {musicaHabilitada && musicAudioElement}
-          <LogoFooterCredit bgColor="transparent" />
+          <LogoFooterCredit bgColor="transparent" textColor={TINTA_SUAVE} />
           <div style={{ height: 92 }} className="hide-desktop" aria-hidden="true" />
         </div>
       </div>
@@ -1194,12 +1277,21 @@ const CSS_PRENSA = `
   .pr-raiz .tpl .album-btn { color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; background: transparent !important; }
   .pr-raiz .tpl .cascade-frame { box-shadow: -1.41px 1.41px 4px rgba(${SH},.40) !important; background: ${PAPEL} !important; }
 
-  .pr-raiz #countdown { background: transparent !important; padding: 0 !important; margin: 0 !important; color: ${TINTA}; }
-  .pr-raiz #countdown .t-kicker { text-align: center; justify-content: center !important; }
-  .pr-raiz #countdown [class*="text-5xl"], .pr-raiz #countdown [class*="text-6xl"] { font-family: ${SERIF} !important; font-weight: 300 !important; color: ${matiz(PAPEL, -4)} !important; text-shadow: var(--pr-rel); }
-  .pr-raiz #countdown[data-style="clasico"] > div > div > div, .pr-raiz #countdown[data-style="flip"] [class*="rounded"], .pr-raiz #countdown[data-style="capsulas"] [class*="rounded"] { background: ${PAPEL2} !important; border: 0.5px solid rgba(${SH},.34) !important; box-shadow: none !important; }
-  .pr-raiz #countdown [class*="font-semibold"], .pr-raiz #countdown [class*="font-bold"] { font-family: ${SERIF} !important; font-weight: 300 !important; color: ${TINTA} !important; }
-  .pr-raiz #countdown .cd-past, .pr-raiz #countdown .cd-past-text { color: ${TINTA} !important; background: transparent !important; border-color: rgba(${SH},.34) !important; box-shadow: none !important; }
+  /* La cuenta regresiva de la colección: cifras prensadas y filetes, nada más. */
+  .pr-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); align-items: end; max-width: 400px; margin: 2px auto 4px; }
+  .pr-cuenta-celda { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 2px 2px 0; }
+  .pr-cuenta-celda + .pr-cuenta-celda { border-left: 0.5px solid rgba(${SH},.30); }
+  .pr-cuenta-num { font-family: ${SERIF}; font-weight: 300; font-size: clamp(32px, 10vw, 46px); line-height: .92; color: ${matiz(PAPEL, -4)}; text-shadow: var(--pr-rel); font-variant-numeric: tabular-nums; }
+  .pr-cuenta-etq { font-family: ${SANS}; font-weight: 400; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA_SUAVE}; white-space: nowrap; }
+  .desktop-stage .pr-cuenta-num { font-size: 46px; }
+  .pr-cuenta-aviso { text-align: center; }
+
+  /* Sin íconos prestados: los componentes compartidos traen los suyos (una
+     nota musical, un tilde, una cama) y al lado del ícono de línea de la
+     cabecera quedaban dos dibujos distintos diciendo lo mismo en la misma
+     sección. El juego de línea de la colección es el único que se ve. */
+  .pr-raiz #songs svg.lucide, .pr-raiz #rsvp svg.lucide, .pr-raiz .ia-icon-box svg.lucide { display: none !important; }
+  .pr-raiz .ia-icon-box { display: none !important; }
 
   .pr-raiz #rsvp.section.dark { background: transparent !important; color: ${TINTA} !important; border: none !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; }
   .pr-raiz #rsvp.section.dark > p.t-kicker, .pr-raiz #rsvp.section.dark > h2, .pr-raiz #rsvp.section.dark > .d-rsvp-grid { width: 100% !important; max-width: 420px !important; text-align: left !important; }

@@ -84,6 +84,11 @@ import {
   INFANTILSAFARI_COLORS,
   ANIVERSARIO_COLORS,
   PRENSA_COLORS,
+  HERBARIO_COLORS,
+  TRAZO_COLORS,
+  NOCHE_COLORS,
+  LUMBRE_COLORS,
+  JARDINDEPAPEL_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
@@ -130,6 +135,11 @@ export {
   INFANTILSAFARI_COLORS,
   ANIVERSARIO_COLORS,
   PRENSA_COLORS,
+  HERBARIO_COLORS,
+  TRAZO_COLORS,
+  NOCHE_COLORS,
+  LUMBRE_COLORS,
+  JARDINDEPAPEL_COLORS,
   type TemplateTipo,
 };
 
@@ -197,6 +207,11 @@ export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
   ANIVERSARIO: "#C48A6E",
   // Papel Prensado: el "acento" es la tinta, que no cambia entre variantes.
   PRENSA: "#514842",
+  HERBARIO: "#6E7A5E",
+  TRAZO: "#3C3A35",
+  NOCHE: "#F6EBE4",
+  LUMBRE: "#3A322B",
+  JARDINDEPAPEL: "#C86B5A",
 };
 
 // El orden de esta lista es el orden en que se ofrecen las plantillas. Los
@@ -250,6 +265,11 @@ const TEMPLATE_TIPOS_ORDENADOS: TemplateTipo[] = [
   "BLACKANDWHITE",
   // Colección Paper · Papel Prensado
   "PRENSA",
+  "HERBARIO",
+  "TRAZO",
+  "NOCHE",
+  "LUMBRE",
+  "JARDINDEPAPEL",
   "BABYSHOWER",
   "BAUTISMO",
   "CORPORATIVOANIVERSARIO",
@@ -280,7 +300,7 @@ function getAvailableTabs(eventType: string | undefined, collection: Coleccion):
   const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "MARMOLYORO", "ATELIERDEPAPEL", "BOTANICAEDITORIAL", "ENCAJECONTEMPORANEO", "LIQUIDGLASS"]);
   // Prensa (Papel Prensado) sirve para casamiento y para XV: cambia la copy y
   // el cronograma, nada de la piel -- ver el toggle "XV" del mockup.
-  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE", "BLACKANDWHITE", "PRENSA"]);
+  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE", "BLACKANDWHITE", "PRENSA", "JARDINDEPAPEL", "LUMBRE", "NOCHE", "TRAZO", "HERBARIO"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL", "BABYSHOWER", "BAUTISMO", "CORPORATIVOANIVERSARIO", "CORPORATIVOENCUENTRO", "CUMPLEANOSCOCKTAIL", "CUMPLEANOSJARDIN", "CUMPLEANOSTERRAZA", "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION", "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
     if (coleccionDeFamilia(tipo) !== collection) return false;
@@ -354,6 +374,11 @@ const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
   INFANTILSAFARI: INFANTILSAFARI_COLORS,
   ANIVERSARIO: ANIVERSARIO_COLORS,
   PRENSA: PRENSA_COLORS,
+  HERBARIO: HERBARIO_COLORS,
+  TRAZO: TRAZO_COLORS,
+  NOCHE: NOCHE_COLORS,
+  LUMBRE: LUMBRE_COLORS,
+  JARDINDEPAPEL: JARDINDEPAPEL_COLORS,
 };
 
 function getColorsForTipo(tipo: TemplateTipo) {
@@ -579,7 +604,7 @@ function TemplatePreviewModalBody({
               )}
             >
               {label}
-              {/* Paper e Icon vienen agrupadas en sub-colecciones (Papelería
+              {/* Paper e Iconic vienen agrupadas en sub-colecciones (Papelería
                   Viva, Papel Prensado, Capas de papel, Tipográfica Editorial):
                   con diecinueve familias en una fila, el subtítulo es lo que
                   deja ubicarse. Flat y Storytelling no lo tienen. */}

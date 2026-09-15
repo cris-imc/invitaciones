@@ -1,35 +1,24 @@
 "use client";
 
 /**
- * PrensaTemplate.tsx — Colección Paper · Papel Prensado · Familia 01 "Prensa"
- * Variante: Lino (base). Las otras cuatro (Hueso, Arena, Piedra, Humo) se
- * generan con scripts/gen-papel-prensado-variants.js y cambian SOLO el tono
- * del papel: la tinta (#514842 / #8A756D) y la sombra son las mismas en las
- * cinco a propósito, porque la colección es monocroma. Si una auditoría de
- * acentos duplicados (guía §3.6) marca estas cinco, no es un bug.
+ * HerbarioTemplate.tsx — Colección Paper · Papel Prensado · Familia 04 "Herbario"
+ * Variante: Salvia (base). Las otras cuatro (Eucalipto, Oliva, Ceniza,
+ * Tinta) se generan con scripts/gen-papel-prensado-variants.js.
  *
- * Portado desde mockup/Paper/Prensa - Panoramica.dc.html, siguiendo sus
- * notas de port: base ModernoTemplate (mecanismo Flat, 9 secciones), los
- * componentes compartidos de v2/ (Countdown, RSVPWizardV2, BottomNavPill,
- * SongSuggestion, Album, ProgressiveQuiz, SectionWrapper) vestidos con el
- * registro de la colección, y nada más que CSS + SVG + doce íconos de línea
- * como máscara. Cero fotos propias.
+ * GENERADO por scripts/derivar-herbario.js a partir de PrensaTemplate.tsx —
+ * no editar a mano.
  *
- * El registro de Papel Prensado, que este archivo tiene que respetar y que
- * comparten Noche, Lumbre, Herbario y Trazo:
- *  - Hoja 301:432 con grano (feTurbulence en data URI), esquinas plegadas
- *    (clip-path + dos gradientes) y filete a 14 px.
- *  - Relieve: la tinta de los nombres y de los números grandes es el papel
- *    apenas oscurecido con una sombra clara y una oscura; la luz viene de
- *    arriba a la derecha (−135°) y gira ±3° con el scroll (sin(scrollY/260)).
- *  - Entrada de sección: opacity 0→1 en 1200 ms junto con
- *    perspective(800px) rotateY(6deg) translateY(10px) → 0 en 350 ms,
- *    IntersectionObserver al 15 %, una sola vez, stagger 120 ms por bloque.
- *  - Splash quieto: la hoja se desvanece 900 ms y la portada sube 24 px.
- *  - Pastilla inferior con íconos de línea que se repliega al scrollear
- *    (300 ms) y vuelve 370 ms después de frenar.
- *  - CONFIRMADO en relieve hueco. Sin sello, sin color, sin confeti.
- *  - Ornamento quieto: cero rotación, cero parallax, cero brillos.
+ * Portado desde mockup/Paper/Herbario - Panoramica.dc.html. Misma imprenta
+ * que Prensa, con botánica prensada encima:
+ *
+ *  - LAS PIEZAS SON FOTOS, NO MÁSCARAS: una rama tiene medios tonos y como
+ *    máscara de un color plano se perdería. Van como <img> con un filtro
+ *    que las duotoniza; ese filtro es lo que cambia por variante, así que
+ *    las cinco se ven como cinco herbarios distintos con UN solo juego de
+ *    cuatro WebP.
+ *  - LA CUENTA REGRESIVA tiene los días en grande y, al costado de un
+ *    filete vertical, horas, minutos y segundos en columna.
+ *  - AL CONFIRMAR CAEN TRES HOJAS sobre la palabra CONFIRMADO.
  */
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -59,39 +48,39 @@ import { useTextos } from "@/components/i18n/ProveedorIdioma";
 // Cormorant Garamond 300 para nombres, cifras y numeración; Jost 300/400 para
 // kickers, datos y texto corrido. La script (Final Parade) es del repo y llega
 // por var(--font-final-parade) desde layout.tsx: no se pide a Google.
-const prCormorant = Cormorant_Garamond({
+const hbCormorant = Cormorant_Garamond({
   subsets: ["latin"],
   preload: false,
   style: ["normal", "italic"],
   weight: ["300", "400"],
-  variable: "--pr-cormorant",
+  variable: "--hb-cormorant",
   display: "swap",
 });
-const prJost = Jost({
+const hbJost = Jost({
   subsets: ["latin"],
   preload: false,
   weight: ["300", "400", "500"],
-  variable: "--pr-jost",
+  variable: "--hb-jost",
   display: "swap",
 });
 
 // ─── Paleta ─────────────────────────────────────────────────────────────────
 // Lo único que cambia por variante es el par de papeles. El generador
 // reemplaza estos dos hex y el nombre del identificador; todo lo demás queda.
-const PAPEL = "#F4ECE2";
-const PAPEL2 = "#EFE5D9";
-const TINTA = "#514842";
-const TINTA_SUAVE = "#8A756D";
+const PAPEL = "#F7F2EA";
+const PAPEL2 = "#F1EADF";
+const TINTA = "#45443C";
+const TINTA_SUAVE = "#857F70";
 /** rgb de la sombra: se usa en todos los rgba() del registro. */
-const SH = "120,103,86";
+const SH = "116,110,92";
 
 // Las tres caras son parte del diseño y no se cambian desde el wizard (a
 // diferencia de las Flat de siempre, que leen --font-title/--font-body-custom):
 // el relieve está calibrado para Cormorant 300 y la firma de la colección es
 // la script. Por eso el paso de Tipografía no aparece para Paper (ver
 // wizard-steps-config.ts).
-const SERIF = "var(--pr-cormorant), 'Cormorant Garamond', serif";
-const SANS = "var(--pr-jost), 'Jost', sans-serif";
+const SERIF = "var(--hb-cormorant), 'Cormorant Garamond', serif";
+const SANS = "var(--hb-jost), 'Jost', sans-serif";
 const SCRIPT = "var(--font-final-parade, 'Final Parade Script'), cursive";
 
 // ─── Piezas ─────────────────────────────────────────────────────────────────
@@ -99,6 +88,17 @@ const SCRIPT = "var(--font-final-parade, 'Final Parade Script'), cursive";
 // de fondo: son tinta plana, así que nunca van como <img>. Las proporciones
 // vienen del INVENTARIO de public/templates.
 const PIEZAS = "/templates/iconos-linea/";
+
+/**
+ * El color de la variante y el filtro que lo aplica a las fotos botánicas.
+ * Los reemplaza scripts/gen-papel-prensado-variants.js: son las dos únicas
+ * líneas que cambian entre las cinco variantes de esta familia.
+ */
+const ACENTO = "#6E7A5E";
+const FILTRO = "grayscale(1) sepia(1) hue-rotate(48deg) saturate(.75) brightness(.96)";
+
+/** Las cuatro piezas botánicas, compartidas por las cinco variantes. */
+const BOTANICA = "/templates/herbario/";
 const ICONOS = {
   anillos: { f: "anillos", ar: "290/332" },
   reloj: { f: "reloj", ar: "265/269" },
@@ -170,7 +170,7 @@ function safeJson<T>(val: string | null | undefined, fallback: T): T {
   try { return JSON.parse(val) as T; } catch { return fallback; }
 }
 
-interface PrensaTemplateProps {
+interface HerbarioTemplateProps {
   invitation: Record<string, unknown>;
   guest?: {
     id: string;
@@ -204,17 +204,36 @@ function temaDe(tipo: string): Theme {
 /** Un bloque que entra con el gesto de la colección. `retraso` en ms. */
 function Entra({ children, retraso = 0, style, className }: { children: React.ReactNode; retraso?: number; style?: React.CSSProperties; className?: string }) {
   return (
-    <div data-pr-reveal="1" data-pr-retraso={retraso} className={`pr-entra ${className ?? ""}`} style={style}>
+    <div data-hb-reveal="1" data-hb-retraso={retraso} className={`hb-entra ${className ?? ""}`} style={style}>
       {children}
     </div>
+  );
+}
+
+/**
+ * Una pieza botánica: una foto prensada, duotonizada al color de la
+ * variante. Va fuera del flujo y sin atajar clics -- varias entran por
+ * fuera del borde de la hoja a propósito.
+ */
+function Botanica({ pieza, className, ...posicion }: { pieza: "magnolia" | "rama-esquina" | "rama-cabecera" | "hoja"; className?: string } & React.CSSProperties) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`${BOTANICA}${pieza}.webp`}
+      alt=""
+      aria-hidden="true"
+      className={className}
+      loading="lazy"
+      style={{ position: "absolute", filter: FILTRO, pointerEvents: "none", zIndex: 0, ...posicion }}
+    />
   );
 }
 
 /** Una hoja de papel prensado: grano, sombra, esquinas plegadas y filete. */
 function Hoja({ children, className, style, portada = false }: { children: React.ReactNode; className?: string; style?: React.CSSProperties; portada?: boolean }) {
   return (
-    <div className={`pr-hoja ${portada ? "pr-hoja--portada" : ""} ${className ?? ""}`} style={style}>
-      <div className="pr-filete" aria-hidden="true" />
+    <div className={`hb-hoja ${portada ? "hb-hoja--portada" : ""} ${className ?? ""}`} style={style}>
+      <div className="hb-filete" aria-hidden="true" />
       {children}
     </div>
   );
@@ -225,8 +244,8 @@ function Cabecera({ icono, numero, titulo, anchoIcono, topeIcono }: { icono: Nom
   return (
     <Entra>
       <IconoLinea nombre={icono} ancho={anchoIcono} tope={topeIcono} />
-      <p className="pr-num">{numero}.</p>
-      <h3 className="pr-titulo">{titulo}</h3>
+      <p className="hb-num">{numero}.</p>
+      <h3 className="hb-titulo">{titulo}</h3>
     </Entra>
   );
 }
@@ -246,24 +265,24 @@ function Cabecera({ icono, numero, titulo, anchoIcono, topeIcono }: { icono: Nom
  * La lógica del tiempo sí es la compartida (useCountdown): eso no tiene
  * nada de visual y duplicarlo sólo traería dos relojes que se desincronizan.
  */
-function CuentaPrensa({ targetDate }: { targetDate: Date }) {
+function CuentaHerbario({ targetDate }: { targetDate: Date }) {
   const tx = useTextos();
   const { time, isEventDay, isPast, hasEnded } = useCountdown(targetDate);
   const enCero = time.dias === 0 && time.hs === 0 && time.min === 0 && time.seg === 0;
 
   if (isEventDay || (!isPast && enCero)) {
     return (
-      <div id="countdown" className="pr-cuenta-aviso">
-        <p className="pr-script">{tx("invitacion.cuentaRegresiva.llegoElDia")}</p>
-        <p className="pr-cuerpo" style={{ marginBottom: 0 }}>{tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}</p>
+      <div id="countdown" className="hb-cuenta-aviso">
+        <p className="hb-script">{tx("invitacion.cuentaRegresiva.llegoElDia")}</p>
+        <p className="hb-cuerpo" style={{ marginBottom: 0 }}>{tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}</p>
       </div>
     );
   }
 
   if (hasEnded || isPast) {
     return (
-      <div id="countdown" className="pr-cuenta-aviso">
-        <p className="pr-script">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
+      <div id="countdown" className="hb-cuenta-aviso">
+        <p className="hb-script">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
       </div>
     );
   }
@@ -275,14 +294,27 @@ function CuentaPrensa({ targetDate }: { targetDate: Date }) {
     { v: pad(time.seg), l: tx("invitacion.cuentaRegresiva.segundos") },
   ];
 
+  // Los días mandan: son el dato que se mira. Horas, minutos y segundos
+  // van al costado, en columna, separados por un filete vertical.
+  const [dias, ...resto] = celdas;
   return (
-    <div id="countdown" className="pr-cuenta">
-      {celdas.map((c) => (
-        <div key={c.l} className="pr-cuenta-celda">
-          <span className="pr-cuenta-num">{c.v}</span>
-          <span className="pr-cuenta-etq">{c.l}</span>
-        </div>
-      ))}
+    <div id="countdown" className="hb-cuenta">
+      <div className="hb-cuenta-dias">
+        <span className="hb-cifra">{dias.v}</span>
+        <span className="hb-cuenta-etq">{dias.l}</span>
+      </div>
+      <span className="hb-cuenta-divisor" aria-hidden="true" />
+      <div className="hb-cuenta-lado">
+        {resto.map((c, i) => (
+          <div key={c.l}>
+            <div className="hb-cuenta-fila">
+              <span className="hb-cuenta-num">{c.v}</span>
+              <span className="hb-cuenta-etq">{c.l}</span>
+            </div>
+            {i < resto.length - 1 && <span className="hb-cuenta-regla" aria-hidden="true" />}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -308,12 +340,12 @@ function CopyField({ label, value }: { label: string; value: string }) {
     });
   };
   return (
-    <div className="pr-banco-fila">
+    <div className="hb-banco-fila">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="pr-banco-clave">{label}</span>
-        <span className="pr-banco-valor">{value}</span>
+        <span className="hb-banco-clave">{label}</span>
+        <span className="hb-banco-valor">{value}</span>
       </div>
-      <button className={`copy-btn pr-btn-fantasma ${copied ? "copied" : ""}`} type="button" onClick={handle} style={{ minHeight: 40, padding: "0 14px" }}>
+      <button className={`copy-btn hb-btn-fantasma ${copied ? "copied" : ""}`} type="button" onClick={handle} style={{ minHeight: 40, padding: "0 14px" }}>
         {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
@@ -322,10 +354,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="pr-banco-fila">
+    <div className="hb-banco-fila">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="pr-banco-clave">{label}</span>
-        <span className="pr-banco-valor">{value}</span>
+        <span className="hb-banco-clave">{label}</span>
+        <span className="hb-banco-valor">{value}</span>
       </div>
     </div>
   );
@@ -404,13 +436,13 @@ function QuizPrensa({ preguntas, invitationId, guestToken, guestName }: { pregun
     preguntas.forEach((q, i) => { if (picks[i] === q.respuestaCorrecta) score++; });
     return (
       <div style={{ textAlign: "center" }}>
-        <p className="pr-lugar">{tx("invitacion.quiz.juegoCompletado")}</p>
-        <p className="pr-dato">{score} / {preguntas.length}</p>
+        <p className="hb-lugar">{tx("invitacion.quiz.juegoCompletado")}</p>
+        <p className="hb-dato">{score} / {preguntas.length}</p>
         {isSaving ? (
-          <p className="pr-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.quiz.guardandoResultados")}</p>
+          <p className="hb-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.quiz.guardandoResultados")}</p>
         ) : (
           stats && stats.count > 0 && (
-            <p className="pr-cuerpo" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: TINTA_SUAVE }}>
+            <p className="hb-cuerpo" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: TINTA_SUAVE }}>
               <span>{tx("invitacion.quiz.promedioGlobal", { n: stats.count })} <strong style={{ color: TINTA, fontWeight: 400 }}>{stats.avg}%</strong>.</span>
             </p>
           )
@@ -430,14 +462,14 @@ function QuizPrensa({ preguntas, invitationId, guestToken, guestName }: { pregun
 
   return (
     <div key={currentIdx}>
-      <p className="pr-lugar">{formatQuestion(q.pregunta)}</p>
+      <p className="hb-lugar">{formatQuestion(q.pregunta)}</p>
       {q.opciones.map((opt, oi) => {
         const chosen = picks[currentIdx] === oi;
         return (
           <button
             key={oi}
             type="button"
-            className="pr-quiz-opcion"
+            className="hb-quiz-opcion"
             data-elegida={chosen ? "1" : undefined}
             disabled={picks[currentIdx] !== undefined}
             onClick={() => pick(oi)}
@@ -451,7 +483,7 @@ function QuizPrensa({ preguntas, invitationId, guestToken, guestName }: { pregun
 }
 
 // ─── La plantilla ───────────────────────────────────────────────────────────
-export function PrensaTemplate({ invitation, guest, isPersonalized = false }: PrensaTemplateProps) {
+export function HerbarioTemplate({ invitation, guest, isPersonalized = false }: HerbarioTemplateProps) {
   const tx = useTextos();
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
@@ -508,7 +540,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
     quietoRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const raiz = raizRef.current;
     if (!raiz) return;
-    raiz.style.setProperty("--pr-rel", relieve(0, true));
+    raiz.style.setProperty("--hb-rel", relieve(0, true));
     let raf = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const alScrollear = (y: number) => {
@@ -517,7 +549,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
-        raiz.style.setProperty("--pr-rel", relieve(y, quietoRef.current));
+        raiz.style.setProperty("--hb-rel", relieve(y, quietoRef.current));
         setPastillaOculta(y > 40);
       });
     };
@@ -536,15 +568,15 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
   // ── Entrada de sección ─────────────────────────────────────────────────
   // IntersectionObserver al 15 %, una sola vez por bloque, con el retraso
-  // que trae cada bloque (data-pr-retraso: 0 / 120 / 240). Se arma cada vez
+  // que trae cada bloque (data-hb-retraso: 0 / 120 / 240). Se arma cada vez
   // que se abre la portada porque hasta entonces el cuerpo no está montado.
   useEffect(() => {
     if (!isCoverOpen) return;
     const raiz = raizRef.current;
     if (!raiz) return;
-    const bloques = Array.from(raiz.querySelectorAll<HTMLElement>("[data-pr-reveal]"));
+    const bloques = Array.from(raiz.querySelectorAll<HTMLElement>("[data-hb-reveal]"));
     if (quietoRef.current || !("IntersectionObserver" in window)) {
-      bloques.forEach((b) => b.classList.add("pr-entra--visto"));
+      bloques.forEach((b) => b.classList.add("hb-entra--visto"));
       return;
     }
     const io = new IntersectionObserver((entradas) => {
@@ -553,7 +585,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
         const el = e.target as HTMLElement;
         const d = Number(el.dataset.prRetraso || 0);
         el.style.transitionDelay = `${d}ms`;
-        el.classList.add("pr-entra--visto");
+        el.classList.add("hb-entra--visto");
         io.unobserve(el);
       });
     }, { threshold: 0.15 });
@@ -660,9 +692,9 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
     .map((item) => item.fileUrl);
 
   const varsDeTema = {
-    "--font-cormorant": "var(--pr-cormorant)",
-    "--font-inter": "var(--pr-jost)",
-    "--font-sans": "var(--pr-jost)",
+    "--font-cormorant": "var(--hb-cormorant)",
+    "--font-inter": "var(--hb-jost)",
+    "--font-sans": "var(--hb-jost)",
     // En esta colección --t-acc y --t-acc2 no son un acento: son la tinta y
     // la tinta suave. Lo que cambia por variante es el papel (--t-bg).
     "--t-acc": TINTA,
@@ -681,26 +713,26 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
   // ── Post-evento ────────────────────────────────────────────────────────
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className={`${prCormorant.variable} ${prJost.variable} pr-raiz`} style={varsDeTema} data-theme={theme} ref={raizRef}>
-        <style>{CSS_PRENSA}</style>
-        <div className="pr-fondo" aria-hidden="true" />
-        <main className="pr-post">
-          <Hoja className="pr-post-hoja">
+      <div className={`${hbCormorant.variable} ${hbJost.variable} hb-raiz`} style={varsDeTema} data-theme={theme} ref={raizRef}>
+        <style>{CSS_HERBARIO}</style>
+        <div className="hb-fondo" aria-hidden="true" />
+        <main className="hb-post">
+          <Hoja className="hb-post-hoja">
             <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho="16%" />
-            <p className="pr-kicker">{tx("invitacion.frase.unMomento")}</p>
-            <h1 className="pr-nombres" style={{ fontSize: 38 }}>
-              <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="pr-sinonimo" />
+            <p className="hb-kicker">{tx("invitacion.frase.unMomento")}</p>
+            <h1 className="hb-nombres" style={{ fontSize: 38 }}>
+              <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="hb-sinonimo" />
             </h1>
             <FileteConPunto />
-            <p className="pr-cuerpo">{tx("invitacion.frase.graciasPorAcompanarnosCorto")}</p>
-            <p className="pr-dato">{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</p>
+            <p className="hb-cuerpo">{tx("invitacion.frase.graciasPorAcompanarnosCorto")}</p>
+            <p className="hb-dato">{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</p>
             <div style={{ marginTop: 22 }}>
               {livePhotos.length > 0 ? (
                 <AlbumCarousel photos={livePhotos} hideHeader={true} />
               ) : (
                 <>
-                  <p className="pr-lugar">{tx("invitacion.album.fotografico")}</p>
-                  <p className="pr-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.album.sinCapturas")}</p>
+                  <p className="hb-lugar">{tx("invitacion.album.fotografico")}</p>
+                  <p className="hb-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.album.sinCapturas")}</p>
                 </>
               )}
             </div>
@@ -712,12 +744,12 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
   }
 
   return (
-    <div className={`${prCormorant.variable} ${prJost.variable} pr-raiz`} style={varsDeTema} ref={raizRef}>
-      <style>{CSS_PRENSA}</style>
+    <div className={`${hbCormorant.variable} ${hbJost.variable} hb-raiz`} style={varsDeTema} ref={raizRef}>
+      <style>{CSS_HERBARIO}</style>
 
       {/* ── Splash (celular) ────────────────────────────────────────── */}
       {!isCoverOpen && (
-        <div className={`pr-splash ${isClosingCover ? "pr-splash--sale" : ""}`}>
+        <div className={`hb-splash ${isClosingCover ? "hb-splash--sale" : ""}`}>
           {portadaFondoAnimado && (
             <div className="acp-mobile-only">
               <AnimatedCoverPhoto
@@ -725,22 +757,23 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
                 tintColor1={PAPEL}
                 tintColor2={TINTA_SUAVE}
                 effect="enfoque"
-                scrimColorRgb="244,236,226"
+                scrimColorRgb="247,242,234"
               />
             </div>
           )}
-          <Hoja className="pr-splash-hoja">
-            <p className="pr-kicker">{saludaAlInvitado ? portadaKicker : kickerDelEvento}</p>
-            <p className="pr-splash-nombre">{guestNameDisplay}</p>
-            <div className="pr-filete-corto" aria-hidden="true" />
+          <Hoja className="hb-splash-hoja">
+            <Botanica pieza="rama-cabecera" width="36%" left="62%" top="-4%" />
+            <p className="hb-kicker">{saludaAlInvitado ? portadaKicker : kickerDelEvento}</p>
+            <p className="hb-splash-nombre">{guestNameDisplay}</p>
+            <div className="hb-filete-corto" aria-hidden="true" />
             {/* Los nombres de los novios sólo si arriba no están ya: cuando
                 el saludo es para el invitado son el dato que falta ("¿la boda
                 de quién?"); cuando el nombre grande ya es el de ellos,
                 repetirlos era escribir lo mismo dos veces. */}
-            {saludaAlInvitado && <p className="pr-dato">{nombresLinea}</p>}
-            <p className="pr-dato" style={{ color: TINTA_SUAVE }}>{fechaCorta}{ciudad ? ` · ${ciudad}` : ""}</p>
-            {Boolean(activeDressCode) && <p className="pr-kicker" style={{ marginTop: 6 }}>{tx("invitacion.ubicacion.dressCode")} {activeDressCode}</p>}
-            <button type="button" onClick={openInvitation} className="pr-btn-solido" style={{ marginTop: 26 }}>
+            {saludaAlInvitado && <p className="hb-dato">{nombresLinea}</p>}
+            <p className="hb-dato" style={{ color: TINTA_SUAVE }}>{fechaCorta}{ciudad ? ` · ${ciudad}` : ""}</p>
+            {Boolean(activeDressCode) && <p className="hb-kicker" style={{ marginTop: 6 }}>{tx("invitacion.ubicacion.dressCode")} {activeDressCode}</p>}
+            <button type="button" onClick={openInvitation} className="hb-btn-solido" style={{ marginTop: 26 }}>
               {tx("invitacion.portada.abrirInvitacion")}
             </button>
           </Hoja>
@@ -752,26 +785,26 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
         <div
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`pr-pase-burbuja ${isTicketMaximized ? "pr-pase-burbuja--abierta" : ""}`}
+          className={`hb-pase-burbuja ${isTicketMaximized ? "hb-pase-burbuja--abierta" : ""}`}
         >
           {isTicketMaximized ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 14 }}>
               <div style={{ textAlign: "left" }}>
-                <span className="pr-kicker" style={{ margin: 0, fontSize: 8 }}>{tx("invitacion.pase.pase")}</span>
+                <span className="hb-kicker" style={{ margin: 0, fontSize: 8 }}>{tx("invitacion.pase.pase")}</span>
                 <span style={{ display: "block", fontFamily: SERIF, fontWeight: 300, fontSize: 18, color: TINTA, lineHeight: 1.1 }}>{guest.name}</span>
                 {guest.mesas && guest.mesas.length > 0 && (
-                  <span className="pr-kicker" style={{ margin: "4px 0 0", fontSize: 8 }}>{guest.mesas.join(" · ")}</span>
+                  <span className="hb-kicker" style={{ margin: "4px 0 0", fontSize: 8 }}>{guest.mesas.join(" · ")}</span>
                 )}
               </div>
               <div style={{ textAlign: "right", borderLeft: `0.5px solid rgba(${SH},.34)`, paddingLeft: 12 }}>
                 <span style={{ display: "block", fontFamily: SERIF, fontWeight: 300, fontSize: 22, color: TINTA, lineHeight: 1 }}>{guest.expectedCount}</span>
-                <span className="pr-kicker" style={{ margin: 0, fontSize: 8 }}>{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
+                <span className="hb-kicker" style={{ margin: 0, fontSize: 8 }}>{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
               </div>
             </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <IconoPastilla nombre="tarjeta" />
-              <span className="pr-kicker" style={{ margin: 0 }}>{tx("invitacion.pase.pase")}</span>
+              <span className="hb-kicker" style={{ margin: 0 }}>{tx("invitacion.pase.pase")}</span>
             </div>
           )}
         </div>,
@@ -782,25 +815,26 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
         document.body
       )}
 
-      <div className="desktop-stage pr-escenario" data-theme={theme}>
-        <div className="pr-fondo" aria-hidden="true" />
+      <div className="desktop-stage hb-escenario" data-theme={theme}>
+        <div className="hb-fondo" aria-hidden="true" />
 
         {/* ── Escritorio: la hoja grande, fija a la izquierda ─────────── */}
-        <aside className="d-left hide-mobile pr-izquierda">
-          <Hoja portada className="pr-hoja-grande">
-            <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} tope={76} />
-            <p className="pr-kicker">{kickerDelEvento}</p>
-            <h1 className="pr-nombres">
+        <aside className="d-left hide-mobile hb-izquierda">
+          <Hoja portada className="hb-hoja-grande">
+            <Botanica pieza="magnolia" width="45%" left="-6%" top="14%" />
+            <Botanica pieza="rama-esquina" width="38%" right="-8%" bottom="-4%" />
+            <p className="hb-kicker">{kickerDelEvento}</p>
+            <h1 className="hb-nombres">
               <span>{nombre1}</span>
-              {nombre2 && <span className="pr-amp">&amp;</span>}
+              {nombre2 && <span className="hb-amp">&amp;</span>}
               {nombre2 && <span>{nombre2}</span>}
             </h1>
-            <div className="pr-filete-corto" aria-hidden="true" />
-            <p className="pr-dato">{fechaLarga}</p>
-            {ciudad && <p className="pr-dato">{ciudad}</p>}
-            <div className="pr-nav-escritorio">
+            <div className="hb-filete-corto" aria-hidden="true" />
+            <p className="hb-dato">{fechaLarga}</p>
+            {ciudad && <p className="hb-dato">{ciudad}</p>}
+            <div className="hb-nav-escritorio">
               <FileteConPunto ancho={220} />
-              <nav className="pr-nav-lista">
+              <nav className="hb-nav-lista">
                 {seccionesNav.map((s) => (
                   <a key={s.id} href={`#${s.id}`}>{s.n}. {s.label}</a>
                 ))}
@@ -809,26 +843,27 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
           </Hoja>
         </aside>
 
-        <div className="d-right tpl pr-derecha" ref={derechaRef}>
+        <div className="d-right tpl hb-derecha" ref={derechaRef}>
           {/* ── Portada (celular) ───────────────────────────────────── */}
-          <section className="hide-desktop pr-seccion pr-portada" data-sec="00">
-            <Hoja portada className={isCoverOpen ? "pr-portada--sube" : ""}>
+          <section className="hide-desktop hb-seccion hb-portada" data-sec="00">
+            <Hoja portada className={isCoverOpen ? "hb-portada--sube" : ""}>
+              <Botanica pieza="magnolia" width="44%" right="-26%" top="8%" />
+              <Botanica pieza="rama-esquina" width="28%" left="-9%" top="60%" />
               <Entra>
-                <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} tope={76} />
-                <p className="pr-kicker">{kickerDelEvento}</p>
+                <p className="hb-kicker">{kickerDelEvento}</p>
               </Entra>
               <Entra retraso={120}>
-                <h1 className="pr-nombres">
+                <h1 className="hb-nombres">
                   <span>{nombre1}</span>
-                  {nombre2 && <span className="pr-amp">&amp;</span>}
+                  {nombre2 && <span className="hb-amp">&amp;</span>}
                   {nombre2 && <span>{nombre2}</span>}
                 </h1>
               </Entra>
               <Entra retraso={240}>
-                <div className="pr-filete-corto" aria-hidden="true" />
-                <p className="pr-dato">{fechaLarga}</p>
-                {ciudad && <p className="pr-dato">{ciudad}</p>}
-                <AddToCalendarLink eventName={nombresLinea} targetDate={fechaEvento} location={[lugarNombre, direccion].filter(Boolean).join(", ")} className="pr-link" showIcon={false}>
+                <div className="hb-filete-corto" aria-hidden="true" />
+                <p className="hb-dato">{fechaLarga}</p>
+                {ciudad && <p className="hb-dato">{ciudad}</p>}
+                <AddToCalendarLink eventName={nombresLinea} targetDate={fechaEvento} location={[lugarNombre, direccion].filter(Boolean).join(", ")} className="hb-link" showIcon={false}>
                   {tx("invitacion.saveTheDate.agregarAlCalendario")}
                 </AddToCalendarLink>
               </Entra>
@@ -837,14 +872,14 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 01 La cuenta regresiva ─────────────────────────────── */}
           {(invitation.contadorHabilitado ?? true) ? (
-            <section className="pr-seccion" data-sec="01" id="countdown-hoja">
+            <section className="hb-seccion" data-sec="01" id="countdown-hoja">
               <Hoja>
                 <Cabecera icono="reloj" numero="01" titulo={tx("invitacion.cuentaRegresiva.kicker")} />
                 <Entra retraso={120}>
-                  <p className="pr-kicker">{tx("invitacion.cuentaRegresiva.faltan")}</p>
-                  <CuentaPrensa targetDate={fechaEvento} />
+                  <p className="hb-kicker">{tx("invitacion.cuentaRegresiva.faltan")}</p>
+                  <CuentaHerbario targetDate={fechaEvento} />
                   <FileteConPunto />
-                  <p className="pr-dato">{fechaLarga}{hora ? ` · ${hora} hs` : ""}</p>
+                  <p className="hb-dato">{fechaLarga}{hora ? ` · ${hora} hs` : ""}</p>
                 </Entra>
               </Hoja>
             </section>
@@ -852,47 +887,47 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 02 La frase (sangra, sin hoja) ─────────────────────── */}
           {frase && (
-            <SectionWrapper id="quote" delay={100} className="pr-frase-seccion">
+            <SectionWrapper id="quote" delay={100} className="hb-frase-seccion">
               <Entra>
                 <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "15%" : "16%"} />
-                <p className="pr-num">02.</p>
-                <p className="pr-frase">{frase}</p>
-                <p className="pr-script">{tx("invitacion.frase.unasPalabras")}</p>
+                <p className="hb-num">02.</p>
+                <p className="hb-frase">{frase}</p>
+                <p className="hb-script">{tx("invitacion.frase.unasPalabras")}</p>
               </Entra>
             </SectionWrapper>
           )}
 
           {/* ── 03 El evento ───────────────────────────────────────── */}
-          <SectionWrapper id="details" delay={150} className="pr-seccion" style={{ padding: 0 }}>
-            <div className="pr-seccion" data-sec="03">
+          <SectionWrapper id="details" delay={150} className="hb-seccion" style={{ padding: 0 }}>
+            <div className="hb-seccion" data-sec="03">
               <Hoja>
                 <Cabecera icono="iglesia" numero="03" titulo={tx("invitacion.ubicacion.cuandoYDonde")} />
                 <Entra retraso={120}>
                   {Boolean(invitation.ceremoniaHabilitada) && (
                     <div>
-                      <p className="pr-kicker">{String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}</p>
-                      {Boolean(invitation.ceremoniaNombre) && <p className="pr-lugar">{String(invitation.ceremoniaNombre)}</p>}
-                      <p className="pr-dato">
+                      <p className="hb-kicker">{String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}</p>
+                      {Boolean(invitation.ceremoniaNombre) && <p className="hb-lugar">{String(invitation.ceremoniaNombre)}</p>}
+                      <p className="hb-dato">
                         {Boolean(invitation.ceremoniaHora) && `${String(invitation.ceremoniaHora)} hs`}
                         {Boolean(invitation.ceremoniaHora) && Boolean(invitation.ceremoniaDireccion) && " · "}
                         {Boolean(invitation.ceremoniaDireccion) && String(invitation.ceremoniaDireccion)}
                       </p>
                       {Boolean(invitation.ceremoniaMapUrl) && (
-                        <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="pr-link">{tx("invitacion.ubicacion.comoLlegar")}</a>
+                        <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="hb-link">{tx("invitacion.ubicacion.comoLlegar")}</a>
                       )}
-                      <div className="pr-hairline" aria-hidden="true" />
+                      <div className="hb-hairline" aria-hidden="true" />
                     </div>
                   )}
                   {(lugarNombre || direccion) && (
                     <div>
-                      <p className="pr-kicker">{tx("invitacion.ubicacion.fiestaSalon")}</p>
-                      {lugarNombre && <p className="pr-lugar">{lugarNombre}</p>}
-                      <p className="pr-dato">
+                      <p className="hb-kicker">{tx("invitacion.ubicacion.fiestaSalon")}</p>
+                      {lugarNombre && <p className="hb-lugar">{lugarNombre}</p>}
+                      <p className="hb-dato">
                         {hora && `${hora} hs`}
                         {hora && direccion && " · "}
                         {direccion}
                       </p>
-                      {mapUrl && <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pr-link">{tx("invitacion.ubicacion.comoLlegar")}</a>}
+                      {mapUrl && <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="hb-link">{tx("invitacion.ubicacion.comoLlegar")}</a>}
                     </div>
                   )}
                 </Entra>
@@ -900,15 +935,15 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
                   <Entra retraso={240}>
                     {cronograma.length > 0 && (
                       <>
-                        <div className="pr-hairline" aria-hidden="true" />
-                        <p className="pr-kicker">Cronograma</p>
-                        <div className="pr-cronograma" id="schedule">
-                          <span className="pr-cronograma-eje" aria-hidden="true" />
+                        <div className="hb-hairline" aria-hidden="true" />
+                        <p className="hb-kicker">Cronograma</p>
+                        <div className="hb-cronograma" id="schedule">
+                          <span className="hb-cronograma-eje" aria-hidden="true" />
                           {cronograma.map((item, i) => (
-                            <Entra key={i} retraso={i * 120} className="pr-hito">
-                              <span className="pr-hito-hora">{item.time ?? ""}</span>
-                              <span className="pr-hito-punto" aria-hidden="true" />
-                              <span className="pr-hito-titulo">{item.title}</span>
+                            <Entra key={i} retraso={i * 120} className="hb-hito">
+                              <span className="hb-hito-hora">{item.time ?? ""}</span>
+                              <span className="hb-hito-punto" aria-hidden="true" />
+                              <span className="hb-hito-titulo">{item.title}</span>
                             </Entra>
                           ))}
                         </div>
@@ -916,9 +951,9 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
                     )}
                     {Boolean(activeDressCode) && (
                       <>
-                        <div className="pr-hairline" aria-hidden="true" />
-                        <p className="pr-kicker">{tx("invitacion.ubicacion.dressCode")}</p>
-                        <p className="pr-cuerpo">{activeDressCode}</p>
+                        <div className="hb-hairline" aria-hidden="true" />
+                        <p className="hb-kicker">{tx("invitacion.ubicacion.dressCode")}</p>
+                        <p className="hb-cuerpo">{activeDressCode}</p>
                       </>
                     )}
                   </Entra>
@@ -931,8 +966,8 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 04 El álbum ────────────────────────────────────────── */}
           {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-            <SectionWrapper id="album" delay={200} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion" data-sec="04">
+            <SectionWrapper id="album" delay={200} className="hb-seccion" style={{ padding: 0 }}>
+              <div className="hb-seccion" data-sec="04">
                 <Hoja>
                   <Cabecera icono="polaroids" numero="04" titulo={tx("invitacion.album.titulo")} />
                   <Entra retraso={120}>
@@ -945,19 +980,19 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 05 El mapa ─────────────────────────────────────────── */}
           {mapUrl && (
-            <section className="pr-seccion" data-sec="05" id="location">
+            <section className="hb-seccion" data-sec="05" id="location">
               <Hoja>
                 <Cabecera icono="auto" numero="05" titulo={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre }).replace(/^Mapa de\s*/i, "Mapa")} anchoIcono="22%" />
                 <Entra retraso={120}>
-                  <div className="pr-mapa">
+                  <div className="hb-mapa">
                     {embedMapUrl ? (
                       <iframe src={embedMapUrl} width="100%" height="100%" style={{ border: 0, display: "block" }} loading="lazy" title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })} referrerPolicy="no-referrer-when-downgrade" />
                     ) : (
-                      <span className="pr-kicker" style={{ margin: 0 }}>{tx("invitacion.ubicacion.mapaNoDisponible")}</span>
+                      <span className="hb-kicker" style={{ margin: 0 }}>{tx("invitacion.ubicacion.mapaNoDisponible")}</span>
                     )}
                   </div>
-                  <p className="pr-dato">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pr-btn-solido">{tx("invitacion.ubicacion.verMapaFiesta")}</a>
+                  <p className="hb-dato">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="hb-btn-solido">{tx("invitacion.ubicacion.verMapaFiesta")}</a>
                 </Entra>
               </Hoja>
             </section>
@@ -965,14 +1000,17 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 06 Tu confirmación ─────────────────────────────────── */}
           {rsvpEnabled && (
-            <section className="pr-seccion" data-sec="06" id="rsvp-hoja">
+            <section className="hb-seccion" data-sec="06" id="rsvp-hoja">
               <Hoja>
+                <Botanica pieza="hoja" className="hb-hoja-cae" width="24px" />
+                <Botanica pieza="hoja" className="hb-hoja-cae" width="24px" />
+                <Botanica pieza="hoja" className="hb-hoja-cae" width="24px" />
                 <Cabecera icono="tarjeta" numero="06" titulo={tx("invitacion.rsvp.confirmar")} />
                 {rsvpDias > 0 && (
                   <Entra retraso={120}>
-                    <p className="pr-kicker">{tx("invitacion.rsvp.quedan")}</p>
-                    <p className="pr-cifra">{diasParaConfirmar}</p>
-                    <p className="pr-kicker">{tx("invitacion.rsvp.diasParaConfirmar")}</p>
+                    <p className="hb-kicker">{tx("invitacion.rsvp.quedan")}</p>
+                    <p className="hb-cifra">{diasParaConfirmar}</p>
+                    <p className="hb-kicker">{tx("invitacion.rsvp.diasParaConfirmar")}</p>
                   </Entra>
                 )}
                 <Entra retraso={240}>
@@ -1011,8 +1049,8 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
           <QrDeIngreso guest={guest as never} />
 
           {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
-            <SectionWrapper id="album-2" delay={150} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion">
+            <SectionWrapper id="album-2" delay={150} className="hb-seccion" style={{ padding: 0 }}>
+              <div className="hb-seccion">
                 <Hoja>
                   <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
                 </Hoja>
@@ -1022,11 +1060,11 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── Quiz ───────────────────────────────────────────────── */}
           {triviaHabilitada && triviaPreguntas.length > 0 && (
-            <SectionWrapper id="quiz" delay={300} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion">
+            <SectionWrapper id="quiz" delay={300} className="hb-seccion" style={{ padding: 0 }}>
+              <div className="hb-seccion">
                 <Hoja>
                   <Entra>
-                    <p className="pr-kicker">{String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes"))}</p>
+                    <p className="hb-kicker">{String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes"))}</p>
                     <QuizPrensa preguntas={triviaPreguntas} invitationId={String(invitation.id ?? "")} guestToken={guest?.uniqueToken} guestName={guest?.name} />
                   </Entra>
                 </Hoja>
@@ -1036,12 +1074,12 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 07 Regalos ─────────────────────────────────────────── */}
           {showGiftSection && (
-            <SectionWrapper id="banco" delay={200} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion" data-sec="07">
+            <SectionWrapper id="banco" delay={200} className="hb-seccion" style={{ padding: 0 }}>
+              <div className="hb-seccion" data-sec="07">
                 <Hoja>
                   <Cabecera icono="sobre" numero="07" titulo={tx("invitacion.regalos.banco")} />
                   <Entra retraso={120}>
-                    {Boolean(invitation.regaloMensaje) && <p className="pr-cuerpo">{String(invitation.regaloMensaje)}</p>}
+                    {Boolean(invitation.regaloMensaje) && <p className="hb-cuerpo">{String(invitation.regaloMensaje)}</p>}
                     <div style={{ display: "grid", gap: 14 }}>
                       {pagoTarjetaHabilitado && (
                         <BankDetailsCard
@@ -1090,7 +1128,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 08 Sugerí una canción ──────────────────────────────── */}
           {songsEnabled && (
-            <section className="pr-seccion" data-sec="08" id="songs-hoja">
+            <section className="hb-seccion" data-sec="08" id="songs-hoja">
               <Hoja>
                 <Cabecera icono="nota" numero="08" titulo={tx("invitacion.musica.titulo")} anchoIcono="15%" />
                 <Entra retraso={120}>
@@ -1110,19 +1148,19 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
           )}
 
           {/* ── 09 Cierre ──────────────────────────────────────────── */}
-          <section className="pr-seccion" data-sec="09" id="cierre">
+          <section className="hb-seccion" data-sec="09" id="cierre">
             <Hoja>
+              <Botanica pieza="rama-cabecera" width="72%" left="26%" top="-3%" />
               <Entra>
-                <IconoLinea nombre="confeti" />
-                <p className="pr-num">09.</p>
-                <div className="pr-monograma">
+                <p className="hb-num">09.</p>
+                <div className="hb-monograma">
                   <svg viewBox="0 0 88 110" width="78" height="98" aria-hidden="true">
                     <ellipse cx="44" cy="55" rx="40" ry="52" fill="none" stroke="currentColor" strokeWidth=".75" />
                     <ellipse cx="44" cy="55" rx="34" ry="46" fill="none" stroke="currentColor" strokeWidth=".4" />
                   </svg>
                   <span>{monograma}</span>
                 </div>
-                <p className="pr-script">{tx("invitacion.frase.graciasPorEstar")}</p>
+                <p className="hb-script">{tx("invitacion.frase.graciasPorEstar")}</p>
               </Entra>
             </Hoja>
           </section>
@@ -1134,7 +1172,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
       </div>
 
       {isCoverOpen && (
-        <div className={`pr-pastilla ${pastillaOculta ? "pr-pastilla--oculta" : ""}`}>
+        <div className={`hb-pastilla ${pastillaOculta ? "hb-pastilla--oculta" : ""}`}>
           <BottomNavPill sections={navSections} variant="moderno" accentColor={TINTA} surfaceColor={PAPEL} inactiveColor={TINTA_SUAVE} solid />
         </div>
       )}
@@ -1152,189 +1190,204 @@ function IconoPastilla({ nombre }: { nombre: NombreDeIcono }) {
 // Todo lo que el mockup tenía como objetos de estilo. Los componentes
 // compartidos (Countdown, RSVP, canciones, álbum, pastilla) se visten desde
 // acá con selectores sobre sus ganchos, igual que hace Moderno.
-const CSS_PRENSA = `
-  .pr-raiz { position: relative; color: ${TINTA}; font-family: ${SANS}; }
-  .pr-fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+const CSS_HERBARIO = `
+  .hb-raiz { position: relative; color: ${TINTA}; font-family: ${SANS}; }
+  .hb-fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-color: ${PAPEL}; background-image: ${GRANO_PAGINA}; background-blend-mode: multiply; }
-  .pr-escenario { position: relative; z-index: 1; background: transparent !important; }
-  .pr-escenario.desktop-stage { background: transparent; }
-  .pr-derecha { background: transparent; }
-  .desktop-stage.pr-escenario .d-left.pr-izquierda { background: transparent; padding: 26px 22px; align-items: center; justify-content: center; }
-  .pr-hoja-grande { width: 94%; aspect-ratio: 301/432; padding: 34px 30px 26px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-  .pr-hoja-grande .pr-nombres { font-size: 38px; }
-  .pr-nav-escritorio { margin-top: auto; width: 100%; }
-  .pr-nav-lista { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 14px; }
-  .pr-nav-lista a { background: none; border: none; padding: 5px 2px; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; text-decoration: none; }
-  .pr-nav-lista a:hover { color: ${TINTA}; }
+  .hb-escenario { position: relative; z-index: 1; background: transparent !important; }
+  .hb-escenario.desktop-stage { background: transparent; }
+  .hb-derecha { background: transparent; }
+  .desktop-stage.hb-escenario .d-left.hb-izquierda { background: transparent; padding: 26px 22px; align-items: center; justify-content: center; }
+  .hb-hoja-grande { width: 94%; aspect-ratio: 301/432; padding: 34px 30px 26px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .hb-hoja-grande .hb-nombres { font-size: 38px; }
+  .hb-nav-escritorio { margin-top: auto; width: 100%; }
+  .hb-nav-lista { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 14px; }
+  .hb-nav-lista a { background: none; border: none; padding: 5px 2px; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; text-decoration: none; }
+  .hb-nav-lista a:hover { color: ${TINTA}; }
 
   /* La hoja */
-  .pr-hoja { position: relative; padding: 32px 26px 28px; text-align: center;
+  .hb-hoja { position: relative; padding: 32px 26px 28px; text-align: center;
     background-color: ${PAPEL}; background-image: ${GRANO_HOJA}; background-blend-mode: multiply;
     box-shadow: -1.41px 1.41px 4px rgba(${SH},.40);
     clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px)); }
-  .desktop-stage .pr-hoja { padding: 44px 54px 38px; }
-  .pr-hoja::before, .pr-hoja::after { content: ""; position: absolute; width: 26px; height: 26px; pointer-events: none; }
-  .pr-hoja::before { top: 0; right: 0; background: linear-gradient(225deg, rgba(${SH},.34), transparent); }
-  .pr-hoja::after { bottom: 0; left: 0; background: linear-gradient(45deg, rgba(${SH},.34), transparent); }
-  .pr-filete { position: absolute; inset: 14px; border: 0.5px solid rgba(${SH},.34); border-radius: 6px; pointer-events: none; }
-  .pr-hoja--portada { aspect-ratio: 301/432; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .pr-seccion { position: relative; padding: 11px 3%; }
-  .pr-portada { padding-top: 14px; }
-  .pr-portada--sube { animation: prPortadaSube .9s cubic-bezier(.22,.61,.36,1) both; }
+  .desktop-stage .hb-hoja { padding: 44px 54px 38px; }
+  .hb-hoja::before, .hb-hoja::after { content: ""; position: absolute; width: 26px; height: 26px; pointer-events: none; }
+  .hb-hoja::before { top: 0; right: 0; background: linear-gradient(225deg, rgba(${SH},.34), transparent); }
+  .hb-hoja::after { bottom: 0; left: 0; background: linear-gradient(45deg, rgba(${SH},.34), transparent); }
+  .hb-filete { position: absolute; inset: 14px; border: 0.5px solid rgba(${SH},.34); border-radius: 6px; pointer-events: none; }
+  .hb-hoja--portada { aspect-ratio: 301/432; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .hb-seccion { position: relative; padding: 11px 3%; }
+  .hb-portada { padding-top: 14px; }
+  .hb-portada--sube { animation: hbPortadaSube .9s cubic-bezier(.22,.61,.36,1) both; }
 
   /* Tipos */
-  .pr-kicker { font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin: 0 0 10px; }
-  .pr-dato { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA}; margin: 0 0 8px; }
-  .pr-cuerpo { font-family: ${SANS}; font-weight: 300; font-size: 15px; line-height: 1.75; color: ${TINTA}; margin: 0 auto 16px; max-width: 46ch; }
-  .pr-num { font-family: ${SERIF}; font-weight: 300; font-size: 26px; line-height: 1; color: ${TINTA}; margin: 0 0 8px; }
-  .pr-titulo { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.25; color: ${TINTA}; margin: 0 0 22px; display: inline-block; transform: rotate(-2.5deg); }
-  .pr-script { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.3; color: ${TINTA}; margin: 0 0 8px; display: inline-block; transform: rotate(-2.5deg); }
-  .pr-nombres { font-family: ${SERIF}; font-weight: 300; font-size: 38px; line-height: 1.12; margin: 0 0 14px; color: ${matiz(PAPEL, -4)};
-    text-shadow: var(--pr-rel); display: flex; flex-direction: column; align-items: center; }
-  .pr-amp { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.2; color: ${TINTA}; text-shadow: none; margin: 2px 0; }
-  .pr-cifra { font-family: ${SERIF}; font-weight: 300; font-size: 86px; line-height: .9; color: ${matiz(PAPEL, -4)}; text-shadow: var(--pr-rel); margin: 6px 0 8px; }
-  .pr-filete-corto { width: 38px; height: 0.5px; background: rgba(${SH},.6); margin: 14px auto 16px; }
-  .pr-hairline { height: 0.5px; background: rgba(${SH},.3); margin: 22px 0; }
-  .pr-lugar { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 26px; line-height: 1.2; color: ${TINTA}; margin: 0 0 8px; }
-  .pr-link { display: inline-flex; align-items: center; min-height: 44px; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: ${TINTA}; border-bottom: 0.5px solid rgba(${SH},.7); text-decoration: none; }
-  .pr-btn-solido { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; background: ${TINTA}; color: ${PAPEL}; border: none; font-family: ${SANS}; font-weight: 400; font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
-  .pr-btn-fantasma { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; background: transparent; color: ${TINTA}; border: 0.5px solid rgba(${SH},.5); font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; }
-  .pr-frase-seccion { position: relative; padding: 48px 8%; text-align: center; background: transparent; }
-  .desktop-stage .pr-frase-seccion { padding: 64px 8%; }
-  .pr-frase { font-family: ${SERIF}; font-weight: 300; font-style: italic; font-size: 28px; line-height: 1.35; color: ${TINTA}; margin: 0 auto 6px; max-width: 26ch; }
-  .desktop-stage .pr-frase { font-size: 34px; }
+  .hb-kicker { font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin: 0 0 10px; }
+  .hb-dato { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA}; margin: 0 0 8px; }
+  .hb-cuerpo { font-family: ${SANS}; font-weight: 300; font-size: 15px; line-height: 1.75; color: ${TINTA}; margin: 0 auto 16px; max-width: 46ch; }
+  .hb-num { font-family: ${SERIF}; font-weight: 300; font-size: 26px; line-height: 1; color: ${TINTA}; margin: 0 0 8px; }
+  .hb-titulo { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.25; color: ${TINTA}; margin: 0 0 22px; display: inline-block; transform: rotate(-2.5deg); }
+  .hb-script { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.3; color: ${TINTA}; margin: 0 0 8px; display: inline-block; transform: rotate(-2.5deg); }
+  .hb-nombres { font-family: ${SERIF}; font-weight: 300; font-size: 38px; line-height: 1.12; margin: 0 0 14px; color: ${matiz(PAPEL, -4)};
+    text-shadow: var(--hb-rel); display: flex; flex-direction: column; align-items: center; }
+  .hb-amp { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.2; color: ${TINTA}; text-shadow: none; margin: 2px 0; }
+  .hb-cifra { font-family: ${SERIF}; font-weight: 300; font-size: 86px; line-height: .9; color: ${matiz(PAPEL, -4)}; text-shadow: var(--hb-rel); margin: 6px 0 8px; }
+  .hb-filete-corto { width: 38px; height: 0.5px; background: rgba(${SH},.6); margin: 14px auto 16px; }
+  .hb-hairline { height: 0.5px; background: rgba(${SH},.3); margin: 22px 0; }
+  .hb-lugar { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 26px; line-height: 1.2; color: ${TINTA}; margin: 0 0 8px; }
+  .hb-link { display: inline-flex; align-items: center; min-height: 44px; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: ${TINTA}; border-bottom: 0.5px solid rgba(${SH},.7); text-decoration: none; }
+  .hb-btn-solido { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; background: ${TINTA}; color: ${PAPEL}; border: none; font-family: ${SANS}; font-weight: 400; font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+  .hb-btn-fantasma { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; background: transparent; color: ${TINTA}; border: 0.5px solid rgba(${SH},.5); font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; }
+  .hb-frase-seccion { position: relative; padding: 48px 8%; text-align: center; background: transparent; }
+  .desktop-stage .hb-frase-seccion { padding: 64px 8%; }
+  .hb-frase { font-family: ${SERIF}; font-weight: 300; font-style: italic; font-size: 28px; line-height: 1.35; color: ${TINTA}; margin: 0 auto 6px; max-width: 26ch; }
+  .desktop-stage .hb-frase { font-size: 34px; }
 
   /* Entrada de sección */
-  .pr-entra { opacity: 0; transform: perspective(800px) rotateY(6deg) translateY(10px); transform-origin: left center;
+  .hb-entra { opacity: 0; transform: perspective(800px) rotateY(6deg) translateY(10px); transform-origin: left center;
     transition: opacity 1.2s cubic-bezier(.22,.61,.36,1), transform .35s cubic-bezier(.22,.61,.36,1); }
-  .pr-entra--visto { opacity: 1; transform: none; }
+  .hb-entra--visto { opacity: 1; transform: none; }
 
   /* Cronograma */
-  .pr-cronograma { position: relative; text-align: left; max-width: 380px; margin: 0 auto; }
-  .pr-cronograma-eje { position: absolute; left: 74px; top: 10px; bottom: 10px; width: 0.5px; background: rgba(${SH},.45); }
-  .pr-hito { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
-  .pr-hito-hora { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; color: ${TINTA_SUAVE}; width: 62px; text-align: right; flex-shrink: 0; }
-  .pr-hito-punto { width: 3px; height: 3px; border-radius: 50%; background: ${TINTA}; flex-shrink: 0; }
-  .pr-hito-titulo { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 20px; color: ${TINTA}; }
+  .hb-cronograma { position: relative; text-align: left; max-width: 380px; margin: 0 auto; }
+  .hb-cronograma-eje { position: absolute; left: 74px; top: 10px; bottom: 10px; width: 0.5px; background: rgba(${SH},.45); }
+  .hb-hito { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+  .hb-hito-hora { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; color: ${TINTA_SUAVE}; width: 62px; text-align: right; flex-shrink: 0; }
+  .hb-hito-punto { width: 3px; height: 3px; border-radius: 50%; background: ${ACENTO}; flex-shrink: 0; }
+  .hb-hito-titulo { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 20px; color: ${TINTA}; }
 
   /* Mapa */
-  .pr-mapa { height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  .hb-mapa { height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden;
     background-color: ${PAPEL2}; background-image: repeating-linear-gradient(0deg, rgba(${SH},.12) 0 0.5px, transparent 0.5px 26px), repeating-linear-gradient(90deg, rgba(${SH},.12) 0 0.5px, transparent 0.5px 26px);
     border: 0.5px solid rgba(${SH},.34); margin-bottom: 18px; }
-  .desktop-stage .pr-mapa { height: 240px; }
+  .desktop-stage .hb-mapa { height: 240px; }
 
   /* Banco */
-  .pr-banco-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 0.5px solid rgba(${SH},.22); text-align: left; }
-  .pr-banco-clave { display: block; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin-bottom: 2px; }
-  .pr-banco-valor { display: block; font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; overflow-wrap: anywhere; }
-  .pr-hoja #banco .t-kicker, .pr-hoja h4 { font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .39em !important; text-transform: uppercase !important; color: ${TINTA_SUAVE} !important; }
+  .hb-banco-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 0.5px solid rgba(${SH},.22); text-align: left; }
+  .hb-banco-clave { display: block; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin-bottom: 2px; }
+  .hb-banco-valor { display: block; font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; overflow-wrap: anywhere; }
+  .hb-hoja #banco .t-kicker, .hb-hoja h4 { font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .39em !important; text-transform: uppercase !important; color: ${TINTA_SUAVE} !important; }
 
   /* Quiz */
-  .pr-quiz-opcion { display: block; width: 100%; max-width: 420px; margin: 0 auto 8px; min-height: 48px; padding: 12px 16px; cursor: pointer; text-align: left;
+  .hb-quiz-opcion { display: block; width: 100%; max-width: 420px; margin: 0 auto 8px; min-height: 48px; padding: 12px 16px; cursor: pointer; text-align: left;
     font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; background: transparent; border: 0.5px solid rgba(${SH},.34); transition: background .2s ease, color .2s ease; }
-  .pr-quiz-opcion[data-elegida] { background: ${TINTA}; color: ${PAPEL}; }
-  .pr-quiz-opcion:disabled { cursor: default; }
+  .hb-quiz-opcion[data-elegida] { background: ${TINTA}; color: ${PAPEL}; }
+  .hb-quiz-opcion:disabled { cursor: default; }
+
+  /* Las tres hojas que caen cuando se confirma: entran desde arriba, con
+     120 ms de diferencia entre una y otra, y se quedan. Quietas hasta que
+     el RSVP muestra su bloque de confirmado, que es el único [role=status]
+     con aria-live: así no caen cuando alguien avisa que no viene. */
+  @keyframes hbCae1 { from { transform: translateY(-120px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes hbCae2 { from { transform: translateY(-150px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes hbCae3 { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .hb-hoja-cae { top: 0; opacity: 0; z-index: 1; }
+  .hb-seccion:has([role="status"][aria-live="polite"]) .hb-hoja-cae:nth-of-type(1) { left: 18%; animation: hbCae1 .9s cubic-bezier(.22,.61,.36,1) both; }
+  .hb-seccion:has([role="status"][aria-live="polite"]) .hb-hoja-cae:nth-of-type(2) { left: 48%; top: 8px; animation: hbCae2 .9s cubic-bezier(.22,.61,.36,1) .12s both; }
+  .hb-seccion:has([role="status"][aria-live="polite"]) .hb-hoja-cae:nth-of-type(3) { left: 74%; top: 2px; animation: hbCae3 .9s cubic-bezier(.22,.61,.36,1) .24s both; }
 
   /* Monograma */
-  .pr-monograma { position: relative; width: 78px; height: 98px; display: flex; align-items: center; justify-content: center; margin: 6px auto 18px; }
-  .pr-monograma svg { position: absolute; inset: 0; color: rgba(${SH},.7); }
-  .pr-monograma span { position: relative; font-family: ${SERIF}; font-weight: 300; font-size: 22px; letter-spacing: .18em; color: ${TINTA}; }
+  .hb-monograma { position: relative; width: 78px; height: 98px; display: flex; align-items: center; justify-content: center; margin: 6px auto 18px; }
+  .hb-monograma svg { position: absolute; inset: 0; color: rgba(${SH},.7); }
+  .hb-monograma span { position: relative; font-family: ${SERIF}; font-weight: 300; font-size: 22px; letter-spacing: .18em; color: ${TINTA}; }
 
   /* Splash */
-  .pr-splash { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 16px 3%;
+  .hb-splash { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 16px 3%;
     background-color: ${PAPEL}; background-image: ${GRANO_PAGINA}; background-blend-mode: multiply; }
-  .pr-splash--sale { animation: prSplashSale .9s ease both; }
-  .pr-splash-hoja { position: relative; width: 100%; max-width: 340px; aspect-ratio: 301/432; padding: 40px 28px 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .pr-splash-nombre { font-family: ${SCRIPT}; font-weight: 400; font-size: 56px; line-height: 1.06; color: ${TINTA}; margin: 2px 0 4px; }
-  @keyframes prSplashSale { from { opacity: 1; } to { opacity: 0; } }
-  @keyframes prPortadaSube { from { transform: translateY(24px); } to { transform: translateY(0); } }
-  @keyframes prPrensado { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .hb-splash--sale { animation: hbSplashSale .9s ease both; }
+  .hb-splash-hoja { position: relative; width: 100%; max-width: 340px; aspect-ratio: 301/432; padding: 40px 28px 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .hb-splash-nombre { font-family: ${SCRIPT}; font-weight: 400; font-size: 56px; line-height: 1.06; color: ${TINTA}; margin: 2px 0 4px; }
+  @keyframes hbSplashSale { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes hbPortadaSube { from { transform: translateY(24px); } to { transform: translateY(0); } }
+  @keyframes hbPrensado { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
   /* Pase (burbuja arriba) */
-  .pr-pase-burbuja { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 99999; cursor: pointer; padding: 8px 14px;
+  .hb-pase-burbuja { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 99999; cursor: pointer; padding: 8px 14px;
     background-color: ${PAPEL}; background-image: ${GRANO_HOJA}; background-blend-mode: multiply; border: 0.5px solid rgba(${SH},.34); box-shadow: -1.41px 1.41px 8px rgba(${SH},.34); transition: all .5s ease; }
-  .pr-pase-burbuja--abierta { width: calc(100% - 32px); max-width: 360px; padding: 12px 16px; }
+  .hb-pase-burbuja--abierta { width: calc(100% - 32px); max-width: 360px; padding: 12px 16px; }
 
   /* Pastilla inferior */
-  .pr-pastilla { transition: opacity .35s ease, transform .35s cubic-bezier(.22,.61,.36,1); }
-  .pr-pastilla--oculta { opacity: 0; transform: translateY(26px); transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1); pointer-events: none; }
-  .pr-raiz .bottom-nav, .desktop-stage.pr-escenario .bottom-nav { border-radius: 0 !important; background: ${PAPEL} !important; border: 0.5px solid rgba(${SH},.28) !important;
+  .hb-pastilla { transition: opacity .35s ease, transform .35s cubic-bezier(.22,.61,.36,1); }
+  .hb-pastilla--oculta { opacity: 0; transform: translateY(26px); transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1); pointer-events: none; }
+  .hb-raiz .bottom-nav, .desktop-stage.hb-escenario .bottom-nav { border-radius: 0 !important; background: ${PAPEL} !important; border: 0.5px solid rgba(${SH},.28) !important;
     box-shadow: -1.41px 1.41px 8px rgba(${SH},.34) !important; backdrop-filter: none !important; padding: 5px !important; gap: 2px !important; }
-  .pr-raiz .bottom-nav a { color: ${TINTA} !important; opacity: .55 !important; min-height: 48px; }
-  .pr-raiz .bottom-nav a[aria-current="true"] { opacity: 1 !important; background: ${PAPEL2}; }
+  .hb-raiz .bottom-nav a { color: ${TINTA} !important; opacity: .55 !important; min-height: 48px; }
+  .hb-raiz .bottom-nav a[aria-current="true"] { opacity: 1 !important; background: ${PAPEL2}; }
 
   /* Componentes compartidos vestidos con el registro */
-  .pr-raiz .tpl h2, .pr-raiz .tpl h3, .pr-raiz .tpl h4 { font-family: ${SERIF}; color: ${TINTA}; }
+  .hb-raiz .tpl h2, .hb-raiz .tpl h3, .hb-raiz .tpl h4 { font-family: ${SERIF}; color: ${TINTA}; }
   /* La script tiene que ganarle a la regla de arriba y a la tipografía que
      el anfitrión elige en el wizard (--font-title): los títulos de sección,
      el &, la frase de cierre y el nombre del splash van SIEMPRE en Final
      Parade, es la firma de la colección. */
-  .pr-raiz .pr-titulo, .pr-raiz .tpl h3.pr-titulo, .pr-raiz .pr-script, .pr-raiz .pr-amp, .pr-raiz .pr-splash-nombre, .pr-raiz .pr-sinonimo { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-style: normal !important; }
-  .pr-raiz .tpl .t-kicker, .pr-raiz .tpl p.kicker { font-family: ${SANS} !important; color: ${TINTA_SUAVE} !important; font-size: 10px !important; font-weight: 400 !important; letter-spacing: .39em !important; text-transform: uppercase !important; display: block; }
-  .pr-raiz .tpl .t-kicker::before, .pr-raiz .tpl p.kicker::before { display: none !important; }
-  .pr-raiz .tpl div:not(#countdown div), .pr-raiz .tpl section, .pr-raiz .tpl button, .pr-raiz .tpl input, .pr-raiz .tpl iframe, .pr-raiz .tpl .t-btn, .pr-raiz .tpl .album-btn { border-radius: 0 !important; }
-  .pr-raiz .tpl .album-item { border-radius: 0 !important; box-shadow: -1.41px 1.41px 4px rgba(${SH},.40); border: 10px solid ${PAPEL}; border-bottom-width: 26px; background-color: ${PAPEL}; }
-  .pr-raiz .tpl .album-btn { color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; background: transparent !important; }
-  .pr-raiz .tpl .cascade-frame { box-shadow: -1.41px 1.41px 4px rgba(${SH},.40) !important; background: ${PAPEL} !important; }
+  .hb-raiz .hb-titulo, .hb-raiz .tpl h3.hb-titulo, .hb-raiz .hb-script, .hb-raiz .hb-amp, .hb-raiz .hb-splash-nombre, .hb-raiz .hb-sinonimo { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-style: normal !important; }
+  .hb-raiz .tpl .t-kicker, .hb-raiz .tpl p.kicker { font-family: ${SANS} !important; color: ${TINTA_SUAVE} !important; font-size: 10px !important; font-weight: 400 !important; letter-spacing: .39em !important; text-transform: uppercase !important; display: block; }
+  .hb-raiz .tpl .t-kicker::before, .hb-raiz .tpl p.kicker::before { display: none !important; }
+  .hb-raiz .tpl div:not(#countdown div), .hb-raiz .tpl section, .hb-raiz .tpl button, .hb-raiz .tpl input, .hb-raiz .tpl iframe, .hb-raiz .tpl .t-btn, .hb-raiz .tpl .album-btn { border-radius: 0 !important; }
+  .hb-raiz .tpl .album-item { border-radius: 0 !important; box-shadow: -1.41px 1.41px 4px rgba(${SH},.40); border: 10px solid ${PAPEL}; border-bottom-width: 26px; background-color: ${PAPEL}; }
+  .hb-raiz .tpl .album-btn { color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; background: transparent !important; }
+  .hb-raiz .tpl .cascade-frame { box-shadow: -1.41px 1.41px 4px rgba(${SH},.40) !important; background: ${PAPEL} !important; }
 
-  /* La cuenta regresiva de la colección: cifras prensadas y filetes, nada más. */
-  .pr-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); align-items: end; max-width: 400px; margin: 2px auto 4px; }
-  .pr-cuenta-celda { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 2px 2px 0; }
-  .pr-cuenta-celda + .pr-cuenta-celda { border-left: 0.5px solid rgba(${SH},.30); }
-  .pr-cuenta-num { font-family: ${SERIF}; font-weight: 300; font-size: clamp(32px, 10vw, 46px); line-height: .92; color: ${matiz(PAPEL, -4)}; text-shadow: var(--pr-rel); font-variant-numeric: tabular-nums; }
-  .pr-cuenta-etq { font-family: ${SANS}; font-weight: 400; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA_SUAVE}; white-space: nowrap; }
-  .desktop-stage .pr-cuenta-num { font-size: 46px; }
-  .pr-cuenta-aviso { text-align: center; }
+  /* La cuenta regresiva de Herbario: los días en grande, el resto al lado. */
+  .hb-cuenta { display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; margin: 4px auto 20px; }
+  .hb-cuenta-dias { text-align: center; display: flex; flex-direction: column; gap: 6px; }
+  .hb-cuenta-divisor { width: 0.5px; height: 112px; background: rgba(${SH},.45); }
+  .hb-cuenta-lado { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+  .hb-cuenta-fila { display: flex; align-items: baseline; gap: 9px; }
+  .hb-cuenta-regla { display: block; width: 92px; height: 0.5px; background: rgba(${SH},.3); margin: 8px 0; }
+  .hb-cuenta-num { font-family: ${SERIF}; font-weight: 300; font-size: 30px; line-height: 1; color: ${TINTA}; min-width: 44px; font-variant-numeric: tabular-nums; }
+  .hb-cuenta-etq { font-family: ${SANS}; font-weight: 400; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA_SUAVE}; white-space: nowrap; }
+  .desktop-stage .hb-cuenta-num { font-size: 46px; }
+  .hb-cuenta-aviso { text-align: center; }
 
   /* Sin íconos prestados: los componentes compartidos traen los suyos (una
      nota musical, un tilde, una cama) y al lado del ícono de línea de la
      cabecera quedaban dos dibujos distintos diciendo lo mismo en la misma
      sección. El juego de línea de la colección es el único que se ve. */
-  .pr-raiz #songs svg.lucide, .pr-raiz #rsvp svg.lucide, .pr-raiz .ia-icon-box svg.lucide { display: none !important; }
-  .pr-raiz .ia-icon-box { display: none !important; }
+  .hb-raiz #songs svg.lucide, .hb-raiz #rsvp svg.lucide, .hb-raiz .ia-icon-box svg.lucide { display: none !important; }
+  .hb-raiz .ia-icon-box { display: none !important; }
 
-  .pr-raiz #rsvp.section.dark { background: transparent !important; color: ${TINTA} !important; border: none !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; }
-  .pr-raiz #rsvp.section.dark > p.t-kicker, .pr-raiz #rsvp.section.dark > h2, .pr-raiz #rsvp.section.dark > .d-rsvp-grid { width: 100% !important; max-width: 420px !important; text-align: left !important; }
-  .pr-raiz #rsvp.section.dark h2 { display: none !important; }
-  .pr-raiz #rsvp.section.dark b, .pr-raiz #rsvp.section.dark strong { color: ${TINTA} !important; }
-  .pr-raiz #rsvp.section.dark label { text-transform: uppercase !important; font-size: 10px !important; font-family: ${SANS} !important; letter-spacing: .39em !important; color: ${TINTA_SUAVE} !important; font-weight: 400 !important; }
-  .pr-raiz #rsvp.section.dark input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; padding: 12px 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; min-height: 48px; }
-  .pr-raiz #rsvp.section.dark input::placeholder { color: ${TINTA_SUAVE} !important; opacity: .8 !important; }
-  .pr-raiz #rsvp.section.dark .t-btn { border-radius: 0 !important; min-height: 48px; padding: 0 22px !important; flex: 1 !important; min-width: 130px !important; background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; font-family: ${SANS} !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: .24em !important; font-size: 11.5px !important; }
-  .pr-raiz #rsvp.section.dark .t-btn.solid, .pr-raiz #rsvp.section.dark button[data-rsvp="confirmar"] { background: ${TINTA} !important; color: ${PAPEL} !important; border-color: ${TINTA} !important; }
-  .pr-raiz #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) { flex-direction: row !important; gap: 12px !important; }
-  .pr-raiz .tpl .d-rsvp-grid { display: flex !important; flex-direction: column !important; gap: 24px !important; align-items: flex-start !important; }
-  .pr-raiz .tpl .d-rsvp-grid > div { width: 100% !important; }
-  .pr-raiz #rsvp.section.dark .t-detail { background: transparent !important; border: none !important; border-top: 0.5px solid rgba(${SH},.3) !important; padding: 16px 0 0 !important; text-align: left !important; box-shadow: none !important; width: 100% !important; }
-  .pr-raiz #rsvp.section.dark .t-detail h4 { color: ${TINTA_SUAVE} !important; font-family: ${SANS} !important; text-transform: uppercase !important; font-size: 10px !important; letter-spacing: .39em !important; font-weight: 400 !important; margin-bottom: 6px !important; }
-  .pr-raiz #rsvp.section.dark .t-detail p { color: ${TINTA} !important; font-size: 14px !important; }
-  .pr-raiz #rsvp.section.dark .t-detail p b { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 26px !important; color: ${TINTA} !important; }
+  .hb-raiz #rsvp.section.dark { background: transparent !important; color: ${TINTA} !important; border: none !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; }
+  .hb-raiz #rsvp.section.dark > p.t-kicker, .hb-raiz #rsvp.section.dark > h2, .hb-raiz #rsvp.section.dark > .d-rsvp-grid { width: 100% !important; max-width: 420px !important; text-align: left !important; }
+  .hb-raiz #rsvp.section.dark h2 { display: none !important; }
+  .hb-raiz #rsvp.section.dark b, .hb-raiz #rsvp.section.dark strong { color: ${TINTA} !important; }
+  .hb-raiz #rsvp.section.dark label { text-transform: uppercase !important; font-size: 10px !important; font-family: ${SANS} !important; letter-spacing: .39em !important; color: ${TINTA_SUAVE} !important; font-weight: 400 !important; }
+  .hb-raiz #rsvp.section.dark input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; padding: 12px 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; min-height: 48px; }
+  .hb-raiz #rsvp.section.dark input::placeholder { color: ${TINTA_SUAVE} !important; opacity: .8 !important; }
+  .hb-raiz #rsvp.section.dark .t-btn { border-radius: 0 !important; min-height: 48px; padding: 0 22px !important; flex: 1 !important; min-width: 130px !important; background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; font-family: ${SANS} !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: .24em !important; font-size: 11.5px !important; }
+  .hb-raiz #rsvp.section.dark .t-btn.solid, .hb-raiz #rsvp.section.dark button[data-rsvp="confirmar"] { background: ${TINTA} !important; color: ${PAPEL} !important; border-color: ${TINTA} !important; }
+  .hb-raiz #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) { flex-direction: row !important; gap: 12px !important; }
+  .hb-raiz .tpl .d-rsvp-grid { display: flex !important; flex-direction: column !important; gap: 24px !important; align-items: flex-start !important; }
+  .hb-raiz .tpl .d-rsvp-grid > div { width: 100% !important; }
+  .hb-raiz #rsvp.section.dark .t-detail { background: transparent !important; border: none !important; border-top: 0.5px solid rgba(${SH},.3) !important; padding: 16px 0 0 !important; text-align: left !important; box-shadow: none !important; width: 100% !important; }
+  .hb-raiz #rsvp.section.dark .t-detail h4 { color: ${TINTA_SUAVE} !important; font-family: ${SANS} !important; text-transform: uppercase !important; font-size: 10px !important; letter-spacing: .39em !important; font-weight: 400 !important; margin-bottom: 6px !important; }
+  .hb-raiz #rsvp.section.dark .t-detail p { color: ${TINTA} !important; font-size: 14px !important; }
+  .hb-raiz #rsvp.section.dark .t-detail p b { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 26px !important; color: ${TINTA} !important; }
   /* CONFIRMADO en relieve hueco: prensado hacia adentro, creciendo de .96 a 1. */
-  .pr-raiz #rsvp.section.dark [class*="confirm"] h3, .pr-raiz #rsvp.section.dark h3 { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 44px !important; line-height: 1 !important; letter-spacing: .04em !important; color: ${matiz(PAPEL, 3)} !important;
-    text-shadow: 0 -1px 0 rgba(255,255,255,.90), 0 1px 1px rgba(${SH},.50), 0 2px 3px rgba(${SH},.12); animation: prPrensado .5s cubic-bezier(.22,.61,.36,1) both; }
+  .hb-raiz #rsvp.section.dark [class*="confirm"] h3, .hb-raiz #rsvp.section.dark h3 { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 44px !important; line-height: 1 !important; letter-spacing: .04em !important; color: ${matiz(PAPEL, 3)} !important;
+    text-shadow: 0 -1px 0 rgba(255,255,255,.90), 0 1px 1px rgba(${SH},.50), 0 2px 3px rgba(${SH},.12); animation: hbPrensado .5s cubic-bezier(.22,.61,.36,1) both; }
 
-  .pr-raiz #songs.d-sec.dark, .pr-raiz #songs { background: transparent !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; color: ${TINTA}; }
-  .pr-raiz #songs > p.t-kicker, .pr-raiz #songs > form, .pr-raiz #songs > div { width: 100% !important; max-width: 420px !important; text-align: left !important; }
-  .pr-raiz #songs h2, .pr-raiz #songs p:not(.t-kicker) { font-family: ${SANS}; color: ${TINTA}; }
-  .pr-raiz #songs .mod-input-row { display: flex !important; flex-direction: column !important; gap: 0 !important; width: 100% !important; }
-  .pr-raiz #songs input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; min-height: 48px; padding: 0 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; }
-  .pr-raiz #songs button[type="submit"], .pr-raiz #songs .t-btn { background: ${TINTA} !important; color: ${PAPEL} !important; border: none !important; border-radius: 0 !important; min-height: 48px; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 11.5px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
-  .pr-raiz #songs .mod-item, .pr-raiz #songs li { background: transparent !important; border: none !important; border-bottom: 0.5px solid rgba(${SH},.22) !important; border-radius: 0 !important; }
+  .hb-raiz #songs.d-sec.dark, .hb-raiz #songs { background: transparent !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; color: ${TINTA}; }
+  .hb-raiz #songs > p.t-kicker, .hb-raiz #songs > form, .hb-raiz #songs > div { width: 100% !important; max-width: 420px !important; text-align: left !important; }
+  .hb-raiz #songs h2, .hb-raiz #songs p:not(.t-kicker) { font-family: ${SANS}; color: ${TINTA}; }
+  .hb-raiz #songs .mod-input-row { display: flex !important; flex-direction: column !important; gap: 0 !important; width: 100% !important; }
+  .hb-raiz #songs input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; min-height: 48px; padding: 0 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; }
+  .hb-raiz #songs button[type="submit"], .hb-raiz #songs .t-btn { background: ${TINTA} !important; color: ${PAPEL} !important; border: none !important; border-radius: 0 !important; min-height: 48px; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 11.5px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
+  .hb-raiz #songs .mod-item, .hb-raiz #songs li { background: transparent !important; border: none !important; border-bottom: 0.5px solid rgba(${SH},.22) !important; border-radius: 0 !important; }
 
-  .pr-raiz #info-adicional { background: transparent !important; }
-  .pr-raiz #ia-trigger-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; letter-spacing: .24em !important; text-transform: uppercase !important; font-size: 11px !important; }
+  .hb-raiz #info-adicional { background: transparent !important; }
+  .hb-raiz #ia-trigger-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; letter-spacing: .24em !important; text-transform: uppercase !important; font-size: 11px !important; }
 
-  .pr-raiz .copy-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
-  .pr-raiz .copy-btn.copied { background: ${TINTA} !important; color: ${PAPEL} !important; }
+  .hb-raiz .copy-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
+  .hb-raiz .copy-btn.copied { background: ${TINTA} !important; color: ${PAPEL} !important; }
 
   /* Post-evento */
-  .pr-post { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 48px 3% 24px; min-height: 100dvh; display: flex; align-items: center; }
-  .pr-post-hoja { width: 100%; padding: 44px 30px 38px; }
-  .pr-sinonimo { font-family: ${SCRIPT}; font-weight: 400; font-style: normal; color: ${TINTA}; text-shadow: none; }
+  .hb-post { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 48px 3% 24px; min-height: 100dvh; display: flex; align-items: center; }
+  .hb-post-hoja { width: 100%; padding: 44px 30px 38px; }
+  .hb-sinonimo { font-family: ${SCRIPT}; font-weight: 400; font-style: normal; color: ${TINTA}; text-shadow: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    .pr-entra { opacity: 1; transform: none; transition: none; }
-    .pr-splash--sale, .pr-portada--sube { animation: none; }
-    .pr-pastilla, .pr-pastilla--oculta { transition: none; opacity: 1; transform: none; pointer-events: auto; }
+    .hb-entra { opacity: 1; transform: none; transition: none; }
+    .hb-splash--sale, .hb-portada--sube { animation: none; }
+    .hb-pastilla, .hb-pastilla--oculta { transition: none; opacity: 1; transform: none; pointer-events: auto; }
   }
 `;

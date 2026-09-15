@@ -1,35 +1,27 @@
 "use client";
 
 /**
- * PrensaTemplate.tsx — Colección Paper · Papel Prensado · Familia 01 "Prensa"
- * Variante: Lino (base). Las otras cuatro (Hueso, Arena, Piedra, Humo) se
- * generan con scripts/gen-papel-prensado-variants.js y cambian SOLO el tono
- * del papel: la tinta (#514842 / #8A756D) y la sombra son las mismas en las
- * cinco a propósito, porque la colección es monocroma. Si una auditoría de
- * acentos duplicados (guía §3.6) marca estas cinco, no es un bug.
+ * LumbreTemplateTostado.tsx — Colección Paper · Papel Prensado · Familia 06 "Lumbre"
+ * Variante: Tostado (generada por scripts/gen-papel-prensado-variants.js, no editar a mano). Las otras cuatro (Tostado, Arcilla, Ceniza, Sombra)
+ * se generan con scripts/gen-papel-prensado-variants.js.
  *
- * Portado desde mockup/Paper/Prensa - Panoramica.dc.html, siguiendo sus
- * notas de port: base ModernoTemplate (mecanismo Flat, 9 secciones), los
- * componentes compartidos de v2/ (Countdown, RSVPWizardV2, BottomNavPill,
- * SongSuggestion, Album, ProgressiveQuiz, SectionWrapper) vestidos con el
- * registro de la colección, y nada más que CSS + SVG + doce íconos de línea
- * como máscara. Cero fotos propias.
+ * GENERADO por scripts/derivar-lumbre.js a partir de PrensaTemplate.tsx —
+ * no editar a mano: lo que sea del registro se arregla en Prensa y se vuelve
+ * a derivar; lo que sea de Lumbre se cambia en el script.
  *
- * El registro de Papel Prensado, que este archivo tiene que respetar y que
- * comparten Noche, Lumbre, Herbario y Trazo:
- *  - Hoja 301:432 con grano (feTurbulence en data URI), esquinas plegadas
- *    (clip-path + dos gradientes) y filete a 14 px.
- *  - Relieve: la tinta de los nombres y de los números grandes es el papel
- *    apenas oscurecido con una sombra clara y una oscura; la luz viene de
- *    arriba a la derecha (−135°) y gira ±3° con el scroll (sin(scrollY/260)).
- *  - Entrada de sección: opacity 0→1 en 1200 ms junto con
- *    perspective(800px) rotateY(6deg) translateY(10px) → 0 en 350 ms,
- *    IntersectionObserver al 15 %, una sola vez, stagger 120 ms por bloque.
- *  - Splash quieto: la hoja se desvanece 900 ms y la portada sube 24 px.
- *  - Pastilla inferior con íconos de línea que se repliega al scrollear
- *    (300 ms) y vuelve 370 ms después de frenar.
- *  - CONFIRMADO en relieve hueco. Sin sello, sin color, sin confeti.
- *  - Ornamento quieto: cero rotación, cero parallax, cero brillos.
+ * Portado desde mockup/Paper/Lumbre - Panoramica.dc.html. Es la misma
+ * imprenta que Prensa -- hoja con grano, relieve que gira con el scroll,
+ * entrada de sección, pastilla que se repliega, CONFIRMADO hueco -- con dos
+ * diferencias, que son toda la familia:
+ *
+ *  - EL PAPEL ES MÁS OSCURO Y MÁS CÁLIDO (topo #E9DFD3, tinta #3A322B). La
+ *    colección sigue siendo monocroma: las cinco variantes cambian el tono
+ *    del papel y nada más.
+ *  - LA PORTADA ES A SANGRE: la foto del anfitrión ocupa la pantalla entera,
+ *    con un velo de legibilidad que va de rgba(28,24,20,.15) arriba a .78
+ *    abajo, y los nombres en Final Parade en blanco sobre ella. Sin foto
+ *    cargada el velo cae sobre el papel prensado, así que la portada sigue
+ *    siendo una portada y no un rectángulo vacío.
  */
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -59,39 +51,39 @@ import { useTextos } from "@/components/i18n/ProveedorIdioma";
 // Cormorant Garamond 300 para nombres, cifras y numeración; Jost 300/400 para
 // kickers, datos y texto corrido. La script (Final Parade) es del repo y llega
 // por var(--font-final-parade) desde layout.tsx: no se pide a Google.
-const prCormorant = Cormorant_Garamond({
+const luCormorant = Cormorant_Garamond({
   subsets: ["latin"],
   preload: false,
   style: ["normal", "italic"],
   weight: ["300", "400"],
-  variable: "--pr-cormorant",
+  variable: "--lu-cormorant",
   display: "swap",
 });
-const prJost = Jost({
+const luJost = Jost({
   subsets: ["latin"],
   preload: false,
   weight: ["300", "400", "500"],
-  variable: "--pr-jost",
+  variable: "--lu-jost",
   display: "swap",
 });
 
 // ─── Paleta ─────────────────────────────────────────────────────────────────
 // Lo único que cambia por variante es el par de papeles. El generador
 // reemplaza estos dos hex y el nombre del identificador; todo lo demás queda.
-const PAPEL = "#F4ECE2";
-const PAPEL2 = "#EFE5D9";
-const TINTA = "#514842";
-const TINTA_SUAVE = "#8A756D";
+const PAPEL = "#EFE6DA";
+const PAPEL2 = "#E7DCCE";
+const TINTA = "#3A322B";
+const TINTA_SUAVE = "#857868";
 /** rgb de la sombra: se usa en todos los rgba() del registro. */
-const SH = "120,103,86";
+const SH = "104,88,70";
 
 // Las tres caras son parte del diseño y no se cambian desde el wizard (a
 // diferencia de las Flat de siempre, que leen --font-title/--font-body-custom):
 // el relieve está calibrado para Cormorant 300 y la firma de la colección es
 // la script. Por eso el paso de Tipografía no aparece para Paper (ver
 // wizard-steps-config.ts).
-const SERIF = "var(--pr-cormorant), 'Cormorant Garamond', serif";
-const SANS = "var(--pr-jost), 'Jost', sans-serif";
+const SERIF = "var(--lu-cormorant), 'Cormorant Garamond', serif";
+const SANS = "var(--lu-jost), 'Jost', sans-serif";
 const SCRIPT = "var(--font-final-parade, 'Final Parade Script'), cursive";
 
 // ─── Piezas ─────────────────────────────────────────────────────────────────
@@ -170,7 +162,7 @@ function safeJson<T>(val: string | null | undefined, fallback: T): T {
   try { return JSON.parse(val) as T; } catch { return fallback; }
 }
 
-interface PrensaTemplateProps {
+interface LumbreTemplateTostadoProps {
   invitation: Record<string, unknown>;
   guest?: {
     id: string;
@@ -204,7 +196,7 @@ function temaDe(tipo: string): Theme {
 /** Un bloque que entra con el gesto de la colección. `retraso` en ms. */
 function Entra({ children, retraso = 0, style, className }: { children: React.ReactNode; retraso?: number; style?: React.CSSProperties; className?: string }) {
   return (
-    <div data-pr-reveal="1" data-pr-retraso={retraso} className={`pr-entra ${className ?? ""}`} style={style}>
+    <div data-lu-reveal="1" data-lu-retraso={retraso} className={`lu-entra ${className ?? ""}`} style={style}>
       {children}
     </div>
   );
@@ -213,8 +205,8 @@ function Entra({ children, retraso = 0, style, className }: { children: React.Re
 /** Una hoja de papel prensado: grano, sombra, esquinas plegadas y filete. */
 function Hoja({ children, className, style, portada = false }: { children: React.ReactNode; className?: string; style?: React.CSSProperties; portada?: boolean }) {
   return (
-    <div className={`pr-hoja ${portada ? "pr-hoja--portada" : ""} ${className ?? ""}`} style={style}>
-      <div className="pr-filete" aria-hidden="true" />
+    <div className={`lu-hoja ${portada ? "lu-hoja--portada" : ""} ${className ?? ""}`} style={style}>
+      <div className="lu-filete" aria-hidden="true" />
       {children}
     </div>
   );
@@ -225,8 +217,8 @@ function Cabecera({ icono, numero, titulo, anchoIcono, topeIcono }: { icono: Nom
   return (
     <Entra>
       <IconoLinea nombre={icono} ancho={anchoIcono} tope={topeIcono} />
-      <p className="pr-num">{numero}.</p>
-      <h3 className="pr-titulo">{titulo}</h3>
+      <p className="lu-num">{numero}.</p>
+      <h3 className="lu-titulo">{titulo}</h3>
     </Entra>
   );
 }
@@ -253,17 +245,17 @@ function CuentaPrensa({ targetDate }: { targetDate: Date }) {
 
   if (isEventDay || (!isPast && enCero)) {
     return (
-      <div id="countdown" className="pr-cuenta-aviso">
-        <p className="pr-script">{tx("invitacion.cuentaRegresiva.llegoElDia")}</p>
-        <p className="pr-cuerpo" style={{ marginBottom: 0 }}>{tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}</p>
+      <div id="countdown" className="lu-cuenta-aviso">
+        <p className="lu-script">{tx("invitacion.cuentaRegresiva.llegoElDia")}</p>
+        <p className="lu-cuerpo" style={{ marginBottom: 0 }}>{tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}</p>
       </div>
     );
   }
 
   if (hasEnded || isPast) {
     return (
-      <div id="countdown" className="pr-cuenta-aviso">
-        <p className="pr-script">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
+      <div id="countdown" className="lu-cuenta-aviso">
+        <p className="lu-script">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
       </div>
     );
   }
@@ -276,11 +268,11 @@ function CuentaPrensa({ targetDate }: { targetDate: Date }) {
   ];
 
   return (
-    <div id="countdown" className="pr-cuenta">
+    <div id="countdown" className="lu-cuenta">
       {celdas.map((c) => (
-        <div key={c.l} className="pr-cuenta-celda">
-          <span className="pr-cuenta-num">{c.v}</span>
-          <span className="pr-cuenta-etq">{c.l}</span>
+        <div key={c.l} className="lu-cuenta-celda">
+          <span className="lu-cuenta-num">{c.v}</span>
+          <span className="lu-cuenta-etq">{c.l}</span>
         </div>
       ))}
     </div>
@@ -308,12 +300,12 @@ function CopyField({ label, value }: { label: string; value: string }) {
     });
   };
   return (
-    <div className="pr-banco-fila">
+    <div className="lu-banco-fila">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="pr-banco-clave">{label}</span>
-        <span className="pr-banco-valor">{value}</span>
+        <span className="lu-banco-clave">{label}</span>
+        <span className="lu-banco-valor">{value}</span>
       </div>
-      <button className={`copy-btn pr-btn-fantasma ${copied ? "copied" : ""}`} type="button" onClick={handle} style={{ minHeight: 40, padding: "0 14px" }}>
+      <button className={`copy-btn lu-btn-fantasma ${copied ? "copied" : ""}`} type="button" onClick={handle} style={{ minHeight: 40, padding: "0 14px" }}>
         {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
@@ -322,10 +314,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="pr-banco-fila">
+    <div className="lu-banco-fila">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="pr-banco-clave">{label}</span>
-        <span className="pr-banco-valor">{value}</span>
+        <span className="lu-banco-clave">{label}</span>
+        <span className="lu-banco-valor">{value}</span>
       </div>
     </div>
   );
@@ -404,13 +396,13 @@ function QuizPrensa({ preguntas, invitationId, guestToken, guestName }: { pregun
     preguntas.forEach((q, i) => { if (picks[i] === q.respuestaCorrecta) score++; });
     return (
       <div style={{ textAlign: "center" }}>
-        <p className="pr-lugar">{tx("invitacion.quiz.juegoCompletado")}</p>
-        <p className="pr-dato">{score} / {preguntas.length}</p>
+        <p className="lu-lugar">{tx("invitacion.quiz.juegoCompletado")}</p>
+        <p className="lu-dato">{score} / {preguntas.length}</p>
         {isSaving ? (
-          <p className="pr-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.quiz.guardandoResultados")}</p>
+          <p className="lu-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.quiz.guardandoResultados")}</p>
         ) : (
           stats && stats.count > 0 && (
-            <p className="pr-cuerpo" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: TINTA_SUAVE }}>
+            <p className="lu-cuerpo" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: TINTA_SUAVE }}>
               <span>{tx("invitacion.quiz.promedioGlobal", { n: stats.count })} <strong style={{ color: TINTA, fontWeight: 400 }}>{stats.avg}%</strong>.</span>
             </p>
           )
@@ -430,14 +422,14 @@ function QuizPrensa({ preguntas, invitationId, guestToken, guestName }: { pregun
 
   return (
     <div key={currentIdx}>
-      <p className="pr-lugar">{formatQuestion(q.pregunta)}</p>
+      <p className="lu-lugar">{formatQuestion(q.pregunta)}</p>
       {q.opciones.map((opt, oi) => {
         const chosen = picks[currentIdx] === oi;
         return (
           <button
             key={oi}
             type="button"
-            className="pr-quiz-opcion"
+            className="lu-quiz-opcion"
             data-elegida={chosen ? "1" : undefined}
             disabled={picks[currentIdx] !== undefined}
             onClick={() => pick(oi)}
@@ -451,7 +443,7 @@ function QuizPrensa({ preguntas, invitationId, guestToken, guestName }: { pregun
 }
 
 // ─── La plantilla ───────────────────────────────────────────────────────────
-export function PrensaTemplate({ invitation, guest, isPersonalized = false }: PrensaTemplateProps) {
+export function LumbreTemplateTostado({ invitation, guest, isPersonalized = false }: LumbreTemplateTostadoProps) {
   const tx = useTextos();
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
@@ -508,7 +500,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
     quietoRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const raiz = raizRef.current;
     if (!raiz) return;
-    raiz.style.setProperty("--pr-rel", relieve(0, true));
+    raiz.style.setProperty("--lu-rel", relieve(0, true));
     let raf = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const alScrollear = (y: number) => {
@@ -517,7 +509,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
-        raiz.style.setProperty("--pr-rel", relieve(y, quietoRef.current));
+        raiz.style.setProperty("--lu-rel", relieve(y, quietoRef.current));
         setPastillaOculta(y > 40);
       });
     };
@@ -536,15 +528,15 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
   // ── Entrada de sección ─────────────────────────────────────────────────
   // IntersectionObserver al 15 %, una sola vez por bloque, con el retraso
-  // que trae cada bloque (data-pr-retraso: 0 / 120 / 240). Se arma cada vez
+  // que trae cada bloque (data-lu-retraso: 0 / 120 / 240). Se arma cada vez
   // que se abre la portada porque hasta entonces el cuerpo no está montado.
   useEffect(() => {
     if (!isCoverOpen) return;
     const raiz = raizRef.current;
     if (!raiz) return;
-    const bloques = Array.from(raiz.querySelectorAll<HTMLElement>("[data-pr-reveal]"));
+    const bloques = Array.from(raiz.querySelectorAll<HTMLElement>("[data-lu-reveal]"));
     if (quietoRef.current || !("IntersectionObserver" in window)) {
-      bloques.forEach((b) => b.classList.add("pr-entra--visto"));
+      bloques.forEach((b) => b.classList.add("lu-entra--visto"));
       return;
     }
     const io = new IntersectionObserver((entradas) => {
@@ -553,7 +545,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
         const el = e.target as HTMLElement;
         const d = Number(el.dataset.prRetraso || 0);
         el.style.transitionDelay = `${d}ms`;
-        el.classList.add("pr-entra--visto");
+        el.classList.add("lu-entra--visto");
         io.unobserve(el);
       });
     }, { threshold: 0.15 });
@@ -660,9 +652,9 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
     .map((item) => item.fileUrl);
 
   const varsDeTema = {
-    "--font-cormorant": "var(--pr-cormorant)",
-    "--font-inter": "var(--pr-jost)",
-    "--font-sans": "var(--pr-jost)",
+    "--font-cormorant": "var(--lu-cormorant)",
+    "--font-inter": "var(--lu-jost)",
+    "--font-sans": "var(--lu-jost)",
     // En esta colección --t-acc y --t-acc2 no son un acento: son la tinta y
     // la tinta suave. Lo que cambia por variante es el papel (--t-bg).
     "--t-acc": TINTA,
@@ -681,26 +673,26 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
   // ── Post-evento ────────────────────────────────────────────────────────
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className={`${prCormorant.variable} ${prJost.variable} pr-raiz`} style={varsDeTema} data-theme={theme} ref={raizRef}>
-        <style>{CSS_PRENSA}</style>
-        <div className="pr-fondo" aria-hidden="true" />
-        <main className="pr-post">
-          <Hoja className="pr-post-hoja">
+      <div className={`${luCormorant.variable} ${luJost.variable} lu-raiz`} style={varsDeTema} data-theme={theme} ref={raizRef}>
+        <style>{CSS_LUMBRE}</style>
+        <div className="lu-fondo" aria-hidden="true" />
+        <main className="lu-post">
+          <Hoja className="lu-post-hoja">
             <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho="16%" />
-            <p className="pr-kicker">{tx("invitacion.frase.unMomento")}</p>
-            <h1 className="pr-nombres" style={{ fontSize: 38 }}>
-              <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="pr-sinonimo" />
+            <p className="lu-kicker">{tx("invitacion.frase.unMomento")}</p>
+            <h1 className="lu-nombres" style={{ fontSize: 38 }}>
+              <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="lu-sinonimo" />
             </h1>
             <FileteConPunto />
-            <p className="pr-cuerpo">{tx("invitacion.frase.graciasPorAcompanarnosCorto")}</p>
-            <p className="pr-dato">{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</p>
+            <p className="lu-cuerpo">{tx("invitacion.frase.graciasPorAcompanarnosCorto")}</p>
+            <p className="lu-dato">{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</p>
             <div style={{ marginTop: 22 }}>
               {livePhotos.length > 0 ? (
                 <AlbumCarousel photos={livePhotos} hideHeader={true} />
               ) : (
                 <>
-                  <p className="pr-lugar">{tx("invitacion.album.fotografico")}</p>
-                  <p className="pr-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.album.sinCapturas")}</p>
+                  <p className="lu-lugar">{tx("invitacion.album.fotografico")}</p>
+                  <p className="lu-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.album.sinCapturas")}</p>
                 </>
               )}
             </div>
@@ -712,38 +704,36 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
   }
 
   return (
-    <div className={`${prCormorant.variable} ${prJost.variable} pr-raiz`} style={varsDeTema} ref={raizRef}>
-      <style>{CSS_PRENSA}</style>
+    <div className={`${luCormorant.variable} ${luJost.variable} lu-raiz`} style={varsDeTema} ref={raizRef}>
+      <style>{CSS_LUMBRE}</style>
 
       {/* ── Splash (celular) ────────────────────────────────────────── */}
       {!isCoverOpen && (
-        <div className={`pr-splash ${isClosingCover ? "pr-splash--sale" : ""}`}>
+        <div className={`lu-splash ${isClosingCover ? "lu-splash--sale" : ""}`}>
           {portadaFondoAnimado && (
-            <div className="acp-mobile-only">
-              <AnimatedCoverPhoto
-                photoSrc={portadaImagenFondoDesktopRaw as string}
-                tintColor1={PAPEL}
-                tintColor2={TINTA_SUAVE}
-                effect="enfoque"
-                scrimColorRgb="244,236,226"
-              />
-            </div>
+            <AnimatedCoverPhoto
+              photoSrc={portadaImagenFondoDesktopRaw as string}
+              tint={false}
+              effect="enfoque"
+              scrimColorRgb="28,24,20"
+            />
           )}
-          <Hoja className="pr-splash-hoja">
-            <p className="pr-kicker">{saludaAlInvitado ? portadaKicker : kickerDelEvento}</p>
-            <p className="pr-splash-nombre">{guestNameDisplay}</p>
-            <div className="pr-filete-corto" aria-hidden="true" />
+          <div className="lu-velo lu-velo--splash" aria-hidden="true" />
+          <div className="lu-sangre-texto">
+            <p className="lu-kicker lu-kicker--claro">{saludaAlInvitado ? portadaKicker : kickerDelEvento}</p>
+            <p className="lu-splash-nombre">{guestNameDisplay}</p>
+            <div className="lu-filete-corto lu-filete-corto--claro" aria-hidden="true" />
             {/* Los nombres de los novios sólo si arriba no están ya: cuando
                 el saludo es para el invitado son el dato que falta ("¿la boda
                 de quién?"); cuando el nombre grande ya es el de ellos,
                 repetirlos era escribir lo mismo dos veces. */}
-            {saludaAlInvitado && <p className="pr-dato">{nombresLinea}</p>}
-            <p className="pr-dato" style={{ color: TINTA_SUAVE }}>{fechaCorta}{ciudad ? ` · ${ciudad}` : ""}</p>
-            {Boolean(activeDressCode) && <p className="pr-kicker" style={{ marginTop: 6 }}>{tx("invitacion.ubicacion.dressCode")} {activeDressCode}</p>}
-            <button type="button" onClick={openInvitation} className="pr-btn-solido" style={{ marginTop: 26 }}>
+            {saludaAlInvitado && <p className="lu-dato lu-dato--claro">{nombresLinea}</p>}
+            <p className="lu-dato lu-dato--claro">{fechaCorta}{ciudad ? ` · ${ciudad}` : ""}</p>
+            {Boolean(activeDressCode) && <p className="lu-kicker lu-kicker--claro" style={{ marginTop: 6 }}>{tx("invitacion.ubicacion.dressCode")} {activeDressCode}</p>}
+            <button type="button" onClick={openInvitation} className="lu-btn-claro" style={{ marginTop: 26 }}>
               {tx("invitacion.portada.abrirInvitacion")}
             </button>
-          </Hoja>
+          </div>
           <style>{COVER_EXIT_STYLE}{COVER_RESPONSIVE_STYLE}</style>
         </div>
       )}
@@ -752,26 +742,26 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
         <div
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`pr-pase-burbuja ${isTicketMaximized ? "pr-pase-burbuja--abierta" : ""}`}
+          className={`lu-pase-burbuja ${isTicketMaximized ? "lu-pase-burbuja--abierta" : ""}`}
         >
           {isTicketMaximized ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 14 }}>
               <div style={{ textAlign: "left" }}>
-                <span className="pr-kicker" style={{ margin: 0, fontSize: 8 }}>{tx("invitacion.pase.pase")}</span>
+                <span className="lu-kicker" style={{ margin: 0, fontSize: 8 }}>{tx("invitacion.pase.pase")}</span>
                 <span style={{ display: "block", fontFamily: SERIF, fontWeight: 300, fontSize: 18, color: TINTA, lineHeight: 1.1 }}>{guest.name}</span>
                 {guest.mesas && guest.mesas.length > 0 && (
-                  <span className="pr-kicker" style={{ margin: "4px 0 0", fontSize: 8 }}>{guest.mesas.join(" · ")}</span>
+                  <span className="lu-kicker" style={{ margin: "4px 0 0", fontSize: 8 }}>{guest.mesas.join(" · ")}</span>
                 )}
               </div>
               <div style={{ textAlign: "right", borderLeft: `0.5px solid rgba(${SH},.34)`, paddingLeft: 12 }}>
                 <span style={{ display: "block", fontFamily: SERIF, fontWeight: 300, fontSize: 22, color: TINTA, lineHeight: 1 }}>{guest.expectedCount}</span>
-                <span className="pr-kicker" style={{ margin: 0, fontSize: 8 }}>{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
+                <span className="lu-kicker" style={{ margin: 0, fontSize: 8 }}>{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
               </div>
             </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <IconoPastilla nombre="tarjeta" />
-              <span className="pr-kicker" style={{ margin: 0 }}>{tx("invitacion.pase.pase")}</span>
+              <span className="lu-kicker" style={{ margin: 0 }}>{tx("invitacion.pase.pase")}</span>
             </div>
           )}
         </div>,
@@ -782,69 +772,85 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
         document.body
       )}
 
-      <div className="desktop-stage pr-escenario" data-theme={theme}>
-        <div className="pr-fondo" aria-hidden="true" />
+      <div className="desktop-stage lu-escenario" data-theme={theme}>
+        <div className="lu-fondo" aria-hidden="true" />
 
         {/* ── Escritorio: la hoja grande, fija a la izquierda ─────────── */}
-        <aside className="d-left hide-mobile pr-izquierda">
-          <Hoja portada className="pr-hoja-grande">
-            <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} tope={76} />
-            <p className="pr-kicker">{kickerDelEvento}</p>
-            <h1 className="pr-nombres">
+        <aside className="d-left hide-mobile lu-izquierda lu-izquierda--sangre">
+          {portadaFondoAnimado && (
+            <AnimatedCoverPhoto
+              photoSrc={portadaImagenFondoDesktopRaw as string}
+              tint={false}
+              effect="enfoque"
+              scrimColorRgb="28,24,20"
+            />
+          )}
+          <div className="lu-velo" aria-hidden="true" />
+          <div className="lu-sangre-texto lu-sangre-texto--desk">
+            <p className="lu-kicker lu-kicker--claro">{kickerDelEvento}</p>
+            <h1 className="lu-nombres lu-nombres--sangre">
               <span>{nombre1}</span>
-              {nombre2 && <span className="pr-amp">&amp;</span>}
+              {nombre2 && <span className="lu-amp lu-amp--claro">&amp;</span>}
               {nombre2 && <span>{nombre2}</span>}
             </h1>
-            <div className="pr-filete-corto" aria-hidden="true" />
-            <p className="pr-dato">{fechaLarga}</p>
-            {ciudad && <p className="pr-dato">{ciudad}</p>}
-            <div className="pr-nav-escritorio">
+            <div className="lu-filete-corto lu-filete-corto--claro" aria-hidden="true" />
+            <p className="lu-dato lu-dato--claro">{fechaLarga}</p>
+            {ciudad && <p className="lu-dato lu-dato--claro">{ciudad}</p>}
+            <div className="lu-nav-escritorio lu-nav-escritorio--claro">
               <FileteConPunto ancho={220} />
-              <nav className="pr-nav-lista">
+              <nav className="lu-nav-lista">
                 {seccionesNav.map((s) => (
                   <a key={s.id} href={`#${s.id}`}>{s.n}. {s.label}</a>
                 ))}
               </nav>
             </div>
-          </Hoja>
+          </div>
         </aside>
 
-        <div className="d-right tpl pr-derecha" ref={derechaRef}>
+        <div className="d-right tpl lu-derecha" ref={derechaRef}>
           {/* ── Portada (celular) ───────────────────────────────────── */}
-          <section className="hide-desktop pr-seccion pr-portada" data-sec="00">
-            <Hoja portada className={isCoverOpen ? "pr-portada--sube" : ""}>
+          <section className={`hide-desktop lu-portada-sangre ${isCoverOpen ? "lu-portada--sube" : ""}`} data-sec="00">
+            {portadaFondoAnimado && (
+              <AnimatedCoverPhoto
+                photoSrc={portadaImagenFondoDesktopRaw as string}
+                tint={false}
+                effect="enfoque"
+                scrimColorRgb="28,24,20"
+              />
+            )}
+            <div className="lu-velo" aria-hidden="true" />
+            <div className="lu-sangre-texto">
               <Entra>
-                <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "18%" : "22%"} tope={76} />
-                <p className="pr-kicker">{kickerDelEvento}</p>
+                <p className="lu-kicker lu-kicker--claro">{kickerDelEvento}</p>
               </Entra>
               <Entra retraso={120}>
-                <h1 className="pr-nombres">
+                <h1 className="lu-nombres lu-nombres--sangre">
                   <span>{nombre1}</span>
-                  {nombre2 && <span className="pr-amp">&amp;</span>}
+                  {nombre2 && <span className="lu-amp lu-amp--claro">&amp;</span>}
                   {nombre2 && <span>{nombre2}</span>}
                 </h1>
               </Entra>
               <Entra retraso={240}>
-                <div className="pr-filete-corto" aria-hidden="true" />
-                <p className="pr-dato">{fechaLarga}</p>
-                {ciudad && <p className="pr-dato">{ciudad}</p>}
-                <AddToCalendarLink eventName={nombresLinea} targetDate={fechaEvento} location={[lugarNombre, direccion].filter(Boolean).join(", ")} className="pr-link" showIcon={false}>
+                <div className="lu-filete-corto lu-filete-corto--claro" aria-hidden="true" />
+                <p className="lu-dato lu-dato--claro">{fechaLarga}</p>
+                {ciudad && <p className="lu-dato lu-dato--claro">{ciudad}</p>}
+                <AddToCalendarLink eventName={nombresLinea} targetDate={fechaEvento} location={[lugarNombre, direccion].filter(Boolean).join(", ")} className="lu-link lu-link--claro" showIcon={false}>
                   {tx("invitacion.saveTheDate.agregarAlCalendario")}
                 </AddToCalendarLink>
               </Entra>
-            </Hoja>
+            </div>
           </section>
 
           {/* ── 01 La cuenta regresiva ─────────────────────────────── */}
           {(invitation.contadorHabilitado ?? true) ? (
-            <section className="pr-seccion" data-sec="01" id="countdown-hoja">
+            <section className="lu-seccion" data-sec="01" id="countdown-hoja">
               <Hoja>
                 <Cabecera icono="reloj" numero="01" titulo={tx("invitacion.cuentaRegresiva.kicker")} />
                 <Entra retraso={120}>
-                  <p className="pr-kicker">{tx("invitacion.cuentaRegresiva.faltan")}</p>
+                  <p className="lu-kicker">{tx("invitacion.cuentaRegresiva.faltan")}</p>
                   <CuentaPrensa targetDate={fechaEvento} />
                   <FileteConPunto />
-                  <p className="pr-dato">{fechaLarga}{hora ? ` · ${hora} hs` : ""}</p>
+                  <p className="lu-dato">{fechaLarga}{hora ? ` · ${hora} hs` : ""}</p>
                 </Entra>
               </Hoja>
             </section>
@@ -852,47 +858,47 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 02 La frase (sangra, sin hoja) ─────────────────────── */}
           {frase && (
-            <SectionWrapper id="quote" delay={100} className="pr-frase-seccion">
+            <SectionWrapper id="quote" delay={100} className="lu-frase-seccion">
               <Entra>
                 <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho={esXV ? "15%" : "16%"} />
-                <p className="pr-num">02.</p>
-                <p className="pr-frase">{frase}</p>
-                <p className="pr-script">{tx("invitacion.frase.unasPalabras")}</p>
+                <p className="lu-num">02.</p>
+                <p className="lu-frase">{frase}</p>
+                <p className="lu-script">{tx("invitacion.frase.unasPalabras")}</p>
               </Entra>
             </SectionWrapper>
           )}
 
           {/* ── 03 El evento ───────────────────────────────────────── */}
-          <SectionWrapper id="details" delay={150} className="pr-seccion" style={{ padding: 0 }}>
-            <div className="pr-seccion" data-sec="03">
+          <SectionWrapper id="details" delay={150} className="lu-seccion" style={{ padding: 0 }}>
+            <div className="lu-seccion" data-sec="03">
               <Hoja>
                 <Cabecera icono="iglesia" numero="03" titulo={tx("invitacion.ubicacion.cuandoYDonde")} />
                 <Entra retraso={120}>
                   {Boolean(invitation.ceremoniaHabilitada) && (
                     <div>
-                      <p className="pr-kicker">{String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}</p>
-                      {Boolean(invitation.ceremoniaNombre) && <p className="pr-lugar">{String(invitation.ceremoniaNombre)}</p>}
-                      <p className="pr-dato">
+                      <p className="lu-kicker">{String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}</p>
+                      {Boolean(invitation.ceremoniaNombre) && <p className="lu-lugar">{String(invitation.ceremoniaNombre)}</p>}
+                      <p className="lu-dato">
                         {Boolean(invitation.ceremoniaHora) && `${String(invitation.ceremoniaHora)} hs`}
                         {Boolean(invitation.ceremoniaHora) && Boolean(invitation.ceremoniaDireccion) && " · "}
                         {Boolean(invitation.ceremoniaDireccion) && String(invitation.ceremoniaDireccion)}
                       </p>
                       {Boolean(invitation.ceremoniaMapUrl) && (
-                        <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="pr-link">{tx("invitacion.ubicacion.comoLlegar")}</a>
+                        <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="lu-link">{tx("invitacion.ubicacion.comoLlegar")}</a>
                       )}
-                      <div className="pr-hairline" aria-hidden="true" />
+                      <div className="lu-hairline" aria-hidden="true" />
                     </div>
                   )}
                   {(lugarNombre || direccion) && (
                     <div>
-                      <p className="pr-kicker">{tx("invitacion.ubicacion.fiestaSalon")}</p>
-                      {lugarNombre && <p className="pr-lugar">{lugarNombre}</p>}
-                      <p className="pr-dato">
+                      <p className="lu-kicker">{tx("invitacion.ubicacion.fiestaSalon")}</p>
+                      {lugarNombre && <p className="lu-lugar">{lugarNombre}</p>}
+                      <p className="lu-dato">
                         {hora && `${hora} hs`}
                         {hora && direccion && " · "}
                         {direccion}
                       </p>
-                      {mapUrl && <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pr-link">{tx("invitacion.ubicacion.comoLlegar")}</a>}
+                      {mapUrl && <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="lu-link">{tx("invitacion.ubicacion.comoLlegar")}</a>}
                     </div>
                   )}
                 </Entra>
@@ -900,15 +906,15 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
                   <Entra retraso={240}>
                     {cronograma.length > 0 && (
                       <>
-                        <div className="pr-hairline" aria-hidden="true" />
-                        <p className="pr-kicker">Cronograma</p>
-                        <div className="pr-cronograma" id="schedule">
-                          <span className="pr-cronograma-eje" aria-hidden="true" />
+                        <div className="lu-hairline" aria-hidden="true" />
+                        <p className="lu-kicker">Cronograma</p>
+                        <div className="lu-cronograma" id="schedule">
+                          <span className="lu-cronograma-eje" aria-hidden="true" />
                           {cronograma.map((item, i) => (
-                            <Entra key={i} retraso={i * 120} className="pr-hito">
-                              <span className="pr-hito-hora">{item.time ?? ""}</span>
-                              <span className="pr-hito-punto" aria-hidden="true" />
-                              <span className="pr-hito-titulo">{item.title}</span>
+                            <Entra key={i} retraso={i * 120} className="lu-hito">
+                              <span className="lu-hito-hora">{item.time ?? ""}</span>
+                              <span className="lu-hito-punto" aria-hidden="true" />
+                              <span className="lu-hito-titulo">{item.title}</span>
                             </Entra>
                           ))}
                         </div>
@@ -916,9 +922,9 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
                     )}
                     {Boolean(activeDressCode) && (
                       <>
-                        <div className="pr-hairline" aria-hidden="true" />
-                        <p className="pr-kicker">{tx("invitacion.ubicacion.dressCode")}</p>
-                        <p className="pr-cuerpo">{activeDressCode}</p>
+                        <div className="lu-hairline" aria-hidden="true" />
+                        <p className="lu-kicker">{tx("invitacion.ubicacion.dressCode")}</p>
+                        <p className="lu-cuerpo">{activeDressCode}</p>
                       </>
                     )}
                   </Entra>
@@ -931,8 +937,8 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 04 El álbum ────────────────────────────────────────── */}
           {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-            <SectionWrapper id="album" delay={200} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion" data-sec="04">
+            <SectionWrapper id="album" delay={200} className="lu-seccion" style={{ padding: 0 }}>
+              <div className="lu-seccion" data-sec="04">
                 <Hoja>
                   <Cabecera icono="polaroids" numero="04" titulo={tx("invitacion.album.titulo")} />
                   <Entra retraso={120}>
@@ -945,19 +951,19 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 05 El mapa ─────────────────────────────────────────── */}
           {mapUrl && (
-            <section className="pr-seccion" data-sec="05" id="location">
+            <section className="lu-seccion" data-sec="05" id="location">
               <Hoja>
                 <Cabecera icono="auto" numero="05" titulo={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre }).replace(/^Mapa de\s*/i, "Mapa")} anchoIcono="22%" />
                 <Entra retraso={120}>
-                  <div className="pr-mapa">
+                  <div className="lu-mapa">
                     {embedMapUrl ? (
                       <iframe src={embedMapUrl} width="100%" height="100%" style={{ border: 0, display: "block" }} loading="lazy" title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })} referrerPolicy="no-referrer-when-downgrade" />
                     ) : (
-                      <span className="pr-kicker" style={{ margin: 0 }}>{tx("invitacion.ubicacion.mapaNoDisponible")}</span>
+                      <span className="lu-kicker" style={{ margin: 0 }}>{tx("invitacion.ubicacion.mapaNoDisponible")}</span>
                     )}
                   </div>
-                  <p className="pr-dato">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pr-btn-solido">{tx("invitacion.ubicacion.verMapaFiesta")}</a>
+                  <p className="lu-dato">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="lu-btn-solido">{tx("invitacion.ubicacion.verMapaFiesta")}</a>
                 </Entra>
               </Hoja>
             </section>
@@ -965,14 +971,14 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 06 Tu confirmación ─────────────────────────────────── */}
           {rsvpEnabled && (
-            <section className="pr-seccion" data-sec="06" id="rsvp-hoja">
+            <section className="lu-seccion" data-sec="06" id="rsvp-hoja">
               <Hoja>
                 <Cabecera icono="tarjeta" numero="06" titulo={tx("invitacion.rsvp.confirmar")} />
                 {rsvpDias > 0 && (
                   <Entra retraso={120}>
-                    <p className="pr-kicker">{tx("invitacion.rsvp.quedan")}</p>
-                    <p className="pr-cifra">{diasParaConfirmar}</p>
-                    <p className="pr-kicker">{tx("invitacion.rsvp.diasParaConfirmar")}</p>
+                    <p className="lu-kicker">{tx("invitacion.rsvp.quedan")}</p>
+                    <p className="lu-cifra">{diasParaConfirmar}</p>
+                    <p className="lu-kicker">{tx("invitacion.rsvp.diasParaConfirmar")}</p>
                   </Entra>
                 )}
                 <Entra retraso={240}>
@@ -1011,8 +1017,8 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
           <QrDeIngreso guest={guest as never} />
 
           {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
-            <SectionWrapper id="album-2" delay={150} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion">
+            <SectionWrapper id="album-2" delay={150} className="lu-seccion" style={{ padding: 0 }}>
+              <div className="lu-seccion">
                 <Hoja>
                   <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
                 </Hoja>
@@ -1022,11 +1028,11 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── Quiz ───────────────────────────────────────────────── */}
           {triviaHabilitada && triviaPreguntas.length > 0 && (
-            <SectionWrapper id="quiz" delay={300} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion">
+            <SectionWrapper id="quiz" delay={300} className="lu-seccion" style={{ padding: 0 }}>
+              <div className="lu-seccion">
                 <Hoja>
                   <Entra>
-                    <p className="pr-kicker">{String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes"))}</p>
+                    <p className="lu-kicker">{String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes"))}</p>
                     <QuizPrensa preguntas={triviaPreguntas} invitationId={String(invitation.id ?? "")} guestToken={guest?.uniqueToken} guestName={guest?.name} />
                   </Entra>
                 </Hoja>
@@ -1036,12 +1042,12 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 07 Regalos ─────────────────────────────────────────── */}
           {showGiftSection && (
-            <SectionWrapper id="banco" delay={200} className="pr-seccion" style={{ padding: 0 }}>
-              <div className="pr-seccion" data-sec="07">
+            <SectionWrapper id="banco" delay={200} className="lu-seccion" style={{ padding: 0 }}>
+              <div className="lu-seccion" data-sec="07">
                 <Hoja>
                   <Cabecera icono="sobre" numero="07" titulo={tx("invitacion.regalos.banco")} />
                   <Entra retraso={120}>
-                    {Boolean(invitation.regaloMensaje) && <p className="pr-cuerpo">{String(invitation.regaloMensaje)}</p>}
+                    {Boolean(invitation.regaloMensaje) && <p className="lu-cuerpo">{String(invitation.regaloMensaje)}</p>}
                     <div style={{ display: "grid", gap: 14 }}>
                       {pagoTarjetaHabilitado && (
                         <BankDetailsCard
@@ -1090,7 +1096,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
 
           {/* ── 08 Sugerí una canción ──────────────────────────────── */}
           {songsEnabled && (
-            <section className="pr-seccion" data-sec="08" id="songs-hoja">
+            <section className="lu-seccion" data-sec="08" id="songs-hoja">
               <Hoja>
                 <Cabecera icono="nota" numero="08" titulo={tx("invitacion.musica.titulo")} anchoIcono="15%" />
                 <Entra retraso={120}>
@@ -1110,19 +1116,19 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
           )}
 
           {/* ── 09 Cierre ──────────────────────────────────────────── */}
-          <section className="pr-seccion" data-sec="09" id="cierre">
+          <section className="lu-seccion" data-sec="09" id="cierre">
             <Hoja>
               <Entra>
                 <IconoLinea nombre="confeti" />
-                <p className="pr-num">09.</p>
-                <div className="pr-monograma">
+                <p className="lu-num">09.</p>
+                <div className="lu-monograma">
                   <svg viewBox="0 0 88 110" width="78" height="98" aria-hidden="true">
                     <ellipse cx="44" cy="55" rx="40" ry="52" fill="none" stroke="currentColor" strokeWidth=".75" />
                     <ellipse cx="44" cy="55" rx="34" ry="46" fill="none" stroke="currentColor" strokeWidth=".4" />
                   </svg>
                   <span>{monograma}</span>
                 </div>
-                <p className="pr-script">{tx("invitacion.frase.graciasPorEstar")}</p>
+                <p className="lu-script">{tx("invitacion.frase.graciasPorEstar")}</p>
               </Entra>
             </Hoja>
           </section>
@@ -1134,7 +1140,7 @@ export function PrensaTemplate({ invitation, guest, isPersonalized = false }: Pr
       </div>
 
       {isCoverOpen && (
-        <div className={`pr-pastilla ${pastillaOculta ? "pr-pastilla--oculta" : ""}`}>
+        <div className={`lu-pastilla ${pastillaOculta ? "lu-pastilla--oculta" : ""}`}>
           <BottomNavPill sections={navSections} variant="moderno" accentColor={TINTA} surfaceColor={PAPEL} inactiveColor={TINTA_SUAVE} solid />
         </div>
       )}
@@ -1152,189 +1158,212 @@ function IconoPastilla({ nombre }: { nombre: NombreDeIcono }) {
 // Todo lo que el mockup tenía como objetos de estilo. Los componentes
 // compartidos (Countdown, RSVP, canciones, álbum, pastilla) se visten desde
 // acá con selectores sobre sus ganchos, igual que hace Moderno.
-const CSS_PRENSA = `
-  .pr-raiz { position: relative; color: ${TINTA}; font-family: ${SANS}; }
-  .pr-fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+const CSS_LUMBRE = `
+  .lu-raiz { position: relative; color: ${TINTA}; font-family: ${SANS}; }
+  .lu-fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-color: ${PAPEL}; background-image: ${GRANO_PAGINA}; background-blend-mode: multiply; }
-  .pr-escenario { position: relative; z-index: 1; background: transparent !important; }
-  .pr-escenario.desktop-stage { background: transparent; }
-  .pr-derecha { background: transparent; }
-  .desktop-stage.pr-escenario .d-left.pr-izquierda { background: transparent; padding: 26px 22px; align-items: center; justify-content: center; }
-  .pr-hoja-grande { width: 94%; aspect-ratio: 301/432; padding: 34px 30px 26px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-  .pr-hoja-grande .pr-nombres { font-size: 38px; }
-  .pr-nav-escritorio { margin-top: auto; width: 100%; }
-  .pr-nav-lista { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 14px; }
-  .pr-nav-lista a { background: none; border: none; padding: 5px 2px; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; text-decoration: none; }
-  .pr-nav-lista a:hover { color: ${TINTA}; }
+  .lu-escenario { position: relative; z-index: 1; background: transparent !important; }
+  .lu-escenario.desktop-stage { background: transparent; }
+  .lu-derecha { background: transparent; }
+  .desktop-stage.lu-escenario .d-left.lu-izquierda { background: transparent; padding: 26px 22px; align-items: center; justify-content: center; }
+  .lu-hoja-grande { width: 94%; aspect-ratio: 301/432; padding: 34px 30px 26px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .lu-hoja-grande .lu-nombres { font-size: 38px; }
+  .lu-nav-escritorio { margin-top: auto; width: 100%; }
+  .lu-nav-lista { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 14px; }
+  .lu-nav-lista a { background: none; border: none; padding: 5px 2px; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; text-decoration: none; }
+  .lu-nav-lista a:hover { color: ${TINTA}; }
 
   /* La hoja */
-  .pr-hoja { position: relative; padding: 32px 26px 28px; text-align: center;
+  .lu-hoja { position: relative; padding: 32px 26px 28px; text-align: center;
     background-color: ${PAPEL}; background-image: ${GRANO_HOJA}; background-blend-mode: multiply;
     box-shadow: -1.41px 1.41px 4px rgba(${SH},.40);
     clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px)); }
-  .desktop-stage .pr-hoja { padding: 44px 54px 38px; }
-  .pr-hoja::before, .pr-hoja::after { content: ""; position: absolute; width: 26px; height: 26px; pointer-events: none; }
-  .pr-hoja::before { top: 0; right: 0; background: linear-gradient(225deg, rgba(${SH},.34), transparent); }
-  .pr-hoja::after { bottom: 0; left: 0; background: linear-gradient(45deg, rgba(${SH},.34), transparent); }
-  .pr-filete { position: absolute; inset: 14px; border: 0.5px solid rgba(${SH},.34); border-radius: 6px; pointer-events: none; }
-  .pr-hoja--portada { aspect-ratio: 301/432; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .pr-seccion { position: relative; padding: 11px 3%; }
-  .pr-portada { padding-top: 14px; }
-  .pr-portada--sube { animation: prPortadaSube .9s cubic-bezier(.22,.61,.36,1) both; }
+  .desktop-stage .lu-hoja { padding: 44px 54px 38px; }
+  .lu-hoja::before, .lu-hoja::after { content: ""; position: absolute; width: 26px; height: 26px; pointer-events: none; }
+  .lu-hoja::before { top: 0; right: 0; background: linear-gradient(225deg, rgba(${SH},.34), transparent); }
+  .lu-hoja::after { bottom: 0; left: 0; background: linear-gradient(45deg, rgba(${SH},.34), transparent); }
+  .lu-filete { position: absolute; inset: 14px; border: 0.5px solid rgba(${SH},.34); border-radius: 6px; pointer-events: none; }
+  .lu-hoja--portada { aspect-ratio: 301/432; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .lu-seccion { position: relative; padding: 11px 3%; }
+  .lu-portada { padding-top: 14px; }
+  .lu-portada--sube { animation: luPortadaSube .9s cubic-bezier(.22,.61,.36,1) both; }
 
   /* Tipos */
-  .pr-kicker { font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin: 0 0 10px; }
-  .pr-dato { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA}; margin: 0 0 8px; }
-  .pr-cuerpo { font-family: ${SANS}; font-weight: 300; font-size: 15px; line-height: 1.75; color: ${TINTA}; margin: 0 auto 16px; max-width: 46ch; }
-  .pr-num { font-family: ${SERIF}; font-weight: 300; font-size: 26px; line-height: 1; color: ${TINTA}; margin: 0 0 8px; }
-  .pr-titulo { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.25; color: ${TINTA}; margin: 0 0 22px; display: inline-block; transform: rotate(-2.5deg); }
-  .pr-script { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.3; color: ${TINTA}; margin: 0 0 8px; display: inline-block; transform: rotate(-2.5deg); }
-  .pr-nombres { font-family: ${SERIF}; font-weight: 300; font-size: 38px; line-height: 1.12; margin: 0 0 14px; color: ${matiz(PAPEL, -4)};
-    text-shadow: var(--pr-rel); display: flex; flex-direction: column; align-items: center; }
-  .pr-amp { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.2; color: ${TINTA}; text-shadow: none; margin: 2px 0; }
-  .pr-cifra { font-family: ${SERIF}; font-weight: 300; font-size: 86px; line-height: .9; color: ${matiz(PAPEL, -4)}; text-shadow: var(--pr-rel); margin: 6px 0 8px; }
-  .pr-filete-corto { width: 38px; height: 0.5px; background: rgba(${SH},.6); margin: 14px auto 16px; }
-  .pr-hairline { height: 0.5px; background: rgba(${SH},.3); margin: 22px 0; }
-  .pr-lugar { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 26px; line-height: 1.2; color: ${TINTA}; margin: 0 0 8px; }
-  .pr-link { display: inline-flex; align-items: center; min-height: 44px; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: ${TINTA}; border-bottom: 0.5px solid rgba(${SH},.7); text-decoration: none; }
-  .pr-btn-solido { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; background: ${TINTA}; color: ${PAPEL}; border: none; font-family: ${SANS}; font-weight: 400; font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
-  .pr-btn-fantasma { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; background: transparent; color: ${TINTA}; border: 0.5px solid rgba(${SH},.5); font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; }
-  .pr-frase-seccion { position: relative; padding: 48px 8%; text-align: center; background: transparent; }
-  .desktop-stage .pr-frase-seccion { padding: 64px 8%; }
-  .pr-frase { font-family: ${SERIF}; font-weight: 300; font-style: italic; font-size: 28px; line-height: 1.35; color: ${TINTA}; margin: 0 auto 6px; max-width: 26ch; }
-  .desktop-stage .pr-frase { font-size: 34px; }
+  .lu-kicker { font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin: 0 0 10px; }
+  .lu-dato { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA}; margin: 0 0 8px; }
+  .lu-cuerpo { font-family: ${SANS}; font-weight: 300; font-size: 15px; line-height: 1.75; color: ${TINTA}; margin: 0 auto 16px; max-width: 46ch; }
+  .lu-num { font-family: ${SERIF}; font-weight: 300; font-size: 26px; line-height: 1; color: ${TINTA}; margin: 0 0 8px; }
+  .lu-titulo { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.25; color: ${TINTA}; margin: 0 0 22px; display: inline-block; transform: rotate(-2.5deg); }
+  .lu-script { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.3; color: ${TINTA}; margin: 0 0 8px; display: inline-block; transform: rotate(-2.5deg); }
+  .lu-nombres { font-family: ${SERIF}; font-weight: 300; font-size: 38px; line-height: 1.12; margin: 0 0 14px; color: ${matiz(PAPEL, -4)};
+    text-shadow: var(--lu-rel); display: flex; flex-direction: column; align-items: center; }
+  .lu-amp { font-family: ${SCRIPT}; font-weight: 400; font-size: 34px; line-height: 1.2; color: ${TINTA}; text-shadow: none; margin: 2px 0; }
+  .lu-cifra { font-family: ${SERIF}; font-weight: 300; font-size: 86px; line-height: .9; color: ${matiz(PAPEL, -4)}; text-shadow: var(--lu-rel); margin: 6px 0 8px; }
+  .lu-filete-corto { width: 38px; height: 0.5px; background: rgba(${SH},.6); margin: 14px auto 16px; }
+  .lu-hairline { height: 0.5px; background: rgba(${SH},.3); margin: 22px 0; }
+  .lu-lugar { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 26px; line-height: 1.2; color: ${TINTA}; margin: 0 0 8px; }
+  .lu-link { display: inline-flex; align-items: center; min-height: 44px; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: ${TINTA}; border-bottom: 0.5px solid rgba(${SH},.7); text-decoration: none; }
+  .lu-btn-solido { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; background: ${TINTA}; color: ${PAPEL}; border: none; font-family: ${SANS}; font-weight: 400; font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+  .lu-btn-fantasma { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; background: transparent; color: ${TINTA}; border: 0.5px solid rgba(${SH},.5); font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; }
+  .lu-frase-seccion { position: relative; padding: 48px 8%; text-align: center; background: transparent; }
+  .desktop-stage .lu-frase-seccion { padding: 64px 8%; }
+  .lu-frase { font-family: ${SERIF}; font-weight: 300; font-style: italic; font-size: 28px; line-height: 1.35; color: ${TINTA}; margin: 0 auto 6px; max-width: 26ch; }
+  .desktop-stage .lu-frase { font-size: 34px; }
 
   /* Entrada de sección */
-  .pr-entra { opacity: 0; transform: perspective(800px) rotateY(6deg) translateY(10px); transform-origin: left center;
+  .lu-entra { opacity: 0; transform: perspective(800px) rotateY(6deg) translateY(10px); transform-origin: left center;
     transition: opacity 1.2s cubic-bezier(.22,.61,.36,1), transform .35s cubic-bezier(.22,.61,.36,1); }
-  .pr-entra--visto { opacity: 1; transform: none; }
+  .lu-entra--visto { opacity: 1; transform: none; }
 
   /* Cronograma */
-  .pr-cronograma { position: relative; text-align: left; max-width: 380px; margin: 0 auto; }
-  .pr-cronograma-eje { position: absolute; left: 74px; top: 10px; bottom: 10px; width: 0.5px; background: rgba(${SH},.45); }
-  .pr-hito { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
-  .pr-hito-hora { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; color: ${TINTA_SUAVE}; width: 62px; text-align: right; flex-shrink: 0; }
-  .pr-hito-punto { width: 3px; height: 3px; border-radius: 50%; background: ${TINTA}; flex-shrink: 0; }
-  .pr-hito-titulo { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 20px; color: ${TINTA}; }
+  .lu-cronograma { position: relative; text-align: left; max-width: 380px; margin: 0 auto; }
+  .lu-cronograma-eje { position: absolute; left: 74px; top: 10px; bottom: 10px; width: 0.5px; background: rgba(${SH},.45); }
+  .lu-hito { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+  .lu-hito-hora { font-family: ${SANS}; font-weight: 400; font-size: 13px; letter-spacing: .16em; color: ${TINTA_SUAVE}; width: 62px; text-align: right; flex-shrink: 0; }
+  .lu-hito-punto { width: 3px; height: 3px; border-radius: 50%; background: ${TINTA}; flex-shrink: 0; }
+  .lu-hito-titulo { font-family: ${SERIF}; font-weight: 400; font-style: italic; font-size: 20px; color: ${TINTA}; }
 
   /* Mapa */
-  .pr-mapa { height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  .lu-mapa { height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden;
     background-color: ${PAPEL2}; background-image: repeating-linear-gradient(0deg, rgba(${SH},.12) 0 0.5px, transparent 0.5px 26px), repeating-linear-gradient(90deg, rgba(${SH},.12) 0 0.5px, transparent 0.5px 26px);
     border: 0.5px solid rgba(${SH},.34); margin-bottom: 18px; }
-  .desktop-stage .pr-mapa { height: 240px; }
+  .desktop-stage .lu-mapa { height: 240px; }
 
   /* Banco */
-  .pr-banco-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 0.5px solid rgba(${SH},.22); text-align: left; }
-  .pr-banco-clave { display: block; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin-bottom: 2px; }
-  .pr-banco-valor { display: block; font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; overflow-wrap: anywhere; }
-  .pr-hoja #banco .t-kicker, .pr-hoja h4 { font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .39em !important; text-transform: uppercase !important; color: ${TINTA_SUAVE} !important; }
+  .lu-banco-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 0.5px solid rgba(${SH},.22); text-align: left; }
+  .lu-banco-clave { display: block; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .39em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin-bottom: 2px; }
+  .lu-banco-valor { display: block; font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; overflow-wrap: anywhere; }
+  .lu-hoja #banco .t-kicker, .lu-hoja h4 { font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .39em !important; text-transform: uppercase !important; color: ${TINTA_SUAVE} !important; }
 
   /* Quiz */
-  .pr-quiz-opcion { display: block; width: 100%; max-width: 420px; margin: 0 auto 8px; min-height: 48px; padding: 12px 16px; cursor: pointer; text-align: left;
+  .lu-quiz-opcion { display: block; width: 100%; max-width: 420px; margin: 0 auto 8px; min-height: 48px; padding: 12px 16px; cursor: pointer; text-align: left;
     font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; background: transparent; border: 0.5px solid rgba(${SH},.34); transition: background .2s ease, color .2s ease; }
-  .pr-quiz-opcion[data-elegida] { background: ${TINTA}; color: ${PAPEL}; }
-  .pr-quiz-opcion:disabled { cursor: default; }
+  .lu-quiz-opcion[data-elegida] { background: ${TINTA}; color: ${PAPEL}; }
+  .lu-quiz-opcion:disabled { cursor: default; }
 
   /* Monograma */
-  .pr-monograma { position: relative; width: 78px; height: 98px; display: flex; align-items: center; justify-content: center; margin: 6px auto 18px; }
-  .pr-monograma svg { position: absolute; inset: 0; color: rgba(${SH},.7); }
-  .pr-monograma span { position: relative; font-family: ${SERIF}; font-weight: 300; font-size: 22px; letter-spacing: .18em; color: ${TINTA}; }
+  .lu-monograma { position: relative; width: 78px; height: 98px; display: flex; align-items: center; justify-content: center; margin: 6px auto 18px; }
+  .lu-monograma svg { position: absolute; inset: 0; color: rgba(${SH},.7); }
+  .lu-monograma span { position: relative; font-family: ${SERIF}; font-weight: 300; font-size: 22px; letter-spacing: .18em; color: ${TINTA}; }
+
+  /* La portada a sangre: la foto tapa la pantalla y el velo la hace legible.
+     Sin foto cargada el velo cae sobre el papel prensado, así que la portada
+     sigue siendo una portada y no un rectángulo vacío. */
+  .lu-portada-sangre { position: relative; min-height: 100dvh; display: flex; align-items: flex-end; overflow: hidden;
+    background-color: #6E6257; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 1px, transparent 1px 8px); }
+  .lu-izquierda--sangre { position: relative; overflow: hidden; padding: 0 !important; align-items: flex-end !important; justify-content: center !important;
+    background-color: #6E6257 !important; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 1px, transparent 1px 8px) !important; }
+  .lu-velo { position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: linear-gradient(180deg, rgba(28,24,20,.15) 0%, rgba(28,24,20,.20) 45%, rgba(28,24,20,.78) 100%); }
+  .lu-velo--splash { background: linear-gradient(180deg, rgba(28,24,20,.25) 0%, rgba(28,24,20,.35) 40%, rgba(28,24,20,.80) 100%); }
+  .lu-sangre-texto { position: relative; z-index: 2; width: 100%; padding: 0 26px 34px; text-align: center; }
+  .lu-sangre-texto--desk { padding: 0 34px 34px; }
+  .lu-kicker--claro, .lu-dato--claro { color: #FFFFFF; }
+  .lu-filete-corto--claro { background: rgba(255,255,255,.8); }
+  .lu-link--claro { color: #FFFFFF; border-bottom-color: rgba(255,255,255,.7); }
+  .lu-amp--claro { color: rgba(255,255,255,.9); font-family: ${SERIF}; font-weight: 300; font-size: 28px; }
+  .lu-nombres--sangre { font-family: ${SCRIPT}; font-weight: 400; font-size: 44px; line-height: 1.12; color: #FFFFFF; text-shadow: none; margin: 0 auto 2px; max-width: 88%; }
+  .desktop-stage .lu-nombres--sangre { font-size: 66px; line-height: 1.02; }
+  .lu-nav-escritorio--claro a { color: rgba(255,255,255,.72); }
+  .lu-nav-escritorio--claro a:hover { color: #FFFFFF; }
+  .lu-btn-claro { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; background: #FFFFFF; color: #1C1814;
+    border: none; font-family: ${SANS}; font-weight: 400; font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; }
 
   /* Splash */
-  .pr-splash { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 16px 3%;
+  .lu-splash { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; padding: 0;
     background-color: ${PAPEL}; background-image: ${GRANO_PAGINA}; background-blend-mode: multiply; }
-  .pr-splash--sale { animation: prSplashSale .9s ease both; }
-  .pr-splash-hoja { position: relative; width: 100%; max-width: 340px; aspect-ratio: 301/432; padding: 40px 28px 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .pr-splash-nombre { font-family: ${SCRIPT}; font-weight: 400; font-size: 56px; line-height: 1.06; color: ${TINTA}; margin: 2px 0 4px; }
-  @keyframes prSplashSale { from { opacity: 1; } to { opacity: 0; } }
-  @keyframes prPortadaSube { from { transform: translateY(24px); } to { transform: translateY(0); } }
-  @keyframes prPrensado { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .lu-splash--sale { animation: luSplashSale .9s ease both; }
+  .lu-splash-hoja { position: relative; width: 100%; max-width: 340px; aspect-ratio: 301/432; padding: 40px 28px 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .lu-splash-nombre { font-family: ${SCRIPT}; font-weight: 400; font-size: 62px; line-height: 1.04; color: #FFFFFF; margin: 2px 0 4px; }
+  @keyframes luSplashSale { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes luPortadaSube { from { transform: translateY(24px); } to { transform: translateY(0); } }
+  @keyframes luPrensado { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
   /* Pase (burbuja arriba) */
-  .pr-pase-burbuja { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 99999; cursor: pointer; padding: 8px 14px;
+  .lu-pase-burbuja { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 99999; cursor: pointer; padding: 8px 14px;
     background-color: ${PAPEL}; background-image: ${GRANO_HOJA}; background-blend-mode: multiply; border: 0.5px solid rgba(${SH},.34); box-shadow: -1.41px 1.41px 8px rgba(${SH},.34); transition: all .5s ease; }
-  .pr-pase-burbuja--abierta { width: calc(100% - 32px); max-width: 360px; padding: 12px 16px; }
+  .lu-pase-burbuja--abierta { width: calc(100% - 32px); max-width: 360px; padding: 12px 16px; }
 
   /* Pastilla inferior */
-  .pr-pastilla { transition: opacity .35s ease, transform .35s cubic-bezier(.22,.61,.36,1); }
-  .pr-pastilla--oculta { opacity: 0; transform: translateY(26px); transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1); pointer-events: none; }
-  .pr-raiz .bottom-nav, .desktop-stage.pr-escenario .bottom-nav { border-radius: 0 !important; background: ${PAPEL} !important; border: 0.5px solid rgba(${SH},.28) !important;
+  .lu-pastilla { transition: opacity .35s ease, transform .35s cubic-bezier(.22,.61,.36,1); }
+  .lu-pastilla--oculta { opacity: 0; transform: translateY(26px); transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1); pointer-events: none; }
+  .lu-raiz .bottom-nav, .desktop-stage.lu-escenario .bottom-nav { border-radius: 0 !important; background: ${PAPEL} !important; border: 0.5px solid rgba(${SH},.28) !important;
     box-shadow: -1.41px 1.41px 8px rgba(${SH},.34) !important; backdrop-filter: none !important; padding: 5px !important; gap: 2px !important; }
-  .pr-raiz .bottom-nav a { color: ${TINTA} !important; opacity: .55 !important; min-height: 48px; }
-  .pr-raiz .bottom-nav a[aria-current="true"] { opacity: 1 !important; background: ${PAPEL2}; }
+  .lu-raiz .bottom-nav a { color: ${TINTA} !important; opacity: .55 !important; min-height: 48px; }
+  .lu-raiz .bottom-nav a[aria-current="true"] { opacity: 1 !important; background: ${PAPEL2}; }
 
   /* Componentes compartidos vestidos con el registro */
-  .pr-raiz .tpl h2, .pr-raiz .tpl h3, .pr-raiz .tpl h4 { font-family: ${SERIF}; color: ${TINTA}; }
+  .lu-raiz .tpl h2, .lu-raiz .tpl h3, .lu-raiz .tpl h4 { font-family: ${SERIF}; color: ${TINTA}; }
   /* La script tiene que ganarle a la regla de arriba y a la tipografía que
      el anfitrión elige en el wizard (--font-title): los títulos de sección,
      el &, la frase de cierre y el nombre del splash van SIEMPRE en Final
      Parade, es la firma de la colección. */
-  .pr-raiz .pr-titulo, .pr-raiz .tpl h3.pr-titulo, .pr-raiz .pr-script, .pr-raiz .pr-amp, .pr-raiz .pr-splash-nombre, .pr-raiz .pr-sinonimo { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-style: normal !important; }
-  .pr-raiz .tpl .t-kicker, .pr-raiz .tpl p.kicker { font-family: ${SANS} !important; color: ${TINTA_SUAVE} !important; font-size: 10px !important; font-weight: 400 !important; letter-spacing: .39em !important; text-transform: uppercase !important; display: block; }
-  .pr-raiz .tpl .t-kicker::before, .pr-raiz .tpl p.kicker::before { display: none !important; }
-  .pr-raiz .tpl div:not(#countdown div), .pr-raiz .tpl section, .pr-raiz .tpl button, .pr-raiz .tpl input, .pr-raiz .tpl iframe, .pr-raiz .tpl .t-btn, .pr-raiz .tpl .album-btn { border-radius: 0 !important; }
-  .pr-raiz .tpl .album-item { border-radius: 0 !important; box-shadow: -1.41px 1.41px 4px rgba(${SH},.40); border: 10px solid ${PAPEL}; border-bottom-width: 26px; background-color: ${PAPEL}; }
-  .pr-raiz .tpl .album-btn { color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; background: transparent !important; }
-  .pr-raiz .tpl .cascade-frame { box-shadow: -1.41px 1.41px 4px rgba(${SH},.40) !important; background: ${PAPEL} !important; }
+  .lu-raiz .lu-titulo, .lu-raiz .tpl h3.lu-titulo, .lu-raiz .lu-script, .lu-raiz .lu-amp, .lu-raiz .lu-splash-nombre, .lu-raiz .lu-sinonimo, .lu-raiz .lu-nombres--sangre { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-style: normal !important; }
+  .lu-raiz .tpl .t-kicker, .lu-raiz .tpl p.kicker { font-family: ${SANS} !important; color: ${TINTA_SUAVE} !important; font-size: 10px !important; font-weight: 400 !important; letter-spacing: .39em !important; text-transform: uppercase !important; display: block; }
+  .lu-raiz .tpl .t-kicker::before, .lu-raiz .tpl p.kicker::before { display: none !important; }
+  .lu-raiz .tpl div:not(#countdown div), .lu-raiz .tpl section, .lu-raiz .tpl button, .lu-raiz .tpl input, .lu-raiz .tpl iframe, .lu-raiz .tpl .t-btn, .lu-raiz .tpl .album-btn { border-radius: 0 !important; }
+  .lu-raiz .tpl .album-item { border-radius: 0 !important; box-shadow: -1.41px 1.41px 4px rgba(${SH},.40); border: 10px solid ${PAPEL}; border-bottom-width: 26px; background-color: ${PAPEL}; }
+  .lu-raiz .tpl .album-btn { color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; background: transparent !important; }
+  .lu-raiz .tpl .cascade-frame { box-shadow: -1.41px 1.41px 4px rgba(${SH},.40) !important; background: ${PAPEL} !important; }
 
   /* La cuenta regresiva de la colección: cifras prensadas y filetes, nada más. */
-  .pr-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); align-items: end; max-width: 400px; margin: 2px auto 4px; }
-  .pr-cuenta-celda { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 2px 2px 0; }
-  .pr-cuenta-celda + .pr-cuenta-celda { border-left: 0.5px solid rgba(${SH},.30); }
-  .pr-cuenta-num { font-family: ${SERIF}; font-weight: 300; font-size: clamp(32px, 10vw, 46px); line-height: .92; color: ${matiz(PAPEL, -4)}; text-shadow: var(--pr-rel); font-variant-numeric: tabular-nums; }
-  .pr-cuenta-etq { font-family: ${SANS}; font-weight: 400; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA_SUAVE}; white-space: nowrap; }
-  .desktop-stage .pr-cuenta-num { font-size: 46px; }
-  .pr-cuenta-aviso { text-align: center; }
+  .lu-cuenta { display: grid; grid-template-columns: repeat(4, 1fr); align-items: end; max-width: 400px; margin: 2px auto 4px; }
+  .lu-cuenta-celda { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 2px 2px 0; }
+  .lu-cuenta-celda + .lu-cuenta-celda { border-left: 0.5px solid rgba(${SH},.30); }
+  .lu-cuenta-num { font-family: ${SERIF}; font-weight: 300; font-size: clamp(32px, 10vw, 46px); line-height: .92; color: ${matiz(PAPEL, -4)}; text-shadow: var(--lu-rel); font-variant-numeric: tabular-nums; }
+  .lu-cuenta-etq { font-family: ${SANS}; font-weight: 400; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: ${TINTA_SUAVE}; white-space: nowrap; }
+  .desktop-stage .lu-cuenta-num { font-size: 46px; }
+  .lu-cuenta-aviso { text-align: center; }
 
   /* Sin íconos prestados: los componentes compartidos traen los suyos (una
      nota musical, un tilde, una cama) y al lado del ícono de línea de la
      cabecera quedaban dos dibujos distintos diciendo lo mismo en la misma
      sección. El juego de línea de la colección es el único que se ve. */
-  .pr-raiz #songs svg.lucide, .pr-raiz #rsvp svg.lucide, .pr-raiz .ia-icon-box svg.lucide { display: none !important; }
-  .pr-raiz .ia-icon-box { display: none !important; }
+  .lu-raiz #songs svg.lucide, .lu-raiz #rsvp svg.lucide, .lu-raiz .ia-icon-box svg.lucide { display: none !important; }
+  .lu-raiz .ia-icon-box { display: none !important; }
 
-  .pr-raiz #rsvp.section.dark { background: transparent !important; color: ${TINTA} !important; border: none !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; }
-  .pr-raiz #rsvp.section.dark > p.t-kicker, .pr-raiz #rsvp.section.dark > h2, .pr-raiz #rsvp.section.dark > .d-rsvp-grid { width: 100% !important; max-width: 420px !important; text-align: left !important; }
-  .pr-raiz #rsvp.section.dark h2 { display: none !important; }
-  .pr-raiz #rsvp.section.dark b, .pr-raiz #rsvp.section.dark strong { color: ${TINTA} !important; }
-  .pr-raiz #rsvp.section.dark label { text-transform: uppercase !important; font-size: 10px !important; font-family: ${SANS} !important; letter-spacing: .39em !important; color: ${TINTA_SUAVE} !important; font-weight: 400 !important; }
-  .pr-raiz #rsvp.section.dark input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; padding: 12px 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; min-height: 48px; }
-  .pr-raiz #rsvp.section.dark input::placeholder { color: ${TINTA_SUAVE} !important; opacity: .8 !important; }
-  .pr-raiz #rsvp.section.dark .t-btn { border-radius: 0 !important; min-height: 48px; padding: 0 22px !important; flex: 1 !important; min-width: 130px !important; background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; font-family: ${SANS} !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: .24em !important; font-size: 11.5px !important; }
-  .pr-raiz #rsvp.section.dark .t-btn.solid, .pr-raiz #rsvp.section.dark button[data-rsvp="confirmar"] { background: ${TINTA} !important; color: ${PAPEL} !important; border-color: ${TINTA} !important; }
-  .pr-raiz #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) { flex-direction: row !important; gap: 12px !important; }
-  .pr-raiz .tpl .d-rsvp-grid { display: flex !important; flex-direction: column !important; gap: 24px !important; align-items: flex-start !important; }
-  .pr-raiz .tpl .d-rsvp-grid > div { width: 100% !important; }
-  .pr-raiz #rsvp.section.dark .t-detail { background: transparent !important; border: none !important; border-top: 0.5px solid rgba(${SH},.3) !important; padding: 16px 0 0 !important; text-align: left !important; box-shadow: none !important; width: 100% !important; }
-  .pr-raiz #rsvp.section.dark .t-detail h4 { color: ${TINTA_SUAVE} !important; font-family: ${SANS} !important; text-transform: uppercase !important; font-size: 10px !important; letter-spacing: .39em !important; font-weight: 400 !important; margin-bottom: 6px !important; }
-  .pr-raiz #rsvp.section.dark .t-detail p { color: ${TINTA} !important; font-size: 14px !important; }
-  .pr-raiz #rsvp.section.dark .t-detail p b { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 26px !important; color: ${TINTA} !important; }
+  .lu-raiz #rsvp.section.dark { background: transparent !important; color: ${TINTA} !important; border: none !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; }
+  .lu-raiz #rsvp.section.dark > p.t-kicker, .lu-raiz #rsvp.section.dark > h2, .lu-raiz #rsvp.section.dark > .d-rsvp-grid { width: 100% !important; max-width: 420px !important; text-align: left !important; }
+  .lu-raiz #rsvp.section.dark h2 { display: none !important; }
+  .lu-raiz #rsvp.section.dark b, .lu-raiz #rsvp.section.dark strong { color: ${TINTA} !important; }
+  .lu-raiz #rsvp.section.dark label { text-transform: uppercase !important; font-size: 10px !important; font-family: ${SANS} !important; letter-spacing: .39em !important; color: ${TINTA_SUAVE} !important; font-weight: 400 !important; }
+  .lu-raiz #rsvp.section.dark input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; padding: 12px 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; min-height: 48px; }
+  .lu-raiz #rsvp.section.dark input::placeholder { color: ${TINTA_SUAVE} !important; opacity: .8 !important; }
+  .lu-raiz #rsvp.section.dark .t-btn { border-radius: 0 !important; min-height: 48px; padding: 0 22px !important; flex: 1 !important; min-width: 130px !important; background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; font-family: ${SANS} !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: .24em !important; font-size: 11.5px !important; }
+  .lu-raiz #rsvp.section.dark .t-btn.solid, .lu-raiz #rsvp.section.dark button[data-rsvp="confirmar"] { background: ${TINTA} !important; color: ${PAPEL} !important; border-color: ${TINTA} !important; }
+  .lu-raiz #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) { flex-direction: row !important; gap: 12px !important; }
+  .lu-raiz .tpl .d-rsvp-grid { display: flex !important; flex-direction: column !important; gap: 24px !important; align-items: flex-start !important; }
+  .lu-raiz .tpl .d-rsvp-grid > div { width: 100% !important; }
+  .lu-raiz #rsvp.section.dark .t-detail { background: transparent !important; border: none !important; border-top: 0.5px solid rgba(${SH},.3) !important; padding: 16px 0 0 !important; text-align: left !important; box-shadow: none !important; width: 100% !important; }
+  .lu-raiz #rsvp.section.dark .t-detail h4 { color: ${TINTA_SUAVE} !important; font-family: ${SANS} !important; text-transform: uppercase !important; font-size: 10px !important; letter-spacing: .39em !important; font-weight: 400 !important; margin-bottom: 6px !important; }
+  .lu-raiz #rsvp.section.dark .t-detail p { color: ${TINTA} !important; font-size: 14px !important; }
+  .lu-raiz #rsvp.section.dark .t-detail p b { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 26px !important; color: ${TINTA} !important; }
   /* CONFIRMADO en relieve hueco: prensado hacia adentro, creciendo de .96 a 1. */
-  .pr-raiz #rsvp.section.dark [class*="confirm"] h3, .pr-raiz #rsvp.section.dark h3 { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 44px !important; line-height: 1 !important; letter-spacing: .04em !important; color: ${matiz(PAPEL, 3)} !important;
-    text-shadow: 0 -1px 0 rgba(255,255,255,.90), 0 1px 1px rgba(${SH},.50), 0 2px 3px rgba(${SH},.12); animation: prPrensado .5s cubic-bezier(.22,.61,.36,1) both; }
+  .lu-raiz #rsvp.section.dark [class*="confirm"] h3, .lu-raiz #rsvp.section.dark h3 { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 44px !important; line-height: 1 !important; letter-spacing: .04em !important; color: ${matiz(PAPEL, 3)} !important;
+    text-shadow: 0 -1px 0 rgba(255,255,255,.90), 0 1px 1px rgba(${SH},.50), 0 2px 3px rgba(${SH},.12); animation: luPrensado .5s cubic-bezier(.22,.61,.36,1) both; }
 
-  .pr-raiz #songs.d-sec.dark, .pr-raiz #songs { background: transparent !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; color: ${TINTA}; }
-  .pr-raiz #songs > p.t-kicker, .pr-raiz #songs > form, .pr-raiz #songs > div { width: 100% !important; max-width: 420px !important; text-align: left !important; }
-  .pr-raiz #songs h2, .pr-raiz #songs p:not(.t-kicker) { font-family: ${SANS}; color: ${TINTA}; }
-  .pr-raiz #songs .mod-input-row { display: flex !important; flex-direction: column !important; gap: 0 !important; width: 100% !important; }
-  .pr-raiz #songs input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; min-height: 48px; padding: 0 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; }
-  .pr-raiz #songs button[type="submit"], .pr-raiz #songs .t-btn { background: ${TINTA} !important; color: ${PAPEL} !important; border: none !important; border-radius: 0 !important; min-height: 48px; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 11.5px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
-  .pr-raiz #songs .mod-item, .pr-raiz #songs li { background: transparent !important; border: none !important; border-bottom: 0.5px solid rgba(${SH},.22) !important; border-radius: 0 !important; }
+  .lu-raiz #songs.d-sec.dark, .lu-raiz #songs { background: transparent !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; color: ${TINTA}; }
+  .lu-raiz #songs > p.t-kicker, .lu-raiz #songs > form, .lu-raiz #songs > div { width: 100% !important; max-width: 420px !important; text-align: left !important; }
+  .lu-raiz #songs h2, .lu-raiz #songs p:not(.t-kicker) { font-family: ${SANS}; color: ${TINTA}; }
+  .lu-raiz #songs .mod-input-row { display: flex !important; flex-direction: column !important; gap: 0 !important; width: 100% !important; }
+  .lu-raiz #songs input { background: ${PAPEL2} !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.34) !important; border-radius: 0 !important; min-height: 48px; padding: 0 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; }
+  .lu-raiz #songs button[type="submit"], .lu-raiz #songs .t-btn { background: ${TINTA} !important; color: ${PAPEL} !important; border: none !important; border-radius: 0 !important; min-height: 48px; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 11.5px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
+  .lu-raiz #songs .mod-item, .lu-raiz #songs li { background: transparent !important; border: none !important; border-bottom: 0.5px solid rgba(${SH},.22) !important; border-radius: 0 !important; }
 
-  .pr-raiz #info-adicional { background: transparent !important; }
-  .pr-raiz #ia-trigger-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; letter-spacing: .24em !important; text-transform: uppercase !important; font-size: 11px !important; }
+  .lu-raiz #info-adicional { background: transparent !important; }
+  .lu-raiz #ia-trigger-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; letter-spacing: .24em !important; text-transform: uppercase !important; font-size: 11px !important; }
 
-  .pr-raiz .copy-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
-  .pr-raiz .copy-btn.copied { background: ${TINTA} !important; color: ${PAPEL} !important; }
+  .lu-raiz .copy-btn { background: transparent !important; color: ${TINTA} !important; border: 0.5px solid rgba(${SH},.5) !important; border-radius: 0 !important; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
+  .lu-raiz .copy-btn.copied { background: ${TINTA} !important; color: ${PAPEL} !important; }
 
   /* Post-evento */
-  .pr-post { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 48px 3% 24px; min-height: 100dvh; display: flex; align-items: center; }
-  .pr-post-hoja { width: 100%; padding: 44px 30px 38px; }
-  .pr-sinonimo { font-family: ${SCRIPT}; font-weight: 400; font-style: normal; color: ${TINTA}; text-shadow: none; }
+  .lu-post { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 48px 3% 24px; min-height: 100dvh; display: flex; align-items: center; }
+  .lu-post-hoja { width: 100%; padding: 44px 30px 38px; }
+  .lu-sinonimo { font-family: ${SCRIPT}; font-weight: 400; font-style: normal; color: ${TINTA}; text-shadow: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    .pr-entra { opacity: 1; transform: none; transition: none; }
-    .pr-splash--sale, .pr-portada--sube { animation: none; }
-    .pr-pastilla, .pr-pastilla--oculta { transition: none; opacity: 1; transform: none; pointer-events: auto; }
+    .lu-entra { opacity: 1; transform: none; transition: none; }
+    .lu-splash--sale, .lu-portada--sube { animation: none; }
+    .lu-pastilla, .lu-pastilla--oculta { transition: none; opacity: 1; transform: none; pointer-events: auto; }
   }
 `;

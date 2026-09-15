@@ -69,6 +69,11 @@ import {
     INFANTILSAFARI_COLORS,
     ANIVERSARIO_COLORS,
     PRENSA_COLORS,
+    HERBARIO_COLORS,
+    TRAZO_COLORS,
+    NOCHE_COLORS,
+    LUMBRE_COLORS,
+    JARDINDEPAPEL_COLORS,
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
@@ -136,6 +141,11 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     INFANTILSAFARI: "Infantil Safari",
     ANIVERSARIO: "Aniversario",
     PRENSA: "Prensa",
+    HERBARIO: "Herbario",
+    TRAZO: "Trazo",
+    NOCHE: "Noche",
+    LUMBRE: "Lumbre",
+    JARDINDEPAPEL: "Jardín de papel",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
@@ -197,6 +207,11 @@ const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     INFANTILSAFARI: INFANTILSAFARI_COLORS,
     ANIVERSARIO: ANIVERSARIO_COLORS,
     PRENSA: PRENSA_COLORS,
+    HERBARIO: HERBARIO_COLORS,
+    TRAZO: TRAZO_COLORS,
+    NOCHE: NOCHE_COLORS,
+    LUMBRE: LUMBRE_COLORS,
+    JARDINDEPAPEL: JARDINDEPAPEL_COLORS,
 };
 const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
     (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [
@@ -215,14 +230,14 @@ type Collection = Coleccion;
  * tipo de evento: no puede ser cualquiera porque el modal filtra las tabs por
  * evento y una familia fuera del filtro rompe el preview.
  *
- * Paper e Icon reciben sus familias a medida que se instalan (ver
+ * Paper e Iconic reciben sus familias a medida que se instalan (ver
  * docs/PLAN_NUEVAS_COLECCIONES.md); mientras una colección no tenga familia
  * para un evento, cae a la de siempre de la arquitectura equivalente.
  */
 function familiaPorDefecto(collection: Collection, evento: string | undefined): TemplateTipo {
     const storytelling: TemplateTipo = evento === "QUINCE_ANOS" ? "PRINCESA" : evento === "CUMPLEANOS" ? "CUMPLEANOSTERRAZA" : "GUESTPASSVIP";
     if (collection === "STORYTELLING") return storytelling;
-    if (collection === "ICON") return storytelling;
+    if (collection === "ICONIC") return storytelling;
     return "ELEGANT";
 }
 
@@ -312,7 +327,7 @@ export function StepDesign() {
                             { id: "FLAT", clave: "wizard.plantilla.coleccionFlat", Icono: LayoutGrid, nueva: false },
                             { id: "STORYTELLING", clave: "wizard.plantilla.coleccionStorytelling", Icono: Sparkles, nueva: false },
                             { id: "PAPER", clave: "wizard.plantilla.coleccionPaper", Icono: Layers, nueva: true },
-                            { id: "ICON", clave: "wizard.plantilla.coleccionIcon", Icono: Shapes, nueva: true },
+                            { id: "ICONIC", clave: "wizard.plantilla.coleccionIconic", Icono: Shapes, nueva: true },
                         ] as const).map(({ id, clave, Icono, nueva }) => (
                             <button
                                 key={id}
@@ -360,7 +375,7 @@ export function StepDesign() {
                             {t(
                                 collection === "STORYTELLING" ? "wizard.plantilla.verModelosStorytelling"
                                 : collection === "PAPER" ? "wizard.plantilla.verModelosPaper"
-                                : collection === "ICON" ? "wizard.plantilla.verModelosIcon"
+                                : collection === "ICONIC" ? "wizard.plantilla.verModelosIconic"
                                 : "wizard.plantilla.verModelosFlat"
                             )}
                         </Button>

@@ -132,6 +132,11 @@ export function WizardLivePreview() {
         "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION", "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO",
         // Colección Paper · Papel Prensado
         "PRENSA",
+        "HERBARIO",
+        "TRAZO",
+        "NOCHE",
+        "LUMBRE",
+        "JARDINDEPAPEL",
     ]);
     const tipo = data.templateTipo && DESIGN_TEMPLATE_TIPOS.has(data.templateTipo) ? data.templateTipo : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
