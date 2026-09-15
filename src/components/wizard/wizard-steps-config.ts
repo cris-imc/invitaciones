@@ -75,6 +75,7 @@ export const PAPER_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
 };
 
 export const ICONIC_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
+    TRAZODEPAPEL: "capasDePapel",
     CIUDADDEPAPEL: "capasDePapel",
     CUENTODEPAPEL: "capasDePapel",
     CIELODEPAPEL: "capasDePapel",

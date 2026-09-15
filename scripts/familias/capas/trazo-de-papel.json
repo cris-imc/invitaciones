@@ -1,0 +1,32 @@
+{
+  "archivo": "TrazoDePapelTemplate",
+  "prefijo": "tdp",
+  "mote": "TrazoPapel",
+  "titulo": "TRAZO DE PAPEL",
+  "varianteBase": "Oliva",
+  "resumen": [
+    "El casamiento dibujado a mano: en vez de capas de papel recortado, trazos",
+    "de pincel sueltos -- la pareja abrazada, el ramo, las copas, el auto con",
+    "latas -- y lettering escrito a mano en las secciones. Caveat Brush para",
+    "los títulos y Karla para el resto.",
+    "",
+    "Es la única familia de la sub-colección SIN foto principal: el mockup no",
+    "trae esa sección porque el dibujo es el protagonista. Si el anfitrión",
+    "carga un recorte igual, la sección aparece sin decoración propia."
+  ],
+  "serif": { "modulo": "Caveat_Brush", "css": "'Caveat Brush', cursive", "pesos": ["400"], "italica": false },
+  "sans": { "modulo": "Karla", "css": "'Karla', sans-serif", "pesos": ["400", "500"] },
+  "paleta": {
+    "bg": "#F5EFE3", "bg2": "#EFE6D4", "ink": "#3B4022", "ink2": "#6F6E5C",
+    "acc": "#5C6B2F", "acc2": "#A9B08A", "sky1": "#F5EFE3", "sky2": "#EDE3CC",
+    "hill1": "#DDE0C8", "hill2": "#A9B08A", "hill3": "#5C6B2F",
+    "night": "#2E2C3D", "nightInk": "#F5EFE3"
+  },
+  "paneles": { "recepcion": 0, "ceremonia": 1, "llegar": 2, "cronograma": 3 },
+  "variantes": {
+    "Tinta": { "etiqueta": "Tinta china", "bg": "#F4F1EA", "bg2": "#EAE6DC", "ink": "#1F1F1F", "ink2": "#5E5E5A", "acc": "#1F1F1F", "acc2": "#B8B4A6", "sky1": "#F4F1EA", "sky2": "#E6E2D6", "hill1": "#DAD6CA", "hill2": "#9C988C", "hill3": "#1F1F1F", "night": "#2E2C3D", "nightInk": "#F4F1EA" },
+    "Terracota": { "etiqueta": "Terracota", "bg": "#F6EDE4", "bg2": "#EFE0D2", "ink": "#3A2A22", "ink2": "#7A6A60", "acc": "#B7573C", "acc2": "#D9A88E", "sky1": "#F6EDE4", "sky2": "#EBD6C4", "hill1": "#E4CDBC", "hill2": "#C98E74", "hill3": "#B7573C", "night": "#2E2C3D", "nightInk": "#F6EDE4" },
+    "Azul": { "etiqueta": "Azul tinta", "bg": "#EEF0F3", "bg2": "#E2E6EC", "ink": "#1F2A44", "ink2": "#5F6B84", "acc": "#2C4C8C", "acc2": "#9AAAC8", "sky1": "#EEF0F3", "sky2": "#D9DFEA", "hill1": "#CDD5E2", "hill2": "#8A9BBE", "hill3": "#2C4C8C", "night": "#2E2C3D", "nightInk": "#EEF0F3" },
+    "Borgona": { "etiqueta": "Borgoña", "bg": "#F7EEEE", "bg2": "#EEDFE0", "ink": "#3A1F26", "ink2": "#7B6268", "acc": "#7A2A3B", "acc2": "#C99AA4", "sky1": "#F7EEEE", "sky2": "#EBD2D6", "hill1": "#E3C7CC", "hill2": "#B87F8B", "hill3": "#7A2A3B", "night": "#2E2C3D", "nightInk": "#F7EEEE" }
+  }
+}

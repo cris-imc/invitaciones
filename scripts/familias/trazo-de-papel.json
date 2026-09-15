@@ -1,0 +1,18 @@
+{
+  "codigo": "TRAZODEPAPEL",
+  "etiqueta": "Trazo de papel",
+  "archivo": "TrazoDePapelTemplate",
+  "componente": "TrazoDePapelTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "capasDePapel",
+  "acento": "#5C6B2F",
+  "eventos": ["soloCasamiento"],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    { "id": "default", "nombre": "Oliva", "color": "#5C6B2F" },
+    { "id": "Tinta", "nombre": "Tinta china", "color": "#1F1F1F" },
+    { "id": "Terracota", "nombre": "Terracota", "color": "#B7573C" },
+    { "id": "Azul", "nombre": "Azul tinta", "color": "#2C4C8C" },
+    { "id": "Borgona", "nombre": "Borgoña", "color": "#7A2A3B" }
+  ]
+}

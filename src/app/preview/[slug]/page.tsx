@@ -345,6 +345,14 @@ async function PreviewPageInterna({
         case 'Terracota': return <PlantillaDinamica nombre="CiudadDePapelTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
         default: return <PlantillaDinamica nombre="CiudadDePapelTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
     }
+} else if (invitation.templateTipo === 'TRAZODEPAPEL') {
+    switch (color) {
+        case 'Tinta': return <PlantillaDinamica nombre="TrazoDePapelTemplateTinta" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Terracota': return <PlantillaDinamica nombre="TrazoDePapelTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Azul': return <PlantillaDinamica nombre="TrazoDePapelTemplateAzul" invitation={invRecord} guest={null} isPersonalized={false} />;
+        case 'Borgona': return <PlantillaDinamica nombre="TrazoDePapelTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;
+        default: return <PlantillaDinamica nombre="TrazoDePapelTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+    }
 } else if (invitation.templateTipo === 'PRENSA') {
             switch (color) {
                 case 'Hueso': return <PlantillaDinamica nombre="PrensaTemplateHueso" invitation={invRecord} guest={null} isPersonalized={false} />;

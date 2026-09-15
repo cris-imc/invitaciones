@@ -21,6 +21,11 @@ import { PrensaTemplateHueso } from "@/components/templates/PrensaTemplateHueso"
 import { PrensaTemplateArena } from "@/components/templates/PrensaTemplateArena";
 import { PrensaTemplatePiedra } from "@/components/templates/PrensaTemplatePiedra";
 import { PrensaTemplateHumo } from "@/components/templates/PrensaTemplateHumo";
+import { TrazoDePapelTemplate } from "@/components/templates/TrazoDePapelTemplate";
+import { TrazoDePapelTemplateTinta } from "@/components/templates/TrazoDePapelTemplateTinta";
+import { TrazoDePapelTemplateTerracota } from "@/components/templates/TrazoDePapelTemplateTerracota";
+import { TrazoDePapelTemplateAzul } from "@/components/templates/TrazoDePapelTemplateAzul";
+import { TrazoDePapelTemplateBorgona } from "@/components/templates/TrazoDePapelTemplateBorgona";
 import { CiudadDePapelTemplate } from "@/components/templates/CiudadDePapelTemplate";
 import { CiudadDePapelTemplateNeon } from "@/components/templates/CiudadDePapelTemplateNeon";
 import { CiudadDePapelTemplateConcreto } from "@/components/templates/CiudadDePapelTemplateConcreto";
@@ -768,6 +773,14 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Puerto': return <CiudadDePapelTemplatePuerto invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Terracota': return <CiudadDePapelTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <CiudadDePapelTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'TRAZODEPAPEL') {
+                switch (color) {
+                    case 'Tinta': return <TrazoDePapelTemplateTinta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Terracota': return <TrazoDePapelTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Azul': return <TrazoDePapelTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Borgona': return <TrazoDePapelTemplateBorgona invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <TrazoDePapelTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
             } else if (validInvitation.templateTipo === 'PRENSA') {
                 switch (color) {

@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL" | "TRAZODEPAPEL";
 
 export interface ColorOption {
   id: string;
@@ -1282,4 +1282,20 @@ export const CIUDADDEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
   Concreto: dynamic(() => import("@/components/templates/CiudadDePapelTemplateConcreto").then((m) => m.CiudadDePapelTemplateConcreto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Puerto: dynamic(() => import("@/components/templates/CiudadDePapelTemplatePuerto").then((m) => m.CiudadDePapelTemplatePuerto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Terracota: dynamic(() => import("@/components/templates/CiudadDePapelTemplateTerracota").then((m) => m.CiudadDePapelTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const TRAZODEPAPEL_COLORS: ColorOption[] = [
+  { id: "default", name: "Oliva", color: "#5C6B2F" },
+  { id: "Tinta", name: "Tinta china", color: "#1F1F1F" },
+  { id: "Terracota", name: "Terracota", color: "#B7573C" },
+  { id: "Azul", name: "Azul tinta", color: "#2C4C8C" },
+  { id: "Borgona", name: "Borgoña", color: "#7A2A3B" },
+];
+
+export const TRAZODEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/TrazoDePapelTemplate").then((m) => m.TrazoDePapelTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Tinta: dynamic(() => import("@/components/templates/TrazoDePapelTemplateTinta").then((m) => m.TrazoDePapelTemplateTinta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/TrazoDePapelTemplateTerracota").then((m) => m.TrazoDePapelTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/TrazoDePapelTemplateAzul").then((m) => m.TrazoDePapelTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/TrazoDePapelTemplateBorgona").then((m) => m.TrazoDePapelTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };

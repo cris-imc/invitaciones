@@ -69,9 +69,18 @@ function hijos(src) {
   return out;
 }
 
+/**
+ * El bloque que arranca en una marca, o null si esa sección no existe.
+ *
+ * No todas las familias traen todas las secciones: Trazo de papel no tiene
+ * foto principal (es la familia dibujada a mano, sin fotos), y los quince no
+ * tienen panel de ceremonia. Que falte una no es un error del extractor: la
+ * plantilla dibuja esa sección sin decoración propia si el anfitrión igual
+ * carga los datos.
+ */
 function bloqueDesde(marca) {
   const a = html.indexOf(marca);
-  if (a < 0) throw new Error("no encontré " + marca);
+  if (a < 0) return null;
   const inicio = html.indexOf("<", a + marca.length);
   return html.slice(inicio, cerrar(html, inicio));
 }
@@ -124,14 +133,21 @@ const secciones = [
 ];
 
 const salida = {};
+const ausentes = [];
 for (const [nombre, marca, modo] of secciones) {
   let outer;
   if (modo === "entero" || modo === "interiorDecoracion") {
     const a = html.indexOf(marca);
+    // Los defs y la portada sí son obligatorios: sin ellos no hay familia.
     if (a < 0) throw new Error("no encontré " + marca);
     outer = html.slice(a, cerrar(html, a));
   } else {
     outer = bloqueDesde(marca);
+  }
+  if (outer === null) {
+    salida[nombre] = modo === "paneles" ? [] : "";
+    ausentes.push(nombre);
+    continue;
   }
   if (modo === "entero") { salida[nombre] = piezas(outer); continue; }
   if (modo === "paneles") {
@@ -158,5 +174,9 @@ const dir = path.join(__dirname, "..", "src", "components", "templates", "escena
 fs.mkdirSync(dir, { recursive: true });
 const destino = path.join(dir, `${P}Escenas.ts`);
 fs.writeFileSync(destino, ts);
-const resumen = Object.entries(salida).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.map((x) => x.length).join("+") : v.length} bytes`).join("\n  ");
+const resumen = Object.entries(salida)
+  .filter(([k]) => !ausentes.includes(k))
+  .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.map((x) => x.length).join("+") : v.length} bytes`)
+  .join("\n  ");
 console.log(`${path.relative(process.cwd(), destino)} (${(ts.length / 1024).toFixed(0)} KB)\n  ${resumen}`);
+if (ausentes.length) console.log(`  (este mockup no dibuja: ${ausentes.join(", ")})`);
