@@ -70,6 +70,9 @@ export const TEMPLATE_LABELS: Record<string, string> = {
   INFANTILJURASICO: "Infantil Mundo Jurásico",
   INFANTILSAFARI: "Infantil Safari",
   ANIVERSARIO: "Aniversario",
+
+  // Colección Paper · Papel Prensado
+  PRENSA: "Prensa",
 };
 
 /**

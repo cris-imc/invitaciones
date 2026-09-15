@@ -66,7 +66,9 @@ export type Coleccion = "FLAT" | "STORYTELLING" | "PAPER" | "ICON";
 /** Sub-colección visible dentro de Paper e Icon (los mockups vienen agrupados así). */
 export type Subcoleccion = "papeleriaViva" | "papelPrensado" | "capasDePapel" | "tipograficaEditorial";
 
-export const PAPER_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {};
+export const PAPER_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
+    PRENSA: "papelPrensado",
+};
 
 export const ICON_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {};
 

@@ -222,7 +222,7 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 
 | Familia | Código | Estado |
 |---|---|---|
-| Prensa | PRENSA | — |
+| Prensa | PRENSA | `wiring` — base `PrensaTemplate.tsx` (registro completo: hoja, relieve con luz que gira, entrada de sección, splash quieto, pastilla que se repliega, CONFIRMADO hueco), 4 variantes por `scripts/gen-papel-prensado-variants.js`, los 10 puntos de wiring, `PlantillaDinamica` regenerada, tsc y eslint limpios. Falta la **verificación en navegador**: el preview compila (200) pero la pestaña de Chrome está minimizada y no termina de cargar; queda para cuando haya pantalla. |
 | Noche | NOCHE | — |
 | Lumbre | LUMBRE | — |
 | Herbario | HERBARIO | — |

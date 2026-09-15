@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA";
 
 export interface ColorOption {
   id: string;
@@ -1134,4 +1134,24 @@ export const ELEGANT_COMPONENTS: Record<string, PreviewComponent> = {
   Gray: dynamic(() => import("@/components/templates/ElegantTemplateGray").then((m) => m.ElegantTemplateGray), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   DarkYellow: dynamic(() => import("@/components/templates/ElegantTemplateDarkYellow").then((m) => m.ElegantTemplateDarkYellow), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Pink: dynamic(() => import("@/components/templates/ElegantTemplatePink").then((m) => m.ElegantTemplatePink), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+// ── Colección Paper · Papel Prensado ────────────────────────────────────────
+// En esta sub-colección la "variante" es el tono del papel, no un acento:
+// la tinta es la misma en las cinco (ver PrensaTemplate.tsx). El chip del
+// selector muestra el papel, que es lo que cambia.
+export const PRENSA_COLORS: ColorOption[] = [
+  { id: "default", name: "Lino", color: "#F4ECE2" },
+  { id: "Hueso", name: "Hueso", color: "#F8F4EE" },
+  { id: "Arena", name: "Arena", color: "#EDE3D4" },
+  { id: "Piedra", name: "Piedra", color: "#E4DED6" },
+  { id: "Humo", name: "Humo", color: "#DCD8D2" },
+];
+
+export const PRENSA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/PrensaTemplate").then((m) => m.PrensaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Hueso: dynamic(() => import("@/components/templates/PrensaTemplateHueso").then((m) => m.PrensaTemplateHueso), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Arena: dynamic(() => import("@/components/templates/PrensaTemplateArena").then((m) => m.PrensaTemplateArena), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Piedra: dynamic(() => import("@/components/templates/PrensaTemplatePiedra").then((m) => m.PrensaTemplatePiedra), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Humo: dynamic(() => import("@/components/templates/PrensaTemplateHumo").then((m) => m.PrensaTemplateHumo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };

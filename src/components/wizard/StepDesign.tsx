@@ -68,6 +68,7 @@ import {
     INFANTILJURASICO_COLORS,
     INFANTILSAFARI_COLORS,
     ANIVERSARIO_COLORS,
+    PRENSA_COLORS,
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
@@ -134,6 +135,7 @@ const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
     INFANTILJURASICO: "Infantil Mundo Jurásico",
     INFANTILSAFARI: "Infantil Safari",
     ANIVERSARIO: "Aniversario",
+    PRENSA: "Prensa",
 };
 const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     ELEGANT: ELEGANT_COLORS,
@@ -194,6 +196,7 @@ const TEMPLATE_TIPO_COLORS: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
     INFANTILJURASICO: INFANTILJURASICO_COLORS,
     INFANTILSAFARI: INFANTILSAFARI_COLORS,
     ANIVERSARIO: ANIVERSARIO_COLORS,
+    PRENSA: PRENSA_COLORS,
 };
 const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
     (Object.keys(TEMPLATE_TIPO_LABEL) as TemplateTipo[]).map((tipo) => [

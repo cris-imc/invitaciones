@@ -15,6 +15,12 @@ import { ElegantTemplateGray } from "@/components/templates/ElegantTemplateGray"
 import { ElegantTemplateDarkYellow } from "@/components/templates/ElegantTemplateDarkYellow";
 import { ElegantTemplatePink } from "@/components/templates/ElegantTemplatePink";
 import { GuestPassVipTemplate } from "@/components/templates/GuestPassVipTemplate";
+// Colección Paper · Papel Prensado
+import { PrensaTemplate } from "@/components/templates/PrensaTemplate";
+import { PrensaTemplateHueso } from "@/components/templates/PrensaTemplateHueso";
+import { PrensaTemplateArena } from "@/components/templates/PrensaTemplateArena";
+import { PrensaTemplatePiedra } from "@/components/templates/PrensaTemplatePiedra";
+import { PrensaTemplateHumo } from "@/components/templates/PrensaTemplateHumo";
 import { GuestPassVipTemplateBorgona } from "@/components/templates/GuestPassVipTemplateBorgona";
 import { GuestPassVipTemplateEsmeralda } from "@/components/templates/GuestPassVipTemplateEsmeralda";
 import { GuestPassVipTemplatePlata } from "@/components/templates/GuestPassVipTemplatePlata";
@@ -658,6 +664,14 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'VerdeBotella': return <ChicTemplateVerdeBotella invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Gris': return <ChicTemplateGris invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <ChicTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'PRENSA') {
+                switch (color) {
+                    case 'Hueso': return <PrensaTemplateHueso invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Arena': return <PrensaTemplateArena invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Piedra': return <PrensaTemplatePiedra invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Humo': return <PrensaTemplateHumo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <PrensaTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
             } else if (validInvitation.templateTipo === 'GUESTPASSVIP') {
                 switch (color) {

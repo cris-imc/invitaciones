@@ -151,6 +151,14 @@ export default async function InvitationPage({
                 case 'Gris': return <PlantillaDinamica nombre="ChicTemplateGris" invitation={invRecord} guest={null} isPersonalized={false} />;
                 default: return <PlantillaDinamica nombre="ChicTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
+        } else if (invitation!.templateTipo === 'PRENSA') {
+            switch (color) {
+                case 'Hueso': return <PlantillaDinamica nombre="PrensaTemplateHueso" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Arena': return <PlantillaDinamica nombre="PrensaTemplateArena" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Piedra': return <PlantillaDinamica nombre="PrensaTemplatePiedra" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Humo': return <PlantillaDinamica nombre="PrensaTemplateHumo" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="PrensaTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'GUESTPASSVIP') {
             switch (color) {
                 case 'Borgona': return <PlantillaDinamica nombre="GuestPassVipTemplateBorgona" invitation={invRecord} guest={null} isPersonalized={false} />;

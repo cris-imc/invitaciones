@@ -83,6 +83,7 @@ import {
   INFANTILJURASICO_COLORS,
   INFANTILSAFARI_COLORS,
   ANIVERSARIO_COLORS,
+  PRENSA_COLORS,
   type TemplateTipo,
 } from "./template-preview-registry";
 
@@ -128,6 +129,7 @@ export {
   INFANTILJURASICO_COLORS,
   INFANTILSAFARI_COLORS,
   ANIVERSARIO_COLORS,
+  PRENSA_COLORS,
   type TemplateTipo,
 };
 
@@ -193,6 +195,8 @@ export const TEMPLATE_TIPO_ACCENT: Record<TemplateTipo, string> = {
   INFANTILJURASICO: "#7EA84A",
   INFANTILSAFARI: "#D98A3C",
   ANIVERSARIO: "#C48A6E",
+  // Papel Prensado: el "acento" es la tinta, que no cambia entre variantes.
+  PRENSA: "#514842",
 };
 
 // El orden de esta lista es el orden en que se ofrecen las plantillas. Los
@@ -244,6 +248,8 @@ const TEMPLATE_TIPOS_ORDENADOS: TemplateTipo[] = [
   "ENCAJECONTEMPORANEO",
   "LIQUIDGLASS",
   "BLACKANDWHITE",
+  // Colección Paper · Papel Prensado
+  "PRENSA",
   "BABYSHOWER",
   "BAUTISMO",
   "CORPORATIVOANIVERSARIO",
@@ -272,7 +278,9 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] =
 function getAvailableTabs(eventType: string | undefined, collection: Coleccion): { tipo: TemplateTipo; label: string }[] {
   const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D", "PRINCESA", "CORONAESCARLATA", "JEWELRYBOX", "PASEVIP", "CINEABSTRACTOXV", "ACRYLICPOP", "BOLADEDISCOTECA", "CRYSTAL3D", "FASHIONTAG", "FASHIONLOOKBOOK"]);
   const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "MARMOLYORO", "ATELIERDEPAPEL", "BOTANICAEDITORIAL", "ENCAJECONTEMPORANEO", "LIQUIDGLASS"]);
-  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE", "BLACKANDWHITE"]);
+  // Prensa (Papel Prensado) sirve para casamiento y para XV: cambia la copy y
+  // el cronograma, nada de la piel -- ver el toggle "XV" del mockup.
+  const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE", "BLACKANDWHITE", "PRENSA"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL", "BABYSHOWER", "BAUTISMO", "CORPORATIVOANIVERSARIO", "CORPORATIVOENCUENTRO", "CUMPLEANOSCOCKTAIL", "CUMPLEANOSJARDIN", "CUMPLEANOSTERRAZA", "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION", "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
     if (coleccionDeFamilia(tipo) !== collection) return false;
@@ -345,6 +353,7 @@ const COLORS_BY_TIPO: Record<TemplateTipo, typeof ELEGANT_COLORS> = {
   INFANTILJURASICO: INFANTILJURASICO_COLORS,
   INFANTILSAFARI: INFANTILSAFARI_COLORS,
   ANIVERSARIO: ANIVERSARIO_COLORS,
+  PRENSA: PRENSA_COLORS,
 };
 
 function getColorsForTipo(tipo: TemplateTipo) {

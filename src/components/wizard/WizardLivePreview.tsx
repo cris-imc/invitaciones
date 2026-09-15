@@ -130,6 +130,8 @@ export function WizardLivePreview() {
         "BLACKANDWHITE", "BABYSHOWER",
         "BAUTISMO", "CORPORATIVOANIVERSARIO", "CORPORATIVOENCUENTRO", "CUMPLEANOSCOCKTAIL", "CUMPLEANOSJARDIN", "CUMPLEANOSTERRAZA",
         "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION", "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO",
+        // Colección Paper · Papel Prensado
+        "PRENSA",
     ]);
     const tipo = data.templateTipo && DESIGN_TEMPLATE_TIPOS.has(data.templateTipo) ? data.templateTipo : "ELEGANT";
     const color = themeConfig?.colorPrincipal || "default";
