@@ -71,8 +71,8 @@ import {
     TEMPLATE_TIPO_ACCENT,
     type TemplateTipo,
 } from "./TemplatePreviewModal";
-import { Wand2, Sparkles, LayoutGrid } from "lucide-react";
-import { isStorytellingTemplate } from "./wizard-steps-config";
+import { Wand2, Sparkles, LayoutGrid, Layers, Shapes } from "lucide-react";
+import { coleccionDeFamilia, type Coleccion } from "./wizard-steps-config";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
 
 const TEMPLATE_TIPO_LABEL: Record<TemplateTipo, string> = {
@@ -204,7 +204,24 @@ const TEMPLATE_TIPO_BORDER: Record<TemplateTipo, string> = Object.fromEntries(
 
 
 
-type Collection = "FLAT" | "STORYTELLING";
+type Collection = Coleccion;
+
+/**
+ * Con qué familia se abre el modal cuando la plantilla guardada no es de la
+ * colección que está tildada (o no hay ninguna todavía). Una por colección y
+ * tipo de evento: no puede ser cualquiera porque el modal filtra las tabs por
+ * evento y una familia fuera del filtro rompe el preview.
+ *
+ * Paper e Icon reciben sus familias a medida que se instalan (ver
+ * docs/PLAN_NUEVAS_COLECCIONES.md); mientras una colección no tenga familia
+ * para un evento, cae a la de siempre de la arquitectura equivalente.
+ */
+function familiaPorDefecto(collection: Collection, evento: string | undefined): TemplateTipo {
+    const storytelling: TemplateTipo = evento === "QUINCE_ANOS" ? "PRINCESA" : evento === "CUMPLEANOS" ? "CUMPLEANOSTERRAZA" : "GUESTPASSVIP";
+    if (collection === "STORYTELLING") return storytelling;
+    if (collection === "ICON") return storytelling;
+    return "ELEGANT";
+}
 
 export function StepDesign() {
     const { data, setData, setThemeConfig, themeConfig, usePremiumCredit, setDirty } = useWizardStore();
@@ -222,10 +239,7 @@ export function StepDesign() {
     // pantalla, así el flujo no se corta en dos pasos. Si ya hay una
     // plantilla elegida, la colección se deduce de ella; si no, arranca en
     // Flat (comportamiento de siempre).
-    const [collection, setCollection] = useState<Collection>(() => {
-        if (!data.templateTipo) return "FLAT";
-        return isStorytellingTemplate(data.templateTipo) ? "STORYTELLING" : "FLAT";
-    });
+    const [collection, setCollection] = useState<Collection>(() => coleccionDeFamilia(data.templateTipo));
 
     const isDesignEvent = ['CASAMIENTO', 'QUINCE_ANOS', 'CUMPLEANOS'].includes(data.type ?? '');
     // Si ya hay plantilla elegida Y pertenece a la colección activa, se usa
@@ -236,13 +250,11 @@ export function StepDesign() {
     const templateTipoMatchesCollection = Boolean(
         data.templateTipo &&
         (data.templateTipo as string) in TEMPLATE_TIPO_LABEL &&
-        (collection === "STORYTELLING" ? isStorytellingTemplate(data.templateTipo) : !isStorytellingTemplate(data.templateTipo))
+        coleccionDeFamilia(data.templateTipo) === collection
     );
     const activeTemplateTipo: TemplateTipo = templateTipoMatchesCollection
         ? (data.templateTipo as TemplateTipo)
-        : (collection === "STORYTELLING"
-            ? (data.type === "QUINCE_ANOS" ? "PRINCESA" : data.type === "CUMPLEANOS" ? "CUMPLEANOSTERRAZA" : "GUESTPASSVIP")
-            : "ELEGANT");
+        : familiaPorDefecto(collection, data.type);
     const activeColorId = themeConfig?.colorPrincipal || 'default';
     const activeColorList = TEMPLATE_TIPO_COLORS[activeTemplateTipo];
     const activeColorOption = activeColorList.find(c => c.id === activeColorId) ?? activeColorList[0];
@@ -287,40 +299,37 @@ export function StepDesign() {
                     {/* Botones de colección compactos (sin descripción, para
                         ganar espacio) -- conviven en la misma pantalla que
                         "Cambiar plantilla" de abajo, ya no son un paso aparte. */}
-                    <div className="grid sm:grid-cols-2 gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setCollection("FLAT")}
-                            className={`flex items-center justify-center gap-2 rounded-xl border-2 transition-colors py-3 px-4 font-semibold text-sm ${
-                                collection === "FLAT"
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border hover:border-primary/50"
-                            }`}
-                        >
-                            <LayoutGrid className="w-4 h-4 text-muted-foreground" />
-                            {t("wizard.plantilla.coleccionFlat")}
-                        </button>
-
-                        {/* Guest Pass VIP (Casamiento), Princesa (Quince Años) y Baby Shower y
-                            demás familias de "Evento" (CUMPLEANOS, ver soloCumpleanos en
-                            TemplatePreviewModal.tsx) -- los 3 tipos de evento ya tienen storytelling. */}
-                        {(data.type === "CASAMIENTO" || data.type === "QUINCE_ANOS" || data.type === "CUMPLEANOS") && (
+                    {/* Cuatro colecciones, en el orden en que aparecieron. Las dos
+                        nuevas llevan la etiqueta "Nuevas"; Storytelling la tuvo
+                        hasta que llegaron estas. Los tres tipos de evento con
+                        diseño (Casamiento, Quince, Evento) tienen familias en las
+                        cuatro -- isDesignEvent ya filtró el resto arriba. */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {([
+                            { id: "FLAT", clave: "wizard.plantilla.coleccionFlat", Icono: LayoutGrid, nueva: false },
+                            { id: "STORYTELLING", clave: "wizard.plantilla.coleccionStorytelling", Icono: Sparkles, nueva: false },
+                            { id: "PAPER", clave: "wizard.plantilla.coleccionPaper", Icono: Layers, nueva: true },
+                            { id: "ICON", clave: "wizard.plantilla.coleccionIcon", Icono: Shapes, nueva: true },
+                        ] as const).map(({ id, clave, Icono, nueva }) => (
                             <button
+                                key={id}
                                 type="button"
-                                onClick={() => setCollection("STORYTELLING")}
-                                className={`relative flex items-center justify-center gap-2 rounded-xl border-2 transition-colors py-3 px-4 font-semibold text-sm ${
-                                    collection === "STORYTELLING"
+                                onClick={() => setCollection(id)}
+                                className={`relative flex items-center justify-center gap-2 rounded-xl border-2 transition-colors py-3 px-3 font-semibold text-sm ${
+                                    collection === id
                                         ? "border-primary bg-primary/10"
                                         : "border-border hover:border-primary/50"
                                 }`}
                             >
-                                <span className="absolute -top-2 -right-2 text-[9px] font-bold tracking-wider uppercase bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full shadow-sm">
-                                    {t("wizard.plantilla.nuevas")}
-                                </span>
-                                <Sparkles className="w-4 h-4 text-muted-foreground shrink-0" />
-                                <span>{t("wizard.plantilla.coleccionStorytelling")}</span>
+                                {nueva && (
+                                    <span className="absolute -top-2 -right-2 text-[9px] font-bold tracking-wider uppercase bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full shadow-sm">
+                                        {t("wizard.plantilla.nuevas")}
+                                    </span>
+                                )}
+                                <Icono className="w-4 h-4 text-muted-foreground shrink-0" />
+                                <span>{t(clave)}</span>
                             </button>
-                        )}
+                        ))}
                     </div>
 
                     <div className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border p-8">
@@ -345,7 +354,12 @@ export function StepDesign() {
 
                         <Button type="button" size="lg" className="gap-2" onClick={() => setPreviewOpen(true)}>
                             <Wand2 className="w-4 h-4" />
-                            {collection === "STORYTELLING" ? t("wizard.plantilla.verModelosStorytelling") : t("wizard.plantilla.verModelosFlat")}
+                            {t(
+                                collection === "STORYTELLING" ? "wizard.plantilla.verModelosStorytelling"
+                                : collection === "PAPER" ? "wizard.plantilla.verModelosPaper"
+                                : collection === "ICON" ? "wizard.plantilla.verModelosIcon"
+                                : "wizard.plantilla.verModelosFlat"
+                            )}
                         </Button>
 
                         <TemplatePreviewModal

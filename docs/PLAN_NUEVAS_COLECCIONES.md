@@ -172,7 +172,12 @@ Cada familia es **un commit** ("feat(paper): Prensa, 5 variantes") que incluye l
 
 - **Tamaño.** 145 archivos de 1.400–2.200 líneas. La sesión va a cortarse varias veces; por eso el orden de arriba y la tabla de abajo. Retomar = leer la sección 6, abrir el mockup de la familia marcada "en curso" y seguir.
 - **Fidelidad vs. componentes compartidos.** El mockup maqueta a mano el countdown, el RSVP y el álbum "sólo para mostrar el diseño"; en el port van los componentes `v2/` con el theming de la familia. Donde el diseño del mockup no se pueda lograr con el componente compartido, se documenta acá antes de re-maquetar.
-- **Pesos.** Los PNG de Icon no entran tal cual. WebP con transparencia, ancho máximo 1254 → 900 px, calidad 82; se verifica el peso total por familia (< 600 KB).
+- **Pesos y egreso (Railway cobra cada byte que baja un invitado).** Regla para las 29 familias:
+  - Ninguna pieza en PNG. WebP con transparencia, ancho máximo 800 px (480 px los íconos de línea, 720 px los fondos de portada), calidad 76. Hecho: los 34 MB de PNG de Icon quedaron en 2,5 MB; una familia de Capas de papel carga ~530 KB de piezas, Trazo de papel ~190 KB por las que usa.
+  - Presupuesto por familia: **≤ 500 KB de piezas por invitación abierta**. Se mide antes de marcar la familia como verificada.
+  - Todo `<img>` de pieza que no esté en la portada va con `loading="lazy"` y `decoding="async"`; las máscaras CSS (`iconos-linea`, `manuscrita`) ya son livianas por naturaleza (tinta plana).
+  - Las fuentes de Google van por `next/font/google` con `preload: false` y sólo los pesos que el handoff pide; nunca el archivo completo de la familia.
+  - Los mockups (`.dc.html`, PNG fuente) viven en `mockup/` y no se sirven: `public/` sólo tiene lo optimizado.
 - **Nombres.** `EDITORIAL` y `TRAZO` chocaban: resueltos en 2.2. `cdp` repetido en Cielo y Ciudad: Ciudad usa `ciu`.
 - **`isStorytellingTemplate` para Icon.** Es la decisión que más toca código existente; se hace en la fase 1 y se verifica que el flujo Storytelling actual no cambie (tsc + recorrer el wizard con Guest Pass VIP).
 
@@ -197,20 +202,21 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 |---|---|
 | Rama `nuevas-colecciones` desde `main` `8e0b13c` | ✔ |
 | Este plan | ✔ |
-| Copiar `baraja/` (5 webp más nuevas) | — |
-| Icon `img/` + `img/trazo/` + `assets/rw-*` → WebP en `public/templates/<familia>/` | — |
-| Verificar que ninguna fuente nueva falle en `next/font/google` (nombres exactos) | — |
+| Copiar `baraja/` (5 webp más nuevas) | ✔ `7c619d4` |
+| Icon `img/` + `img/trazo/` + `assets/rw-*` → WebP en `public/templates/<familia>/` | ✔ `scripts/importar-piezas-icon.js`, 2,5 MB |
+| Verificar que ninguna fuente nueva falle en `next/font/google` (nombres exactos) | se hace familia por familia al portar |
 
 ### Fase 1 — Cuatro colecciones
 
 | Ítem | Estado |
 |---|---|
-| `Coleccion` + `COLECCION_DE_FAMILIA` + `coleccionDeFamilia()` en wizard-steps-config | — |
-| `isStorytellingTemplate` = STORYTELLING ∪ ICON | — |
-| StepDesign: 4 botones + default por colección | — |
-| TemplatePreviewModal: filtro por `coleccionDeFamilia` + subtítulo de sub-colección | — |
-| i18n es/en/pt + AR: `coleccionPaper`, `coleccionIcon`, `verModelosPaper`, `verModelosIcon`, nombres de sub-colección | — |
-| tsc + recorrer wizard con Guest Pass VIP y Elegant (nada cambió) | — |
+| `Coleccion` + `PAPER/ICON_TEMPLATE_TIPOS` + `coleccionDeFamilia()` + `subcoleccionDeFamilia()` en wizard-steps-config | ✔ |
+| `isStorytellingTemplate` = STORYTELLING ∪ ICON | ✔ |
+| StepDesign: 4 botones + `familiaPorDefecto()` por colección | ✔ |
+| TemplatePreviewModal: filtro por `coleccionDeFamilia` + subtítulo de sub-colección | ✔ |
+| i18n es/en/pt: `coleccionPaper`, `coleccionIcon`, `verModelosPaper`, `verModelosIcon`, `subcoleccion.*` (AR no hace falta: no hay voseo en esos textos) | ✔ |
+| tsc limpio, eslint sin errores nuevos | ✔ |
+| Recorrer el wizard con Guest Pass VIP y Elegant en el navegador (nada cambió) | pendiente de navegador |
 
 ### Paper · Papel Prensado
 

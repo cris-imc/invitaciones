@@ -17,25 +17,32 @@ const fs = require("fs");
 const path = require("path");
 
 const raiz = path.join(__dirname, "..");
-const ANCHO_MAX = 900;
-const CALIDAD = 82;
+
+// El hosting (Railway) cobra el egreso: cada byte que baja un invitado se
+// paga. El presupuesto es que las piezas de una familia entera no pasen de
+// ~400 KB por invitación. Una pieza se dibuja a lo sumo al 60 % del ancho de
+// un celular (≈ 260 px CSS, 520 px en pantalla retina): 800 px de ancho ya
+// sobran, y a calidad 76 el WebP no muestra artefactos en ilustración plana.
+const CALIDAD = 76;
 
 // Origen → destino. Las piezas de `img/` las comparten las cuatro familias
 // con fotos de Capas de papel (bola, luna, nota, salón, capilla, castillo,
 // parejas y quinceañeras), así que van a una sola carpeta y no repetidas por
 // familia. Trazo de papel y Retrowave tienen las suyas.
 const LOTES = [
-  { desde: "mockup/Icon/img", hasta: "public/templates/capas-de-papel" },
-  { desde: "mockup/Icon/img/trazo", hasta: "public/templates/trazo-de-papel" },
-  { desde: "mockup/Icon/assets", hasta: "public/templates/retrowave" },
+  { desde: "mockup/Icon/img", hasta: "public/templates/capas-de-papel", anchoMax: 800 },
+  { desde: "mockup/Icon/img/trazo", hasta: "public/templates/trazo-de-papel", anchoMax: 480 },
+  // El sol y las palmeras de Retrowave son fondo de portada: entran enteros
+  // en pantalla pero son formas planas, aguantan 720 px sin que se note.
+  { desde: "mockup/Icon/assets", hasta: "public/templates/retrowave", anchoMax: 720 },
 ];
 
-async function convertir(origen, destino) {
+async function convertir(origen, destino, anchoMax) {
   const meta = await sharp(origen).metadata();
-  const ancho = Math.min(meta.width || ANCHO_MAX, ANCHO_MAX);
+  const ancho = Math.min(meta.width || anchoMax, anchoMax);
   await sharp(origen)
     .resize({ width: ancho, withoutEnlargement: true })
-    .webp({ quality: CALIDAD, alphaQuality: 90, effort: 5 })
+    .webp({ quality: CALIDAD, alphaQuality: 88, effort: 6 })
     .toFile(destino);
   return fs.statSync(destino).size;
 }
@@ -50,7 +57,7 @@ async function convertir(origen, destino) {
     let bytes = 0;
     for (const f of pngs) {
       const nombre = f.replace(/\.png$/i, "").replace(/^rw-/, "");
-      bytes += await convertir(path.join(dir, f), path.join(out, `${nombre}.webp`));
+      bytes += await convertir(path.join(dir, f), path.join(out, `${nombre}.webp`), lote.anchoMax);
     }
     total += bytes;
     console.log(`${lote.hasta}: ${pngs.length} piezas, ${(bytes / 1024).toFixed(0)} KB`);

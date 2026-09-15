@@ -42,8 +42,50 @@ export interface WizardStepDef {
 // se comparten igual que con la Colección Flat.
 export const STORYTELLING_TEMPLATE_TIPOS = new Set(["GUESTPASSVIP", "PRINCESA", "CORONAESCARLATA", "JEWELRYBOX", "PASEVIP", "CINEABSTRACTOXV", "ACRYLICPOP", "BOLADEDISCOTECA", "CRYSTAL3D", "FASHIONTAG", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "FASHIONLOOKBOOK", "MARMOLYORO", "ATELIERDEPAPEL", "BOTANICAEDITORIAL", "ENCAJECONTEMPORANEO", "LIQUIDGLASS", "BLACKANDWHITE", "BABYSHOWER", "BAUTISMO", "CORPORATIVOANIVERSARIO", "CORPORATIVOENCUENTRO", "CUMPLEANOSCOCKTAIL", "CUMPLEANOSJARDIN", "CUMPLEANOSTERRAZA", "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION", "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO"]);
 
+/**
+ * Las cuatro colecciones que ofrece el wizard, y a cuál pertenece cada familia.
+ *
+ * Antes la colección era un binario deducido de STORYTELLING_TEMPLATE_TIPOS:
+ * "está en el set → Storytelling, si no → Flat". Con Paper e Icon eso ya no
+ * alcanza, porque Paper es arquitectura Flat (tipografía elegible, portada,
+ * álbum compartido) e Icon es arquitectura Storytelling (scroller propio,
+ * paneles, paso Recorrido) -- pero ninguna de las dos es "la de siempre".
+ *
+ * Por eso hay dos preguntas distintas y dos funciones:
+ *   - coleccionDeFamilia(): qué botón del selector la muestra. Cuatro valores.
+ *   - isStorytellingTemplate(): qué ARQUITECTURA tiene, y por lo tanto qué
+ *     pasos del wizard aparecen y cómo scrollea el preview. Sigue siendo
+ *     booleana y sigue valiendo para los quince lugares que ya la usan: es
+ *     true para Storytelling y también para Icon.
+ *
+ * Las familias Paper e Icon se van sumando acá a medida que se instalan (ver
+ * docs/PLAN_NUEVAS_COLECCIONES.md, sección 6).
+ */
+export type Coleccion = "FLAT" | "STORYTELLING" | "PAPER" | "ICON";
+
+/** Sub-colección visible dentro de Paper e Icon (los mockups vienen agrupados así). */
+export type Subcoleccion = "papeleriaViva" | "papelPrensado" | "capasDePapel" | "tipograficaEditorial";
+
+export const PAPER_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {};
+
+export const ICON_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {};
+
+export function coleccionDeFamilia(templateTipo: string | null | undefined): Coleccion {
+    if (!templateTipo) return "FLAT";
+    if (templateTipo in PAPER_TEMPLATE_TIPOS) return "PAPER";
+    if (templateTipo in ICON_TEMPLATE_TIPOS) return "ICON";
+    if (STORYTELLING_TEMPLATE_TIPOS.has(templateTipo)) return "STORYTELLING";
+    return "FLAT";
+}
+
+export function subcoleccionDeFamilia(templateTipo: string | null | undefined): Subcoleccion | null {
+    if (!templateTipo) return null;
+    return PAPER_TEMPLATE_TIPOS[templateTipo] ?? ICON_TEMPLATE_TIPOS[templateTipo] ?? null;
+}
+
 export function isStorytellingTemplate(templateTipo: string | null | undefined): boolean {
-    return Boolean(templateTipo && STORYTELLING_TEMPLATE_TIPOS.has(templateTipo));
+    if (!templateTipo) return false;
+    return STORYTELLING_TEMPLATE_TIPOS.has(templateTipo) || templateTipo in ICON_TEMPLATE_TIPOS;
 }
 
 // Fuente única del orden de pasos del wizard, usada tanto por WizardSteps.tsx

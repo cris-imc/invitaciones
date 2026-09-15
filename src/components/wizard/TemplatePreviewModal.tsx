@@ -10,7 +10,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isStorytellingTemplate } from "./wizard-steps-config";
+import { coleccionDeFamilia, subcoleccionDeFamilia, type Coleccion, type Subcoleccion } from "./wizard-steps-config";
+import type { ClaveTexto } from "@/lib/i18n/texto";
+
+// Un mapa y no un template literal: t() sólo acepta claves conocidas del
+// diccionario, y `wizard.plantilla.subcoleccion.${x}` es un string cualquiera
+// para TypeScript.
+const CLAVE_DE_SUBCOLECCION: Record<Subcoleccion, ClaveTexto> = {
+  papeleriaViva: "wizard.plantilla.subcoleccion.papeleriaViva",
+  papelPrensado: "wizard.plantilla.subcoleccion.papelPrensado",
+  capasDePapel: "wizard.plantilla.subcoleccion.capasDePapel",
+  tipograficaEditorial: "wizard.plantilla.subcoleccion.tipograficaEditorial",
+};
 import { labelDeFamilia } from "@/lib/template-labels";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
 import {
@@ -258,13 +269,13 @@ const TEMPLATE_TABS: { tipo: TemplateTipo; label: string }[] =
 // docs/PLAN_TEMPLATES_NEON_CHIC.md. El pack de 18 plantillas nuevas de
 // docs/INVENTARIO_IMPLE_MASIVA.md sigue el mismo patrón de gating por tipo
 // de evento -- ver esa tabla para el detalle de cada una.
-function getAvailableTabs(eventType: string | undefined, collection: "FLAT" | "STORYTELLING"): { tipo: TemplateTipo; label: string }[] {
+function getAvailableTabs(eventType: string | undefined, collection: Coleccion): { tipo: TemplateTipo; label: string }[] {
   const soloQuince = new Set(["EDITORIAL", "ONIX", "JARDINSEDA", "HOLOGRAMA", "CIRCUITO", "CRISTAL3D", "PRINCESA", "CORONAESCARLATA", "JEWELRYBOX", "PASEVIP", "CINEABSTRACTOXV", "ACRYLICPOP", "BOLADEDISCOTECA", "CRYSTAL3D", "FASHIONTAG", "FASHIONLOOKBOOK"]);
   const soloCasamiento = new Set(["NORDICO", "RIVIERA", "GOLDENDUSK", "GUESTPASSVIP", "CERAMICAEDITORIAL", "CINEABSTRACTO", "PAPELERIADEHOTELDELUJO", "VINTAGEEDITORIAL", "MARMOLYORO", "ATELIERDEPAPEL", "BOTANICAEDITORIAL", "ENCAJECONTEMPORANEO", "LIQUIDGLASS"]);
   const quinceYCasamiento = new Set(["SEDA", "PETALOS", "LUZLUNA", "BONVOYAGE", "CINE", "BLACKANDWHITE"]);
   const soloCumpleanos = new Set(["CORPORATE", "GARDENPARTY", "LOFTINDUSTRIAL", "INFANTIL", "BABYSHOWER", "BAUTISMO", "CORPORATIVOANIVERSARIO", "CORPORATIVOENCUENTRO", "CUMPLEANOSCOCKTAIL", "CUMPLEANOSJARDIN", "CUMPLEANOSTERRAZA", "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION", "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO"]);
   return TEMPLATE_TABS.filter(({ tipo }) => {
-    if (isStorytellingTemplate(tipo) !== (collection === "STORYTELLING")) return false;
+    if (coleccionDeFamilia(tipo) !== collection) return false;
     if (tipo === "NEON") return eventType === "QUINCE_ANOS" || eventType === "CUMPLEANOS";
     if (tipo === "CHIC") return eventType === "CASAMIENTO";
     if (soloQuince.has(tipo)) return eventType === "QUINCE_ANOS";
@@ -355,7 +366,7 @@ interface TemplatePreviewModalProps {
   // las que se sumen) -- filtra qué tabs de familia se ofrecen acá. Default
   // "FLAT" para no romper otros callers de este modal (showcase, etc.) que
   // todavía no pasan esta prop.
-  collection?: "FLAT" | "STORYTELLING";
+  collection?: Coleccion;
   initialTemplateTipo: TemplateTipo;
   initialColor: string;
   currentData?: Record<string, any>;
@@ -399,7 +410,7 @@ export function TemplatePreviewModal({
 
 interface TemplatePreviewModalBodyProps {
   eventType: string | undefined;
-  collection: "FLAT" | "STORYTELLING";
+  collection: Coleccion;
   initialTemplateTipo: TemplateTipo;
   initialColor: string;
   currentData?: Record<string, any>;
@@ -552,13 +563,22 @@ function TemplatePreviewModalBody({
                 setPreviewLoading(true);
               }}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0",
+                "px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0 flex flex-col items-center leading-tight",
                 activeTab === tipo
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/70"
               )}
             >
               {label}
+              {/* Paper e Icon vienen agrupadas en sub-colecciones (Papelería
+                  Viva, Papel Prensado, Capas de papel, Tipográfica Editorial):
+                  con diecinueve familias en una fila, el subtítulo es lo que
+                  deja ubicarse. Flat y Storytelling no lo tienen. */}
+              {subcoleccionDeFamilia(tipo) && (
+                <span className="text-[10px] font-normal opacity-70 -mt-0.5">
+                  {t(CLAVE_DE_SUBCOLECCION[subcoleccionDeFamilia(tipo)!])}
+                </span>
+              )}
             </button>
           ))}
           </div>
