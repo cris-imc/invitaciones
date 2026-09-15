@@ -157,6 +157,24 @@ function numeroDePase(orderNumber: number | undefined): string {
   return String(orderNumber ?? 42).padStart(3, "0");
 }
 
+/**
+ * Qué escena le toca a cada panel de "Cuándo y dónde".
+ *
+ * El mockup dibuja los paneles en un orden fijo, pero acá los paneles
+ * dependen de lo que cargó el anfitrión: sin ceremonia aparte no hay panel de
+ * ceremonia, sin link de mapa no hay "cómo llegar". Si las escenas se
+ * tomaran por posición, sacar un panel le pasaría el dibujo equivocado al
+ * siguiente -- los cerros de la recepción apareciendo detrás del cronograma.
+ * Por eso van por nombre, y un panel sin escena propia simplemente no lleva
+ * decoración (Escena devuelve null con string vacío).
+ */
+const ESCENA_DE_PANEL: Record<string, string> = {
+  recepcion: CUANDO_JDP[0] ?? "",
+  ceremonia: CUANDO_JDP[1] ?? "",
+  llegar: CUANDO_JDP[2] ?? "",
+  cronograma: CUANDO_JDP[3] ?? "",
+};
+
 /** Un trozo de escena del mockup, montado tal cual. */
 function Escena({ html, className, style }: { html: string; className?: string; style?: React.CSSProperties }) {
   if (!html) return null;
@@ -881,7 +899,7 @@ export function JardinDePapelTemplateVinedo({ invitation, guest, isPersonalized 
             <div data-strip="1" className="jdp-tira">
               {/* Recepción */}
               <div data-tone={TONO} className="jdp-panel jdp-panel--abajo" style={{ background: PALETA.bg }}>
-                <Escena html={CUANDO_JDP[0]} className="jdp-escena" />
+                <Escena html={ESCENA_DE_PANEL.recepcion} className="jdp-escena" />
                 <div className="jdp-panel-top">
                   <span>{nCuando} — {tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
@@ -906,7 +924,7 @@ export function JardinDePapelTemplateVinedo({ invitation, guest, isPersonalized 
               {/* Ceremonia */}
               {ceremoniaHabilitada && (
                 <div id="ceremonia" data-tone={TONO} className="jdp-panel jdp-panel--abajo" style={{ background: PALETA.bg2 }}>
-                  <Escena html={CUANDO_JDP[1]} className="jdp-escena" />
+                  <Escena html={ESCENA_DE_PANEL.ceremonia} className="jdp-escena" />
                   <div className="jdp-panel-top">
                     <span>{ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
@@ -941,7 +959,7 @@ export function JardinDePapelTemplateVinedo({ invitation, guest, isPersonalized 
                     <circle cx={40} cy={560} r={7} style={{ fill: "var(--pp-ink, #2B2A33)" }} />
                     <path d="M330 150 m-16 0 a16 16 0 1 1 32 0 c0 12 -16 30 -16 30 s-16 -18 -16 -30Z" style={{ fill: "var(--pp-acc, #C86B5A)" }} />
                   </svg>
-                  <Escena html={CUANDO_JDP[2]} className="jdp-escena" />
+                  <Escena html={ESCENA_DE_PANEL.llegar} className="jdp-escena" />
                   <div className="jdp-panel-top">
                     <span>{tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
@@ -969,7 +987,7 @@ export function JardinDePapelTemplateVinedo({ invitation, guest, isPersonalized 
               {/* Cronograma */}
               {cronograma.length > 0 && (
                 <div id="schedule" data-tone={TONO} className="jdp-panel jdp-panel--centro" style={{ background: PALETA.bg2 }}>
-                  <Escena html={CUANDO_JDP[3]} className="jdp-escena" />
+                  <Escena html={ESCENA_DE_PANEL.cronograma} className="jdp-escena" />
                   <div className="jdp-panel-top">
                     <span>{tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>

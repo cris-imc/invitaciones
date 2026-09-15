@@ -191,6 +191,14 @@ export default async function InvitationPage({
                 case 'Tinta': return <PlantillaDinamica nombre="HerbarioTemplateTinta" invitation={invRecord} guest={null} isPersonalized={false} />;
                 default: return <PlantillaDinamica nombre="HerbarioTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
+        } else if (invitation!.templateTipo === 'CIELODEPAPEL') {
+            switch (color) {
+                case 'Noche': return <PlantillaDinamica nombre="CieloDePapelTemplateNoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Lila': return <PlantillaDinamica nombre="CieloDePapelTemplateLila" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Dorado': return <PlantillaDinamica nombre="CieloDePapelTemplateDorado" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Menta': return <PlantillaDinamica nombre="CieloDePapelTemplateMenta" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CieloDePapelTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'PRENSA') {
             switch (color) {
                 case 'Hueso': return <PlantillaDinamica nombre="PrensaTemplateHueso" invitation={invRecord} guest={null} isPersonalized={false} />;

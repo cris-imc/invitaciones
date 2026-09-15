@@ -21,6 +21,11 @@ import { PrensaTemplateHueso } from "@/components/templates/PrensaTemplateHueso"
 import { PrensaTemplateArena } from "@/components/templates/PrensaTemplateArena";
 import { PrensaTemplatePiedra } from "@/components/templates/PrensaTemplatePiedra";
 import { PrensaTemplateHumo } from "@/components/templates/PrensaTemplateHumo";
+import { CieloDePapelTemplate } from "@/components/templates/CieloDePapelTemplate";
+import { CieloDePapelTemplateNoche } from "@/components/templates/CieloDePapelTemplateNoche";
+import { CieloDePapelTemplateLila } from "@/components/templates/CieloDePapelTemplateLila";
+import { CieloDePapelTemplateDorado } from "@/components/templates/CieloDePapelTemplateDorado";
+import { CieloDePapelTemplateMenta } from "@/components/templates/CieloDePapelTemplateMenta";
 import { HerbarioTemplate } from "@/components/templates/HerbarioTemplate";
 import { HerbarioTemplateEucalipto } from "@/components/templates/HerbarioTemplateEucalipto";
 import { HerbarioTemplateOliva } from "@/components/templates/HerbarioTemplateOliva";
@@ -729,6 +734,14 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Ceniza': return <HerbarioTemplateCeniza invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Tinta': return <HerbarioTemplateTinta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <HerbarioTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'CIELODEPAPEL') {
+                switch (color) {
+                    case 'Noche': return <CieloDePapelTemplateNoche invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Lila': return <CieloDePapelTemplateLila invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Dorado': return <CieloDePapelTemplateDorado invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Menta': return <CieloDePapelTemplateMenta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <CieloDePapelTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
             } else if (validInvitation.templateTipo === 'PRENSA') {
                 switch (color) {

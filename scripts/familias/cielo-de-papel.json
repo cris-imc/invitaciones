@@ -1,0 +1,40 @@
+{
+  "codigo": "CIELODEPAPEL",
+  "etiqueta": "Cielo de papel",
+  "archivo": "CieloDePapelTemplate",
+  "componente": "CieloDePapelTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "capasDePapel",
+  "acento": "#D9738F",
+  "eventos": [
+    "soloQuince"
+  ],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    {
+      "id": "default",
+      "nombre": "Cielo rosado",
+      "color": "#D9738F"
+    },
+    {
+      "id": "Noche",
+      "nombre": "Noche azul",
+      "color": "#E9A8C2"
+    },
+    {
+      "id": "Lila",
+      "nombre": "Lila",
+      "color": "#8E5FB5"
+    },
+    {
+      "id": "Dorado",
+      "nombre": "Dorado",
+      "color": "#C9962F"
+    },
+    {
+      "id": "Menta",
+      "nombre": "Menta",
+      "color": "#2E9C8A"
+    }
+  ]
+}

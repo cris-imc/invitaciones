@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL";
 
 export interface ColorOption {
   id: string;
@@ -1234,4 +1234,20 @@ export const HERBARIO_COMPONENTS: Record<string, PreviewComponent> = {
   Oliva: dynamic(() => import("@/components/templates/HerbarioTemplateOliva").then((m) => m.HerbarioTemplateOliva), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Ceniza: dynamic(() => import("@/components/templates/HerbarioTemplateCeniza").then((m) => m.HerbarioTemplateCeniza), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Tinta: dynamic(() => import("@/components/templates/HerbarioTemplateTinta").then((m) => m.HerbarioTemplateTinta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CIELODEPAPEL_COLORS: ColorOption[] = [
+  { id: "default", name: "Cielo rosado", color: "#D9738F" },
+  { id: "Noche", name: "Noche azul", color: "#E9A8C2" },
+  { id: "Lila", name: "Lila", color: "#8E5FB5" },
+  { id: "Dorado", name: "Dorado", color: "#C9962F" },
+  { id: "Menta", name: "Menta", color: "#2E9C8A" },
+];
+
+export const CIELODEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CieloDePapelTemplate").then((m) => m.CieloDePapelTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Noche: dynamic(() => import("@/components/templates/CieloDePapelTemplateNoche").then((m) => m.CieloDePapelTemplateNoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lila: dynamic(() => import("@/components/templates/CieloDePapelTemplateLila").then((m) => m.CieloDePapelTemplateLila), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Dorado: dynamic(() => import("@/components/templates/CieloDePapelTemplateDorado").then((m) => m.CieloDePapelTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Menta: dynamic(() => import("@/components/templates/CieloDePapelTemplateMenta").then((m) => m.CieloDePapelTemplateMenta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };

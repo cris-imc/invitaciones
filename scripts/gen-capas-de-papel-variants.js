@@ -50,9 +50,46 @@ const PALETAS = {
   },
 };
 
-/** Las familias de la sub-colección y su archivo base. */
+/**
+ * Las cinco paletas de Cielo de papel, la familia de quince. Son cielos, no
+ * jardines: el acento manda sobre un fondo rosado, lila, dorado o menta, y
+ * "Noche azul" es su variante oscura.
+ */
+const PALETAS_CIELO = {
+  Noche: {
+    etiqueta: "Noche azul",
+    bg: "#1B2347", bg2: "#141B3A", ink: "#F7E9EC", ink2: "#A9B0D6",
+    acc: "#E9A8C2", acc2: "#E3C27E", sky1: "#1B2347", sky2: "#3C3B78",
+    hill1: "#3A4372", hill2: "#2A3159", hill3: "#171D3C",
+    night: "#0F1526", nightInk: "#F7E9EC",
+  },
+  Lila: {
+    etiqueta: "Lila",
+    bg: "#F3ECF7", bg2: "#E8DDF2", ink: "#2A2144", ink2: "#766A8C",
+    acc: "#8E5FB5", acc2: "#E3C27E", sky1: "#F3ECF7", sky2: "#DCC7EE",
+    hill1: "#DDCBEE", hill2: "#B79AD8", hill3: "#6F5796",
+    night: "#2E2C3D", nightInk: "#F3ECF7",
+  },
+  Dorado: {
+    etiqueta: "Dorado",
+    bg: "#FAF1E4", bg2: "#F2E3CD", ink: "#2B2438", ink2: "#7B7060",
+    acc: "#C9962F", acc2: "#D98FA8", sky1: "#FAF1E4", sky2: "#F1D9B6",
+    hill1: "#EBDAC2", hill2: "#D3B98C", hill3: "#8C7450",
+    night: "#2E2C3D", nightInk: "#FAF1E4",
+  },
+  Menta: {
+    etiqueta: "Menta",
+    bg: "#EAF3EF", bg2: "#DAEAE3", ink: "#1F2E2C", ink2: "#647A74",
+    acc: "#2E9C8A", acc2: "#E3C27E", sky1: "#EAF3EF", sky2: "#C8E3DA",
+    hill1: "#CFE5DC", hill2: "#96C4B5", hill3: "#4F7E72",
+    night: "#2E2C3D", nightInk: "#EAF3EF",
+  },
+};
+
+/** Las familias de la sub-colección, su archivo base y sus paletas. */
 const FAMILIAS = [
-  { archivo: "JardinDePapelTemplate", componente: "JardinDePapelTemplate", base: "Jardín" },
+  { archivo: "JardinDePapelTemplate", componente: "JardinDePapelTemplate", base: "Jardín", paletas: PALETAS },
+  { archivo: "CieloDePapelTemplate", componente: "CieloDePapelTemplate", base: "Cielo rosado", paletas: PALETAS_CIELO },
 ];
 
 function bloqueDePaleta(p) {
@@ -86,7 +123,7 @@ for (const fam of FAMILIAS) {
   }
 
   const hechas = [];
-  for (const [sufijo, paleta] of Object.entries(PALETAS)) {
+  for (const [sufijo, paleta] of Object.entries(fam.paletas)) {
     let salida = fuente
       .replace(RE_PALETA, bloqueDePaleta(paleta))
       .replace(` * Variante: ${fam.base} (base)`, ` * Variante: ${paleta.etiqueta}`)
@@ -110,8 +147,8 @@ for (const fam of FAMILIAS) {
   // Control: las cinco tienen que terminar con acentos distintos. Si dos
   // coinciden, el reemplazo no funcionó y el wizard mostraría dos variantes
   // que se ven iguales.
-  const acentos = new Set([fuente.match(/acc: "(#[0-9A-Fa-f]{6})"/)[1], ...Object.values(PALETAS).map((p) => p.acc)]);
-  if (acentos.size !== Object.keys(PALETAS).length + 1) {
+  const acentos = new Set([fuente.match(/acc: "(#[0-9A-Fa-f]{6})"/)[1], ...Object.values(fam.paletas).map((p) => p.acc)]);
+  if (acentos.size !== Object.keys(fam.paletas).length + 1) {
     console.error(`${fam.archivo}: hay acentos repetidos entre variantes`);
     process.exitCode = 1;
   }
